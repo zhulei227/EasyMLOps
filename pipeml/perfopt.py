@@ -11,8 +11,8 @@ class ReduceMemUsage(PipeObject):
     功能性：减少内存使用量
     """
 
-    def __init__(self, name=None):
-        PipeObject.__init__(self, name)
+    def __init__(self, name=None, copy_transform_data=False):
+        PipeObject.__init__(self, name=name, copy_transform_data=copy_transform_data)
         self.type_map_detail = dict()
         self.input_col_names = None
         self.output_col_names = None
@@ -52,7 +52,11 @@ class ReduceMemUsage(PipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s_ = s[self.input_col_names]
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
         for col, ti in self.type_map_detail.items():
             tp, ran = ti
             try:
@@ -96,11 +100,15 @@ class Dense2Sparse(ReduceMemUsage):
     功能性：稠密矩阵转稀疏矩阵
     """
 
-    def __init__(self, name=None):
-        ReduceMemUsage.__init__(self, name=name)
+    def __init__(self, name=None, copy_transform_data=False):
+        ReduceMemUsage.__init__(self, name=name, copy_transform_data=copy_transform_data)
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s_ = s[self.input_col_names]
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
         s_ = pd.DataFrame.sparse.from_spmatrix(data=sp.csr_matrix(s_), columns=self.input_col_names)
         for col, ti in self.type_map_detail.items():
             tp, ran = ti

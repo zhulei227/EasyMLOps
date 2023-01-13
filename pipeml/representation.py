@@ -9,10 +9,11 @@ class UserDefinedRepresentationObject(PipeObject):
     """
 
     def __init__(self, cols="all", y=None, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=False, skip_check_transform_value=False):
+                 skip_check_transform_type=False, skip_check_transform_value=False, copy_transform_data=True):
         PipeObject.__init__(self, name=name, transform_check_max_number_error=transform_check_max_number_error,
                             skip_check_transform_type=skip_check_transform_type,
-                            skip_check_transform_value=skip_check_transform_value)
+                            skip_check_transform_value=skip_check_transform_value,
+                            copy_transform_data=copy_transform_data)
         self.cols = cols
         self.y = y
 
@@ -59,7 +60,11 @@ class UserDefinedRepresentationObject(PipeObject):
 
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s_ = s[self.input_col_names]
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
         for col, new_col in self.cols:
             if col in s_.columns:
                 s_[new_col] = s_[col].apply(lambda x: self._user_defined_function(col, x))
@@ -86,10 +91,11 @@ class UserDefinedRepresentationObject(PipeObject):
 
 class TargetEncoding(UserDefinedRepresentationObject):
     def __init__(self, cols="all", y=None, name=None, error_value=0,
-                 transform_check_max_number_error=1e-3):
+                 transform_check_max_number_error=1e-3, copy_transform_data=True):
         UserDefinedRepresentationObject.__init__(self, cols=cols, name=name, y=y,
                                                  transform_check_max_number_error=transform_check_max_number_error,
-                                                 skip_check_transform_type=True)
+                                                 skip_check_transform_type=True,
+                                                 copy_transform_data=copy_transform_data)
         self.error_value = error_value
         self.target_map_detail = dict()
 
@@ -121,10 +127,11 @@ class TargetEncoding(UserDefinedRepresentationObject):
 
 class LabelEncoding(UserDefinedRepresentationObject):
     def __init__(self, cols="all", name=None, error_value=0,
-                 transform_check_max_number_error=1e-3):
+                 transform_check_max_number_error=1e-3, copy_transform_data=True):
         UserDefinedRepresentationObject.__init__(self, cols=cols, name=name,
                                                  transform_check_max_number_error=transform_check_max_number_error,
-                                                 skip_check_transform_type=True)
+                                                 skip_check_transform_type=True,
+                                                 copy_transform_data=copy_transform_data)
         self.error_value = error_value
         self.label_map_detail = dict()
 
@@ -157,10 +164,11 @@ class LabelEncoding(UserDefinedRepresentationObject):
 
 class OneHotEncoding(UserDefinedRepresentationObject):
     def __init__(self, cols="all", name=None, drop_col=True,
-                 transform_check_max_number_error=1e-3):
+                 transform_check_max_number_error=1e-3, copy_transform_data=True):
         UserDefinedRepresentationObject.__init__(self, cols=cols, name=name,
                                                  transform_check_max_number_error=transform_check_max_number_error,
-                                                 skip_check_transform_type=True)
+                                                 skip_check_transform_type=True,
+                                                 copy_transform_data=copy_transform_data)
         self.drop_col = drop_col
         self.one_hot_detail = dict()
         self.fill_na_model = None
@@ -176,7 +184,11 @@ class OneHotEncoding(UserDefinedRepresentationObject):
 
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s_ = s[self.input_col_names]
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
         s_ = self.fill_na_model.transform(s_)
         for col, new_col in self.cols:
             if col not in self.one_hot_detail.keys():
@@ -238,8 +250,10 @@ class PCADecomposition(PipeObject):
     """
 
     def __init__(self, n_components=3, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        PipeObject.__init__(self, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        PipeObject.__init__(self, name, transform_check_max_number_error=transform_check_max_number_error,
+                            skip_check_transform_type=skip_check_transform_type,
+                            copy_transform_data=copy_transform_data)
         self.n_components = n_components
         self.pca = None
 
@@ -253,7 +267,12 @@ class PCADecomposition(PipeObject):
 
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        result = pandas.DataFrame(self.pca.transform(s[self.input_col_names].fillna(0).values))
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
+        result = pandas.DataFrame(self.pca.transform(s_.fillna(0).values))
         self.output_col_names = result.columns.tolist()
         return result
 
@@ -290,8 +309,10 @@ class NMFDecomposition(PipeObject):
     """
 
     def __init__(self, n_components=3, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        PipeObject.__init__(self, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        PipeObject.__init__(self, name=name, transform_check_max_number_error=transform_check_max_number_error,
+                            skip_check_transform_type=skip_check_transform_type,
+                            copy_transform_data=copy_transform_data)
         self.n_components = n_components
         self.nmf = None
 
@@ -305,7 +326,12 @@ class NMFDecomposition(PipeObject):
 
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        result = pandas.DataFrame(self.nmf.transform(s[self.input_col_names].fillna(0).values))
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
+        result = pandas.DataFrame(self.nmf.transform(s_.fillna(0).values))
         self.output_col_names = result.columns.tolist()
         return result
 

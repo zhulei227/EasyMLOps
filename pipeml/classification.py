@@ -1,5 +1,4 @@
 from .base import *
-import copy
 import scipy.sparse as sp
 import numpy as np
 import pandas as pd
@@ -7,8 +6,9 @@ import pandas as pd
 
 class ClassificationPipeObject(PipeObject):
     def __init__(self, y: series_type = None, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        PipeObject.__init__(self, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        PipeObject.__init__(self, name, transform_check_max_number_error, skip_check_transform_type,
+                            copy_transform_data=copy_transform_data)
         self.y = copy.copy(y)
         self.id2label = {}
         self.label2id = {}
@@ -78,8 +78,9 @@ class LGBMClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, max_depth=3, num_boost_round=256, name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.max_depth = max_depth
         self.num_boost_round = num_boost_round
         self.lgb_model = None
@@ -101,8 +102,13 @@ class LGBMClassification(ClassificationPipeObject):
 
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-        result = pandas.DataFrame(self.lgb_model.predict(s),
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
+        s_ = self.pd2csr(s_)
+        result = pandas.DataFrame(self.lgb_model.predict(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -141,8 +147,9 @@ class LogisticRegressionClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, multi_class="multinomial", solver="newton-cg", max_iter=1000, name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.multi_class = multi_class
         self.solver = solver
         self.max_iter = max_iter
@@ -158,9 +165,12 @@ class LogisticRegressionClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-
-        result = pandas.DataFrame(self.lr.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2csr(s[self.input_col_names])
+        else:
+            s = self.pd2csr(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.lr.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -199,8 +209,11 @@ class SVMClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, gamma=2, c=1, kernel="rbf", name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y=y, name=name,
+                                          transform_check_max_number_error=transform_check_max_number_error,
+                                          skip_check_transform_type=skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.gamma = gamma
         self.C = c
         self.kernel = kernel
@@ -216,8 +229,12 @@ class SVMClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-        result = pandas.DataFrame(self.svm.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2csr(s[self.input_col_names])
+        else:
+            s = self.pd2csr(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.svm.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -256,8 +273,11 @@ class DecisionTreeClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, criterion="gini", max_depth=3, min_samples_leaf=16, name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y=y, name=name,
+                                          transform_check_max_number_error=transform_check_max_number_error,
+                                          skip_check_transform_type=skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.criterion = criterion
         self.max_depth = max_depth
         self.min_samples_leaf = min_samples_leaf
@@ -274,8 +294,12 @@ class DecisionTreeClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-        result = pandas.DataFrame(self.tree.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2csr(s[self.input_col_names])
+        else:
+            s = self.pd2csr(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.tree.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -315,8 +339,11 @@ class RandomForestClassification(ClassificationPipeObject):
     def __init__(self, y: series_type = None, n_estimators=128, criterion="gini", max_depth=3, min_samples_leaf=16,
                  name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y=y, name=name,
+                                          transform_check_max_number_error=transform_check_max_number_error,
+                                          skip_check_transform_type=skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.n_estimators = n_estimators
         self.criterion = criterion
         self.max_depth = max_depth
@@ -335,8 +362,12 @@ class RandomForestClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-        result = pandas.DataFrame(self.tree.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2csr(s[self.input_col_names])
+        else:
+            s = self.pd2csr(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.tree.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -375,8 +406,11 @@ class KNeighborsClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, n_neighbors=5, name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y=y, name=name,
+                                          transform_check_max_number_error=transform_check_max_number_error,
+                                          skip_check_transform_type=skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.n_neighbors = n_neighbors
         self.knn = None
 
@@ -390,8 +424,12 @@ class KNeighborsClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-        result = pandas.DataFrame(self.knn.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2csr(s[self.input_col_names])
+        else:
+            s = self.pd2csr(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.knn.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -430,8 +468,11 @@ class GaussianNBClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y=y, name=name,
+                                          transform_check_max_number_error=transform_check_max_number_error,
+                                          skip_check_transform_type=skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.nb = None
 
     @check_dataframe_type
@@ -444,8 +485,12 @@ class GaussianNBClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2dense(s)
-        result = pandas.DataFrame(self.nb.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2dense(s[self.input_col_names])
+        else:
+            s = self.pd2dense(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.nb.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -484,8 +529,11 @@ class MultinomialNBClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y=y, name=name,
+                                          transform_check_max_number_error=transform_check_max_number_error,
+                                          skip_check_transform_type=skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.nb = None
 
     @check_dataframe_type
@@ -498,8 +546,12 @@ class MultinomialNBClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-        result = pandas.DataFrame(self.nb.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2csr(s[self.input_col_names])
+        else:
+            s = self.pd2csr(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.nb.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result
@@ -538,8 +590,11 @@ class BernoulliNBClassification(ClassificationPipeObject):
 
     def __init__(self, y: series_type = None, name=None,
                  transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True):
-        ClassificationPipeObject.__init__(self, y, name, transform_check_max_number_error, skip_check_transform_type)
+                 skip_check_transform_type=True, copy_transform_data=True):
+        ClassificationPipeObject.__init__(self, y=y, name=name,
+                                          transform_check_max_number_error=transform_check_max_number_error,
+                                          skip_check_transform_type=skip_check_transform_type,
+                                          copy_transform_data=copy_transform_data)
         self.nb = None
 
     @check_dataframe_type
@@ -552,8 +607,12 @@ class BernoulliNBClassification(ClassificationPipeObject):
         return self
 
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s = self.pd2csr(s)
-        result = pandas.DataFrame(self.nb.predict_proba(s),
+        if self.copy_transform_data:
+            s_ = self.pd2csr(s[self.input_col_names])
+        else:
+            s = self.pd2csr(s[self.input_col_names])
+            s_ = s
+        result = pandas.DataFrame(self.nb.predict_proba(s_),
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         self.output_col_names = result.columns.tolist()
         return result

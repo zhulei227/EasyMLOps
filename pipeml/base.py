@@ -45,10 +45,12 @@ class PipeObject(object):
     skip_check_transform_type:在auto_check_transform时是否跳过类型检测(针对一些特殊数据类型，比如稀疏矩阵)
     leak_check_transform_type:弱化类型检测，比如将int32和int64都视为int类型
     leak_check_transform_value:弱化检测值，将None视为相等
+    copy_transform_data:transform阶段是否要copy一次数据
     """
 
     def __init__(self, name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=False,
-                 skip_check_transform_value=False, leak_check_transform_type=True, leak_check_transform_value=True):
+                 skip_check_transform_value=False, leak_check_transform_type=True, leak_check_transform_value=True,
+                 copy_transform_data=True):
         if name is None:
             name = self.__class__
         self.name = name
@@ -59,6 +61,7 @@ class PipeObject(object):
         self.skip_check_transform_value = skip_check_transform_value
         self.leak_check_transform_type = leak_check_transform_type
         self.leak_check_transform_value = leak_check_transform_value
+        self.copy_transform_data = copy_transform_data
 
     def fit(self, s):
         return self
@@ -207,7 +210,8 @@ the top {} error info is \n {}
                 "output_col_names": self.output_col_names,
                 "transform_check_max_number_error": self.transform_check_max_number_error,
                 "skip_check_transform_type": self.skip_check_transform_type,
-                "skip_check_transform_value": self.skip_check_transform_value}
+                "skip_check_transform_value": self.skip_check_transform_value,
+                "copy_transform_data": self.copy_transform_data}
 
     def set_params(self, params: dict_type):
         self.name = params["name"]
@@ -216,3 +220,4 @@ the top {} error info is \n {}
         self.transform_check_max_number_error = params["transform_check_max_number_error"]
         self.skip_check_transform_type = params["skip_check_transform_type"]
         self.skip_check_transform_value = params["skip_check_transform_value"]
+        self.copy_transform_data = params["copy_transform_data"]

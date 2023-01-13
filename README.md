@@ -40,7 +40,7 @@ pip install git+https://github.com/zhulei227/pipeml
 
 ```bash
 git clone https://github.com/zhulei227/pipeml.git
-cd pipenlp
+cd pipeml
 python setup.py install
 ```  
 或  
@@ -805,7 +805,7 @@ x_test_new.head(5)
 
 
 ## 3. 模型的分拆&组合&中间层特征抽取
-PipeNLP的pipe对象也可以是一个PipeNLP，所以我们以将过长的pipeline拆分为多个pipeline，分别fit后再进行组合，避免后面流程的pipe模块更新又要重新fit前面的pipe模块
+PipeML的pipe对象也可以是一个PipeML，所以我们以将过长的pipeline拆分为多个pipeline，分别fit后再进行组合，避免后面流程的pipe模块更新又要重新fit前面的pipe模块
 
 ### 3.1 分拆训练
 

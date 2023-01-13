@@ -7,10 +7,11 @@ class UserDefinedPreprocessObject(PipeObject):
     """
 
     def __init__(self, cols="all", name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=False, skip_check_transform_value=False):
+                 skip_check_transform_type=False, skip_check_transform_value=False, copy_transform_data=True):
         PipeObject.__init__(self, name=name, transform_check_max_number_error=transform_check_max_number_error,
                             skip_check_transform_type=skip_check_transform_type,
-                            skip_check_transform_value=skip_check_transform_value)
+                            skip_check_transform_value=skip_check_transform_value,
+                            copy_transform_data=copy_transform_data)
         self.cols = cols
 
     def _user_defined_function(self, col, x):
@@ -49,7 +50,11 @@ class UserDefinedPreprocessObject(PipeObject):
 
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s_ = s[self.input_col_names]
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
         for col, new_col in self.cols:
             if col in s_.columns:
                 s_[new_col] = s_[col].apply(lambda x: self._user_defined_function(col, x))
@@ -86,9 +91,9 @@ class FixInput(UserDefinedPreprocessObject):
     固定输入，对不存在的col用None填充
     """
 
-    def __init__(self, fill_value=None, name=None):
+    def __init__(self, fill_value=None, name=None, copy_transform_data=True):
         UserDefinedPreprocessObject.__init__(self, cols="all", name=name, skip_check_transform_type=True,
-                                             skip_check_transform_value=True)
+                                             skip_check_transform_value=True, copy_transform_data=copy_transform_data)
         self.fill_value = fill_value
 
     @check_dataframe_type
@@ -99,7 +104,10 @@ class FixInput(UserDefinedPreprocessObject):
 
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s_ = copy.copy(s)
+        if self.copy_transform_data:
+            s_ = copy.copy(s)
+        else:
+            s_ = s
         for col in self.output_col_names:
             if col not in s_.columns:
                 s_[col] = self.fill_value
@@ -126,7 +134,11 @@ class FixInput(UserDefinedPreprocessObject):
 class DropCols(UserDefinedPreprocessObject):
     @check_dataframe_type
     def transform(self, s: dataframe_type) -> dataframe_type:
-        s_ = s[self.input_col_names]
+        if self.copy_transform_data:
+            s_ = s[self.input_col_names]
+        else:
+            s = s[self.input_col_names]
+            s_ = s
         for col, _ in self.cols:
             if col in s_.columns.tolist():
                 del s_[col]
@@ -172,9 +184,10 @@ class FillNa(UserDefinedPreprocessObject):
     fill_mode可选:mean,median,mode
     """
 
-    def __init__(self, cols="all", fill_mode=None, fill_value=None, fill_detail=None, error_value=0, name=None):
+    def __init__(self, cols="all", fill_mode=None, fill_value=None, fill_detail=None, error_value=0, name=None,
+                 copy_transform_data=True):
         UserDefinedPreprocessObject.__init__(self, cols=cols, name=name, skip_check_transform_type=True,
-                                             skip_check_transform_value=True)
+                                             skip_check_transform_value=True, copy_transform_data=copy_transform_data)
         self.fill_value = fill_value
         self.fill_mode = fill_mode
         self.fill_detail = fill_detail
@@ -225,8 +238,10 @@ class FillNa(UserDefinedPreprocessObject):
 
 
 class TransToCategory(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", map_detail=(["None", "nan", "", " ", "*", "inf"], "nan"), name=None):
-        UserDefinedPreprocessObject.__init__(self, cols=cols, name=name, skip_check_transform_type=False)
+    def __init__(self, cols="all", map_detail=(["None", "nan", "", " ", "*", "inf"], "nan"), name=None,
+                 copy_transform_data=True):
+        UserDefinedPreprocessObject.__init__(self, cols=cols, name=name, skip_check_transform_type=False,
+                                             copy_transform_data=copy_transform_data)
         self.map_detail = map_detail
 
     def _user_defined_function(self, col, x):
@@ -250,9 +265,11 @@ class TransToCategory(UserDefinedPreprocessObject):
 
 
 class TransToFloat(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", nan_fill_value=0, name=None, transform_check_max_number_error=1e-3):
+    def __init__(self, cols="all", nan_fill_value=0, name=None, transform_check_max_number_error=1e-3,
+                 copy_transform_data=True):
         UserDefinedPreprocessObject.__init__(self, cols=cols, name=name,
-                                             transform_check_max_number_error=transform_check_max_number_error)
+                                             transform_check_max_number_error=transform_check_max_number_error,
+                                             copy_transform_data=copy_transform_data)
         self.nan_fill_value = nan_fill_value
 
     def _user_defined_function(self, col, x):
@@ -273,9 +290,11 @@ class TransToFloat(UserDefinedPreprocessObject):
 
 
 class TransToInt(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", nan_fill_value=0, name=None, transform_check_max_number_error=1e-3):
+    def __init__(self, cols="all", nan_fill_value=0, name=None, transform_check_max_number_error=1e-3,
+                 copy_transform_data=True):
         UserDefinedPreprocessObject.__init__(self, cols=cols, name=name,
-                                             transform_check_max_number_error=transform_check_max_number_error)
+                                             transform_check_max_number_error=transform_check_max_number_error,
+                                             copy_transform_data=copy_transform_data)
         self.nan_fill_value = nan_fill_value
 
     def _user_defined_function(self, col, x):
@@ -312,8 +331,8 @@ class TransToUpper(UserDefinedPreprocessObject):
 
 
 class CategoryMapValues(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", default_map=([""], ""), map_detail=None, name=None):
-        UserDefinedPreprocessObject.__init__(self, cols=cols, name=name)
+    def __init__(self, cols="all", default_map=([""], ""), map_detail=None, name=None, copy_transform_data=True):
+        UserDefinedPreprocessObject.__init__(self, cols=cols, name=name, copy_transform_data=copy_transform_data)
         self.default_map = default_map
         self.map_detail = map_detail
 
@@ -349,12 +368,13 @@ class CategoryMapValues(UserDefinedPreprocessObject):
 
 class Clip(UserDefinedPreprocessObject):
     def __init__(self, cols="all", default_clip=None, clip_detail=None, percent_range=None, name=None,
-                 skip_check_transform_type=False):
+                 skip_check_transform_type=False, copy_transform_data=True):
         """
        优先级clip_detail>percent_range>default_clip
         """
         UserDefinedPreprocessObject.__init__(self, cols=cols, name=name,
-                                             skip_check_transform_type=skip_check_transform_type)
+                                             skip_check_transform_type=skip_check_transform_type,
+                                             copy_transform_data=copy_transform_data)
         self.default_clip = default_clip
         self.clip_detail = clip_detail
         self.percent_range = percent_range
