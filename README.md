@@ -1,13 +1,13 @@
-﻿# pipeml  
+﻿# EasyMLOps  
   
 ## 介绍   
-`pipeml`包可以更方便地将机器学习建模任务构建为`Pipline`任务流，目前主要功能有：
+`EasyMLOps`包以`Pipline`的方式构建建模任务，可直接进行模型训练、预测(离线，在线)，测试(离线在线预测一致性、预测性能)等功能，通过外套一层Flask或FastApi即可直接部署生产，目前主要功能有：
 
 #### 模型的训练&预测&保存
 
-- 数据清洗，数据自动填充、转换、盖帽等：pipeml.preprocessing
-- 特征表达，包括Target、Label、Onehot Encoding以及PCA降维等：pipeml.representation
-- 分类模型，包括lgbm决策树、logistic回归、svm等传统机器学习模型：pipeml.classification   
+- 数据清洗，数据自动填充、转换、盖帽等：easymlops.ml.preprocessing
+- 特征表达，包括Target、Label、Onehot Encoding以及PCA降维等：easymlops.ml.representation
+- 分类模型，包括lgbm决策树、logistic回归、svm等传统机器学习模型：easymlops.ml.classification   
 
 #### 自定义pipe模块
 
@@ -18,34 +18,34 @@
 #### 模型的分拆&组合&中间层特征抽取  
 
 - pipeml的子模块也可以是pipeml，这样方便逐块建模再组合
-- pipeml可以提取中间层数据，方便复用别人的模型，继续做自己下一步工作:pipeml.transform(data,run_to_layer=指定层数或模块名)   
+- pipeml可以提取中间层数据，方便复用别人的模型，继续做自己下一步工作:pipeobj.transform(data,run_to_layer=指定层数或模块名)   
 
 #### 支持生产部署:数据一致性测试&性能测试&日志记录
 
-- pipeml.transform_single(data)即可对生产数据(通常转换为dict)进行预测
-- pipeml.auto_check_transform(data)可以对数据一致性以及各个pipe模块性能做测试  
-- pipeml.transform_single(data,logger)可以追踪记录pipeline预测中每一步信息  
+- pipeobj.transform_single(data)即可对生产数据(通常转换为dict)进行预测
+- pipeobj.auto_check_transform(data)可以对数据一致性以及各个pipe模块性能做测试  
+- pipeobj.transform_single(data,logger)可以追踪记录pipeline预测中每一步信息  
 
 #### 训练性能优化（主要是减少内存占用）
 
-- pipeml.perfopt.ReduceMemUsage模块:修改数据类型，比如某列特征数据范围在float16内，而目前的数据类型是float64，则将float64修改为float16
-- pipeml.perfopt.Dense2Sparse模块:将稠密矩阵转换为稀疏矩阵（含0量很多时使用），注意后续的pipe模块要提供对稀疏矩阵的支持(pipeml.classification下的模块基本都支持)
+- easymlops.ml.perfopt.ReduceMemUsage模块:修改数据类型，比如某列特征数据范围在float16内，而目前的数据类型是float64，则将float64修改为float16
+- easymlops.ml.perfopt.Dense2Sparse模块:将稠密矩阵转换为稀疏矩阵（含0量很多时使用），注意后续的pipe模块要提供对稀疏矩阵的支持(easymlops.ml.classification下的模块基本都支持)
 
 
 ## 0.安装
 ```bash
-pip install git+https://github.com/zhulei227/pipeml
+pip install git+https://github.com/zhulei227/EasyMLOps
 ```  
 或
 
 ```bash
-git clone https://github.com/zhulei227/pipeml.git
-cd pipeml
+git clone https://github.com/zhulei227/EasyMLOps.git
+cd EasyMLOps
 python setup.py install
 ```  
 或  
 
-将pipml整个包拷贝到你所运行代码的同级目录，然后安装依赖包  
+将整个easymlops包拷贝到你所运行代码的同级目录，然后安装依赖包  
 ```bash
 pip install -r requirements.txt
 ```
@@ -54,9 +54,8 @@ pip install -r requirements.txt
 
 导入`PipeML`主程序
 
-
 ```python
-from pipeml import PipeML
+from easymlops import PipeML
 ```
 
 准备`pandas.DataFrame`格式的数据
@@ -186,23 +185,23 @@ del x_test["Survived"]
 
 ### 1.1 数据清洗
 
-
 ```python
-from pipeml.preprocessing import *
-ml=PipeML()
-ml.pipe(FixInput())\
-  .pipe(FillNa(cols=["Cabin","Ticket","Parch"],fill_mode="mode"))\
-  .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
-  .pipe(FillNa(fill_detail={"Embarked":"N"}))\
-  .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
-  .pipe(TransToFloat(cols=["Age","Fare"]))\
-  .pipe(TransToInt(cols=["PassengerId","Survived","SibSp","Parch"]))\
-  .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
-  .pipe(CategoryMapValues(map_detail={"Cabin":(["nan","NaN"],"n")}))\
-  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
-  .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))\
+from easymlops.ml.preprocessing import *
 
-x_test_new=ml.fit(x_train).transform(x_test)
+ml = PipeML()
+ml.pipe(FixInput())
+.pipe(FillNa(cols=["Cabin", "Ticket", "Parch"], fill_mode="mode"))
+.pipe(FillNa(cols=["Age"], fill_mode="mean"))
+.pipe(FillNa(fill_detail={"Embarked": "N"}))
+.pipe(TransToCategory(cols=["Cabin", "Embarked"]))
+.pipe(TransToFloat(cols=["Age", "Fare"]))
+.pipe(TransToInt(cols=["PassengerId", "Survived", "SibSp", "Parch"]))
+.pipe(TransToLower(cols=["Ticket", "Cabin", "Embarked", "Name", "Sex"]))
+.pipe(CategoryMapValues(map_detail={"Cabin": (["nan", "NaN"], "n")}))
+.pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name"))
+.pipe(Clip(cols=["Fare"], percent_range=(10, 99), name="clip_fare"))
+
+x_test_new = ml.fit(x_train).transform(x_test)
 x_test_new.head(5)
 ```
 
@@ -306,9 +305,8 @@ x_test_new.head(5)
 
 ### 1.2 特征工程
 
-
 ```python
-from pipeml.representation import *
+from easymlops.ml.representation import *
 ```
 
 
@@ -464,29 +462,28 @@ x_test_new.head(5)
 
 ### 1.3 分类模型
 
-
 ```python
-from pipeml.classification import *
+from easymlops.ml.classification import *
 
-ml=PipeML()
-ml.pipe(FixInput())\
-  .pipe(FillNa(cols=["Cabin","Ticket","Parch"],fill_mode="mode"))\
-  .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
-  .pipe(FillNa(fill_detail={"Embarked":"N"}))\
-  .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
-  .pipe(TransToFloat(cols=["Age","Fare"]))\
-  .pipe(TransToInt(cols=["PassengerId","Survived","SibSp","Parch"]))\
-  .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
-  .pipe(CategoryMapValues(map_detail={"Cabin":(["nan","NaN"],"n")}))\
-  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
-  .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))\
-  .pipe(OneHotEncoding(cols=["Pclass","Sex"],drop_col=False))\
-  .pipe(LabelEncoding(cols=["Sex","Pclass"]))\
-  .pipe(TargetEncoding(cols=["Name","Ticket","Embarked","Cabin"],y=y_train))\
-  .pipe(FillNa(fill_value=0))\
-  .pipe(LGBMClassification(y=y_train))
+ml = PipeML()
+ml.pipe(FixInput())
+.pipe(FillNa(cols=["Cabin", "Ticket", "Parch"], fill_mode="mode"))
+.pipe(FillNa(cols=["Age"], fill_mode="mean"))
+.pipe(FillNa(fill_detail={"Embarked": "N"}))
+.pipe(TransToCategory(cols=["Cabin", "Embarked"]))
+.pipe(TransToFloat(cols=["Age", "Fare"]))
+.pipe(TransToInt(cols=["PassengerId", "Survived", "SibSp", "Parch"]))
+.pipe(TransToLower(cols=["Ticket", "Cabin", "Embarked", "Name", "Sex"]))
+.pipe(CategoryMapValues(map_detail={"Cabin": (["nan", "NaN"], "n")}))
+.pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name"))
+.pipe(Clip(cols=["Fare"], percent_range=(10, 99), name="clip_fare"))
+.pipe(OneHotEncoding(cols=["Pclass", "Sex"], drop_col=False))
+.pipe(LabelEncoding(cols=["Sex", "Pclass"]))
+.pipe(TargetEncoding(cols=["Name", "Ticket", "Embarked", "Cabin"], y=y_train))
+.pipe(FillNa(fill_value=0))
+.pipe(LGBMClassification(y=y_train))
 
-x_test_new=ml.fit(x_train).transform(x_test)
+x_test_new = ml.fit(x_train).transform(x_test)
 x_test_new.head(5)
 ```
 
@@ -568,10 +565,6 @@ ml.pipe(FixInput())\
 
 
 
-    <pipeml.pipeml.PipeML at 0x22ba36f1708>
-
-
-
 
 ```python
 ml.load("ml.pkl")
@@ -630,11 +623,12 @@ ml.transform(x_test).head(5)
 
 比如如下实现了一个对逐列归一化的模块
 
-
 ```python
-from pipeml.base import PipeObject
+from easymlops.base import PipeObject
 import numpy as np
 import scipy.stats as ss
+
+
 class Normalization(PipeObject):
     def __init__(self, normal_range=100, normal_type="cdf", std_range=10):
         PipeObject.__init__(self)
@@ -1652,9 +1646,6 @@ ml2.fit(x_train_new)
 
 
 
-    <pipeml.pipeml.PipeML at 0x22bb360f888>
-
-
 
 
 ```python
@@ -1694,17 +1685,17 @@ ml_combine.transform_single({'PassengerId': 1,
 ml1.auto_check_transform(x_test)
 ```
 
-    (<class 'pipeml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'pipeml.preprocessing.TransToCategory'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'pipeml.preprocessing.TransToFloat'>)  module transform check [success], single transform speed:[0.02]ms/it
-    (<class 'pipeml.preprocessing.TransToInt'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.preprocessing.TransToCategory'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.preprocessing.TransToFloat'>)  module transform check [success], single transform speed:[0.02]ms/it
+    (<class 'easymlops.ml.preprocessing.TransToInt'>)  module transform check [success], single transform speed:[0.0]ms/it
     (clip_name)  module transform check [success], single transform speed:[0.0]ms/it
     (clip_fare)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'pipeml.representation.OneHotEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'pipeml.representation.LabelEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'pipeml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'pipeml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'pipeml.representation.PCADecomposition'>)  module transform check [success], single transform speed:[2.13]ms/it
+    (<class 'easymlops.ml.representation.OneHotEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.representation.LabelEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.representation.PCADecomposition'>)  module transform check [success], single transform speed:[2.13]ms/it
     
 
 ### 4.4 日志记录 
@@ -1753,17 +1744,16 @@ ml1.transform_single({'PassengerId': 1,
 ## 5. 训练性能优化
 主要是优化内存使用情况，下面看一个比较特殊点的(特征OneHot展开)
 
-
 ```python
-from pipeml.perfopt import *
+from easymlops.ml.perfopt import *
 
-ml=PipeML()
-ml.pipe(FixInput())\
-  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
-  .pipe(OneHotEncoding(cols=["Pclass","Sex","Name","Ticket","Embarked","Cabin"],drop_col=True))\
-  .pipe(FillNa(fill_value=0))\
-  .pipe(ReduceMemUsage())\
-  .pipe(Dense2Sparse())
+ml = PipeML()
+ml.pipe(FixInput())
+.pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name"))
+.pipe(OneHotEncoding(cols=["Pclass", "Sex", "Name", "Ticket", "Embarked", "Cabin"], drop_col=True))
+.pipe(FillNa(fill_value=0))
+.pipe(ReduceMemUsage())
+.pipe(Dense2Sparse())
 
 ml.fit(x_train).transform(x_train).shape
 ```
@@ -1814,7 +1804,7 @@ ml.transform(x_train,run_to_layer=-1).memory_usage().sum()//1024
 
 
 
-pipeml.classification中的模块对Dense2Sparse基本都支持，比如LightGBM
+easymlops.ml.classification中的模块对Dense2Sparse基本都支持，比如LightGBM
 
 
 ```python
@@ -1831,7 +1821,6 @@ ml.pipe(FixInput())\
 
 
 
-    <pipeml.pipeml.PipeML at 0x22bb46fbe88>
 
 
 
