@@ -34,6 +34,10 @@
 
 ## 0.安装
 ```bash
+pip install easymlops
+```  
+或
+```bash
 pip install git+https://github.com/zhulei227/EasyMLOps
 ```  
 或
