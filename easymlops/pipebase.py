@@ -5,8 +5,8 @@ import pickle
 
 
 class Pipe(PipeObject):
-    def __init__(self):
-        PipeObject.__init__(self)
+    def __init__(self, name=None):
+        PipeObject.__init__(self, name=name)
         self.models = []
 
     def pipe(self, model):
@@ -14,7 +14,7 @@ class Pipe(PipeObject):
         return self
 
     def fit(self, x, show_process=False):
-        x_ = copy.copy(x)
+        x_ = copy.deepcopy(x)
         if show_process:
             for model in tqdm(self.models):
                 print(model.name)
@@ -35,7 +35,7 @@ class Pipe(PipeObject):
         return False
 
     def transform(self, x, show_process=False, run_to_layer=None):
-        x_ = copy.copy(x)
+        x_ = copy.deepcopy(x)
         if show_process:
             for current_layer_deep, model in tqdm(enumerate(self.models)):
                 print(model.name)
@@ -50,7 +50,7 @@ class Pipe(PipeObject):
         return x_
 
     def transform_single(self, x, show_process=False, run_to_layer=None, logger=None, log_base_dict: dict_type = None):
-        x_ = copy.copy(x)
+        x_ = copy.deepcopy(x)
         self._save_log(logger, log_base_dict, 0, x)
         if show_process:
             for current_layer_deep, model in tqdm(enumerate(self.models)):
@@ -79,8 +79,8 @@ class Pipe(PipeObject):
         if log_base_dict is None:
             log_base_dict = dict()
         if logger is not None:
-            log_info = copy.copy(log_base_dict)
-            log_info.update({"step": step, "info": copy.copy(info)})
+            log_info = copy.deepcopy(log_base_dict)
+            log_info.update({"step": step, "info": copy.deepcopy(info)})
             logger.info(log_info)
 
     def save(self, path):
@@ -102,6 +102,6 @@ class Pipe(PipeObject):
             self.models[i].set_params(param)
 
     def auto_check_transform(self, x):
-        x_ = copy.copy(x)
+        x_ = copy.deepcopy(x)
         for model in self.models:
             x_ = model.auto_check_transform(x_)

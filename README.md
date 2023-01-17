@@ -1,42 +1,48 @@
-﻿# EasyMLOps  
+
+# EasyMLOps  
   
 ## 介绍   
 `EasyMLOps`包以`Pipline`的方式构建建模任务，可直接进行模型训练、预测(离线，在线)，测试(离线在线预测一致性、预测性能)等功能，通过外套一层Flask或FastApi即可直接部署生产，目前主要功能有：
 
-#### 模型的训练&预测&保存
+#### 1. 模型的训练&预测&保存
 
 - 数据清洗，数据自动填充、转换、盖帽等：easymlops.ml.preprocessing
 - 特征表达，包括Target、Label、Onehot Encoding以及PCA降维等：easymlops.ml.representation
-- 分类模型，包括lgbm决策树、logistic回归、svm等传统机器学习模型：easymlops.ml.classification   
+- 分类模型，包括lgbm决策树、logistic回归、svm等传统机器学习模型：easymlops.ml.classification 
+- stacking，通过Parallel模块，可以在同一阶段进行多个模型的训练，这样可以很方面的构建stacking模型：easymlops.ensemble.Parallel
 
-#### 自定义pipe模块
+#### 2. 自定义pipe模块
 
 - fit,tranform：最少只需实现这两函数即可接入pipeline中
 - set_params,get_params:实现这两函数可以对模块持久化
 - transform_single:支持生产预测
 
-#### 模型的分拆&组合&中间层特征抽取  
+#### 3. 模型的分拆&组合&中间层特征抽取  
 
 - pipeml的子模块也可以是pipeml，这样方便逐块建模再组合
 - pipeml可以提取中间层数据，方便复用别人的模型，继续做自己下一步工作:pipeobj.transform(data,run_to_layer=指定层数或模块名)   
 
-#### 支持生产部署:数据一致性测试&性能测试&日志记录
+#### 4. 支持生产部署:数据一致性测试&性能测试&日志记录
 
 - pipeobj.transform_single(data)即可对生产数据(通常转换为dict)进行预测
 - pipeobj.auto_check_transform(data)可以对数据一致性以及各个pipe模块性能做测试  
 - pipeobj.transform_single(data,logger)可以追踪记录pipeline预测中每一步信息  
 
-#### 训练性能优化（主要是减少内存占用）
+#### 5. 训练性能优化（主要是减少内存占用）
 
 - easymlops.ml.perfopt.ReduceMemUsage模块:修改数据类型，比如某列特征数据范围在float16内，而目前的数据类型是float64，则将float64修改为float16
-- easymlops.ml.perfopt.Dense2Sparse模块:将稠密矩阵转换为稀疏矩阵（含0量很多时使用），注意后续的pipe模块要提供对稀疏矩阵的支持(easymlops.ml.classification下的模块基本都支持)
+- easymlops.ml.perfopt.Dense2Sparse模块:将稠密矩阵转换为稀疏矩阵（含0量很多时使用），注意后续的pipe模块要提供对稀疏矩阵的支持(easymlops.ml.classification下的模块基本都支持)  
 
+#### 6. 文本NLP处理
+- 去停用词，去标点符号，去特定字符，抽取中文字符，分词，关键词提取等数据清洗操作：easymlops.nlp.preprocessing
+- 文本特征提取，包括bow,tfidf等传统模型；lda,lsi等主题模型；fastext,word2vec,doc2vec等词向量模型：easymlops.nlp.representation
 
 ## 0.安装
 ```bash
 pip install easymlops
 ```  
 或
+
 ```bash
 pip install git+https://github.com/zhulei227/EasyMLOps
 ```  
@@ -57,6 +63,7 @@ pip install -r requirements.txt
 ## 1. 基本使用  
 
 导入`PipeML`主程序
+
 
 ```python
 from easymlops import PipeML
@@ -189,24 +196,150 @@ del x_test["Survived"]
 
 ### 1.1 数据清洗
 
+
 ```python
 from easymlops.ml.preprocessing import *
+ml=PipeML()
+ml.pipe(FixInput())\
+  .pipe(FillNa(cols=["Cabin","Ticket","Parch"],fill_mode="mode"))\
+  .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
+  .pipe(FillNa(fill_detail={"Embarked":"N"}))\
+  .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
+  .pipe(TransToFloat(cols=["Age","Fare"]))\
+  .pipe(TransToInt(cols=["PassengerId","Survived","SibSp","Parch"]))\
+  .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
+  .pipe(CategoryMapValues(map_detail={"Cabin":(["nan","NaN"],"n")}))\
+  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
+  .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))
 
-ml = PipeML()
-ml.pipe(FixInput())
-.pipe(FillNa(cols=["Cabin", "Ticket", "Parch"], fill_mode="mode"))
-.pipe(FillNa(cols=["Age"], fill_mode="mean"))
-.pipe(FillNa(fill_detail={"Embarked": "N"}))
-.pipe(TransToCategory(cols=["Cabin", "Embarked"]))
-.pipe(TransToFloat(cols=["Age", "Fare"]))
-.pipe(TransToInt(cols=["PassengerId", "Survived", "SibSp", "Parch"]))
-.pipe(TransToLower(cols=["Ticket", "Cabin", "Embarked", "Name", "Sex"]))
-.pipe(CategoryMapValues(map_detail={"Cabin": (["nan", "NaN"], "n")}))
-.pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name"))
-.pipe(Clip(cols=["Fare"], percent_range=(10, 99), name="clip_fare"))
-
-x_test_new = ml.fit(x_train).transform(x_test)
+x_test_new=ml.fit(x_train).transform(x_test)
 x_test_new.head(5)
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>500</th>
+      <td>501</td>
+      <td>3</td>
+      <td>calic, mr. petar</td>
+      <td>male</td>
+      <td>17.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>315086</td>
+      <td>8.6625</td>
+      <td>c23 c25 c27</td>
+      <td>s</td>
+    </tr>
+    <tr>
+      <th>501</th>
+      <td>502</td>
+      <td>3</td>
+      <td>canavan, miss. mary</td>
+      <td>female</td>
+      <td>21.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>364846</td>
+      <td>7.7500</td>
+      <td>c23 c25 c27</td>
+      <td>q</td>
+    </tr>
+    <tr>
+      <th>502</th>
+      <td>503</td>
+      <td>3</td>
+      <td>o'sullivan, miss. bridget mary</td>
+      <td>female</td>
+      <td>29.204774</td>
+      <td>0</td>
+      <td>0</td>
+      <td>330909</td>
+      <td>7.7175</td>
+      <td>c23 c25 c27</td>
+      <td>q</td>
+    </tr>
+    <tr>
+      <th>503</th>
+      <td>504</td>
+      <td>3</td>
+      <td>laitinen, miss. kristina sofia</td>
+      <td>female</td>
+      <td>37.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4135</td>
+      <td>9.5875</td>
+      <td>c23 c25 c27</td>
+      <td>s</td>
+    </tr>
+    <tr>
+      <th>504</th>
+      <td>505</td>
+      <td>1</td>
+      <td>maioni, miss. roberta</td>
+      <td>female</td>
+      <td>16.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>110152</td>
+      <td>86.5000</td>
+      <td>b79</td>
+      <td>s</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+ml.save("ml.pkl")
+```
+
+
+```python
+ml=PipeML()
+ml.pipe(FixInput())\
+  .pipe(FillNa(cols=["Cabin","Ticket","Parch"],fill_mode="mode"))\
+  .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
+  .pipe(FillNa(fill_detail={"Embarked":"N"}))\
+  .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
+  .pipe(TransToFloat(cols=["Age","Fare"]))\
+  .pipe(TransToInt(cols=["PassengerId","Survived","SibSp","Parch"]))\
+  .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
+  .pipe(CategoryMapValues(map_detail={"Cabin":(["nan","NaN"],"n")}))\
+  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
+  .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))
+
+ml.load("ml.pkl")
+```
+
+
+```python
+ml.transform(x_test).head(5)
 ```
 
 
@@ -309,6 +442,7 @@ x_test_new.head(5)
 
 ### 1.2 特征工程
 
+
 ```python
 from easymlops.ml.representation import *
 ```
@@ -330,7 +464,7 @@ ml.pipe(FixInput())\
   .pipe(OneHotEncoding(cols=["Pclass","Sex"],drop_col=False))\
   .pipe(LabelEncoding(cols=["Sex","Pclass"]))\
   .pipe(TargetEncoding(cols=["Name","Ticket","Embarked","Cabin"],y=y_train))\
-  .pipe(FillNa(fill_value=0))
+  .pipe(FillNa(fill_number_value=0))
 
 x_test_new=ml.fit(x_train).transform(x_test)
 x_test_new.head(5)
@@ -466,28 +600,29 @@ x_test_new.head(5)
 
 ### 1.3 分类模型
 
+
 ```python
 from easymlops.ml.classification import *
 
-ml = PipeML()
-ml.pipe(FixInput())
-.pipe(FillNa(cols=["Cabin", "Ticket", "Parch"], fill_mode="mode"))
-.pipe(FillNa(cols=["Age"], fill_mode="mean"))
-.pipe(FillNa(fill_detail={"Embarked": "N"}))
-.pipe(TransToCategory(cols=["Cabin", "Embarked"]))
-.pipe(TransToFloat(cols=["Age", "Fare"]))
-.pipe(TransToInt(cols=["PassengerId", "Survived", "SibSp", "Parch"]))
-.pipe(TransToLower(cols=["Ticket", "Cabin", "Embarked", "Name", "Sex"]))
-.pipe(CategoryMapValues(map_detail={"Cabin": (["nan", "NaN"], "n")}))
-.pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name"))
-.pipe(Clip(cols=["Fare"], percent_range=(10, 99), name="clip_fare"))
-.pipe(OneHotEncoding(cols=["Pclass", "Sex"], drop_col=False))
-.pipe(LabelEncoding(cols=["Sex", "Pclass"]))
-.pipe(TargetEncoding(cols=["Name", "Ticket", "Embarked", "Cabin"], y=y_train))
-.pipe(FillNa(fill_value=0))
-.pipe(LGBMClassification(y=y_train))
+ml=PipeML()
+ml.pipe(FixInput())\
+  .pipe(FillNa(cols=["Cabin","Ticket","Parch"],fill_mode="mode"))\
+  .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
+  .pipe(FillNa(fill_detail={"Embarked":"N"}))\
+  .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
+  .pipe(TransToFloat(cols=["Age","Fare"]))\
+  .pipe(TransToInt(cols=["PassengerId","Survived","SibSp","Parch"]))\
+  .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
+  .pipe(CategoryMapValues(map_detail={"Cabin":(["nan","NaN"],"n")}))\
+  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
+  .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))\
+  .pipe(OneHotEncoding(cols=["Pclass","Sex"],drop_col=False))\
+  .pipe(LabelEncoding(cols=["Sex","Pclass"]))\
+  .pipe(TargetEncoding(cols=["Name","Ticket","Embarked","Cabin"],y=y_train))\
+  .pipe(FillNa(fill_number_value=0))\
+  .pipe(LGBMClassification(y=y_train))
 
-x_test_new = ml.fit(x_train).transform(x_test)
+x_test_new=ml.fit(x_train).transform(x_test)
 x_test_new.head(5)
 ```
 
@@ -569,6 +704,10 @@ ml.pipe(FixInput())\
 
 
 
+    <easymlops.pipeml.PipeML at 0x1f5031d4e48>
+
+
+
 
 ```python
 ml.load("ml.pkl")
@@ -619,6 +758,156 @@ ml.transform(x_test).head(5)
 
 
 
+### 1.5 Stacking建模
+
+
+```python
+from easymlops.ml.ensemble import Parallel
+ml = PipeML()
+ml.pipe(FixInput()) \
+  .pipe(TransToCategory(cols=["Cabin", "Embarked"])) \
+  .pipe(TransToFloat(cols=["Age", "Fare"])) \
+  .pipe(TransToInt(cols=["PassengerId", "SibSp", "Parch"])) \
+  .pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name")) \
+  .pipe(Clip(cols=["Fare"], percent_range=(10, 99), name="clip_fare")) \
+  .pipe(Parallel([OneHotEncoding(cols=["Pclass", "Sex"]), LabelEncoding(cols=["Sex", "Pclass"]),
+                    TargetEncoding(cols=["Name", "Ticket", "Embarked", "Cabin", "Sex"], y=y_train)])) \
+  .pipe(FillNa(fill_number_value=0, fill_category_value="missing")) \
+  .pipe(Parallel([PCADecomposition(n_components=2, prefix="pca"), NMFDecomposition(n_components=2, prefix="nmf")]))
+
+ml.fit(x_train).transform(x_test).head(5)
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pca_0</th>
+      <th>pca_1</th>
+      <th>nmf_0</th>
+      <th>nmf_1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>250.113628</td>
+      <td>-26.857317</td>
+      <td>6.211156</td>
+      <td>0.080100</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>251.118945</td>
+      <td>-27.505963</td>
+      <td>6.226342</td>
+      <td>0.071882</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>252.020439</td>
+      <td>-28.977182</td>
+      <td>6.224453</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>253.219795</td>
+      <td>-24.617566</td>
+      <td>6.261636</td>
+      <td>0.183279</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>255.231018</td>
+      <td>50.696607</td>
+      <td>6.249646</td>
+      <td>2.115887</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+ml = PipeML()
+ml.pipe(FixInput()) \
+  .pipe(TransToCategory(cols=["Cabin", "Embarked"])) \
+  .pipe(TransToFloat(cols=["Age", "Fare"])) \
+  .pipe(TransToInt(cols=["PassengerId", "SibSp", "Parch"])) \
+  .pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name")) \
+  .pipe(Clip(cols=["Fare"], percent_range=(10, 99), name="clip_fare")) \
+  .pipe(Parallel([OneHotEncoding(cols=["Pclass", "Sex"]), LabelEncoding(cols=["Sex", "Pclass"]),
+                    TargetEncoding(cols=["Name", "Ticket", "Embarked", "Cabin", "Sex"], y=y_train)])) \
+  .pipe(FillNa(fill_number_value=0, fill_category_value="missing")) \
+  .pipe(Parallel([PCADecomposition(n_components=4, prefix="pca"), NMFDecomposition(n_components=4, prefix="nmf")]))\
+  .pipe(Parallel([LGBMClassification(y=y_train, prefix="lgbm"), LogisticRegressionClassification(y_train, prefix="lr")]))
+
+ml.fit(x_train).transform(x_test).head(5)
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>lgbm_0</th>
+      <th>lgbm_1</th>
+      <th>lr_0</th>
+      <th>lr_1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.997739</td>
+      <td>0.002261</td>
+      <td>0.632065</td>
+      <td>0.367935</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.989129</td>
+      <td>0.010871</td>
+      <td>0.649331</td>
+      <td>0.350669</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.993015</td>
+      <td>0.006985</td>
+      <td>0.563674</td>
+      <td>0.436326</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.984683</td>
+      <td>0.015317</td>
+      <td>0.703988</td>
+      <td>0.296012</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.308946</td>
+      <td>0.691054</td>
+      <td>0.309790</td>
+      <td>0.690210</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ## 2. 自定义pipe模块  
 自需要实现一个包含了fit,transform,get_params和set_params这四个函数的类即可：  
 - fit:用于拟合模块中参数
@@ -627,12 +916,11 @@ ml.transform(x_test).head(5)
 
 比如如下实现了一个对逐列归一化的模块
 
+
 ```python
 from easymlops.base import PipeObject
 import numpy as np
 import scipy.stats as ss
-
-
 class Normalization(PipeObject):
     def __init__(self, normal_range=100, normal_type="cdf", std_range=10):
         PipeObject.__init__(self)
@@ -683,7 +971,7 @@ ml=PipeML()
 ml.pipe(FixInput())\
   .pipe(SelectCols(cols=["Age","Fare","Embarked"]))\
   .pipe(TargetEncoding(cols=["Embarked"],y=y_train))\
-  .pipe(FillNa(fill_value=0))
+  .pipe(FillNa())
 
 x_test_new=ml.fit(x_train).transform(x_test)
 x_test_new.head(5)
@@ -745,7 +1033,7 @@ ml=PipeML()
 ml.pipe(FixInput())\
   .pipe(SelectCols(cols=["Age","Fare","Embarked"]))\
   .pipe(TargetEncoding(cols=["Embarked"],y=y_train))\
-  .pipe(FillNa(fill_value=0))\
+  .pipe(FillNa())\
   .pipe(Normalization())
   
 x_test_new=ml.fit(x_train).transform(x_test)
@@ -819,7 +1107,7 @@ ml1.pipe(FixInput())\
    .pipe(OneHotEncoding(cols=["Pclass","Sex"],drop_col=False))\
    .pipe(LabelEncoding(cols=["Sex","Pclass"]))\
    .pipe(TargetEncoding(cols=["Name","Ticket","Embarked","Cabin"],y=y_train))\
-   .pipe(FillNa(fill_value=0))\
+   .pipe(FillNa())\
    .pipe(PCADecomposition(n_components=8))
 
 x_train_new=ml1.fit(x_train).transform(x_train)
@@ -952,8 +1240,8 @@ x_test_new.head(5)
     </tr>
     <tr>
       <th>4</th>
-      <td>43.86</td>
-      <td>56.14</td>
+      <td>43.85</td>
+      <td>56.15</td>
     </tr>
   </tbody>
 </table>
@@ -1006,8 +1294,8 @@ ml_combine.transform(x_test).head(5)
     </tr>
     <tr>
       <th>4</th>
-      <td>43.86</td>
-      <td>56.14</td>
+      <td>43.85</td>
+      <td>56.15</td>
     </tr>
   </tbody>
 </table>
@@ -1036,7 +1324,7 @@ ml1.pipe(FixInput())\
    .pipe(OneHotEncoding(cols=["Pclass","Sex"],drop_col=False))\
    .pipe(LabelEncoding(cols=["Sex","Pclass"]))\
    .pipe(TargetEncoding(cols=["Name","Ticket","Embarked","Cabin"]))\
-   .pipe(FillNa(fill_value=0))\
+   .pipe(FillNa())\
    .pipe(PCADecomposition(n_components=8))
 
 ml2=PipeML()
@@ -1089,8 +1377,8 @@ ml_combine.transform(x_test).head(5)
     </tr>
     <tr>
       <th>4</th>
-      <td>43.86</td>
-      <td>56.14</td>
+      <td>43.85</td>
+      <td>56.15</td>
     </tr>
   </tbody>
 </table>
@@ -1104,6 +1392,194 @@ ml_combine.transform(x_test).head(5)
 
 
 ```python
+x_train
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>3</td>
+      <td>Braund, Mr. Owen Harris</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>A/5 21171</td>
+      <td>7.2500</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>Cumings, Mrs. John Bradley (Florence Briggs Th...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>PC 17599</td>
+      <td>71.2833</td>
+      <td>C85</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>3</td>
+      <td>Heikkinen, Miss. Laina</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>STON/O2. 3101282</td>
+      <td>7.9250</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>1</td>
+      <td>Futrelle, Mrs. Jacques Heath (Lily May Peel)</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>113803</td>
+      <td>53.1000</td>
+      <td>C123</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>3</td>
+      <td>Allen, Mr. William Henry</td>
+      <td>male</td>
+      <td>35.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>373450</td>
+      <td>8.0500</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>495</th>
+      <td>496</td>
+      <td>3</td>
+      <td>Yousseff, Mr. Gerious</td>
+      <td>male</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2627</td>
+      <td>14.4583</td>
+      <td>NaN</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <th>496</th>
+      <td>497</td>
+      <td>1</td>
+      <td>Eustis, Miss. Elizabeth Mussey</td>
+      <td>female</td>
+      <td>54.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>36947</td>
+      <td>78.2667</td>
+      <td>D20</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <th>497</th>
+      <td>498</td>
+      <td>3</td>
+      <td>Shellard, Mr. Frederick William</td>
+      <td>male</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>0</td>
+      <td>C.A. 6212</td>
+      <td>15.1000</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>498</th>
+      <td>499</td>
+      <td>1</td>
+      <td>Allison, Mrs. Hudson J C (Bessie Waldo Daniels)</td>
+      <td>female</td>
+      <td>25.0</td>
+      <td>1</td>
+      <td>2</td>
+      <td>113781</td>
+      <td>151.5500</td>
+      <td>C22 C26</td>
+      <td>S</td>
+    </tr>
+    <tr>
+      <th>499</th>
+      <td>500</td>
+      <td>3</td>
+      <td>Svensson, Mr. Olof</td>
+      <td>male</td>
+      <td>24.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>350035</td>
+      <td>7.7958</td>
+      <td>NaN</td>
+      <td>S</td>
+    </tr>
+  </tbody>
+</table>
+<p>500 rows × 11 columns</p>
+</div>
+
+
+
+
+```python
 ml1=PipeML()
 ml1.pipe(FixInput())\
    .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
@@ -1113,8 +1589,8 @@ ml1.pipe(FixInput())\
    .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))\
    .pipe(OneHotEncoding(cols=["Pclass","Sex"],drop_col=False))\
    .pipe(LabelEncoding(cols=["Sex","Pclass"]))\
-   .pipe(TargetEncoding(cols=["Name","Ticket","Embarked","Cabin"]))\
-   .pipe(FillNa(fill_value=0))\
+   .pipe(TargetEncoding(cols=["Name","Ticket","Embarked","Cabin"],y=y_train))\
+   .pipe(FillNa())\
    .pipe(PCADecomposition(n_components=8))
 
 x_test_new=ml1.fit(x_train).transform(x_test)
@@ -1142,58 +1618,58 @@ x_test_new.head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>250.113827</td>
-      <td>-26.850921</td>
-      <td>-5.608664</td>
-      <td>-0.243334</td>
-      <td>-0.938809</td>
-      <td>-0.212824</td>
-      <td>0.046545</td>
-      <td>-0.140212</td>
+      <td>250.113748</td>
+      <td>-26.852814</td>
+      <td>-5.607253</td>
+      <td>-0.118244</td>
+      <td>-1.098243</td>
+      <td>-0.120703</td>
+      <td>0.040973</td>
+      <td>-0.124744</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>251.119130</td>
-      <td>-27.498349</td>
-      <td>-1.568484</td>
-      <td>-0.107851</td>
-      <td>-0.324375</td>
-      <td>1.384873</td>
-      <td>-0.315554</td>
-      <td>-0.127256</td>
+      <td>251.119044</td>
+      <td>-27.500182</td>
+      <td>-1.567217</td>
+      <td>-0.089340</td>
+      <td>-0.022752</td>
+      <td>-1.143059</td>
+      <td>-0.179981</td>
+      <td>-1.018557</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>252.020625</td>
-      <td>-28.969310</td>
-      <td>-22.515387</td>
-      <td>-0.559448</td>
-      <td>-0.178321</td>
-      <td>1.251006</td>
-      <td>-0.272883</td>
-      <td>-0.044459</td>
+      <td>252.020539</td>
+      <td>-28.971093</td>
+      <td>-22.514046</td>
+      <td>-0.529986</td>
+      <td>-0.020735</td>
+      <td>-0.921948</td>
+      <td>-0.135084</td>
+      <td>-1.051066</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>253.219972</td>
-      <td>-24.609949</td>
-      <td>14.257928</td>
-      <td>0.226706</td>
-      <td>-0.448605</td>
-      <td>1.484468</td>
-      <td>-0.350580</td>
-      <td>-0.206012</td>
+      <td>253.219892</td>
+      <td>-24.611896</td>
+      <td>14.259275</td>
+      <td>0.240977</td>
+      <td>-0.040018</td>
+      <td>-1.309767</td>
+      <td>-0.212481</td>
+      <td>-1.001431</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>255.230490</td>
-      <td>50.688354</td>
-      <td>-11.883826</td>
-      <td>-1.145850</td>
-      <td>0.238721</td>
-      <td>0.773559</td>
-      <td>-0.503235</td>
-      <td>0.410151</td>
+      <td>255.230488</td>
+      <td>50.687678</td>
+      <td>-11.883178</td>
+      <td>-1.155351</td>
+      <td>0.263995</td>
+      <td>-0.411215</td>
+      <td>-0.385816</td>
+      <td>-0.610259</td>
     </tr>
   </tbody>
 </table>
@@ -1349,8 +1825,8 @@ ml1.transform(x_test,run_to_layer=-3).head(5)
       <td>0</td>
       <td>0.0</td>
       <td>8.6625</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.317829</td>
+      <td>0.334254</td>
       <td>1</td>
       <td>0</td>
       <td>0</td>
@@ -1368,8 +1844,8 @@ ml1.transform(x_test,run_to_layer=-3).head(5)
       <td>0</td>
       <td>0.0</td>
       <td>7.7500</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.317829</td>
+      <td>0.511111</td>
       <td>1</td>
       <td>0</td>
       <td>0</td>
@@ -1387,8 +1863,8 @@ ml1.transform(x_test,run_to_layer=-3).head(5)
       <td>0</td>
       <td>0.0</td>
       <td>7.7175</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.317829</td>
+      <td>0.511111</td>
       <td>1</td>
       <td>0</td>
       <td>0</td>
@@ -1406,8 +1882,8 @@ ml1.transform(x_test,run_to_layer=-3).head(5)
       <td>0</td>
       <td>0.0</td>
       <td>9.5875</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.317829</td>
+      <td>0.334254</td>
       <td>1</td>
       <td>0</td>
       <td>0</td>
@@ -1423,10 +1899,10 @@ ml1.transform(x_test,run_to_layer=-3).head(5)
       <td>16.0</td>
       <td>0</td>
       <td>0</td>
-      <td>NaN</td>
+      <td>1.0</td>
       <td>86.5000</td>
-      <td>0.0</td>
-      <td>NaN</td>
+      <td>0.000000</td>
+      <td>0.334254</td>
       <td>0</td>
       <td>1</td>
       <td>0</td>
@@ -1569,14 +2045,14 @@ ml1.transform_single({'PassengerId': 1,
 
 
 
-    {0: -249.81959191654775,
-     1: -20.106987489055555,
-     2: 1.2714145429756447,
-     3: 0.41105773721744937,
-     4: -0.7178704758648916,
-     5: -0.4248150783967751,
-     6: -0.31184226216927236,
-     7: -0.08396180398652602}
+    {0: -249.81966525008983,
+     1: -20.108644461714313,
+     2: 1.272686718451494,
+     3: 0.5173581256201676,
+     4: -0.8759345476698472,
+     5: 0.098536572656829,
+     6: -0.3357057915922265,
+     7: -0.0069406716383854095}
 
 
 
@@ -1600,15 +2076,15 @@ ml1.transform_single({'PassengerId': 1,
 
     {'PassengerId': 1,
      'Pclass': 1,
-     'Name': nan,
+     'Name': 0,
      'Sex': 1,
      'Age': 22.0,
      'SibSp': 1,
      'Parch': 0,
-     'Ticket': nan,
+     'Ticket': 0.0,
      'Fare': 7.7175,
-     'Cabin': nan,
-     'Embarked': nan,
+     'Cabin': 0.3178294573643411,
+     'Embarked': 0.3342541436464088,
      'Pclass_3': 1,
      'Pclass_1': 0,
      'Pclass_2': 0,
@@ -1650,6 +2126,9 @@ ml2.fit(x_train_new)
 
 
 
+    <easymlops.pipeml.PipeML at 0x1f518548a58>
+
+
 
 
 ```python
@@ -1672,7 +2151,7 @@ ml_combine.transform_single({'PassengerId': 1,
 
 
 
-    {0: 50.0, 1: 50.0}
+    {0: 50.11, 1: 49.89}
 
 
 
@@ -1689,17 +2168,17 @@ ml_combine.transform_single({'PassengerId': 1,
 ml1.auto_check_transform(x_test)
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.01]ms/it
     (<class 'easymlops.ml.preprocessing.TransToCategory'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.preprocessing.TransToFloat'>)  module transform check [success], single transform speed:[0.02]ms/it
-    (<class 'easymlops.ml.preprocessing.TransToInt'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (clip_name)  module transform check [success], single transform speed:[0.0]ms/it
-    (clip_fare)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.representation.OneHotEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.representation.LabelEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.representation.PCADecomposition'>)  module transform check [success], single transform speed:[2.13]ms/it
+    (<class 'easymlops.ml.preprocessing.TransToFloat'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.preprocessing.TransToInt'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (clip_name)  module transform check [success], single transform speed:[0.01]ms/it
+    (clip_fare)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.representation.OneHotEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.representation.LabelEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.representation.PCADecomposition'>)  module transform check [success], single transform speed:[1.63]ms/it
     
 
 ### 4.4 日志记录 
@@ -1734,30 +2213,31 @@ ml1.transform_single({'PassengerId': 1,
 
 
 
-    {0: -249.81959191654775,
-     1: -20.106987489055555,
-     2: 1.2714145429756447,
-     3: 0.41105773721744937,
-     4: -0.7178704758648916,
-     5: -0.4248150783967751,
-     6: -0.31184226216927236,
-     7: -0.08396180398652602}
+    {0: -249.81966525008983,
+     1: -20.108644461714313,
+     2: 1.272686718451494,
+     3: 0.5173581256201676,
+     4: -0.8759345476698472,
+     5: 0.098536572656829,
+     6: -0.3357057915922265,
+     7: -0.0069406716383854095}
 
 
 
 ## 5. 训练性能优化
 主要是优化内存使用情况，下面看一个比较特殊点的(特征OneHot展开)
 
+
 ```python
 from easymlops.ml.perfopt import *
 
-ml = PipeML()
-ml.pipe(FixInput())
-.pipe(Clip(cols=["Age"], default_clip=(1, 99), name="clip_name"))
-.pipe(OneHotEncoding(cols=["Pclass", "Sex", "Name", "Ticket", "Embarked", "Cabin"], drop_col=True))
-.pipe(FillNa(fill_value=0))
-.pipe(ReduceMemUsage())
-.pipe(Dense2Sparse())
+ml=PipeML()
+ml.pipe(FixInput())\
+  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
+  .pipe(OneHotEncoding(cols=["Pclass","Sex","Name","Ticket","Embarked","Cabin"],drop_col=True))\
+  .pipe(FillNa())\
+  .pipe(ReduceMemUsage())\
+  .pipe(Dense2Sparse())
 
 ml.fit(x_train).transform(x_train).shape
 ```
@@ -1816,7 +2296,7 @@ ml=PipeML()
 ml.pipe(FixInput())\
   .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
   .pipe(OneHotEncoding(cols=["Pclass","Sex","Name","Ticket","Embarked","Cabin"],drop_col=True))\
-  .pipe(FillNa(fill_value=0))\
+  .pipe(FillNa())\
   .pipe(ReduceMemUsage())\
   .pipe(Dense2Sparse())\
   .pipe(LGBMClassification(y=y_train))
@@ -1825,6 +2305,7 @@ ml.pipe(FixInput())\
 
 
 
+    <easymlops.pipeml.PipeML at 0x1f51865f5f8>
 
 
 
@@ -1876,6 +2357,521 @@ ml.fit(x_train).transform(x_test).head(5)
 </div>
 
 
+
+## 6. 文本NLP处理  
+
+### 6.1 文本清洗
+
+
+```python
+from easymlops.nlp.preprocessing import *
+
+#先将Name以外的特征数值化
+nlp=PipeML()
+nlp.pipe(FixInput())\
+   .pipe(TargetEncoding(cols=["Sex","Ticket","Cabin","Embarked"],y=y_train))\
+   .pipe(FillNa())
+
+nlp.fit(x_train).transform(x_test).head(5)
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>500</th>
+      <td>501</td>
+      <td>3</td>
+      <td>Calic, Mr. Petar</td>
+      <td>0.171429</td>
+      <td>17.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>8.6625</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+    </tr>
+    <tr>
+      <th>501</th>
+      <td>502</td>
+      <td>3</td>
+      <td>Canavan, Miss. Mary</td>
+      <td>0.751351</td>
+      <td>21.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>7.7500</td>
+      <td>0.0</td>
+      <td>0.511111</td>
+    </tr>
+    <tr>
+      <th>502</th>
+      <td>503</td>
+      <td>3</td>
+      <td>O'Sullivan, Miss. Bridget Mary</td>
+      <td>0.751351</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>7.6292</td>
+      <td>0.0</td>
+      <td>0.511111</td>
+    </tr>
+    <tr>
+      <th>503</th>
+      <td>504</td>
+      <td>3</td>
+      <td>Laitinen, Miss. Kristina Sofia</td>
+      <td>0.751351</td>
+      <td>37.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>9.5875</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+    </tr>
+    <tr>
+      <th>504</th>
+      <td>505</td>
+      <td>1</td>
+      <td>Maioni, Miss. Roberta</td>
+      <td>0.751351</td>
+      <td>16.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0</td>
+      <td>86.5000</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+#接下来把Name中所有字符转小写，然后将所有标点符号用空格代替
+nlp=PipeML()
+nlp.pipe(FixInput())\
+   .pipe(TargetEncoding(cols=["Sex","Ticket","Cabin","Embarked"],y=y_train))\
+   .pipe(FillNa())\
+   .pipe(Lower(cols=["Name"]))\
+   .pipe(ReplacePunctuation(cols=["Name"],symbols=" "))
+
+nlp.fit(x_train).transform(x_test).head(5)
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>500</th>
+      <td>501</td>
+      <td>3</td>
+      <td>calic  mr  petar</td>
+      <td>0.171429</td>
+      <td>17.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>8.6625</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+    </tr>
+    <tr>
+      <th>501</th>
+      <td>502</td>
+      <td>3</td>
+      <td>canavan  miss  mary</td>
+      <td>0.751351</td>
+      <td>21.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>7.7500</td>
+      <td>0.0</td>
+      <td>0.511111</td>
+    </tr>
+    <tr>
+      <th>502</th>
+      <td>503</td>
+      <td>3</td>
+      <td>o sullivan  miss  bridget mary</td>
+      <td>0.751351</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>7.6292</td>
+      <td>0.0</td>
+      <td>0.511111</td>
+    </tr>
+    <tr>
+      <th>503</th>
+      <td>504</td>
+      <td>3</td>
+      <td>laitinen  miss  kristina sofia</td>
+      <td>0.751351</td>
+      <td>37.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>9.5875</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+    </tr>
+    <tr>
+      <th>504</th>
+      <td>505</td>
+      <td>1</td>
+      <td>maioni  miss  roberta</td>
+      <td>0.751351</td>
+      <td>16.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0</td>
+      <td>86.5000</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### 6.2 文本特征表示  
+注意：后续模型处理的最小单位需要在原column中以空格分隔，比如上面第一行"calic mr petar"会分别把"calic","mr","petar"当作独立的词处理
+
+
+```python
+from easymlops.nlp.representation import *
+#构建tfidf模型
+nlp=PipeML()
+nlp.pipe(FixInput())\
+   .pipe(TargetEncoding(cols=["Sex","Ticket","Cabin","Embarked"],y=y_train))\
+   .pipe(FillNa())\
+   .pipe(Lower(cols=["Name"]))\
+   .pipe(ReplacePunctuation(cols=["Name"],symbols=" "))\
+   .pipe(TFIDF(cols=["Name"]))\
+   .pipe(DropCols(cols=["Name"]))
+
+nlp.fit(x_train).transform(x_test).head(5)
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Pclass</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+      <th>...</th>
+      <th>tfidf_Name_yarred</th>
+      <th>tfidf_Name_yoto</th>
+      <th>tfidf_Name_young</th>
+      <th>tfidf_Name_youseff</th>
+      <th>tfidf_Name_yousif</th>
+      <th>tfidf_Name_youssef</th>
+      <th>tfidf_Name_yousseff</th>
+      <th>tfidf_Name_yrois</th>
+      <th>tfidf_Name_zabour</th>
+      <th>tfidf_Name_zimmerman</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>500</th>
+      <td>501</td>
+      <td>3</td>
+      <td>0.171429</td>
+      <td>17.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>8.6625</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>501</th>
+      <td>502</td>
+      <td>3</td>
+      <td>0.751351</td>
+      <td>21.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>7.7500</td>
+      <td>0.0</td>
+      <td>0.511111</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>502</th>
+      <td>503</td>
+      <td>3</td>
+      <td>0.751351</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>7.6292</td>
+      <td>0.0</td>
+      <td>0.511111</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>503</th>
+      <td>504</td>
+      <td>3</td>
+      <td>0.751351</td>
+      <td>37.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>9.5875</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>504</th>
+      <td>505</td>
+      <td>1</td>
+      <td>0.751351</td>
+      <td>16.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1.0</td>
+      <td>86.5000</td>
+      <td>0.0</td>
+      <td>0.334254</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 994 columns</p>
+</div>
+
+
+
+
+```python
+#构建lsi主题模型+word2vec词向量模型
+nlp=PipeML()
+nlp.pipe(FixInput())\
+   .pipe(TargetEncoding(cols=["Sex","Ticket","Cabin","Embarked"],y=y_train))\
+   .pipe(FillNa())\
+   .pipe(Lower(cols=["Name"]))\
+   .pipe(ReplacePunctuation(cols=["Name"],symbols=" "))\
+   .pipe(SelectCols(cols=["Name"]))\
+   .pipe(Parallel([LsiTopicModel(cols=["Name"],num_topics=4),Word2VecModel(embedding_size=4,cols=["Name"])]))\
+   .pipe(DropCols(cols=["Name"]))
+
+nlp.fit(x_train).transform(x_test).head(5)
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>lsi_Name_0</th>
+      <th>lsi_Name_1</th>
+      <th>lsi_Name_2</th>
+      <th>lsi_Name_3</th>
+      <th>w2v_Name_0</th>
+      <th>w2v_Name_1</th>
+      <th>w2v_Name_2</th>
+      <th>w2v_Name_3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>500</th>
+      <td>2.132522</td>
+      <td>0.648001</td>
+      <td>0.075899</td>
+      <td>0.093432</td>
+      <td>-0.183208</td>
+      <td>-0.017150</td>
+      <td>0.403337</td>
+      <td>0.551337</td>
+    </tr>
+    <tr>
+      <th>501</th>
+      <td>2.034848</td>
+      <td>-0.608226</td>
+      <td>0.733371</td>
+      <td>0.013229</td>
+      <td>-0.085437</td>
+      <td>-0.033206</td>
+      <td>0.293308</td>
+      <td>0.416924</td>
+    </tr>
+    <tr>
+      <th>502</th>
+      <td>2.040231</td>
+      <td>-0.616307</td>
+      <td>0.747636</td>
+      <td>0.021959</td>
+      <td>-0.051665</td>
+      <td>0.000399</td>
+      <td>0.277010</td>
+      <td>0.309539</td>
+    </tr>
+    <tr>
+      <th>503</th>
+      <td>2.026293</td>
+      <td>-0.579115</td>
+      <td>0.735050</td>
+      <td>-0.011961</td>
+      <td>-0.140556</td>
+      <td>0.009208</td>
+      <td>0.393155</td>
+      <td>0.443419</td>
+    </tr>
+    <tr>
+      <th>504</th>
+      <td>2.025096</td>
+      <td>-0.573416</td>
+      <td>0.720068</td>
+      <td>-0.010264</td>
+      <td>-0.140556</td>
+      <td>0.009208</td>
+      <td>0.393155</td>
+      <td>0.443419</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+nlp.auto_check_transform(x_test)
+```
+
+    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.nlp.preprocessing.Lower'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.nlp.preprocessing.ReplacePunctuation'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.preprocessing.SelectCols'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.ensemble.Parallel'>)  module transform check [success], single transform speed:[5.09]ms/it
+    (<class 'easymlops.ml.preprocessing.DropCols'>)  module transform check [success], single transform speed:[0.0]ms/it
+    
 
 ## TODO  
 

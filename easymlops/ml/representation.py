@@ -49,19 +49,13 @@ class UserDefinedRepresentationObject(PipeObject):
                 raise Exception("cols should be None,'all' or a list")
         return s
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type) -> dataframe_type:
-        return self
-
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, new_col in self.cols:
             if col in s.columns:
                 s[new_col] = s[col].apply(lambda x: self._user_defined_function(col, x))
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         for col, new_col in self.cols:
             if col in s.keys():
                 s[new_col] = self._user_defined_function(col, s[col])
@@ -75,6 +69,30 @@ class UserDefinedRepresentationObject(PipeObject):
 
 
 class TargetEncoding(UserDefinedRepresentationObject):
+    """
+      input type:pandas.dataframe
+      input like:
+      | 0 | 1 |
+      |good|A|
+      |bad|B|
+      |good|A|
+      |bad|B|
+
+      y like:
+      |y|
+      |1|
+      |0|
+      |0|
+      |1|
+      ----------------------------
+      output type:pandas.dataframe
+      output like:
+      | 0 | 1 |
+      |0.5|0.5|
+      |0.5|0.5|
+      |0.5|0.5|
+      |0.5|0.5|
+      """
     def __init__(self, cols="all", y=None, name=None, error_value=0,
                  transform_check_max_number_error=1e-3, copy_transform_data=True):
         super().__init__(cols=cols, name=name, y=y,
@@ -84,8 +102,8 @@ class TargetEncoding(UserDefinedRepresentationObject):
         self.error_value = error_value
         self.target_map_detail = dict()
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
+    def _fit(self, s: dataframe_type):
+        assert self.y is not None and len(self.y) == len(s)
         s["y_"] = self.y
         for col, _ in self.cols:
             tmp_ = s[[col, "y_"]]
@@ -107,6 +125,23 @@ class TargetEncoding(UserDefinedRepresentationObject):
 
 
 class LabelEncoding(UserDefinedRepresentationObject):
+    """
+      input type:pandas.dataframe
+      input like:
+      | 0 | 1 |
+      |good|A|
+      |bad|B|
+      |good|A|
+      |bad|B|
+      ----------------------------
+      output type:pandas.dataframe
+      output like:
+      | 0 | 1 |
+      |1|0|
+      |0|1|
+      |1|0|
+      |0|1|
+      """
     def __init__(self, cols="all", name=None, error_value=0,
                  transform_check_max_number_error=1e-3, copy_transform_data=True):
         super().__init__(cols=cols, name=name,
@@ -116,8 +151,7 @@ class LabelEncoding(UserDefinedRepresentationObject):
         self.error_value = error_value
         self.label_map_detail = dict()
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
+    def _fit(self, s: dataframe_type):
         for col, _ in self.cols:
             col_map = s[col].value_counts().to_dict()
             c = 1
@@ -140,6 +174,23 @@ class LabelEncoding(UserDefinedRepresentationObject):
 
 
 class OneHotEncoding(UserDefinedRepresentationObject):
+    """
+         input type:pandas.dataframe
+         input like:
+         | x | y |
+         |good|A|
+         |bad|B|
+         |good|A|
+         |bad|B|
+         ----------------------------
+         output type:pandas.dataframe
+         output like:
+         | x_good | x_bad | y_A | y_B |
+         |   1    |   0   |  1  |  0  |
+         |   0    |   1   |  0  |  1  |
+         |   1    |   0   |  1  |  0  |
+         |   0    |   1   |  0  |  1  |
+         """
     def __init__(self, cols="all", name=None, drop_col=True,
                  transform_check_max_number_error=1e-3, copy_transform_data=True):
         super().__init__(cols=cols, name=name,
@@ -150,16 +201,14 @@ class OneHotEncoding(UserDefinedRepresentationObject):
         self.one_hot_detail = dict()
         self.fill_na_model = None
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
-        self.fill_na_model = FillNa(cols=[col for col, _ in self.cols], fill_value="nan")
+    def _fit(self, s: dataframe_type):
+        self.fill_na_model = FillNa(cols=[col for col, _ in self.cols], fill_category_value="nan", fill_number_value=0)
         s = self.fill_na_model.fit(s).transform(s)
         for col, _ in self.cols:
             self.one_hot_detail[col] = s[col].unique().tolist()
         return self
 
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         s = self.fill_na_model.transform(s)
         for col, new_col in self.cols:
             if col not in self.one_hot_detail.keys():
@@ -172,8 +221,7 @@ class OneHotEncoding(UserDefinedRepresentationObject):
                 del s[col]
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         s = self.fill_na_model.transform_single(s)
         for col, new_col in self.cols:
             if col not in self.one_hot_detail.keys():
@@ -216,30 +264,26 @@ class PCADecomposition(PipeObject):
     """
 
     def __init__(self, n_components=3, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True):
+                 skip_check_transform_type=True, copy_transform_data=True, prefix=None):
         super().__init__(name=name, transform_check_max_number_error=transform_check_max_number_error,
                          skip_check_transform_type=skip_check_transform_type,
-                         copy_transform_data=copy_transform_data)
+                         copy_transform_data=copy_transform_data, prefix=prefix)
         self.n_components = n_components
         self.pca = None
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type) -> dataframe_type:
+    def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.decomposition import PCA
         self.pca = PCA(n_components=self.n_components)
         self.pca.fit(s.fillna(0).values)
         return self
 
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         result = pandas.DataFrame(self.pca.transform(s.fillna(0).values))
         return result
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type):
+    def _transform_single(self, s: dict_type):
         input_dataframe = pd.DataFrame([s])
-        input_dataframe = input_dataframe[self.input_col_names]
-        return self.transform(input_dataframe).to_dict("record")[0]
+        return self._transform(input_dataframe).to_dict("record")[0]
 
     def _get_params(self) -> dict_type:
         return {"pca": self.pca, "n_components": self.n_components}
@@ -265,30 +309,26 @@ class NMFDecomposition(PipeObject):
     """
 
     def __init__(self, n_components=3, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True):
+                 skip_check_transform_type=True, copy_transform_data=True, prefix=None):
         super().__init__(name=name, transform_check_max_number_error=transform_check_max_number_error,
                          skip_check_transform_type=skip_check_transform_type,
-                         copy_transform_data=copy_transform_data)
+                         copy_transform_data=copy_transform_data, prefix=prefix)
         self.n_components = n_components
         self.nmf = None
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type) -> dataframe_type:
+    def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.decomposition import NMF
         self.nmf = NMF(n_components=self.n_components)
         self.nmf.fit(s.fillna(0).values)
         return self
 
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         result = pandas.DataFrame(self.nmf.transform(s.fillna(0).values))
         return result
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type):
+    def _transform_single(self, s: dict_type):
         input_dataframe = pd.DataFrame([s])
-        input_dataframe = input_dataframe[self.input_col_names]
-        return self.transform(input_dataframe).to_dict("record")[0]
+        return self._transform(input_dataframe).to_dict("record")[0]
 
     def _get_params(self) -> dict_type:
         return {"nmf": self.nmf, "n_components": self.n_components}

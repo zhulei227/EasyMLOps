@@ -38,6 +38,8 @@ def check_dataframe_type(func):
 
 def fit_wrapper(func):
     def wrapper(*args, **kwargs):
+        print("Deprecated this function [{}] for better flexibility,please use [{}] replace".format("fit_wrapper",
+                                                                                                    "_fit"))
         args = list(args)
         pipe_object = args[0]
         data: dataframe_type = args[1]
@@ -56,6 +58,8 @@ def fit_wrapper(func):
 
 def transform_wrapper(func):
     def wrapper(*args, **kwargs):
+        print("Deprecated this function [{}] for better flexibility,please use [{}] replace".format("transform_wrapper",
+                                                                                                    "_transform"))
         args = list(args)
         pipe_object = args[0]
         data: dataframe_type = args[1]
@@ -73,6 +77,9 @@ def transform_wrapper(func):
 
 def transform_single_wrapper(func):
     def wrapper(*args, **kwargs):
+        print("Deprecated this function [{}] for better flexibility,please use [{}] replace".format(
+            "transform_single_wrapper",
+            "_transform_single"))
         args = list(args)
         pipe_object = args[0]
         data: dict_type = args[1]
@@ -98,11 +105,12 @@ class SuperPipeObject(object):
     leak_check_transform_type:弱化类型检测，比如将int32和int64都视为int类型
     leak_check_transform_value:弱化检测值，将None视为相等
     copy_transform_data:transform阶段是否要copy一次数据
+    prefix:是否为输出添加一个前缀,默认None,不添加
     """
 
     def __init__(self, name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=False,
                  skip_check_transform_value=False, leak_check_transform_type=True, leak_check_transform_value=True,
-                 copy_transform_data=True):
+                 copy_transform_data=True, prefix=None):
         if name is None:
             name = self.__class__
         self.name = name
@@ -114,6 +122,14 @@ class SuperPipeObject(object):
         self.leak_check_transform_type = leak_check_transform_type
         self.leak_check_transform_value = leak_check_transform_value
         self.copy_transform_data = copy_transform_data
+        self.prefix = prefix
+
+    def fit(self, s: dataframe_type):
+        """
+        fit:依次调用before_fit,_fit,after_fit
+        """
+        self._fit(self.before_fit(s))
+        return self.after_fit()
 
     def before_fit(self, s: dataframe_type) -> dataframe_type:
         """
@@ -123,15 +139,20 @@ class SuperPipeObject(object):
         self.input_col_names = s.columns.tolist()
         return s
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
+    def _fit(self, s: dataframe_type):
         return self
 
     def after_fit(self):
         """
         fit后操作
         """
-        pass
+        return self
+
+    def transform(self, s: dataframe_type) -> dataframe_type:
+        """
+        批量接口:依次调用before_transform,_transform,after_transform
+        """
+        return self.after_transform(self._transform(self.before_transform(s)))
 
     def before_transform(self, s: dataframe_type) -> dataframe_type:
         assert type(s) == dataframe_type
@@ -142,15 +163,15 @@ class SuperPipeObject(object):
             s_ = s
         return s_
 
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
-        """
-        批量接口
-        """
-        pass
+    def _transform(self, s: dataframe_type) -> dataframe_type:
+        return s
 
     def after_transform(self, s: dataframe_type) -> dataframe_type:
-        self.output_col_names = s.columns.tolist()
+        # 是否改名
+        if self.prefix is not None:
+            s.columns = ["{}_{}".format(self.prefix, col) for col in s.columns]
+        # 保留output columns
+        self.output_col_names = list(s.columns)
         return s
 
     @staticmethod
@@ -160,18 +181,30 @@ class SuperPipeObject(object):
             new_s[key] = s[key]
         return new_s
 
+    def transform_single(self, s: dict_type) -> dict_type:
+        """
+        当条数据接口:调用顺序before_transform_single,_transform_single,after_transform_single
+        """
+        return self.after_transform_single(self._transform_single(self.before_transform_single(s)))
+
     def before_transform_single(self, s: dict_type) -> dict_type:
         assert type(s) == dict_type
         return self.extract_dict(s, self.input_col_names)
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         """
         当条数据接口，生产用
         """
-        raise Exception("need to implement")
+        return s
 
     def after_transform_single(self, s: dict_type) -> dict_type:
+        # 改名
+        if self.prefix is not None:
+            new_s = dict()
+            for col, value in s.items():
+                new_s["{}_{}".format(self.prefix, col)] = value
+            s = new_s
+        # 输出指定columns
         return self.extract_dict(s, self.output_col_names)
 
     def auto_check_transform(self, s_):
@@ -310,7 +343,8 @@ the top {} error info is \n {}
                 "transform_check_max_number_error": self.transform_check_max_number_error,
                 "skip_check_transform_type": self.skip_check_transform_type,
                 "skip_check_transform_value": self.skip_check_transform_value,
-                "copy_transform_data": self.copy_transform_data}
+                "copy_transform_data": self.copy_transform_data,
+                "prefix": self.prefix}
 
     def set_params(self, params: dict_type):
         self._set_params(params)
@@ -323,55 +357,24 @@ the top {} error info is \n {}
         self.skip_check_transform_type = params["skip_check_transform_type"]
         self.skip_check_transform_value = params["skip_check_transform_value"]
         self.copy_transform_data = params["copy_transform_data"]
+        self.prefix = params["prefix"]
 
 
 class PipeObject(SuperPipeObject):
     def __init__(self, name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=False,
                  skip_check_transform_value=False, leak_check_transform_type=True, leak_check_transform_value=True,
-                 copy_transform_data=True):
+                 copy_transform_data=True, prefix=None):
         super().__init__(name=name, transform_check_max_number_error=transform_check_max_number_error,
                          skip_check_transform_type=skip_check_transform_type,
                          skip_check_transform_value=skip_check_transform_value,
                          leak_check_transform_type=leak_check_transform_type,
                          leak_check_transform_value=leak_check_transform_value,
-                         copy_transform_data=copy_transform_data)
-
-    def before_fit(self, s: dataframe_type) -> dataframe_type:
-        s = super().before_fit(s)
-        return s
-
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
-        return self
+                         copy_transform_data=copy_transform_data, prefix=prefix)
 
     def after_fit(self):
         super().after_fit()
         self.get_params()
         return self
-
-    def before_transform(self, s: dataframe_type) -> dataframe_type:
-        s = super().before_transform(s)
-        return s
-
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
-        pass
-
-    def after_transform(self, s: dataframe_type) -> dataframe_type:
-        s = super().after_transform(s)
-        return s
-
-    def before_transform_single(self, s: dict_type) -> dict_type:
-        s = super().before_transform_single(s)
-        return s
-
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
-        pass
-
-    def after_transform_single(self, s: dict_type) -> dict_type:
-        s = super().after_transform_single(s)
-        return s
 
     def get_params(self) -> dict_type:
         # 逐步获取父类的_get_params

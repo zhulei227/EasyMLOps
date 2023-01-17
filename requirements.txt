@@ -3,4 +3,8 @@ tqdm
 pandas
 scipy
 #scikit-learn
+#gensim
+#pyyaml<=5.4
 #lightgbm
+#jieba
+#pyahocorasick

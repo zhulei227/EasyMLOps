@@ -34,8 +34,7 @@ class Normalization(PipeObject):
         self.mean_std = dict()
         self.cols = cols
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type) -> dataframe_type:
+    def _fit(self, s: dataframe_type) -> dataframe_type:
         if str(self.cols).lower() in ["none", "all"]:
             self.cols = s.columns.tolist()
         if self.normal_type == "cdf":
@@ -46,8 +45,7 @@ class Normalization(PipeObject):
                 self.mean_std[col] = (mean, std)
         return self
 
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         if self.normal_type == "cdf":
             for col in self.cols:
                 if col in self.mean_std:
@@ -59,8 +57,7 @@ class Normalization(PipeObject):
                     s[col] = self.normal_range * s[col]
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         if self.normal_type == "cdf":
             for col in self.cols:
                 if col in self.mean_std:
@@ -88,19 +85,13 @@ class MapValues(PipeObject):
         super().__init__(name=name, copy_transform_data=copy_transform_data)
         self.map_values = map_values if map_values is not None else dict()
 
-    @fit_wrapper
-    def fit(self, s):
-        return self
-
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         for col in s.columns:
             if col in self.map_values:
                 s[col] = np.round(s[col] / self.map_values[col][0] * self.map_values[col][1], 2)
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         for col in s.keys():
             if col in self.map_values:
                 s[col] = np.round(s[col] / self.map_values[col][0] * self.map_values[col][1], 2)

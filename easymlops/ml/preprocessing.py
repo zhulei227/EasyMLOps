@@ -39,19 +39,13 @@ class UserDefinedPreprocessObject(PipeObject):
                 raise Exception("cols should be None,'all' or a list")
         return s
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type) -> dataframe_type:
-        return self
-
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, new_col in self.cols:
             if col in s.columns:
                 s[new_col] = s[col].apply(lambda x: self._user_defined_function(col, x))
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         for col, new_col in self.cols:
             if col in s.keys():
                 s[new_col] = self._user_defined_function(col, s[col])
@@ -74,8 +68,7 @@ class FixInput(UserDefinedPreprocessObject):
                          skip_check_transform_value=True, copy_transform_data=copy_transform_data)
         self.fill_value = fill_value
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
+    def _fit(self, s: dataframe_type):
         self.output_col_names = self.input_col_names
         return self
 
@@ -104,24 +97,24 @@ class FixInput(UserDefinedPreprocessObject):
 
 
 class DropCols(UserDefinedPreprocessObject):
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, _ in self.cols:
             if col in s.columns.tolist():
                 del s[col]
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         for col, _ in self.cols:
             if col in s.keys():
                 s.pop(col)
         return s
 
+    def _get_params(self):
+        return {}
+
 
 class SelectCols(UserDefinedPreprocessObject):
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         selected_cols = [col for col, _ in self.cols]
         for col in selected_cols:
             if col not in s.columns:
@@ -129,8 +122,7 @@ class SelectCols(UserDefinedPreprocessObject):
         s = s[selected_cols]
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         s_ = dict()
         selected_cols = [col for col, _ in self.cols]
         for col in selected_cols:
@@ -150,17 +142,17 @@ class FillNa(UserDefinedPreprocessObject):
     fill_mode可选:mean,median,mode
     """
 
-    def __init__(self, cols="all", fill_mode=None, fill_value=None, fill_detail=None, error_value=0, name=None,
+    def __init__(self, cols="all", fill_mode=None, fill_number_value=0, fill_category_value="missing", fill_detail=None,
+                 name=None,
                  copy_transform_data=True):
         super().__init__(cols=cols, name=name, skip_check_transform_type=True,
                          skip_check_transform_value=True, copy_transform_data=copy_transform_data)
-        self.fill_value = fill_value
+        self.fill_number_value = fill_number_value
+        self.fill_category_value = fill_category_value
         self.fill_mode = fill_mode
         self.fill_detail = fill_detail
-        self.error_value = error_value
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
+    def _fit(self, s: dataframe_type):
         if self.fill_detail is None:
             self.fill_detail = dict()
             if self.fill_mode is not None:
@@ -175,7 +167,10 @@ class FillNa(UserDefinedPreprocessObject):
                         raise Exception("fill_model should be [mean,median,mode]")
             else:
                 for col, _ in self.cols:
-                    self.fill_detail[col] = self.fill_value
+                    if "int" in str(s[col].dtype).lower() or "float" in str(s[col].dtype).lower():
+                        self.fill_detail[col] = self.fill_number_value
+                    else:
+                        self.fill_detail[col] = self.fill_category_value
         else:
             new_cols = []
             for col, new_col in self.cols:
@@ -186,24 +181,20 @@ class FillNa(UserDefinedPreprocessObject):
 
     def _user_defined_function(self, col, x):
         if str(x).lower() in ["none", "nan", "np.nan", "null"]:
-            try:
-                x = self.fill_detail.get(col, self.error_value)
-            except:
-                x = self.error_value
+            x = self.fill_detail.get(col)
         return x
 
     def _get_params(self) -> dict_type:
-        return {"fill_detail": self.fill_detail, "error_value": self.error_value}
+        return {"fill_detail": self.fill_detail}
 
     def _set_params(self, params: dict):
         self.fill_detail = params["fill_detail"]
-        self.error_value = params["error_value"]
 
 
 class TransToCategory(UserDefinedPreprocessObject):
     def __init__(self, cols="all", map_detail=(["None", "nan", "", " ", "*", "inf"], "nan"), name=None,
                  copy_transform_data=True):
-        super().__init__(cols=cols, name=name, skip_check_transform_type=False,
+        super().__init__(cols=cols, name=name, skip_check_transform_type=True,
                          copy_transform_data=copy_transform_data)
         self.map_detail = map_detail
 
@@ -302,8 +293,7 @@ class CategoryMapValues(UserDefinedPreprocessObject):
         else:
             return x
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
+    def _fit(self, s: dataframe_type):
         if self.map_detail is None:
             self.map_detail = dict()
             for col, _ in self.cols:
@@ -325,7 +315,7 @@ class CategoryMapValues(UserDefinedPreprocessObject):
 
 class Clip(UserDefinedPreprocessObject):
     def __init__(self, cols="all", default_clip=None, clip_detail=None, percent_range=None, name=None,
-                 skip_check_transform_type=False, copy_transform_data=True):
+                 skip_check_transform_type=True, copy_transform_data=True):
         """
        优先级clip_detail>percent_range>default_clip
         """
@@ -344,8 +334,7 @@ class Clip(UserDefinedPreprocessObject):
             x = clip_detail_[1] if x >= clip_detail_[1] else x
         return x
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type):
+    def _fit(self, s: dataframe_type):
         if self.clip_detail is None:
             self.clip_detail = dict()
             if self.percent_range is None:

@@ -8,11 +8,11 @@ import scipy.sparse as sp
 
 class ReduceMemUsage(PipeObject):
     """
-    功能性：减少内存使用量
+    功能性：通过修改数据类型减少内存使用量
     """
 
     def __init__(self, name=None, copy_transform_data=False):
-        super().__init__(name=name, copy_transform_data=copy_transform_data)
+        super().__init__(name=name, copy_transform_data=copy_transform_data,skip_check_transform_type=True)
         self.type_map_detail = dict()
 
     @staticmethod
@@ -43,14 +43,12 @@ class ReduceMemUsage(PipeObject):
         else:
             return str, None
 
-    @fit_wrapper
-    def fit(self, s: dataframe_type) -> dataframe_type:
+    def _fit(self, s: dataframe_type) -> dataframe_type:
         for col in self.input_col_names:
             self.type_map_detail[col] = self.get_type(s[col])
         return self
 
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, ti in self.type_map_detail.items():
             tp, ran = ti
             try:
@@ -62,8 +60,7 @@ class ReduceMemUsage(PipeObject):
                 pass
         return s
 
-    @transform_single_wrapper
-    def transform_single(self, s: dict_type) -> dict_type:
+    def _transform_single(self, s: dict_type) -> dict_type:
         for col, ti in self.type_map_detail.items():
             tp, ran = ti
             try:
@@ -84,14 +81,14 @@ class ReduceMemUsage(PipeObject):
 
 class Dense2Sparse(ReduceMemUsage):
     """
-    功能性：稠密矩阵转稀疏矩阵
+    功能性：通过将稠密矩阵压缩为稀疏矩阵减少内存使用；
+    注意：1）矩阵中0比较多时效果显著；2）注意后续pipe object要支持csr结构的稀疏矩阵
     """
 
     def __init__(self, name=None, copy_transform_data=False):
         super().__init__(name=name, copy_transform_data=copy_transform_data)
 
-    @transform_wrapper
-    def transform(self, s: dataframe_type) -> dataframe_type:
+    def _transform(self, s: dataframe_type) -> dataframe_type:
         s = pd.DataFrame.sparse.from_spmatrix(data=sp.csr_matrix(s), columns=self.input_col_names)
         for col, ti in self.type_map_detail.items():
             tp, ran = ti
