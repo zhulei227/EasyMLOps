@@ -314,132 +314,6 @@ x_test_new.head(5)
 
 
 
-
-```python
-ml.save("ml.pkl")
-```
-
-
-```python
-ml=PipeML()
-ml.pipe(FixInput())\
-  .pipe(FillNa(cols=["Cabin","Ticket","Parch"],fill_mode="mode"))\
-  .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
-  .pipe(FillNa(fill_detail={"Embarked":"N"}))\
-  .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
-  .pipe(TransToFloat(cols=["Age","Fare"]))\
-  .pipe(TransToInt(cols=["PassengerId","Survived","SibSp","Parch"]))\
-  .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
-  .pipe(CategoryMapValues(map_detail={"Cabin":(["nan","NaN"],"n")}))\
-  .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
-  .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))
-
-ml.load("ml.pkl")
-```
-
-
-```python
-ml.transform(x_test).head(5)
-```
-
-
-
-
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>PassengerId</th>
-      <th>Pclass</th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Age</th>
-      <th>SibSp</th>
-      <th>Parch</th>
-      <th>Ticket</th>
-      <th>Fare</th>
-      <th>Cabin</th>
-      <th>Embarked</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>500</th>
-      <td>501</td>
-      <td>3</td>
-      <td>calic, mr. petar</td>
-      <td>male</td>
-      <td>17.000000</td>
-      <td>0</td>
-      <td>0</td>
-      <td>315086</td>
-      <td>8.6625</td>
-      <td>c23 c25 c27</td>
-      <td>s</td>
-    </tr>
-    <tr>
-      <th>501</th>
-      <td>502</td>
-      <td>3</td>
-      <td>canavan, miss. mary</td>
-      <td>female</td>
-      <td>21.000000</td>
-      <td>0</td>
-      <td>0</td>
-      <td>364846</td>
-      <td>7.7500</td>
-      <td>c23 c25 c27</td>
-      <td>q</td>
-    </tr>
-    <tr>
-      <th>502</th>
-      <td>503</td>
-      <td>3</td>
-      <td>o'sullivan, miss. bridget mary</td>
-      <td>female</td>
-      <td>29.204774</td>
-      <td>0</td>
-      <td>0</td>
-      <td>330909</td>
-      <td>7.7175</td>
-      <td>c23 c25 c27</td>
-      <td>q</td>
-    </tr>
-    <tr>
-      <th>503</th>
-      <td>504</td>
-      <td>3</td>
-      <td>laitinen, miss. kristina sofia</td>
-      <td>female</td>
-      <td>37.000000</td>
-      <td>0</td>
-      <td>0</td>
-      <td>4135</td>
-      <td>9.5875</td>
-      <td>c23 c25 c27</td>
-      <td>s</td>
-    </tr>
-    <tr>
-      <th>504</th>
-      <td>505</td>
-      <td>1</td>
-      <td>maioni, miss. roberta</td>
-      <td>female</td>
-      <td>16.000000</td>
-      <td>0</td>
-      <td>0</td>
-      <td>110152</td>
-      <td>86.5000</td>
-      <td>b79</td>
-      <td>s</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
 ### 1.2 特征工程
 
 
@@ -704,7 +578,7 @@ ml.pipe(FixInput())\
 
 
 
-    <easymlops.pipeml.PipeML at 0x1f5031d4e48>
+    <easymlops.pipeml.PipeML at 0x1f0260c5eb8>
 
 
 
@@ -2126,7 +2000,7 @@ ml2.fit(x_train_new)
 
 
 
-    <easymlops.pipeml.PipeML at 0x1f518548a58>
+    <easymlops.pipeml.PipeML at 0x1f015ebf358>
 
 
 
@@ -2175,10 +2049,10 @@ ml1.auto_check_transform(x_test)
     (clip_name)  module transform check [success], single transform speed:[0.01]ms/it
     (clip_fare)  module transform check [success], single transform speed:[0.01]ms/it
     (<class 'easymlops.ml.representation.OneHotEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.representation.LabelEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.representation.LabelEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
     (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.representation.PCADecomposition'>)  module transform check [success], single transform speed:[1.63]ms/it
+    (<class 'easymlops.ml.representation.PCADecomposition'>)  module transform check [success], single transform speed:[2.1]ms/it
     
 
 ### 4.4 日志记录 
@@ -2305,7 +2179,7 @@ ml.pipe(FixInput())\
 
 
 
-    <easymlops.pipeml.PipeML at 0x1f51865f5f8>
+    <easymlops.pipeml.PipeML at 0x1f03b57a898>
 
 
 
@@ -2800,9 +2674,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>500</th>
       <td>2.132522</td>
-      <td>0.648001</td>
-      <td>0.075899</td>
-      <td>0.093432</td>
+      <td>0.648002</td>
+      <td>-0.075903</td>
+      <td>-0.093426</td>
       <td>-0.183208</td>
       <td>-0.017150</td>
       <td>0.403337</td>
@@ -2811,9 +2685,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>501</th>
       <td>2.034848</td>
-      <td>-0.608226</td>
-      <td>0.733371</td>
-      <td>0.013229</td>
+      <td>-0.608232</td>
+      <td>-0.733353</td>
+      <td>-0.013251</td>
       <td>-0.085437</td>
       <td>-0.033206</td>
       <td>0.293308</td>
@@ -2822,9 +2696,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>502</th>
       <td>2.040231</td>
-      <td>-0.616307</td>
-      <td>0.747636</td>
-      <td>0.021959</td>
+      <td>-0.616313</td>
+      <td>-0.747628</td>
+      <td>-0.022868</td>
       <td>-0.051665</td>
       <td>0.000399</td>
       <td>0.277010</td>
@@ -2833,9 +2707,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>503</th>
       <td>2.026293</td>
-      <td>-0.579115</td>
-      <td>0.735050</td>
-      <td>-0.011961</td>
+      <td>-0.579113</td>
+      <td>-0.735068</td>
+      <td>0.012226</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -2844,9 +2718,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>504</th>
       <td>2.025096</td>
-      <td>-0.573416</td>
-      <td>0.720068</td>
-      <td>-0.010264</td>
+      <td>-0.573417</td>
+      <td>-0.720064</td>
+      <td>0.010258</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -2863,13 +2737,13 @@ nlp.fit(x_train).transform(x_test).head(5)
 nlp.auto_check_transform(x_test)
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.01]ms/it
     (<class 'easymlops.ml.representation.TargetEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.02]ms/it
     (<class 'easymlops.nlp.preprocessing.Lower'>)  module transform check [success], single transform speed:[0.01]ms/it
     (<class 'easymlops.nlp.preprocessing.ReplacePunctuation'>)  module transform check [success], single transform speed:[0.01]ms/it
     (<class 'easymlops.ml.preprocessing.SelectCols'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.ensemble.Parallel'>)  module transform check [success], single transform speed:[5.09]ms/it
+    (<class 'easymlops.ml.ensemble.Parallel'>)  module transform check [success], single transform speed:[5.4]ms/it
     (<class 'easymlops.ml.preprocessing.DropCols'>)  module transform check [success], single transform speed:[0.0]ms/it
     
 
