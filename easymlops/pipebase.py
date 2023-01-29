@@ -5,13 +5,19 @@ import pickle
 
 
 class Pipe(PipeObject):
-    def __init__(self, name=None):
-        PipeObject.__init__(self, name=name)
+    def __init__(self, run_to_layer=None, **kwargs):
+        super().__init__(**kwargs)
         self.models = []
+        self.run_to_layer = run_to_layer
 
     def pipe(self, model):
         self.models.append(model)
         return self
+
+    def __getitem__(self, target_layer):
+        for current_layer_deep, model in enumerate(self.models):
+            if self._match_layer(current_layer_deep, model.name, target_layer):
+                return model
 
     def fit(self, x, show_process=False):
         x_ = copy.deepcopy(x)
@@ -35,6 +41,7 @@ class Pipe(PipeObject):
         return False
 
     def transform(self, x, show_process=False, run_to_layer=None):
+        run_to_layer = self.run_to_layer if run_to_layer is None else run_to_layer
         x_ = copy.deepcopy(x)
         if show_process:
             for current_layer_deep, model in tqdm(enumerate(self.models)):
@@ -50,6 +57,7 @@ class Pipe(PipeObject):
         return x_
 
     def transform_single(self, x, show_process=False, run_to_layer=None, logger=None, log_base_dict: dict_type = None):
+        run_to_layer = self.run_to_layer if run_to_layer is None else run_to_layer
         x_ = copy.deepcopy(x)
         self._save_log(logger, log_base_dict, 0, x)
         if show_process:
@@ -101,7 +109,14 @@ class Pipe(PipeObject):
         for i, param in enumerate(params):
             self.models[i].set_params(param)
 
-    def auto_check_transform(self, x):
+    def auto_check_transform(self, x, return_x=False):
         x_ = copy.deepcopy(x)
         for model in self.models:
-            x_ = model.auto_check_transform(x_)
+            if issubclass(model.__class__, Pipe):
+                # 如果是Pipe类型，则返回transform后的x供下一个Pipe模块调用
+                x_ = model.auto_check_transform(x_, return_x=True)
+            else:
+                # 非Pipe以及其子类，默认都会返回transform后的x
+                x_ = model.auto_check_transform(x_)
+        if return_x:
+            return x_

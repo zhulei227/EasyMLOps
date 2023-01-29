@@ -4,12 +4,9 @@ import string
 from ..base import *
 
 
-class UserDefinedPreProcessing(PipeObject):
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False,
-                 transform_check_max_number_error=1e-5):
-        super().__init__(name=name, prefix=prefix, copy_transform_data=copy_transform_data,
-                         transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=True)
+class PreprocessBase(PipeObject):
+    def __init__(self, cols="all", skip_check_transform_type=True, **kwargs):
+        super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.cols = cols
 
     def before_fit(self, s: dataframe_type) -> dataframe_type:
@@ -26,7 +23,7 @@ class UserDefinedPreProcessing(PipeObject):
         self.cols = params["cols"]
 
 
-class Lower(UserDefinedPreProcessing):
+class Lower(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -41,8 +38,8 @@ class Lower(UserDefinedPreProcessing):
     |jkk|
     """
 
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False):
-        super().__init__(name=name, cols=cols, prefix=prefix, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(cols=cols, **kwargs)
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col in self.cols:
@@ -58,7 +55,7 @@ class Lower(UserDefinedPreProcessing):
         return {}
 
 
-class Upper(UserDefinedPreProcessing):
+class Upper(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -73,8 +70,8 @@ class Upper(UserDefinedPreProcessing):
     |JKK|
     """
 
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False):
-        super().__init__(name=name, cols=cols, prefix=prefix, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(cols=cols, **kwargs)
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col in self.cols:
@@ -90,7 +87,7 @@ class Upper(UserDefinedPreProcessing):
         return {}
 
 
-class RemoveDigits(UserDefinedPreProcessing):
+class RemoveDigits(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -105,8 +102,8 @@ class RemoveDigits(UserDefinedPreProcessing):
     |jk|
     """
 
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False):
-        super().__init__(name=name, cols=cols, prefix=prefix, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(cols=cols, **kwargs)
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col in self.cols:
@@ -122,7 +119,7 @@ class RemoveDigits(UserDefinedPreProcessing):
         return {}
 
 
-class ReplaceDigits(UserDefinedPreProcessing):
+class ReplaceDigits(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -137,8 +134,8 @@ class ReplaceDigits(UserDefinedPreProcessing):
     |j[d]k[d]|
     """
 
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False, symbols="[d]"):
-        super().__init__(name=name, cols=cols, prefix=prefix, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", symbols="[d]", **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.symbols = symbols
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -158,7 +155,7 @@ class ReplaceDigits(UserDefinedPreProcessing):
         self.symbols = params["symbols"]
 
 
-class RemovePunctuation(UserDefinedPreProcessing):
+class RemovePunctuation(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -173,8 +170,8 @@ class RemovePunctuation(UserDefinedPreProcessing):
     |abc|
     """
 
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False):
-        super().__init__(name=name, cols=cols, prefix=prefix, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(cols=cols, **kwargs)
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col in self.cols:
@@ -191,7 +188,7 @@ class RemovePunctuation(UserDefinedPreProcessing):
         return {}
 
 
-class ReplacePunctuation(UserDefinedPreProcessing):
+class ReplacePunctuation(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -206,8 +203,8 @@ class ReplacePunctuation(UserDefinedPreProcessing):
     |abc[p]|
     """
 
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False, symbols="[p]"):
-        super().__init__(name=name, cols=cols, prefix=prefix, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", symbols="[p]", **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.symbols = symbols
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -228,7 +225,7 @@ class ReplacePunctuation(UserDefinedPreProcessing):
         self.symbols = params["symbols"]
 
 
-class RemoveWhitespace(UserDefinedPreProcessing):
+class RemoveWhitespace(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -243,8 +240,8 @@ class RemoveWhitespace(UserDefinedPreProcessing):
     |abc|
     """
 
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False):
-        super().__init__(name=name, cols=cols, prefix=prefix, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(cols=cols, **kwargs)
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col in self.cols:
@@ -262,7 +259,7 @@ class RemoveWhitespace(UserDefinedPreProcessing):
         return {}
 
 
-class RemoveStopWords(UserDefinedPreProcessing):
+class RemoveStopWords(PreprocessBase):
     """
     stop_words=["ab"]
     ----------------------------
@@ -279,9 +276,8 @@ class RemoveStopWords(UserDefinedPreProcessing):
     |abc|
     """
 
-    def __init__(self, cols="all", stop_words=None, stop_words_path=None, name=None,
-                 transform_check_max_number_error=1e-5):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error)
+    def __init__(self, cols="all", stop_words=None, stop_words_path=None, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.stop_words = set()
         if stop_words is not None:
             for word in stop_words:
@@ -314,7 +310,7 @@ class RemoveStopWords(UserDefinedPreProcessing):
         self.stop_words = params["stop_words"]
 
 
-class ExtractKeyWords(UserDefinedPreProcessing):
+class ExtractKeyWords(PreprocessBase):
     """
     key_words=["ab","cd"]
     ----------------------------
@@ -331,9 +327,8 @@ class ExtractKeyWords(UserDefinedPreProcessing):
     |ab|
     """
 
-    def __init__(self, cols="all", key_words=None, key_words_path=None, name=None,
-                 transform_check_max_number_error=1e-5):
-        super().__init__(name=name, cols=cols, transform_check_max_number_error=transform_check_max_number_error)
+    def __init__(self, cols="all", key_words=None, key_words_path=None, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         import ahocorasick
         self.actree = ahocorasick.Automaton()
         if key_words is not None:
@@ -368,7 +363,7 @@ class ExtractKeyWords(UserDefinedPreProcessing):
         self.actree = params["actree"]
 
 
-class AppendKeyWords(UserDefinedPreProcessing):
+class AppendKeyWords(PreprocessBase):
     """
     key_words=["ab","cd"]
     ----------------------------
@@ -385,9 +380,8 @@ class AppendKeyWords(UserDefinedPreProcessing):
     |abc def ab|
     """
 
-    def __init__(self, cols="all", key_words=None, key_words_path=None, name=None,
-                 transform_check_max_number_error=1e-5):
-        super().__init__(name=name, cols=cols, transform_check_max_number_error=transform_check_max_number_error)
+    def __init__(self, cols="all", key_words=None, key_words_path=None, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         import ahocorasick
         self.actree = ahocorasick.Automaton()
         if key_words is not None:
@@ -422,7 +416,7 @@ class AppendKeyWords(UserDefinedPreProcessing):
         self.actree = params["actree"]
 
 
-class ExtractChineseWords(UserDefinedPreProcessing):
+class ExtractChineseWords(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -437,8 +431,8 @@ class ExtractChineseWords(UserDefinedPreProcessing):
     |中文|
     """
 
-    def __init__(self, cols="all", name=None):
-        super().__init__(name=name, cols=cols)
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(cols=cols, **kwargs)
 
     @staticmethod
     def apply_function(s):
@@ -459,7 +453,7 @@ class ExtractChineseWords(UserDefinedPreProcessing):
         return {}
 
 
-class ExtractNGramWords(UserDefinedPreProcessing):
+class ExtractNGramWords(PreprocessBase):
     """
     demo1:
     n_grams=[2]
@@ -492,8 +486,8 @@ class ExtractNGramWords(UserDefinedPreProcessing):
     |abc def abcdef|
     """
 
-    def __init__(self, cols="all", n_grams=None, name=None, transform_check_max_number_error=1e-5):
-        super().__init__(name=name, cols=cols, transform_check_max_number_error=transform_check_max_number_error)
+    def __init__(self, cols="all", n_grams=None, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         if n_grams is not None:
             self.n_grams = n_grams
         else:
@@ -531,7 +525,7 @@ class ExtractNGramWords(UserDefinedPreProcessing):
         self.n_grams = params["n_grams"]
 
 
-class ExtractJieBaWords(UserDefinedPreProcessing):
+class ExtractJieBaWords(PreprocessBase):
     """
     input type:pandas.series
     input like:
@@ -546,8 +540,8 @@ class ExtractJieBaWords(UserDefinedPreProcessing):
     |北京 清华大学|
     """
 
-    def __init__(self, cols="all", cut_all=False, name=None, transform_check_max_number_error=1e-5):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error)
+    def __init__(self, cols="all", cut_all=False, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.cut_all = cut_all
 
     def apply_function(self, s):

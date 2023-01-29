@@ -11,8 +11,8 @@ class ReduceMemUsage(PipeObject):
     功能性：通过修改数据类型减少内存使用量
     """
 
-    def __init__(self, name=None, copy_transform_data=False):
-        super().__init__(name=name, copy_transform_data=copy_transform_data,skip_check_transform_type=True)
+    def __init__(self, skip_check_transform_type=True, **kwargs):
+        super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.type_map_detail = dict()
 
     @staticmethod
@@ -85,8 +85,8 @@ class Dense2Sparse(ReduceMemUsage):
     注意：1）矩阵中0比较多时效果显著；2）注意后续pipe object要支持csr结构的稀疏矩阵
     """
 
-    def __init__(self, name=None, copy_transform_data=False):
-        super().__init__(name=name, copy_transform_data=copy_transform_data)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
         s = pd.DataFrame.sparse.from_spmatrix(data=sp.csr_matrix(s), columns=self.input_col_names)

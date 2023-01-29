@@ -6,10 +6,25 @@ class Parallel(PipeObject):
     并行模块:接受相同的数据，每个pipe object运行后合并(按col名覆盖)输出
     """
 
-    def __init__(self, pipe_objects=None, name=None, drop_input_data=True):
-        super().__init__(name=name,skip_check_transform_type=True)
+    def __init__(self, pipe_objects=None, drop_input_data=True, skip_check_transform_type=True, **kwargs):
+        super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.pipe_objects = pipe_objects
         self.drop_input_data = drop_input_data
+
+    def __getitem__(self, target_pipe_model):
+        for current_layer_deep, model in enumerate(self.pipe_objects):
+            if self._match_pipe_model(current_layer_deep, model.name, target_pipe_model):
+                return model
+
+    def _match_pipe_model(self, current_layer_deep, current_layer_name, target_layer):
+        if target_layer is not None:
+            if type(target_layer) == int and target_layer < 0:
+                target_layer = len(self.pipe_objects) + target_layer
+            if type(target_layer) == int and current_layer_deep == target_layer:
+                return True
+            if type(target_layer) == str and current_layer_name == target_layer:
+                return True
+        return False
 
     def _fit(self, s: dataframe_type):
         for obj in self.pipe_objects:

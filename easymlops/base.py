@@ -110,7 +110,8 @@ class SuperPipeObject(object):
 
     def __init__(self, name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=False,
                  skip_check_transform_value=False, leak_check_transform_type=True, leak_check_transform_value=True,
-                 copy_transform_data=True, prefix=None):
+                 copy_transform_data=True, prefix=None, **kwargs):
+        super().__init__(**kwargs)
         if name is None:
             name = self.__class__
         self.name = name
@@ -361,15 +362,8 @@ the top {} error info is \n {}
 
 
 class PipeObject(SuperPipeObject):
-    def __init__(self, name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=False,
-                 skip_check_transform_value=False, leak_check_transform_type=True, leak_check_transform_value=True,
-                 copy_transform_data=True, prefix=None):
-        super().__init__(name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type,
-                         skip_check_transform_value=skip_check_transform_value,
-                         leak_check_transform_type=leak_check_transform_type,
-                         leak_check_transform_value=leak_check_transform_value,
-                         copy_transform_data=copy_transform_data, prefix=prefix)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def after_fit(self):
         super().after_fit()

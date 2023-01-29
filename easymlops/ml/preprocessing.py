@@ -1,17 +1,13 @@
 from ..base import *
 
 
-class UserDefinedPreprocessObject(PipeObject):
+class PreprocessBase(PipeObject):
     """
     只需要对单个key-value处理的类型
     """
 
-    def __init__(self, cols="all", name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=False, skip_check_transform_value=False, copy_transform_data=True):
-        super().__init__(name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type,
-                         skip_check_transform_value=skip_check_transform_value,
-                         copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(**kwargs)
         self.cols = cols
 
     def _user_defined_function(self, col, x):
@@ -58,14 +54,15 @@ class UserDefinedPreprocessObject(PipeObject):
         self.cols = params["cols"]
 
 
-class FixInput(UserDefinedPreprocessObject):
+class FixInput(PreprocessBase):
     """
     固定输入，对不存在的col用None填充
     """
 
-    def __init__(self, fill_value=None, name=None, copy_transform_data=True):
-        super().__init__(cols="all", name=name, skip_check_transform_type=True,
-                         skip_check_transform_value=True, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", fill_value=None, skip_check_transform_type=True,
+                 skip_check_transform_value=True, **kwargs):
+        super().__init__(cols=cols, skip_check_transform_type=skip_check_transform_type,
+                         skip_check_transform_value=skip_check_transform_value, **kwargs)
         self.fill_value = fill_value
 
     def _fit(self, s: dataframe_type):
@@ -96,7 +93,53 @@ class FixInput(UserDefinedPreprocessObject):
         self.fill_value = params["fill_value"]
 
 
-class DropCols(UserDefinedPreprocessObject):
+class Replace(PreprocessBase):
+    """
+    source_values:["*"," "]
+    target_value:""
+    ----------------------------
+    input type:pandas.dataframe
+    input like:
+    |input|
+    |hi*|
+    |hi |
+    -------------------------
+    output type:pandas.serdataframeies
+    output like:
+    |output|
+    |hi|
+    |hi|
+    """
+
+    def __init__(self, cols="all", source_values=None, target_value="", **kwargs):
+        super().__init__(cols=cols, **kwargs)
+        self.source_values = source_values
+        if source_values is None:
+            self.source_values = []
+        assert type(self.source_values) == list
+        self.target_value = target_value
+
+    def _transform(self, s: dataframe_type) -> dataframe_type:
+        for col, new_col in self.cols:
+            for source_value in self.source_values:
+                s[new_col] = s[col].astype(str).str.replace(source_value, self.target_value)
+        return s
+
+    def _transform_single(self, s: dict_type) -> dict_type:
+        for col, new_col in self.cols:
+            for source_value in self.source_values:
+                s[new_col] = str(s[col]).replace(source_value, self.target_value)
+        return s
+
+    def _get_params(self):
+        return {"source_values": self.source_values, "target_value": self.target_value}
+
+    def _set_params(self, params: dict_type):
+        self.source_values = params["source_values"]
+        self.target_value = params["target_value"]
+
+
+class DropCols(PreprocessBase):
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, _ in self.cols:
             if col in s.columns.tolist():
@@ -113,7 +156,7 @@ class DropCols(UserDefinedPreprocessObject):
         return {}
 
 
-class SelectCols(UserDefinedPreprocessObject):
+class SelectCols(PreprocessBase):
     def _transform(self, s: dataframe_type) -> dataframe_type:
         selected_cols = [col for col, _ in self.cols]
         for col in selected_cols:
@@ -136,17 +179,15 @@ class SelectCols(UserDefinedPreprocessObject):
         return {}
 
 
-class FillNa(UserDefinedPreprocessObject):
+class FillNa(PreprocessBase):
     """
     优先级fill_detail>fill_mode>fill_value
     fill_mode可选:mean,median,mode
     """
 
-    def __init__(self, cols="all", fill_mode=None, fill_number_value=0, fill_category_value="missing", fill_detail=None,
-                 name=None,
-                 copy_transform_data=True):
-        super().__init__(cols=cols, name=name, skip_check_transform_type=True,
-                         skip_check_transform_value=True, copy_transform_data=copy_transform_data)
+    def __init__(self, cols="all", fill_mode=None, fill_number_value=0, fill_category_value="nan", fill_detail=None,
+                 **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.fill_number_value = fill_number_value
         self.fill_category_value = fill_category_value
         self.fill_mode = fill_mode
@@ -191,11 +232,9 @@ class FillNa(UserDefinedPreprocessObject):
         self.fill_detail = params["fill_detail"]
 
 
-class TransToCategory(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", map_detail=(["None", "nan", "", " ", "*", "inf"], "nan"), name=None,
-                 copy_transform_data=True):
-        super().__init__(cols=cols, name=name, skip_check_transform_type=True,
-                         copy_transform_data=copy_transform_data)
+class TransToCategory(PreprocessBase):
+    def __init__(self, cols="all", map_detail=(["None", "nan", "", " ", "*", "inf"], "nan"), **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.map_detail = map_detail
 
     def _user_defined_function(self, col, x):
@@ -215,12 +254,9 @@ class TransToCategory(UserDefinedPreprocessObject):
         self.map_detail = params["map_detail"]
 
 
-class TransToFloat(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", nan_fill_value=0, name=None, transform_check_max_number_error=1e-3,
-                 copy_transform_data=True):
-        super().__init__(cols=cols, name=name,
-                         transform_check_max_number_error=transform_check_max_number_error,
-                         copy_transform_data=copy_transform_data)
+class TransToFloat(PreprocessBase):
+    def __init__(self, cols="all", nan_fill_value=0, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.nan_fill_value = nan_fill_value
 
     def _user_defined_function(self, col, x):
@@ -237,12 +273,9 @@ class TransToFloat(UserDefinedPreprocessObject):
         self.nan_fill_value = params["nan_fill_value"]
 
 
-class TransToInt(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", nan_fill_value=0, name=None, transform_check_max_number_error=1e-3,
-                 copy_transform_data=True):
-        super().__init__(cols=cols, name=name,
-                         transform_check_max_number_error=transform_check_max_number_error,
-                         copy_transform_data=copy_transform_data)
+class TransToInt(PreprocessBase):
+    def __init__(self, cols="all", nan_fill_value=0, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.nan_fill_value = nan_fill_value
 
     def _user_defined_function(self, col, x):
@@ -259,7 +292,7 @@ class TransToInt(UserDefinedPreprocessObject):
         self.nan_fill_value = params["nan_fill_value"]
 
 
-class TransToLower(UserDefinedPreprocessObject):
+class TransToLower(PreprocessBase):
     def _user_defined_function(self, col, x):
         try:
             return str(x).lower()
@@ -270,7 +303,7 @@ class TransToLower(UserDefinedPreprocessObject):
         return {}
 
 
-class TransToUpper(UserDefinedPreprocessObject):
+class TransToUpper(PreprocessBase):
     def _user_defined_function(self, col, x):
         try:
             return str(x).upper()
@@ -281,9 +314,9 @@ class TransToUpper(UserDefinedPreprocessObject):
         return {}
 
 
-class CategoryMapValues(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", default_map=([""], ""), map_detail=None, name=None, copy_transform_data=True):
-        super().__init__(cols=cols, name=name, copy_transform_data=copy_transform_data)
+class CategoryMapValues(PreprocessBase):
+    def __init__(self, cols="all", default_map=([""], ""), map_detail=None, **kwargs):
+        super().__init__(cols=cols, **kwargs)
         self.default_map = default_map
         self.map_detail = map_detail
 
@@ -313,15 +346,12 @@ class CategoryMapValues(UserDefinedPreprocessObject):
         self.map_detail = params["map_detail"]
 
 
-class Clip(UserDefinedPreprocessObject):
-    def __init__(self, cols="all", default_clip=None, clip_detail=None, percent_range=None, name=None,
-                 skip_check_transform_type=True, copy_transform_data=True):
+class Clip(PreprocessBase):
+    def __init__(self, cols="all", default_clip=None, clip_detail=None, percent_range=None, **kwargs):
         """
        优先级clip_detail>percent_range>default_clip
         """
-        super().__init__(cols=cols, name=name,
-                         skip_check_transform_type=skip_check_transform_type,
-                         copy_transform_data=copy_transform_data)
+        super().__init__(cols=cols, **kwargs)
         self.default_clip = default_clip
         self.clip_detail = clip_detail
         self.percent_range = percent_range

@@ -20,14 +20,13 @@ class Normalization(PipeObject):
     | 55| 34| 56| 23|
     """
 
-    def __init__(self, cols=None, name=None, normal_range=100, normal_type="cdf", std_range=10,
-                 copy_transform_data=True):
+    def __init__(self, cols=None, normal_range=100, normal_type="cdf", std_range=10, **kwargs):
         """
         :param normal_range:
         :param normal_type: cdf,range
         :param std_range:
         """
-        super().__init__(name=name, copy_transform_data=copy_transform_data)
+        super().__init__(**kwargs)
         self.normal_range = normal_range
         self.normal_type = normal_type
         self.std_range = std_range
@@ -81,8 +80,8 @@ class Normalization(PipeObject):
 
 
 class MapValues(PipeObject):
-    def __init__(self, name=None, map_values: dict = None, copy_transform_data=True):
-        super().__init__(name=name, copy_transform_data=copy_transform_data)
+    def __init__(self, map_values: dict = None, copy_transform_data=True, **kwargs):
+        super().__init__(copy_transform_data=copy_transform_data, **kwargs)
         self.map_values = map_values if map_values is not None else dict()
 
     def _transform(self, s: dataframe_type) -> dataframe_type:

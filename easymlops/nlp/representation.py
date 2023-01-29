@@ -3,13 +3,18 @@ import numpy as np
 import pandas as pd
 
 
-class UserDefinedRepresentation(PipeObject):
-    def __init__(self, cols="all", name=None, prefix=None, copy_transform_data=False,
-                 transform_check_max_number_error=1e-5, skip_check_transform_type=True):
-        super().__init__(name=name, prefix=prefix, copy_transform_data=copy_transform_data,
-                         transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type)
+class RepresentationBase(PipeObject):
+    def __init__(self, cols="all", skip_check_transform_type=True, native_init_params=None, native_fit_params=None,
+                 **kwargs):
+        super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.cols = cols
+        # 底层模型自带参数
+        self.native_init_params = native_init_params
+        self.native_fit_params = native_fit_params
+        if self.native_init_params is None:
+            self.native_init_params = dict()
+        if self.native_fit_params is None:
+            self.native_fit_params = dict()
 
     def before_fit(self, s: dataframe_type) -> dataframe_type:
         s = super().before_fit(s)
@@ -34,13 +39,16 @@ class UserDefinedRepresentation(PipeObject):
         return self._transform(pd.DataFrame([s])).to_dict("record")[0]
 
     def _get_params(self):
-        return {"cols": self.cols}
+        return {"cols": self.cols, "native_init_params": self.native_init_params,
+                "native_fit_params": self.native_fit_params}
 
     def _set_params(self, params: dict_type):
         self.cols = params["cols"]
+        self.native_init_params = params["native_init_params"]
+        self.native_fit_params = params["native_fit_params"]
 
 
-class BagOfWords(UserDefinedRepresentation):
+class BagOfWords(RepresentationBase):
     """
     input type:pandas.series
     input like:(space separation)
@@ -55,11 +63,13 @@ class BagOfWords(UserDefinedRepresentation):
     | 1 |  1 | 0 |  0  |  1  |
     """
 
-    def __init__(self, cols="all", name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=True,
-                 prefix="bag"):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type, prefix=prefix)
+    def __init__(self, cols="all", prefix="bag", **kwargs):
+        super().__init__(cols=cols, prefix=prefix, **kwargs)
         self.tf = {}
+        self.default_native_init_params = {"max_features": None, "tokenizer": self.tokenizer_func,
+                                           "preprocessor": self.preprocessor_func, "min_df": 1, "max_df": 1.0,
+                                           "binary": False}
+        self.default_native_init_params.update(self.native_init_params)
 
     @staticmethod
     def tokenizer_func(x):
@@ -72,15 +82,8 @@ class BagOfWords(UserDefinedRepresentation):
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.feature_extraction.text import CountVectorizer
         for col in self.cols:
-            tf = CountVectorizer(
-                max_features=None,
-                tokenizer=self.tokenizer_func,
-                preprocessor=self.preprocessor_func,
-                min_df=1,
-                max_df=1.0,
-                binary=False,
-            )
-            tf.fit(s[col])
+            tf = CountVectorizer(**self.default_native_init_params)
+            tf.fit(s[col], **self.native_fit_params)
             self.tf[col] = tf
         return self
 
@@ -107,7 +110,7 @@ class BagOfWords(UserDefinedRepresentation):
         self.tf = params["tf"]
 
 
-class TFIDF(UserDefinedRepresentation):
+class TFIDF(RepresentationBase):
     """
     input type:pandas.series
     input like:(space separation)
@@ -122,11 +125,13 @@ class TFIDF(UserDefinedRepresentation):
     |0.3|0.2 | 0 |  0  | 0.2 |
     """
 
-    def __init__(self, cols="all", name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=True,
-                 prefix="tfidf"):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type, prefix=prefix)
+    def __init__(self, cols="all", prefix="tfidf", **kwargs):
+        super().__init__(cols=cols, prefix=prefix, **kwargs)
         self.tfidf = {}
+        self.default_native_init_params = {"max_features": None, "tokenizer": self.tokenizer_func,
+                                           "preprocessor": self.preprocessor_func, "min_df": 1, "max_df": 1.0,
+                                           "binary": False}
+        self.default_native_init_params.update(self.native_init_params)
 
     @staticmethod
     def tokenizer_func(x):
@@ -139,15 +144,8 @@ class TFIDF(UserDefinedRepresentation):
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.feature_extraction.text import TfidfVectorizer
         for col in self.cols:
-            tfidf = TfidfVectorizer(
-                max_features=None,
-                tokenizer=self.tokenizer_func,
-                preprocessor=self.preprocessor_func,
-                min_df=1,
-                max_df=1.0,
-                binary=False,
-            )
-            tfidf.fit(s[col])
+            tfidf = TfidfVectorizer(**self.default_native_init_params)
+            tfidf.fit(s[col], **self.native_fit_params)
             self.tfidf[col] = tfidf
         return self
 
@@ -174,7 +172,7 @@ class TFIDF(UserDefinedRepresentation):
         self.tfidf = params["tfidf"]
 
 
-class LdaTopicModel(UserDefinedRepresentation):
+class LdaTopicModel(RepresentationBase):
     """
     input type:pandas.series
     input like:(space separation)
@@ -189,11 +187,10 @@ class LdaTopicModel(UserDefinedRepresentation):
     |0.3|0.2|0.6|0.1|
     """
 
-    def __init__(self, cols="all", num_topics=10, name=None, transform_check_max_number_error=1e-1,
-                 skip_check_transform_type=True, prefix="lda"):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type, prefix=prefix)
-        self.num_topics = num_topics
+    def __init__(self, cols="all", num_topics=10, prefix="lda", **kwargs):
+        super().__init__(cols=cols, prefix=prefix, **kwargs)
+        self.native_init_params.update({"num_topics": num_topics})
+        self.native_init_params.update(self.native_fit_params)
         self.common_dictionary = {}
         self.lda_model = {}
 
@@ -205,7 +202,7 @@ class LdaTopicModel(UserDefinedRepresentation):
             texts = [line.split(" ") for line in texts]
             common_dictionary = Dictionary(texts)
             common_corpus = [common_dictionary.doc2bow(text) for text in texts]
-            lda_model = LdaModel(common_corpus, num_topics=self.num_topics)
+            lda_model = LdaModel(common_corpus, **self.native_init_params)
             self.lda_model[col] = lda_model
             self.common_dictionary[col] = common_dictionary
         return self
@@ -218,7 +215,8 @@ class LdaTopicModel(UserDefinedRepresentation):
             texts = s[col].values.tolist()
             texts = [line.split(" ") for line in texts]
             common_corpus = [common_dictionary.doc2bow(text) for text in texts]
-            vectors = matutils.corpus2dense(lda_model[common_corpus], num_terms=self.num_topics).T
+            vectors = matutils.corpus2dense(lda_model[common_corpus],
+                                            num_terms=self.native_init_params.get("num_topics")).T
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
             for icol in result.columns:
@@ -227,15 +225,14 @@ class LdaTopicModel(UserDefinedRepresentation):
         return s
 
     def _get_params(self) -> dict_type:
-        return {"num_topics": self.num_topics, "common_dictionary": self.common_dictionary, "lda_model": self.lda_model}
+        return {"common_dictionary": self.common_dictionary, "lda_model": self.lda_model}
 
     def _set_params(self, params: dict):
-        self.num_topics = params["num_topics"]
         self.common_dictionary = params["common_dictionary"]
         self.lda_model = params["lda_model"]
 
 
-class LsiTopicModel(UserDefinedRepresentation):
+class LsiTopicModel(RepresentationBase):
     """
     input type:pandas.series
     input like:(space separation)
@@ -250,11 +247,10 @@ class LsiTopicModel(UserDefinedRepresentation):
     |0.3|0.2|0.6|0.1|
     """
 
-    def __init__(self, cols="all", num_topics=10, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, prefix="lsi"):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type, prefix=prefix)
-        self.num_topics = num_topics
+    def __init__(self, cols="all", num_topics=10, prefix="lsi", **kwargs):
+        super().__init__(cols=cols, prefix=prefix, **kwargs)
+        self.native_init_params.update({"num_topics": num_topics})
+        self.native_init_params.update(self.native_fit_params)
         self.common_dictionary = {}
         self.lsi_model = {}
 
@@ -266,7 +262,7 @@ class LsiTopicModel(UserDefinedRepresentation):
             texts = [line.split(" ") for line in texts]
             common_dictionary = Dictionary(texts)
             common_corpus = [common_dictionary.doc2bow(text) for text in texts]
-            lsi_model = LsiModel(common_corpus, num_topics=self.num_topics, id2word=common_dictionary)
+            lsi_model = LsiModel(common_corpus, id2word=common_dictionary, **self.native_init_params)
             self.lsi_model[col] = lsi_model
             self.common_dictionary[col] = common_dictionary
         return self
@@ -279,7 +275,8 @@ class LsiTopicModel(UserDefinedRepresentation):
             texts = s[col].values.tolist()
             texts = [line.split(" ") for line in texts]
             common_corpus = [common_dictionary.doc2bow(text) for text in texts]
-            vectors = matutils.corpus2dense(lsi_model[common_corpus], num_terms=self.num_topics).T
+            vectors = matutils.corpus2dense(lsi_model[common_corpus],
+                                            num_terms=self.native_init_params.get("num_topics")).T
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
             for icol in result.columns:
@@ -288,15 +285,14 @@ class LsiTopicModel(UserDefinedRepresentation):
         return s
 
     def _get_params(self) -> dict_type:
-        return {"num_topics": self.num_topics, "common_dictionary": self.common_dictionary, "lsi_model": self.lsi_model}
+        return {"common_dictionary": self.common_dictionary, "lsi_model": self.lsi_model}
 
     def _set_params(self, params: dict):
-        self.num_topics = params["num_topics"]
         self.common_dictionary = params["common_dictionary"]
         self.lsi_model = params["lsi_model"]
 
 
-class Word2VecModel(UserDefinedRepresentation):
+class Word2VecModel(RepresentationBase):
     """
     input type:pandas.series
     input like:(space separation)
@@ -311,20 +307,18 @@ class Word2VecModel(UserDefinedRepresentation):
     |0.3|0.2|0.6|0.1|
     """
 
-    def __init__(self, cols="all", embedding_size=16, min_count=5, name=None, transform_check_max_number_error=1e-1,
-                 skip_check_transform_type=True, prefix="w2v"):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type, prefix=prefix)
-        self.min_count = min_count
-        self.embedding_size = embedding_size
+    def __init__(self, cols="all", embedding_size=16, min_count=5, prefix="w2v", **kwargs):
+        super().__init__(cols=cols, prefix=prefix, **kwargs)
         self.w2v_model = {}
+        self.native_init_params.update(self.native_fit_params)
+        self.native_init_params.update({"vector_size": embedding_size, "min_count": min_count})
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from gensim.models import Word2Vec
         for col in self.cols:
             texts = s[col].values.tolist()
             texts = [line.split(" ") for line in texts]
-            w2v_model = Word2Vec(sentences=texts, vector_size=self.embedding_size, min_count=self.min_count)
+            w2v_model = Word2Vec(sentences=texts, **self.native_init_params)
             self.w2v_model[col] = w2v_model
         return self
 
@@ -334,7 +328,7 @@ class Word2VecModel(UserDefinedRepresentation):
             texts = s[col].values.tolist()
             texts = [line.split(" ") for line in texts]
             vectors = [np.mean(np.asarray([w2v_model.wv[word] for word in line if word in w2v_model.wv]),
-                               axis=0) + np.zeros(shape=(self.embedding_size,))
+                               axis=0) + np.zeros(shape=(self.native_init_params.get("vector_size"),))
                        for line in texts]
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
@@ -344,15 +338,13 @@ class Word2VecModel(UserDefinedRepresentation):
         return s
 
     def _get_params(self) -> dict_type:
-        return {"embedding_size": self.embedding_size, "w2v_model": self.w2v_model, "min_count": self.min_count}
+        return {"w2v_model": self.w2v_model}
 
     def _set_params(self, params: dict):
-        self.embedding_size = params["embedding_size"]
         self.w2v_model = params["w2v_model"]
-        self.min_count = params["min_count"]
 
 
-class Doc2VecModel(UserDefinedRepresentation):
+class Doc2VecModel(RepresentationBase):
     """
     input type:pandas.series
     input like:(space separation)
@@ -367,13 +359,11 @@ class Doc2VecModel(UserDefinedRepresentation):
     |0.3|0.2|0.6|0.1|
     """
 
-    def __init__(self, cols="all", embedding_size=16, min_count=5, name=None, transform_check_max_number_error=1e-1,
-                 skip_check_transform_type=True, prefix="d2v"):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type, prefix=prefix)
-        self.min_count = min_count
-        self.embedding_size = embedding_size
+    def __init__(self, cols="all", embedding_size=16, min_count=5, prefix="d2v", **kwargs):
+        super().__init__(cols=cols, prefix=prefix, **kwargs)
         self.d2v_model = {}
+        self.native_init_params.update(self.native_fit_params)
+        self.native_init_params.update({"vector_size": embedding_size, "min_count": min_count})
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from gensim.models.doc2vec import Doc2Vec, TaggedDocument
@@ -381,7 +371,7 @@ class Doc2VecModel(UserDefinedRepresentation):
             texts = s[col].values.tolist()
             texts = [line.split(" ") for line in texts]
             documents = [TaggedDocument(doc, [i]) for i, doc in enumerate(texts)]
-            d2v_model = Doc2Vec(documents, vector_size=self.embedding_size, min_count=self.min_count)
+            d2v_model = Doc2Vec(documents, **self.native_init_params)
             self.d2v_model[col] = d2v_model
         return self
 
@@ -399,15 +389,13 @@ class Doc2VecModel(UserDefinedRepresentation):
         return s
 
     def _get_params(self) -> dict_type:
-        return {"embedding_size": self.embedding_size, "d2v_model": self.d2v_model, "min_count": self.min_count}
+        return {"d2v_model": self.d2v_model}
 
     def _set_params(self, params: dict):
-        self.embedding_size = params["embedding_size"]
         self.d2v_model = params["d2v_model"]
-        self.min_count = params["min_count"]
 
 
-class FastTextModel(UserDefinedRepresentation):
+class FastTextModel(RepresentationBase):
     """
     input type:pandas.series
     input like:(space separation)
@@ -422,20 +410,18 @@ class FastTextModel(UserDefinedRepresentation):
     |0.3|0.2|0.6|0.1|
     """
 
-    def __init__(self, cols="all", embedding_size=16, min_count=5, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, prefix="fast"):
-        super().__init__(cols=cols, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type, prefix=prefix)
-        self.min_count = min_count
-        self.embedding_size = embedding_size
+    def __init__(self, cols="all", embedding_size=16, min_count=5, prefix="fasttext", **kwargs):
+        super().__init__(cols=cols, prefix=prefix, **kwargs)
         self.fasttext_model = {}
+        self.native_init_params.update(self.native_fit_params)
+        self.native_init_params.update({"vector_size": embedding_size, "min_count": min_count})
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from gensim.models import FastText
         for col in self.cols:
             texts = s[col].values.tolist()
             texts = [line.split(" ") for line in texts]
-            fasttext_model = FastText(sentences=texts, vector_size=self.embedding_size, min_count=self.min_count)
+            fasttext_model = FastText(sentences=texts, **self.native_init_params)
             self.fasttext_model[col] = fasttext_model
         return self
 
@@ -446,7 +432,7 @@ class FastTextModel(UserDefinedRepresentation):
             texts = [line.split(" ") for line in texts]
             vectors = [np.mean(np.asarray([fasttext_model.wv[word]
                                            for word in line if word in fasttext_model.wv]), axis=0) + np.zeros(
-                shape=(self.embedding_size,))
+                shape=(self.native_init_params.get("vector_size"),))
                        for line in texts]
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
@@ -456,10 +442,7 @@ class FastTextModel(UserDefinedRepresentation):
         return s
 
     def _get_params(self) -> dict_type:
-        return {"embedding_size": self.embedding_size, "fasttext_model": self.fasttext_model,
-                "min_count": self.min_count}
+        return {"fasttext_model": self.fasttext_model}
 
     def _set_params(self, params: dict_type):
-        self.embedding_size = params["embedding_size"]
         self.fasttext_model = params["fasttext_model"]
-        self.min_count = params["min_count"]

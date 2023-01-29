@@ -4,12 +4,11 @@ import numpy as np
 import pandas as pd
 
 
-class ClassificationPipeObject(PipeObject):
-    def __init__(self, y: series_type = None, name=None, transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        super().__init__(name, transform_check_max_number_error, skip_check_transform_type,
-                         copy_transform_data=copy_transform_data, prefix=prefix)
+class ClassificationBase(PipeObject):
+    def __init__(self, y: series_type = None, cols="all", skip_check_transform_type=True, drop_input_data=True,
+                 native_init_params=None, native_fit_params=None,
+                 **kwargs):
+        super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.cols = cols
         self.drop_input_data = drop_input_data
         self.y = copy.copy(y)
@@ -22,11 +21,18 @@ class ClassificationPipeObject(PipeObject):
                 self.label2id[label] = idx
             self.y = self.y.apply(lambda x: self.label2id.get(x))
             self.num_class = len(self.id2label)
+        # 底层模型自带参数
+        self.native_init_params = native_init_params
+        self.native_fit_params = native_fit_params
+        if self.native_init_params is None:
+            self.native_init_params = dict()
+        if self.native_fit_params is None:
+            self.native_fit_params = dict()
 
     def before_fit(self, s: dataframe_type) -> dataframe_type:
         s = super().before_fit(s)
         assert self.y is not None
-        if str(self.cols).lower() in ["none", "all"]:
+        if str(self.cols).lower() in ["none", "all", "null", "nan"]:
             self.cols = s.columns.tolist()
             return s
         else:
@@ -72,7 +78,8 @@ class ClassificationPipeObject(PipeObject):
 
     def _get_params(self) -> dict_type:
         return {"id2label": self.id2label, "label2id": self.label2id, "num_class": self.num_class, "cols": self.cols,
-                "drop_input_data": self.drop_input_data}
+                "drop_input_data": self.drop_input_data, "native_init_params": self.native_init_params,
+                "native_fit_params": self.native_fit_params}
 
     def _set_params(self, params: dict):
         self.id2label = params["id2label"]
@@ -80,6 +87,8 @@ class ClassificationPipeObject(PipeObject):
         self.num_class = params["num_class"]
         self.cols = params["cols"]
         self.drop_input_data = params["drop_input_data"]
+        self.native_init_params = params["native_init_params"]
+        self.native_fit_params = params["native_fit_params"]
 
     @staticmethod
     def pd2csr(data: dataframe_type):
@@ -94,7 +103,7 @@ class ClassificationPipeObject(PipeObject):
         return data.values
 
 
-class LGBMClassification(ClassificationPipeObject):
+class LGBMClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -114,29 +123,22 @@ class LGBMClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, max_depth=3, num_boost_round=256, name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        super().__init__(y=y, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type,
-                         copy_transform_data=copy_transform_data, prefix=prefix,
-                         drop_input_data=drop_input_data, cols=cols)
-        self.max_depth = max_depth
-        self.num_boost_round = num_boost_round
+    def __init__(self, y=None, max_depth=3, num_boost_round=256, verbose=-1, objective="multiclass", **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.native_init_params.update({
+            'objective': objective,
+            'num_class': self.num_class,
+            'max_depth': max_depth,
+            'verbose': verbose
+        })
+        self.native_fit_params.update({"num_boost_round": num_boost_round})
         self.lgb_model = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         import lightgbm as lgb
         s_ = self.pd2csr(s)
-        params = {
-            'objective': 'multiclass',
-            'num_class': self.num_class,
-            'max_depth': self.max_depth,
-            'verbose': -1
-        }
-        self.lgb_model = lgb.train(params=params, train_set=lgb.Dataset(data=s_, label=self.y),
-                                   num_boost_round=self.num_boost_round)
+        self.lgb_model = lgb.train(params=self.native_init_params, train_set=lgb.Dataset(data=s_, label=self.y),
+                                   **self.native_fit_params)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -152,7 +154,7 @@ class LGBMClassification(ClassificationPipeObject):
         self.lgb_model = params["lgb_model"]
 
 
-class LogisticRegressionClassification(ClassificationPipeObject):
+class LogisticRegressionClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -172,24 +174,17 @@ class LogisticRegressionClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, multi_class="multinomial", solver="newton-cg", max_iter=1000, name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        super().__init__(y=y, name=name, transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type,
-                         copy_transform_data=copy_transform_data, prefix=prefix,
-                         drop_input_data=drop_input_data, cols=cols)
-        self.multi_class = multi_class
-        self.solver = solver
-        self.max_iter = max_iter
+    def __init__(self, y=None, multi_class="multinomial", solver="newton-cg", max_iter=1000,
+                 **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.native_init_params.update({"multi_class": multi_class, "solver": solver, "max_iter": max_iter})
         self.lr = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.linear_model import LogisticRegression
         s_ = self.pd2csr(s)
-        self.lr = LogisticRegression(multi_class=self.multi_class, solver=self.solver, max_iter=self.max_iter)
-        self.lr.fit(s_, self.y)
+        self.lr = LogisticRegression(**self.native_init_params)
+        self.lr.fit(s_, self.y, **self.native_fit_params)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -204,7 +199,7 @@ class LogisticRegressionClassification(ClassificationPipeObject):
         self.lr = params["lr"]
 
 
-class SVMClassification(ClassificationPipeObject):
+class SVMClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -224,25 +219,17 @@ class SVMClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, gamma=2, c=1, kernel="rbf", name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        super().__init__(y=y, name=name,
-                         transform_check_max_number_error=transform_check_max_number_error,
-                         skip_check_transform_type=skip_check_transform_type,
-                         copy_transform_data=copy_transform_data, prefix=prefix,
-                         drop_input_data=drop_input_data, cols=cols)
-        self.gamma = gamma
-        self.C = c
-        self.kernel = kernel
+    def __init__(self, y=None, gamma=2, c=1, kernel="rbf", **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.native_init_params.update(
+            {"kernel": kernel, "decision_function_shape": "ovo", "gamma": gamma, "C": c, "probability": True})
         self.svm = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.svm import SVC
         s_ = self.pd2csr(s)
-        self.svm = SVC(kernel=self.kernel, decision_function_shape="ovo", gamma=self.gamma, C=self.C, probability=True)
-        self.svm.fit(s_, self.y)
+        self.svm = SVC(**self.native_init_params)
+        self.svm.fit(s_, self.y, **self.native_fit_params)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -257,7 +244,7 @@ class SVMClassification(ClassificationPipeObject):
         self.svm = params["svm"]
 
 
-class DecisionTreeClassification(ClassificationPipeObject):
+class DecisionTreeClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -277,26 +264,17 @@ class DecisionTreeClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, criterion="gini", max_depth=3, min_samples_leaf=16, name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        ClassificationPipeObject.__init__(self, y=y, name=name,
-                                          transform_check_max_number_error=transform_check_max_number_error,
-                                          skip_check_transform_type=skip_check_transform_type,
-                                          copy_transform_data=copy_transform_data, prefix=prefix,
-                                          drop_input_data=drop_input_data, cols=cols)
-        self.criterion = criterion
-        self.max_depth = max_depth
-        self.min_samples_leaf = min_samples_leaf
+    def __init__(self, y=None, criterion="gini", max_depth=3, min_samples_leaf=16, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.native_init_params.update(
+            {"criterion": criterion, "max_depth": max_depth, "min_samples_leaf": min_samples_leaf})
         self.tree = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.tree import DecisionTreeClassifier
         s_ = self.pd2csr(s)
-        self.tree = DecisionTreeClassifier(criterion=self.criterion, max_depth=self.max_depth,
-                                           min_samples_leaf=self.min_samples_leaf)
-        self.tree.fit(s_, self.y)
+        self.tree = DecisionTreeClassifier(**self.native_init_params)
+        self.tree.fit(s_, self.y, **self.native_fit_params)
         self.input_col_names = s.columns.tolist()
         return self
 
@@ -313,7 +291,7 @@ class DecisionTreeClassification(ClassificationPipeObject):
         self.tree = params["tree"]
 
 
-class RandomForestClassification(ClassificationPipeObject):
+class RandomForestClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -333,29 +311,17 @@ class RandomForestClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, n_estimators=128, criterion="gini", max_depth=3, min_samples_leaf=16,
-                 name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        ClassificationPipeObject.__init__(self, y=y, name=name,
-                                          transform_check_max_number_error=transform_check_max_number_error,
-                                          skip_check_transform_type=skip_check_transform_type,
-                                          copy_transform_data=copy_transform_data, prefix=prefix,
-                                          drop_input_data=drop_input_data, cols=cols)
-        self.n_estimators = n_estimators
-        self.criterion = criterion
-        self.max_depth = max_depth
-        self.min_samples_leaf = min_samples_leaf
+    def __init__(self, y=None, n_estimators=128, criterion="gini", max_depth=3, min_samples_leaf=16, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.native_init_params.update({"n_estimators": n_estimators, "criterion": criterion, "max_depth": max_depth,
+                                        "min_samples_leaf": min_samples_leaf})
         self.tree = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.ensemble import RandomForestClassifier
         s_ = self.pd2csr(s)
-        self.tree = RandomForestClassifier(n_estimators=self.n_estimators, criterion=self.criterion,
-                                           max_depth=self.max_depth,
-                                           min_samples_leaf=self.min_samples_leaf)
-        self.tree.fit(s_, self.y)
+        self.tree = RandomForestClassifier(**self.native_init_params)
+        self.tree.fit(s_, self.y, **self.native_fit_params)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -372,7 +338,7 @@ class RandomForestClassification(ClassificationPipeObject):
         self.tree = params["tree"]
 
 
-class KNeighborsClassification(ClassificationPipeObject):
+class KNeighborsClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -392,22 +358,16 @@ class KNeighborsClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, n_neighbors=5, name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        ClassificationPipeObject.__init__(self, y=y, name=name,
-                                          transform_check_max_number_error=transform_check_max_number_error,
-                                          skip_check_transform_type=skip_check_transform_type,
-                                          copy_transform_data=copy_transform_data, prefix=prefix,
-                                          drop_input_data=drop_input_data, cols=cols)
-        self.n_neighbors = n_neighbors
+    def __init__(self, y=None, n_neighbors=5, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.native_init_params.update(self.native_fit_params)
+        self.native_init_params.update({"n_neighbors": n_neighbors})
         self.knn = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.neighbors import KNeighborsClassifier
         s_ = self.pd2csr(s)
-        self.knn = KNeighborsClassifier(n_neighbors=self.n_neighbors)
+        self.knn = KNeighborsClassifier(**self.native_init_params)
         self.knn.fit(s_, self.y)
         return self
 
@@ -424,7 +384,7 @@ class KNeighborsClassification(ClassificationPipeObject):
         self.knn = params["knn"]
 
 
-class GaussianNBClassification(ClassificationPipeObject):
+class GaussianNBClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -444,22 +404,15 @@ class GaussianNBClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        ClassificationPipeObject.__init__(self, y=y, name=name,
-                                          transform_check_max_number_error=transform_check_max_number_error,
-                                          skip_check_transform_type=skip_check_transform_type,
-                                          copy_transform_data=copy_transform_data, prefix=prefix,
-                                          drop_input_data=drop_input_data, cols=cols)
+    def __init__(self, y=None, **kwargs):
+        super().__init__(y=y, **kwargs)
         self.nb = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.naive_bayes import GaussianNB
         s_ = self.pd2dense(s)
-        self.nb = GaussianNB()
-        self.nb.fit(s_, self.y)
+        self.nb = GaussianNB(**self.native_init_params)
+        self.nb.fit(s_, self.y, **self.native_fit_params)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -475,7 +428,7 @@ class GaussianNBClassification(ClassificationPipeObject):
         self.nb = params["nb"]
 
 
-class MultinomialNBClassification(ClassificationPipeObject):
+class MultinomialNBClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -495,22 +448,15 @@ class MultinomialNBClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        ClassificationPipeObject.__init__(self, y=y, name=name,
-                                          transform_check_max_number_error=transform_check_max_number_error,
-                                          skip_check_transform_type=skip_check_transform_type,
-                                          copy_transform_data=copy_transform_data, prefix=prefix,
-                                          drop_input_data=drop_input_data, cols=cols)
+    def __init__(self, y=None, **kwargs):
+        super().__init__(y=y, **kwargs)
         self.nb = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.naive_bayes import MultinomialNB
         s_ = self.pd2csr(s)
-        self.nb = MultinomialNB()
-        self.nb.fit(s_, self.y)
+        self.nb = MultinomialNB(**self.native_init_params)
+        self.nb.fit(s_, self.y, **self.native_fit_params)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -526,7 +472,7 @@ class MultinomialNBClassification(ClassificationPipeObject):
         self.nb = params["nb"]
 
 
-class BernoulliNBClassification(ClassificationPipeObject):
+class BernoulliNBClassification(ClassificationBase):
     """
     input type:pandas.dataframe
     input like:
@@ -546,22 +492,15 @@ class BernoulliNBClassification(ClassificationPipeObject):
     |0.5 |0.5|
     """
 
-    def __init__(self, y: series_type = None, name=None,
-                 transform_check_max_number_error=1e-5,
-                 skip_check_transform_type=True, copy_transform_data=True, prefix=None, drop_input_data=True,
-                 cols="all"):
-        ClassificationPipeObject.__init__(self, y=y, name=name,
-                                          transform_check_max_number_error=transform_check_max_number_error,
-                                          skip_check_transform_type=skip_check_transform_type,
-                                          copy_transform_data=copy_transform_data, prefix=prefix,
-                                          drop_input_data=drop_input_data, cols=cols)
+    def __init__(self, y=None, **kwargs):
+        super().__init__(y=y, **kwargs)
         self.nb = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         from sklearn.naive_bayes import BernoulliNB
         s_ = self.pd2csr(s)
-        self.nb = BernoulliNB()
-        self.nb.fit(s_, self.y)
+        self.nb = BernoulliNB(**self.native_init_params)
+        self.nb.fit(s_, self.y, **self.native_fit_params)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
