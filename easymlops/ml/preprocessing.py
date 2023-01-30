@@ -1,3 +1,5 @@
+import numpy as np
+
 from ..base import *
 
 
@@ -59,38 +61,92 @@ class FixInput(PreprocessBase):
     固定输入，对不存在的col用None填充
     """
 
-    def __init__(self, cols="all", fill_value=None, skip_check_transform_type=True,
+    def __init__(self, cols="all", fill_number_value=np.nan, fill_category_value=None,
+                 skip_check_transform_type=True,
                  skip_check_transform_value=True, **kwargs):
         super().__init__(cols=cols, skip_check_transform_type=skip_check_transform_type,
                          skip_check_transform_value=skip_check_transform_value, **kwargs)
-        self.fill_value = fill_value
+        self.fill_number_value = fill_number_value
+        self.fill_category_value = fill_category_value
+        self.column_dtypes = dict()
+
+    def as_number(self, x):
+        try:
+            return float(str(x))
+        except:
+            return self.fill_number_value
+
+    def as_category(self, x):
+        try:
+            return str(x)
+        except:
+            return self.fill_category_value
 
     def _fit(self, s: dataframe_type):
         self.output_col_names = self.input_col_names
+        # 记录数据类型
+        self.column_dtypes = dict()
+        for col in self.output_col_names:
+            col_type = str(s[col].dtype).lower()
+            if "int" in col_type or "float" in col_type:
+                self.column_dtypes[col] = "number"
+            else:
+                self.column_dtypes[col] = "category"
         return self
 
+    def _check_miss_addition_columns(self, input_transform_columns):
+        # 检查缺失字段
+        miss_columns = list(set(self.output_col_names) - set(input_transform_columns))
+        if len(miss_columns) > 0:
+            print(
+                "({}) module, please check these missing columns:\033[1;43m{}\033[0m, "
+                "they will by filled by {}(number),{}(category)".format(
+                    self.name, miss_columns, self.fill_number_value, self.fill_category_value))
+        # 检查多余字段
+        addition_columns = list(set(input_transform_columns) - set(self.output_col_names))
+        if len(addition_columns) > 0:
+            print("({}) module, please check these additional columns:\033[1;43m{}\033[0m".format(self.name,
+                                                                                                  addition_columns))
+
     def transform(self, s: dataframe_type) -> dataframe_type:
+        self._check_miss_addition_columns(s.columns)
         if self.copy_transform_data:
             s_ = copy.copy(s)
         else:
             s_ = s
         for col in self.output_col_names:
+            col_type = self.column_dtypes.get(col)
             if col not in s_.columns:
-                s_[col] = self.fill_value
+                s_[col] = None
+            # 调整数据类型
+            if col_type == "number":
+                s_[col] = s_[col].apply(lambda x: self.as_number(x))
+            else:
+                s_[col] = s_[col].apply(lambda x: self.as_category(x))
         return s_[self.output_col_names]
 
     def transform_single(self, s: dict_type) -> dict_type:
+        self._check_miss_addition_columns(s.keys())
         s_ = copy.copy(s)
         for col in self.output_col_names:
+            col_type = self.column_dtypes.get(col)
             if col not in s_.keys():
-                s_[col] = self.fill_value
+                s_[col] = None
+            # 调整数据类型
+            if col_type == "number":
+                s_[col] = self.as_number(s_[col])
+            else:
+                s_[col] = self.as_category(s_[col])
         return self.extract_dict(s_, self.output_col_names)
 
     def _get_params(self) -> dict_type:
-        return {"fill_value": self.fill_value}
+        return {"fill_number_value": self.fill_number_value,
+                "fill_category_value": self.fill_category_value, "column_dtypes": self.column_dtypes}
 
     def _set_params(self, params: dict_type):
-        self.fill_value = params["fill_value"]
+        self.fill_number_value = params["fill_number_value"]
+        self.fill_category_value = params["fill_category_value"]
+        self.column_dtypes = params["column_dtypes"]
 
 
 class Replace(PreprocessBase):
@@ -394,3 +450,154 @@ class Clip(PreprocessBase):
 
     def _set_params(self, params: dict):
         self.clip_detail = params["clip_detail"]
+
+
+class MinMaxScaler(PreprocessBase):
+    """
+    最大最小归一化
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.min_max_detail = dict()
+
+    def _check_min_max_equal(self, col, min_value, max_value):
+        if min_value == max_value:
+            print("({}), in  column \033[1;43m{}\033[0m ,min value and max value has the same value:{},"
+                  "the finally result will be set 1".format(self.name, col, min_value))
+
+    def show_detail(self):
+        data = []
+        for col, value in self.min_max_detail.items():
+            min_value, max_value = value
+            data.append([col, min_value, max_value])
+        return pd.DataFrame(data=data, columns=["col", "min_value", "max_value"])
+
+    def _fit(self, s: dataframe_type):
+        for col, _ in self.cols:
+            col_value = s[col]
+            min_value = np.min(col_value)
+            max_value = np.max(col_value)
+            self.min_max_detail[col] = (min_value, max_value)
+        return self
+
+    def _transform(self, s: dataframe_type) -> dataframe_type:
+        for col, new_col in self.cols:
+            min_value, max_value = self.min_max_detail.get(col)
+            self._check_min_max_equal(col, min_value, max_value)
+            if min_value == max_value:
+                s[new_col] = 1
+            else:
+                s[new_col] = s[col].apply(lambda x: (x - min_value) / (max_value - min_value))
+        return s
+
+    def _transform_single(self, s: dict_type) -> dict_type:
+        for col, new_col in self.cols:
+            min_value, max_value = self.min_max_detail.get(col)
+            self._check_min_max_equal(col, min_value, max_value)
+            if min_value == max_value:
+                s[new_col] = 1
+            else:
+                s[new_col] = (s[col] - min_value) / (max_value - min_value)
+        return s
+
+    def _get_params(self):
+        return {"min_max_detail": self.min_max_detail}
+
+    def _set_params(self, params: dict):
+        self.min_max_detail = params["min_max_detail"]
+
+
+class Normalizer(PreprocessBase):
+    """
+    标准化
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.mean_std_detail = dict()
+
+    def _check_std(self, col, std):
+        if std == 0:
+            print("({}), in  column \033[1;43m{}\033[0m ,the std is 0,"
+                  "the finally result will be set 1".format(self.name, col))
+
+    def show_detail(self):
+        data = []
+        for col, value in self.mean_std_detail.items():
+            mean_value, std_value = value
+            data.append([col, mean_value, std_value])
+        return pd.DataFrame(data=data, columns=["col", "mean_value", "std_value"])
+
+    def _fit(self, s: dataframe_type):
+        for col, _ in self.cols:
+            col_value = s[col]
+            mean_value = np.mean(col_value)
+            std_value = np.std(col_value)
+            self.mean_std_detail[col] = (mean_value, std_value)
+        return self
+
+    def _transform(self, s: dataframe_type) -> dataframe_type:
+        for col, new_col in self.cols:
+            mean_value, std_value = self.mean_std_detail.get(col)
+            self._check_std(col, std_value)
+            if std_value == 0:
+                s[new_col] = 1
+            else:
+                s[new_col] = s[col].apply(lambda x: (x - mean_value) / std_value)
+        return s
+
+    def _transform_single(self, s: dict_type) -> dict_type:
+        for col, new_col in self.cols:
+            mean_value, std_value = self.mean_std_detail.get(col)
+            self._check_std(col, std_value)
+            if std_value == 0:
+                s[new_col] = 1
+            else:
+                s[new_col] = (s[col] - mean_value) / std_value
+        return s
+
+    def _get_params(self):
+        return {"mean_std_detail": self.mean_std_detail}
+
+    def _set_params(self, params: dict):
+        self.mean_std_detail = params["mean_std_detail"]
+
+
+class Bins(PreprocessBase):
+    """
+    分箱
+    strategy:uniform/等距；quantile/等位；kmeans/聚类
+    """
+
+    def __init__(self, n_bins=10, strategy="quantile", **kwargs):
+        super().__init__(**kwargs)
+        self.n_bins = n_bins
+        self.strategy = strategy
+        self.bin_detail = dict()
+
+    def _fit(self, s: dataframe_type):
+        from sklearn.preprocessing import KBinsDiscretizer
+        for col, _ in self.cols:
+            bin_model = KBinsDiscretizer(n_bins=self.n_bins, encode="ordinal", strategy=self.strategy)
+            bin_model.fit(s[[col]])
+            self.bin_detail[col] = bin_model
+        return self
+
+    def _transform(self, s: dataframe_type) -> dataframe_type:
+        for col, new_col in self.cols:
+            bin_model = self.bin_detail[col]
+            s[new_col] = bin_model.transform(s[[col]])
+        return s
+
+    def _transform_single(self, s: dict_type) -> dict_type:
+        input_dataframe = pd.DataFrame([s])
+        return self._transform(input_dataframe).to_dict("record")[0]
+
+    def _get_params(self):
+        return {"n_bins": self.n_bins, "strategy": self.strategy, "bin_detail": self.bin_detail}
+
+    def _set_params(self, params: dict_type):
+        self.bin_detail = params["bin_detail"]
+        self.n_bins = params["n_bins"]
+        self.strategy = params["strategy"]

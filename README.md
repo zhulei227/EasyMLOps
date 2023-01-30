@@ -5,9 +5,9 @@
 
 ### 1. 基础建模模块
 
-- 数据清洗，数据自动填充、转换、盖帽等：easymlops.ml.preprocessing
+- 数据清洗，数据自动填充、转换、盖帽、归一化、分箱等：easymlops.ml.preprocessing
 - 特征处理:
-  - 特征编码，包括Target、Label、Onehot Encoding等：easymlops.ml.encoding
+  - 特征编码，包括Target、Label、Onehot Encoding、WOEEncoding等：easymlops.ml.encoding
   - 特征降维，包括PCA、NFM等：easymlops.ml.decomposition 
   - 特征选择:easymlops.ml.feature_selection
     - 过滤式：包括饱和度、方差、相关性、卡方、P-value、互信息、IV、PSI等  
@@ -218,16 +218,21 @@ del x_test["Survived"]
 from easymlops.ml.preprocessing import *
 ml=PipeML()
 ml.pipe(FixInput())\
-  .pipe(FillNa(cols=["Cabin","Ticket","Parch"],fill_mode="mode"))\
+  .pipe(FillNa(cols=["Cabin","Ticket","Parch","Fare"],fill_mode="mode"))\
   .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
   .pipe(FillNa(fill_detail={"Embarked":"N"}))\
   .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
   .pipe(TransToFloat(cols=["Age","Fare"]))\
-  .pipe(TransToInt(cols=["PassengerId","Survived","SibSp","Parch"]))\
+  .pipe(TransToInt(cols=["Pclass","PassengerId","Survived","SibSp","Parch"]))\
   .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
   .pipe(CategoryMapValues(map_detail={"Cabin":(["nan","NaN"],"n")}))\
   .pipe(Clip(cols=["Age"],default_clip=(1,99),name="clip_name"))\
-  .pipe(Clip(cols=["Fare"],percent_range=(10,99),name="clip_fare"))
+  .pipe(Clip(cols=["Fare"],percent_range=(1,99),name="clip_fare"))\
+  .pipe(MinMaxScaler(cols=[("Age","Age_minmax")]))\
+  .pipe(Normalizer(cols=[("Fare","Fare_normal")]))\
+  .pipe(Bins(n_bins=10,strategy="uniform",cols=[("Age","Age_uni")]))\
+  .pipe(Bins(n_bins=10,strategy="quantile",cols=[("Age","Age_quan")]))\
+  .pipe(Bins(n_bins=10,strategy="kmeans",cols=[("Fare","Fare_km")]))
 
 x_test_new=ml.fit(x_train).transform(x_test)
 x_test_new.head(5)
@@ -253,6 +258,11 @@ x_test_new.head(5)
       <th>Fare</th>
       <th>Cabin</th>
       <th>Embarked</th>
+      <th>Age_minmax</th>
+      <th>Fare_normal</th>
+      <th>Age_uni</th>
+      <th>Age_quan</th>
+      <th>Fare_km</th>
     </tr>
   </thead>
   <tbody>
@@ -267,8 +277,13 @@ x_test_new.head(5)
       <td>0</td>
       <td>315086</td>
       <td>8.6625</td>
-      <td>c23 c25 c27</td>
+      <td>n</td>
       <td>s</td>
+      <td>0.228571</td>
+      <td>-0.523659</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>501</th>
@@ -281,8 +296,13 @@ x_test_new.head(5)
       <td>0</td>
       <td>364846</td>
       <td>7.7500</td>
-      <td>c23 c25 c27</td>
+      <td>n</td>
       <td>q</td>
+      <td>0.285714</td>
+      <td>-0.544624</td>
+      <td>2.0</td>
+      <td>2.0</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>502</th>
@@ -295,8 +315,13 @@ x_test_new.head(5)
       <td>0</td>
       <td>330909</td>
       <td>7.7175</td>
-      <td>c23 c25 c27</td>
+      <td>n</td>
       <td>q</td>
+      <td>0.402925</td>
+      <td>-0.545371</td>
+      <td>4.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>503</th>
@@ -309,8 +334,13 @@ x_test_new.head(5)
       <td>0</td>
       <td>4135</td>
       <td>9.5875</td>
-      <td>c23 c25 c27</td>
+      <td>n</td>
       <td>s</td>
+      <td>0.514286</td>
+      <td>-0.502407</td>
+      <td>5.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
     </tr>
     <tr>
       <th>504</th>
@@ -325,6 +355,11 @@ x_test_new.head(5)
       <td>86.5000</td>
       <td>b79</td>
       <td>s</td>
+      <td>0.214286</td>
+      <td>1.264706</td>
+      <td>2.0</td>
+      <td>1.0</td>
+      <td>4.0</td>
     </tr>
   </tbody>
 </table>
@@ -383,13 +418,13 @@ x_test_new.head(5)
   <tbody>
     <tr>
       <th>500</th>
-      <td>501</td>
+      <td>501.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>1</td>
       <td>17.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>8.6625</td>
       <td>0.299607</td>
@@ -399,13 +434,13 @@ x_test_new.head(5)
     </tr>
     <tr>
       <th>501</th>
-      <td>502</td>
+      <td>502.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>2</td>
       <td>21.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>7.7500</td>
       <td>0.299607</td>
@@ -415,13 +450,13 @@ x_test_new.head(5)
     </tr>
     <tr>
       <th>502</th>
-      <td>503</td>
+      <td>503.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>2</td>
       <td>0.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>7.6292</td>
       <td>0.299607</td>
@@ -431,13 +466,13 @@ x_test_new.head(5)
     </tr>
     <tr>
       <th>503</th>
-      <td>504</td>
+      <td>504.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>2</td>
       <td>37.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>9.5875</td>
       <td>0.299607</td>
@@ -447,13 +482,13 @@ x_test_new.head(5)
     </tr>
     <tr>
       <th>504</th>
-      <td>505</td>
+      <td>505.0</td>
       <td>-0.741789</td>
       <td>0</td>
       <td>2</td>
       <td>16.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>1.0</td>
       <td>86.5000</td>
       <td>0.000000</td>
@@ -496,7 +531,7 @@ ml["woe"].show_detail().head()
     <tr>
       <th>0</th>
       <td>Pclass</td>
-      <td>3</td>
+      <td>3.0</td>
       <td>78</td>
       <td>0.404145</td>
       <td>201</td>
@@ -507,7 +542,7 @@ ml["woe"].show_detail().head()
     <tr>
       <th>1</th>
       <td>Pclass</td>
-      <td>1</td>
+      <td>1.0</td>
       <td>66</td>
       <td>0.341969</td>
       <td>50</td>
@@ -518,7 +553,7 @@ ml["woe"].show_detail().head()
     <tr>
       <th>2</th>
       <td>Pclass</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>49</td>
       <td>0.253886</td>
       <td>56</td>
@@ -642,7 +677,7 @@ ml.pipe(FixInput())\
   .pipe(PersonCorrFilter(min_threshold=0.1,y=y_train,name="person"))\
   .pipe(PSIFilter(oot_x=x_test,cols=["Pclass","Sex","Embarked"],name="psi",max_threshold=0.5))\
   .pipe(LabelEncoding(cols=["Sex","Ticket","Embarked","Pclass"]))\
-  .pipe(TargetEncoding(cols=["Name"],y=y_train))\
+  .pipe(TargetEncoding(cols=["Name","Cabin"],y=y_train))\
   .pipe(Chi2Filter(y=y_train,name="chi2"))\
   .pipe(MutualInfoFilter(y=y_train))\
   .pipe(IVFilter(y=y_train,name="iv",cols=["Sex","Fare"],min_threshold=0.05))
@@ -665,6 +700,7 @@ x_test_new.head(5)
       <th>Sex</th>
       <th>Ticket</th>
       <th>Fare</th>
+      <th>Cabin</th>
       <th>Embarked</th>
     </tr>
   </thead>
@@ -676,6 +712,7 @@ x_test_new.head(5)
       <td>1</td>
       <td>0</td>
       <td>8.6625</td>
+      <td>0.317829</td>
       <td>1</td>
     </tr>
     <tr>
@@ -685,6 +722,7 @@ x_test_new.head(5)
       <td>2</td>
       <td>0</td>
       <td>7.7500</td>
+      <td>0.317829</td>
       <td>3</td>
     </tr>
     <tr>
@@ -694,6 +732,7 @@ x_test_new.head(5)
       <td>2</td>
       <td>0</td>
       <td>7.6292</td>
+      <td>0.317829</td>
       <td>3</td>
     </tr>
     <tr>
@@ -703,6 +742,7 @@ x_test_new.head(5)
       <td>2</td>
       <td>0</td>
       <td>9.5875</td>
+      <td>0.317829</td>
       <td>1</td>
     </tr>
     <tr>
@@ -712,6 +752,7 @@ x_test_new.head(5)
       <td>2</td>
       <td>354</td>
       <td>86.5000</td>
+      <td>0.000000</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -748,7 +789,7 @@ ml["psi"].show_detail().head()
     <tr>
       <th>0</th>
       <td>Pclass</td>
-      <td>3</td>
+      <td>3.0</td>
       <td>279</td>
       <td>0.558</td>
       <td>212</td>
@@ -758,7 +799,7 @@ ml["psi"].show_detail().head()
     <tr>
       <th>1</th>
       <td>Pclass</td>
-      <td>1</td>
+      <td>1.0</td>
       <td>116</td>
       <td>0.232</td>
       <td>100</td>
@@ -768,7 +809,7 @@ ml["psi"].show_detail().head()
     <tr>
       <th>2</th>
       <td>Pclass</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>105</td>
       <td>0.210</td>
       <td>79</td>
@@ -842,8 +883,8 @@ x_test_new.head(5)
       <td>1</td>
       <td>0</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.317829</td>
       <td>1</td>
     </tr>
@@ -852,8 +893,8 @@ x_test_new.head(5)
       <td>1</td>
       <td>0</td>
       <td>2</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.317829</td>
       <td>3</td>
     </tr>
@@ -862,8 +903,8 @@ x_test_new.head(5)
       <td>1</td>
       <td>0</td>
       <td>2</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.317829</td>
       <td>3</td>
     </tr>
@@ -872,8 +913,8 @@ x_test_new.head(5)
       <td>1</td>
       <td>0</td>
       <td>2</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.317829</td>
       <td>1</td>
     </tr>
@@ -882,8 +923,8 @@ x_test_new.head(5)
       <td>2</td>
       <td>0</td>
       <td>2</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.000000</td>
       <td>1</td>
     </tr>
@@ -1055,7 +1096,7 @@ from easymlops.ml.ensemble import Parallel
 ml = PipeML()
 ml.pipe(FixInput()) \
   .pipe(FillNa()) \
-  .pipe(Parallel([OneHotEncoding(cols=["Pclass", "Sex"]), LabelEncoding(cols=["Sex", "Pclass"]),
+  .pipe(Parallel([OneHotEncoding(cols=["Pclass", "Sex"]), LabelEncoding(cols=[("Sex","Sex_label"), ("Pclass","Pclass_label")]),
                     TargetEncoding(cols=["Name", "Ticket", "Embarked", "Cabin", "Sex"], y=y_train)])) \
   .pipe(Parallel([PCADecomposition(n_components=2, prefix="pca"), NMFDecomposition(n_components=2, prefix="nmf")]))
 
@@ -1080,38 +1121,38 @@ ml.fit(x_train).transform(x_test).head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>250.112111</td>
-      <td>-27.100222</td>
-      <td>6.209767</td>
-      <td>0.178925</td>
+      <td>250.111868</td>
+      <td>-27.103302</td>
+      <td>6.209714</td>
+      <td>0.178558</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>251.117545</td>
-      <td>-27.786163</td>
-      <td>6.225061</td>
-      <td>0.168913</td>
+      <td>251.117271</td>
+      <td>-27.787295</td>
+      <td>6.225051</td>
+      <td>0.168702</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>252.017756</td>
-      <td>-29.153839</td>
-      <td>6.222647</td>
-      <td>0.096552</td>
+      <td>252.017480</td>
+      <td>-29.155072</td>
+      <td>6.222640</td>
+      <td>0.096320</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>253.218198</td>
-      <td>-25.042248</td>
-      <td>6.260863</td>
-      <td>0.267679</td>
+      <td>253.217925</td>
+      <td>-25.043321</td>
+      <td>6.260848</td>
+      <td>0.267476</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>255.220152</td>
-      <td>50.506239</td>
-      <td>6.249161</td>
-      <td>2.144931</td>
+      <td>255.220248</td>
+      <td>50.507856</td>
+      <td>6.249152</td>
+      <td>2.144759</td>
     </tr>
   </tbody>
 </table>
@@ -1232,13 +1273,13 @@ nlp.fit(x_train).transform(x_test).head(5)
   <tbody>
     <tr>
       <th>500</th>
-      <td>501</td>
-      <td>3</td>
+      <td>501.0</td>
+      <td>3.0</td>
       <td>calic  mr  petar</td>
       <td>0.171429</td>
       <td>17.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>8.6625</td>
       <td>0.317829</td>
@@ -1246,13 +1287,13 @@ nlp.fit(x_train).transform(x_test).head(5)
     </tr>
     <tr>
       <th>501</th>
-      <td>502</td>
-      <td>3</td>
+      <td>502.0</td>
+      <td>3.0</td>
       <td>canavan  miss  mary</td>
       <td>0.751351</td>
       <td>21.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>7.7500</td>
       <td>0.317829</td>
@@ -1260,13 +1301,13 @@ nlp.fit(x_train).transform(x_test).head(5)
     </tr>
     <tr>
       <th>502</th>
-      <td>503</td>
-      <td>3</td>
+      <td>503.0</td>
+      <td>3.0</td>
       <td>o sullivan  miss  bridget mary</td>
       <td>0.751351</td>
       <td>0.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>7.6292</td>
       <td>0.317829</td>
@@ -1274,13 +1315,13 @@ nlp.fit(x_train).transform(x_test).head(5)
     </tr>
     <tr>
       <th>503</th>
-      <td>504</td>
-      <td>3</td>
+      <td>504.0</td>
+      <td>3.0</td>
       <td>laitinen  miss  kristina sofia</td>
       <td>0.751351</td>
       <td>37.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>9.5875</td>
       <td>0.317829</td>
@@ -1288,13 +1329,13 @@ nlp.fit(x_train).transform(x_test).head(5)
     </tr>
     <tr>
       <th>504</th>
-      <td>505</td>
-      <td>1</td>
+      <td>505.0</td>
+      <td>1.0</td>
       <td>maioni  miss  roberta</td>
       <td>0.751351</td>
       <td>16.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>1.0</td>
       <td>86.5000</td>
       <td>0.000000</td>
@@ -1522,9 +1563,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>500</th>
       <td>2.132522</td>
-      <td>0.648001</td>
-      <td>-0.075894</td>
-      <td>0.093436</td>
+      <td>0.648004</td>
+      <td>-0.075895</td>
+      <td>-0.093468</td>
       <td>-0.183208</td>
       <td>-0.017150</td>
       <td>0.403337</td>
@@ -1534,8 +1575,8 @@ nlp.fit(x_train).transform(x_test).head(5)
       <th>501</th>
       <td>2.034848</td>
       <td>-0.608228</td>
-      <td>-0.733372</td>
-      <td>0.013403</td>
+      <td>-0.733369</td>
+      <td>-0.013220</td>
       <td>-0.085437</td>
       <td>-0.033206</td>
       <td>0.293308</td>
@@ -1544,9 +1585,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>502</th>
       <td>2.040231</td>
-      <td>-0.616306</td>
-      <td>-0.747572</td>
-      <td>0.022976</td>
+      <td>-0.616304</td>
+      <td>-0.747661</td>
+      <td>-0.022293</td>
       <td>-0.051665</td>
       <td>0.000399</td>
       <td>0.277010</td>
@@ -1556,8 +1597,8 @@ nlp.fit(x_train).transform(x_test).head(5)
       <th>503</th>
       <td>2.026293</td>
       <td>-0.579115</td>
-      <td>-0.735064</td>
-      <td>-0.012227</td>
+      <td>-0.735073</td>
+      <td>0.012305</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -1566,9 +1607,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>504</th>
       <td>2.025096</td>
-      <td>-0.573416</td>
-      <td>-0.720063</td>
-      <td>-0.010258</td>
+      <td>-0.573417</td>
+      <td>-0.720071</td>
+      <td>0.010259</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -1627,7 +1668,7 @@ ml.transform(x_train,run_to_layer=-2).memory_usage().sum()//1024
 
 
 
-    500
+    501
 
 
 
@@ -2044,13 +2085,13 @@ ml.transform(x_test,run_to_layer=1).head(5)
   <tbody>
     <tr>
       <th>500</th>
-      <td>501</td>
-      <td>3</td>
+      <td>501.0</td>
+      <td>3.0</td>
       <td>Calic, Mr. Petar</td>
       <td>male</td>
       <td>17.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>315086</td>
       <td>8.6625</td>
       <td>nan</td>
@@ -2058,13 +2099,13 @@ ml.transform(x_test,run_to_layer=1).head(5)
     </tr>
     <tr>
       <th>501</th>
-      <td>502</td>
-      <td>3</td>
+      <td>502.0</td>
+      <td>3.0</td>
       <td>Canavan, Miss. Mary</td>
       <td>female</td>
       <td>21.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>364846</td>
       <td>7.7500</td>
       <td>nan</td>
@@ -2072,13 +2113,13 @@ ml.transform(x_test,run_to_layer=1).head(5)
     </tr>
     <tr>
       <th>502</th>
-      <td>503</td>
-      <td>3</td>
+      <td>503.0</td>
+      <td>3.0</td>
       <td>O'Sullivan, Miss. Bridget Mary</td>
       <td>female</td>
       <td>0.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>330909</td>
       <td>7.6292</td>
       <td>nan</td>
@@ -2086,13 +2127,13 @@ ml.transform(x_test,run_to_layer=1).head(5)
     </tr>
     <tr>
       <th>503</th>
-      <td>504</td>
-      <td>3</td>
+      <td>504.0</td>
+      <td>3.0</td>
       <td>Laitinen, Miss. Kristina Sofia</td>
       <td>female</td>
       <td>37.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>4135</td>
       <td>9.5875</td>
       <td>nan</td>
@@ -2100,13 +2141,13 @@ ml.transform(x_test,run_to_layer=1).head(5)
     </tr>
     <tr>
       <th>504</th>
-      <td>505</td>
-      <td>1</td>
+      <td>505.0</td>
+      <td>1.0</td>
       <td>Maioni, Miss. Roberta</td>
       <td>female</td>
       <td>16.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>110152</td>
       <td>86.5000</td>
       <td>B79</td>
@@ -2144,9 +2185,9 @@ ml.transform(x_test,run_to_layer=-3).head(5)
       <th>Fare</th>
       <th>Cabin</th>
       <th>Embarked</th>
-      <th>Pclass_3</th>
-      <th>Pclass_1</th>
-      <th>Pclass_2</th>
+      <th>Pclass_3.0</th>
+      <th>Pclass_1.0</th>
+      <th>Pclass_2.0</th>
       <th>Sex_male</th>
       <th>Sex_female</th>
     </tr>
@@ -2154,13 +2195,13 @@ ml.transform(x_test,run_to_layer=-3).head(5)
   <tbody>
     <tr>
       <th>500</th>
-      <td>501</td>
+      <td>501.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>1.111379</td>
       <td>17.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>8.6625</td>
       <td>0.317829</td>
@@ -2173,13 +2214,13 @@ ml.transform(x_test,run_to_layer=-3).head(5)
     </tr>
     <tr>
       <th>501</th>
-      <td>502</td>
+      <td>502.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>21.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>7.7500</td>
       <td>0.317829</td>
@@ -2192,13 +2233,13 @@ ml.transform(x_test,run_to_layer=-3).head(5)
     </tr>
     <tr>
       <th>502</th>
-      <td>503</td>
+      <td>503.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>0.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>7.6292</td>
       <td>0.317829</td>
@@ -2211,13 +2252,13 @@ ml.transform(x_test,run_to_layer=-3).head(5)
     </tr>
     <tr>
       <th>503</th>
-      <td>504</td>
+      <td>504.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>37.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>9.5875</td>
       <td>0.317829</td>
@@ -2230,13 +2271,13 @@ ml.transform(x_test,run_to_layer=-3).head(5)
     </tr>
     <tr>
       <th>504</th>
-      <td>505</td>
+      <td>505.0</td>
       <td>-0.741789</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>16.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>354</td>
       <td>86.5000</td>
       <td>0.000000</td>
@@ -2279,9 +2320,9 @@ ml.transform(x_test,run_to_layer="target_encoding").head(5)
       <th>Fare</th>
       <th>Cabin</th>
       <th>Embarked</th>
-      <th>Pclass_3</th>
-      <th>Pclass_1</th>
-      <th>Pclass_2</th>
+      <th>Pclass_3.0</th>
+      <th>Pclass_1.0</th>
+      <th>Pclass_2.0</th>
       <th>Sex_male</th>
       <th>Sex_female</th>
     </tr>
@@ -2289,13 +2330,13 @@ ml.transform(x_test,run_to_layer="target_encoding").head(5)
   <tbody>
     <tr>
       <th>500</th>
-      <td>501</td>
+      <td>501.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>1.111379</td>
       <td>17.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>8.6625</td>
       <td>0.317829</td>
@@ -2308,13 +2349,13 @@ ml.transform(x_test,run_to_layer="target_encoding").head(5)
     </tr>
     <tr>
       <th>501</th>
-      <td>502</td>
+      <td>502.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>21.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>7.7500</td>
       <td>0.317829</td>
@@ -2327,13 +2368,13 @@ ml.transform(x_test,run_to_layer="target_encoding").head(5)
     </tr>
     <tr>
       <th>502</th>
-      <td>503</td>
+      <td>503.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>0.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>7.6292</td>
       <td>0.317829</td>
@@ -2346,13 +2387,13 @@ ml.transform(x_test,run_to_layer="target_encoding").head(5)
     </tr>
     <tr>
       <th>503</th>
-      <td>504</td>
+      <td>504.0</td>
       <td>0.482439</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>37.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0</td>
       <td>9.5875</td>
       <td>0.317829</td>
@@ -2365,13 +2406,13 @@ ml.transform(x_test,run_to_layer="target_encoding").head(5)
     </tr>
     <tr>
       <th>504</th>
-      <td>505</td>
+      <td>505.0</td>
       <td>-0.741789</td>
       <td>0</td>
       <td>-1.569990</td>
       <td>16.0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>354</td>
       <td>86.5000</td>
       <td>0.000000</td>
@@ -2442,7 +2483,7 @@ ml[3].show_detail()
     <tr>
       <th>2</th>
       <td>Pclass</td>
-      <td>3</td>
+      <td>3.0</td>
       <td>78</td>
       <td>0.404145</td>
       <td>201</td>
@@ -2453,7 +2494,7 @@ ml[3].show_detail()
     <tr>
       <th>3</th>
       <td>Pclass</td>
-      <td>1</td>
+      <td>1.0</td>
       <td>66</td>
       <td>0.341969</td>
       <td>50</td>
@@ -2464,7 +2505,7 @@ ml[3].show_detail()
     <tr>
       <th>4</th>
       <td>Pclass</td>
-      <td>2</td>
+      <td>2.0</td>
       <td>49</td>
       <td>0.253886</td>
       <td>56</td>
@@ -2587,6 +2628,9 @@ ml.transform_single(input_dict)
 ml.transform_single({})
 ```
 
+    (<class 'easymlops.ml.preprocessing.FixInput'>) module, please check these missing columns:[1;43m['Pclass', 'Name', 'Fare', 'SibSp', 'Parch', 'PassengerId', 'Ticket', 'Sex', 'Age', 'Embarked', 'Cabin'][0m, they will by filled by nan(number),None(category)
+    
+
 
 
 
@@ -2627,7 +2671,7 @@ ml.pipe(FixInput())\
 
 
 
-    <easymlops.pipeml.PipeML at 0x1bbab1d5f08>
+    <easymlops.pipeml.PipeML at 0x200e4883fc8>
 
 
 
@@ -2922,6 +2966,12 @@ ml[-2].show_detail()
       <td>S</td>
       <td>0.334254</td>
     </tr>
+    <tr>
+      <th>3</th>
+      <td>Embarked</td>
+      <td>nan</td>
+      <td>1.000000</td>
+    </tr>
   </tbody>
 </table>
 </div>
@@ -2937,7 +2987,7 @@ ml[-2].show_detail()
 - 当前命名的参数与底层的参数名称的冲突检测？    
 - 在transform时候是否需要把数据拷贝一下？  
 
-建议自定义时继承PipeObject对象，然后实现_fit\_transform\_transform_single\_get_params\_set_params，这样自定义的Pipe模块更稳健，如下，调整后的TargetEncoding，代码几乎一样
+建议自定义时继承PipeObject对象，然后实现_fit\ _transform\ _transform_single\ _get_params\ _set_params，这样自定义的Pipe模块更稳健，如下，调整后的TargetEncoding，代码几乎一样
 
 
 ```python
@@ -3104,6 +3154,12 @@ ml[-2].show_detail()
       <td>S</td>
       <td>0.334254</td>
     </tr>
+    <tr>
+      <th>3</th>
+      <td>Embarked</td>
+      <td>nan</td>
+      <td>1.000000</td>
+    </tr>
   </tbody>
 </table>
 </div>
@@ -3121,7 +3177,7 @@ ml[-2].show_detail()
 
 ```python
 ml.transform_single({'PassengerId': 1,
- 'Survived': 0,
+ 'Cabin': 0,
  'Pclass': 3,
  'Name': 'Braund, Mr. Owen Harris',
  'Sex': 'male',
@@ -3143,7 +3199,7 @@ ml.transform_single({'PassengerId': 1,
 
 ```python
 ml.transform_single({'PassengerId': 1,
- 'Survived': 0,
+ 'Cabin': 0,
  'Pclass': 3,
  'Name': 'Braund, Mr. Owen Harris',
  'Sex': 'male',
@@ -3175,13 +3231,13 @@ ml.transform_single({'PassengerId': 1,
 ml_combine.auto_check_transform(x_test)
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.03]ms/it
+    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.01]ms/it
+    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.01]ms/it
     (<class 'easymlops.ml.encoding.OneHotEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
     (<class 'easymlops.ml.encoding.LabelEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.encoding.TargetEncoding'>)  module transform check [success], single transform speed:[0.04]ms/it
-    (<class 'easymlops.ml.decomposition.PCADecomposition'>)  module transform check [success], single transform speed:[1.31]ms/it
-    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>)  module transform check [success], single transform speed:[1.4]ms/it
+    (<class 'easymlops.ml.encoding.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.decomposition.PCADecomposition'>)  module transform check [success], single transform speed:[1.26]ms/it
+    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>)  module transform check [success], single transform speed:[1.36]ms/it
     
 
 ### 7.3 日志记录 
@@ -3201,7 +3257,7 @@ extend_log_info={"user_id":1,"time":"2023-01-12 15:04:32"}
 
 ```python
 ml.transform_single({'PassengerId': 1,
- 'Survived': 0,
+ 'Cabin': 0,
  'Pclass': 3,
  'Name': 'Braund, Mr. Owen Harris',
  'Sex': 'male',
@@ -3222,8 +3278,6 @@ ml.transform_single({'PassengerId': 1,
 
 ## TODO  
 
-- 添加数据归一化模块
-- 添加数据分箱模块
 - 扩展包装式特征选择方法，比如模拟退火、遗传算法、团伙检测等方法
 - 添加数据监控模块：主要是数据偏移(p(x),p(y),p(y|x))，后续会逐步加入对这些偏移问题的建模优化模块
 - 扩展更多NLP中关于文本分类的内容，比如TextCNN、Bert+BiLSTM等等  
