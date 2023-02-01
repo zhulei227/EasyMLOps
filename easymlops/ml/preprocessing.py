@@ -5,16 +5,23 @@ from ..base import *
 
 class PreprocessBase(PipeObject):
     """
-    只需要对单个key-value处理的类型
+    所有下面Preprocess类的父类
     """
 
     def __init__(self, cols="all", **kwargs):
+        """
+        cols输入格式:
+        1.cols="all",cols=None表示对所有columns进行操作
+        2.cols=["col1","col2"]表示对col1和col2操作
+        3.cols=[("col1","new_col1"),("col2","new_col2")]表示对col1和col2操作，并将结果赋值给new_col1和new_col2，并不修改原始col1和col2
+        """
         super().__init__(**kwargs)
         self.cols = cols
 
     def _user_defined_function(self, col, x):
         """
-        对col的对应值x执行某种自定义操作
+        col:当前col名称
+        x:当前col对应的值
         """
         raise Exception("need to implement")
 
@@ -58,21 +65,27 @@ class PreprocessBase(PipeObject):
 
 class FixInput(PreprocessBase):
     """
-    固定输入，对不存在的col用None填充
+    固定cols中:
+    1.column的名称以及顺序
+    2.column的数据类型，将所有数据分为number和category两种类型，对于空或者异常值用fill_number_value或fill_category_value填充
     """
 
     def __init__(self, cols="all", fill_number_value=np.nan, fill_category_value=None,
-                 skip_check_transform_type=True,
+                 skip_check_transform_type=True, show_check_detail=True,
                  skip_check_transform_value=True, **kwargs):
         super().__init__(cols=cols, skip_check_transform_type=skip_check_transform_type,
                          skip_check_transform_value=skip_check_transform_value, **kwargs)
         self.fill_number_value = fill_number_value
         self.fill_category_value = fill_category_value
         self.column_dtypes = dict()
+        self.show_check_detail = show_check_detail
 
     def as_number(self, x):
         try:
-            return float(str(x))
+            x_type = str(type(x)).lower()
+            if "int" in x_type or "float" in x_type:
+                return np.clip(x, np.finfo(np.float64).min, np.finfo(np.float64).max)
+            return np.clip(float(str(x)), np.finfo(np.float64).min, np.finfo(np.float64).max)
         except:
             return self.fill_number_value
 
@@ -97,14 +110,14 @@ class FixInput(PreprocessBase):
     def _check_miss_addition_columns(self, input_transform_columns):
         # 检查缺失字段
         miss_columns = list(set(self.output_col_names) - set(input_transform_columns))
-        if len(miss_columns) > 0:
+        if len(miss_columns) > 0 and self.show_check_detail:
             print(
                 "({}) module, please check these missing columns:\033[1;43m{}\033[0m, "
                 "they will by filled by {}(number),{}(category)".format(
                     self.name, miss_columns, self.fill_number_value, self.fill_category_value))
         # 检查多余字段
         addition_columns = list(set(input_transform_columns) - set(self.output_col_names))
-        if len(addition_columns) > 0:
+        if len(addition_columns) > 0 and self.show_check_detail:
             print("({}) module, please check these additional columns:\033[1;43m{}\033[0m".format(self.name,
                                                                                                   addition_columns))
 
@@ -151,20 +164,23 @@ class FixInput(PreprocessBase):
 
 class Replace(PreprocessBase):
     """
+    1.将cols中特定字符替换为目标字符
+    cols=["input"]
     source_values:["*"," "]
     target_value:""
     ----------------------------
-    input type:pandas.dataframe
-    input like:
     |input|
     |hi*|
     |hi |
     -------------------------
-    output type:pandas.serdataframeies
-    output like:
-    |output|
+    |input|
     |hi|
     |hi|
+    ----------------------------------------------------
+    2.cols输入格式:
+    2.1.cols="all",cols=None表示对所有columns进行操作
+    2.2.cols=["col1","col2"]表示对col1和col2操作
+    2.3.cols=[("col1","new_col1"),("col2","new_col2")]表示对col1和col2操作，并将结果赋值给new_col1和new_col2，并不修改原始col1和col2
     """
 
     def __init__(self, cols="all", source_values=None, target_value="", **kwargs):
@@ -196,6 +212,19 @@ class Replace(PreprocessBase):
 
 
 class DropCols(PreprocessBase):
+    """
+    删掉特定的列:cols
+    cols=["col1"]
+    ----------------
+    | col1 | col2 |
+    |  1   |  2   |
+    |  3   |  4   |
+    ---------------
+     | col2 |
+     |  2   |
+     |  4   |
+    """
+
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, _ in self.cols:
             if col in s.columns.tolist():
@@ -213,6 +242,19 @@ class DropCols(PreprocessBase):
 
 
 class SelectCols(PreprocessBase):
+    """
+    选择特定的cols
+    cols=["col1","col2"]
+    ---------------------------
+    | col1 | col2 |  col3  |
+    |  1   |  2   |   5    |
+    |  3   |  4   |   6    |
+    ---------------------------
+    | col1 | col2 |
+    |  1   |  2   |
+    |  3   |  4   |
+    """
+
     def _transform(self, s: dataframe_type) -> dataframe_type:
         selected_cols = [col for col, _ in self.cols]
         for col in selected_cols:
@@ -237,17 +279,23 @@ class SelectCols(PreprocessBase):
 
 class FillNa(PreprocessBase):
     """
-    优先级fill_detail>fill_mode>fill_value
-    fill_mode可选:mean,median,mode
+    对cols中空进行填充，有三个优先级
+    1.fill_detail不为空,则处理fill_detail所指定的填充值，格式为fill_detail={"col1":1,"col2":"miss"}表示将col1中的空填充为1，col2中的填充为"miss"
+    2.fill_detail为空时，接着看fill_mode，可选项有mean:表示均值填充，median:中位数填充，mode:众数填充(对number和category类型均可)
+    3.当fill_detail和fill_mode均为空时，将number数据类型用fill_number_value填充，category数据类型用fill_category_value填充
     """
 
-    def __init__(self, cols="all", fill_mode=None, fill_number_value=0, fill_category_value="nan", fill_detail=None,
+    def __init__(self, cols="all", fill_mode=None, fill_number_value=0, fill_category_value=None, fill_detail=None,
+                 default_null_values=None,
                  **kwargs):
         super().__init__(cols=cols, **kwargs)
+        if default_null_values is None:
+            default_null_values = ["none", "nan", "np.nan", "null", "", " "]
         self.fill_number_value = fill_number_value
         self.fill_category_value = fill_category_value
         self.fill_mode = fill_mode
         self.fill_detail = fill_detail
+        self.default_null_values = default_null_values
 
     def _fit(self, s: dataframe_type):
         if self.fill_detail is None:
@@ -277,19 +325,25 @@ class FillNa(PreprocessBase):
         return self
 
     def _user_defined_function(self, col, x):
-        if str(x).lower() in ["none", "nan", "np.nan", "null"]:
+        if str(x).lower() in self.default_null_values:
             x = self.fill_detail.get(col)
         return x
 
     def _get_params(self) -> dict_type:
-        return {"fill_detail": self.fill_detail}
+        return {"fill_detail": self.fill_detail, "default_null_values": self.default_null_values}
 
     def _set_params(self, params: dict):
         self.fill_detail = params["fill_detail"]
+        self.default_null_values = params["default_null_values"]
 
 
 class TransToCategory(PreprocessBase):
-    def __init__(self, cols="all", map_detail=(["None", "nan", "", " ", "*", "inf"], "nan"), **kwargs):
+    """
+    1.将cols中的数据转换为category字符类型
+    2.通过map_detail=(["none", "nan", "", " ", "*", "inf", "null"], "nan")可以补充一个replace的操作，如果字符在map_detail[0]中，则替换为map_detail[1]
+    """
+
+    def __init__(self, cols="all", map_detail=(["none", "nan", "", " ", "*", "inf", "null"], "nan"), **kwargs):
         super().__init__(cols=cols, **kwargs)
         self.map_detail = map_detail
 
@@ -299,7 +353,7 @@ class TransToCategory(PreprocessBase):
             x = str(int(float(x)))
         except:
             pass
-        if x in self.map_detail[0]:
+        if x.lower() in self.map_detail[0]:
             x = self.map_detail[1]
         return x
 
@@ -311,6 +365,10 @@ class TransToCategory(PreprocessBase):
 
 
 class TransToFloat(PreprocessBase):
+    """
+    将cols中的数据转换为float类型，对于处理异常的情况用nan_fill_value填充
+    """
+
     def __init__(self, cols="all", nan_fill_value=0, **kwargs):
         super().__init__(cols=cols, **kwargs)
         self.nan_fill_value = nan_fill_value
@@ -330,6 +388,10 @@ class TransToFloat(PreprocessBase):
 
 
 class TransToInt(PreprocessBase):
+    """
+    将cols中的数据转换为int类型，对于处理异常的情况用nan_fill_value填充
+    """
+
     def __init__(self, cols="all", nan_fill_value=0, **kwargs):
         super().__init__(cols=cols, **kwargs)
         self.nan_fill_value = nan_fill_value
@@ -349,6 +411,10 @@ class TransToInt(PreprocessBase):
 
 
 class TransToLower(PreprocessBase):
+    """
+    将字符中的所有英文字符转小写
+    """
+
     def _user_defined_function(self, col, x):
         try:
             return str(x).lower()
@@ -360,6 +426,10 @@ class TransToLower(PreprocessBase):
 
 
 class TransToUpper(PreprocessBase):
+    """
+    将字符中的所有英文字符转大写
+    """
+
     def _user_defined_function(self, col, x):
         try:
             return str(x).upper()
@@ -371,6 +441,12 @@ class TransToUpper(PreprocessBase):
 
 
 class CategoryMapValues(PreprocessBase):
+    """
+    本质也是replace操作,有两个优先级别
+    1.map_detail不为空，格式为map_detail={"col1":(["a","b"],"c"),"col2":([0,-1],1)}表示将col1中的"a","b"替换为"c",将col2中的0,-1替换为1
+    2.map_detail为空时，default_map生效，比如default_map=(["a","b"],"c")表示将所有cols中出现的"a","b"替换为"c"
+    """
+
     def __init__(self, cols="all", default_map=([""], ""), map_detail=None, **kwargs):
         super().__init__(cols=cols, **kwargs)
         self.default_map = default_map
@@ -403,6 +479,13 @@ class CategoryMapValues(PreprocessBase):
 
 
 class Clip(PreprocessBase):
+    """
+    对数值数据进行盖帽操作，有三个优先级
+    1.clip_detail不为空，clip_detail={"col1":(-1,1),"col2":(0,1)}表示将col1中<=-1的值设置为-1，>=1的值设置为1，将col2中<=0的值设置为0，>=1的值设置为1
+    2.clip_detail为空，percent_range不为空，percent_range=(1,99)表示对所有cols，对最小的1%和最高的99%数据进行clip
+    3.clip_detail和percent_range均为空时，default_clip=(0,1)表示对所有cols，<=0的设置为0，>=1的设置为1
+    """
+
     def __init__(self, cols="all", default_clip=None, clip_detail=None, percent_range=None, **kwargs):
         """
        优先级clip_detail>percent_range>default_clip
@@ -454,7 +537,8 @@ class Clip(PreprocessBase):
 
 class MinMaxScaler(PreprocessBase):
     """
-    最大最小归一化
+    对cols进行最大最小归一化:(x-min)/(max-min)
+    但如果max和min相等，则设置为1
     """
 
     def __init__(self, **kwargs):
@@ -510,7 +594,8 @@ class MinMaxScaler(PreprocessBase):
 
 class Normalizer(PreprocessBase):
     """
-    标准化
+    对cols进行标准化:(x-mean)/std
+    但如果std=0，则直接设置为1
     """
 
     def __init__(self, **kwargs):
@@ -566,8 +651,9 @@ class Normalizer(PreprocessBase):
 
 class Bins(PreprocessBase):
     """
-    分箱
-    strategy:uniform/等距；quantile/等位；kmeans/聚类
+    对cols进行分箱
+    n_bins:分箱数
+    strategy:uniform/quantile/kmeans分别表示等距/等位/kmeans聚类分箱
     """
 
     def __init__(self, n_bins=10, strategy="quantile", **kwargs):

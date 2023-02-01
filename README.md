@@ -45,12 +45,17 @@
 - 进阶函数接口:_fit,_transform,_transofrm_single,_set_params,_get_params
 
 
-### 7. 生产部署:数据一致性测试&性能测试&日志记录
+### 7. 生产部署:日志记录&预测一致性测试&性能测试&空值测试&极端值测试
 
-- pipeobj.transform_single(data)即可对生产数据(通常转换为dict)进行预测
-- pipeobj.auto_check_transform(data)可以对数据一致性以及各个pipe模块性能做测试  
-- pipeobj.transform_single(data,logger)可以追踪记录pipeline预测中每一步信息  
+- 生产预测接口，pipeobj.transform_single(data)即可对生产数据(通常转换为dict)进行预测
+- 日志记录，pipeobj.transform_single(data,logger)可以追踪记录pipeline预测中每一步信息
+- 预测一致性&性能测试，pipeobj.check_transform_function(data)可以对transform/transform_single的一致性以及各个pipe模块的性能做测试  
+- 空值测试，pipeobj.check_null_value(data)主要用于检测取各类空值时，比如直接删除，取值None,null,nan,np.nan...最终预测结果是否还能一致
+- 极端值测试，pipeobj.check_extreme_value(data)用于检测输入极端值的情况下，还能否有正常的输出，比如你处理的某列数据是1~100范围，线上生产给你一个inf,0,max float,min float看看模块还能否正常输出结果
+- 类型反转测试，pipeobj.check_inverse_dtype(data) 比如，你的模型训练的是数值类型，如果给你一个字符串的"1"，你的代码会不会报错，如果你训练的字符数据，给你一个数值的0.01你的程序会不会崩
+- int转float测试，pipeobj.check_int_trans_float(data)，pandas会将某些特征自动推断为int，而线上传输的可能是float，需要测试这两种情况是否能一致
 
+- 自动化测试接口，pipeobj.auto_test(data)，依次将上面的各个测试走一遍
 
 
 ## 0.安装
@@ -218,10 +223,10 @@ del x_test["Survived"]
 from easymlops.ml.preprocessing import *
 ml=PipeML()
 ml.pipe(FixInput())\
-  .pipe(FillNa(cols=["Cabin","Ticket","Parch","Fare"],fill_mode="mode"))\
+  .pipe(FillNa(cols=["Cabin","Ticket","Parch","Fare","Sex"],fill_mode="mode"))\
   .pipe(FillNa(cols=["Age"],fill_mode="mean"))\
   .pipe(FillNa(fill_detail={"Embarked":"N"}))\
-  .pipe(TransToCategory(cols=["Cabin","Embarked"]))\
+  .pipe(TransToCategory(cols=["Cabin","Embarked","Name"]))\
   .pipe(TransToFloat(cols=["Age","Fare"]))\
   .pipe(TransToInt(cols=["Pclass","PassengerId","Survived","SibSp","Parch"]))\
   .pipe(TransToLower(cols=["Ticket","Cabin","Embarked","Name","Sex"]))\
@@ -280,10 +285,10 @@ x_test_new.head(5)
       <td>n</td>
       <td>s</td>
       <td>0.228571</td>
-      <td>-0.523659</td>
+      <td>-0.518312</td>
       <td>2.0</td>
       <td>1.0</td>
-      <td>0.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>501</th>
@@ -299,10 +304,10 @@ x_test_new.head(5)
       <td>n</td>
       <td>q</td>
       <td>0.285714</td>
-      <td>-0.544624</td>
+      <td>-0.539225</td>
       <td>2.0</td>
       <td>2.0</td>
-      <td>0.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>502</th>
@@ -314,14 +319,14 @@ x_test_new.head(5)
       <td>0</td>
       <td>0</td>
       <td>330909</td>
-      <td>7.7175</td>
+      <td>7.6292</td>
       <td>n</td>
       <td>q</td>
       <td>0.402925</td>
-      <td>-0.545371</td>
+      <td>-0.541994</td>
       <td>4.0</td>
       <td>5.0</td>
-      <td>0.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>503</th>
@@ -337,10 +342,10 @@ x_test_new.head(5)
       <td>n</td>
       <td>s</td>
       <td>0.514286</td>
-      <td>-0.502407</td>
+      <td>-0.497111</td>
       <td>5.0</td>
       <td>6.0</td>
-      <td>0.0</td>
+      <td>1.0</td>
     </tr>
     <tr>
       <th>504</th>
@@ -356,7 +361,7 @@ x_test_new.head(5)
       <td>b79</td>
       <td>s</td>
       <td>0.214286</td>
-      <td>1.264706</td>
+      <td>1.265641</td>
       <td>2.0</td>
       <td>1.0</td>
       <td>4.0</td>
@@ -625,38 +630,38 @@ x_test_new.head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>250.112231</td>
-      <td>-27.096138</td>
-      <td>-5.834393</td>
-      <td>-0.180067</td>
+      <td>244.143134</td>
+      <td>-26.433827</td>
+      <td>-5.579019</td>
+      <td>0.139935</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>251.117645</td>
-      <td>-27.780886</td>
-      <td>-1.800322</td>
-      <td>-0.126839</td>
+      <td>244.149330</td>
+      <td>-27.065848</td>
+      <td>-1.535096</td>
+      <td>0.032236</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>252.017857</td>
-      <td>-29.148327</td>
-      <td>-22.754604</td>
-      <td>-0.559045</td>
+      <td>244.048654</td>
+      <td>-28.613322</td>
+      <td>-22.472506</td>
+      <td>-0.393424</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>253.218297</td>
-      <td>-25.037062</td>
-      <td>14.051899</td>
-      <td>0.198425</td>
+      <td>244.250079</td>
+      <td>-24.145769</td>
+      <td>14.298703</td>
+      <td>0.353986</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>255.219620</td>
-      <td>50.498192</td>
-      <td>-11.402204</td>
-      <td>-1.090810</td>
+      <td>245.211271</td>
+      <td>51.165456</td>
+      <td>-11.852851</td>
+      <td>-1.108305</td>
     </tr>
   </tbody>
 </table>
@@ -1121,36 +1126,36 @@ ml.fit(x_train).transform(x_test).head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>250.111868</td>
-      <td>-27.103302</td>
+      <td>244.142772</td>
+      <td>-26.441827</td>
       <td>6.209714</td>
       <td>0.178558</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>251.117271</td>
-      <td>-27.787295</td>
+      <td>244.148957</td>
+      <td>-27.072988</td>
       <td>6.225051</td>
       <td>0.168702</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>252.017480</td>
-      <td>-29.155072</td>
+      <td>244.048279</td>
+      <td>-28.620891</td>
       <td>6.222640</td>
       <td>0.096320</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>253.217925</td>
-      <td>-25.043321</td>
+      <td>244.249710</td>
+      <td>-24.152708</td>
       <td>6.260848</td>
       <td>0.267476</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>255.220248</td>
-      <td>50.507856</td>
+      <td>245.211899</td>
+      <td>51.176116</td>
       <td>6.249152</td>
       <td>2.144759</td>
     </tr>
@@ -1191,38 +1196,38 @@ ml.fit(x_train).transform(x_test).head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.964262</td>
-      <td>0.035738</td>
-      <td>0.649694</td>
-      <td>0.350306</td>
+      <td>0.967995</td>
+      <td>0.032005</td>
+      <td>0.658180</td>
+      <td>0.341820</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.981094</td>
-      <td>0.018906</td>
-      <td>0.653345</td>
-      <td>0.346655</td>
+      <td>0.992226</td>
+      <td>0.007774</td>
+      <td>0.661813</td>
+      <td>0.338187</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.987265</td>
-      <td>0.012735</td>
-      <td>0.645544</td>
-      <td>0.354456</td>
+      <td>0.981467</td>
+      <td>0.018533</td>
+      <td>0.665298</td>
+      <td>0.334702</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.866328</td>
-      <td>0.133672</td>
-      <td>0.654837</td>
-      <td>0.345163</td>
+      <td>0.712881</td>
+      <td>0.287119</td>
+      <td>0.660105</td>
+      <td>0.339895</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0.301595</td>
-      <td>0.698405</td>
-      <td>0.445869</td>
-      <td>0.554131</td>
+      <td>0.264412</td>
+      <td>0.735588</td>
+      <td>0.471488</td>
+      <td>0.528512</td>
     </tr>
   </tbody>
 </table>
@@ -1563,9 +1568,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>500</th>
       <td>2.132522</td>
-      <td>0.648004</td>
-      <td>-0.075895</td>
-      <td>-0.093468</td>
+      <td>0.648002</td>
+      <td>0.075899</td>
+      <td>0.093497</td>
       <td>-0.183208</td>
       <td>-0.017150</td>
       <td>0.403337</td>
@@ -1574,9 +1579,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>501</th>
       <td>2.034848</td>
-      <td>-0.608228</td>
-      <td>-0.733369</td>
-      <td>-0.013220</td>
+      <td>-0.608227</td>
+      <td>0.733364</td>
+      <td>0.013151</td>
       <td>-0.085437</td>
       <td>-0.033206</td>
       <td>0.293308</td>
@@ -1585,9 +1590,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>502</th>
       <td>2.040231</td>
-      <td>-0.616304</td>
-      <td>-0.747661</td>
-      <td>-0.022293</td>
+      <td>-0.616310</td>
+      <td>0.747684</td>
+      <td>0.022635</td>
       <td>-0.051665</td>
       <td>0.000399</td>
       <td>0.277010</td>
@@ -1596,9 +1601,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>503</th>
       <td>2.026293</td>
-      <td>-0.579115</td>
-      <td>-0.735073</td>
-      <td>0.012305</td>
+      <td>-0.579112</td>
+      <td>0.735054</td>
+      <td>-0.012189</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -1607,9 +1612,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>504</th>
       <td>2.025096</td>
-      <td>-0.573417</td>
-      <td>-0.720071</td>
-      <td>0.010259</td>
+      <td>-0.573415</td>
+      <td>0.720067</td>
+      <td>-0.010234</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -1790,58 +1795,58 @@ x_test_new.head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>250.112231</td>
-      <td>-27.096138</td>
-      <td>-5.834393</td>
-      <td>-0.180067</td>
-      <td>-1.124374</td>
-      <td>-0.103224</td>
-      <td>0.040820</td>
-      <td>-0.131174</td>
+      <td>244.143134</td>
+      <td>-26.433827</td>
+      <td>-5.579019</td>
+      <td>0.139935</td>
+      <td>-1.089247</td>
+      <td>-0.171164</td>
+      <td>0.037629</td>
+      <td>-0.129986</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>251.117645</td>
-      <td>-27.780886</td>
-      <td>-1.800322</td>
-      <td>-0.126839</td>
-      <td>-0.081313</td>
-      <td>-1.153031</td>
-      <td>-0.191893</td>
-      <td>-1.016990</td>
+      <td>244.149330</td>
+      <td>-27.065848</td>
+      <td>-1.535096</td>
+      <td>0.032236</td>
+      <td>0.030136</td>
+      <td>-1.150590</td>
+      <td>-0.114188</td>
+      <td>-1.025774</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>252.017857</td>
-      <td>-29.148327</td>
-      <td>-22.754604</td>
-      <td>-0.559045</td>
-      <td>-0.052818</td>
-      <td>-0.926988</td>
-      <td>-0.143329</td>
-      <td>-1.040929</td>
+      <td>244.048654</td>
+      <td>-28.613322</td>
+      <td>-22.472506</td>
+      <td>-0.393424</td>
+      <td>-0.062435</td>
+      <td>-0.962957</td>
+      <td>-0.102700</td>
+      <td>-1.061490</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>253.218297</td>
-      <td>-25.037062</td>
-      <td>14.051899</td>
-      <td>0.198425</td>
-      <td>-0.116402</td>
-      <td>-1.322741</td>
-      <td>-0.226845</td>
-      <td>-1.006329</td>
+      <td>244.250079</td>
+      <td>-24.145769</td>
+      <td>14.298703</td>
+      <td>0.353986</td>
+      <td>0.085036</td>
+      <td>-1.292375</td>
+      <td>-0.120276</td>
+      <td>-1.005569</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>255.219620</td>
-      <td>50.498192</td>
-      <td>-11.402204</td>
-      <td>-1.090810</td>
-      <td>0.354341</td>
-      <td>-0.394043</td>
-      <td>-0.365711</td>
-      <td>-0.548342</td>
+      <td>245.211271</td>
+      <td>51.165456</td>
+      <td>-11.852851</td>
+      <td>-1.108305</td>
+      <td>0.057464</td>
+      <td>-0.521142</td>
+      <td>-0.345954</td>
+      <td>-0.625369</td>
     </tr>
   </tbody>
 </table>
@@ -1872,28 +1877,28 @@ ml2.fit(x_train_new).transform(x_test_new).head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.996235</td>
-      <td>0.003765</td>
+      <td>0.996155</td>
+      <td>0.003845</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.979202</td>
-      <td>0.020798</td>
+      <td>0.980622</td>
+      <td>0.019378</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.970884</td>
-      <td>0.029116</td>
+      <td>0.973603</td>
+      <td>0.026397</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.984536</td>
-      <td>0.015464</td>
+      <td>0.985191</td>
+      <td>0.014809</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0.204515</td>
-      <td>0.795485</td>
+      <td>0.258010</td>
+      <td>0.741990</td>
     </tr>
   </tbody>
 </table>
@@ -1925,28 +1930,28 @@ ml_combine.transform(x_test).head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.996235</td>
-      <td>0.003765</td>
+      <td>0.996155</td>
+      <td>0.003845</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0.979202</td>
-      <td>0.020798</td>
+      <td>0.980622</td>
+      <td>0.019378</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.970884</td>
-      <td>0.029116</td>
+      <td>0.973603</td>
+      <td>0.026397</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.984536</td>
-      <td>0.015464</td>
+      <td>0.985191</td>
+      <td>0.014809</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0.204515</td>
-      <td>0.795485</td>
+      <td>0.258010</td>
+      <td>0.741990</td>
     </tr>
   </tbody>
 </table>
@@ -1995,58 +2000,58 @@ x_test_new.head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>-395.474344</td>
-      <td>16.246479</td>
-      <td>-12.526273</td>
-      <td>-39.863262</td>
-      <td>-3.525237</td>
-      <td>1.171257</td>
-      <td>-0.642503</td>
-      <td>0.425204</td>
+      <td>-387.121036</td>
+      <td>13.979222</td>
+      <td>-12.776600</td>
+      <td>-38.933042</td>
+      <td>-2.880351</td>
+      <td>1.155796</td>
+      <td>-0.564385</td>
+      <td>-0.593809</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>-396.034758</td>
-      <td>17.057039</td>
-      <td>-12.883940</td>
-      <td>-40.405460</td>
-      <td>0.505058</td>
-      <td>-1.880799</td>
-      <td>-0.632594</td>
-      <td>0.421864</td>
+      <td>-387.087823</td>
+      <td>14.134133</td>
+      <td>-12.661127</td>
+      <td>-39.437177</td>
+      <td>1.162099</td>
+      <td>-1.898521</td>
+      <td>-0.592609</td>
+      <td>-0.750671</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>-396.602256</td>
-      <td>17.387752</td>
-      <td>-13.794505</td>
-      <td>-42.144470</td>
-      <td>-20.413251</td>
-      <td>-1.752624</td>
-      <td>-0.926964</td>
-      <td>0.291678</td>
+      <td>-387.059681</td>
+      <td>13.808067</td>
+      <td>-13.096079</td>
+      <td>-41.560890</td>
+      <td>-19.720113</td>
+      <td>-1.761060</td>
+      <td>-0.881661</td>
+      <td>-0.562568</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>-397.322960</td>
-      <td>18.434067</td>
-      <td>-13.508230</td>
-      <td>-37.263258</td>
-      <td>16.299650</td>
-      <td>-1.968569</td>
-      <td>-0.408951</td>
-      <td>0.530000</td>
+      <td>-387.184160</td>
+      <td>14.199977</td>
+      <td>-12.390480</td>
+      <td>-36.093664</td>
+      <td>16.911090</td>
+      <td>-1.990755</td>
+      <td>-0.372917</td>
+      <td>-0.905934</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>-238.496005</td>
-      <td>274.260464</td>
-      <td>150.607307</td>
-      <td>75.272168</td>
-      <td>-21.145699</td>
-      <td>-1.725589</td>
-      <td>0.589471</td>
-      <td>-0.513614</td>
+      <td>-228.588562</td>
+      <td>268.592272</td>
+      <td>148.668435</td>
+      <td>77.511089</td>
+      <td>-22.424479</td>
+      <td>-1.651499</td>
+      <td>0.376687</td>
+      <td>0.360375</td>
     </tr>
   </tbody>
 </table>
@@ -2094,7 +2099,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0.0</td>
       <td>315086</td>
       <td>8.6625</td>
-      <td>nan</td>
+      <td>None</td>
       <td>S</td>
     </tr>
     <tr>
@@ -2108,7 +2113,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0.0</td>
       <td>364846</td>
       <td>7.7500</td>
-      <td>nan</td>
+      <td>None</td>
       <td>Q</td>
     </tr>
     <tr>
@@ -2122,7 +2127,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0.0</td>
       <td>330909</td>
       <td>7.6292</td>
-      <td>nan</td>
+      <td>None</td>
       <td>Q</td>
     </tr>
     <tr>
@@ -2136,7 +2141,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0.0</td>
       <td>4135</td>
       <td>9.5875</td>
-      <td>nan</td>
+      <td>None</td>
       <td>S</td>
     </tr>
     <tr>
@@ -2611,14 +2616,14 @@ ml.transform_single(input_dict)
 
 
 
-    {0: -395.47434383444215,
-     1: 16.246479243154806,
-     2: -12.52627328963649,
-     3: -39.863261981794416,
-     4: -3.5252367095105677,
-     5: 1.17125734500937,
-     6: -0.64250346850212,
-     7: 0.4252039033015551}
+    {0: -387.12103636413934,
+     1: 13.97922161572029,
+     2: -12.776599783138563,
+     3: -38.93304205157552,
+     4: -2.8803508317309654,
+     5: 1.155795904439429,
+     6: -0.5643848743244888,
+     7: -0.5938089285211727}
 
 
 
@@ -2628,20 +2633,20 @@ ml.transform_single(input_dict)
 ml.transform_single({})
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>) module, please check these missing columns:[1;43m['Pclass', 'Name', 'Fare', 'SibSp', 'Parch', 'PassengerId', 'Ticket', 'Sex', 'Age', 'Embarked', 'Cabin'][0m, they will by filled by nan(number),None(category)
+    (<class 'easymlops.ml.preprocessing.FixInput'>) module, please check these missing columns:[1;43m['Embarked', 'PassengerId', 'Cabin', 'Fare', 'Ticket', 'Age', 'Pclass', 'Name', 'Sex', 'Parch', 'SibSp'][0m, they will by filled by nan(number),None(category)
     
 
 
 
 
-    {0: -96.9781043279831,
-     1: -311.7235001595718,
-     2: 219.46040409835868,
-     3: -65.86569587701999,
-     4: -17.895054639401152,
-     5: 0.1821931041957648,
-     6: -1.3061114366829252,
-     7: -0.44054724091208186}
+    {0: -95.64039657615285,
+     1: -305.1318009424023,
+     2: 215.2032019812796,
+     3: -62.09476149164795,
+     4: -17.02882296816116,
+     5: 0.1713669364343205,
+     6: -1.3024227323286315,
+     7: 0.5629456659915981}
 
 
 
@@ -2671,7 +2676,7 @@ ml.pipe(FixInput())\
 
 
 
-    <easymlops.pipeml.PipeML at 0x200e4883fc8>
+    <easymlops.pipeml.PipeML at 0x208a3b23748>
 
 
 
@@ -2703,58 +2708,58 @@ ml.transform(x_test).head(5)
   <tbody>
     <tr>
       <th>0</th>
-      <td>-395.474344</td>
-      <td>16.246479</td>
-      <td>-12.526273</td>
-      <td>-39.863262</td>
-      <td>-3.525237</td>
-      <td>1.171257</td>
-      <td>-0.642503</td>
-      <td>0.425204</td>
+      <td>-387.121036</td>
+      <td>13.979222</td>
+      <td>-12.776600</td>
+      <td>-38.933042</td>
+      <td>-2.880351</td>
+      <td>1.155796</td>
+      <td>-0.564385</td>
+      <td>-0.593809</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>-396.034758</td>
-      <td>17.057039</td>
-      <td>-12.883940</td>
-      <td>-40.405460</td>
-      <td>0.505058</td>
-      <td>-1.880799</td>
-      <td>-0.632594</td>
-      <td>0.421864</td>
+      <td>-387.087823</td>
+      <td>14.134133</td>
+      <td>-12.661127</td>
+      <td>-39.437177</td>
+      <td>1.162099</td>
+      <td>-1.898521</td>
+      <td>-0.592609</td>
+      <td>-0.750671</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>-396.602256</td>
-      <td>17.387752</td>
-      <td>-13.794505</td>
-      <td>-42.144470</td>
-      <td>-20.413251</td>
-      <td>-1.752624</td>
-      <td>-0.926964</td>
-      <td>0.291678</td>
+      <td>-387.059681</td>
+      <td>13.808067</td>
+      <td>-13.096079</td>
+      <td>-41.560890</td>
+      <td>-19.720113</td>
+      <td>-1.761060</td>
+      <td>-0.881661</td>
+      <td>-0.562568</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>-397.322960</td>
-      <td>18.434067</td>
-      <td>-13.508230</td>
-      <td>-37.263258</td>
-      <td>16.299650</td>
-      <td>-1.968569</td>
-      <td>-0.408951</td>
-      <td>0.530000</td>
+      <td>-387.184160</td>
+      <td>14.199977</td>
+      <td>-12.390480</td>
+      <td>-36.093664</td>
+      <td>16.911090</td>
+      <td>-1.990755</td>
+      <td>-0.372917</td>
+      <td>-0.905934</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>-238.496005</td>
-      <td>274.260464</td>
-      <td>150.607307</td>
-      <td>75.272168</td>
-      <td>-21.145699</td>
-      <td>-1.725589</td>
-      <td>0.589471</td>
-      <td>-0.513614</td>
+      <td>-228.588562</td>
+      <td>268.592272</td>
+      <td>148.668435</td>
+      <td>77.511089</td>
+      <td>-22.424479</td>
+      <td>-1.651499</td>
+      <td>0.376687</td>
+      <td>0.360375</td>
     </tr>
   </tbody>
 </table>
@@ -2770,14 +2775,14 @@ ml.transform_single(input_dict)
 
 
 
-    {0: -395.4743438344421,
-     1: 16.246479243154795,
-     2: -12.526273289636507,
-     3: -39.863261981794416,
-     4: -3.5252367095105663,
-     5: 1.1712573450093697,
-     6: -0.6425034685021197,
-     7: 0.42520390330155505}
+    {0: -387.1210363641393,
+     1: 13.979221615720292,
+     2: -12.776599783138565,
+     3: -38.933042051575526,
+     4: -2.8803508317309676,
+     5: 1.155795904439429,
+     6: -0.5643848743244889,
+     7: -0.5938089285211727}
 
 
 
@@ -3218,29 +3223,7 @@ ml.transform_single({'PassengerId': 1,
 
 
 
-### 7.2 数据一致性测试&性能测试
-部署生产环境之前，我们通常要关注两点：  
-- 离线训练模型和在线预测模型的一致性，即tranform和transform_single的一致性；  
-- transform_single对当条数据的预测性能  
-
-这些可以通过调用如下函数，进行自动化测试：  
-- auto_check_transform：只要有打印[success]，则表示一致性测试通过，性能测试表示为[*]毫秒/每条数据，如果有异常则会直接抛出，并中断后续pipe模块的测试
-
-
-```python
-ml_combine.auto_check_transform(x_test)
-```
-
-    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.encoding.OneHotEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.encoding.LabelEncoding'>)  module transform check [success], single transform speed:[0.01]ms/it
-    (<class 'easymlops.ml.encoding.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.decomposition.PCADecomposition'>)  module transform check [success], single transform speed:[1.26]ms/it
-    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>)  module transform check [success], single transform speed:[1.36]ms/it
-    
-
-### 7.3 日志记录 
+### 7.2 日志记录 
 日志通常只需要在生产中使用，所以只在transform_single可用
 
 
@@ -3275,6 +3258,138 @@ ml.transform_single({'PassengerId': 1,
     {'Age': 22.0, 'Fare': 7.25, 'Embarked': 0.3342541436464088}
 
 
+
+### 7.3 transform/transform_single一致性测试&性能测试:check_transform_function
+部署生产环境之前，我们通常要关注两点：  
+- 离线训练模型和在线预测模型的一致性，即tranform和transform_single的一致性；  
+- transform_single对当条数据的预测性能  
+
+这些可以通过调用如下函数，进行自动化测试：  
+- check_transform_function：只要有打印[success]，则表示在当前测试数据上transform和transform_single的输出一致，性能测试表示为[*]毫秒/每条数据，如果有异常则会直接抛出，并中断后续pipe模块的测试
+
+
+```python
+ml_combine.check_transform_function(x_test)
+```
+
+    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.08]ms/it
+    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.0]ms/it
+    (<class 'easymlops.ml.encoding.OneHotEncoding'>)  module transform check [success], single transform speed:[0.04]ms/it
+    (<class 'easymlops.ml.encoding.LabelEncoding'>)  module transform check [success], single transform speed:[0.04]ms/it
+    (<class 'easymlops.ml.encoding.TargetEncoding'>)  module transform check [success], single transform speed:[0.04]ms/it
+    (<class 'easymlops.ml.decomposition.PCADecomposition'>)  module transform check [success], single transform speed:[5.83]ms/it
+    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>)  module transform check [success], single transform speed:[1.41]ms/it
+    
+
+### 7.4 空值测试：check_null_value  
+
+- 由于pandas在读取数据时会自动做类型推断，对空会有不同的处理，比如float设置为np.nan，对object设置为None或NaN  
+- 而且pandas读取数据默认为批量读取批量推断，所以某一列数据空还不唯一，np.nan和None可能共存  
+
+所以，这里对逐个column分别设置不同的空进行测试，测试内容：  
+- 相同的空情况下，transform和transform_single是否一致  
+- 不同的空的transform结果是否一致  
+
+可通过`null_values=[None, np.nan, "null", "NULL", "nan", "NaN", "", "none", "None", " "]`(默认)设置自定义空值
+
+
+```python
+ml_combine.check_null_value(x_test)
+```
+
+    column: [PassengerId] check null value complete, total single transform speed:[7.75]ms/it
+    column: [Pclass] check null value complete, total single transform speed:[7.47]ms/it
+    column: [Name] check null value complete, total single transform speed:[7.77]ms/it
+    column: [Sex] check null value complete, total single transform speed:[7.66]ms/it
+    column: [Age] check null value complete, total single transform speed:[7.87]ms/it
+    column: [SibSp] check null value complete, total single transform speed:[8.17]ms/it
+    column: [Parch] check null value complete, total single transform speed:[8.04]ms/it
+    column: [Ticket] check null value complete, total single transform speed:[7.94]ms/it
+    column: [Fare] check null value complete, total single transform speed:[7.91]ms/it
+    column: [Cabin] check null value complete, total single transform speed:[8.28]ms/it
+    column: [Embarked] check null value complete, total single transform speed:[7.65]ms/it
+    
+
+### 7.5极端值测试：check_extreme_value  
+
+通常用于训练的数据都是经过筛选的正常数据，但线上难免会有极端值混入，比如你训练的某列数据范围在`0~1`之间，如果传入一个`-1`，也许就会报错，目前
+
+- 对两种类型的分别进行极端测试，设置如下：
+  - 数值型:设置`number_extreme_values = [np.inf, 0.0, -1, 1, -1e-7, 1e-7, np.finfo(np.float64).min, np.finfo(np.float64).max]`(默认)
+  - 离散型:设置`category_extreme_values = ["", "null", None, "1.0", "0.0", "-1.0", "-1", "NaN", "None"]`(默认)  
+
+- 将全部特征设置为如上的极端值进行测试
+
+注意：这里只检测了transform与transform_single的一致性，不要求各极端值输入下的输出一致性(注意和上面的空值检测不一样，空值检测要求所有类型的空的输出也要一致)
+
+
+```python
+ml_combine.check_extreme_value(x_test)
+```
+
+    column: [PassengerId] check extreme value complete, total single transform speed:[7.47]ms/it
+    column: [Pclass] check extreme value complete, total single transform speed:[7.62]ms/it
+    column: [Name] check extreme value complete, total single transform speed:[7.74]ms/it
+    column: [Sex] check extreme value complete, total single transform speed:[7.77]ms/it
+    column: [Age] check extreme value complete, total single transform speed:[7.55]ms/it
+    column: [SibSp] check extreme value complete, total single transform speed:[7.68]ms/it
+    column: [Parch] check extreme value complete, total single transform speed:[7.63]ms/it
+    column: [Ticket] check extreme value complete, total single transform speed:[7.56]ms/it
+    column: [Fare] check extreme value complete, total single transform speed:[7.61]ms/it
+    column: [Cabin] check extreme value complete, total single transform speed:[7.77]ms/it
+    column: [Embarked] check extreme value complete, total single transform speed:[7.65]ms/it
+    [__all__] columns set the same extreme value complete,total single transform speed:[8.06]ms/it
+    
+
+### 7.6 数据类型反转测试：check_inverse_dtype  
+
+某特征入模是数据是数值，但上线后传过来的是离散值，也有可能相反，这里就对这种情况做测试，对原是数值的替换为离散做测试，对原始离散值的替换为数值，替换规则如下：
+- 原数值的，替换为：`number_inverse_values = ["", "null", None, "1.0", "0.0", "-1.0", "-1"]`(默认)  
+- 原离散的，替换为：`category_inverse_values = [0.0, -1, 1, -1e-7, 1e-7, np.finfo(np.float64).min, np.finfo(np.float64).max]`(默认)  
+
+同样，数据类型反转测试只对transform和transform_single的一致性有要求
+
+
+```python
+ml_combine.check_inverse_dtype(x_test)
+```
+
+    column: [PassengerId] check inverse value complete, total single transform speed:[7.96]ms/it
+    column: [Pclass] check inverse value complete, total single transform speed:[7.83]ms/it
+    column: [Name] check inverse value complete, total single transform speed:[7.69]ms/it
+    column: [Sex] check inverse value complete, total single transform speed:[7.68]ms/it
+    column: [Age] check inverse value complete, total single transform speed:[7.86]ms/it
+    column: [SibSp] check inverse value complete, total single transform speed:[7.82]ms/it
+    column: [Parch] check inverse value complete, total single transform speed:[7.82]ms/it
+    column: [Ticket] check inverse value complete, total single transform speed:[7.77]ms/it
+    column: [Fare] check inverse value complete, total single transform speed:[8.06]ms/it
+    column: [Cabin] check inverse value complete, total single transform speed:[8.06]ms/it
+    column: [Embarked] check inverse value complete, total single transform speed:[7.53]ms/it
+    
+
+### 7.7 int转float测试：check_int_trans_float  
+pandas会将某些特征自动推断为int，而线上可能传输的是float，需要做如下测试：  
+- 转float后transform和transform_single之间的一致性  
+- int和float特征通过transform后的一致性
+
+
+```python
+ml_combine.check_int_trans_float(x_test)
+```
+
+    column: [PassengerId] check int trans float value complete, total single transform speed:[7.53]ms/it
+    column: [Pclass] check int trans float value complete, total single transform speed:[7.68]ms/it
+    column: [SibSp] check int trans float value complete, total single transform speed:[7.53]ms/it
+    column: [Parch] check int trans float value complete, total single transform speed:[7.98]ms/it
+    
+
+### 7.8 自动测试：auto_test
+就是把上面的所有测试，整合到auto_test一个函数中
+
+
+```python
+#ml_combine.auto_test(x_test)
+```
 
 ## TODO  
 
