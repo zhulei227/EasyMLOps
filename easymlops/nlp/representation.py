@@ -88,6 +88,8 @@ class BagOfWords(RepresentationBase):
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
+        # 先聚合稀疏矩阵，在添加稠密矩阵
+        dfs = []
         for col in self.cols:
             tf = self.tf.get(col)
             tf_vectors_csr = tf.transform(s[col])
@@ -98,10 +100,12 @@ class BagOfWords(RepresentationBase):
             df = pandas.DataFrame.sparse.from_spmatrix(data=tf_vectors_csr,
                                                        columns=["{}_{}_{}".format(self.prefix, col, name) for name in
                                                                 feature_names])
-            for icol in df.columns:
-                s[icol] = df[icol]
-                s[icol] = df[icol].values
-        return s
+            dfs.append(df)
+        combine_df = pd.concat(dfs)
+        combine_cols = s.columns.tolist() + combine_df.columns.tolist()
+        for col in s.columns:
+            combine_df[col] = s[col]
+        return combine_df[combine_cols]
 
     def _get_params(self) -> dict_type:
         return {"tf": self.tf}
@@ -150,6 +154,7 @@ class TFIDF(RepresentationBase):
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
+        dfs = []
         for col in self.cols:
             tfidf = self.tfidf.get(col)
             tfidf_vectors_csr = tfidf.transform(s[col])
@@ -160,10 +165,12 @@ class TFIDF(RepresentationBase):
             df = pandas.DataFrame.sparse.from_spmatrix(data=tfidf_vectors_csr,
                                                        columns=["{}_{}_{}".format(self.prefix, col, name) for name in
                                                                 feature_names])
-            for icol in df.columns:
-                s[icol] = df[icol]
-                s[icol] = df[icol].values
-        return s
+            dfs.append(df)
+        combine_df = pd.concat(dfs)
+        combine_cols = s.columns.tolist() + combine_df.columns.tolist()
+        for col in s.columns:
+            combine_df[col] = s[col]
+        return combine_df[combine_cols]
 
     def _get_params(self) -> dict_type:
         return {"tfidf": self.tfidf}
@@ -220,7 +227,6 @@ class LdaTopicModel(RepresentationBase):
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
             for icol in result.columns:
-                s[icol] = result[icol]
                 s[icol] = result[icol].values
         return s
 
@@ -280,7 +286,6 @@ class LsiTopicModel(RepresentationBase):
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
             for icol in result.columns:
-                s[icol] = result[icol]
                 s[icol] = result[icol].values
         return s
 
@@ -333,7 +338,6 @@ class Word2VecModel(RepresentationBase):
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
             for icol in result.columns:
-                s[icol] = result[icol]
                 s[icol] = result[icol].values
         return s
 
@@ -384,7 +388,6 @@ class Doc2VecModel(RepresentationBase):
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
             for icol in result.columns:
-                s[icol] = result[icol]
                 s[icol] = result[icol].values
         return s
 
@@ -437,7 +440,6 @@ class FastTextModel(RepresentationBase):
             result = pandas.DataFrame(vectors)
             result.columns = ["{}_{}_{}".format(self.prefix, col, name) for name in result.columns]
             for icol in result.columns:
-                s[icol] = result[icol]
                 s[icol] = result[icol].values
         return s
 

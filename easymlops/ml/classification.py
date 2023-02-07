@@ -123,22 +123,30 @@ class LGBMClassification(ClassificationBase):
     |0.5 |0.5|
     """
 
-    def __init__(self, y=None, max_depth=3, num_boost_round=256, verbose=-1, objective="multiclass", **kwargs):
+    def __init__(self, y=None, verbose=-1, objective="multiclass",
+                 use_faster_predictor=True, **kwargs):
         super().__init__(y=y, **kwargs)
         self.native_init_params.update({
             'objective': objective,
             'num_class': self.num_class,
-            'max_depth': max_depth,
             'verbose': verbose
         })
-        self.native_fit_params.update({"num_boost_round": num_boost_round})
         self.lgb_model = None
+        self.use_faster_predictor = use_faster_predictor
+        self.lgb_model_faster_predictor_params = None
+        self.lgb_model_faster_predictor = None
 
     def _fit(self, s: dataframe_type) -> dataframe_type:
         import lightgbm as lgb
-        s_ = self.pd2csr(s)
+        s_ = self.pd2csr(s)  # 转稀疏矩阵后会丢失columns信息
         self.lgb_model = lgb.train(params=self.native_init_params, train_set=lgb.Dataset(data=s_, label=self.y),
                                    **self.native_fit_params)
+        if self.use_faster_predictor:
+            from ..utils import FasterLgbMulticlassPredictor
+            self.lgb_model_faster_predictor_params = self.lgb_model.dump_model()
+            self.lgb_model_faster_predictor_params["feature_names"] = s.columns.tolist()
+            self.lgb_model_faster_predictor = FasterLgbMulticlassPredictor(
+                model=self.lgb_model_faster_predictor_params, cache_num=10)
         return self
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
@@ -147,11 +155,34 @@ class LGBMClassification(ClassificationBase):
                                   columns=[self.id2label.get(i) for i in range(self.num_class)])
         return result
 
+    def _transform_single(self, s: dict_type):
+        if self.use_faster_predictor:
+            return self.lgb_model_faster_predictor.predict(s).get("score")
+        else:
+            input_dataframe = pd.DataFrame([s])
+            return self._transform(input_dataframe).to_dict("record")[0]
+
     def _get_params(self) -> dict_type:
-        return {"lgb_model": self.lgb_model}
+        params = {"lgb_model": self.lgb_model, "use_faster_predictor": self.use_faster_predictor}
+        if self.use_faster_predictor:
+            params["lgb_model_faster_predictor_params"] = self.lgb_model_faster_predictor_params
+        return params
 
     def _set_params(self, params: dict_type):
         self.lgb_model = params["lgb_model"]
+        self.use_faster_predictor = params["use_faster_predictor"]
+        if self.use_faster_predictor:
+            from ..utils import FasterLgbMulticlassPredictor
+            self.lgb_model_faster_predictor_params = params["lgb_model_faster_predictor_params"]
+            self.lgb_model_faster_predictor = FasterLgbMulticlassPredictor(
+                model=self.lgb_model_faster_predictor_params, cache_num=10)
+
+    def get_contrib(self, s: dict_type) -> dict_type:
+        """
+        获取sabaas特征重要性
+        """
+        assert self.use_faster_predictor
+        return self.lgb_model_faster_predictor.predict(s).get("contrib")
 
 
 class LogisticRegressionClassification(ClassificationBase):

@@ -1,6 +1,5 @@
-import numpy as np
-
 from ..base import *
+from .perfopt import ReduceMemUsage
 
 
 class PreprocessBase(PipeObject):
@@ -18,7 +17,14 @@ class PreprocessBase(PipeObject):
         super().__init__(**kwargs)
         self.cols = cols
 
-    def _user_defined_function(self, col, x):
+    def apply_function_series(self, col: str, x: series_type):
+        """
+        col:当前col名称
+        x:当前col对应的值
+        """
+        raise Exception("need to implement")
+
+    def apply_function_single(self, col: str, x):
         """
         col:当前col名称
         x:当前col对应的值
@@ -47,13 +53,13 @@ class PreprocessBase(PipeObject):
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, new_col in self.cols:
             if col in s.columns:
-                s[new_col] = s[col].apply(lambda x: self._user_defined_function(col, x))
+                s[new_col] = self.apply_function_series(col, s[col])
         return s
 
     def _transform_single(self, s: dict_type) -> dict_type:
         for col, new_col in self.cols:
             if col in s.keys():
-                s[new_col] = self._user_defined_function(col, s[col])
+                s[new_col] = self.apply_function_single(col, s[col])
         return s
 
     def _get_params(self):
@@ -70,30 +76,14 @@ class FixInput(PreprocessBase):
     2.column的数据类型，将所有数据分为number和category两种类型，对于空或者异常值用fill_number_value或fill_category_value填充
     """
 
-    def __init__(self, cols="all", fill_number_value=np.nan, fill_category_value=None,
-                 skip_check_transform_type=True, show_check_detail=True,
+    def __init__(self, cols="all", reduce_mem_usage=True, skip_check_transform_type=True, show_check_detail=True,
                  skip_check_transform_value=True, **kwargs):
         super().__init__(cols=cols, skip_check_transform_type=skip_check_transform_type,
                          skip_check_transform_value=skip_check_transform_value, **kwargs)
-        self.fill_number_value = fill_number_value
-        self.fill_category_value = fill_category_value
         self.column_dtypes = dict()
+        self.reduce_mem_usage = reduce_mem_usage
+        self.reduce_mem_usage_mode = None
         self.show_check_detail = show_check_detail
-
-    def as_number(self, x):
-        try:
-            x_type = str(type(x)).lower()
-            if "int" in x_type or "float" in x_type:
-                return np.clip(x, np.finfo(np.float64).min, np.finfo(np.float64).max)
-            return np.clip(float(str(x)), np.finfo(np.float64).min, np.finfo(np.float64).max)
-        except:
-            return self.fill_number_value
-
-    def as_category(self, x):
-        try:
-            return str(x)
-        except:
-            return self.fill_category_value
 
     def _fit(self, s: dataframe_type):
         self.output_col_names = self.input_col_names
@@ -102,9 +92,13 @@ class FixInput(PreprocessBase):
         for col in self.output_col_names:
             col_type = str(s[col].dtype).lower()
             if "int" in col_type or "float" in col_type:
-                self.column_dtypes[col] = "number"
+                self.column_dtypes[col] = float
             else:
-                self.column_dtypes[col] = "category"
+                self.column_dtypes[col] = str
+        # reduce mem usage
+        if self.reduce_mem_usage:
+            self.reduce_mem_usage_mode = ReduceMemUsage()
+            self.reduce_mem_usage_mode.fit(s)
         return self
 
     def _check_miss_addition_columns(self, input_transform_columns):
@@ -113,8 +107,8 @@ class FixInput(PreprocessBase):
         if len(miss_columns) > 0 and self.show_check_detail:
             print(
                 "({}) module, please check these missing columns:\033[1;43m{}\033[0m, "
-                "they will by filled by {}(number),{}(category)".format(
-                    self.name, miss_columns, self.fill_number_value, self.fill_category_value))
+                "they will by filled by 0(int),None(float),np.nan(category)".format(
+                    self.name, miss_columns))
         # 检查多余字段
         addition_columns = list(set(input_transform_columns) - set(self.output_col_names))
         if len(addition_columns) > 0 and self.show_check_detail:
@@ -122,44 +116,75 @@ class FixInput(PreprocessBase):
                                                                                                   addition_columns))
 
     def transform(self, s: dataframe_type) -> dataframe_type:
+        # 检查缺失
         self._check_miss_addition_columns(s.columns)
+        # copy数据
         if self.copy_transform_data:
             s_ = copy.copy(s)
         else:
             s_ = s
         for col in self.output_col_names:
             col_type = self.column_dtypes.get(col)
+            # 空值填充
             if col not in s_.columns:
-                s_[col] = None
+                if col_type == str:
+                    s_[col] = None
+                else:
+                    s_[col] = np.nan
             # 调整数据类型
-            if col_type == "number":
-                s_[col] = s_[col].apply(lambda x: self.as_number(x))
-            else:
-                s_[col] = s_[col].apply(lambda x: self.as_category(x))
+            try:
+                s_[col] = s_[col].astype(col_type)
+            except:
+                # 只有float会报错
+                s_[col] = s_[col].apply(lambda x: self.as_float(x))
+        # reduce mem usage
+        if self.reduce_mem_usage:
+            s_ = self.reduce_mem_usage_mode.transform(s_)
         return s_[self.output_col_names]
 
+    @staticmethod
+    def as_float(x):
+        try:
+            return float(x)
+        except:
+            return np.nan
+
     def transform_single(self, s: dict_type) -> dict_type:
+        # 检验冲突
         self._check_miss_addition_columns(s.keys())
+        # copy数据
         s_ = copy.copy(s)
         for col in self.output_col_names:
             col_type = self.column_dtypes.get(col)
+            # 空值填充
             if col not in s_.keys():
-                s_[col] = None
+                if col_type == str:
+                    s_[col] = None
+                else:
+                    s_[col] = np.nan
             # 调整数据类型
-            if col_type == "number":
-                s_[col] = self.as_number(s_[col])
-            else:
-                s_[col] = self.as_category(s_[col])
+            try:
+                s_[col] = col_type(s_[col])
+            except:
+                # 只有float会出错
+                s_[col] = np.nan
+        # reduce mem usage
+        if self.reduce_mem_usage:
+            s_ = self.reduce_mem_usage_mode.transform_single(s_)
         return self.extract_dict(s_, self.output_col_names)
 
     def _get_params(self) -> dict_type:
-        return {"fill_number_value": self.fill_number_value,
-                "fill_category_value": self.fill_category_value, "column_dtypes": self.column_dtypes}
+        params = {"column_dtypes": self.column_dtypes, "reduce_mem_usage": self.reduce_mem_usage}
+        if self.reduce_mem_usage:
+            params["reduce_mem_usage_mode"] = self.reduce_mem_usage_mode.get_params()
+        return params
 
     def _set_params(self, params: dict_type):
-        self.fill_number_value = params["fill_number_value"]
-        self.fill_category_value = params["fill_category_value"]
         self.column_dtypes = params["column_dtypes"]
+        self.reduce_mem_usage = params["reduce_mem_usage"]
+        if self.reduce_mem_usage:
+            self.reduce_mem_usage_mode = ReduceMemUsage()
+            self.reduce_mem_usage_mode.set_params(params["reduce_mem_usage_mode"])
 
 
 class Replace(PreprocessBase):
@@ -191,11 +216,14 @@ class Replace(PreprocessBase):
         assert type(self.source_values) == list
         self.target_value = target_value
 
-    def _transform(self, s: dataframe_type) -> dataframe_type:
-        for col, new_col in self.cols:
-            for source_value in self.source_values:
-                s[new_col] = s[col].astype(str).str.replace(source_value, self.target_value)
-        return s
+    def apply_function_single(self, col: str, x):
+        if x in self.source_values:
+            return self.target_value
+        else:
+            return x
+
+    def apply_function_series(self, col: str, x: series_type):
+        return x.replace(self.source_values, self.target_value)
 
     def _transform_single(self, s: dict_type) -> dict_type:
         for col, new_col in self.cols:
@@ -290,7 +318,7 @@ class FillNa(PreprocessBase):
                  **kwargs):
         super().__init__(cols=cols, **kwargs)
         if default_null_values is None:
-            default_null_values = ["none", "nan", "np.nan", "null", "", " "]
+            default_null_values = ["none", "nan", "np.nan", "null", "", " ", "inf", "np.inf"]
         self.fill_number_value = fill_number_value
         self.fill_category_value = fill_category_value
         self.fill_mode = fill_mode
@@ -324,9 +352,16 @@ class FillNa(PreprocessBase):
             self.cols = new_cols
         return self
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col, x):
         if str(x).lower() in self.default_null_values:
             x = self.fill_detail.get(col)
+        return x
+
+    def apply_function_series(self, col: str, x: series_type):
+        fill_value = self.fill_detail.get(col)
+        x_ = x.astype(str).str.lower()
+        for null_value in self.default_null_values:
+            x[x_ == null_value] = fill_value
         return x
 
     def _get_params(self) -> dict_type:
@@ -347,15 +382,21 @@ class TransToCategory(PreprocessBase):
         super().__init__(cols=cols, **kwargs)
         self.map_detail = map_detail
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col: str, x):
         x = str(x)
-        try:
-            x = str(int(float(x)))
-        except:
-            pass
         if x.lower() in self.map_detail[0]:
             x = self.map_detail[1]
         return x
+
+    def apply_function_series(self, col: str, x: series_type):
+        x = x.astype(str)
+        try:
+            x_ = x.str.lower()
+            for null_value in self.map_detail[0]:
+                x[x_ == null_value] = self.map_detail[1]
+            return x
+        except:
+            return x.apply(lambda x__: self.apply_function_single(col, x__))
 
     def _get_params(self) -> dict_type:
         return {"map_detail": self.map_detail}
@@ -373,11 +414,18 @@ class TransToFloat(PreprocessBase):
         super().__init__(cols=cols, **kwargs)
         self.nan_fill_value = nan_fill_value
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col: str, x):
         try:
             return float(x)
         except:
             x = self.nan_fill_value
+        return x
+
+    def apply_function_series(self, col: str, x: series_type):
+        try:
+            x = x.astype(float)
+        except:
+            x = x.apply(lambda x_: self.apply_function_single(col, x_))
         return x
 
     def _get_params(self) -> dict_type:
@@ -396,12 +444,18 @@ class TransToInt(PreprocessBase):
         super().__init__(cols=cols, **kwargs)
         self.nan_fill_value = nan_fill_value
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col: str, x):
         try:
             return int(float(x))
         except:
             x = self.nan_fill_value
         return x
+
+    def apply_function_series(self, col: str, x: series_type):
+        try:
+            return x.astype(float).astype(int)
+        except:
+            return x.apply(lambda x_: self.apply_function_single(col, x_))
 
     def _get_params(self) -> dict_type:
         return {"nan_fill_value": self.nan_fill_value}
@@ -415,11 +469,11 @@ class TransToLower(PreprocessBase):
     将字符中的所有英文字符转小写
     """
 
-    def _user_defined_function(self, col, x):
-        try:
-            return str(x).lower()
-        except:
-            return ""
+    def apply_function_single(self, col: str, x):
+        return str(x).lower()
+
+    def apply_function_series(self, col: str, x: series_type):
+        return x.astype(str).str.lower()
 
     def _get_params(self):
         return {}
@@ -430,11 +484,11 @@ class TransToUpper(PreprocessBase):
     将字符中的所有英文字符转大写
     """
 
-    def _user_defined_function(self, col, x):
-        try:
-            return str(x).upper()
-        except:
-            return ""
+    def apply_function_single(self, col: str, x):
+        return str(x).upper()
+
+    def apply_function_series(self, col: str, x: series_type):
+        return x.astype(str).str.lower()
 
     def _get_params(self):
         return {}
@@ -452,11 +506,16 @@ class CategoryMapValues(PreprocessBase):
         self.default_map = default_map
         self.map_detail = map_detail
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col: str, x):
         if x in self.map_detail.get(col, ([""], ""))[0]:
             return self.map_detail.get(col, ([""], ""))[1]
         else:
             return x
+
+    def apply_function_series(self, col: str, x: series_type):
+        map_values = self.map_detail.get(col, ([""], ""))[0]
+        target_value = self.map_detail.get(col, ([""], ""))[1]
+        return x.replace(map_values, target_value)
 
     def _fit(self, s: dataframe_type):
         if self.map_detail is None:
@@ -495,12 +554,20 @@ class Clip(PreprocessBase):
         self.clip_detail = clip_detail
         self.percent_range = percent_range
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col: str, x):
         clip_detail_ = self.clip_detail.get(col, (None, None))
         if clip_detail_[0] is not None and str(x).lower() not in ["none", "nan", "null", "", "inf", "np.nan", "np.inf"]:
             x = clip_detail_[0] if x <= clip_detail_[0] else x
         if clip_detail_[1] is not None and str(x).lower() not in ["none", "nan", "null", "", "inf", "np.nan", "np.inf"]:
             x = clip_detail_[1] if x >= clip_detail_[1] else x
+        return x
+
+    def apply_function_series(self, col: str, x: series_type):
+        clip_detail_ = self.clip_detail.get(col, (None, None))
+        if clip_detail_[0] is not None and str(x).lower() not in ["none", "nan", "null", "", "inf", "np.nan", "np.inf"]:
+            x = np.clip(x, clip_detail_[0], a_max=None)
+        if clip_detail_[1] is not None and str(x).lower() not in ["none", "nan", "null", "", "inf", "np.nan", "np.inf"]:
+            x = np.clip(x, a_min=None, a_max=clip_detail_[1])
         return x
 
     def _fit(self, s: dataframe_type):
@@ -572,7 +639,7 @@ class MinMaxScaler(PreprocessBase):
             if min_value == max_value:
                 s[new_col] = 1
             else:
-                s[new_col] = s[col].apply(lambda x: (x - min_value) / (max_value - min_value))
+                s[new_col] = (s[col] - min_value) / (max_value - min_value)
         return s
 
     def _transform_single(self, s: dict_type) -> dict_type:
@@ -629,7 +696,7 @@ class Normalizer(PreprocessBase):
             if std_value == 0:
                 s[new_col] = 1
             else:
-                s[new_col] = s[col].apply(lambda x: (x - mean_value) / std_value)
+                s[new_col] = (s[col] - mean_value) / std_value
         return s
 
     def _transform_single(self, s: dict_type) -> dict_type:

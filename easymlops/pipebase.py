@@ -20,14 +20,23 @@ class Pipe(PipeObject):
                 return model
 
     def fit(self, x, show_process=False):
+        # 注意:最后一层无需transform
         x_ = copy.deepcopy(x)
         if show_process:
-            for model in tqdm(self.models):
+            for idx in tqdm(range(len(self.models))):
+                model = self.models[idx]
                 print(model.name)
-                x_ = model.fit(x_).transform(x_)
+                if idx == len(self.models) - 1:
+                    model.fit(x_)
+                else:
+                    x_ = model.fit(x_).transform(x_)
         else:
-            for model in self.models:
-                x_ = model.fit(x_).transform(x_)
+            for idx in range(len(self.models)):
+                model = self.models[idx]
+                if idx == len(self.models) - 1:
+                    model.fit(x_)
+                else:
+                    x_ = model.fit(x_).transform(x_)
         return self
 
     def _match_layer(self, current_layer_deep, current_layer_name, target_layer):

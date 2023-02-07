@@ -1,8 +1,9 @@
-numpy
+numpy>=1.17
 tqdm
-pandas
+dask>=0.17
+pandas>=0.25
 scipy
-#scikit-learn
+scikit-learn>=0.21
 #gensim
 #pyyaml<=5.4
 #lightgbm

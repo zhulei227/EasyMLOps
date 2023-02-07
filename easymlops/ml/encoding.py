@@ -14,9 +14,17 @@ class EncodingBase(PipeObject):
         self.fill_na = fill_na
         self.fill_na_model = None
 
-    def _user_defined_function(self, col, x):
+    def apply_function_series(self, col: str, x: series_type):
         """
-        对col的对应值x执行某种自定义操作
+        col:当前col名称
+        x:当前col对应的值
+        """
+        raise Exception("need to implement")
+
+    def apply_function_single(self, col: str, x):
+        """
+        col:当前col名称
+        x:当前col对应的值
         """
         raise Exception("need to implement")
 
@@ -60,7 +68,7 @@ class EncodingBase(PipeObject):
     def _transform(self, s: dataframe_type) -> dataframe_type:
         for col, new_col in self.cols:
             if col in s.columns:
-                s[new_col] = s[col].apply(lambda x: self._user_defined_function(col, x))
+                s[new_col] = self.apply_function_series(col, s[col])
         return s
 
     def before_transform_single(self, s: dict_type) -> dict_type:
@@ -72,7 +80,7 @@ class EncodingBase(PipeObject):
     def _transform_single(self, s: dict_type) -> dict_type:
         for col, new_col in self.cols:
             if col in s.keys():
-                s[new_col] = self._user_defined_function(col, s[col])
+                s[new_col] = self.apply_function_single(col, s[col])
         return s
 
     def _get_params(self) -> dict_type:
@@ -137,9 +145,19 @@ class TargetEncoding(EncodingBase):
         del s["y_"]
         return self
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col: str, x):
         map_detail_ = self.target_map_detail.get(col, dict())
-        return map_detail_.get(x, self.error_value)
+        return float(map_detail_.get(x, self.error_value))
+
+    def apply_function_series(self, col: str, x: series_type):
+        map_detail_ = self.target_map_detail.get(col, dict())
+        x_ = copy.deepcopy(x)
+        match_ = copy.deepcopy(x)
+        for key, value in map_detail_.items():
+            x[x_ == key] = value
+            match_[x_ == key] = True
+        x[match_ != True] = self.error_value
+        return x.astype(float)
 
     def _get_params(self) -> dict_type:
         return {"target_map_detail": self.target_map_detail, "error_value": self.error_value}
@@ -186,9 +204,19 @@ class LabelEncoding(EncodingBase):
             self.label_map_detail[col] = col_map
         return self
 
-    def _user_defined_function(self, col, x):
+    def apply_function_single(self, col: str, x):
         map_detail_ = self.label_map_detail.get(col, dict())
-        return map_detail_.get(x, self.error_value)
+        return int(map_detail_.get(x, self.error_value))
+
+    def apply_function_series(self, col: str, x: series_type):
+        map_detail_ = self.label_map_detail.get(col, dict())
+        x_ = copy.deepcopy(x)
+        match_ = copy.deepcopy(x)
+        for key, value in map_detail_.items():
+            x[x_ == key] = value
+            match_[x_ == key] = True
+        x[match_ != True] = self.error_value
+        return x.astype(int)
 
     def _get_params(self) -> dict_type:
         return {"label_map_detail": self.label_map_detail, "error_value": self.error_value}
@@ -236,7 +264,7 @@ class OneHotEncoding(EncodingBase):
                 raise Exception("{} not in {}".format(col, self.one_hot_detail.keys()))
             values = self.one_hot_detail.get(col)
             for value in values:
-                s["{}_{}".format(new_col, value)] = (s[col] == value).astype(int)
+                s["{}_{}".format(new_col, value)] = (s[col] == value).astype(np.uint8)
         if self.drop_col:
             for col in self.one_hot_detail.keys():
                 del s[col]
@@ -284,9 +312,10 @@ class WOEEncoding(EncodingBase):
          | 0 |
          """
 
-    def __init__(self, y=None, cols="all", drop_col=False, save_detail=True, fill_na=True, **kwargs):
+    def __init__(self, y=None, cols="all", drop_col=False, save_detail=True, fill_na=True, error_value=0, **kwargs):
         super().__init__(cols=cols, fill_na=fill_na, **kwargs)
         self.drop_col = drop_col
+        self.error_value = error_value
         self.woe_map_detail = dict()
         self.save_detail = save_detail
         self.dist_detail = []
@@ -330,7 +359,7 @@ class WOEEncoding(EncodingBase):
         for col, new_col in self.cols:
             if col not in self.woe_map_detail.keys():
                 raise Exception("{} not in {}".format(col, self.woe_map_detail.keys()))
-            s[new_col] = s[col].apply(lambda x: self.woe_map_detail.get(col).get(x))
+            s[new_col] = self.apply_function_series(col, s[col])
         if self.drop_col:
             for col in self.woe_map_detail.keys():
                 del s[col]
@@ -340,14 +369,28 @@ class WOEEncoding(EncodingBase):
         for col, new_col in self.cols:
             if col not in self.woe_map_detail.keys():
                 raise Exception("{} not in {}".format(col, self.woe_map_detail.keys()))
-            s[new_col] = self.woe_map_detail.get(col).get(s[col])
+            s[new_col] = self.apply_function_single(col, s[col])
         if self.drop_col:
             for col in self.woe_map_detail.keys():
                 del s[col]
         return s
 
+    def apply_function_single(self, col: str, x):
+        map_detail_ = self.woe_map_detail.get(col, dict())
+        return float(map_detail_.get(x, self.error_value))
+
+    def apply_function_series(self, col: str, x: series_type):
+        map_detail_ = self.woe_map_detail.get(col, dict())
+        x_ = copy.deepcopy(x)
+        match_ = copy.deepcopy(x)
+        for key, value in map_detail_.items():
+            x[x_ == key] = value
+            match_[x_ == key] = True
+        x[match_ != True] = self.error_value
+        return x.astype(float)
+
     def _get_params(self) -> dict_type:
-        params = {"woe_map_detail": self.woe_map_detail,
+        params = {"woe_map_detail": self.woe_map_detail, "error_value": self.error_value,
                   "drop_col": self.drop_col, "save_detail": self.save_detail}
         if self.save_detail:
             params["dist_detail"] = self.dist_detail
@@ -355,6 +398,7 @@ class WOEEncoding(EncodingBase):
 
     def _set_params(self, params: dict):
         self.save_detail = params["save_detail"]
+        self.error_value = params["error_value"]
         if self.save_detail:
             self.dist_detail = params["dist_detail"]
         else:

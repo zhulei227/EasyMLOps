@@ -1,5 +1,4 @@
 from ...base import *
-from ..preprocessing import FillNa
 from ..classification import LGBMClassification, LogisticRegressionClassification
 
 
@@ -66,19 +65,15 @@ class LREmbed(EmbedBase):
     logistic embed 特征选择
     """
 
-    def __init__(self, y=None, multi_class="auto", solver="newton-cg", fill_na=True, max_iter=1000,
+    def __init__(self, y=None, min_threshold=1e-3, multi_class="auto", solver="newton-cg", max_iter=1000,
                  **kwargs):
-        super().__init__(y=y, **kwargs)
+        super().__init__(y=y, min_threshold=min_threshold, **kwargs)
         self.multi_class = multi_class
         self.solver = solver
         self.max_iter = max_iter
-        self.fill_na = fill_na
 
     def _fit(self, s: dataframe_type):
-        if self.fill_na:
-            s_ = FillNa().fit(s[self.cols]).transform(s[self.cols])
-        else:
-            s_ = s[self.cols]
+        s_ = s[self.cols]
         model = LogisticRegressionClassification(y=self.y, multi_class=self.multi_class, solver=self.solver,
                                                  max_iter=self.max_iter,
                                                  native_init_params=self.native_init_params,
@@ -105,18 +100,14 @@ class LGBMEmbed(EmbedBase):
     lgb embed 特征选择
     """
 
-    def __init__(self, y=None, objective="regression", fill_na=True, importance_type="split", **kwargs):
+    def __init__(self, y=None, objective="regression", importance_type="split", **kwargs):
         super().__init__(y=y, **kwargs)
         self.objective = objective
         self.importance_type = importance_type
-        self.fill_na = fill_na
 
     def _fit(self, s: dataframe_type):
-        if self.fill_na:
-            s_ = FillNa().fit(s[self.cols]).transform(s[self.cols])
-        else:
-            s_ = s[self.cols]
-        model = LGBMClassification(y=self.y, objective=self.objective,
+        s_ = s[self.cols]
+        model = LGBMClassification(y=self.y, use_faster_predictor=False, objective=self.objective,
                                    native_init_params=self.native_init_params,
                                    native_fit_params=self.native_fit_params)
         if self.objective != "multiclass":

@@ -215,6 +215,9 @@ class SuperPipeObject(object):
             end_time = datetime.datetime.now()
             single_operate_times.append((end_time - start_time).microseconds / 1000)
         single_transform = pandas.DataFrame(single_transform)
+        # 统一数据类型
+        for col in single_transform.columns:
+            single_transform[col] = single_transform[col].astype(batch_transform[col].dtype)
         return batch_transform, single_transform, single_operate_times
 
     def _check_shape(self, batch_transform, single_transform):
@@ -259,6 +262,10 @@ class SuperPipeObject(object):
                 # 数值数据检测
                 try:
                     batch_col_values = batch_col_values.to_dense()  # 转换为dense
+                except:
+                    pass
+                try:
+                    single_col_values = single_col_values.to_dense()  # 转换为dense
                 except:
                     pass
                 error_index = np.argwhere(
