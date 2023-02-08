@@ -30,6 +30,8 @@
 - pipeml的子模块也可以是pipeml，这样方便逐块建模再组合
 - pipeml可以提取中间层数据，方便复用别人的模型，继续做自己下一步工作:pipeobj.transform(data,run_to_layer=指定层数或模块名) 
 - 获取指定pipe模块的两种方式
+- pipeml的切片运行方式
+
 
 ### 5.pipeline流程的训练&预测&持久化
 
@@ -1670,9 +1672,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>500</th>
       <td>2.132522</td>
-      <td>0.648004</td>
-      <td>0.075899</td>
-      <td>0.093464</td>
+      <td>0.648003</td>
+      <td>-0.075878</td>
+      <td>-0.093493</td>
       <td>-0.183208</td>
       <td>-0.017150</td>
       <td>0.403337</td>
@@ -1681,9 +1683,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>501</th>
       <td>2.034848</td>
-      <td>-0.608229</td>
-      <td>0.733368</td>
-      <td>0.013386</td>
+      <td>-0.608230</td>
+      <td>-0.733356</td>
+      <td>-0.013253</td>
       <td>-0.085437</td>
       <td>-0.033206</td>
       <td>0.293308</td>
@@ -1692,9 +1694,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>502</th>
       <td>2.040231</td>
-      <td>-0.616308</td>
-      <td>0.747646</td>
-      <td>0.022625</td>
+      <td>-0.616302</td>
+      <td>-0.747591</td>
+      <td>-0.022578</td>
       <td>-0.051665</td>
       <td>0.000399</td>
       <td>0.277010</td>
@@ -1703,9 +1705,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>503</th>
       <td>2.026293</td>
-      <td>-0.579109</td>
-      <td>0.735045</td>
-      <td>-0.012179</td>
+      <td>-0.579112</td>
+      <td>-0.735049</td>
+      <td>0.012020</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -1714,9 +1716,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>504</th>
       <td>2.025096</td>
-      <td>-0.573417</td>
-      <td>0.720071</td>
-      <td>-0.010283</td>
+      <td>-0.573416</td>
+      <td>-0.720068</td>
+      <td>0.010257</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -2673,6 +2675,369 @@ ml["target_encoding"].show_detail().head()
 
 
 
+### 4.5 切片式
+可以通过切分的方式获取部分连续的pipe模块，并组装为PipeML，这样可以更加方便灵活的获取中间结果
+
+
+```python
+#运行前3层
+step1=ml[:3].transform(x_test[:5])
+step1
+```
+
+
+
+
+<div>
+ 
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+      <th>Pclass_3</th>
+      <th>Pclass_1</th>
+      <th>Pclass_2</th>
+      <th>Sex_male</th>
+      <th>Sex_female</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>500</th>
+      <td>501</td>
+      <td>3</td>
+      <td>Calic, Mr. Petar</td>
+      <td>male</td>
+      <td>17.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>315086</td>
+      <td>8.664062</td>
+      <td>None</td>
+      <td>S</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>501</th>
+      <td>502</td>
+      <td>3</td>
+      <td>Canavan, Miss. Mary</td>
+      <td>female</td>
+      <td>21.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>364846</td>
+      <td>7.750000</td>
+      <td>None</td>
+      <td>Q</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>502</th>
+      <td>503</td>
+      <td>3</td>
+      <td>O'Sullivan, Miss. Bridget Mary</td>
+      <td>female</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>330909</td>
+      <td>7.628906</td>
+      <td>None</td>
+      <td>Q</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>503</th>
+      <td>504</td>
+      <td>3</td>
+      <td>Laitinen, Miss. Kristina Sofia</td>
+      <td>female</td>
+      <td>37.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4135</td>
+      <td>9.585938</td>
+      <td>None</td>
+      <td>S</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>504</th>
+      <td>505</td>
+      <td>1</td>
+      <td>Maioni, Miss. Roberta</td>
+      <td>female</td>
+      <td>16.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>110152</td>
+      <td>86.500000</td>
+      <td>B79</td>
+      <td>S</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+#运行中间3,4层
+step2=ml[3:5].transform(step1)
+step2
+```
+
+
+
+
+<div>
+ 
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PassengerId</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>SibSp</th>
+      <th>Parch</th>
+      <th>Ticket</th>
+      <th>Fare</th>
+      <th>Cabin</th>
+      <th>Embarked</th>
+      <th>Pclass_3</th>
+      <th>Pclass_1</th>
+      <th>Pclass_2</th>
+      <th>Sex_male</th>
+      <th>Sex_female</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>500</th>
+      <td>501</td>
+      <td>0.482439</td>
+      <td>0</td>
+      <td>1.111379</td>
+      <td>17.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>8.664062</td>
+      <td>None</td>
+      <td>S</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>501</th>
+      <td>502</td>
+      <td>0.482439</td>
+      <td>0</td>
+      <td>-1.569990</td>
+      <td>21.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>7.750000</td>
+      <td>None</td>
+      <td>Q</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>502</th>
+      <td>503</td>
+      <td>0.482439</td>
+      <td>0</td>
+      <td>-1.569990</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>7.628906</td>
+      <td>None</td>
+      <td>Q</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>503</th>
+      <td>504</td>
+      <td>0.482439</td>
+      <td>0</td>
+      <td>-1.569990</td>
+      <td>37.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>9.585938</td>
+      <td>None</td>
+      <td>S</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>504</th>
+      <td>505</td>
+      <td>-0.741789</td>
+      <td>0</td>
+      <td>-1.569990</td>
+      <td>16.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>354</td>
+      <td>86.500000</td>
+      <td>B79</td>
+      <td>S</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+#运行5层及之后
+step3=ml[5:].transform(step2)
+step3
+```
+
+
+
+
+<div>
+ 
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-1.441766</td>
+      <td>0.012960</td>
+      <td>2.828399</td>
+      <td>0.338076</td>
+      <td>-1.338859</td>
+      <td>-0.075010</td>
+      <td>0.416083</td>
+      <td>0.156167</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.367719</td>
+      <td>2.166848</td>
+      <td>1.977360</td>
+      <td>-0.180096</td>
+      <td>-2.371848</td>
+      <td>0.166540</td>
+      <td>-0.781668</td>
+      <td>-0.645946</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.250239</td>
+      <td>2.523279</td>
+      <td>2.089104</td>
+      <td>-0.258638</td>
+      <td>-2.242903</td>
+      <td>1.016662</td>
+      <td>-0.745599</td>
+      <td>0.052138</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.241155</td>
+      <td>1.816799</td>
+      <td>1.987426</td>
+      <td>0.767974</td>
+      <td>-2.115902</td>
+      <td>-1.454603</td>
+      <td>0.087935</td>
+      <td>-0.189948</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2.547265</td>
+      <td>-0.513182</td>
+      <td>0.477557</td>
+      <td>0.098263</td>
+      <td>-1.795859</td>
+      <td>-0.815377</td>
+      <td>-1.506217</td>
+      <td>2.801200</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 ## 5. Pipeline流程的训练&预测&持久化  
 
 训练接口fit和批量预测接口transform上面demo以及运行多次就不介绍了，下面介绍当条数据的预测接口transform_single这个主要用于线上单条数据的预测，要求输入是字典格式，而且输出也是字典格式
@@ -2725,7 +3090,7 @@ ml.transform_single(input_dict)
 ml.transform_single({})
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>) module, please check these missing columns:[1;43m['SibSp', 'Ticket', 'Age', 'Name', 'Fare', 'Pclass', 'Parch', 'Cabin', 'Embarked', 'PassengerId', 'Sex'][0m, they will by filled by 0(int),None(float),np.nan(category)
+    (<class 'easymlops.ml.preprocessing.FixInput'>) module, please check these missing columns:[1;43m['Parch', 'Pclass', 'PassengerId', 'Sex', 'SibSp', 'Fare', 'Cabin', 'Age', 'Ticket', 'Embarked', 'Name'][0m, they will by filled by 0(int),None(float),np.nan(category)
     
 
 
@@ -2769,7 +3134,7 @@ ml.pipe(FixInput())\
 
 
 
-    <easymlops.pipeml.PipeML at 0x1d8804d2148>
+    <easymlops.pipeml.PipeML at 0x1c9450e3848>
 
 
 
@@ -3322,17 +3687,22 @@ ml.transform_single({'PassengerId': 1,
 
 ```python
 import logging
-logger=logging.getLogger()#logging的具体使用方法还请另行查资料
+logger = logging.getLogger("EasyMLOps")
+logger.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 ```
 
 
 ```python
-extend_log_info={"user_id":1,"time":"2023-01-12 15:04:32"}
+base_log_info={"user_id":1}
 ```
 
 
 ```python
-ml.transform_single({'PassengerId': 1,
+ml_combine.transform_single({'PassengerId': 1,
  'Cabin': 0,
  'Pclass': 3,
  'Name': 'Braund, Mr. Owen Harris',
@@ -3342,13 +3712,23 @@ ml.transform_single({'PassengerId': 1,
  'Parch': 0,
  'Ticket': 'A/5 21171',
  'Fare': 7.25,
- 'Embarked': 'S'},logger=logger,log_base_dict=extend_log_info)
+ 'Embarked': 'S'},logger=logger,log_base_dict=base_log_info)
 ```
 
+    2023-02-08 22:15:38,958 - EasyMLOps - INFO - {'step': 'step-0-0', 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S'}, 'user_id': 1}
+    2023-02-08 22:15:38,958 - EasyMLOps - INFO - {'step': 'step-0-1', 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S'}, 'user_id': 1}
+    2023-02-08 22:15:38,958 - EasyMLOps - INFO - {'step': 'step-0-2', 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S', 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
+    2023-02-08 22:15:38,958 - EasyMLOps - INFO - {'step': 'step-0-3', 'transform': {'PassengerId': 1, 'Pclass': 1, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 1, 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S', 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
+    2023-02-08 22:15:38,958 - EasyMLOps - INFO - {'step': 'step-0-4', 'transform': {'PassengerId': 1, 'Pclass': 1, 'Name': 0.0, 'Sex': 1, 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 0.0, 'Fare': 7.25, 'Cabin': 0.0, 'Embarked': 0.3342541436464088, 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
+    2023-02-08 22:15:38,958 - EasyMLOps - INFO - {'step': 'step-0-5', 'transform': {'PassengerId': -1.7285901631375231, 'Pclass': -0.8106443551185183, 'Name': -0.7928836579940379, 'Sex': -0.7663560447348134, 'Age': -0.0712, 'SibSp': 0.36959398692704365, 'Parch': -0.48750010550124606, 'Ticket': -0.838660240430917, 'Fare': -0.0, 'Cabin': -1.6283869335868641, 'Embarked': -0.5978457499180799, 'Pclass_3': 0.8900082557709795, 'Pclass_1': -0.5496210815947049, 'Pclass_2': -0.5155800469472481, 'Sex_male': 0.7663560447348134, 'Sex_female': -0.7663560447348134}, 'user_id': 1}
+    2023-02-08 22:15:38,993 - EasyMLOps - INFO - {'step': 'step-0-6', 'transform': {0: -2.5934573285350657, 1: -0.8397964026166761, 2: -0.545422674095227, 3: -0.04674137417118096, 4: -0.3682295243585497, 5: 1.4383508180817393, 6: -0.6615934600868223, 7: 0.3488816151410472}, 'user_id': 1}
+    2023-02-08 22:15:38,993 - EasyMLOps - INFO - {'step': 'step-1-0', 'transform': {0: 0.9998591472977608, 1: 0.00014085270223913456}, 'user_id': 1}
+    
 
 
 
-    {'Age': 22.0, 'Fare': 7.25, 'Embarked': 0.3342541436464088}
+
+    {0: 0.9998591472977608, 1: 0.00014085270223913456}
 
 
 
@@ -3365,14 +3745,14 @@ ml.transform_single({'PassengerId': 1,
 ml_combine.check_transform_function(x_test)
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.11]ms/it
-    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.encoding.OneHotEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.encoding.LabelEncoding'>)  module transform check [success], single transform speed:[0.04]ms/it
+    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.18]ms/it
+    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.02]ms/it
+    (<class 'easymlops.ml.encoding.OneHotEncoding'>)  module transform check [success], single transform speed:[0.02]ms/it
+    (<class 'easymlops.ml.encoding.LabelEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
     (<class 'easymlops.ml.encoding.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
     (<class 'easymlops.ml.preprocessing.Normalizer'>)  module transform check [success], single transform speed:[0.04]ms/it
-    (<class 'easymlops.ml.decomposition.PCADecomposition'>)  module transform check [success], single transform speed:[24.34]ms/it
-    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>)  module transform check [success], single transform speed:[1.41]ms/it
+    (<class 'easymlops.ml.decomposition.PCADecomposition'>)  module transform check [success], single transform speed:[32.42]ms/it
+    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>)  module transform check [success], single transform speed:[1.48]ms/it
     
 
 ### 7.4 空值测试：check_null_value  
@@ -3391,17 +3771,17 @@ ml_combine.check_transform_function(x_test)
 ml_combine.check_null_value(x_test,sample=10)
 ```
 
-    column: [PassengerId] check null value complete, total single transform speed:[26.97]ms/it
-    column: [Pclass] check null value complete, total single transform speed:[25.88]ms/it
-    column: [Name] check null value complete, total single transform speed:[28.59]ms/it
-    column: [Sex] check null value complete, total single transform speed:[28.73]ms/it
-    column: [Age] check null value complete, total single transform speed:[27.71]ms/it
-    column: [SibSp] check null value complete, total single transform speed:[26.61]ms/it
-    column: [Parch] check null value complete, total single transform speed:[26.11]ms/it
-    column: [Ticket] check null value complete, total single transform speed:[25.89]ms/it
-    column: [Fare] check null value complete, total single transform speed:[25.97]ms/it
-    column: [Cabin] check null value complete, total single transform speed:[25.92]ms/it
-    column: [Embarked] check null value complete, total single transform speed:[26.41]ms/it
+    column: [PassengerId] check null value complete, total single transform speed:[26.61]ms/it
+    column: [Pclass] check null value complete, total single transform speed:[27.59]ms/it
+    column: [Name] check null value complete, total single transform speed:[25.88]ms/it
+    column: [Sex] check null value complete, total single transform speed:[26.03]ms/it
+    column: [Age] check null value complete, total single transform speed:[26.34]ms/it
+    column: [SibSp] check null value complete, total single transform speed:[26.53]ms/it
+    column: [Parch] check null value complete, total single transform speed:[26.91]ms/it
+    column: [Ticket] check null value complete, total single transform speed:[26.03]ms/it
+    column: [Fare] check null value complete, total single transform speed:[25.79]ms/it
+    column: [Cabin] check null value complete, total single transform speed:[27.56]ms/it
+    column: [Embarked] check null value complete, total single transform speed:[26.23]ms/it
     
 
 ### 7.5极端值测试：check_extreme_value  
@@ -3421,18 +3801,18 @@ ml_combine.check_null_value(x_test,sample=10)
 ml_combine.check_extreme_value(x_test,sample=10)
 ```
 
-    column: [PassengerId] check extreme value complete, total single transform speed:[28.17]ms/it
-    column: [Pclass] check extreme value complete, total single transform speed:[26.46]ms/it
-    column: [Name] check extreme value complete, total single transform speed:[25.53]ms/it
-    column: [Sex] check extreme value complete, total single transform speed:[26.34]ms/it
-    column: [Age] check extreme value complete, total single transform speed:[27.51]ms/it
-    column: [SibSp] check extreme value complete, total single transform speed:[26.72]ms/it
-    column: [Parch] check extreme value complete, total single transform speed:[25.64]ms/it
-    column: [Ticket] check extreme value complete, total single transform speed:[26.95]ms/it
-    column: [Fare] check extreme value complete, total single transform speed:[26.36]ms/it
-    column: [Cabin] check extreme value complete, total single transform speed:[25.91]ms/it
-    column: [Embarked] check extreme value complete, total single transform speed:[25.83]ms/it
-    [__all__] columns set the same extreme value complete,total single transform speed:[26.42]ms/it
+    column: [PassengerId] check extreme value complete, total single transform speed:[26.64]ms/it
+    column: [Pclass] check extreme value complete, total single transform speed:[25.82]ms/it
+    column: [Name] check extreme value complete, total single transform speed:[26.15]ms/it
+    column: [Sex] check extreme value complete, total single transform speed:[25.61]ms/it
+    column: [Age] check extreme value complete, total single transform speed:[25.45]ms/it
+    column: [SibSp] check extreme value complete, total single transform speed:[25.61]ms/it
+    column: [Parch] check extreme value complete, total single transform speed:[27.01]ms/it
+    column: [Ticket] check extreme value complete, total single transform speed:[26.25]ms/it
+    column: [Fare] check extreme value complete, total single transform speed:[26.43]ms/it
+    column: [Cabin] check extreme value complete, total single transform speed:[26.16]ms/it
+    column: [Embarked] check extreme value complete, total single transform speed:[26.55]ms/it
+    [__all__] columns set the same extreme value complete,total single transform speed:[26.17]ms/it
     
 
 ### 7.6 数据类型反转测试：check_inverse_dtype  
@@ -3448,17 +3828,17 @@ ml_combine.check_extreme_value(x_test,sample=10)
 ml_combine.check_inverse_dtype(x_test,sample=10)
 ```
 
-    column: [PassengerId] check inverse value complete, total single transform speed:[25.79]ms/it
-    column: [Pclass] check inverse value complete, total single transform speed:[25.36]ms/it
-    column: [Name] check inverse value complete, total single transform speed:[26.3]ms/it
-    column: [Sex] check inverse value complete, total single transform speed:[25.16]ms/it
-    column: [Age] check inverse value complete, total single transform speed:[25.33]ms/it
-    column: [SibSp] check inverse value complete, total single transform speed:[25.33]ms/it
-    column: [Parch] check inverse value complete, total single transform speed:[25.59]ms/it
-    column: [Ticket] check inverse value complete, total single transform speed:[25.4]ms/it
-    column: [Fare] check inverse value complete, total single transform speed:[25.01]ms/it
-    column: [Cabin] check inverse value complete, total single transform speed:[25.32]ms/it
-    column: [Embarked] check inverse value complete, total single transform speed:[26.27]ms/it
+    column: [PassengerId] check inverse value complete, total single transform speed:[26.71]ms/it
+    column: [Pclass] check inverse value complete, total single transform speed:[26.12]ms/it
+    column: [Name] check inverse value complete, total single transform speed:[26.7]ms/it
+    column: [Sex] check inverse value complete, total single transform speed:[26.6]ms/it
+    column: [Age] check inverse value complete, total single transform speed:[26.81]ms/it
+    column: [SibSp] check inverse value complete, total single transform speed:[25.09]ms/it
+    column: [Parch] check inverse value complete, total single transform speed:[25.29]ms/it
+    column: [Ticket] check inverse value complete, total single transform speed:[25.06]ms/it
+    column: [Fare] check inverse value complete, total single transform speed:[25.27]ms/it
+    column: [Cabin] check inverse value complete, total single transform speed:[25.86]ms/it
+    column: [Embarked] check inverse value complete, total single transform speed:[25.86]ms/it
     
 
 ### 7.7 int转float测试：check_int_trans_float  
@@ -3471,10 +3851,10 @@ pandas会将某些特征自动推断为int，而线上可能传输的是float，
 ml_combine.check_int_trans_float(x_test)
 ```
 
-    column: [PassengerId] check int trans float value complete, total single transform speed:[25.24]ms/it
-    column: [Pclass] check int trans float value complete, total single transform speed:[25.26]ms/it
-    column: [SibSp] check int trans float value complete, total single transform speed:[25.25]ms/it
-    column: [Parch] check int trans float value complete, total single transform speed:[25.42]ms/it
+    column: [PassengerId] check int trans float value complete, total single transform speed:[26.97]ms/it
+    column: [Pclass] check int trans float value complete, total single transform speed:[26.51]ms/it
+    column: [SibSp] check int trans float value complete, total single transform speed:[25.63]ms/it
+    column: [Parch] check int trans float value complete, total single transform speed:[25.55]ms/it
     
 
 ### 7.8 自动测试：auto_test

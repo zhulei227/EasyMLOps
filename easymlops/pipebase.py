@@ -14,29 +14,37 @@ class Pipe(PipeObject):
         self.models.append(model)
         return self
 
-    def __getitem__(self, target_layer):
-        for current_layer_deep, model in enumerate(self.models):
-            if self._match_layer(current_layer_deep, model.name, target_layer):
-                return model
+    def __getitem__(self, index):
+        # 切片方式
+        if isinstance(index, slice):
+            target_models = self.models[index]
+            new_pipe = copy.deepcopy(self)
+            new_pipe.models = []
+            for model in target_models:
+                new_pipe.pipe(model)
+            return new_pipe
+        # 读取指定层方式
+        elif type(index) == int or type(index) == str:
+            for current_layer_deep, model in enumerate(self.models):
+                if self._match_layer(current_layer_deep, model.name, index):
+                    return model
+        else:
+            raise Exception("{} indices should be int,str or slice".format(self.name))
 
     def fit(self, x, show_process=False):
         # 注意:最后一层无需transform
         x_ = copy.deepcopy(x)
+        run_idx = range(len(self.models))
         if show_process:
-            for idx in tqdm(range(len(self.models))):
-                model = self.models[idx]
+            run_idx = tqdm(run_idx)
+        for idx in run_idx:
+            model = self.models[idx]
+            if show_process:
                 print(model.name)
-                if idx == len(self.models) - 1:
-                    model.fit(x_)
-                else:
-                    x_ = model.fit(x_).transform(x_)
-        else:
-            for idx in range(len(self.models)):
-                model = self.models[idx]
-                if idx == len(self.models) - 1:
-                    model.fit(x_)
-                else:
-                    x_ = model.fit(x_).transform(x_)
+            if idx == len(self.models) - 1:
+                model.fit(x_)
+            else:
+                x_ = model.fit(x_).transform(x_)
         return self
 
     def _match_layer(self, current_layer_deep, current_layer_name, target_layer):
@@ -52,36 +60,36 @@ class Pipe(PipeObject):
     def transform(self, x, show_process=False, run_to_layer=None):
         run_to_layer = self.run_to_layer if run_to_layer is None else run_to_layer
         x_ = copy.deepcopy(x)
+        run_models = enumerate(self.models)
         if show_process:
-            for current_layer_deep, model in tqdm(enumerate(self.models)):
+            run_models = tqdm(run_models)
+        for current_layer_deep, model in run_models:
+            if show_process:
                 print(model.name)
-                x_ = model.transform(x_)
-                if self._match_layer(current_layer_deep, model.name, run_to_layer):
-                    break
-        else:
-            for current_layer_deep, model in enumerate(self.models):
-                x_ = model.transform(x_)
-                if self._match_layer(current_layer_deep, model.name, run_to_layer):
-                    break
+            x_ = model.transform(x_)
+            if self._match_layer(current_layer_deep, model.name, run_to_layer):
+                break
         return x_
 
-    def transform_single(self, x, show_process=False, run_to_layer=None, logger=None, log_base_dict: dict_type = None):
+    def transform_single(self, x, show_process=False, run_to_layer=None, logger=None, prefix="step",
+                         log_base_dict: dict_type = None):
         run_to_layer = self.run_to_layer if run_to_layer is None else run_to_layer
         x_ = copy.deepcopy(x)
-        self._save_log(logger, log_base_dict, 0, x)
+        run_models = enumerate(self.models)
         if show_process:
-            for current_layer_deep, model in tqdm(enumerate(self.models)):
+            run_models = tqdm(run_models)
+        for current_layer_deep, model in run_models:
+            if show_process:
                 print(model.name)
+            if isinstance(model, Pipe):
+                x_ = model.transform_single(x_, show_process=show_process, logger=logger,
+                                            prefix="{}-{}".format(prefix, current_layer_deep),
+                                            log_base_dict=log_base_dict)
+            else:
                 x_ = model.transform_single(x_)
-                self._save_log(logger, log_base_dict, current_layer_deep + 1, x_)
-                if self._match_layer(current_layer_deep, model.name, run_to_layer):
-                    break
-        else:
-            for current_layer_deep, model in enumerate(self.models):
-                x_ = model.transform_single(x_)
-                self._save_log(logger, log_base_dict, current_layer_deep + 1, x_)
-                if self._match_layer(current_layer_deep, model.name, run_to_layer):
-                    break
+                self._save_log(logger, log_base_dict, "{}-{}".format(prefix, current_layer_deep), x_)
+            if self._match_layer(current_layer_deep, model.name, run_to_layer):
+                break
         return x_
 
     @staticmethod
@@ -96,8 +104,8 @@ class Pipe(PipeObject):
         if log_base_dict is None:
             log_base_dict = dict()
         if logger is not None:
-            log_info = copy.deepcopy(log_base_dict)
-            log_info.update({"step": step, "info": copy.deepcopy(info)})
+            log_info = {"step": step, "transform": copy.deepcopy(info)}
+            log_info.update(log_base_dict)
             logger.info(log_info)
 
     def save(self, path):
