@@ -87,24 +87,26 @@ class Pipe(PipeObject):
                                             log_base_dict=log_base_dict)
             else:
                 x_ = model.transform_single(x_)
-                self._save_log(logger, log_base_dict, "{}-{}".format(prefix, current_layer_deep), x_)
+                self._save_log(logger=logger, log_base_dict=log_base_dict,
+                               step="{}-{}".format(prefix, current_layer_deep), transform=x_, pipe_name=model.name)
             if self._match_layer(current_layer_deep, model.name, run_to_layer):
                 break
         return x_
 
     @staticmethod
-    def _save_log(logger, log_base_dict, step, info):
+    def _save_log(logger, log_base_dict, step, transform, pipe_name):
         """
         :param logger: 主要提供,logger.info方法，最好异步，不阻塞主程序
         :param log_base_dict: 续保保存基本信息，比如涉及到该条数据的id信息等
         :param step: 所在pipeline的第几步
-        :param info: 该步的输出
+        :param transform: 该步的输出
+        :param pipe_name:pipe模块名称
         :return:
         """
         if log_base_dict is None:
             log_base_dict = dict()
         if logger is not None:
-            log_info = {"step": step, "transform": copy.deepcopy(info)}
+            log_info = {"step": step, "pipe_name": pipe_name, "transform": copy.deepcopy(transform)}
             log_info.update(log_base_dict)
             logger.info(log_info)
 
