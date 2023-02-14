@@ -160,7 +160,7 @@ class Pipe(PipeObject):
         x = copy.deepcopy(x_)
         self._switch_show_check_detail(types=skip_show_check_detail_types, show_open=False)
         try:
-            batch_transform, single_transform, single_operate_times = \
+            batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
                 self._run_batch_single_transform(x)
         except Exception as e:
             print(e)
@@ -177,7 +177,7 @@ class Pipe(PipeObject):
                   .format(check_col, check_type, check_value))
         # 恢复
         self._switch_show_check_detail(types=skip_show_check_detail_types, show_open=True)
-        return batch_transform, single_transform, single_operate_times
+        return batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem
 
     def _check_two_batch_transform_same(self, cur_batch_transform, pre_batch_transform, check_col, check_type,
                                         check_cur_value, check_pre_value):
@@ -207,7 +207,7 @@ class Pipe(PipeObject):
             # 真删除
             del x_[col]
             pre_null = "__delete__"
-            pre_batch_transform, pre_single_transform, single_operate_times = \
+            pre_batch_transform, pre_single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
                 self._run_transform_and_check(x_, check_col=col, check_type="null", check_value=pre_null,
                                               skip_show_check_detail_types=["FixInput"])
             total_single_operate_times.extend(single_operate_times)
@@ -216,7 +216,7 @@ class Pipe(PipeObject):
                 cur_null = null_value
                 x_ = copy.deepcopy(x[:min(sample, len(x))])
                 x_[col] = null_value
-                cur_batch_transform, cur_single_transform, single_operate_times = \
+                cur_batch_transform, cur_single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
                     self._run_transform_and_check(x_, check_col=col, check_type="null", check_value=cur_null,
                                                   skip_show_check_detail_types=["FixInput"])
 
@@ -226,8 +226,10 @@ class Pipe(PipeObject):
                                                      check_pre_value=pre_null)
                 pre_batch_transform, pre_single_transform, pre_null = cur_batch_transform, cur_single_transform, cur_null
                 total_single_operate_times.extend(single_operate_times)
-            print("column: [{}] check null value complete, total single transform speed:[{}]ms/it".format(col, np.round(
-                np.mean(total_single_operate_times), 2)))
+            print(
+                "column:[{}] check [null value] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
+                    .format(col, np.round(np.mean(total_single_operate_times), 2), max_cpu_percent,
+                            int(max_used_mem - min_used_mem)))
 
     def check_extreme_value(self, x: dataframe_type, sample=100,
                             number_extreme_values=None,
@@ -236,13 +238,17 @@ class Pipe(PipeObject):
         检验输入极端值的情况下，还能否有正常的output
         """
         if number_extreme_values is None:
-            number_extreme_values = [np.inf, 0.0, -1, 1, -1e-7, 1e-7, np.finfo(np.float64).min,
+            number_extreme_values = [np.inf, 0.0, -1, 1, -1e-7, 1e-7, np.iinfo(np.int64).min,
+                                     np.iinfo(np.int64).max, np.finfo(np.float64).min,
                                      np.finfo(np.float64).max]
         if category_extreme_values is None:
             category_extreme_values = ["", "null", None, "1.0", "0.0", "-1.0", "-1", "none", "NaN", "None"]
         cols = x.columns.tolist()
         for col in cols:
             total_single_operate_times = []
+            total_min_used_mem = np.iinfo(np.int64).max
+            total_max_used_mem = np.iinfo(np.int64).min
+            total_max_cpu_percent = 0
             if "int" in str(x[col].dtype).lower() or "float" in str(x[col].dtype).lower():
                 extreme_values = number_extreme_values
             else:
@@ -251,12 +257,16 @@ class Pipe(PipeObject):
             for extreme_value in extreme_values:
                 x_ = copy.deepcopy(x[:min(sample, len(x))])
                 x_[col] = extreme_value
-                batch_transform, single_transform, single_operate_times = \
+                batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
                     self._run_transform_and_check(x_, check_col=col, check_type="extreme", check_value=extreme_value)
 
                 total_single_operate_times.extend(single_operate_times)
-            print("column: [{}] check extreme value complete, total single transform speed:[{}]ms/it"
-                  .format(col, np.round(np.mean(total_single_operate_times), 2)))
+                total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
+                total_min_used_mem = min(total_min_used_mem, min_used_mem)
+                total_max_used_mem = max(total_max_used_mem, max_used_mem)
+            print("column:[{}] check [extreme value] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
+                  .format(col, np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
+                          int(total_max_used_mem - total_min_used_mem)))
         # 全局测试
         # 1.纯空测试
         self._switch_show_check_detail(types=["FixInput"], show_open=False)
@@ -264,15 +274,22 @@ class Pipe(PipeObject):
         self._switch_show_check_detail(types=["FixInput"], show_open=True)
         # 2.其余各类值全部赋值测试
         total_single_operate_times = []
+        total_min_used_mem = np.iinfo(np.int64).max
+        total_max_used_mem = np.iinfo(np.int64).min
+        total_max_cpu_percent = 0
         for extreme_value in number_extreme_values + category_extreme_values:
             x_ = copy.deepcopy(x[:min(sample, len(x))])
             for col in x_.columns:
                 x_[col] = extreme_value
-            batch_transform, single_transform, single_operate_times = \
+            batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
                 self._run_transform_and_check(x_, check_col="__all__", check_type="extreme", check_value=extreme_value)
             total_single_operate_times.extend(single_operate_times)
-        print("[__all__] columns set the same extreme value complete,total single transform speed:[{}]ms/it"
-              .format(np.round(np.mean(total_single_operate_times), 2)))
+            total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
+            total_min_used_mem = min(total_min_used_mem, min_used_mem)
+            total_max_used_mem = max(total_max_used_mem, max_used_mem)
+        print("column:[__all__] check [extreme value] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
+              .format(np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
+                      int(total_max_used_mem - total_min_used_mem)))
 
     def check_inverse_dtype(self, x: dataframe_type, sample=100,
                             number_inverse_values=None,
@@ -283,10 +300,14 @@ class Pipe(PipeObject):
         if number_inverse_values is None:
             number_inverse_values = ["", "null", None, "1.0", "0.0", "-1.0", "-1"]
         if category_inverse_values is None:
-            category_inverse_values = [0.0, -1, 1, -1e-7, 1e-7, np.finfo(np.float64).min, np.finfo(np.float64).max]
+            category_inverse_values = [0.0, -1, 1, -1e-7, 1e-7, np.iinfo(np.int64).min,
+                                       np.iinfo(np.int64).max, np.finfo(np.float64).min, np.finfo(np.float64).max]
         cols = x.columns.tolist()
         for col in cols:
             total_single_operate_times = []
+            total_min_used_mem = np.iinfo(np.int64).max
+            total_max_used_mem = np.iinfo(np.int64).min
+            total_max_cpu_percent = 0
             if "int" in str(x[col].dtype).lower() or "float" in str(x[col].dtype).lower():
                 inverse_values = number_inverse_values
             else:
@@ -295,11 +316,15 @@ class Pipe(PipeObject):
             for inverse_value in inverse_values:
                 x_ = copy.deepcopy(x[:min(sample, len(x))])
                 x_[col] = inverse_value
-                batch_transform, single_transform, single_operate_times = \
+                batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
                     self._run_transform_and_check(x_, check_type="inverse", check_col=col, check_value=inverse_value)
                 total_single_operate_times.extend(single_operate_times)
-            print("column: [{}] check inverse value complete, total single transform speed:[{}]ms/it"
-                  .format(col, np.round(np.mean(total_single_operate_times), 2)))
+                total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
+                total_min_used_mem = min(total_min_used_mem, min_used_mem)
+                total_max_used_mem = max(total_max_used_mem, max_used_mem)
+            print("column:[{}] check [inverse type] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
+                  .format(col, np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
+                          int(total_max_used_mem - total_min_used_mem)))
 
     def check_int_trans_float(self, x: dataframe_type, sample=100):
         """
@@ -307,7 +332,7 @@ class Pipe(PipeObject):
         """
         cols = x.columns.tolist()
         x_ = copy.deepcopy(x[:min(sample, len(x))])
-        base_batch_transform, _, _ = \
+        base_batch_transform, _, _, _, _, _ = \
             self._run_transform_and_check(x_, check_col="__base__", check_type="int trans float",
                                           check_value="float type data")
         for col in cols:
@@ -315,17 +340,24 @@ class Pipe(PipeObject):
                 x_ = copy.deepcopy(x[:min(sample, len(x))])
                 x_[col] = x_[col].astype(float)
                 total_single_operate_times = []
-                float_batch_transform, _, single_operate_times = \
+                total_min_used_mem = np.iinfo(np.int64).max
+                total_max_used_mem = np.iinfo(np.int64).min
+                total_max_cpu_percent = 0
+                float_batch_transform, _, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
                     self._run_transform_and_check(x_, check_col=col, check_type="int trans float",
                                                   check_value="float type data")
                 total_single_operate_times.extend(single_operate_times)
-
+                total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
+                total_min_used_mem = min(total_min_used_mem, min_used_mem)
+                total_max_used_mem = max(total_max_used_mem, max_used_mem)
                 # float和base对比
                 self._check_two_batch_transform_same(base_batch_transform, float_batch_transform, check_col=col,
                                                      check_type="int trans float", check_cur_value="__int__",
                                                      check_pre_value="__float__")
-                print("column: [{}] check int trans float value complete, total single transform speed:[{}]ms/it"
-                      .format(col, np.round(np.mean(total_single_operate_times), 2)))
+                print(
+                    "column:[{}] check [int trans float] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
+                        .format(col, np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
+                                int(total_max_used_mem - total_min_used_mem)))
 
     def auto_test(self, x, sample=100):
         check_transform_function_describe = """

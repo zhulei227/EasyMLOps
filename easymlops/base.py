@@ -1,90 +1,15 @@
 import copy
 import numpy as np
 import pandas
-import datetime
-import warnings
-
 import pandas as pd
+import datetime
+from .utils import CpuMemDetector
+import warnings
 
 warnings.filterwarnings("ignore")
 dataframe_type = pandas.core.frame.DataFrame
 series_type = pandas.core.series.Series
 dict_type = dict
-
-
-def check_dict_type(func):
-    def wrapper(*args, **kwargs):
-        assert type(args[1]) == dict_type
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
-def check_dataframe_type(func):
-    def wrapper(*args, **kwargs):
-        assert type(args[1]) == dataframe_type
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
-def fit_wrapper(func):
-    def wrapper(*args, **kwargs):
-        print("Deprecated this function [{}] for better flexibility,please use [{}] replace".format("fit_wrapper",
-                                                                                                    "_fit"))
-        args = list(args)
-        pipe_object = args[0]
-        data: dataframe_type = args[1]
-        # 调用before_fit
-        data = pipe_object.before_fit(data)
-        args[1] = data
-        args = tuple(args)
-        # 调用fit
-        pipe_object = func(*args, **kwargs)
-        # 调用after_fit
-        pipe_object.after_fit()
-        return pipe_object
-
-    return wrapper
-
-
-def transform_wrapper(func):
-    def wrapper(*args, **kwargs):
-        print("Deprecated this function [{}] for better flexibility,please use [{}] replace".format("transform_wrapper",
-                                                                                                    "_transform"))
-        args = list(args)
-        pipe_object = args[0]
-        data: dataframe_type = args[1]
-        # 调用before_transform
-        data = pipe_object.before_transform(data)
-        args[1] = data
-        args = tuple(args)
-        # 调用transform
-        data = func(*args, **kwargs)
-        # 调用after_transform
-        return pipe_object.after_transform(data)
-
-    return wrapper
-
-
-def transform_single_wrapper(func):
-    def wrapper(*args, **kwargs):
-        print("Deprecated this function [{}] for better flexibility,please use [{}] replace".format(
-            "transform_single_wrapper",
-            "_transform_single"))
-        args = list(args)
-        pipe_object = args[0]
-        data: dict_type = args[1]
-        # 调用before_transform_single
-        data = pipe_object.before_transform_single(data)
-        args[1] = data
-        args = tuple(args)
-        # 调用transform
-        data = func(*args, **kwargs)
-        # 调用after_transform
-        return pipe_object.after_transform_single(data)
-
-    return wrapper
 
 
 class SuperPipeObject(object):
@@ -149,12 +74,17 @@ class SuperPipeObject(object):
 
     def before_transform(self, s: dataframe_type) -> dataframe_type:
         assert type(s) == dataframe_type
+        # 是否copy数据, copy可以避免修改input
         if self.copy_transform_data:
-            s_ = s[self.input_col_names]
+            s_ = copy.deepcopy(s)
         else:
-            s = s[self.input_col_names]
             s_ = s
-        return s_
+        # 对其训练时的input columns
+        input_cols = s.columns.tolist()
+        if self.check_list_same(input_cols, self.input_col_names):
+            return s_
+        else:
+            return s_[self.input_col_names]
 
     def _transform(self, s: dataframe_type) -> dataframe_type:
         return s
@@ -173,6 +103,22 @@ class SuperPipeObject(object):
         for key in keys:
             new_s[key] = s[key]
         return new_s
+
+    @staticmethod
+    def check_list_same(list1: list, list2: list):
+        """
+        比较俩列表元素是否完全相同
+        """
+        flag = True
+        if len(list1) != len(list2):
+            flag = False
+        for idx in range(len(list1)):
+            item1 = list1[idx]
+            item2 = list2[idx]
+            if item1 != item2:
+                flag = False
+                break
+        return flag
 
     def transform_single(self, s: dict_type) -> dict_type:
         """
@@ -209,16 +155,20 @@ class SuperPipeObject(object):
         single_transform = []
         single_operate_times = []
         s = copy.copy(s_)
+        detector = CpuMemDetector()
+        detector.start()
         for record in s.to_dict("record"):
             start_time = datetime.datetime.now()
             single_transform.append(self.transform_single(record))
             end_time = datetime.datetime.now()
             single_operate_times.append((end_time - start_time).microseconds / 1000)
+        detector.end()
+        max_cpu_percent, min_used_mem, max_used_mem = detector.get_status()
         single_transform = pandas.DataFrame(single_transform)
         # 统一数据类型
         for col in single_transform.columns:
             single_transform[col] = single_transform[col].astype(batch_transform[col].dtype)
-        return batch_transform, single_transform, single_operate_times
+        return batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem
 
     def _check_shape(self, batch_transform, single_transform):
         """
@@ -268,8 +218,9 @@ class SuperPipeObject(object):
                     single_col_values = single_col_values.to_dense()  # 转换为dense
                 except:
                     pass
+
                 error_index = np.argwhere(
-                    np.abs(batch_col_values - single_col_values) > self.transform_check_max_number_error)
+                    np.abs(batch_col_values * 1.0 - single_col_values * 1.0) > self.transform_check_max_number_error)
                 if len(error_index) > 0:
                     error_info = pd.DataFrame(
                         {"error_index": np.reshape(error_index[:3], (-1,)),
@@ -318,7 +269,8 @@ class SuperPipeObject(object):
         自动测试批量接口和单条数据接口
         """
         # 运行batch和single transform
-        batch_transform, single_transform, single_operate_times = self._run_batch_single_transform(s_)
+        batch_transform, single_transform, single_operate_times \
+            , max_cpu_percent, min_used_mem, max_used_mem = self._run_batch_single_transform(s_)
         # 检验1:输出shape是否一致
         self._check_shape(batch_transform, single_transform)
         # 检验2:输出名称是否一致
@@ -328,8 +280,10 @@ class SuperPipeObject(object):
         # 检验4:数值是否一致
         self._check_data_same(batch_transform, single_transform)
         # 打印运行成功信息
-        print("({})  module transform check [success], single transform speed:[{}]ms/it".format(self.name, np.round(
-            np.mean(single_operate_times), 2)))
+        print(
+            "({}) module check [transform] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]".format(
+                self.name, np.round(np.mean(single_operate_times), 2), int(max_cpu_percent),
+                int(max_used_mem - min_used_mem)))
         return batch_transform
 
     def _leak_check_type_is_same(self, type1, type2):

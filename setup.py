@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='easymlops',
-    version='0.0.8',
+    version='0.0.9',
     python_requires='>=3.6',
     author='zhulei227',
     url='https://github.com/zhulei227/EasyMLOps',

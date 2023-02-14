@@ -161,9 +161,9 @@ class LGBMRegression(RegressionBase):
         self.lgb_model = params["lgb_model"]
         self.use_faster_predictor = params["use_faster_predictor"]
         if self.use_faster_predictor:
-            from ..utils import FasterLgbMulticlassPredictor
+            from ..utils import FasterLgbSinglePredictor
             self.lgb_model_faster_predictor_params = params["lgb_model_faster_predictor_params"]
-            self.lgb_model_faster_predictor = FasterLgbMulticlassPredictor(
+            self.lgb_model_faster_predictor = FasterLgbSinglePredictor(
                 model=self.lgb_model_faster_predictor_params, cache_num=10)
 
     def get_contrib(self, s: dict_type) -> dict_type:

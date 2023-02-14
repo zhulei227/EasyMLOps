@@ -4,6 +4,7 @@ dask>=0.17
 pandas>=0.25
 scipy
 scikit-learn>=0.21
+psutil
 #gensim
 #pyyaml<=5.4
 #lightgbm

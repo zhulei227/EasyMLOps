@@ -5,7 +5,7 @@
 
 ### 1. 基础建模模块
 
-- 数据清洗，数据自动填充、转换、盖帽、归一化、分箱等：easymlops.ml.preprocessing
+- 数据清洗，数据自动填充、转换、盖帽、归一化、分箱、四则运算、逻辑运算、比较大小等：easymlops.ml.preprocessing
 - 特征处理:
   - 特征编码，包括Target、Label、Onehot Encoding、WOEEncoding等：easymlops.ml.encoding
   - 特征降维，包括PCA、NFM等：easymlops.ml.decomposition 
@@ -106,7 +106,19 @@ data.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -251,7 +263,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -403,7 +427,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -520,7 +556,19 @@ ml["woe"].show_detail().head()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -619,7 +667,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -698,7 +758,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -779,7 +851,19 @@ ml["psi"].show_detail().head()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -871,7 +955,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -952,7 +1048,19 @@ ml[-2].show_detail()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1001,7 +1109,19 @@ ml[-1].show_detail()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1054,7 +1174,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1138,7 +1270,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1214,7 +1358,19 @@ ml.fit(x_train).transform(x_test).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1284,7 +1440,19 @@ ml.fit(x_train).transform(x_test).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1359,7 +1527,19 @@ nlp.fit(x_train).transform(x_test).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1478,7 +1658,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1653,7 +1845,19 @@ nlp.fit(x_train).transform(x_test).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1672,9 +1876,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>500</th>
       <td>2.132522</td>
-      <td>0.648003</td>
-      <td>0.075888</td>
-      <td>-0.093527</td>
+      <td>0.648002</td>
+      <td>-0.075900</td>
+      <td>0.093424</td>
       <td>-0.183208</td>
       <td>-0.017150</td>
       <td>0.403337</td>
@@ -1683,9 +1887,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>501</th>
       <td>2.034848</td>
-      <td>-0.608227</td>
-      <td>0.733356</td>
-      <td>-0.013281</td>
+      <td>-0.608228</td>
+      <td>-0.733370</td>
+      <td>0.013288</td>
       <td>-0.085437</td>
       <td>-0.033206</td>
       <td>0.293308</td>
@@ -1694,9 +1898,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>502</th>
       <td>2.040231</td>
-      <td>-0.616298</td>
-      <td>0.747636</td>
-      <td>-0.022272</td>
+      <td>-0.616303</td>
+      <td>-0.747638</td>
+      <td>0.022877</td>
       <td>-0.051665</td>
       <td>0.000399</td>
       <td>0.277010</td>
@@ -1705,9 +1909,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>503</th>
       <td>2.026293</td>
-      <td>-0.579114</td>
-      <td>0.735043</td>
-      <td>0.012248</td>
+      <td>-0.579116</td>
+      <td>-0.735033</td>
+      <td>-0.011914</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -1716,9 +1920,9 @@ nlp.fit(x_train).transform(x_test).head(5)
     <tr>
       <th>504</th>
       <td>2.025096</td>
-      <td>-0.573416</td>
-      <td>0.720069</td>
-      <td>0.010257</td>
+      <td>-0.573415</td>
+      <td>-0.720068</td>
+      <td>-0.010283</td>
       <td>-0.140556</td>
       <td>0.009208</td>
       <td>0.393155</td>
@@ -1801,7 +2005,19 @@ ml.fit(x_train).transform(x_test).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1870,7 +2086,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -1958,7 +2186,19 @@ ml2.fit(x_train_new).transform(x_test_new).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2011,7 +2251,19 @@ ml_combine.transform(x_test).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2076,7 +2328,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2163,7 +2427,19 @@ ml.transform(x_test,run_to_layer=1).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2193,7 +2469,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0</td>
       <td>315086</td>
       <td>8.664062</td>
-      <td>None</td>
+      <td>nan</td>
       <td>S</td>
     </tr>
     <tr>
@@ -2207,7 +2483,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0</td>
       <td>364846</td>
       <td>7.750000</td>
-      <td>None</td>
+      <td>nan</td>
       <td>Q</td>
     </tr>
     <tr>
@@ -2221,7 +2497,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0</td>
       <td>330909</td>
       <td>7.628906</td>
-      <td>None</td>
+      <td>nan</td>
       <td>Q</td>
     </tr>
     <tr>
@@ -2235,7 +2511,7 @@ ml.transform(x_test,run_to_layer=1).head(5)
       <td>0</td>
       <td>4135</td>
       <td>9.585938</td>
-      <td>None</td>
+      <td>nan</td>
       <td>S</td>
     </tr>
     <tr>
@@ -2268,7 +2544,19 @@ ml.transform(x_test,run_to_layer=-3).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2403,7 +2691,19 @@ ml.transform(x_test,run_to_layer="target_encoding").head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2541,7 +2841,19 @@ ml[3].show_detail()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2628,7 +2940,19 @@ ml["target_encoding"].show_detail().head()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2689,7 +3013,19 @@ step1
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2724,7 +3060,7 @@ step1
       <td>0</td>
       <td>315086</td>
       <td>8.664062</td>
-      <td>None</td>
+      <td>nan</td>
       <td>S</td>
       <td>1</td>
       <td>0</td>
@@ -2743,7 +3079,7 @@ step1
       <td>0</td>
       <td>364846</td>
       <td>7.750000</td>
-      <td>None</td>
+      <td>nan</td>
       <td>Q</td>
       <td>1</td>
       <td>0</td>
@@ -2762,7 +3098,7 @@ step1
       <td>0</td>
       <td>330909</td>
       <td>7.628906</td>
-      <td>None</td>
+      <td>nan</td>
       <td>Q</td>
       <td>1</td>
       <td>0</td>
@@ -2781,7 +3117,7 @@ step1
       <td>0</td>
       <td>4135</td>
       <td>9.585938</td>
-      <td>None</td>
+      <td>nan</td>
       <td>S</td>
       <td>1</td>
       <td>0</td>
@@ -2825,7 +3161,19 @@ step2
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2860,7 +3208,7 @@ step2
       <td>0</td>
       <td>0</td>
       <td>8.664062</td>
-      <td>None</td>
+      <td>nan</td>
       <td>S</td>
       <td>1</td>
       <td>0</td>
@@ -2879,7 +3227,7 @@ step2
       <td>0</td>
       <td>0</td>
       <td>7.750000</td>
-      <td>None</td>
+      <td>nan</td>
       <td>Q</td>
       <td>1</td>
       <td>0</td>
@@ -2898,7 +3246,7 @@ step2
       <td>0</td>
       <td>0</td>
       <td>7.628906</td>
-      <td>None</td>
+      <td>nan</td>
       <td>Q</td>
       <td>1</td>
       <td>0</td>
@@ -2917,7 +3265,7 @@ step2
       <td>0</td>
       <td>0</td>
       <td>9.585938</td>
-      <td>None</td>
+      <td>nan</td>
       <td>S</td>
       <td>1</td>
       <td>0</td>
@@ -2961,7 +3309,19 @@ step3
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3090,7 +3450,7 @@ ml.transform_single(input_dict)
 ml.transform_single({})
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>) module, please check these missing columns:[1;43m['Sex', 'SibSp', 'Pclass', 'Name', 'Parch', 'PassengerId', 'Ticket', 'Fare', 'Embarked', 'Cabin', 'Age'][0m, they will by filled by 0(int),None(float),np.nan(category)
+    (<class 'easymlops.ml.preprocessing.core.FixInput'>) module, please check these missing columns:[1;43m['Parch', 'Embarked', 'Ticket', 'Fare', 'Age', 'PassengerId', 'Pclass', 'SibSp', 'Sex', 'Cabin', 'Name'][0m, they will by filled by 0(int),None(float),np.nan(category)
     
 
 
@@ -3134,7 +3494,7 @@ ml.pipe(FixInput())\
 
 
 
-    <easymlops.pipeml.PipeML at 0x29ebd41eb88>
+    <easymlops.pipeml.PipeML at 0x25176329208>
 
 
 
@@ -3148,7 +3508,19 @@ ml.transform(x_test).head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3332,7 +3704,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3400,7 +3784,19 @@ ml[-2].show_detail()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3520,7 +3916,19 @@ x_test_new.head(5)
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3588,7 +3996,19 @@ ml[-2].show_detail()
 
 
 <div>
- 
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3715,14 +4135,14 @@ output=ml_combine.transform_single({'PassengerId': 1,
  'Embarked': 'S'},logger=logger,log_base_dict=base_log_info)
 ```
 
-    2023-02-09 10:09:17,235 - EasyMLOps - INFO - {'step': 'step-0-0', 'pipe_name': <class 'easymlops.ml.preprocessing.FixInput'>, 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S'}, 'user_id': 1}
-    2023-02-09 10:09:17,235 - EasyMLOps - INFO - {'step': 'step-0-1', 'pipe_name': <class 'easymlops.ml.preprocessing.FillNa'>, 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S'}, 'user_id': 1}
-    2023-02-09 10:09:17,235 - EasyMLOps - INFO - {'step': 'step-0-2', 'pipe_name': <class 'easymlops.ml.encoding.OneHotEncoding'>, 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S', 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
-    2023-02-09 10:09:17,235 - EasyMLOps - INFO - {'step': 'step-0-3', 'pipe_name': <class 'easymlops.ml.encoding.LabelEncoding'>, 'transform': {'PassengerId': 1, 'Pclass': 1, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 1, 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S', 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
-    2023-02-09 10:09:17,235 - EasyMLOps - INFO - {'step': 'step-0-4', 'pipe_name': <class 'easymlops.ml.encoding.TargetEncoding'>, 'transform': {'PassengerId': 1, 'Pclass': 1, 'Name': 0.0, 'Sex': 1, 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 0.0, 'Fare': 7.25, 'Cabin': 0.0, 'Embarked': 0.3342541436464088, 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
-    2023-02-09 10:09:17,235 - EasyMLOps - INFO - {'step': 'step-0-5', 'pipe_name': <class 'easymlops.ml.preprocessing.Normalizer'>, 'transform': {'PassengerId': -1.7285901631375231, 'Pclass': -0.8106443551185183, 'Name': -0.7928836579940379, 'Sex': -0.7663560447348134, 'Age': -0.0712, 'SibSp': 0.36959398692704365, 'Parch': -0.48750010550124606, 'Ticket': -0.838660240430917, 'Fare': -0.0, 'Cabin': -1.6283869335868641, 'Embarked': -0.5978457499180799, 'Pclass_3': 0.8900082557709795, 'Pclass_1': -0.5496210815947049, 'Pclass_2': -0.5155800469472481, 'Sex_male': 0.7663560447348134, 'Sex_female': -0.7663560447348134}, 'user_id': 1}
-    2023-02-09 10:09:17,268 - EasyMLOps - INFO - {'step': 'step-0-6', 'pipe_name': <class 'easymlops.ml.decomposition.PCADecomposition'>, 'transform': {0: -2.5934573285350657, 1: -0.8397964026166761, 2: -0.545422674095227, 3: -0.04674137417118096, 4: -0.3682295243585497, 5: 1.4383508180817393, 6: -0.6615934600868223, 7: 0.3488816151410472}, 'user_id': 1}
-    2023-02-09 10:09:17,268 - EasyMLOps - INFO - {'step': 'step-1-0', 'pipe_name': <class 'easymlops.ml.classification.LogisticRegressionClassification'>, 'transform': {0: 0.9998591472977608, 1: 0.00014085270223913456}, 'user_id': 1}
+    2023-02-14 22:51:19,414 - EasyMLOps - INFO - {'step': 'step-0-0', 'pipe_name': <class 'easymlops.ml.preprocessing.core.FixInput'>, 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S'}, 'user_id': 1}
+    2023-02-14 22:51:19,414 - EasyMLOps - INFO - {'step': 'step-0-1', 'pipe_name': <class 'easymlops.ml.preprocessing.onevar_operation.FillNa'>, 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S'}, 'user_id': 1}
+    2023-02-14 22:51:19,414 - EasyMLOps - INFO - {'step': 'step-0-2', 'pipe_name': <class 'easymlops.ml.encoding.OneHotEncoding'>, 'transform': {'PassengerId': 1, 'Pclass': 3, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 'male', 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S', 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
+    2023-02-14 22:51:19,414 - EasyMLOps - INFO - {'step': 'step-0-3', 'pipe_name': <class 'easymlops.ml.encoding.LabelEncoding'>, 'transform': {'PassengerId': 1, 'Pclass': 1, 'Name': 'Braund, Mr. Owen Harris', 'Sex': 1, 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 'A/5 21171', 'Fare': 7.25, 'Cabin': '0', 'Embarked': 'S', 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
+    2023-02-14 22:51:19,414 - EasyMLOps - INFO - {'step': 'step-0-4', 'pipe_name': <class 'easymlops.ml.encoding.TargetEncoding'>, 'transform': {'PassengerId': 1, 'Pclass': 1, 'Name': 0.0, 'Sex': 1, 'Age': 22.0, 'SibSp': 1, 'Parch': 0, 'Ticket': 0.0, 'Fare': 7.25, 'Cabin': 0.0, 'Embarked': 0.3342541436464088, 'Pclass_3': 1, 'Pclass_1': 0, 'Pclass_2': 0, 'Sex_male': 1, 'Sex_female': 0}, 'user_id': 1}
+    2023-02-14 22:51:19,414 - EasyMLOps - INFO - {'step': 'step-0-5', 'pipe_name': <class 'easymlops.ml.preprocessing.onevar_operation.Normalizer'>, 'transform': {'PassengerId': -1.7285901631375231, 'Pclass': -0.8106443551185183, 'Name': -0.7928836579940379, 'Sex': -0.7663560447348134, 'Age': -0.0712, 'SibSp': 0.36959398692704365, 'Parch': -0.48750010550124606, 'Ticket': -0.838660240430917, 'Fare': -0.0, 'Cabin': -1.6283869335868641, 'Embarked': -0.5978457499180799, 'Pclass_3': 0.8900082557709795, 'Pclass_1': -0.5496210815947049, 'Pclass_2': -0.5155800469472481, 'Sex_male': 0.7663560447348134, 'Sex_female': -0.7663560447348134}, 'user_id': 1}
+    2023-02-14 22:51:19,446 - EasyMLOps - INFO - {'step': 'step-0-6', 'pipe_name': <class 'easymlops.ml.decomposition.PCADecomposition'>, 'transform': {0: -2.5934573285350657, 1: -0.8397964026166761, 2: -0.545422674095227, 3: -0.04674137417118096, 4: -0.3682295243585497, 5: 1.4383508180817393, 6: -0.6615934600868223, 7: 0.3488816151410472}, 'user_id': 1}
+    2023-02-14 22:51:19,457 - EasyMLOps - INFO - {'step': 'step-1-0', 'pipe_name': <class 'easymlops.ml.classification.LogisticRegressionClassification'>, 'transform': {0: 0.9998591472977608, 1: 0.00014085270223913456}, 'user_id': 1}
     
 
 
@@ -3743,21 +4163,21 @@ output
 - transform_single对当条数据的预测性能  
 
 这些可以通过调用如下函数，进行自动化测试：  
-- check_transform_function：只要有打印[success]，则表示在当前测试数据上transform和transform_single的输出一致，性能测试表示为[*]毫秒/每条数据，如果有异常则会直接抛出，并中断后续pipe模块的测试
+- check_transform_function：只要有打印complete，则表示在当前测试数据上transform和transform_single的输出一致，性能测试表示为speed:[*]毫秒/每条数据，以及运行过程中cpu的最大使用率和内存变化(最大内存-最小内存)，如果有异常则会直接抛出，并中断后续pipe模块的测试
 
 
 ```python
 ml_combine.check_transform_function(x_test)
 ```
 
-    (<class 'easymlops.ml.preprocessing.FixInput'>)  module transform check [success], single transform speed:[0.09]ms/it
-    (<class 'easymlops.ml.preprocessing.FillNa'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.encoding.OneHotEncoding'>)  module transform check [success], single transform speed:[0.05]ms/it
-    (<class 'easymlops.ml.encoding.LabelEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.encoding.TargetEncoding'>)  module transform check [success], single transform speed:[0.0]ms/it
-    (<class 'easymlops.ml.preprocessing.Normalizer'>)  module transform check [success], single transform speed:[0.04]ms/it
-    (<class 'easymlops.ml.decomposition.PCADecomposition'>)  module transform check [success], single transform speed:[23.31]ms/it
-    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>)  module transform check [success], single transform speed:[1.31]ms/it
+    (<class 'easymlops.ml.preprocessing.core.FixInput'>) module check [transform] complete,speed:[0.19ms]/it,cpu:[37%],memory:[0K]
+    (<class 'easymlops.ml.preprocessing.onevar_operation.FillNa'>) module check [transform] complete,speed:[0.02ms]/it,cpu:[0%],memory:[0K]
+    (<class 'easymlops.ml.encoding.OneHotEncoding'>) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+    (<class 'easymlops.ml.encoding.LabelEncoding'>) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+    (<class 'easymlops.ml.encoding.TargetEncoding'>) module check [transform] complete,speed:[0.01ms]/it,cpu:[0%],memory:[0K]
+    (<class 'easymlops.ml.preprocessing.onevar_operation.Normalizer'>) module check [transform] complete,speed:[0.07ms]/it,cpu:[0%],memory:[0K]
+    (<class 'easymlops.ml.decomposition.PCADecomposition'>) module check [transform] complete,speed:[25.26ms]/it,cpu:[40%],memory:[27152K]
+    (<class 'easymlops.ml.classification.LogisticRegressionClassification'>) module check [transform] complete,speed:[2.13ms]/it,cpu:[38%],memory:[1352K]
     
 
 ### 7.4 空值测试：check_null_value  
@@ -3776,17 +4196,17 @@ ml_combine.check_transform_function(x_test)
 ml_combine.check_null_value(x_test,sample=10)
 ```
 
-    column: [PassengerId] check null value complete, total single transform speed:[25.6]ms/it
-    column: [Pclass] check null value complete, total single transform speed:[25.14]ms/it
-    column: [Name] check null value complete, total single transform speed:[25.29]ms/it
-    column: [Sex] check null value complete, total single transform speed:[26.64]ms/it
-    column: [Age] check null value complete, total single transform speed:[25.7]ms/it
-    column: [SibSp] check null value complete, total single transform speed:[26.3]ms/it
-    column: [Parch] check null value complete, total single transform speed:[26.46]ms/it
-    column: [Ticket] check null value complete, total single transform speed:[25.92]ms/it
-    column: [Fare] check null value complete, total single transform speed:[24.92]ms/it
-    column: [Cabin] check null value complete, total single transform speed:[25.14]ms/it
-    column: [Embarked] check null value complete, total single transform speed:[25.37]ms/it
+    column:[PassengerId] check [null value] complete,speed:[29.36ms]/it,cpu:[24%],memory:[120K]
+    column:[Pclass] check [null value] complete,speed:[28.29ms]/it,cpu:[52%],memory:[1724K]
+    column:[Name] check [null value] complete,speed:[28.22ms]/it,cpu:[26%],memory:[532K]
+    column:[Sex] check [null value] complete,speed:[27.47ms]/it,cpu:[39%],memory:[284K]
+    column:[Age] check [null value] complete,speed:[26.56ms]/it,cpu:[83%],memory:[24K]
+    column:[SibSp] check [null value] complete,speed:[26.49ms]/it,cpu:[30%],memory:[40K]
+    column:[Parch] check [null value] complete,speed:[28.05ms]/it,cpu:[30%],memory:[16K]
+    column:[Ticket] check [null value] complete,speed:[26.6ms]/it,cpu:[20%],memory:[12K]
+    column:[Fare] check [null value] complete,speed:[27.42ms]/it,cpu:[20%],memory:[80K]
+    column:[Cabin] check [null value] complete,speed:[28.01ms]/it,cpu:[84%],memory:[120K]
+    column:[Embarked] check [null value] complete,speed:[28.17ms]/it,cpu:[20%],memory:[44K]
     
 
 ### 7.5极端值测试：check_extreme_value  
@@ -3806,18 +4226,18 @@ ml_combine.check_null_value(x_test,sample=10)
 ml_combine.check_extreme_value(x_test,sample=10)
 ```
 
-    column: [PassengerId] check extreme value complete, total single transform speed:[25.9]ms/it
-    column: [Pclass] check extreme value complete, total single transform speed:[25.56]ms/it
-    column: [Name] check extreme value complete, total single transform speed:[25.47]ms/it
-    column: [Sex] check extreme value complete, total single transform speed:[25.61]ms/it
-    column: [Age] check extreme value complete, total single transform speed:[26.19]ms/it
-    column: [SibSp] check extreme value complete, total single transform speed:[25.85]ms/it
-    column: [Parch] check extreme value complete, total single transform speed:[25.2]ms/it
-    column: [Ticket] check extreme value complete, total single transform speed:[25.78]ms/it
-    column: [Fare] check extreme value complete, total single transform speed:[25.78]ms/it
-    column: [Cabin] check extreme value complete, total single transform speed:[25.0]ms/it
-    column: [Embarked] check extreme value complete, total single transform speed:[27.04]ms/it
-    [__all__] columns set the same extreme value complete,total single transform speed:[27.09]ms/it
+    column:[PassengerId] check [extreme value] complete,speed:[26.41ms]/it,cpu:[58%],memory:[15708K]
+    column:[Pclass] check [extreme value] complete,speed:[29.01ms]/it,cpu:[62%],memory:[12720K]
+    column:[Name] check [extreme value] complete,speed:[26.9ms]/it,cpu:[80%],memory:[12492K]
+    column:[Sex] check [extreme value] complete,speed:[26.75ms]/it,cpu:[49%],memory:[59900K]
+    column:[Age] check [extreme value] complete,speed:[28.43ms]/it,cpu:[71%],memory:[47360K]
+    column:[SibSp] check [extreme value] complete,speed:[26.86ms]/it,cpu:[71%],memory:[22624K]
+    column:[Parch] check [extreme value] complete,speed:[27.13ms]/it,cpu:[68%],memory:[31772K]
+    column:[Ticket] check [extreme value] complete,speed:[27.41ms]/it,cpu:[51%],memory:[82232K]
+    column:[Fare] check [extreme value] complete,speed:[26.58ms]/it,cpu:[69%],memory:[42920K]
+    column:[Cabin] check [extreme value] complete,speed:[28.16ms]/it,cpu:[35%],memory:[23224K]
+    column:[Embarked] check [extreme value] complete,speed:[27.78ms]/it,cpu:[84%],memory:[39040K]
+    column:[__all__] check [extreme value] complete,speed:[28.13ms]/it,cpu:[62%],memory:[62964K]
     
 
 ### 7.6 数据类型反转测试：check_inverse_dtype  
@@ -3833,17 +4253,17 @@ ml_combine.check_extreme_value(x_test,sample=10)
 ml_combine.check_inverse_dtype(x_test,sample=10)
 ```
 
-    column: [PassengerId] check inverse value complete, total single transform speed:[27.23]ms/it
-    column: [Pclass] check inverse value complete, total single transform speed:[27.01]ms/it
-    column: [Name] check inverse value complete, total single transform speed:[25.0]ms/it
-    column: [Sex] check inverse value complete, total single transform speed:[25.22]ms/it
-    column: [Age] check inverse value complete, total single transform speed:[25.22]ms/it
-    column: [SibSp] check inverse value complete, total single transform speed:[25.45]ms/it
-    column: [Parch] check inverse value complete, total single transform speed:[25.22]ms/it
-    column: [Ticket] check inverse value complete, total single transform speed:[25.23]ms/it
-    column: [Fare] check inverse value complete, total single transform speed:[25.0]ms/it
-    column: [Cabin] check inverse value complete, total single transform speed:[25.45]ms/it
-    column: [Embarked] check inverse value complete, total single transform speed:[25.0]ms/it
+    column:[PassengerId] check [inverse type] complete,speed:[27.72ms]/it,cpu:[27%],memory:[51200K]
+    column:[Pclass] check [inverse type] complete,speed:[29.49ms]/it,cpu:[32%],memory:[5712K]
+    column:[Name] check [inverse type] complete,speed:[27.7ms]/it,cpu:[40%],memory:[39308K]
+    column:[Sex] check [inverse type] complete,speed:[27.81ms]/it,cpu:[34%],memory:[17528K]
+    column:[Age] check [inverse type] complete,speed:[27.03ms]/it,cpu:[50%],memory:[15468K]
+    column:[SibSp] check [inverse type] complete,speed:[27.36ms]/it,cpu:[83%],memory:[8828K]
+    column:[Parch] check [inverse type] complete,speed:[27.32ms]/it,cpu:[72%],memory:[38236K]
+    column:[Ticket] check [inverse type] complete,speed:[27.53ms]/it,cpu:[91%],memory:[21544K]
+    column:[Fare] check [inverse type] complete,speed:[26.33ms]/it,cpu:[69%],memory:[3920K]
+    column:[Cabin] check [inverse type] complete,speed:[25.91ms]/it,cpu:[23%],memory:[1916K]
+    column:[Embarked] check [inverse type] complete,speed:[26.04ms]/it,cpu:[24%],memory:[34476K]
     
 
 ### 7.7 int转float测试：check_int_trans_float  
@@ -3856,10 +4276,10 @@ pandas会将某些特征自动推断为int，而线上可能传输的是float，
 ml_combine.check_int_trans_float(x_test)
 ```
 
-    column: [PassengerId] check int trans float value complete, total single transform speed:[25.35]ms/it
-    column: [Pclass] check int trans float value complete, total single transform speed:[25.16]ms/it
-    column: [SibSp] check int trans float value complete, total single transform speed:[25.16]ms/it
-    column: [Parch] check int trans float value complete, total single transform speed:[25.16]ms/it
+    column:[PassengerId] check [int trans float] complete,speed:[25.47ms]/it,cpu:[23%],memory:[864K]
+    column:[Pclass] check [int trans float] complete,speed:[25.63ms]/it,cpu:[25%],memory:[140K]
+    column:[SibSp] check [int trans float] complete,speed:[26.59ms]/it,cpu:[39%],memory:[1732K]
+    column:[Parch] check [int trans float] complete,speed:[27.45ms]/it,cpu:[44%],memory:[2700K]
     
 
 ### 7.8 自动测试：auto_test
