@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NLP任务 &mdash; EasyMLOps 0.1 文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="内存优化" href="cap4_mem_opt.html" />
+    <link rel="prev" title="Table任务" href="cap2_table.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EasyMLOps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">EasyMLOps使用文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cap1_introduce.html">简介&amp;安装&amp;反馈</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap2_table.html">Table任务</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">NLP任务</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">文本处理</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">文本清洗</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">中文分词</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">关键词抽取</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#n-gram">提取N-gram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">文本特征提取</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bag-of-words">Bag-of-Words特征提取</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tfidf">TFIDF特征提取</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lda">LDA主题特征提取</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lsi">LSI主题特征提取</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#word2vec">Word2Vec词向量特征</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#doc2vec">Doc2Vec文档向量</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fasttext">FastText词向量</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">文本分类</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cap4_mem_opt.html">内存优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap5_persistence.html">持久化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap6_pipe.html">自定义pipe模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EasyMLOps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">NLP任务</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cap3_nlp.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nlp">
+<h1>NLP任务<a class="headerlink" href="#nlp" title="此标题的永久链接">¶</a></h1>
+<p>目前该部分的功能还不多，主要是一些数据清洗以及特征提取的模块，如下以酒店评价数据集为例做演示</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#加载及切割数据</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span><span class="c1">#与easymlops同级目录</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/demo2.csv&quot;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;gbk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   label | review                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|-----:|--------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 6465 |       0 | 感觉非常不好,房间有霉味,设施太过陈旧,拧开水龙头,要等很久,才出热水                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 1433 |       1 | 酒店位置不错，作为一家准四星级的酒店，大堂比较小；房间设施虽然有点旧，但是很干净，服务很好；早餐还可以就是价格高！总的来说还是可以推荐的                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 2619 |       1 | 门卡无故被停用，无法开门，要到总台重新办理才能开门，很不方便。希望能改进。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|  223 |       1 | 非常不错的酒店已经多次入住                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 3881 |       1 | 总体来说度过了一个非常愉快的周末。1。酒店的地理位置很好，一个酒店就是一座岛。通往小岛的路也是曲径通幽，路边景色很美。喜欢。2。整个酒店有个很大的特色，一进门就是道教的64八卦图，并且，在山下的石头上刻了一部道德经。3。酒店的环境很好，成片的后草皮，而且干净，随便躺躺睡睡都可以.4.酒店有自己的游船，不过价格贵，640元一条船。5。酒店的餐厅，菜味道不错，而且价格不贵，鱼头汤108/小份，但是4-5个人也够了，其他的菜大部分也都是20快左右。6.住的是9号楼的湖景房，有阳台的，真的象住在水中一样。7.有开房水果赠送，而且服务员态度也不错。见面都打招呼的，但是房间内部实在不能让人满意，可能是老5星级的关系，房间装修顶多只能算是4星，而且，9号楼没有大床，不过我们把床拼起来了，也算是个大床房。8。酒店ktv很贵，640最低消费，脚摩70/人。9.夏天的晚上，夜朗星不稀，晚上12点可以看到非常非常多的星星，而且还看到一颗流星。。。总之，个人觉得这个酒店真的不错，家庭旅游非常好。以后还会选择入住。 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(7766, 2)
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span><span class="o">=</span><span class="n">data</span><span class="p">[:</span><span class="mi">6000</span><span class="p">]</span>
+<span class="n">x_test</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">6000</span><span class="p">:]</span>
+<span class="n">y_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="n">y_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="id1">
+<h2>文本处理<a class="headerlink" href="#id1" title="此标题的永久链接">¶</a></h2>
+<section id="id2">
+<h3>文本清洗<a class="headerlink" href="#id2" title="此标题的永久链接">¶</a></h3>
+<ul class="simple">
+<li><p>Lower：所有英文字符转小写</p></li>
+<li><p>Upper：所有英文字符转大写</p></li>
+<li><p>RemoveDigits：移除字符串中的所有数字</p></li>
+<li><p>ReplaceDigits：替换字符串中的所有数字为一个特殊字符<code class="docutils literal notranslate"><span class="pre">symbols=&quot;[d]&quot;</span></code></p></li>
+<li><p>RemovePunctuation：移除字符串中的所有标点符号（中英文）</p></li>
+<li><p>ReplacePunctuation：替换字符串中的所有标点符号为一个特殊字符<code class="docutils literal notranslate"><span class="pre">symbols=&quot;[p]&quot;</span></code></p></li>
+<li><p>RemoveWhitespace：移除空白字符，包括空格、指标、回车等</p></li>
+<li><p>Replace：进行字符串的局部替换（注意easymlops.table.preprocessing.Replace只支持整个字符串的替换）</p></li>
+<li><p>RemoveStopWords：移除停用词，通过<code class="docutils literal notranslate"><span class="pre">stop_words=[&quot;a&quot;,&quot;b&quot;...]</span></code>或<code class="docutils literal notranslate"><span class="pre">stop_words_path=xxx/stopwords.txt</span></code>(换行分割)指定</p></li>
+<li><p>ExtractChineseWords：仅提取字符串中的中文字符</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops</span> <span class="kn">import</span> <span class="n">NLPPipeline</span>
+<span class="kn">from</span> <span class="nn">easymlops.nlp.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Lower</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Upper</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">RemoveDigits</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">RemovePunctuation</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">RemoveWhitespace</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">RemoveStopWords</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;的&quot;</span><span class="p">,</span><span class="s2">&quot;你&quot;</span><span class="p">,</span><span class="s2">&quot;我&quot;</span><span class="p">,</span><span class="s2">&quot;得&quot;</span><span class="p">,</span><span class="s2">&quot;其他&quot;</span><span class="p">]))</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      | review                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|-----:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 7127 | 房间残旧天花发霉卫生间马桶冲洗不干净没有窗户排气不好以后不用钱都不去哪里住了                                                                                                                                                                                                                                                                                                                                                                 |
+| 1640 | 石家庄最好的酒店服务是非常不错的硬件由于这个城市的原因所以也没有办法挑什么但是非常可惜这个可是在省会的城市啊省会的城市不应该这样吧星里面不如旗下的                                                                                                                                                                                                                                                                                           |
+| 7113 | 这个酒店的前身听别人说是乐山驻成都的招待所现在改成酒店了房间里面的设施不好我定的是单人间居然要穿过他们的前台在后面的一栋单独的楼上去经过的时候看见那个院子里还有一些别的什么公司而且还没有电梯要自己上楼梯早餐点就结束了临走的时候要求打印水单前台人员说是打印机坏了没有办法打印单位要求拿水单和发票报销郁闷服务人员也是好像忙得不行的样子根本就谈不上什么服务质量的高低了他们的房卡也坏了房间还是服务员帮着开的门一句话别住在这里自寻烦恼了 |
+| 5536 | 建议携程不要和这家酒店合作名曰三星要我看准星级都勉强首先不在市区里面去涵江区打车还要块钱当然你能打到的话在一条前不着村后不着店的公路旁交通极其不便其次一进入酒店就一股霉味地毯上到处都是污渍很像地图最不能容忍的是有很多小虫子到处乱爬我正好赶上台风没有办法只能在那住要不我不敢保证还会住那里                                                                                                                                               |
+| 5288 | 很实惠就是不灵活安排希望能更加进步下次去还到这里                                                                                                                                                                                                                                                                                                                                                                                             |
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>中文分词<a class="headerlink" href="#id3" title="此标题的永久链接">¶</a></h3>
+<ul class="simple">
+<li><p>ExtractJieBaWords：目前只支持jieba分词，分词结果默认以空格分割</p></li>
+</ul>
+<p>注意，需要安装：<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">jieba</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      | review                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|-----:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 7127 | 房间 残旧 天花 发霉 卫生间 马桶 冲洗 不 干净 没有 窗户 排气 不好 以后 不用 钱 都 不 去 哪里 住 了                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 1640 | 石家庄 最好 的 酒店 服务 是 非常 不错 的 硬件 由于 这个 城市 的 原因 所以 也 没有 办法 挑 什么 但是 非常 可惜 这个 可是 在 省会 的 城市 啊 省会 的 城市 不 应该 这样 吧 星 里面 不如 旗下 的                                                                                                                                                                                                                                                                                                                                                                              |
+| 7113 | 这个 酒店 的 前身 听 别人 说 是 乐山 驻 成都 的 招待所 现在 改成 酒店 了 房间 里面 的 设施 不好 我定 的 是 单人间 居然 要 穿过 他们 的 前台 在 后面 的 一栋 单独 的 楼上 去 经过 的 时候 看见 那个 院子 里 还有 一些 别的 什么 公司 而且 还 没有 电梯 要 自己 上 楼梯 早餐 点 就 结束 了 临走 的 时候 要求 打印 水单 前台 人员 说 是 打印机 坏 了 没有 办法 打印 单位 要求 拿水单 和 发票 报销 郁闷 服务 人员 也 是 好像 忙 得 不行 的 样子 根本 就 谈不上 什么 服务质量 的 高低 了 他们 的 房卡 也 坏 了 房间 还是 服务员 帮着 开 的 门 一句 话别 住 在 这里 自寻烦恼 了 |
+| 5536 | 建议 携程 不要 和 这家 酒店 合作 名曰 三星 要 我 看准 星级 都 勉强 首先 不 在 市区 里面 去 涵江区 打车 还要 块钱 当然 你 能 打 到 的话 在 一条 前 不 着 村 后不着店 的 公路 旁 交通 极其 不便 其次 一 进入 酒店 就 一股 霉味 地毯 上 到处 都 是 污渍 很 像 地图 最 不能容忍 的 是 有 很多 小虫子 到处 乱 爬 我 正好 赶上 台风 没有 办法 只能 在 那 住 要 不 我 不敢 保证 还会 住 那里                                                                                                                                                                                     |
+| 5288 | 很 实惠 就是 不 灵活 安排 希望 能 更加 进步 下次 去 还 到 这里                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>关键词抽取<a class="headerlink" href="#id4" title="此标题的永久链接">¶</a></h3>
+<ul class="simple">
+<li><p>ExtractKeyWords：抽取<code class="docutils literal notranslate"><span class="pre">key_words=[&quot;kw1&quot;,&quot;kw2&quot;]</span></code>或<code class="docutils literal notranslate"><span class="pre">key_words_path=xxx/keyword.txt</span></code>指定的关键词；</p></li>
+<li><p>AppendKeyWords：将抽取的关键词拼接到原文后面</p></li>
+</ul>
+<p>注意，这里需要<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyahocorasick</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractKeyWords</span><span class="p">(</span><span class="n">key_words</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;大堂&quot;</span><span class="p">,</span><span class="s2">&quot;环境&quot;</span><span class="p">,</span><span class="s2">&quot;交通&quot;</span><span class="p">,</span><span class="s2">&quot;酒店&quot;</span><span class="p">,</span><span class="s2">&quot;空气&quot;</span><span class="p">,</span><span class="s2">&quot;嘉宾&quot;</span><span class="p">,</span><span class="s2">&quot;国际&quot;</span><span class="p">,</span><span class="s2">&quot;免费&quot;</span><span class="p">,</span><span class="s2">&quot;早餐&quot;</span><span class="p">,</span><span class="s2">&quot;宽带&quot;</span><span class="p">,</span><span class="s2">&quot;前台&quot;</span><span class="p">,</span><span class="s2">&quot;实惠&quot;</span><span class="p">,</span><span class="s2">&quot;携程&quot;</span><span class="p">,</span><span class="s2">&quot;房间&quot;</span><span class="p">,</span><span class="s2">&quot;卫生&quot;</span><span class="p">]))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      | review                             |
+|-----:|:-----------------------------------|
+| 7127 | 房间 卫生                          |
+| 1640 | 酒店                               |
+| 7113 | 酒店 酒店 房间 前台 早餐 前台 房间 |
+| 5536 | 携程 酒店 交通 酒店                |
+| 5288 | 实惠                               |
+</pre></div>
+</div>
+</section>
+<section id="n-gram">
+<h3>提取N-gram<a class="headerlink" href="#n-gram" title="此标题的永久链接">¶</a></h3>
+<ul class="simple">
+<li><p>ExtractNGramWords，通过设置<code class="docutils literal notranslate"><span class="pre">n_grams=[1,2,3]</span></code>以支持2-gram,3-gram的拼接</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractKeyWords</span><span class="p">(</span><span class="n">key_words</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;大堂&quot;</span><span class="p">,</span><span class="s2">&quot;环境&quot;</span><span class="p">,</span><span class="s2">&quot;交通&quot;</span><span class="p">,</span><span class="s2">&quot;酒店&quot;</span><span class="p">,</span><span class="s2">&quot;空气&quot;</span><span class="p">,</span><span class="s2">&quot;嘉宾&quot;</span><span class="p">,</span><span class="s2">&quot;国际&quot;</span><span class="p">,</span><span class="s2">&quot;免费&quot;</span><span class="p">,</span><span class="s2">&quot;早餐&quot;</span><span class="p">,</span><span class="s2">&quot;宽带&quot;</span><span class="p">,</span><span class="s2">&quot;前台&quot;</span><span class="p">,</span><span class="s2">&quot;实惠&quot;</span><span class="p">,</span><span class="s2">&quot;携程&quot;</span><span class="p">,</span><span class="s2">&quot;房间&quot;</span><span class="p">,</span><span class="s2">&quot;卫生&quot;</span><span class="p">]))</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractNGramWords</span><span class="p">(</span><span class="n">n_grams</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      | review                                                |
+|-----:|:------------------------------------------------------|
+| 7127 | 房间卫生                                              |
+| 1640 | 酒店                                                  |
+| 7113 | 酒店酒店 酒店房间 房间前台 前台早餐 早餐前台 前台房间 |
+| 5536 | 携程酒店 酒店交通 交通酒店                            |
+| 5288 | 实惠                                                  |
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id5">
+<h2>文本特征提取<a class="headerlink" href="#id5" title="此标题的永久链接">¶</a></h2>
+<p>主要三类特征</p>
+<ul class="simple">
+<li><p>bow/tfidf等常用特征</p></li>
+<li><p>lsi/lda等主题模型特征</p></li>
+<li><p>fastext/word2vec/doc2vec等词向量特征</p></li>
+</ul>
+<p>这些pipe模块的前置模块即是前面的文本处理结果，<strong>注意：处理号的token要求空格分割</strong></p>
+<section id="bag-of-words">
+<h3>Bag-of-Words特征提取<a class="headerlink" href="#bag-of-words" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.nlp.representation</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">BagOfWords</span><span class="p">())</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="c1">#选择前10个columns展示</span>
+<span class="n">top_10_cols</span><span class="o">=</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="p">[</span><span class="n">top_10_cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   bag_review_ |   bag_review_一 |   bag_review_一一 |   bag_review_一一列举 |   bag_review_一丁点 |   bag_review_一上 |   bag_review_一上午 |   bag_review_一下 |   bag_review_一下下 |   bag_review_一下子 |
+|-----:|--------------:|----------------:|------------------:|----------------------:|--------------------:|------------------:|--------------------:|------------------:|--------------------:|--------------------:|
+| 7127 |             0 |               0 |                 0 |                     0 |                   0 |                 0 |                   0 |                 0 |                   0 |                   0 |
+| 1640 |             0 |               0 |                 0 |                     0 |                   0 |                 0 |                   0 |                 0 |                   0 |                   0 |
+| 7113 |             0 |               0 |                 0 |                     0 |                   0 |                 0 |                   0 |                 0 |                   0 |                   0 |
+| 5536 |             0 |               1 |                 0 |                     0 |                   0 |                 0 |                   0 |                 0 |                   0 |                   0 |
+| 5288 |             0 |               0 |                 0 |                     0 |                   0 |                 0 |                   0 |                 0 |                   0 |                   0 |
+</pre></div>
+</div>
+</section>
+<section id="tfidf">
+<h3>TFIDF特征提取<a class="headerlink" href="#tfidf" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">TFIDF</span><span class="p">())</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="c1">#选择前10个columns展示</span>
+<span class="n">top_10_cols</span><span class="o">=</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="p">[</span><span class="n">top_10_cols</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   tfidf_review_ |   tfidf_review_一 |   tfidf_review_一一 |   tfidf_review_一一列举 |   tfidf_review_一丁点 |   tfidf_review_一上 |   tfidf_review_一上午 |   tfidf_review_一下 |   tfidf_review_一下下 |   tfidf_review_一下子 |
+|-----:|----------------:|------------------:|--------------------:|------------------------:|----------------------:|--------------------:|----------------------:|--------------------:|----------------------:|----------------------:|
+| 7127 |               0 |         0         |                   0 |                       0 |                     0 |                   0 |                     0 |                   0 |                     0 |                     0 |
+| 1640 |               0 |         0         |                   0 |                       0 |                     0 |                   0 |                     0 |                   0 |                     0 |                     0 |
+| 7113 |               0 |         0         |                   0 |                       0 |                     0 |                   0 |                     0 |                   0 |                     0 |                     0 |
+| 5536 |               0 |         0.0870994 |                   0 |                       0 |                     0 |                   0 |                     0 |                   0 |                     0 |                     0 |
+| 5288 |               0 |         0         |                   0 |                       0 |                     0 |                   0 |                     0 |                   0 |                     0 |                     0 |
+</pre></div>
+</div>
+</section>
+<section id="lda">
+<h3>LDA主题特征提取<a class="headerlink" href="#lda" title="此标题的永久链接">¶</a></h3>
+<p>这里需要<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">gensim</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LdaTopicModel</span><span class="p">(</span><span class="n">num_topics</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   lda_review_0 |   lda_review_1 |   lda_review_2 |   lda_review_3 |   lda_review_4 |   lda_review_5 |   lda_review_6 |   lda_review_7 |   lda_review_8 |   lda_review_9 |
+|-----:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|
+| 7127 |      0         |              0 |      0         |       0        |              0 |       0.727733 |              0 |       0.234104 |              0 |              0 |
+| 1640 |      0.978557  |              0 |      0         |       0        |              0 |       0        |              0 |       0        |              0 |              0 |
+| 7113 |      0.10456   |              0 |      0.114921  |       0        |              0 |       0.650086 |              0 |       0.125424 |              0 |              0 |
+| 5536 |      0.0856321 |              0 |      0.0525631 |       0.175759 |              0 |       0.678907 |              0 |       0        |              0 |              0 |
+| 5288 |      0.614322  |              0 |      0         |       0.332316 |              0 |       0        |              0 |       0        |              0 |              0 |
+</pre></div>
+</div>
+</section>
+<section id="lsi">
+<h3>LSI主题特征提取<a class="headerlink" href="#lsi" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LsiTopicModel</span><span class="p">(</span><span class="n">num_topics</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   lsi_review_0 |   lsi_review_1 |   lsi_review_2 |   lsi_review_3 |   lsi_review_4 |   lsi_review_5 |   lsi_review_6 |   lsi_review_7 |   lsi_review_8 |   lsi_review_9 |
+|-----:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|
+| 7127 |       0.858575 |     -0.70027   |      -0.843685 |     -0.0668491 |     -0.693314  |       0.441741 |    -0.183873   |    -1.17893    |      0.0851453 |      0.755182  |
+| 1640 |       5.86927  |      2.11575   |       1.06398  |     -0.622473  |      0.598806  |       0.715508 |     0.508536   |     0.0282597  |     -0.622821  |     -0.417345  |
+| 7113 |      15.1899   |      0.261911  |       1.16639  |     -1.48284   |     -3.16782   |       2.59123  |     0.287749   |     0.206293   |      0.414483  |     -0.272836  |
+| 5536 |       4.78021  |     -1.56075   |      -0.927984 |      0.797013  |      2.27539   |       0.571027 |    -1.32656    |    -0.321795   |     -2.60123   |      2.62209   |
+| 5288 |       0.448427 |      0.0689611 |      -0.970707 |     -0.122688  |      0.0200293 |      -0.358036 |     0.00373121 |    -0.00259268 |     -0.398738  |      0.0671273 |
+</pre></div>
+</div>
+</section>
+<section id="word2vec">
+<h3>Word2Vec词向量特征<a class="headerlink" href="#word2vec" title="此标题的永久链接">¶</a></h3>
+<p>这里的文档特征是每个token词向量的平均值</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Word2VecModel</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   w2v_review_0 |   w2v_review_1 |   w2v_review_2 |   w2v_review_3 |   w2v_review_4 |   w2v_review_5 |   w2v_review_6 |   w2v_review_7 |   w2v_review_8 |   w2v_review_9 |
+|-----:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|
+| 7127 |      0.149905  |      0.539101  |       1.61803  |     -0.520869  |       1.28348  |       0.269167 |        1.7893  |       0.367624 |      -1.05573  |       0.292887 |
+| 1640 |     -0.535773  |     -0.0151048 |       0.963358 |     -0.186407  |       1.03127  |       0.170625 |        1.876   |       1.2312   |      -0.72744  |      -0.37903  |
+| 7113 |     -0.0289475 |      0.477569  |       1.1908   |     -0.092565  |       0.66135  |       0.250403 |        1.34142 |       0.445295 |      -1.55385  |      -0.128968 |
+| 5536 |      0.0400489 |     -0.0727166 |       1.32027  |     -0.0587338 |       0.402637 |       0.17381  |        1.89048 |       0.274273 |      -1.19714  |      -0.369206 |
+| 5288 |      0.147199  |     -0.914351  |       1.11222  |     -0.544475  |      -0.153332 |      -0.312194 |        2.58658 |       0.844455 |      -0.930132 |       0.34616  |
+</pre></div>
+</div>
+</section>
+<section id="doc2vec">
+<h3>Doc2Vec文档向量<a class="headerlink" href="#doc2vec" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Doc2VecModel</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   d2v_review_0 |   d2v_review_1 |   d2v_review_2 |   d2v_review_3 |   d2v_review_4 |   d2v_review_5 |   d2v_review_6 |   d2v_review_7 |   d2v_review_8 |   d2v_review_9 |
+|-----:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|---------------:|
+| 7127 |      0.0991587 |    -0.0109045  |     0.0790115  |     -0.0498847 |      0.0956094 |      0.0109559 |       0.214567 |      -0.152318 |      -0.172422 |     0.0982961  |
+| 1640 |      0.187836  |    -0.0663459  |     0.0911619  |      0.0199243 |      0.431156  |     -0.107956  |       0.714324 |       0.138839 |      -0.324371 |    -0.132915   |
+| 7113 |     -0.207934  |     0.205402   |     0.176139   |     -0.291981  |      0.407413  |     -0.0131239 |       0.731769 |      -0.439703 |      -0.656194 |     0.00921523 |
+| 5536 |      0.441469  |    -0.0213459  |    -0.00080414 |      0.297836  |      0.456871  |     -0.278487  |       0.258496 |      -0.22986  |      -0.17897  |     0.0631988  |
+| 5288 |      0.26423   |    -0.00279085 |     0.132275   |     -0.0238498 |      0.0906615 |     -0.154652  |       0.16212  |       0.213439 |      -0.16477  |    -0.00957786 |
+</pre></div>
+</div>
+</section>
+<section id="fasttext">
+<h3>FastText词向量<a class="headerlink" href="#fasttext" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FastTextModel</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   fasttext_review_0 |   fasttext_review_1 |   fasttext_review_2 |   fasttext_review_3 |   fasttext_review_4 |   fasttext_review_5 |   fasttext_review_6 |   fasttext_review_7 |   fasttext_review_8 |   fasttext_review_9 |
+|-----:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|--------------------:|
+| 7127 |           -0.289566 |           0.158579  |             1.77409 |           -0.214785 |          -0.452001  |          -0.945153  |            1.59104  |           0.0912326 |           -0.832337 |           -0.387233 |
+| 1640 |           -0.717482 |           0.0832835 |             1.49416 |            0.726315 |           0.0506884 |          -1.04302   |            1.60123  |           0.863163  |           -0.638874 |           -0.672286 |
+| 7113 |           -0.583676 |          -0.0858972 |             1.80547 |           -0.294098 |          -0.330605  |          -1.14284   |            0.979384 |           0.243881  |           -0.981069 |           -0.53791  |
+| 5536 |           -0.600507 |          -0.614163  |             1.97067 |            0.152928 |          -0.555457  |          -0.833012  |            1.12409  |           0.150353  |           -0.62357  |           -0.688771 |
+| 5288 |           -0.422559 |          -0.517089  |             2.20643 |            0.42231  |          -0.936419  |           0.0781822 |            2.01152  |           0.892577  |           -0.173849 |           -0.892289 |
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id6">
+<h2>文本分类<a class="headerlink" href="#id6" title="此标题的永久链接">¶</a></h2>
+<p>借助于table中的分类器，可以做文本分类任务了</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.classification</span> <span class="kn">import</span> <span class="n">LGBMClassification</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">BagOfWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LGBMClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |        1 |          0 |
+|-----:|---------:|-----------:|
+| 1000 | 0.986622 | 0.0133777  |
+| 5291 | 0.934425 | 0.0655745  |
+| 3134 | 0.227386 | 0.772614   |
+| 4607 | 0.990448 | 0.00955158 |
+| 3677 | 0.954822 | 0.0451778  |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cap2_table.html" class="btn btn-neutral float-left" title="Table任务" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cap4_mem_opt.html" class="btn btn-neutral float-right" title="内存优化" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, zhulei227.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

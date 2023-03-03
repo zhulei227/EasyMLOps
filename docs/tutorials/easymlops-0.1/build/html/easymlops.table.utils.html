@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>easymlops.table.utils package &mdash; EasyMLOps 0.1 文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="prev" title="easymlops.table.storage package" href="easymlops.table.storage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EasyMLOps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">EasyMLOps使用文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cap1_introduce.html">简介&amp;安装&amp;反馈</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap2_table.html">Table任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap3_nlp.html">NLP任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap4_mem_opt.html">内存优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap5_persistence.html">持久化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap6_pipe.html">自定义pipe模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="easymlops.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="easymlops.core.html">easymlops.core package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="easymlops.nlp.html">easymlops.nlp package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="easymlops.table.html">easymlops.table package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="easymlops.table.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.classification">easymlops.table.classification module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.decomposition">easymlops.table.decomposition module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.encoding">easymlops.table.encoding module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.ensemble">easymlops.table.ensemble module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.perfopt">easymlops.table.perfopt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.regression">easymlops.table.regression module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="easymlops.html#module-easymlops">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EasyMLOps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="easymlops.html">API Refrence(Version=0.1)</a></li>
+          <li class="breadcrumb-item"><a href="easymlops.table.html">easymlops.table package</a></li>
+      <li class="breadcrumb-item active">easymlops.table.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/easymlops.table.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="easymlops-table-utils-package">
+<h1>easymlops.table.utils package<a class="headerlink" href="#easymlops-table-utils-package" title="此标题的永久链接">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="此标题的永久链接">¶</a></h2>
+</section>
+<section id="module-easymlops.table.utils.cpu_mem_detector">
+<span id="easymlops-table-utils-cpu-mem-detector-module"></span><h2>easymlops.table.utils.cpu_mem_detector module<a class="headerlink" href="#module-easymlops.table.utils.cpu_mem_detector" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.utils.cpu_mem_detector.CpuMemDetector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.utils.cpu_mem_detector.</span></span><span class="sig-name descname"><span class="pre">CpuMemDetector</span></span><a class="headerlink" href="#easymlops.table.utils.cpu_mem_detector.CpuMemDetector" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></p>
+<p>监控指定时间区间内，cpu和内存的使用情况</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.cpu_mem_detector.CpuMemDetector.end">
+<span class="sig-name descname"><span class="pre">end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.cpu_mem_detector.CpuMemDetector.end" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.cpu_mem_detector.CpuMemDetector.get_status">
+<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.cpu_mem_detector.CpuMemDetector.get_status" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.cpu_mem_detector.CpuMemDetector.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#easymlops.table.utils.cpu_mem_detector.CpuMemDetector.run" title="永久链接至目标">¶</a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.cpu_mem_detector.CpuMemDetector.work">
+<span class="sig-name descname"><span class="pre">work</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.cpu_mem_detector.CpuMemDetector.work" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.utils.faster_lgbm_predictor_multiclass">
+<span id="easymlops-table-utils-faster-lgbm-predictor-multiclass-module"></span><h2>easymlops.table.utils.faster_lgbm_predictor_multiclass module<a class="headerlink" href="#module-easymlops.table.utils.faster_lgbm_predictor_multiclass" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_multiclass.FasterLgbMulticlassPredictor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.utils.faster_lgbm_predictor_multiclass.</span></span><span class="sig-name descname"><span class="pre">FasterLgbMulticlassPredictor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_multiclass.FasterLgbMulticlassPredictor" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>lgb模型多分类模型预测加速</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_multiclass.FasterLgbMulticlassPredictor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_multiclass.FasterLgbMulticlassPredictor.predict" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.utils.faster_lgbm_predictor_single">
+<span id="easymlops-table-utils-faster-lgbm-predictor-single-module"></span><h2>easymlops.table.utils.faster_lgbm_predictor_single module<a class="headerlink" href="#module-easymlops.table.utils.faster_lgbm_predictor_single" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.utils.faster_lgbm_predictor_single.</span></span><span class="sig-name descname"><span class="pre">FasterLgbSinglePredictor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>lgb模型二分类或者回归任务加速</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor.init_average_value">
+<span class="sig-name descname"><span class="pre">init_average_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor.init_average_value" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor.post_tree_avg_value_update">
+<span class="sig-name descname"><span class="pre">post_tree_avg_value_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor.post_tree_avg_value_update" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor.predict" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.ForestCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.utils.faster_lgbm_predictor_single.</span></span><span class="sig-name descname"><span class="pre">ForestCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.ForestCache" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.ForestCache.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_leaves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.ForestCache.predict" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.MathUtils">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.utils.faster_lgbm_predictor_single.</span></span><span class="sig-name descname"><span class="pre">MathUtils</span></span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.MathUtils" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.MathUtils.sigmoid">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sigmoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.MathUtils.sigmoid" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.TreeCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.utils.faster_lgbm_predictor_single.</span></span><span class="sig-name descname"><span class="pre">TreeCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.TreeCache" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.decision">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.decision" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.decision2">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decision2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.decision2" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.get_cache_value">
+<span class="sig-name descname"><span class="pre">get_cache_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.get_cache_value" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.is_match">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.is_match" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_leaves</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.faster_lgbm_predictor_single.TreeCache.predict" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.utils.pandas_utils">
+<span id="easymlops-table-utils-pandas-utils-module"></span><h2>easymlops.table.utils.pandas_utils module<a class="headerlink" href="#module-easymlops.table.utils.pandas_utils" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.utils.pandas_utils.PandasUtils">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.utils.pandas_utils.</span></span><span class="sig-name descname"><span class="pre">PandasUtils</span></span><a class="headerlink" href="#easymlops.table.utils.pandas_utils.PandasUtils" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>pandas操作工具箱</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.pandas_utils.PandasUtils.concat_duplicate_columns">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concat_duplicate_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'last'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.pandas_utils.PandasUtils.concat_duplicate_columns" title="永久链接至目标">¶</a></dt>
+<dd><p>keep:last/相同column保留最后一个，first/相同column保留第一个</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.pandas_utils.PandasUtils.pd2csr">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pd2csr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.pandas_utils.PandasUtils.pd2csr" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.utils.pandas_utils.PandasUtils.pd2dense">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pd2dense</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.utils.pandas_utils.PandasUtils.pd2dense" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-easymlops.table.utils" title="此标题的永久链接">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="easymlops.table.storage.html" class="btn btn-neutral float-left" title="easymlops.table.storage package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, zhulei227.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

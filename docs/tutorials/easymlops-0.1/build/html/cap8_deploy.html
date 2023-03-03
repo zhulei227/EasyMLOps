@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生产部署 &mdash; EasyMLOps 0.1 文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="特征存储&amp;监控&amp;分析" href="cap9_storage.html" />
+    <link rel="prev" title="pipeline操作" href="cap7_pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EasyMLOps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">EasyMLOps使用文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cap1_introduce.html">简介&amp;安装&amp;反馈</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap2_table.html">Table任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap3_nlp.html">NLP任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap4_mem_opt.html">内存优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap5_persistence.html">持久化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap6_pipe.html">自定义pipe模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">生产部署</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#flask">flask部署</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">日志记录</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">测试</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">一致性测试&amp;性能测试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">空值测试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">极端值测试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">数据类型反转测试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intfloat">int转float测试</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#auto-test">自动测试：auto_test</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EasyMLOps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">生产部署</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cap8_deploy.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>生产部署<a class="headerlink" href="#id1" title="此标题的永久链接">¶</a></h1>
+<p>首先训练一个简单模型</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span><span class="c1">#与easymlops同级目录</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/demo.csv&quot;</span><span class="p">)</span>
+<span class="n">x_train</span><span class="o">=</span><span class="n">data</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span>
+<span class="n">x_test</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">500</span><span class="p">:]</span>
+<span class="n">y_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="n">y_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops</span> <span class="kn">import</span> <span class="n">TablePipeLine</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.encoding</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">TargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x1a71f8f3ac8&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">({})</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;Age&#39;: 0, &#39;Fare&#39;: 0, &#39;Embarked&#39;: 1.0}
+</pre></div>
+</div>
+<section id="flask">
+<h2>flask部署<a class="headerlink" href="#flask" title="此标题的永久链接">¶</a></h2>
+<p>将transform_single的结果返回即可，如下极简单的方式即可发布rest接口</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span><span class="n">request</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+ 
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/predict&#39;</span><span class="p">,</span><span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">():</span>
+    <span class="n">request_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="o">==</span><span class="s2">&quot;GET&quot;</span> <span class="k">else</span> <span class="n">request</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">request_params</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>然后，在浏览器中…</p>
+<p>输入:http://localhost:5000/predict 可以得到<code class="docutils literal notranslate"><span class="pre">{&quot;Age&quot;:0,&quot;Embarked&quot;:1.0,&quot;Fare&quot;:0}</span></code></p>
+<p>输入:http://localhost:5000/predict?Age=12&amp;Fare=8.5&amp;Embarked=S 可以得到 <code class="docutils literal notranslate"><span class="pre">{&quot;Age&quot;:</span> <span class="pre">12.0,</span> <span class="pre">&quot;Fare&quot;:</span> <span class="pre">8.5,</span> <span class="pre">&quot;Embarked&quot;:</span> <span class="pre">0.3342541436464088}</span> </code></p>
+</section>
+<section id="id2">
+<h2>日志记录<a class="headerlink" href="#id2" title="此标题的永久链接">¶</a></h2>
+<p>记录日志可以帮助我们监控系统的运行情况，以及后续做一些分析，使用方式如下</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">TablePipeLine</span><span class="p">()</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">TargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x1c07f979988&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#定义日志记录格式</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;EasyMLOps&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>需要一个字典额外补充数据的关键信息比如<code class="docutils literal notranslate"><span class="pre">user_id</span></code>,<code class="docutils literal notranslate"><span class="pre">手机号</span></code>等…方便追踪数据</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">base_log_info</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;user123&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">output</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">({</span><span class="s1">&#39;PassengerId&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="s1">&#39;Cabin&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+ <span class="s1">&#39;Pclass&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+ <span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Braund, Mr. Owen Harris&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;Sex&#39;</span><span class="p">:</span> <span class="s1">&#39;male&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;Age&#39;</span><span class="p">:</span> <span class="mf">22.0</span><span class="p">,</span>
+ <span class="s1">&#39;SibSp&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+ <span class="s1">&#39;Parch&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+ <span class="s1">&#39;Ticket&#39;</span><span class="p">:</span> <span class="s1">&#39;A/5 21171&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;Fare&#39;</span><span class="p">:</span> <span class="mf">7.25</span><span class="p">,</span>
+ <span class="s1">&#39;Embarked&#39;</span><span class="p">:</span> <span class="s1">&#39;S&#39;</span><span class="p">},</span><span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span><span class="n">log_base_dict</span><span class="o">=</span><span class="n">base_log_info</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>2023-03-03 19:02:51,631 - EasyMLOps - INFO - {&#39;step&#39;: &#39;step-0&#39;, &#39;pipe_name&#39;: &lt;class &#39;easymlops.table.preprocessing.core.FixInput&#39;&gt;, &#39;transform&#39;: {&#39;PassengerId&#39;: 1, &#39;Pclass&#39;: 3, &#39;Name&#39;: &#39;Braund, Mr. Owen Harris&#39;, &#39;Sex&#39;: &#39;male&#39;, &#39;Age&#39;: 22.0, &#39;SibSp&#39;: 1, &#39;Parch&#39;: 0, &#39;Ticket&#39;: &#39;A/5 21171&#39;, &#39;Fare&#39;: 7.25, &#39;Cabin&#39;: &#39;0&#39;, &#39;Embarked&#39;: &#39;S&#39;}, &#39;key&#39;: &#39;user123&#39;}
+2023-03-03 19:02:51,634 - EasyMLOps - INFO - {&#39;step&#39;: &#39;step-1&#39;, &#39;pipe_name&#39;: &lt;class &#39;easymlops.table.preprocessing.core.SelectCols&#39;&gt;, &#39;transform&#39;: {&#39;Age&#39;: 22.0, &#39;Fare&#39;: 7.25, &#39;Embarked&#39;: &#39;S&#39;}, &#39;key&#39;: &#39;user123&#39;}
+2023-03-03 19:02:51,634 - EasyMLOps - INFO - {&#39;step&#39;: &#39;step-2-0&#39;, &#39;pipe_name&#39;: &lt;class &#39;easymlops.table.encoding.TargetEncoding&#39;&gt;, &#39;transform&#39;: {&#39;Age&#39;: 22.0, &#39;Fare&#39;: 7.25, &#39;Embarked&#39;: 0.3342541436464088}, &#39;key&#39;: &#39;user123&#39;}
+2023-03-03 19:02:51,635 - EasyMLOps - INFO - {&#39;step&#39;: &#39;step-3&#39;, &#39;pipe_name&#39;: &lt;class &#39;easymlops.table.preprocessing.onevar_operation.FillNa&#39;&gt;, &#39;transform&#39;: {&#39;Age&#39;: 22.0, &#39;Fare&#39;: 7.25, &#39;Embarked&#39;: 0.3342541436464088}, &#39;key&#39;: &#39;user123&#39;}
+</pre></div>
+</div>
+<p>如上是pipeline记录日志的基本格式，包括这些信息：</p>
+<ul class="simple">
+<li><p>step：当前是pipeline的第几层，如果嵌套，会表示为 <code class="docutils literal notranslate"><span class="pre">step-x-x</span></code>这样的格式，比如上面的<code class="docutils literal notranslate"><span class="pre">step-2-0</span></code>，表示第2层的第0层，即TargetEncoding层</p></li>
+<li><p>pipe_name：当前层所对应的pipe模块名称</p></li>
+<li><p>transform：当前层的输出</p></li>
+<li><p>额外信息：即上面的字典补充内容，如用key来标识数据</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2>测试<a class="headerlink" href="#id3" title="此标题的永久链接">¶</a></h2>
+<p>对于表格型模型上线主要关注如下问题：</p>
+<ul class="simple">
+<li><p>性能测试：测试每个pipe模块的transform_single性能情况，包括平均耗时、cpu、内存消耗等；</p></li>
+<li><p>一致性测试：测试transform函数和transform_single函数的输出是否一致；</p></li>
+<li><p>空值测试：空值有很多表现形式，比如没有、None、np.nan、null等都是空的表现，空值测试要求不同的空的情况下的输出要一致；</p></li>
+<li><p>极端值测试：模型训练时的数据分布相对比较正常，而实际生产可能会有意外的极端值情况，比如训练时某变量都&gt;0，而生产环境传过来的值=0等等，极端值测试就是测试各种极端取值情况下，pipeline能不能正常运行</p></li>
+<li><p>类型反转测试：离线训练时，某变量是浮点数，而到了生产它变成了字符串，检测这种情况下，pipeline能不能正常运行；</p></li>
+<li><p>int转float测试：主要检验精度变化时，pipeline能否保持一致的输出；</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.classification</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">OneHotEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Pclass&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">],</span> <span class="n">drop_col</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">WOEEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ticket&quot;</span><span class="p">,</span> <span class="s2">&quot;Embarked&quot;</span><span class="p">,</span> <span class="s2">&quot;Cabin&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">,</span> <span class="s2">&quot;Pclass&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LabelEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LGBMClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span><span class="n">native_init_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;max_depth&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span><span class="n">native_fit_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;num_boost_round&quot;</span><span class="p">:</span><span class="mi">128</span><span class="p">}))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|     |         0 |        1 |
+|----:|----------:|---------:|
+| 500 | 0.923326  | 0.076674 |
+| 501 | 0.373652  | 0.626348 |
+| 502 | 0.37838   | 0.62162  |
+| 503 | 0.670166  | 0.329834 |
+| 504 | 0.0684703 | 0.93153  |
+</pre></div>
+</div>
+<section id="id4">
+<h3>一致性测试&amp;性能测试<a class="headerlink" href="#id4" title="此标题的永久链接">¶</a></h3>
+<p>这里把一致性测试和性能测试放到一起了，主要检验如下：</p>
+<ul class="simple">
+<li><p>离线训练模型和在线预测模型的一致性，即tranform和transform_single的一致性，包括：</p>
+<ul>
+<li><p>输出的shape是否一致</p></li>
+<li><p>输出的数据类型是否一致</p></li>
+<li><p>输出的column名称</p></li>
+<li><p>相同column的数值是否相等</p></li>
+</ul>
+</li>
+<li><p>transform_single对当条数据的预测性能，包括：</p>
+<ul>
+<li><p>平均预测一条数据的耗时</p></li>
+<li><p>在运行期间cpu最高使用率</p></li>
+<li><p>在运行期间内存的最大变化</p></li>
+</ul>
+</li>
+</ul>
+<p>这些可以通过调用如下函数，进行自动化测试：</p>
+<ul class="simple">
+<li><p>check_transform_function：只要有打印complete，则表示在当前测试数据上transform和transform_single的输出一致，性能测试表示为speed:[*]毫秒/每条数据，以及运行过程中cpu的最大使用率和内存变化(最大内存-最小内存)，如果有异常则会直接抛出，并中断后续pipe模块的测试</p></li>
+</ul>
+<p><strong>注意：如果对于下面回调方式不理解，可以往前看：自定义pipe模块 那里的介绍</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.callback</span> <span class="kn">import</span> <span class="n">check_transform_function_pipeline</span>
+<span class="n">table</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">check_transform_function_pipeline</span><span class="p">,</span><span class="n">x_test</span><span class="p">,</span><span class="n">sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(&lt;class &#39;easymlops.table.preprocessing.core.FixInput&#39;&gt;) module check [transform] complete,speed:[0.3ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.preprocessing.onevar_operation.FillNa&#39;&gt;) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.encoding.OneHotEncoding&#39;&gt;) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.encoding.WOEEncoding&#39;&gt;) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.encoding.LabelEncoding&#39;&gt;) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.classification.LGBMClassification&#39;&gt;) module check [transform] complete,speed:[0.5ms]/it,cpu:[0%],memory:[0K]
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3>空值测试<a class="headerlink" href="#id5" title="此标题的永久链接">¶</a></h3>
+<ul class="simple">
+<li><p>由于pandas在读取数据时会自动做类型推断，对空会有不同的处理，比如float设置为np.nan，对object设置为None或NaN</p></li>
+<li><p>而且pandas读取数据默认为批量读取批量推断，所以某一列数据空还不唯一，np.nan和None可能共存</p></li>
+</ul>
+<p>所以，这里对逐个column分别设置不同的空进行测试，测试内容：</p>
+<ul class="simple">
+<li><p>相同的空情况下，transform和transform_single是否一致</p></li>
+<li><p>不同的空的transform结果是否一致</p></li>
+</ul>
+<p>可通过<code class="docutils literal notranslate"><span class="pre">null_values=[None,</span> <span class="pre">np.nan,</span> <span class="pre">&quot;null&quot;,</span> <span class="pre">&quot;NULL&quot;,</span> <span class="pre">&quot;nan&quot;,</span> <span class="pre">&quot;NaN&quot;,</span> <span class="pre">&quot;&quot;,</span> <span class="pre">&quot;none&quot;,</span> <span class="pre">&quot;None&quot;,</span> <span class="pre">&quot;</span> <span class="pre">&quot;]</span></code>(默认)设置自定义空值</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.callback</span> <span class="kn">import</span> <span class="n">check_null_value</span>
+<span class="n">table</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">check_null_value</span><span class="p">,</span><span class="n">x_test</span><span class="p">,</span><span class="n">sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column:[PassengerId] check [null value] complete,speed:[2.23ms]/it,cpu:[100%],memory:[0K]
+column:[Pclass] check [null value] complete,speed:[2.31ms]/it,cpu:[0%],memory:[0K]
+column:[Name] check [null value] complete,speed:[2.62ms]/it,cpu:[0%],memory:[0K]
+column:[Sex] check [null value] complete,speed:[2.42ms]/it,cpu:[0%],memory:[0K]
+column:[Age] check [null value] complete,speed:[2.04ms]/it,cpu:[0%],memory:[0K]
+column:[SibSp] check [null value] complete,speed:[2.47ms]/it,cpu:[0%],memory:[0K]
+column:[Parch] check [null value] complete,speed:[2.26ms]/it,cpu:[100%],memory:[0K]
+column:[Ticket] check [null value] complete,speed:[2.9ms]/it,cpu:[0%],memory:[0K]
+column:[Fare] check [null value] complete,speed:[2.42ms]/it,cpu:[100%],memory:[0K]
+column:[Cabin] check [null value] complete,speed:[2.52ms]/it,cpu:[0%],memory:[0K]
+column:[Embarked] check [null value] complete,speed:[2.63ms]/it,cpu:[0%],memory:[0K]
+</pre></div>
+</div>
+</section>
+<section id="id6">
+<h3>极端值测试<a class="headerlink" href="#id6" title="此标题的永久链接">¶</a></h3>
+<p>通常用于训练的数据都是经过筛选的正常数据，但线上难免会有极端值混入，比如你训练的某列数据范围在<code class="docutils literal notranslate"><span class="pre">0~1</span></code>之间，如果传入一个<code class="docutils literal notranslate"><span class="pre">-1</span></code>，也许就会报错，目前</p>
+<ul class="simple">
+<li><p>对两种类型的分别进行极端测试，设置如下：</p>
+<ul>
+<li><p>数值型:设置<code class="docutils literal notranslate"><span class="pre">number_extreme_values</span> <span class="pre">=</span> <span class="pre">[np.inf,</span> <span class="pre">0.0,</span> <span class="pre">-1,</span> <span class="pre">1,</span> <span class="pre">-1e-7,</span> <span class="pre">1e-7,</span> <span class="pre">np.finfo(np.float64).min,</span> <span class="pre">np.finfo(np.float64).max]</span></code>(默认)</p></li>
+<li><p>离散型:设置<code class="docutils literal notranslate"><span class="pre">category_extreme_values</span> <span class="pre">=</span> <span class="pre">[&quot;&quot;,</span> <span class="pre">&quot;null&quot;,</span> <span class="pre">None,</span> <span class="pre">&quot;1.0&quot;,</span> <span class="pre">&quot;0.0&quot;,</span> <span class="pre">&quot;-1.0&quot;,</span> <span class="pre">&quot;-1&quot;,</span> <span class="pre">&quot;NaN&quot;,</span> <span class="pre">&quot;None&quot;]</span></code>(默认)</p></li>
+</ul>
+</li>
+<li><p>将全部特征设置为如上的极端值进行测试</p></li>
+</ul>
+<p>注意：这里只检测了transform与transform_single的一致性，不要求各极端值输入下的输出一致性(注意和上面的空值检测不一样，空值检测要求所有类型的空的输出也要一致)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.callback</span> <span class="kn">import</span> <span class="n">check_extreme_value</span>
+<span class="n">table</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">check_extreme_value</span><span class="p">,</span><span class="n">x_test</span><span class="p">,</span><span class="n">sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column:[PassengerId] check [extreme value] complete,speed:[2.29ms]/it,cpu:[10%],memory:[5205900K]
+column:[Pclass] check [extreme value] complete,speed:[2.45ms]/it,cpu:[100%],memory:[5205728K]
+column:[Name] check [extreme value] complete,speed:[2.6ms]/it,cpu:[100%],memory:[5205700K]
+column:[Sex] check [extreme value] complete,speed:[2.14ms]/it,cpu:[100%],memory:[5205624K]
+column:[Age] check [extreme value] complete,speed:[2.25ms]/it,cpu:[100%],memory:[5205468K]
+column:[SibSp] check [extreme value] complete,speed:[2.6ms]/it,cpu:[100%],memory:[5205468K]
+column:[Parch] check [extreme value] complete,speed:[2.58ms]/it,cpu:[100%],memory:[5205240K]
+column:[Ticket] check [extreme value] complete,speed:[2.5ms]/it,cpu:[100%],memory:[5205172K]
+column:[Fare] check [extreme value] complete,speed:[2.54ms]/it,cpu:[100%],memory:[5205260K]
+column:[Cabin] check [extreme value] complete,speed:[2.57ms]/it,cpu:[100%],memory:[5205324K]
+column:[Embarked] check [extreme value] complete,speed:[2.7ms]/it,cpu:[100%],memory:[5205208K]
+column:[__all__] check [extreme value] complete,speed:[2.05ms]/it,cpu:[100%],memory:[5205228K]
+</pre></div>
+</div>
+<p>极端测试的覆盖场景其实还不够，上面仅测试了单个变量取极端值的情况，而任意K(k&gt;=2)个变量取极端值的情况并没有测试（测试成本太高了），所以上面的<code class="docutils literal notranslate"><span class="pre">__all__</span></code>这个场景是直接对全部变量取不同极端值做了一次测试</p>
+</section>
+<section id="id7">
+<h3>数据类型反转测试<a class="headerlink" href="#id7" title="此标题的永久链接">¶</a></h3>
+<p>某特征入模是数据是数值，但上线后传过来的是离散值，也有可能相反，这里就对这种情况做测试，对原是数值的替换为离散做测试，对原始离散值的替换为数值，替换规则如下：</p>
+<ul class="simple">
+<li><p>原数值的，替换为：<code class="docutils literal notranslate"><span class="pre">number_inverse_values</span> <span class="pre">=</span> <span class="pre">[&quot;&quot;,</span> <span class="pre">&quot;null&quot;,</span> <span class="pre">None,</span> <span class="pre">&quot;1.0&quot;,</span> <span class="pre">&quot;0.0&quot;,</span> <span class="pre">&quot;-1.0&quot;,</span> <span class="pre">&quot;-1&quot;]</span></code>(默认)</p></li>
+<li><p>原离散的，替换为：<code class="docutils literal notranslate"><span class="pre">category_inverse_values</span> <span class="pre">=</span> <span class="pre">[0.0,</span> <span class="pre">-1,</span> <span class="pre">1,</span> <span class="pre">-1e-7,</span> <span class="pre">1e-7,</span> <span class="pre">np.finfo(np.float64).min,</span> <span class="pre">np.finfo(np.float64).max]</span></code>(默认)</p></li>
+</ul>
+<p>同样，数据类型反转测试只对transform和transform_single的一致性有要求</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.callback</span> <span class="kn">import</span> <span class="n">check_inverse_dtype</span>
+<span class="n">table</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">check_inverse_dtype</span><span class="p">,</span><span class="n">x_test</span><span class="p">,</span><span class="n">sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column:[PassengerId] check [inverse type] complete,speed:[2.02ms]/it,cpu:[0%],memory:[0K]
+column:[Pclass] check [inverse type] complete,speed:[2.78ms]/it,cpu:[100%],memory:[5539488K]
+column:[Name] check [inverse type] complete,speed:[2.44ms]/it,cpu:[100%],memory:[5539492K]
+column:[Sex] check [inverse type] complete,speed:[2.7ms]/it,cpu:[100%],memory:[5539480K]
+column:[Age] check [inverse type] complete,speed:[2.66ms]/it,cpu:[100%],memory:[5539432K]
+column:[SibSp] check [inverse type] complete,speed:[2.99ms]/it,cpu:[100%],memory:[5539428K]
+column:[Parch] check [inverse type] complete,speed:[2.79ms]/it,cpu:[100%],memory:[5539432K]
+column:[Ticket] check [inverse type] complete,speed:[2.42ms]/it,cpu:[100%],memory:[5539432K]
+column:[Fare] check [inverse type] complete,speed:[2.14ms]/it,cpu:[100%],memory:[5539416K]
+column:[Cabin] check [inverse type] complete,speed:[2.55ms]/it,cpu:[100%],memory:[5539436K]
+column:[Embarked] check [inverse type] complete,speed:[2.32ms]/it,cpu:[100%],memory:[5538952K]
+</pre></div>
+</div>
+</section>
+<section id="intfloat">
+<h3>int转float测试<a class="headerlink" href="#intfloat" title="此标题的永久链接">¶</a></h3>
+<p>pandas会将某些特征自动推断为int，而线上可能传输的是float，需要做如下测试：</p>
+<ul class="simple">
+<li><p>转float后transform和transform_single之间的一致性</p></li>
+<li><p>int和float特征通过transform后的一致性</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.callback</span> <span class="kn">import</span> <span class="n">check_int_trans_float</span>
+<span class="n">table</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">check_int_trans_float</span><span class="p">,</span><span class="n">x_test</span><span class="p">,</span><span class="n">sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>column:[PassengerId] check [int trans float] complete,speed:[3.13ms]/it,cpu:[0%],memory:[0K]
+column:[Pclass] check [int trans float] complete,speed:[1.56ms]/it,cpu:[0%],memory:[0K]
+column:[SibSp] check [int trans float] complete,speed:[3.13ms]/it,cpu:[0%],memory:[0K]
+column:[Parch] check [int trans float] complete,speed:[3.13ms]/it,cpu:[0%],memory:[0K]
+</pre></div>
+</div>
+</section>
+<section id="auto-test">
+<h3>自动测试：auto_test<a class="headerlink" href="#auto-test" title="此标题的永久链接">¶</a></h3>
+<p>就是把上面的所有测试，整合到auto_test一个函数中</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">auto_test</span><span class="p">(</span><span class="n">x_test</span><span class="p">,</span><span class="n">sample</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>###################################################################
+ 1.一致性测试和性能测试:check_transform_function                      
+###################################################################
+(&lt;class &#39;easymlops.table.preprocessing.core.FixInput&#39;&gt;) module check [transform] complete,speed:[0.3ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.preprocessing.onevar_operation.FillNa&#39;&gt;) module check [transform] complete,speed:[0.1ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.encoding.OneHotEncoding&#39;&gt;) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.encoding.WOEEncoding&#39;&gt;) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.encoding.LabelEncoding&#39;&gt;) module check [transform] complete,speed:[0.0ms]/it,cpu:[0%],memory:[0K]
+(&lt;class &#39;easymlops.table.classification.LGBMClassification&#39;&gt;) module check [transform] complete,speed:[1.9ms]/it,cpu:[0%],memory:[0K]
+
+#########################################################################################
+ 2.空值测试:check_null_value                                                           
+ null_values=[None, np.nan, &quot;null&quot;, &quot;NULL&quot;, &quot;nan&quot;, &quot;NaN&quot;, &quot;&quot;, &quot;none&quot;, &quot;None&quot;, &quot; &quot;](默认)
+########################################################################################
+column:[PassengerId] check [null value] complete,speed:[2.73ms]/it,cpu:[0%],memory:[0K]
+column:[Pclass] check [null value] complete,speed:[2.49ms]/it,cpu:[100%],memory:[0K]
+column:[Name] check [null value] complete,speed:[2.78ms]/it,cpu:[0%],memory:[0K]
+column:[Sex] check [null value] complete,speed:[2.7ms]/it,cpu:[0%],memory:[0K]
+column:[Age] check [null value] complete,speed:[2.44ms]/it,cpu:[100%],memory:[0K]
+column:[SibSp] check [null value] complete,speed:[2.83ms]/it,cpu:[100%],memory:[36K]
+column:[Parch] check [null value] complete,speed:[3.16ms]/it,cpu:[100%],memory:[0K]
+column:[Ticket] check [null value] complete,speed:[2.51ms]/it,cpu:[0%],memory:[0K]
+column:[Fare] check [null value] complete,speed:[2.47ms]/it,cpu:[100%],memory:[0K]
+column:[Cabin] check [null value] complete,speed:[2.63ms]/it,cpu:[0%],memory:[0K]
+column:[Embarked] check [null value] complete,speed:[2.43ms]/it,cpu:[0%],memory:[0K]
+
+############################################################################################################
+ 3.极端值测试:check_extreme_value                                                                            
+ number_extreme_values = [np.inf, 0.0, -1, 1, -1e-7, 1e-7, np.finfo(np.float64).min, np.finfo(np.float64).max](默认)
+ category_extreme_values = [&quot;&quot;, &quot;null&quot;, None, &quot;1.0&quot;, &quot;0.0&quot;, &quot;-1.0&quot;, &quot;-1&quot;, &quot;NaN&quot;, &quot;None&quot;](默认)                            
+###########################################################################################################
+column:[PassengerId] check [extreme value] complete,speed:[2.7ms]/it,cpu:[100%],memory:[5539868K]
+column:[Pclass] check [extreme value] complete,speed:[2.45ms]/it,cpu:[100%],memory:[5539864K]
+column:[Name] check [extreme value] complete,speed:[2.54ms]/it,cpu:[100%],memory:[5539880K]
+column:[Sex] check [extreme value] complete,speed:[2.57ms]/it,cpu:[100%],memory:[5539876K]
+column:[Age] check [extreme value] complete,speed:[2.66ms]/it,cpu:[100%],memory:[5539860K]
+column:[SibSp] check [extreme value] complete,speed:[2.68ms]/it,cpu:[100%],memory:[5539804K]
+column:[Parch] check [extreme value] complete,speed:[2.39ms]/it,cpu:[100%],memory:[5539420K]
+column:[Ticket] check [extreme value] complete,speed:[2.63ms]/it,cpu:[100%],memory:[5539364K]
+column:[Fare] check [extreme value] complete,speed:[2.38ms]/it,cpu:[100%],memory:[5539352K]
+column:[Cabin] check [extreme value] complete,speed:[2.57ms]/it,cpu:[100%],memory:[5539292K]
+column:[Embarked] check [extreme value] complete,speed:[2.54ms]/it,cpu:[100%],memory:[5539268K]
+column:[__all__] check [extreme value] complete,speed:[1.67ms]/it,cpu:[0%],memory:[0K]
+
+###############################################################################################################
+ 4.数据类型反转测试:check_inverse_dtype                                                                          
+ category_inverse_values = [0.0, -1, 1, -1e-7, 1e-7, np.finfo(np.float64).min, np.finfo(np.float64).max](默认)
+ number_inverse_values = [&quot;&quot;, &quot;null&quot;, None, &quot;1.0&quot;, &quot;0.0&quot;, &quot;-1.0&quot;, &quot;-1&quot;](默认)                                
+#############################################################################################################
+column:[PassengerId] check [inverse type] complete,speed:[2.36ms]/it,cpu:[100%],memory:[5539252K]
+column:[Pclass] check [inverse type] complete,speed:[2.7ms]/it,cpu:[100%],memory:[5539256K]
+column:[Name] check [inverse type] complete,speed:[2.62ms]/it,cpu:[100%],memory:[5539256K]
+column:[Sex] check [inverse type] complete,speed:[2.65ms]/it,cpu:[100%],memory:[5539240K]
+column:[Age] check [inverse type] complete,speed:[2.23ms]/it,cpu:[100%],memory:[5539212K]
+column:[SibSp] check [inverse type] complete,speed:[2.88ms]/it,cpu:[100%],memory:[5539236K]
+column:[Parch] check [inverse type] complete,speed:[2.57ms]/it,cpu:[100%],memory:[5539228K]
+column:[Ticket] check [inverse type] complete,speed:[2.78ms]/it,cpu:[100%],memory:[5539208K]
+column:[Fare] check [inverse type] complete,speed:[2.22ms]/it,cpu:[100%],memory:[5539208K]
+column:[Cabin] check [inverse type] complete,speed:[2.48ms]/it,cpu:[100%],memory:[5539204K]
+column:[Embarked] check [inverse type] complete,speed:[2.95ms]/it,cpu:[100%],memory:[5539208K]
+
+############################################
+ 5.int数据转float测试:check_int_trans_float                                                                                            
+############################################
+column:[PassengerId] check [int trans float] complete,speed:[1.56ms]/it,cpu:[100%],memory:[0K]
+column:[Pclass] check [int trans float] complete,speed:[3.45ms]/it,cpu:[0%],memory:[0K]
+column:[SibSp] check [int trans float] complete,speed:[2.72ms]/it,cpu:[100%],memory:[0K]
+column:[Parch] check [int trans float] complete,speed:[3.32ms]/it,cpu:[0%],memory:[0K]
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cap7_pipeline.html" class="btn btn-neutral float-left" title="pipeline操作" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cap9_storage.html" class="btn btn-neutral float-right" title="特征存储&amp;监控&amp;分析" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, zhulei227.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

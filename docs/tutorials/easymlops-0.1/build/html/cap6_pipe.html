@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>自定义pipe模块 &mdash; EasyMLOps 0.1 文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="pipeline操作" href="cap7_pipeline.html" />
+    <link rel="prev" title="持久化" href="cap5_persistence.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EasyMLOps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">EasyMLOps使用文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cap1_introduce.html">简介&amp;安装&amp;反馈</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap2_table.html">Table任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap3_nlp.html">NLP任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap4_mem_opt.html">内存优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap5_persistence.html">持久化</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">自定义pipe模块</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">pipe设计逻辑</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">最低需求：数据分析</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">持久化需求</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">保存</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">加载</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">生产需求</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id7">安全需求</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id8">扩展需求</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id9">直接添加新函数</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">回调式</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id11">高阶需求</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id12">获取父类依赖</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">挂载需求</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
+<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EasyMLOps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">自定义pipe模块</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cap6_pipe.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pipe">
+<h1>自定义pipe模块<a class="headerlink" href="#pipe" title="此标题的永久链接">¶</a></h1>
+<p>由设计逻辑出发，逐步对pipe所支持的功能展开介绍</p>
+<section id="id1">
+<h2>pipe设计逻辑<a class="headerlink" href="#id1" title="此标题的永久链接">¶</a></h2>
+<p>pipe是构成pipeline的最小执行单元，它要做到如下特性：</p>
+<ul class="simple">
+<li><p>独立：每个pipe就是一个独立的个体，这样一旦出现问题，通常只需要修复问题pipe模块，不需要去review全局代码；</p></li>
+<li><p>全面：同时每个pipe又要做到<strong>麻雀虽小、五脏俱全</strong>，它需要再自己内部完成模型的训练、预测、生产预测等基本功能；</p></li>
+<li><p>通用：所有pipe应该遵循同一套标准，规范输入和输出，这样对外调用透明，pipeline可以方便的流转整合这些pipe</p></li>
+</ul>
+<p>功能层面，按需求层次可以拆分如下：</p>
+<ul class="simple">
+<li><p>最低需求-数据分析：只需要完成对数据的fit和transform即可</p></li>
+<li><p>持久化需求：还想要复用模块，那就需要实现set_params和get_params</p></li>
+<li><p>生产需求：需要实现transform_single，保证与transform一致</p></li>
+<li><p>安全需求：更稳健的函数实现方式</p></li>
+<li><p>扩展需求：</p>
+<ul>
+<li><p>自行定义添加新函数：后续在pipeline中会介绍如果获取到pipe并调用</p></li>
+<li><p>回调函数的方式：这样不会使得pipe越来越臃肿，只保留自身相关的功能</p></li>
+</ul>
+</li>
+<li><p>高阶需求：</p>
+<ul>
+<li><p>依赖需求：获取当前pipe的前置pipe以完成一些需求，比如调用前置pipe的transform</p></li>
+<li><p>挂载需求：当前pipe需要后续执行一些额外的操作，但这些操作又不需要在作用在pipeline中，比如记录当前pipe的输出，这是可以将额外操作封装为一个pipe，并设置为branch_pipe即可</p></li>
+</ul>
+</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#准备数据</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span><span class="c1">#与easymlops同级目录</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/demo.csv&quot;</span><span class="p">)</span>
+<span class="n">x_train</span><span class="o">=</span><span class="n">data</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span>
+<span class="n">x_test</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">500</span><span class="p">:]</span>
+<span class="n">y_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="n">y_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>最低需求：数据分析<a class="headerlink" href="#id2" title="此标题的永久链接">¶</a></h2>
+<p>如果只是临时性的数据分析，而且需要用到easymlops的其他pipe模块，那么只需要实现fit和transform即融入，下面以TargetEncoding举例</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops</span> <span class="kn">import</span> <span class="n">TablePipeLine</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.encoding</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.perfopt</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.decomposition</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UDFTargetEncoding</span><span class="p">(</span><span class="n">TablePipeObjectBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">error_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="n">tmp_</span> <span class="o">=</span> <span class="n">s</span><span class="p">[[</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;y_&quot;</span><span class="p">]]</span>
+            <span class="n">col_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp_</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;y_&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]})</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_map</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+</pre></div>
+</div>
+<p>我们看到这个类里面定义了3个函数，它们的功能如下：</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__init__</span></code>函数：这是对象初始化函数，在新建对象的时候就会调用的函数（如果不清楚，可以补充一下python面向对象编程方面的知识），然后有几个入参，<code class="docutils literal notranslate"><span class="pre">y</span></code>即是<code class="docutils literal notranslate"><span class="pre">target</span></code>，<code class="docutils literal notranslate"><span class="pre">cols</span></code>表示要对那些列做encoding，<code class="docutils literal notranslate"><span class="pre">error_value</span></code>表示预测阶段不被命中的target encoding的默认值；同时通过<code class="docutils literal notranslate"><span class="pre">self.xxx</span></code>将这些参数共享（变量名称前加<code class="docutils literal notranslate"><span class="pre">self.</span></code>表示为成员变量，可以在各成员函数中共享），新建立了一个<code class="docutils literal notranslate"><span class="pre">self.target_map_detail</span></code>用于记录各col的各个取值对应的targetencoding值，另外这里面有个<code class="docutils literal notranslate"><span class="pre">super().__init__()</span></code>它表示调用父类<code class="docutils literal notranslate"><span class="pre">TablePipeObjectBase</span></code>中的初始化方法</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fit</span></code>函数：fit阶段将cols中的col逐个取出，并与y拼接，对col中各取值做分组求y的均值，然后将其对应关系保存到<code class="docutils literal notranslate"><span class="pre">self.target_map_detail</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transform</span></code>函数：拿到各col的map关系，做map即可</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">UDFTargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|     |   Age |     Fare |   Embarked |
+|----:|------:|---------:|-----------:|
+| 500 |    17 |  8.66406 |   0.334254 |
+| 501 |    21 |  7.75    |   0.511111 |
+| 502 |   nan |  7.62891 |   0.511111 |
+| 503 |    37 |  9.58594 |   0.334254 |
+| 504 |    16 | 86.5     |   0.334254 |
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>持久化需求<a class="headerlink" href="#id3" title="此标题的永久链接">¶</a></h2>
+<p>但这时我们的模型还只能临时用一用，想保留下来留着下次使用还得实现另外一组函数get_params和set_params，</p>
+<ul class="simple">
+<li><p>get_params：将告诉上层，需要持久化的参数有那些</p></li>
+<li><p>set_params：是上层给你这个参数，你要怎么还原为成员变量</p></li>
+</ul>
+<p>具体要保留那些参数，最小要求是transform所需的那些，接下来加入get_params和set_params</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UDFTargetEncoding</span><span class="p">(</span><span class="n">TablePipeObjectBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">error_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="n">tmp_</span> <span class="o">=</span> <span class="n">s</span><span class="p">[[</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;y_&quot;</span><span class="p">]]</span>
+            <span class="n">col_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp_</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;y_&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]})</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_map</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#获取父类的params</span>
+        <span class="n">params</span><span class="o">=</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="c1">#加入当前的参数</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">,</span> <span class="s2">&quot;error_value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">,</span><span class="s2">&quot;cols&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">params</span>
+    
+    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1">#设置父类的params</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1">#再设置当前层的params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;error_value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cols&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>这里需要注意父类里面还有参数需要保存，所以有<code class="docutils literal notranslate"><span class="pre">super().get_params()</span></code>和<code class="docutils literal notranslate"><span class="pre">super().set_params(params)</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">UDFTargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|     |   Age |     Fare |   Embarked |
+|----:|------:|---------:|-----------:|
+| 500 |    17 |  8.66406 |   0.334254 |
+| 501 |    21 |  7.75    |   0.511111 |
+| 502 |   nan |  7.62891 |   0.511111 |
+| 503 |    37 |  9.58594 |   0.334254 |
+| 504 |    16 | 86.5     |   0.334254 |
+</pre></div>
+</div>
+<section id="id4">
+<h3>保存<a class="headerlink" href="#id4" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;table.pkl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3>加载<a class="headerlink" href="#id5" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">UDFTargetEncoding</span><span class="p">())</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;table.pkl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|     |   Age |     Fare |   Embarked |
+|----:|------:|---------:|-----------:|
+| 500 |    17 |  8.66406 |   0.334254 |
+| 501 |    21 |  7.75    |   0.511111 |
+| 502 |   nan |  7.62891 |   0.511111 |
+| 503 |    37 |  9.58594 |   0.334254 |
+| 504 |    16 | 86.5     |   0.334254 |
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id6">
+<h2>生产需求<a class="headerlink" href="#id6" title="此标题的永久链接">¶</a></h2>
+<p>线上生产环境需要：</p>
+<p>1）更加快速的预测；</p>
+<p>2）输入数据格式通常是json；</p>
+<p>为了匹配生产，单独设计的了另一个函数transform_single，用于生产上的数据预测，它的输入是dict格式(解析json后),要求输出要与transform的一致</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UDFTargetEncoding</span><span class="p">(</span><span class="n">TablePipeObjectBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">error_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="n">tmp_</span> <span class="o">=</span> <span class="n">s</span><span class="p">[[</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;y_&quot;</span><span class="p">]]</span>
+            <span class="n">col_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp_</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;y_&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]})</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_map</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">transform_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#获取父类的params</span>
+        <span class="n">params</span><span class="o">=</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="c1">#加入当前的参数</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">,</span> <span class="s2">&quot;error_value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">,</span><span class="s2">&quot;cols&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">params</span>
+
+    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="c1">#设置父类的params</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1">#再设置当前层的params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;error_value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cols&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">UDFTargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|     |   Age |     Fare |   Embarked |
+|----:|------:|---------:|-----------:|
+| 500 |    17 |  8.66406 |   0.334254 |
+| 501 |    21 |  7.75    |   0.511111 |
+| 502 |   nan |  7.62891 |   0.511111 |
+| 503 |    37 |  9.58594 |   0.334254 |
+| 504 |    16 | 86.5     |   0.334254 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#取第一条数据</span>
+<span class="n">record</span><span class="o">=</span><span class="n">x_test</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">record</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;PassengerId&#39;: 501,
+ &#39;Pclass&#39;: 3,
+ &#39;Name&#39;: &#39;Calic, Mr. Petar&#39;,
+ &#39;Sex&#39;: &#39;male&#39;,
+ &#39;Age&#39;: 17.0,
+ &#39;SibSp&#39;: 0,
+ &#39;Parch&#39;: 0,
+ &#39;Ticket&#39;: &#39;315086&#39;,
+ &#39;Fare&#39;: 8.6625,
+ &#39;Cabin&#39;: nan,
+ &#39;Embarked&#39;: &#39;S&#39;}
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;Age&#39;: 17.0, &#39;Fare&#39;: 8.664, &#39;Embarked&#39;: 0.3342541436464088}
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h2>安全需求<a class="headerlink" href="#id7" title="此标题的永久链接">¶</a></h2>
+<p>以上5个函数的实现几乎可以让项目上线了，但还存在一些安全隐患，比如：</p>
+<ul class="simple">
+<li><p>输入输出数据的类型是否有校验</p></li>
+<li><p>输入输出数据的顺序是否就校验</p></li>
+<li><p>set_params和get_params时有可能搞忘记存储父类的params</p></li>
+<li><p>当前命名的参数与父类的参数名称可能有冲突</p></li>
+</ul>
+<p>为了更加安全，可以将上面实现的fit,transform,transform_single,set_params和get_params修改为udf_fit,udf_transform,udf_transform_single,udf_set_params,udf_get_params，内置的方法会帮你自动完成这些检验</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UDFTargetEncoding</span><span class="p">(</span><span class="n">TablePipeObjectBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">error_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">udf_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="n">tmp_</span> <span class="o">=</span> <span class="n">s</span><span class="p">[[</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;y_&quot;</span><span class="p">]]</span>
+            <span class="n">col_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp_</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;y_&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]})</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_map</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">udf_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">udf_transform_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">udf_get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">,</span> <span class="s2">&quot;error_value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">,</span><span class="s2">&quot;cols&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">udf_set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;error_value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cols&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>这里，添加了udf前缀后，就不需要考虑父类的params了</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">UDFTargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|     |   Age |     Fare |   Embarked |
+|----:|------:|---------:|-----------:|
+| 500 |    17 |  8.66406 |   0.334254 |
+| 501 |    21 |  7.75    |   0.511111 |
+| 502 |   nan |  7.62891 |   0.511111 |
+| 503 |    37 |  9.58594 |   0.334254 |
+| 504 |    16 | 86.5     |   0.334254 |
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h2>扩展需求<a class="headerlink" href="#id8" title="此标题的永久链接">¶</a></h2>
+<p>上面这些函数是一些必需的函数，但我们同时还有一些额外自己的需求，比如我想要一个函数用来返回target encoding的具体map细节 ，这里有两种实现方式</p>
+<section id="id9">
+<h3>直接添加新函数<a class="headerlink" href="#id9" title="此标题的永久链接">¶</a></h3>
+<p>这种方法最简单直接了，如下加了一个<code class="docutils literal notranslate"><span class="pre">show_detail</span></code>函数</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UDFTargetEncoding</span><span class="p">(</span><span class="n">TablePipeObjectBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_value</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">error_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">udf_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="n">tmp_</span> <span class="o">=</span> <span class="n">s</span><span class="p">[[</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;y_&quot;</span><span class="p">]]</span>
+            <span class="n">col_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp_</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;y_&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]})</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_map</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">show_detail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">map_detail</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">bin_value</span><span class="p">,</span> <span class="n">target_value</span> <span class="ow">in</span> <span class="n">map_detail</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">col</span><span class="p">,</span> <span class="n">bin_value</span><span class="p">,</span> <span class="n">target_value</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="s2">&quot;bin_value&quot;</span><span class="p">,</span> <span class="s2">&quot;target_value&quot;</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">udf_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">udf_transform_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">udf_get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">,</span> <span class="s2">&quot;error_value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">,</span><span class="s2">&quot;cols&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">udf_set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;error_value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cols&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">UDFTargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x261d04cdc08&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">show_detail</span><span class="p">()</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    | col      | bin_value   |   target_value |
+|---:|:---------|:------------|---------------:|
+|  0 | Embarked | C           |       0.521739 |
+|  1 | Embarked | Q           |       0.511111 |
+|  2 | Embarked | S           |       0.334254 |
+|  3 | Embarked | nan         |       1        |
+</pre></div>
+</div>
+<p>这里<code class="docutils literal notranslate"><span class="pre">table[-1]</span></code>表示拿到<code class="docutils literal notranslate"><span class="pre">table</span></code>这个pipeline的<code class="docutils literal notranslate"><span class="pre">-1</span></code>层的pipe模块，具体的获取方式将会在后续pipeline中介绍</p>
+</section>
+<section id="id10">
+<h3>回调式<a class="headerlink" href="#id10" title="此标题的永久链接">¶</a></h3>
+<p>上面这种方式有两个显著的缺点：</p>
+<ul class="simple">
+<li><p>如果这个TargetEncoding类是别人写好了，你没法直接修改别人的代码</p></li>
+<li><p>就算这个类是自己写的，随着添加的自定义方法越来越多，维护将会越来越困难</p></li>
+</ul>
+<p>所以，这里将一些额外功能剥离出去，统一通过回调的方式来增加新功能，回调定义以及实现在最顶层父类的方法中了，所以上面的类无需再自己实现即可进行回调，父类中的callback定义如下：</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_func</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">return_callback_result</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">callback_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_callback_result</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>这里，<code class="docutils literal notranslate"><span class="pre">callback_func</span></code>即外部的回调函数定义，回调函数的第一个入场为<code class="docutils literal notranslate"><span class="pre">self</span></code>，即当前调用者这个pipe，第二个为<code class="docutils literal notranslate"><span class="pre">data</span></code>即需要传入的参数，后续<code class="docutils literal notranslate"><span class="pre">args</span></code>和<code class="docutils literal notranslate"><span class="pre">kwargs</span></code>为其他扩展参数，下面看看如果外部定义<code class="docutils literal notranslate"><span class="pre">show_detail</span></code>（可以发现只需要把<code class="docutils literal notranslate"><span class="pre">self</span></code>换成另外一个变量名称即可）</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">show_detail</span><span class="p">(</span><span class="n">pipe_object</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">map_detail</span> <span class="ow">in</span> <span class="n">pipe_object</span><span class="o">.</span><span class="n">target_map_detail</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">bin_value</span><span class="p">,</span> <span class="n">target_value</span> <span class="ow">in</span> <span class="n">map_detail</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">col</span><span class="p">,</span> <span class="n">bin_value</span><span class="p">,</span> <span class="n">target_value</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="s2">&quot;bin_value&quot;</span><span class="p">,</span> <span class="s2">&quot;target_value&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#内部定义的show_detail去掉</span>
+<span class="k">class</span> <span class="nc">UDFTargetEncoding</span><span class="p">(</span><span class="n">TablePipeObjectBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">error_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">udf_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="n">tmp_</span> <span class="o">=</span> <span class="n">s</span><span class="p">[[</span><span class="n">col</span><span class="p">,</span> <span class="s2">&quot;y_&quot;</span><span class="p">]]</span>
+            <span class="n">col_map</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp_</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;y_&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]})</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_map</span>
+        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;y_&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">udf_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">udf_transform_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">col</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">udf_get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span><span class="p">,</span> <span class="s2">&quot;error_value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span><span class="p">,</span><span class="s2">&quot;cols&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">udf_set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_map_detail</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;target_map_detail&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;error_value&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cols&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SelectCols</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">UDFTargetEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Embarked&quot;</span><span class="p">],</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x2b736dbe248&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">show_detail</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">return_callback_result</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    | col      | bin_value   |   target_value |
+|---:|:---------|:------------|---------------:|
+|  0 | Embarked | C           |       0.521739 |
+|  1 | Embarked | Q           |       0.511111 |
+|  2 | Embarked | S           |       0.334254 |
+|  3 | Embarked | nan         |       1        |
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id11">
+<h2>高阶需求<a class="headerlink" href="#id11" title="此标题的永久链接">¶</a></h2>
+<section id="id12">
+<h3>获取父类依赖<a class="headerlink" href="#id12" title="此标题的永久链接">¶</a></h3>
+<p>有时候，我们需要拿到父类的pipe对象做一些操作，如果对新的x重复运行父类的transform，这里内置pipeline已经帮忙完成了依赖关系的设置(必需通过xxx.pipe(xxx)方式添加pipe才会自动设置依赖关系 )，可以通过如下俩函数，获取直接父类对象，以及所有父类对象的列表</p>
+<ul class="simple">
+<li><p>get_parent_pipe</p></li>
+<li><p>get_all_parent_pipes</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_parent_pipe</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.preprocessing.core.SelectCols at 0x2b736e35508&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_all_parent_pipes</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;easymlops.table.preprocessing.core.FixInput at 0x2b736db8b88&gt;,
+ &lt;easymlops.table.preprocessing.core.SelectCols at 0x2b736e35508&gt;]
+</pre></div>
+</div>
+</section>
+<section id="id13">
+<h3>挂载需求<a class="headerlink" href="#id13" title="此标题的永久链接">¶</a></h3>
+<p>我们另外还需要做些额外的功能，比如保存当前模块的输出结果到某些数据库，或者做一些监控，或者做一些实时/定时的分析等等….这些主流程以外的操作，都可以通过挂载的方式追加到当前pipe之后，这里主要通过下面3个函数来实现</p>
+<ul class="simple">
+<li><p>set_branch_pipe：为当前pipe挂载一个pipe，挂载pipe分别再宿主pipe的fit,transform,transform_single后，运行自己的fit,transform,transform_single</p></li>
+<li><p>get_branch_pipe：由于可以设置多个挂载pipe，通过get_branch_pipe传入一个index获取到想要的挂载pipe</p></li>
+<li><p>remove_branch_pipe：更具传入的index，移除不需要的pipe</p></li>
+</ul>
+<p>比如下面，引入一个存储模块，将TargetEncoding的输出保存到本地</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.storage</span> <span class="kn">import</span> <span class="n">LocalStorage</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_branch_pipe</span><span class="p">(</span><span class="n">LocalStorage</span><span class="p">(</span><span class="n">db_name</span><span class="o">=</span><span class="s2">&quot;./local.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;target_output&quot;</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">,</span><span class="s2">&quot;Fare&quot;</span><span class="p">,</span><span class="s2">&quot;Embarked&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#模拟线上预测一条数据</span>
+<span class="n">record</span><span class="o">=</span><span class="n">x_test</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">record</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;PassengerId&#39;: 501,
+ &#39;Pclass&#39;: 3,
+ &#39;Name&#39;: &#39;Calic, Mr. Petar&#39;,
+ &#39;Sex&#39;: &#39;male&#39;,
+ &#39;Age&#39;: 17.0,
+ &#39;SibSp&#39;: 0,
+ &#39;Parch&#39;: 0,
+ &#39;Ticket&#39;: &#39;315086&#39;,
+ &#39;Fare&#39;: 8.6625,
+ &#39;Cabin&#39;: nan,
+ &#39;Embarked&#39;: &#39;S&#39;}
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="mi">501</span><span class="p">})</span><span class="c1">#这里需要额外传入也给key，标识数据的唯一ID</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;Age&#39;: 17.0, &#39;Fare&#39;: 8.664, &#39;Embarked&#39;: 0.3342541436464088}
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="mi">501</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   key | transform_time      |   Age |   Fare |   Embarked |
+|---:|------:|:--------------------|------:|-------:|-----------:|
+|  0 |   501 | 2023-03-02 15:02:11 |    17 |  8.664 |   0.334254 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cap5_persistence.html" class="btn btn-neutral float-left" title="持久化" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cap7_pipeline.html" class="btn btn-neutral float-right" title="pipeline操作" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, zhulei227.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

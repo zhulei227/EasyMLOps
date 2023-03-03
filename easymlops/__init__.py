@@ -1,3 +1,8 @@
-__version__ = "0.0.9"
+__version__ = "0.1"
 
-from .pipeml import PipeML
+from .table.core import TablePipeLine
+from .nlp.core import NLPPipeline
+
+import warnings
+
+warnings.filterwarnings("ignore")
