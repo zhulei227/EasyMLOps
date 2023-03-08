@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>easymlops.table.core package &mdash; EasyMLOps  文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="easymlops.table.extend package" href="easymlops.table.extend.html" />
+    <link rel="prev" title="easymlops.table.callback package" href="easymlops.table.callback.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EasyMLOps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">EasyMLOps使用文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cap1_introduce.html">简介&amp;安装&amp;反馈</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap2_table.html">Table任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap3_nlp.html">NLP任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap4_mem_opt.html">内存优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap5_persistence.html">持久化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap6_pipe.html">自定义pipe模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.1)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="easymlops.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="easymlops.core.html">easymlops.core package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="easymlops.nlp.html">easymlops.nlp package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="easymlops.table.html">easymlops.table package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="easymlops.table.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.classification">easymlops.table.classification module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.decomposition">easymlops.table.decomposition module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.encoding">easymlops.table.encoding module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.ensemble">easymlops.table.ensemble module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.perfopt">easymlops.table.perfopt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.regression">easymlops.table.regression module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="easymlops.html#module-easymlops">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EasyMLOps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="easymlops.html">API Refrence(Version=0.1.1)</a></li>
+          <li class="breadcrumb-item"><a href="easymlops.table.html">easymlops.table package</a></li>
+      <li class="breadcrumb-item active">easymlops.table.core package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/easymlops.table.core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="easymlops-table-core-package">
+<h1>easymlops.table.core package<a class="headerlink" href="#easymlops-table-core-package" title="此标题的永久链接">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="此标题的永久链接">¶</a></h2>
+</section>
+<section id="module-easymlops.table.core.pipe_object">
+<span id="easymlops-table-core-pipe-object-module"></span><h2>easymlops.table.core.pipe_object module<a class="headerlink" href="#module-easymlops.table.core.pipe_object" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.core.pipe_object.</span></span><span class="sig-name descname"><span class="pre">TablePipeObjectBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_check_max_number_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_check_transform_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_check_transform_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_check_transform_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leak_check_transform_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase" title="easymlops.core.pipe_object.PipeObjectBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">PipeObjectBase</span></code></a></p>
+<p>Table型模型的PipeBase</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.after_fit">
+<span class="sig-name descname"><span class="pre">after_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.after_fit" title="永久链接至目标">¶</a></dt>
+<dd><p>fit后操作</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.after_transform">
+<span class="sig-name descname"><span class="pre">after_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.after_transform" title="永久链接至目标">¶</a></dt>
+<dd><p>udf_transform之后调用</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.after_transform_single">
+<span class="sig-name descname"><span class="pre">after_transform_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.after_transform_single" title="永久链接至目标">¶</a></dt>
+<dd><p>udf_transform_single之后调用</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.before_fit">
+<span class="sig-name descname"><span class="pre">before_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.before_fit" title="永久链接至目标">¶</a></dt>
+<dd><p>fit前预操作</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.before_transform">
+<span class="sig-name descname"><span class="pre">before_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.before_transform" title="永久链接至目标">¶</a></dt>
+<dd><p>udf_transform之前调用</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.before_transform_single">
+<span class="sig-name descname"><span class="pre">before_transform_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.before_transform_single" title="永久链接至目标">¶</a></dt>
+<dd><p>udf_transform_single之前调用</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.check_key_conflict">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_key_conflict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.check_key_conflict" title="永久链接至目标">¶</a></dt>
+<dd><p>检测param1和param2中的key是否有冲突</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> – </p></li>
+<li><p><strong>param2</strong> – </p></li>
+<li><p><strong>class1</strong> – </p></li>
+<li><p><strong>class2</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.check_list_same">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_list_same</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.check_list_same" title="永久链接至目标">¶</a></dt>
+<dd><p>比较俩列表元素是否完全相同</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>list1</strong> – </p></li>
+<li><p><strong>list2</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.extract_dict">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.extract_dict" title="永久链接至目标">¶</a></dt>
+<dd><p>从s中抽取指定的keys</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>keys</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.fit" title="永久链接至目标">¶</a></dt>
+<dd><p>fit:依次调用before_fit,_fit,after_fit</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.get_all_parent_pipes">
+<span class="sig-name descname"><span class="pre">get_all_parent_pipes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.get_all_parent_pipes" title="永久链接至目标">¶</a></dt>
+<dd><p>获取所有前置pipe 列表</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.get_branch_pipe">
+<span class="sig-name descname"><span class="pre">get_branch_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.get_branch_pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>获取指定index的branch pipe</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.get_col_type">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_col_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pandas_col_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.get_col_type" title="永久链接至目标">¶</a></dt>
+<dd><p>获取当前col的数据类型</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pandas_col_type</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.get_master_pipe">
+<span class="sig-name descname"><span class="pre">get_master_pipe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.get_master_pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>获取绑定的master pipe</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.get_match_values_index">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_match_values_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.get_match_values_index" title="永久链接至目标">¶</a></dt>
+<dd><p>获取当前x的值是否匹配values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.get_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.get_parent_pipe">
+<span class="sig-name descname"><span class="pre">get_parent_pipe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.get_parent_pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>获取直接前置的pipe</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.remove_branch_pipe">
+<span class="sig-name descname"><span class="pre">remove_branch_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.remove_branch_pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>移除指定index的branch pipe</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.set_branch_pipe">
+<span class="sig-name descname"><span class="pre">set_branch_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipe_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.set_branch_pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>设置 branch pipe</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pipe_obj</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.set_master_pipe">
+<span class="sig-name descname"><span class="pre">set_master_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master_pipe</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.set_master_pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>设置master_pipe，这个函数是被pipeline调用的，当前pipe的角色是branch pipe</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>master_pipe</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.set_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.set_parent_pipe">
+<span class="sig-name descname"><span class="pre">set_parent_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_pipe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.set_parent_pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>设置前置的pipe，被pipeline调用</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parent_pipe</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.transform" title="永久链接至目标">¶</a></dt>
+<dd><p>批量接口:依次调用before_transform,_transform,after_transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.transform_all_parent">
+<span class="sig-name descname"><span class="pre">transform_all_parent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.transform_all_parent" title="永久链接至目标">¶</a></dt>
+<dd><p>将所有前置的pipe顺序执行一次transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>show_process</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.transform_single">
+<span class="sig-name descname"><span class="pre">transform_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.transform_single" title="永久链接至目标">¶</a></dt>
+<dd><p>单条数据接口:调用顺序before_transform_single,_transform_single,after_transform_single</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.transform_single_all_parent">
+<span class="sig-name descname"><span class="pre">transform_single_all_parent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.transform_single_all_parent" title="永久链接至目标">¶</a></dt>
+<dd><p>将所有前置的pipe顺序执行一次transform_single</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>show_process</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.udf_fit">
+<span class="sig-name descname"><span class="pre">udf_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.udf_fit" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.udf_get_params">
+<span class="sig-name descname"><span class="pre">udf_get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.udf_get_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.udf_set_params">
+<span class="sig-name descname"><span class="pre">udf_set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.udf_set_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.udf_transform">
+<span class="sig-name descname"><span class="pre">udf_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.udf_transform" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipe_object.TablePipeObjectBase.udf_transform_single">
+<span class="sig-name descname"><span class="pre">udf_transform_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipe_object.TablePipeObjectBase.udf_transform_single" title="永久链接至目标">¶</a></dt>
+<dd><p>单条数据接口，生产部署用</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.core.pipeline_object">
+<span id="easymlops-table-core-pipeline-object-module"></span><h2>easymlops.table.core.pipeline_object module<a class="headerlink" href="#module-easymlops.table.core.pipeline_object" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.core.pipeline_object.</span></span><span class="sig-name descname"><span class="pre">TablePipeLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_to_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TablePipeObjectBase</span></code></a></p>
+<p>表格型模型的PipeLine，注意继承的是TablePipeObjectBase</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.auto_test">
+<span class="sig-name descname"><span class="pre">auto_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.auto_test" title="永久链接至目标">¶</a></dt>
+<dd><p>自动测试接口</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>sample</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.fit" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>show_process</strong> – 是否打印训练过程</p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.get_params" title="永久链接至目标">¶</a></dt>
+<dd><p>获取整个pipeline的参数</p>
+<dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.load" title="永久链接至目标">¶</a></dt>
+<dd><p>从path路径加载模型</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.pipe">
+<span class="sig-name descname"><span class="pre">pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.pipe" title="永久链接至目标">¶</a></dt>
+<dd><p>添加新pipe</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.save" title="永久链接至目标">¶</a></dt>
+<dd><p>存储模型至path路径</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.set_dependency">
+<span class="sig-name descname"><span class="pre">set_dependency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.set_dependency" title="永久链接至目标">¶</a></dt>
+<dd><p>设置model与之前model的依赖关系</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.set_params" title="永久链接至目标">¶</a></dt>
+<dd><p>设置整个pipeline的参数</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_to_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.transform" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>show_process</strong> – 可视化训练过程</p></li>
+<li><p><strong>run_to_layer</strong> – 只运行至指定的index</p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.core.pipeline_object.TablePipeLine.transform_single">
+<span class="sig-name descname"><span class="pre">transform_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_process</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_to_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_base_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_base_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.core.pipeline_object.TablePipeLine.transform_single" title="永久链接至目标">¶</a></dt>
+<dd><p>生成部署用于单条数据预测</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>show_process</strong> – 可视化预测过程</p></li>
+<li><p><strong>run_to_layer</strong> – 运行至指定的index</p></li>
+<li><p><strong>logger</strong> – 记录日志，需要提供info和error函数</p></li>
+<li><p><strong>prefix</strong> – 打印日志阶段所用的前缀</p></li>
+<li><p><strong>log_base_dict</strong> – 记录日志的额外补充信息（主要是key）</p></li>
+<li><p><strong>storage_base_dict</strong> – 存储模块调用时的额外补充信息（主要是key）</p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-easymlops.table.core" title="此标题的永久链接">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="easymlops.table.callback.html" class="btn btn-neutral float-left" title="easymlops.table.callback package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="easymlops.table.extend.html" class="btn btn-neutral float-right" title="easymlops.table.extend package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, zhulei227.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -5,9 +5,11 @@ pandas>=0.25
 scipy
 scikit-learn>=0.21
 #psutil
-#sqlite
 #gensim
 #pyyaml<=5.4
 #lightgbm
 #jieba
 #pyahocorasick
+#sqlite
+#happybase
+#func_timeout

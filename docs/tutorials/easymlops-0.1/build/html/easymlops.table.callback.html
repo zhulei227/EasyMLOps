@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>easymlops.table.callback package &mdash; EasyMLOps  文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="easymlops.table.core package" href="easymlops.table.core.html" />
+    <link rel="prev" title="easymlops.table package" href="easymlops.table.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EasyMLOps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">EasyMLOps使用文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cap1_introduce.html">简介&amp;安装&amp;反馈</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap2_table.html">Table任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap3_nlp.html">NLP任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap4_mem_opt.html">内存优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap5_persistence.html">持久化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap6_pipe.html">自定义pipe模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.1)</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="easymlops.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="easymlops.core.html">easymlops.core package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="easymlops.nlp.html">easymlops.nlp package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="easymlops.table.html">easymlops.table package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="easymlops.table.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.classification">easymlops.table.classification module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.decomposition">easymlops.table.decomposition module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.encoding">easymlops.table.encoding module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.ensemble">easymlops.table.ensemble module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.perfopt">easymlops.table.perfopt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table.regression">easymlops.table.regression module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="easymlops.table.html#module-easymlops.table">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="easymlops.html#module-easymlops">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EasyMLOps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="easymlops.html">API Refrence(Version=0.1.1)</a></li>
+          <li class="breadcrumb-item"><a href="easymlops.table.html">easymlops.table package</a></li>
+      <li class="breadcrumb-item active">easymlops.table.callback package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/easymlops.table.callback.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="easymlops-table-callback-package">
+<h1>easymlops.table.callback package<a class="headerlink" href="#easymlops-table-callback-package" title="此标题的永久链接">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="此标题的永久链接">¶</a></h2>
+</section>
+<section id="module-easymlops.table.callback.check">
+<span id="easymlops-table-callback-check-module"></span><h2>easymlops.table.callback.check module<a class="headerlink" href="#module-easymlops.table.callback.check" title="此标题的永久链接">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_columns">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_transform</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_columns" title="永久链接至目标">¶</a></dt>
+<dd><p>检测离线批量和在线单条的输出的columns是否一致</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> – </p></li>
+<li><p><strong>batch_transform</strong> – </p></li>
+<li><p><strong>single_transform</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_data_same">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_data_same</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><span class="pre">TablePipeObjectBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_transform</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_data_same" title="永久链接至目标">¶</a></dt>
+<dd><p>检测离线批量和在线单条的输出的数值是否一致</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>batch_transform</strong> – </p></li>
+<li><p><strong>single_transform</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_data_type">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_data_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><span class="pre">TablePipeObjectBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_transform</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_data_type" title="永久链接至目标">¶</a></dt>
+<dd><p>检测离线批量和在线单条的输出的数据类型是否一致</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>batch_transform</strong> – </p></li>
+<li><p><strong>single_transform</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_extreme_value">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_extreme_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine" title="easymlops.table.core.pipeline_object.TablePipeLine"><span class="pre">TablePipeLine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_extreme_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_extreme_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_extreme_value" title="永久链接至目标">¶</a></dt>
+<dd><p>检验输入极端值的情况下，还能不能有输出</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>sample</strong> – </p></li>
+<li><p><strong>number_extreme_values</strong> – </p></li>
+<li><p><strong>category_extreme_values</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_int_trans_float">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_int_trans_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine" title="easymlops.table.core.pipeline_object.TablePipeLine"><span class="pre">TablePipeLine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_int_trans_float" title="永久链接至目标">¶</a></dt>
+<dd><p>将原始int数据类型转为float</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>sample</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_inverse_dtype">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_inverse_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine" title="easymlops.table.core.pipeline_object.TablePipeLine"><span class="pre">TablePipeLine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_inverse_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_inverse_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_inverse_dtype" title="永久链接至目标">¶</a></dt>
+<dd><p>检测数据类型反转后，还能不能跑出结果</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>sample</strong> – </p></li>
+<li><p><strong>number_inverse_values</strong> – </p></li>
+<li><p><strong>category_inverse_values</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_null_value">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_null_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine" title="easymlops.table.core.pipeline_object.TablePipeLine"><span class="pre">TablePipeLine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_null_value" title="永久链接至目标">¶</a></dt>
+<dd><p>检测取不同空值情况下的输出是否一样</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>sample</strong> – </p></li>
+<li><p><strong>null_values</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_shape">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><span class="pre">TablePipeObjectBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_transform</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_shape" title="永久链接至目标">¶</a></dt>
+<dd><p>检测离线批量和在线单条的输出的shape是否一致</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>batch_transform</strong> – </p></li>
+<li><p><strong>single_transform</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_transform_function">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_transform_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><span class="pre">TablePipeObjectBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_transform_function" title="永久链接至目标">¶</a></dt>
+<dd><p>测试离线批量和在线单条的shape,输出名称,数据类型,数值是否一致</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>s</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_transform_function_pipeline">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_transform_function_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine" title="easymlops.table.core.pipeline_object.TablePipeLine"><span class="pre">TablePipeLine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_transform_function_pipeline" title="永久链接至目标">¶</a></dt>
+<dd><p>check_transform_function函数的pipeline版本检测</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>sample</strong> – </p></li>
+<li><p><strong>return_x</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.check_two_batch_transform_same">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">check_two_batch_transform_same</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine" title="easymlops.table.core.pipeline_object.TablePipeLine"><span class="pre">TablePipeLine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cur_batch_transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_batch_transform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_cur_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_pre_value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.check_two_batch_transform_same" title="永久链接至目标">¶</a></dt>
+<dd><p>检验俩数据是否一致</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>cur_batch_transform</strong> – </p></li>
+<li><p><strong>pre_batch_transform</strong> – </p></li>
+<li><p><strong>check_col</strong> – </p></li>
+<li><p><strong>check_type</strong> – </p></li>
+<li><p><strong>check_cur_value</strong> – </p></li>
+<li><p><strong>check_pre_value</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.leak_check_type_is_same">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">leak_check_type_is_same</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><span class="pre">TablePipeObjectBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.leak_check_type_is_same" title="永久链接至目标">¶</a></dt>
+<dd><p>弱化数据类型后，是否一致，比如int32和int64看作同一种数据类型</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>type1</strong> – </p></li>
+<li><p><strong>type2</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.leak_check_value_is_same">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">leak_check_value_is_same</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><span class="pre">TablePipeObjectBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ser1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ser2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.leak_check_value_is_same" title="永久链接至目标">¶</a></dt>
+<dd><p>所有数值的检测</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>ser1</strong> – </p></li>
+<li><p><strong>ser2</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.run_batch_single_transform">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">run_batch_single_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><span class="pre">TablePipeObjectBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.run_batch_single_transform" title="永久链接至目标">¶</a></dt>
+<dd><p>分别获取检测离线批量和在线单条的预测结果，以及统计运算性能</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – 调用的pipe</p></li>
+<li><p><strong>s</strong> – 被调用数据</p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="easymlops.table.callback.check.run_transform_and_check">
+<span class="sig-prename descclassname"><span class="pre">easymlops.table.callback.check.</span></span><span class="sig-name descname"><span class="pre">run_transform_and_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine" title="easymlops.table.core.pipeline_object.TablePipeLine"><span class="pre">TablePipeLine</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.callback.check.run_transform_and_check" title="永久链接至目标">¶</a></dt>
+<dd><p>分别跑transform和transform_single后做检测输出是否一致</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – </p></li>
+<li><p><strong>x</strong> – </p></li>
+<li><p><strong>check_col</strong> – </p></li>
+<li><p><strong>check_type</strong> – </p></li>
+<li><p><strong>check_value</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.callback">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-easymlops.table.callback" title="此标题的永久链接">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="easymlops.table.html" class="btn btn-neutral float-left" title="easymlops.table package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="easymlops.table.core.html" class="btn btn-neutral float-right" title="easymlops.table.core package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, zhulei227.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

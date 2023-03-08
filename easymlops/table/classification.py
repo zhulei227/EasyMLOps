@@ -168,7 +168,12 @@ class LGBMClassification(ClassificationBase):
 
     def udf_transform_single(self, s: dict_type, **kwargs):
         if self.use_faster_predictor:
-            return self.lgb_model_faster_predictor.predict(s).get("score")
+            predict_dict = self.lgb_model_faster_predictor.predict(s).get("score")
+            # 修改key
+            new_predict_dict = dict()
+            for key, value in predict_dict.items():
+                new_predict_dict[self.id2label.get(key)] = value
+            return new_predict_dict
         else:
             input_dataframe = pd.DataFrame([s])
             input_dataframe = input_dataframe[self.cols]

@@ -1,5 +1,4 @@
 import re
-import string
 from easymlops.table.core import *
 from easymlops.nlp.core import *
 
@@ -129,11 +128,11 @@ class RemovePunctuation(PreprocessBase):
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
         for col in self.cols:
-            s[col] = s[col].astype(str).str.replace(rf"([{string.punctuation}+'，。！（）“‘？：；】【、'])+", "")
+            s[col] = s[col].astype(str).str.replace(r"[^\w\s]", "")
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
-        puns = rf"([{string.punctuation}+'，。！（）“‘？：；】【、'])+"
+        puns = r"[^\w\s]"
         for col in self.cols:
             s[col] = re.sub(puns, "", str(s[col]))
         return s
@@ -153,11 +152,11 @@ class ReplacePunctuation(PreprocessBase):
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
         for col in self.cols:
-            s[col] = s[col].astype(str).str.replace(rf"([{string.punctuation}+'，。！（）“‘？：；】【、'])+", "")
+            s[col] = s[col].astype(str).str.replace(r"[^\w\s]", self.symbols)
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
-        puns = rf"([{string.punctuation}+'，。！（）“‘？：；】【、'])+"
+        puns = r"[^\w\s]"
         for col in self.cols:
             s[col] = re.sub(puns, self.symbols, str(s[col]))
         return s

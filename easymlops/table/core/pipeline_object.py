@@ -65,11 +65,10 @@ class TablePipeLine(TablePipeObjectBase):
         # 切片方式
         if isinstance(index, slice):
             target_models = self.models[index]
-            new_pipe = copy.deepcopy(self)
-            new_pipe.models = []
+            new_pipe_line = self.__class__()
             for model in target_models:
-                new_pipe.pipe(model)
-            return new_pipe
+                new_pipe_line.pipe(copy.deepcopy(model))
+            return new_pipe_line
         # 读取指定层方式
         elif type(index) == int or type(index) == str or type(index) == list or type(index) == tuple:
             return self._match_index_pipe(match_index=index)

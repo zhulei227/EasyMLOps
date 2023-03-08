@@ -17,7 +17,7 @@ class LocalStorage(TablePipeObjectBase, threading.Thread):
         self.cols = cols
         if self.cols is None:
             self.cols = ["value"]
-        self.table_columns = ["key", "transform_time"] + self.cols
+        self.table_columns = ["storage_key", "storage_transform_time"] + self.cols
         self.db_name = db_name
         self.table_name = table_name
         self.cache_data = []
@@ -41,13 +41,21 @@ class LocalStorage(TablePipeObjectBase, threading.Thread):
             _cur.execute(sql)
         except Exception as e:
             print(f"connect to {db_name}:{table_name} exception:{e}")
-        # 创建索引
+        # 创建索引:storage_key
         if _conn is not None and _cur is not None:
             try:
-                sql = f"create index if not exists index_{table_name}_key on {table_name}(key)"
+                sql = f"create index if not exists index_{table_name}_storage_key on {table_name}(storage_key)"
                 _cur.execute(sql)
             except Exception as e:
-                print(f"create index key exception:{e}")
+                print(f"create index storage_key exception:{e}")
+        # 创建索引:storage_transform_time
+        if _conn is not None and _cur is not None:
+            try:
+                sql = f"create index if not exists index_{table_name}_storage_transform_time " \
+                      f"on {table_name}(storage_transform_time)"
+                _cur.execute(sql)
+            except Exception as e:
+                print(f"create index storage_transform_time exception:{e}")
         return _conn, _cur
 
     def fit(self, s: dataframe_type, **kwargs):
@@ -72,9 +80,9 @@ class LocalStorage(TablePipeObjectBase, threading.Thread):
 
     def transform_single(self, s: dict_type, storage_base_dict: dict_type = None, **kwargs) -> dict_type:
         s_ = copy.deepcopy(s)
-        s_["key"] = "default" if storage_base_dict is None \
+        s_["storage_key"] = "default" if storage_base_dict is None \
             else storage_base_dict.get("key", "default")
-        s_["transform_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        s_["storage_transform_time"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         register_data = []
         for col in self.table_columns:
             register_data.append(str(s_.get(col, "")))
@@ -82,7 +90,7 @@ class LocalStorage(TablePipeObjectBase, threading.Thread):
         return s
 
     def select_key(self, key="default", limit=10):
-        sql = f"select * from {self.table_name} where key='{key}' limit {limit}"
+        sql = f"select * from {self.table_name} where storage_key='{key}' limit {limit}"
         try:
             lock.acquire(True)
             self._cur.execute(sql)

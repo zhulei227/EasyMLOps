@@ -8,7 +8,7 @@ with open('README.rst') as f:
 
 setup(
     name='easymlops',
-    version='0.1',
+    version='0.1.1',
     python_requires='>=3.6',
     long_description=long_description,
     author='zhulei227',

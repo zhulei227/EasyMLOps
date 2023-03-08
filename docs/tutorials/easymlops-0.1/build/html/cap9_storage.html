@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="zh-CN" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>特征存储&amp;监控&amp;分析 &mdash; EasyMLOps  文档</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/translations.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="搜索" href="search.html" />
+    <link rel="next" title="API Refrence(Version=0.1.1)" href="easymlops.html" />
+    <link rel="prev" title="生产部署" href="cap8_deploy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EasyMLOps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">EasyMLOps使用文档</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cap1_introduce.html">简介&amp;安装&amp;反馈</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap2_table.html">Table任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap3_nlp.html">NLP任务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap4_mem_opt.html">内存优化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap5_persistence.html">持久化</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap6_pipe.html">自定义pipe模块</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">特征存储&amp;监控&amp;分析</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">存储的两种方式</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">嵌入式</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">挂载式</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">本地存储</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#key-select-key">查询key:select_key</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#where">复杂查询:where</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#group-agg-where">聚合分析:group_agg_where</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sql-sql">纯SQL函数:sql</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#hbase">Hbase存储</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id6">查询指定key:select_key</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#select-time">查询指定时间区间:select_time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scan">复杂查询:scan</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.1)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EasyMLOps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">特征存储&amp;监控&amp;分析</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cap9_storage.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>特征存储&amp;监控&amp;分析<a class="headerlink" href="#id1" title="此标题的永久链接">¶</a></h1>
+<p>模型部署生产后，我们通常还有些后续需求：</p>
+<ul class="simple">
+<li><p>存储：将某些pipe的输出直接保存到数据库存储，比如特征工程后的数据等；</p></li>
+<li><p>监控&amp;分析：监控数据短期内的变化情况，分析异常指标等</p></li>
+</ul>
+<section id="id2">
+<h2>存储的两种方式<a class="headerlink" href="#id2" title="此标题的永久链接">¶</a></h2>
+<ul class="simple">
+<li><p>嵌入式：算法研发的同学也肩负了后续指标监控、报表统计等运维形式的工作，这样在研发过程就可以把存储pipe模块嵌入到pipeline中；</p></li>
+<li><p>挂载式：算法研发只需要关注算法相关的模块，后续上线时，运维同学再把存储模块挂载到需要保存的pipe模块后，这种方式更加灵活</p></li>
+</ul>
+<p>下面以本地存储为例运行这两种方式，还请<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">sqlite3</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;../../&quot;</span><span class="p">)</span><span class="c1">#与easymlops同级目录</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/demo.csv&quot;</span><span class="p">)</span>
+<span class="n">x_train</span><span class="o">=</span><span class="n">data</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span>
+<span class="n">x_test</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">500</span><span class="p">:]</span>
+<span class="n">y_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="n">y_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops</span> <span class="kn">import</span> <span class="n">TablePipeLine</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.encoding</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.classification</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.storage</span> <span class="kn">import</span> <span class="n">LocalStorage</span><span class="p">,</span><span class="n">HbaseStorage</span>
+</pre></div>
+</div>
+<section id="id3">
+<h3>嵌入式<a class="headerlink" href="#id3" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">OneHotEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Pclass&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">],</span> <span class="n">drop_col</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">WOEEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ticket&quot;</span><span class="p">,</span> <span class="s2">&quot;Embarked&quot;</span><span class="p">,</span> <span class="s2">&quot;Cabin&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">,</span> <span class="s2">&quot;Pclass&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LabelEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LocalStorage</span><span class="p">(</span><span class="n">db_name</span><span class="o">=</span><span class="s2">&quot;./local.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;label_encoding&quot;</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PassengerId&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span><span class="s1">&#39;Age&#39;</span><span class="p">,</span><span class="s1">&#39;SibSp&#39;</span><span class="p">,</span><span class="s1">&#39;Parch&#39;</span><span class="p">,</span>
+                                                                             <span class="s1">&#39;Ticket&#39;</span><span class="p">,</span><span class="s1">&#39;Fare&#39;</span><span class="p">,</span><span class="s1">&#39;Cabin&#39;</span><span class="p">,</span><span class="s1">&#39;Embarked&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_3&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_1&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_2&#39;</span><span class="p">,</span><span class="s1">&#39;Sex_male&#39;</span><span class="p">,</span><span class="s1">&#39;Sex_female&#39;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LGBMClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span><span class="n">native_init_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;max_depth&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span><span class="n">native_fit_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;num_boost_round&quot;</span><span class="p">:</span><span class="mi">128</span><span class="p">},</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;lgbm&quot;</span><span class="p">))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LocalStorage</span><span class="p">(</span><span class="n">db_name</span><span class="o">=</span><span class="s2">&quot;./local.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lgbm_0&quot;</span><span class="p">,</span><span class="s2">&quot;lgbm_1&quot;</span><span class="p">]))</span>\
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x28364cb02c8&gt;
+</pre></div>
+</div>
+<p>上面，再LabelEncoding和LGBMClassfication后分别加了一个LocalStorage模块，用于保存它们的输出，下面模拟一条生产输入数据</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">record</span><span class="o">=</span><span class="n">x_test</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">record</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;PassengerId&#39;: 501,
+ &#39;Pclass&#39;: 3,
+ &#39;Name&#39;: &#39;Calic, Mr. Petar&#39;,
+ &#39;Sex&#39;: &#39;male&#39;,
+ &#39;Age&#39;: 17.0,
+ &#39;SibSp&#39;: 0,
+ &#39;Parch&#39;: 0,
+ &#39;Ticket&#39;: &#39;315086&#39;,
+ &#39;Fare&#39;: 8.6625,
+ &#39;Cabin&#39;: nan,
+ &#39;Embarked&#39;: &#39;S&#39;}
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PassengerId&quot;</span><span class="p">)})</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;lgbm_0&#39;: 0.9233260451690832, &#39;lgbm_1&#39;: 0.0766739548309168}
+</pre></div>
+</div>
+<p>查询key</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#查看label encoding的输出</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="mi">501</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time   |   PassengerId |   Pclass |   Name |     Sex |   Age |   SibSp |   Parch |   Ticket |   Fare |    Cabin |   Embarked |   Pclass_3 |   Pclass_1 |   Pclass_2 |   Sex_male |   Sex_female |
+|---:|--------------:|:-------------------------|--------------:|---------:|-------:|--------:|------:|--------:|--------:|---------:|-------:|---------:|-----------:|-----------:|-----------:|-----------:|-----------:|-------------:|
+|  0 |           501 | 2023-03-07 21:41:33      |           501 | 0.482439 |      0 | 1.11138 |    17 |       0 |       0 |        0 |  8.664 | 0.299607 |   0.224849 |          1 |          0 |          0 |          1 |            0 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#查看lgbm classification的输出</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="mi">501</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time   |   lgbm_0 |   lgbm_1 |
+|---:|--------------:|:-------------------------|---------:|---------:|
+|  0 |           501 | 2023-03-07 21:41:33      | 0.923326 | 0.076674 |
+</pre></div>
+</div>
+</section>
+<section id="id4">
+<h3>挂载式<a class="headerlink" href="#id4" title="此标题的永久链接">¶</a></h3>
+<p>如下，算法同学无需关心存储，正常建模就好</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">OneHotEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Pclass&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">],</span> <span class="n">drop_col</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">WOEEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ticket&quot;</span><span class="p">,</span> <span class="s2">&quot;Embarked&quot;</span><span class="p">,</span> <span class="s2">&quot;Cabin&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">,</span> <span class="s2">&quot;Pclass&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LabelEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LGBMClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span><span class="n">native_init_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;max_depth&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span><span class="n">native_fit_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;num_boost_round&quot;</span><span class="p">:</span><span class="mi">128</span><span class="p">},</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;lgbm&quot;</span><span class="p">))</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x2836874cb88&gt;
+</pre></div>
+</div>
+<p>运维同学通过如下方式挂载存储模块</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#记录label encoding的输出</span>
+<span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_branch_pipe</span><span class="p">(</span><span class="n">LocalStorage</span><span class="p">(</span><span class="n">db_name</span><span class="o">=</span><span class="s2">&quot;./local.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;label_encoding&quot;</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PassengerId&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span><span class="s1">&#39;Age&#39;</span><span class="p">,</span><span class="s1">&#39;SibSp&#39;</span><span class="p">,</span><span class="s1">&#39;Parch&#39;</span><span class="p">,</span>
+                                                                             <span class="s1">&#39;Ticket&#39;</span><span class="p">,</span><span class="s1">&#39;Fare&#39;</span><span class="p">,</span><span class="s1">&#39;Cabin&#39;</span><span class="p">,</span><span class="s1">&#39;Embarked&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_3&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_1&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_2&#39;</span><span class="p">,</span><span class="s1">&#39;Sex_male&#39;</span><span class="p">,</span><span class="s1">&#39;Sex_female&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#记录y的输出</span>
+<span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_branch_pipe</span><span class="p">(</span><span class="n">LocalStorage</span><span class="p">(</span><span class="n">db_name</span><span class="o">=</span><span class="s2">&quot;./local.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lgbm_0&quot;</span><span class="p">,</span><span class="s2">&quot;lgbm_1&quot;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#模拟生产数据</span>
+<span class="n">record</span><span class="o">=</span><span class="n">x_test</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">record</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;PassengerId&#39;: 502,
+ &#39;Pclass&#39;: 3,
+ &#39;Name&#39;: &#39;Canavan, Miss. Mary&#39;,
+ &#39;Sex&#39;: &#39;female&#39;,
+ &#39;Age&#39;: 21.0,
+ &#39;SibSp&#39;: 0,
+ &#39;Parch&#39;: 0,
+ &#39;Ticket&#39;: &#39;364846&#39;,
+ &#39;Fare&#39;: 7.75,
+ &#39;Cabin&#39;: nan,
+ &#39;Embarked&#39;: &#39;Q&#39;}
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PassengerId&quot;</span><span class="p">)})</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;lgbm_0&#39;: 0.3736520279722756, &#39;lgbm_1&#39;: 0.6263479720277243}
+</pre></div>
+</div>
+<p>查询key，注意这里需要通过<code class="docutils literal notranslate"><span class="pre">.get_branch_pipe(index)</span></code>的方式获取到指定的存储模块，再进行查询key的操作</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="mi">502</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time   |   PassengerId |   Pclass |   Name |      Sex |   Age |   SibSp |   Parch |   Ticket |   Fare |    Cabin |   Embarked |   Pclass_3 |   Pclass_1 |   Pclass_2 |   Sex_male |   Sex_female |
+|---:|--------------:|:-------------------------|--------------:|---------:|-------:|---------:|------:|--------:|--------:|---------:|-------:|---------:|-----------:|-----------:|-----------:|-----------:|-----------:|-------------:|
+|  0 |           502 | 2023-03-07 21:41:39      |           502 | 0.482439 |      0 | -1.56999 |    21 |       0 |       0 |        0 |   7.75 | 0.299607 |  -0.508609 |          1 |          0 |          0 |          0 |            1 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="mi">502</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time   |   lgbm_0 |   lgbm_1 |
+|---:|--------------:|:-------------------------|---------:|---------:|
+|  0 |           502 | 2023-03-07 21:41:39      | 0.373652 | 0.626348 |
+</pre></div>
+</div>
+<p>由于对当前pipe而言都只挂载了一个pipe，所以可以通过<code class="docutils literal notranslate"><span class="pre">get_branch_pipe(0)</span></code>获取，如果还继续挂载了其他pipe模块，通过增加index获取</p>
+</section>
+</section>
+<section id="id5">
+<h2>本地存储<a class="headerlink" href="#id5" title="此标题的永久链接">¶</a></h2>
+<p>目前设计了如下几个函数做监控和分析用，接下来模拟更多的生产数据</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">x_test</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]):</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PassengerId&quot;</span><span class="p">)})</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|███████████████████████████████████████████████████████████████████████████████| 389/389 [00:01&lt;00:00, 325.22it/s]
+</pre></div>
+</div>
+<section id="key-select-key">
+<h3>查询key:select_key<a class="headerlink" href="#key-select-key" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="mi">502</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time   |   PassengerId |   Pclass |   Name |      Sex |   Age |   SibSp |   Parch |   Ticket |   Fare |    Cabin |   Embarked |   Pclass_3 |   Pclass_1 |   Pclass_2 |   Sex_male |   Sex_female |
+|---:|--------------:|:-------------------------|--------------:|---------:|-------:|---------:|------:|--------:|--------:|---------:|-------:|---------:|-----------:|-----------:|-----------:|-----------:|-----------:|-------------:|
+|  0 |           502 | 2023-03-07 21:41:39      |           502 | 0.482439 |      0 | -1.56999 |    21 |       0 |       0 |        0 |   7.75 | 0.299607 |  -0.508609 |          1 |          0 |          0 |          0 |            1 |
+</pre></div>
+</div>
+</section>
+<section id="where">
+<h3>复杂查询:where<a class="headerlink" href="#where" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s2">&quot;Pclass&gt;0.4 and Sex&gt;1 and Sex_male=1&quot;</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time   |   PassengerId |   Pclass |   Name |     Sex |   Age |   SibSp |   Parch |    Ticket |   Fare |    Cabin |   Embarked |   Pclass_3 |   Pclass_1 |   Pclass_2 |   Sex_male |   Sex_female |
+|---:|--------------:|:-------------------------|--------------:|---------:|-------:|--------:|------:|--------:|--------:|----------:|-------:|---------:|-----------:|-----------:|-----------:|-----------:|-----------:|-------------:|
+|  0 |           501 | 2023-03-07 21:41:33      |           501 | 0.482439 |      0 | 1.11138 |    17 |       0 |       0 |  0        |  8.664 | 0.299607 |   0.224849 |          1 |          0 |          0 |          1 |            0 |
+|  1 |           509 | 2023-03-07 21:41:41      |           509 | 0.482439 |      0 | 1.11138 |    28 |       0 |       0 |  0        | 22.53  | 0.299607 |   0.224849 |          1 |          0 |          0 |          1 |            0 |
+|  2 |           510 | 2023-03-07 21:41:41      |           510 | 0.482439 |      0 | 1.11138 |    26 |       0 |       0 | -0.464158 | 56.5   | 0.299607 |   0.224849 |          1 |          0 |          0 |          1 |            0 |
+|  3 |           511 | 2023-03-07 21:41:41      |           511 | 0.482439 |      0 | 1.11138 |    29 |       0 |       0 |  0        |  7.75  | 0.299607 |  -0.508609 |          1 |          0 |          0 |          1 |            0 |
+|  4 |           512 | 2023-03-07 21:41:41      |           512 | 0.482439 |      0 | 1.11138 |     0 |       0 |       0 |  0        |  8.05  | 0.299607 |   0.224849 |          1 |          0 |          0 |          1 |            0 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#存活率更高的乘客</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="s2">&quot;lgbm_1&gt;0.8&quot;</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time   |    lgbm_0 |   lgbm_1 |
+|---:|--------------:|:-------------------------|----------:|---------:|
+|  0 |           505 | 2023-03-07 21:41:41      | 0.0684703 | 0.93153  |
+|  1 |           514 | 2023-03-07 21:41:41      | 0.0718778 | 0.928122 |
+|  2 |           517 | 2023-03-07 21:41:41      | 0.113928  | 0.886072 |
+|  3 |           519 | 2023-03-07 21:41:41      | 0.19458   | 0.80542  |
+|  4 |           521 | 2023-03-07 21:41:41      | 0.0710767 | 0.928923 |
+</pre></div>
+</div>
+</section>
+<section id="group-agg-where">
+<h3>聚合分析:group_agg_where<a class="headerlink" href="#group-agg-where" title="此标题的永久链接">¶</a></h3>
+<p>不同sex_male,pclass_3下的统计量</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">return_df</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">group_agg_where</span><span class="p">(</span><span class="n">group_by</span><span class="o">=</span><span class="s2">&quot;Sex_male,Pclass_3&quot;</span><span class="p">,</span> <span class="n">agg_sql</span><span class="o">=</span><span class="s2">&quot;Sex_male,Pclass_3,max(PassengerId) as PassengerId_max,sum(Sex)/count(Sex) as Sex_mean,count(Ticket) as Ticket_cnt&quot;</span><span class="p">,</span> <span class="n">where_sql</span><span class="o">=</span><span class="s2">&quot;storage_transform_time&gt;=&#39;2023-03-03 01:01:01&#39;&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">return_df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   Sex_male |   Pclass_3 |   PassengerId_max |   Sex_mean |   Ticket_cnt |
+|---:|-----------:|-----------:|------------------:|-----------:|-------------:|
+|  0 |          0 |          0 |               888 |   -1.56999 |           75 |
+|  1 |          0 |          1 |               889 |   -1.56999 |           54 |
+|  2 |          1 |          0 |               890 |    1.11138 |          104 |
+|  3 |          1 |          1 |               891 |    1.11138 |          158 |
+</pre></div>
+</div>
+</section>
+<section id="sql-sql">
+<h3>纯SQL函数:sql<a class="headerlink" href="#sql-sql" title="此标题的永久链接">¶</a></h3>
+<p>以上接口不支持复杂的sql嵌套，这里可以直接定义复杂的sql嵌套分析</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span>
+<span class="n">sql</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">-- 统计是否存活用户的最早最晚transform时间</span>
+<span class="s2">select survied_pred,min(storage_transform_time) as transform_min,max(storage_transform_time) as transform_max from </span>
+<span class="s2">    -- 如果lgbm_1&gt;0.5就视为存活</span>
+<span class="s2">    (select storage_key,storage_transform_time,case when lgbm_1&gt;0.5 then 1 else 0 end as survied_pred from </span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">) as t </span>
+<span class="s2">group by survied_pred</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">return_df</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">return_df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   survied_pred | transform_min       | transform_max       |
+|---:|---------------:|:--------------------|:--------------------|
+|  0 |              0 | 2023-03-07 21:41:33 | 2023-03-07 21:41:42 |
+|  1 |              1 | 2023-03-07 21:41:39 | 2023-03-07 21:41:42 |
+</pre></div>
+</div>
+</section>
+</section>
+<section id="hbase">
+<h2>Hbase存储<a class="headerlink" href="#hbase" title="此标题的永久链接">¶</a></h2>
+<p>由于hbase存储自身的限制，目前只支持：</p>
+<ul class="simple">
+<li><p>查询指定key的数据；</p></li>
+<li><p>查询指定时间范围内的数据；</p></li>
+<li><p>scan进行复杂查询</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">OneHotEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Pclass&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">],</span> <span class="n">drop_col</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">WOEEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ticket&quot;</span><span class="p">,</span> <span class="s2">&quot;Embarked&quot;</span><span class="p">,</span> <span class="s2">&quot;Cabin&quot;</span><span class="p">,</span> <span class="s2">&quot;Sex&quot;</span><span class="p">,</span> <span class="s2">&quot;Pclass&quot;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">))</span> \
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LabelEncoding</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LGBMClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span><span class="n">native_init_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;max_depth&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span><span class="n">native_fit_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;num_boost_round&quot;</span><span class="p">:</span><span class="mi">128</span><span class="p">},</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;lgbm&quot;</span><span class="p">))</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x1e6b88d5808&gt;
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#记录label encoding的输出</span>
+<span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_branch_pipe</span><span class="p">(</span><span class="n">HbaseStorage</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;192.168.244.131&quot;</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">9090</span><span class="p">,</span><span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;label_encoding&quot;</span><span class="p">,</span> <span class="n">cf_name</span><span class="o">=</span><span class="s2">&quot;cf1&quot;</span><span class="p">,</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PassengerId&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span><span class="s1">&#39;Sex&#39;</span><span class="p">,</span><span class="s1">&#39;Age&#39;</span><span class="p">,</span><span class="s1">&#39;SibSp&#39;</span><span class="p">,</span><span class="s1">&#39;Parch&#39;</span><span class="p">,</span>
+                                                                             <span class="s1">&#39;Ticket&#39;</span><span class="p">,</span><span class="s1">&#39;Fare&#39;</span><span class="p">,</span><span class="s1">&#39;Cabin&#39;</span><span class="p">,</span><span class="s1">&#39;Embarked&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_3&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_1&#39;</span><span class="p">,</span><span class="s1">&#39;Pclass_2&#39;</span><span class="p">,</span><span class="s1">&#39;Sex_male&#39;</span><span class="p">,</span><span class="s1">&#39;Sex_female&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>connect to 192.168.244.131:9090/label_encoding success!
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#模拟生产数据</span>
+<span class="n">record</span><span class="o">=</span><span class="n">x_test</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">record</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;PassengerId&#39;: 501,
+ &#39;Pclass&#39;: 3,
+ &#39;Name&#39;: &#39;Calic, Mr. Petar&#39;,
+ &#39;Sex&#39;: &#39;male&#39;,
+ &#39;Age&#39;: 17.0,
+ &#39;SibSp&#39;: 0,
+ &#39;Parch&#39;: 0,
+ &#39;Ticket&#39;: &#39;315086&#39;,
+ &#39;Fare&#39;: 8.6625,
+ &#39;Cabin&#39;: nan,
+ &#39;Embarked&#39;: &#39;S&#39;}
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PassengerId&quot;</span><span class="p">)})</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;lgbm_0&#39;: 0.9233260451690832, &#39;lgbm_1&#39;: 0.0766739548309168}
+</pre></div>
+</div>
+<section id="id6">
+<h3>查询指定key:select_key<a class="headerlink" href="#id6" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="s2">&quot;600&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time     |   PassengerId |    Pclass |   Name |     Sex |   Age |   SibSp |   Parch |   Ticket |    Fare |   Cabin |   Embarked |   Pclass_3 |   Pclass_1 |   Pclass_2 |   Sex_male |   Sex_female |
+|---:|--------------:|:---------------------------|--------------:|----------:|-------:|--------:|------:|--------:|--------:|---------:|--------:|--------:|-----------:|-----------:|-----------:|-----------:|-----------:|-------------:|
+|  0 |           600 | 2023-03-07 21:42:04.038874 |           600 | -0.741789 |      0 | 1.11138 |    49 |       1 |       0 |        0 | 56.9375 |       0 |  -0.551169 |          0 |          1 |          0 |          1 |            0 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">x_test</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]):</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PassengerId&quot;</span><span class="p">)})</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|███████████████████████████████████████████████████████████████████████████████| 389/389 [00:01&lt;00:00, 234.24it/s]
+</pre></div>
+</div>
+</section>
+<section id="select-time">
+<h3>查询指定时间区间:select_time<a class="headerlink" href="#select-time" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">select_time</span><span class="p">(</span><span class="n">start_time</span><span class="o">=</span><span class="s2">&quot;2023-03-07 21:21:00&quot;</span><span class="p">,</span><span class="n">stop_time</span><span class="o">=</span><span class="s2">&quot;2023-03-07 22:22:00&quot;</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time     |   PassengerId |    Pclass |   Name |      Sex |   Age |   SibSp |   Parch |   Ticket |      Fare |    Cabin |   Embarked |   Pclass_3 |   Pclass_1 |   Pclass_2 |   Sex_male |   Sex_female |
+|---:|--------------:|:---------------------------|--------------:|----------:|-------:|---------:|------:|--------:|--------:|---------:|----------:|---------:|-----------:|-----------:|-----------:|-----------:|-----------:|-------------:|
+|  0 |           501 | 2023-03-07 21:42:00.584158 |           501 |  0.482439 |      0 |  1.11138 |    17 |       0 |       0 |        0 |   8.66406 | 0.299607 |   0.224849 |          1 |          0 |          0 |          1 |            0 |
+|  1 |           503 | 2023-03-07 21:42:03.694794 |           503 |  0.482439 |      0 | -1.56999 |     0 |       0 |       0 |        0 |   7.62891 | 0.299607 |  -0.508609 |          1 |          0 |          0 |          0 |            1 |
+|  2 |           504 | 2023-03-07 21:42:03.697801 |           504 |  0.482439 |      0 | -1.56999 |    37 |       0 |       0 |        0 |   9.58594 | 0.299607 |   0.224849 |          1 |          0 |          0 |          0 |            1 |
+|  3 |           505 | 2023-03-07 21:42:03.701797 |           505 | -0.741789 |      0 | -1.56999 |    16 |       0 |       0 |        0 |  86.5     | 0        |   0.224849 |          0 |          1 |          0 |          0 |            1 |
+|  4 |           506 | 2023-03-07 21:42:03.704802 |           506 | -0.741789 |      0 |  1.11138 |    18 |       1 |       0 |        0 | 108.875   | 0        |  -0.551169 |          0 |          1 |          0 |          1 |            0 |
+</pre></div>
+</div>
+</section>
+<section id="scan">
+<h3>复杂查询:scan<a class="headerlink" href="#scan" title="此标题的永久链接">¶</a></h3>
+<p>hbase可以支持一些复杂的组合查询，使用方式可以参考如下链接</p>
+<p>https://www.jianshu.com/p/0bad3534186b<br />
+https://hbase.apache.org/book.html#thrift</p>
+<p>比如下面，查询PassengerId&gt;=”503” 且 storage_transform_time&gt;=”2023-03-07 21:21:00” 的前5条数据</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scan_filter</span> <span class="o">=</span> <span class="s2">&quot;SingleColumnValueFilter(&#39;cf1&#39;, &#39;PassengerId&#39;, &gt;=, &#39;binary:503&#39;, true, true) AND SingleColumnValueFilter(&#39;cf1&#39;, &#39;storage_transform_time&#39;, &gt;=, &#39;binary:2023-03-07 21:21:00&#39;, true, true) &quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_filter</span><span class="o">=</span><span class="n">scan_filter</span><span class="p">,</span><span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time     |   PassengerId |    Pclass |   Name |      Sex |   Age |   SibSp |   Parch |   Ticket |      Fare |    Cabin |   Embarked |   Pclass_3 |   Pclass_1 |   Pclass_2 |   Sex_male |   Sex_female |
+|---:|--------------:|:---------------------------|--------------:|----------:|-------:|---------:|------:|--------:|--------:|---------:|----------:|---------:|-----------:|-----------:|-----------:|-----------:|-----------:|-------------:|
+|  0 |           503 | 2023-03-07 21:50:43.963905 |           503 |  0.482439 |      0 | -1.56999 |     0 |       0 |       0 |        0 |   7.62891 | 0.299607 |  -0.508609 |          1 |          0 |          0 |          0 |            1 |
+|  1 |           504 | 2023-03-07 21:50:43.966905 |           504 |  0.482439 |      0 | -1.56999 |    37 |       0 |       0 |        0 |   9.58594 | 0.299607 |   0.224849 |          1 |          0 |          0 |          0 |            1 |
+|  2 |           505 | 2023-03-07 21:50:43.970904 |           505 | -0.741789 |      0 | -1.56999 |    16 |       0 |       0 |        0 |  86.5     | 0        |   0.224849 |          0 |          1 |          0 |          0 |            1 |
+|  3 |           506 | 2023-03-07 21:50:43.974912 |           506 | -0.741789 |      0 |  1.11138 |    18 |       1 |       0 |        0 | 108.875   | 0        |  -0.551169 |          0 |          1 |          0 |          1 |            0 |
+|  4 |           507 | 2023-03-07 21:50:43.977907 |           507 | -0.330626 |      0 | -1.56999 |    33 |       0 |       2 |        0 |  26       | 0.299607 |   0.224849 |          0 |          0 |          1 |          0 |            1 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cap8_deploy.html" class="btn btn-neutral float-left" title="生产部署" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="easymlops.html" class="btn btn-neutral float-right" title="API Refrence(Version=0.1.1)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 版权所有 2023, zhulei227.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
