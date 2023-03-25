@@ -145,7 +145,7 @@ class TreeCache(object):
 
     @staticmethod
     def decision(data: float, threshold: float, default_left: bool):
-        if data is None or data is np.nan:
+        if str(data).lower() in ["none", "nan", "np.nan", "null"]:
             if default_left is True:
                 return "left_child"
             else:

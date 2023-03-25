@@ -28,6 +28,14 @@ easymlops.nlp.representation module
    :undoc-members:
    :show-inheritance:
 
+easymlops.nlp.similarity module
+-------------------------------
+
+.. automodule:: easymlops.nlp.similarity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

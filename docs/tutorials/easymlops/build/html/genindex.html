@@ -52,7 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
-<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.2)</a></li>
 </ul>
 
         </div>
@@ -97,6 +97,7 @@
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -110,6 +111,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.table.preprocessing.html#easymlops.table.preprocessing.onevar_operation.Abs">Abs（easymlops.table.preprocessing.onevar_operation 中的类）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.activate_connect">activate_connect() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.activate_connect">activate_connect() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -283,6 +286,8 @@
 </li>
       <li><a href="easymlops.table.preprocessing.html#easymlops.table.preprocessing.bivar_operation.Subtract.apply_function_single_bi">apply_function_single_bi()（easymlops.table.preprocessing.bivar_operation.Subtract 静态方法）</a>
 </li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.apply_single">apply_single() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
       <li><a href="easymlops.core.html#easymlops.core.pipeline_object.PipeLineBase.auto_test">auto_test() （easymlops.core.pipeline_object.PipeLineBase 方法）</a>
 </li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine.auto_test">auto_test() （easymlops.table.core.pipeline_object.TablePipeLine 方法）</a>
@@ -301,6 +306,10 @@
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.RepresentationBase.before_fit">before_fit() （easymlops.nlp.representation.RepresentationBase 方法）</a>
 </li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.before_fit">before_fit() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.before_fit">before_fit() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
+</li>
       <li><a href="easymlops.table.html#easymlops.table.classification.ClassificationBase.before_fit">before_fit() （easymlops.table.classification.ClassificationBase 方法）</a>
 </li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase.before_fit">before_fit() （easymlops.table.core.pipe_object.TablePipeObjectBase 方法）</a>
@@ -313,10 +322,10 @@
 </li>
       <li><a href="easymlops.table.preprocessing.html#easymlops.table.preprocessing.core.PreprocessBase.before_fit">before_fit() （easymlops.table.preprocessing.core.PreprocessBase 方法）</a>
 </li>
-      <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.before_fit">before_fit() （easymlops.table.regression.RegressionBase 方法）</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.before_fit">before_fit() （easymlops.table.regression.RegressionBase 方法）</a>
+</li>
       <li><a href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase.before_transform">before_transform() （easymlops.core.pipe_object.PipeObjectBase 方法）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.classification.ClassificationBase.before_transform">before_transform() （easymlops.table.classification.ClassificationBase 方法）</a>
@@ -367,10 +376,10 @@
 </li>
       <li><a href="easymlops.table.callback.html#easymlops.table.callback.check.check_null_value">check_null_value()（在 easymlops.table.callback.check 模块中）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.table.callback.html#easymlops.table.callback.check.check_shape">check_shape()（在 easymlops.table.callback.check 模块中）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.table.callback.html#easymlops.table.callback.check.check_transform_function">check_transform_function()（在 easymlops.table.callback.check 模块中）</a>
 </li>
       <li><a href="easymlops.table.callback.html#easymlops.table.callback.check.check_transform_function_pipeline">check_transform_function_pipeline()（在 easymlops.table.callback.check 模块中）</a>
@@ -390,6 +399,10 @@
       <li><a href="easymlops.table.utils.html#easymlops.table.utils.cpu_mem_detector.CpuMemDetector">CpuMemDetector（easymlops.table.utils.cpu_mem_detector 中的类）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.local_storage.LocalStorage.create_connect">create_connect() （easymlops.table.storage.local_storage.LocalStorage 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.create_connect">create_connect()（easymlops.nlp.similarity.ElasticSearchSimilarity 静态方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.create_connect">create_connect()（easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 静态方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.create_connect">create_connect()（easymlops.table.storage.hbase_storage.HbaseStorage 静态方法）</a>
 </li>
@@ -496,6 +509,13 @@
 </li>
       </ul></li>
       <li>
+    easymlops.nlp.similarity
+
+      <ul>
+        <li><a href="easymlops.nlp.html#module-easymlops.nlp.similarity">模块</a>
+</li>
+      </ul></li>
+      <li>
     easymlops.table
 
       <ul>
@@ -579,8 +599,6 @@
         <li><a href="easymlops.table.extend.html#module-easymlops.table.extend.normalization">模块</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     easymlops.table.feature_selection
 
@@ -588,6 +606,8 @@
         <li><a href="easymlops.table.feature_selection.html#module-easymlops.table.feature_selection">模块</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     easymlops.table.feature_selection.embed
 
@@ -652,6 +672,20 @@
 </li>
       </ul></li>
       <li>
+    easymlops.table.storage.elasticsearch_storage
+
+      <ul>
+        <li><a href="easymlops.table.storage.html#module-easymlops.table.storage.elasticsearch_storage">模块</a>
+</li>
+      </ul></li>
+      <li>
+    easymlops.table.storage.faiss_storage
+
+      <ul>
+        <li><a href="easymlops.table.storage.html#module-easymlops.table.storage.faiss_storage">模块</a>
+</li>
+      </ul></li>
+      <li>
     easymlops.table.storage.hbase_storage
 
       <ul>
@@ -700,6 +734,10 @@
         <li><a href="easymlops.table.utils.html#module-easymlops.table.utils.pandas_utils">模块</a>
 </li>
       </ul></li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity">ElasticSearchSimilarity（easymlops.nlp.similarity 中的类）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage">ElasticSearchStorage（easymlops.table.storage.elasticsearch_storage 中的类）</a>
+</li>
       <li><a href="easymlops.table.feature_selection.html#easymlops.table.feature_selection.embed.EmbedBase">EmbedBase（easymlops.table.feature_selection.embed 中的类）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.encoding.EncodingBase">EncodingBase（easymlops.table.encoding 中的类）</a>
@@ -728,6 +766,10 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity">FaissSimilarity（easymlops.nlp.similarity 中的类）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage">FaissStorage（easymlops.table.storage.faiss_storage 中的类）</a>
+</li>
       <li><a href="easymlops.table.utils.html#easymlops.table.utils.faster_lgbm_predictor_multiclass.FasterLgbMulticlassPredictor">FasterLgbMulticlassPredictor（easymlops.table.utils.faster_lgbm_predictor_multiclass 中的类）</a>
 </li>
       <li><a href="easymlops.table.utils.html#easymlops.table.utils.faster_lgbm_predictor_single.FasterLgbSinglePredictor">FasterLgbSinglePredictor（easymlops.table.utils.faster_lgbm_predictor_single 中的类）</a>
@@ -738,13 +780,15 @@
 </li>
       <li><a href="easymlops.table.feature_selection.html#easymlops.table.feature_selection.filter.FilterBase">FilterBase（easymlops.table.feature_selection.filter 中的类）</a>
 </li>
-      <li><a href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase.fit">fit() （easymlops.core.pipe_object.PipeObjectBase 方法）</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase.fit">fit() （easymlops.core.pipe_object.PipeObjectBase 方法）</a>
+</li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase.fit">fit() （easymlops.table.core.pipe_object.TablePipeObjectBase 方法）</a>
 </li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine.fit">fit() （easymlops.table.core.pipeline_object.TablePipeLine 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.fit">fit() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.fit">fit() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -866,17 +910,25 @@
 </li>
       <li><a href="easymlops.table.feature_selection.html#easymlops.table.feature_selection.embed.LGBMEmbed">LGBMEmbed（easymlops.table.feature_selection.embed 中的类）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.table.html#easymlops.table.regression.LGBMRegression">LGBMRegression（easymlops.table.regression 中的类）</a>
 </li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LinearRegression">LinearRegression（easymlops.table.regression 中的类）</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.core.html#easymlops.core.pipeline_object.PipeLineBase.load">load() （easymlops.core.pipeline_object.PipeLineBase 方法）</a>
 </li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine.load">load() （easymlops.table.core.pipeline_object.TablePipeLine 方法）</a>
 </li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.load_index_raw_data">load_index_raw_data() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.load_index_raw_data">load_index_raw_data() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
+</li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.local_storage.LocalStorage">LocalStorage（easymlops.table.storage.local_storage 中的类）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.classification.LogisticRegressionClassification">LogisticRegressionClassification（easymlops.table.classification 中的类）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LogisticRegression">LogisticRegression（easymlops.table.regression 中的类）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.preprocessing.Lower">Lower（easymlops.nlp.preprocessing 中的类）</a>
 </li>
@@ -993,6 +1045,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.query">query() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.query">query() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1016,12 +1080,12 @@
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.preprocessing.RemoveWhitespace">RemoveWhitespace（easymlops.nlp.preprocessing 中的类）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.table.preprocessing.html#easymlops.table.preprocessing.core.ReName">ReName（easymlops.table.preprocessing.core 中的类）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.preprocessing.ReplaceDigits">ReplaceDigits（easymlops.nlp.preprocessing 中的类）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.nlp.html#easymlops.nlp.preprocessing.ReplacePunctuation">ReplacePunctuation（easymlops.nlp.preprocessing 中的类）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.preprocessing.Replace">Replace（easymlops.nlp.preprocessing 中的类）</a>
@@ -1029,6 +1093,14 @@
       <li><a href="easymlops.table.preprocessing.html#easymlops.table.preprocessing.onevar_operation.Replace">Replace（easymlops.table.preprocessing.onevar_operation 中的类）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.RepresentationBase">RepresentationBase（easymlops.nlp.representation 中的类）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeCVRegression">RidgeCVRegression（easymlops.table.regression 中的类）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeRegression">RidgeRegression（easymlops.table.regression 中的类）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.run">run() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.run">run() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.run">run() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -1050,7 +1122,21 @@
 </li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine.save">save() （easymlops.table.core.pipeline_object.TablePipeLine 方法）</a>
 </li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.save_index_raw_data">save_index_raw_data() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.save_index_raw_data">save_index_raw_data() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
+</li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.scan">scan() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.search">search() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.search">search() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.search">search() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.search">search() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.select_key">select_key() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.select_key">select_key() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -1072,15 +1158,19 @@
 </li>
       <li><a href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase.set_params">set_params() （easymlops.core.pipe_object.PipeObjectBase 方法）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase.set_params">set_params() （easymlops.table.core.pipe_object.TablePipeObjectBase 方法）</a>
 </li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipeline_object.TablePipeLine.set_params">set_params() （easymlops.table.core.pipeline_object.TablePipeLine 方法）</a>
 </li>
       <li><a href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase.set_parent_pipe">set_parent_pipe() （easymlops.core.pipe_object.PipeObjectBase 方法）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase.set_parent_pipe">set_parent_pipe() （easymlops.table.core.pipe_object.TablePipeObjectBase 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.set_stop">set_stop() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.set_stop">set_stop() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.set_stop">set_stop() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -1144,6 +1234,10 @@
 </li>
       <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.transform">transform() （easymlops.table.regression.RegressionBase 方法）</a>
 </li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.transform">transform() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.transform">transform() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
+</li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.transform">transform() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.local_storage.LocalStorage.transform">transform() （easymlops.table.storage.local_storage.LocalStorage 方法）</a>
@@ -1156,8 +1250,12 @@
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.RepresentationBase.transform_single">transform_single() （easymlops.nlp.representation.RepresentationBase 方法）</a>
 </li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.transform_single">transform_single() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.transform_single">transform_single() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
+</li>
       <li><a href="easymlops.table.html#easymlops.table.classification.ClassificationBase.transform_single">transform_single() （easymlops.table.classification.ClassificationBase 方法）</a>
 </li>
       <li><a href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase.transform_single">transform_single() （easymlops.table.core.pipe_object.TablePipeObjectBase 方法）</a>
@@ -1175,6 +1273,10 @@
       <li><a href="easymlops.table.preprocessing.html#easymlops.table.preprocessing.onevar_operation.Bins.transform_single">transform_single() （easymlops.table.preprocessing.onevar_operation.Bins 方法）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.transform_single">transform_single() （easymlops.table.regression.RegressionBase 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.transform_single">transform_single() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.transform_single">transform_single() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.transform_single">transform_single() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -1217,6 +1319,10 @@
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.TFIDF.udf_fit">udf_fit() （easymlops.nlp.representation.TFIDF 方法）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.Word2VecModel.udf_fit">udf_fit() （easymlops.nlp.representation.Word2VecModel 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.udf_fit">udf_fit() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.udf_fit">udf_fit() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.classification.BernoulliNBClassification.udf_fit">udf_fit() （easymlops.table.classification.BernoulliNBClassification 方法）</a>
 </li>
@@ -1302,7 +1408,17 @@
 </li>
       <li><a href="easymlops.table.html#easymlops.table.regression.LGBMRegression.udf_fit">udf_fit() （easymlops.table.regression.LGBMRegression 方法）</a>
 </li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LinearRegression.udf_fit">udf_fit() （easymlops.table.regression.LinearRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LogisticRegression.udf_fit">udf_fit() （easymlops.table.regression.LogisticRegression 方法）</a>
+</li>
       <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.udf_fit">udf_fit() （easymlops.table.regression.RegressionBase 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeCVRegression.udf_fit">udf_fit() （easymlops.table.regression.RidgeCVRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeRegression.udf_fit">udf_fit() （easymlops.table.regression.RidgeRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.udf_fit">udf_fit() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
 </li>
       <li><a href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase.udf_get_params">udf_get_params() （easymlops.core.pipe_object.PipeObjectBase 方法）</a>
 </li>
@@ -1355,6 +1471,10 @@
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.TFIDF.udf_get_params">udf_get_params() （easymlops.nlp.representation.TFIDF 方法）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.Word2VecModel.udf_get_params">udf_get_params() （easymlops.nlp.representation.Word2VecModel 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.udf_get_params">udf_get_params() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.udf_get_params">udf_get_params() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.classification.BernoulliNBClassification.udf_get_params">udf_get_params() （easymlops.table.classification.BernoulliNBClassification 方法）</a>
 </li>
@@ -1500,7 +1620,19 @@
 </li>
       <li><a href="easymlops.table.html#easymlops.table.regression.LGBMRegression.udf_get_params">udf_get_params() （easymlops.table.regression.LGBMRegression 方法）</a>
 </li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LinearRegression.udf_get_params">udf_get_params() （easymlops.table.regression.LinearRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LogisticRegression.udf_get_params">udf_get_params() （easymlops.table.regression.LogisticRegression 方法）</a>
+</li>
       <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.udf_get_params">udf_get_params() （easymlops.table.regression.RegressionBase 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeCVRegression.udf_get_params">udf_get_params() （easymlops.table.regression.RidgeCVRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeRegression.udf_get_params">udf_get_params() （easymlops.table.regression.RidgeRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.udf_get_params">udf_get_params() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.udf_get_params">udf_get_params() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.udf_get_params">udf_get_params() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -1541,6 +1673,10 @@
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.TFIDF.udf_set_params">udf_set_params() （easymlops.nlp.representation.TFIDF 方法）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.Word2VecModel.udf_set_params">udf_set_params() （easymlops.nlp.representation.Word2VecModel 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.udf_set_params">udf_set_params() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.udf_set_params">udf_set_params() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.classification.BernoulliNBClassification.udf_set_params">udf_set_params() （easymlops.table.classification.BernoulliNBClassification 方法）</a>
 </li>
@@ -1626,7 +1762,19 @@
 </li>
       <li><a href="easymlops.table.html#easymlops.table.regression.LGBMRegression.udf_set_params">udf_set_params() （easymlops.table.regression.LGBMRegression 方法）</a>
 </li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LinearRegression.udf_set_params">udf_set_params() （easymlops.table.regression.LinearRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LogisticRegression.udf_set_params">udf_set_params() （easymlops.table.regression.LogisticRegression 方法）</a>
+</li>
       <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.udf_set_params">udf_set_params() （easymlops.table.regression.RegressionBase 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeCVRegression.udf_set_params">udf_set_params() （easymlops.table.regression.RidgeCVRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeRegression.udf_set_params">udf_set_params() （easymlops.table.regression.RidgeRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.udf_set_params">udf_set_params() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.udf_set_params">udf_set_params() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.udf_set_params">udf_set_params() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
@@ -1675,6 +1823,10 @@
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.TFIDF.udf_transform">udf_transform() （easymlops.nlp.representation.TFIDF 方法）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.representation.Word2VecModel.udf_transform">udf_transform() （easymlops.nlp.representation.Word2VecModel 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.ElasticSearchSimilarity.udf_transform">udf_transform() （easymlops.nlp.similarity.ElasticSearchSimilarity 方法）</a>
+</li>
+      <li><a href="easymlops.nlp.html#easymlops.nlp.similarity.FaissSimilarity.udf_transform">udf_transform() （easymlops.nlp.similarity.FaissSimilarity 方法）</a>
 </li>
       <li><a href="easymlops.table.html#easymlops.table.classification.BernoulliNBClassification.udf_transform">udf_transform() （easymlops.table.classification.BernoulliNBClassification 方法）</a>
 </li>
@@ -1742,7 +1894,15 @@
 </li>
       <li><a href="easymlops.table.html#easymlops.table.regression.LGBMRegression.udf_transform">udf_transform() （easymlops.table.regression.LGBMRegression 方法）</a>
 </li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LinearRegression.udf_transform">udf_transform() （easymlops.table.regression.LinearRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.LogisticRegression.udf_transform">udf_transform() （easymlops.table.regression.LogisticRegression 方法）</a>
+</li>
       <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.udf_transform">udf_transform() （easymlops.table.regression.RegressionBase 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeCVRegression.udf_transform">udf_transform() （easymlops.table.regression.RidgeCVRegression 方法）</a>
+</li>
+      <li><a href="easymlops.table.html#easymlops.table.regression.RidgeRegression.udf_transform">udf_transform() （easymlops.table.regression.RidgeRegression 方法）</a>
 </li>
       <li><a href="easymlops.core.html#easymlops.core.pipe_object.PipeObjectBase.udf_transform_single">udf_transform_single() （easymlops.core.pipe_object.PipeObjectBase 方法）</a>
 </li>
@@ -1818,9 +1978,13 @@
 </li>
       <li><a href="easymlops.table.html#easymlops.table.regression.RegressionBase.udf_transform_single">udf_transform_single() （easymlops.table.regression.RegressionBase 方法）</a>
 </li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.update_connect">update_connect() （easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage 方法）</a>
+</li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.hbase_storage.HbaseStorage.update_connect">update_connect() （easymlops.table.storage.hbase_storage.HbaseStorage 方法）</a>
 </li>
       <li><a href="easymlops.table.storage.html#easymlops.table.storage.local_storage.LocalStorage.update_connect">update_connect() （easymlops.table.storage.local_storage.LocalStorage 方法）</a>
+</li>
+      <li><a href="easymlops.table.storage.html#easymlops.table.storage.faiss_storage.FaissStorage.update_index_raw_data">update_index_raw_data() （easymlops.table.storage.faiss_storage.FaissStorage 方法）</a>
 </li>
       <li><a href="easymlops.nlp.html#easymlops.nlp.preprocessing.Upper">Upper（easymlops.nlp.preprocessing 中的类）</a>
 </li>
@@ -1878,6 +2042,8 @@
 </li>
         <li><a href="easymlops.nlp.html#module-easymlops.nlp.representation">easymlops.nlp.representation</a>
 </li>
+        <li><a href="easymlops.nlp.html#module-easymlops.nlp.similarity">easymlops.nlp.similarity</a>
+</li>
         <li><a href="easymlops.table.html#module-easymlops.table">easymlops.table</a>
 </li>
         <li><a href="easymlops.table.callback.html#module-easymlops.table.callback">easymlops.table.callback</a>
@@ -1921,6 +2087,10 @@
         <li><a href="easymlops.table.html#module-easymlops.table.regression">easymlops.table.regression</a>
 </li>
         <li><a href="easymlops.table.storage.html#module-easymlops.table.storage">easymlops.table.storage</a>
+</li>
+        <li><a href="easymlops.table.storage.html#module-easymlops.table.storage.elasticsearch_storage">easymlops.table.storage.elasticsearch_storage</a>
+</li>
+        <li><a href="easymlops.table.storage.html#module-easymlops.table.storage.faiss_storage">easymlops.table.storage.faiss_storage</a>
 </li>
         <li><a href="easymlops.table.storage.html#module-easymlops.table.storage.hbase_storage">easymlops.table.storage.hbase_storage</a>
 </li>

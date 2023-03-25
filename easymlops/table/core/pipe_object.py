@@ -396,6 +396,7 @@ class TablePipeObjectBase(PipeObjectBase):
         :return:
         """
         pipe_obj.set_master_pipe(self)
+        pipe_obj.set_parent_pipe(self)
         self.branch_pipes.append(pipe_obj)
 
     def get_branch_pipe(self, index):
@@ -498,5 +499,5 @@ class TablePipeObjectBase(PipeObjectBase):
         for current_parent_pipe in tqdm(all_parent_pipes) if show_process else all_parent_pipes:
             if show_process:
                 print(current_parent_pipe.name)
-            x_ = current_parent_pipe.transform(x_, **kwargs)
+            x_ = current_parent_pipe.transform_single(x_, **kwargs)
         return x_

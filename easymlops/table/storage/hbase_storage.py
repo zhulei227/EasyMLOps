@@ -2,9 +2,8 @@ import time
 import datetime
 from easymlops.table.core import *
 import threading
-import happybase
-from func_timeout import func_set_timeout
 import random
+from func_timeout import func_set_timeout
 
 
 class HbaseStorage(TablePipeObjectBase, threading.Thread):
@@ -40,7 +39,7 @@ class HbaseStorage(TablePipeObjectBase, threading.Thread):
             self._conn, self._tab_key, self._tab_transform = self.create_connect(self.hosts, self.port, self.table_name,
                                                                                  self.cf_name)
 
-    @func_set_timeout(0.2)
+    @func_set_timeout(10)
     def _activate_connect(self):
         try:
             self._conn.tables()
@@ -59,6 +58,7 @@ class HbaseStorage(TablePipeObjectBase, threading.Thread):
         random.shuffle(hosts)
         for host in hosts:
             try:
+                import happybase
                 _conn = happybase.Connection(host=host, port=port)
                 _conn.open()
                 # 创建key表

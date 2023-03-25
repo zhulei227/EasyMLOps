@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="索引" href="genindex.html" />
     <link rel="search" title="搜索" href="search.html" />
-    <link rel="next" title="API Refrence(Version=0.1.1)" href="easymlops.html" />
+    <link rel="next" title="API Refrence(Version=0.1.2)" href="easymlops.html" />
     <link rel="prev" title="生产部署" href="cap8_deploy.html" /> 
 </head>
 
@@ -73,9 +73,22 @@
 <li class="toctree-l3"><a class="reference internal" href="#scan">复杂查询:scan</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#faiss">Faiss存储</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#k">检索最相似的k个数据</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">为生产数据创建索引</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.1)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#elasticsearch">ElasticSearch存储</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">模拟生产数据流</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#key">查询key</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#query">query搜索</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">query聚合</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#search">search透传</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.2)</a></li>
 </ul>
 
         </div>
@@ -151,7 +164,7 @@
 <span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x28364cb02c8&gt;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x23a242ae908&gt;
 </pre></div>
 </div>
 <p>上面，再LabelEncoding和LGBMClassfication后分别加了一个LocalStorage模块，用于保存它们的输出，下面模拟一条生产输入数据</p>
@@ -367,6 +380,8 @@
 <li><p>查询指定时间范围内的数据；</p></li>
 <li><p>scan进行复杂查询</p></li>
 </ul>
+<p>该部分模块需要：</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">happybase</span></code> 和 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">func_timeout</span></code></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
 <span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>\
@@ -465,6 +480,284 @@ https://hbase.apache.org/book.html#thrift</p>
 |  4 |           507 | 2023-03-07 21:50:43.977907 |           507 | -0.330626 |      0 | -1.56999 |    33 |       0 |       2 |        0 |  26       | 0.299607 |   0.224849 |          0 |          0 |          1 |          0 |            1 |
 </pre></div>
 </div>
+</section>
+</section>
+<section id="faiss">
+<h2>Faiss存储<a class="headerlink" href="#faiss" title="此标题的永久链接">¶</a></h2>
+<p>faiss即Facebook AI Similarity Search，是一个由facebook开发以用于搜索相似向量的库，所以该存储模块所存储的必需为数值，而该模块所能提供的功能也主要是最相似向量的检索，faiss具有不同的索引构造方式，以及不同的相似度度量方式，这部分可以通过<code class="docutils literal notranslate"><span class="pre">create_index_param</span></code>和<code class="docutils literal notranslate"><span class="pre">create_index_measure</span></code>设置，各种方式的优缺点以及适合场景还请访问官方文档:https://github.com/facebookresearch/faiss</p>
+<p>该模块需要 <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">faiss-cpu</span></code>或<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">faiss-gpu</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/demo2.csv&quot;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;gbk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   label | review                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|-----:|--------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 3834 |       1 | 不错的地方，房间不错，服务也可。除了火车声音有点受不了。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 2491 |       1 | 这次住的附楼（未挂星），硬件设施比较陈旧，空调也不太好，我还因此换了回房间．二楼还有很多蚊子．不过服务                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|  279 |       1 | 地理位置不错，房间环境也可以，洗衣速度快，值得称赞，唯一不足就是装修期间，很多楼层乱乱的。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 6056 |       0 | 床发出吱嘎吱嘎的声音，房间隔音太差，赠送的早餐非常好吃。补充点评2008年7月22日：我们住的是度假村的标准间。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 4199 |       1 | 据我昆山一个搞装潢的朋友讲,这家酒店的大堂和客房选用的石材、家具、卫浴设备都很高档,以性价比来说挺超值的.所以以前出差到昆山都住这家酒店.半年没来了,这次来发现他们员工都换了新制服,大堂的很多装饰也焕然一新,走进大堂还有淡淡的香味,还蛮惊喜的.之前几次一直住主楼,这次订房想换个风格,就选了他们的商务楼.这边房间和主楼配备几乎相同,只是卫生间是透明的,可以一边泡澡一边看电视,估计也是他们的一个卖点.今天上网无意中点开他们家的&quot;所有房型&quot;才发现,可能是夏天酒店业淡季的原因,现在携程上面订行政客房就能送1份108元早餐和50元足浴,还有鲜花水果报纸什么的.细算下来,搞促销的时候住行政客房还是很划算的,但愿下次过去的时候这个活动还没结束.这次入住唯一感觉不太满意的就是办入住的时间有点长,扫描证件弄了好几分钟,不过奥运期间好象酒店都这样.宾馆反馈2008年8月14日：尊敬的客人:您好感谢您选择君豪酒店,除了行政客房外,我们还有商务豪华客房也有优惠的促销,同样是订房就送早餐和足浴券.关于您所说的证件登记的问题,我们也是在配合奥运期间公安部门的安全规定,极力为客人提供一个安全舒适的环境,也请您能够理解.欢迎您下次入住,我们一定会为您提供优质的更好的服务. |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_train</span><span class="o">=</span><span class="n">data</span><span class="p">[:</span><span class="mi">5000</span><span class="p">]</span>
+<span class="n">x_test</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">5000</span><span class="p">:]</span>
+<span class="n">y_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="n">y_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>构造一个模型</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops</span> <span class="kn">import</span> <span class="n">TablePipeLine</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.nlp.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.nlp.representation</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.classification</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.ensemble</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Parallel</span><span class="p">([</span><span class="n">LsiTopicModel</span><span class="p">(</span><span class="n">num_topics</span><span class="o">=</span><span class="mi">128</span><span class="p">),</span><span class="n">Word2VecModel</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)]))</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">LGBMClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span><span class="n">native_init_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;max_depth&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">},</span><span class="n">native_fit_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;num_boost_round&quot;</span><span class="p">:</span><span class="mi">128</span><span class="p">},</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;lgbm&quot;</span><span class="p">))</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x18d88026088&gt;
+</pre></div>
+</div>
+<p>挂载</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.storage</span> <span class="kn">import</span> <span class="n">FaissStorage</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_branch_pipe</span><span class="p">(</span><span class="n">FaissStorage</span><span class="p">(</span><span class="n">raw_data</span><span class="o">=</span><span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;review&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span><span class="n">storage_path</span><span class="o">=</span><span class="s2">&quot;./faiss_storage&quot;</span><span class="p">,</span>
+                                       <span class="n">create_index_param</span><span class="o">=</span><span class="s2">&quot;IVF100,PQ16&quot;</span><span class="p">,</span><span class="n">create_index_measure</span><span class="o">=</span><span class="s2">&quot;METRIC_INNER_PRODUCT&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>这里由于没有事先训练好index，所以要先训练一次，但如果已经训练好了，可以通过<code class="docutils literal notranslate"><span class="pre">load_index_raw_data</span></code>直接加载</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span><span class="n">run_to_layer</span><span class="o">=-</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;FaissStorage(&lt;class &#39;easymlops.table.storage.faiss_storage.FaissStorage&#39;&gt;, started 8940)&gt;
+</pre></div>
+</div>
+<section id="k">
+<h3>检索最相似的k个数据<a class="headerlink" href="#k" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;review&quot;</span><span class="p">:</span><span class="s2">&quot;地方偏僻，而且部根本是人服的，前天去住的候，空都有，酒店借口，已了，但是一都有，了省，搞的，...&quot;</span><span class="p">}</span>
+<span class="n">result_df</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span><span class="n">run_to_layer</span><span class="o">=-</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result_df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    | similarity_top_1_raw_data                              | similarity_top_2_raw_data                                                                                                                    | similarity_top_3_raw_data                                                                                                                                                                                                                                                               |   similarity_top_1_measure |   similarity_top_2_measure |   similarity_top_3_measure |
+|---:|:-------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------:|---------------------------:|---------------------------:|
+|  0 | 角房太冷了，tnnd。角房太冷了，tnnd。角房太冷了，tnnd。 | 房间太小.设施太垃圾.洗澡水半天都是凉水.放很久才有热水啊.洗澡间放5分钟就水漫金山了，所以原定住10天,结果住了2天就退定了,冰箱没接电,宽带还可以. | 交通不便是地方最最令我失望的地方，住了三天，第一天，打不到的士，酒店的司了商竟然收我40去一上打只要不到20的地方。不是的，而是趁火打劫的行在令我怒。房的第二晚上，竟然有空，只慢吹。而且房的隔音也不怎么，白天晚上都可以到KTV和夜的歌。本酒店的房，和格我喜的，不以上的，以後真的不敢恭。 |                    90.5594 |                    64.8806 |                    63.1392 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_data</span><span class="o">=</span><span class="n">x_test</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span>
+<span class="n">result_df</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span><span class="n">run_to_layer</span><span class="o">=-</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result_df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      | similarity_top_1_raw_data                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | similarity_top_2_raw_data                                                                                                                                                                                              | similarity_top_3_raw_data                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |   similarity_top_1_measure |   similarity_top_2_measure |   similarity_top_3_measure |
+|-----:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------:|---------------------------:|---------------------------:|
+| 4566 | 交通很方便，服务态度不错，就是隔音条件不太好。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | 总的来说,比较干净,而且地理位置很好,市区繁华地段.进出方便.                                                                                                                                                              | 服务不错，位置也比较方便，坐地铁、去虹桥机场都很方便。设施有点旧，隔音不好。房间还比较干净。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |                   247.216  |                   236.071  |                   233.069  |
+| 5590 | 10月19日上岛的，11点到大堂，房间还没有好要等到下午1点，于是寄存行李，步行欣赏沿途风光，快12点赶往冬季码头潜水，中午工作人员为了节省时间没有培训就把我们送上船了，好在我的东北教练很负责任给我额外培训，虽然受天气影响能见度不高只看到几只小丑鱼，海葵和珊瑚，但也是很美好的潜水回忆了。---上午的时间安排很成功，避免了等待及厌烦。下午1点结束潜水在冬季码头乘坐免费的电瓶车到大堂，直接拿房间钥匙，由电瓶车免费送上去。不过观海木楼在山顶，有多个台阶车子只送到一半，要自己走上去。房间是8626有很不错的角度看海景，房间很有特色，设施齐全室外还有独立的游泳池，蜜月旅行酒店还特意送了果盘，潜水耳朵进水要了棉签，服务生很快就爬上山送来了，感觉这里的服务很错的。不过因为出于“室外桃源，人间仙境”的岛上，人和小动物和谐共处，所以有很多小家伙出入，我们看到好几只壁虎，小虫，飞蛾还有蛤蟆，蛤蟆从门缝钻进房间一跳就找不到了，我紧张的打电话给前台问是否会有蛇，蛤蟆还不算可怕，如果有蛇就太恐怖了，服务生说房间附近的草木都洒了硫磺，绝对不会有蛇的，还热心的问是否需要来帮我抓蛤蟆，被我们谢绝了。害怕有别的小东西再进来，老公用报纸堵住门缝，喷了防蚊药水，还把墙上的几个木头洞用纸巾堵上了，不过我还是睡不踏实，半夜4点惊醒尖叫，原来蛤蟆跳到被窝里把我吓醒了！老公惊醒就来说赶蛤蟆，那场景真实难忘啊！回来的路上老公还戏称这为“美好的回忆”呢！心惊胆战的度过一夜人很累一直睡到早上10点多，错过了看日出，在木楼上景色很不错，我们享受好美景就去退房，速度很快，服务态度也很好。然后又帮我们把行李存好。退房后我们又继续沿海滩行走，玩水到中午12点去海鲜自助餐厅吃“早中饭”，40元一人，虽然海鲜种类不多，可无限量供应的和乐蟹让人过足了瘾，伴着碧海蓝天椰林进餐，真是享受啊。吃好饭继续边走边看，一直走到未开发禁止通行牌才打道回大堂，再乘免费电瓶车送到码头坐船。时间很充裕的，因为我们把无谓的等待时间都利用起来了，感觉很不错。 | 手机已收到短消息回复订房OK，前台自己没查到，却叫我打电话给携程，要我自己搞定，即使我给前台看确认的短消息，一样不理，后来我自己打了电话，让携程的客服跟前台通话后，他们就找到了，这就是锦江之星（上海张江店）的服务态度 | 上海浦东雅诗阁，宽带是要额外收费的，然而在携程的网站上（，房间价格的表格中，宽带下面只是写着“宽带”两个字，后来在酒店结账的时候发现宽带是额外收费的，我给携程打电话，才被告知，“宽带”这两个字仅仅表明这个酒店有宽带设施！其实在我使用宽带之前，已经和前台询问是否收费，前台当时可能忙，说让我先用，结帐的时候免去。结果结账的时候是另一个服务生，拒绝免除宽带费。让我向携程讨公道去。知道我把他们的大堂副经理叫了出来，我的外国同事用英语把这个经理数落了一番之后，他们才免除了这笔费用。其实上网费并不多，几百元钱，但是这种出尔反尔，先告诉我免费，再收费的做法实在是过分。而且，对中国人和外国人的态度明显不一样，也让我感到很不爽。 |                   158.007  |                   154.179  |                   145.682  |
+|  281 | 酒店服务意识很好，很热情，主动介绍酒店的特色。感觉不错。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 很好的地理位置，一蹋糊涂的服务，萧条的酒店。                                                                                                                                                                           | 非常好的酒店，四星的标准完全超值的享受，服务非常好                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |                    87.1075 |                    85.8245 |                    84.1975 |
+| 1875 | 酒店位置十分偏远，交通，购物，餐饮极不方便                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 交通挺方便的，离机场步行十分钟，离火车站车行十分钟。可能最近是淡季吧，有点冷清。                                                                                                                                       | 酒店有世外桃的感,境非常美,不如果有自,交通就不是很方便了.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |                   179.902  |                   174.152  |                   169.272  |
+| 5119 | 第二次入住这个酒店了，服务很好，让客人感到很舒服，很满意。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 酒店服务意识很好，很热情，主动介绍酒店的特色。感觉不错。                                                                                                                                                               | 是非常不错的酒店，服务也很周到，赞赏香港人的服务意识。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |                   113.135  |                   112.554  |                   103.822  |
+</pre></div>
+</div>
+</section>
+<section id="id7">
+<h3>为生产数据创建索引<a class="headerlink" href="#id7" title="此标题的永久链接">¶</a></h3>
+<p>如果需要为生产数据创建索引，需要设置<code class="docutils literal notranslate"><span class="pre">add_index=True</span></code>，以及在<code class="docutils literal notranslate"><span class="pre">storage_base_dict</span></code>中添加<code class="docutils literal notranslate"><span class="pre">row_data</span></code>，而持久化生产上的<code class="docutils literal notranslate"><span class="pre">index</span></code>和<code class="docutils literal notranslate"><span class="pre">raw_data</span></code>，需要自己<strong>手动</strong>调用<code class="docutils literal notranslate"><span class="pre">save_index_raw_data</span></code>接口，比如下面模拟生产数据</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">x_test</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)):</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">,</span><span class="s2">&quot;row_data&quot;</span><span class="p">:</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;review&quot;</span><span class="p">)},</span><span class="n">add_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|██████████████████████████████████████████████████████████████████████████████████| 10/10 [00:00&lt;00:00, 32.93it/s]
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_data</span><span class="o">=</span><span class="n">x_test</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">result_df</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span><span class="n">run_to_layer</span><span class="o">=-</span><span class="mi">2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result_df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    | similarity_top_1_raw_data                                                                                                                                                                                                                                                                                                                                                       | similarity_top_2_raw_data                              | similarity_top_3_raw_data                                    |   similarity_top_1_measure |   similarity_top_2_measure |   similarity_top_3_measure |
+|---:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------|:-------------------------------------------------------------|---------------------------:|---------------------------:|---------------------------:|
+|  0 | 听说金仕顿已经是4星级了，感觉和3星没什么区别，最不能忍受的是上网问题，普通的标准间竟然还是电话线拨号上网，而且奇贵无比，只好多花点银子住了商务房，如果不是来交通厅办事，打死不会住这里，福州其他以前感觉不错的4星宾馆现在都升5星了，看来福州宾馆的水平在全国来讲算偏低水平了。还要提醒酒店的是，早餐自助餐的花样太少，每每转几圈竟然不知要吃什么。|1|2023-03-13 21:10:47.876759 | 住的是一楼，房间太小，窗户对着一堵墙。以后不会再住它了 | 性价比较高，我住了一晚之后从乐山回来又续订了两晚，比较满意。 |                     65.514 |                    65.3999 |                    62.6765 |
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_data</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;review&#39;: &#39;听说金仕顿已经是4星级了，感觉和3星没什么区别，最不能忍受的是上网问题，普通的标准间竟然还是电话线拨号上网，而且奇贵无比，只好多花点银子住了商务房，如果不是来交通厅办事，打死不会住这里，福州其他以前感觉不错的4星宾馆现在都升5星了，看来福州宾馆的水平在全国来讲算偏低水平了。还要提醒酒店的是，早餐自助餐的花样太少，每每转几圈竟然不知要吃什么。&#39;}
+</pre></div>
+</div>
+<p>有时候你可能会发现，完全相同的两个向量未必能被检索为相似度最高,这与你创建索引的方式以及评估相似度方式相关，通常来说，如果想要更高的召回，那就需要更多的内存和计算时间开销，请根据你自己的使用场景合理选择</p>
+</section>
+</section>
+<section id="elasticsearch">
+<h2>ElasticSearch存储<a class="headerlink" href="#elasticsearch" title="此标题的永久链接">¶</a></h2>
+<p>you know, for search</p>
+<p>这里需要注意一下<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">elasticsearch==x.x.x</span></code>的版本需要与服务端一致</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;./data/demo.csv&quot;</span><span class="p">,</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;gbk&quot;</span><span class="p">)</span>
+<span class="n">x_train</span><span class="o">=</span><span class="n">data</span><span class="p">[:</span><span class="mi">500</span><span class="p">]</span>
+<span class="n">x_test</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="mi">500</span><span class="p">:]</span>
+<span class="n">y_train</span><span class="o">=</span><span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="n">y_test</span><span class="o">=</span><span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_train</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+<span class="k">del</span> <span class="n">x_test</span><span class="p">[</span><span class="s2">&quot;Survived&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops</span> <span class="kn">import</span> <span class="n">TablePipeLine</span>
+<span class="kn">from</span> <span class="nn">easymlops.table.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>构建模型</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="o">=</span><span class="n">TablePipeLine</span><span class="p">()</span>
+<span class="n">table</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+  <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">())</span>
+
+<span class="n">table</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.table.core.pipeline_object.TablePipeLine at 0x2262dd51148&gt;
+</pre></div>
+</div>
+<p>挂载存储模块</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.storage</span> <span class="kn">import</span> <span class="n">ElasticSearchStorage</span>
+<span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_branch_pipe</span><span class="p">(</span><span class="n">ElasticSearchStorage</span><span class="p">(</span><span class="n">index_name</span><span class="o">=</span><span class="s2">&quot;survived_index&quot;</span><span class="p">,</span><span class="n">es_args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;http://192.168.244.133:9200&quot;</span><span class="p">],</span><span class="n">es_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)))</span>
+</pre></div>
+</div>
+<section id="id8">
+<h3>模拟生产数据流<a class="headerlink" href="#id8" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">x_test</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s2">&quot;record&quot;</span><span class="p">)):</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">transform_single</span><span class="p">(</span><span class="n">record</span><span class="p">,</span><span class="n">storage_base_dict</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span><span class="n">i</span><span class="p">})</span>
+    <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>100%|██████████████████████████████████████████████████████████████████████████████| 100/100 [00:00&lt;00:00, 2630.66it/s]
+</pre></div>
+</div>
+</section>
+<section id="key">
+<h3>查询key<a class="headerlink" href="#key" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">select_key</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;3&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   storage_key | storage_transform_time     |   Age |   Cabin | Embarked   |    Fare | Name                           |   Parch |   PassengerId |   Pclass | Sex    |   SibSp |   Ticket |
+|---:|--------------:|:---------------------------|------:|--------:|:-----------|--------:|:-------------------------------|--------:|--------------:|---------:|:-------|--------:|---------:|
+|  0 |             3 | 2023-03-25 10:13:11.044650 |    37 |     nan | S          | 9.58594 | Laitinen, Miss. Kristina Sofia |       0 |           504 |        3 | female |       0 |     4135 |
+</pre></div>
+</div>
+</section>
+<section id="query">
+<h3>query搜索<a class="headerlink" href="#query" title="此标题的永久链接">¶</a></h3>
+<p>前三条与<code class="docutils literal notranslate"><span class="pre">Name</span></code>最相似的记录</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;match&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Lester, Mr. James&#39;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;sort&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;_score&#39;</span><span class="p">:</span> <span class="p">{</span>                    
+            <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="s1">&#39;desc&#39;</span>        
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;from&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;size&#39;</span><span class="p">:</span><span class="mi">3</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">query_output</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">query_output</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   PassengerId |   Pclass | Name                      | Sex   |   Age |   SibSp |   Parch | Ticket           |     Fare | Cabin   | Embarked   |   storage_key | storage_transform_time     |   hit_score_ |
+|---:|--------------:|---------:|:--------------------------|:------|------:|--------:|--------:|:-----------------|---------:|:--------|:-----------|--------------:|:---------------------------|-------------:|
+|  0 |           512 |        3 | Webber, Mr. James         | male  |   0   |       0 |       0 | SOTON/OQ 3101316 |  8.04688 | nan     | S          |            11 | 2023-03-25 09:52:43.008322 |      3.64815 |
+|  1 |           526 |        3 | Farrell, Mr. James        | male  |  40.5 |       0 |       0 | 367232           |  7.75    | nan     | Q          |            25 | 2023-03-25 09:52:43.013323 |      3.64815 |
+|  2 |           513 |        1 | McGough, Mr. James Robert | male  |  36   |       0 |       0 | PC 17473         | 26.2812  | E25     | S          |            12 | 2023-03-25 09:52:43.009328 |      3.27887 |
+</pre></div>
+</div>
+</section>
+<section id="id9">
+<h3>query聚合<a class="headerlink" href="#id9" title="此标题的永久链接">¶</a></h3>
+<p>Pclass分组下最大的Fare</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;_source&#39;</span><span class="p">:[</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span><span class="s1">&#39;Fare&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;aggs&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;Pclass&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;field&#39;</span><span class="p">:</span><span class="s1">&#39;Fare&#39;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;sort&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;Pclass&#39;</span><span class="p">:</span> <span class="p">{</span>                    
+            <span class="s1">&#39;order&#39;</span><span class="p">:</span> <span class="s1">&#39;asc&#39;</span>        
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;from&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;size&#39;</span><span class="p">:</span><span class="mi">3</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">agg_output</span><span class="o">=</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">agg_output</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|    |   Pclass |     Fare |
+|---:|---------:|---------:|
+|  0 |        1 |  86.5    |
+|  1 |        1 | 108.875  |
+|  2 |        1 |  26.5469 |
+</pre></div>
+</div>
+<p>通过<code class="docutils literal notranslate"><span class="pre">body</span></code>设置不同的查询语法可以获得更加复杂的查询结果，具体语法还请自行查看资料，另外保证很大的自由度，下面<code class="docutils literal notranslate"><span class="pre">search</span></code>可以直接透传原始的es的<code class="docutils literal notranslate"><span class="pre">search</span></code></p>
+</section>
+<section id="search">
+<h3>search透传<a class="headerlink" href="#search" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_branch_pipe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;took&#39;: 4,
+ &#39;timed_out&#39;: False,
+ &#39;_shards&#39;: {&#39;total&#39;: 1, &#39;successful&#39;: 1, &#39;skipped&#39;: 0, &#39;failed&#39;: 0},
+ &#39;hits&#39;: {&#39;total&#39;: {&#39;value&#39;: 101, &#39;relation&#39;: &#39;eq&#39;},
+  &#39;max_score&#39;: None,
+  &#39;hits&#39;: [{&#39;_index&#39;: &#39;survived_index2&#39;,
+    &#39;_type&#39;: &#39;_doc&#39;,
+    &#39;_id&#39;: &#39;4&#39;,
+    &#39;_score&#39;: None,
+    &#39;_source&#39;: {&#39;Pclass&#39;: 1, &#39;Fare&#39;: 86.5},
+    &#39;sort&#39;: [1]},
+   {&#39;_index&#39;: &#39;survived_index2&#39;,
+    &#39;_type&#39;: &#39;_doc&#39;,
+    &#39;_id&#39;: &#39;5&#39;,
+    &#39;_score&#39;: None,
+    &#39;_source&#39;: {&#39;Pclass&#39;: 1, &#39;Fare&#39;: 108.875},
+    &#39;sort&#39;: [1]},
+   {&#39;_index&#39;: &#39;survived_index2&#39;,
+    &#39;_type&#39;: &#39;_doc&#39;,
+    &#39;_id&#39;: &#39;7&#39;,
+    &#39;_score&#39;: None,
+    &#39;_source&#39;: {&#39;Pclass&#39;: 1, &#39;Fare&#39;: 26.546875},
+    &#39;sort&#39;: [1]}]},
+ &#39;aggregations&#39;: {&#39;Pclass&#39;: {&#39;value&#39;: 227.5}}}
+</pre></div>
+</div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
@@ -477,7 +770,7 @@ https://hbase.apache.org/book.html#thrift</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cap8_deploy.html" class="btn btn-neutral float-left" title="生产部署" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="easymlops.html" class="btn btn-neutral float-right" title="API Refrence(Version=0.1.1)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="easymlops.html" class="btn btn-neutral float-right" title="API Refrence(Version=0.1.2)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

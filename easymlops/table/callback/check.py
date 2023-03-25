@@ -19,12 +19,18 @@ def run_batch_single_transform(module: TablePipeObjectBase, s_):
     """
     s = copy.deepcopy(s_)
     batch_transform = module.transform(s)  # 注意:transform可能会修改s自身数据
+    # 做shuffle检测
+    if np.sum(s_.index != batch_transform.index) > 0:
+        raise Exception(f"({module})  module's transform function will shuffle data's index,please fix it")
     single_transform = []
     single_operate_times = []
     s = copy.deepcopy(s_)
     detector = CpuMemDetector()
     detector.start()
-    for record in s.to_dict("record"):
+    records = s.to_dict("records")
+    if len(records) == 0:  # 全空
+        records = [{}] * batch_transform.shape[0]
+    for record in records:
         start_time = datetime.datetime.now()
         single_transform.append(module.transform_single(record))
         end_time = datetime.datetime.now()

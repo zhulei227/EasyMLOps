@@ -1,3 +1,6 @@
 .idea/
 *.ipynb
+*.ipynb_checkpoints
 *.pyc
+*.pkl
+*.db

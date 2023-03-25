@@ -55,7 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.1)</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="easymlops.html">easymlops package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="easymlops.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="easymlops.core.html">easymlops.core package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="easymlops.nlp.html">easymlops.nlp package</a></li>
@@ -92,7 +92,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="easymlops.html">API Refrence(Version=0.1.1)</a></li>
+          <li class="breadcrumb-item"><a href="easymlops.html">easymlops package</a></li>
           <li class="breadcrumb-item"><a href="easymlops.table.html">easymlops.table package</a></li>
       <li class="breadcrumb-item active">easymlops.table.storage package</li>
       <li class="wy-breadcrumbs-aside">
@@ -108,6 +108,249 @@
 <h1>easymlops.table.storage package<a class="headerlink" href="#easymlops-table-storage-package" title="此标题的永久链接">¶</a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="此标题的永久链接">¶</a></h2>
+</section>
+<section id="module-easymlops.table.storage.elasticsearch_storage">
+<span id="easymlops-table-storage-elasticsearch-storage-module"></span><h2>easymlops.table.storage.elasticsearch_storage module<a class="headerlink" href="#module-easymlops.table.storage.elasticsearch_storage" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.storage.elasticsearch_storage.</span></span><span class="sig-name descname"><span class="pre">ElasticSearchStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default_index'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">es_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">es_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TablePipeObjectBase</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></p>
+<p>存储模块，主要用于在transform_single阶段存储数据,其余过程均透传,es默认对所有列都创建索引</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.activate_connect">
+<span class="sig-name descname"><span class="pre">activate_connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.activate_connect" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.create_connect">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">es_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">es_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.create_connect" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.fit" title="永久链接至目标">¶</a></dt>
+<dd><p>fit:依次调用before_fit,_fit,after_fit</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.query" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.run" title="永久链接至目标">¶</a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.search" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.select_key">
+<span class="sig-name descname"><span class="pre">select_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.select_key" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.set_stop">
+<span class="sig-name descname"><span class="pre">set_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.set_stop" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.transform" title="永久链接至目标">¶</a></dt>
+<dd><p>批量接口:依次调用before_transform,_transform,after_transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.transform_single">
+<span class="sig-name descname"><span class="pre">transform_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_base_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.transform_single" title="永久链接至目标">¶</a></dt>
+<dd><p>单条数据接口:调用顺序before_transform_single,_transform_single,after_transform_single</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.udf_get_params">
+<span class="sig-name descname"><span class="pre">udf_get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.udf_get_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.udf_set_params">
+<span class="sig-name descname"><span class="pre">udf_set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.udf_set_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.update_connect">
+<span class="sig-name descname"><span class="pre">update_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">es_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">es_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.elasticsearch_storage.ElasticSearchStorage.update_connect" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-easymlops.table.storage.faiss_storage">
+<span id="easymlops-table-storage-faiss-storage-module"></span><h2>easymlops.table.storage.faiss_storage module<a class="headerlink" href="#module-easymlops.table.storage.faiss_storage" title="此标题的永久链接">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">easymlops.table.storage.faiss_storage.</span></span><span class="sig-name descname"><span class="pre">FaissStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_top_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_index_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_index_measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'similarity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./faiss_storage'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage" title="永久链接至目标">¶</a></dt>
+<dd><p>基类：<a class="reference internal" href="easymlops.table.core.html#easymlops.table.core.pipe_object.TablePipeObjectBase" title="easymlops.table.core.pipe_object.TablePipeObjectBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TablePipeObjectBase</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.load_index_raw_data">
+<span class="sig-name descname"><span class="pre">load_index_raw_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.load_index_raw_data" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.run" title="永久链接至目标">¶</a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.save_index_raw_data">
+<span class="sig-name descname"><span class="pre">save_index_raw_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.save_index_raw_data" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.search" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.set_stop">
+<span class="sig-name descname"><span class="pre">set_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.set_stop" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.transform" title="永久链接至目标">¶</a></dt>
+<dd><p>批量接口:依次调用before_transform,_transform,after_transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.transform_single">
+<span class="sig-name descname"><span class="pre">transform_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage_base_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.transform_single" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – 生产输入</p></li>
+<li><p><strong>add_index</strong> – 是否添加index</p></li>
+<li><p><strong>storage_base_dict</strong> – 额外存储信息</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.udf_fit">
+<span class="sig-name descname"><span class="pre">udf_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.udf_fit" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.udf_get_params">
+<span class="sig-name descname"><span class="pre">udf_get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.udf_get_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">返回<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.udf_set_params">
+<span class="sig-name descname"><span class="pre">udf_set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.udf_set_params" title="永久链接至目标">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">参数<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> – </p>
+</dd>
+<dt class="field-even">返回<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="easymlops.table.storage.faiss_storage.FaissStorage.update_index_raw_data">
+<span class="sig-name descname"><span class="pre">update_index_raw_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#easymlops.table.storage.faiss_storage.FaissStorage.update_index_raw_data" title="永久链接至目标">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-easymlops.table.storage.hbase_storage">
 <span id="easymlops-table-storage-hbase-storage-module"></span><h2>easymlops.table.storage.hbase_storage module<a class="headerlink" href="#module-easymlops.table.storage.hbase_storage" title="此标题的永久链接">¶</a></h2>
