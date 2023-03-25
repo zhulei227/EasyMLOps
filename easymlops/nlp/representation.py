@@ -16,8 +16,8 @@ class RepresentationBase(TablePipeObjectBase):
         super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.cols = cols
         # 底层模型自带参数
-        self.native_init_params = native_init_params
-        self.native_fit_params = native_fit_params
+        self.native_init_params = copy.deepcopy(native_init_params)
+        self.native_fit_params = copy.deepcopy(native_fit_params)
         if self.native_init_params is None:
             self.native_init_params = dict()
         if self.native_fit_params is None:

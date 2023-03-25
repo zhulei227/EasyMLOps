@@ -3,12 +3,12 @@ from setuptools import find_packages, setup
 with open('requirements.txt') as f:
     requirements = f.read()
 
-with open('README.rst') as f:
+with open('README.rst', encoding="utf8") as f:
     long_description = f.read()
 
 setup(
     name='easymlops',
-    version='0.1.1',
+    version='0.1.2',
     python_requires='>=3.6',
     long_description=long_description,
     author='zhulei227',

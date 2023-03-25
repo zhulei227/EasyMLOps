@@ -37,8 +37,8 @@ class ClassificationBase(TablePipeObjectBase):
             self.y = self.y.apply(lambda x: self.label2id.get(x))
             self.num_class = len(self.id2label)
         # 底层模型自带参数
-        self.native_init_params = native_init_params
-        self.native_fit_params = native_fit_params
+        self.native_init_params = copy.deepcopy(native_init_params)
+        self.native_fit_params = copy.deepcopy(native_fit_params)
         if self.native_init_params is None:
             self.native_init_params = dict()
         if self.native_fit_params is None:
@@ -95,8 +95,7 @@ class ClassificationBase(TablePipeObjectBase):
 
     def udf_get_params(self) -> dict_type:
         return {"id2label": self.id2label, "label2id": self.label2id, "num_class": self.num_class, "cols": self.cols,
-                "drop_input_data": self.drop_input_data, "native_init_params": self.native_init_params,
-                "native_fit_params": self.native_fit_params, "support_sparse_input": self.support_sparse_input}
+                "drop_input_data": self.drop_input_data, "support_sparse_input": self.support_sparse_input}
 
     def udf_set_params(self, params: dict):
         self.id2label = params["id2label"]
@@ -104,8 +103,6 @@ class ClassificationBase(TablePipeObjectBase):
         self.num_class = params["num_class"]
         self.cols = params["cols"]
         self.drop_input_data = params["drop_input_data"]
-        self.native_init_params = params["native_init_params"]
-        self.native_fit_params = params["native_fit_params"]
         self.support_sparse_input = params["support_sparse_input"]
 
 
@@ -146,9 +143,11 @@ class LGBMClassification(ClassificationBase):
             s_ = PandasUtils.pd2csr(s)
         else:
             s_ = s
+
+        if self.dataset_params.get("feature_name") is None:
+            self.dataset_params["feature_name"] = self.cols
         self.lgb_model = lgb.train(params=self.native_init_params,
-                                   train_set=lgb.Dataset(data=s_, label=self.y, feature_name=list(s.columns),
-                                                         **self.dataset_params),
+                                   train_set=lgb.Dataset(data=s_, label=self.y, **self.dataset_params),
                                    **self.native_fit_params)
         if self.use_faster_predictor:
             from easymlops.table.utils import FasterLgbMulticlassPredictor

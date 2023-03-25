@@ -32,8 +32,8 @@ class RegressionBase(TablePipeObjectBase):
         self.pred_name = pred_name
         self.support_sparse_input = support_sparse_input
         # 底层模型自带参数
-        self.native_init_params = native_init_params
-        self.native_fit_params = native_fit_params
+        self.native_init_params = copy.deepcopy(native_init_params)
+        self.native_fit_params = copy.deepcopy(native_fit_params)
         if self.native_init_params is None:
             self.native_init_params = dict()
         if self.native_fit_params is None:
@@ -90,15 +90,12 @@ class RegressionBase(TablePipeObjectBase):
 
     def udf_get_params(self) -> dict_type:
         return {"pred_name": self.pred_name, "cols": self.cols,
-                "drop_input_data": self.drop_input_data, "native_init_params": self.native_init_params,
-                "native_fit_params": self.native_fit_params, "support_sparse_input": self.support_sparse_input}
+                "drop_input_data": self.drop_input_data, "support_sparse_input": self.support_sparse_input}
 
     def udf_set_params(self, params: dict):
         self.pred_name = params["pred_name"]
         self.cols = params["cols"]
         self.drop_input_data = params["drop_input_data"]
-        self.native_init_params = params["native_init_params"]
-        self.native_fit_params = params["native_fit_params"]
         self.support_sparse_input = params["support_sparse_input"]
 
 
@@ -135,9 +132,10 @@ class LGBMRegression(RegressionBase):
             s_ = PandasUtils.pd2csr(s)
         else:
             s_ = s
+        if self.dataset_params.get("feature_name") is None:
+            self.dataset_params["feature_name"] = self.cols
         self.lgb_model = lgb.train(params=self.native_init_params,
-                                   train_set=lgb.Dataset(data=s_, label=self.y, feature_name=list(s.columns),
-                                                         **self.dataset_params),
+                                   train_set=lgb.Dataset(data=s_, label=self.y, **self.dataset_params),
                                    **self.native_fit_params)
         if self.use_faster_predictor:
             from easymlops.table.utils import FasterLgbSinglePredictor
@@ -183,3 +181,131 @@ class LGBMRegression(RegressionBase):
         """
         assert self.use_faster_predictor
         return self.lgb_model_faster_predictor.predict(s).get("contrib")
+
+
+class LogisticRegression(RegressionBase):
+
+    def __init__(self, y=None, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.lr = None
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        from sklearn.linear_model import LogisticRegression
+        self.lr = LogisticRegression(**self.native_init_params)
+        self.lr.fit(s_, self.y, **self.native_fit_params)
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        result = pd.DataFrame(self.lr.predict(s_),
+                              columns=[self.pred_name], index=s.index)
+        return result
+
+    def udf_get_params(self) -> dict:
+        return {"lr": self.lr}
+
+    def udf_set_params(self, params: dict):
+        self.lr = params["lr"]
+
+
+class LinearRegression(RegressionBase):
+
+    def __init__(self, y=None, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.lr = None
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        from sklearn.linear_model import LinearRegression
+        self.lr = LinearRegression(**self.native_init_params)
+        self.lr.fit(s_, self.y, **self.native_fit_params)
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        result = pd.DataFrame(self.lr.predict(s_),
+                              columns=[self.pred_name], index=s.index)
+        return result
+
+    def udf_get_params(self) -> dict:
+        return {"lr": self.lr}
+
+    def udf_set_params(self, params: dict):
+        self.lr = params["lr"]
+
+
+class RidgeRegression(RegressionBase):
+
+    def __init__(self, y=None, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.lr = None
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        from sklearn.linear_model import Ridge
+        self.lr = Ridge(**self.native_init_params)
+        self.lr.fit(s_, self.y, **self.native_fit_params)
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        result = pd.DataFrame(self.lr.predict(s_),
+                              columns=[self.pred_name], index=s.index)
+        return result
+
+    def udf_get_params(self) -> dict:
+        return {"lr": self.lr}
+
+    def udf_set_params(self, params: dict):
+        self.lr = params["lr"]
+
+
+class RidgeCVRegression(RegressionBase):
+
+    def __init__(self, y=None, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.lr = None
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        from sklearn.linear_model import RidgeCV
+        self.lr = RidgeCV(**self.native_init_params)
+        self.lr.fit(s_, self.y, **self.native_fit_params)
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        if self.support_sparse_input:
+            s_ = PandasUtils.pd2csr(s)
+        else:
+            s_ = s
+        result = pd.DataFrame(self.lr.predict(s_),
+                              columns=[self.pred_name], index=s.index)
+        return result
+
+    def udf_get_params(self) -> dict:
+        return {"lr": self.lr}
+
+    def udf_set_params(self, params: dict):
+        self.lr = params["lr"]

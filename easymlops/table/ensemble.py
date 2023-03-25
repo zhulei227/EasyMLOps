@@ -97,11 +97,10 @@ class Parallel(TablePipeObjectBase):
 
     def udf_get_params(self):
         return {"pipe_objects_params": [obj.get_params() for obj in self.pipe_objects],
-                "pipe_objects": self.pipe_objects, "drop_input_data": self.drop_input_data}
+                "drop_input_data": self.drop_input_data}
 
     def udf_set_params(self, params: dict_type):
         self.drop_input_data = params["drop_input_data"]
-        self.pipe_objects = params["pipe_objects"]
         pipe_objects_params = params["pipe_objects_params"]
         for i in range(len(pipe_objects_params)):
             pipe_params = pipe_objects_params[i]

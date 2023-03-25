@@ -147,7 +147,7 @@ class LGBMEmbed(EmbedBase):
                                    native_init_params=self.native_init_params,
                                    native_fit_params=self.native_fit_params)
         if self.objective != "multiclass":
-            self.native_init_params["num_class"] = 1
+            model.native_init_params["num_class"] = 1
         model.fit(s_, **kwargs)
         self.embed_value_dist = dict()
         for idx, weight in enumerate(model.lgb_model.feature_importance(self.importance_type)):

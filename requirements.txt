@@ -4,6 +4,7 @@ dask>=0.17
 pandas>=0.25
 scipy
 scikit-learn>=0.21
+#func_timeout
 #psutil
 #gensim
 #pyyaml<=5.4
@@ -12,4 +13,6 @@ scikit-learn>=0.21
 #pyahocorasick
 #sqlite
 #happybase
-#func_timeout
+#faiss-cpu
+#faiss-gpu
+#elasticsearch==7.7.0

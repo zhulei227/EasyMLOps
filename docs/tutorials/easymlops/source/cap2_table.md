@@ -629,7 +629,7 @@ table[-1].get_contrib(table.transform_single(x_test.to_dict("record")[0],run_to_
 
 
 ## 回归建模
-目前只封装了lgbm，后续将会封装其他模型
+
 
 
 ```python

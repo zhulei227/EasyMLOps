@@ -4,6 +4,22 @@ easymlops.table.storage package
 Submodules
 ----------
 
+easymlops.table.storage.elasticsearch\_storage module
+-----------------------------------------------------
+
+.. automodule:: easymlops.table.storage.elasticsearch_storage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+easymlops.table.storage.faiss\_storage module
+---------------------------------------------
+
+.. automodule:: easymlops.table.storage.faiss_storage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 easymlops.table.storage.hbase\_storage module
 ---------------------------------------------
 

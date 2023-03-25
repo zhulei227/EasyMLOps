@@ -265,14 +265,16 @@ class TablePipeLine(TablePipeObjectBase):
         for i, param in enumerate(params):
             self.models[i].set_params(param)
 
-    def auto_test(self, x, sample=100):
+    def auto_test(self, x_, sample=100):
         """
         自动测试接口
 
-        :param x:
+        :param x_:
         :param sample:
         :return:
         """
+        # 对x做一次shuffle
+        x = x_[:sample].sample(frac=1)
         from easymlops.table.callback import check_transform_function_pipeline, check_null_value, check_extreme_value, \
             check_inverse_dtype, check_int_trans_float
         check_transform_function_describe = """

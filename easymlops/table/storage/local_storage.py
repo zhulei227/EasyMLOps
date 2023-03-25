@@ -2,7 +2,6 @@ import time
 import datetime
 from easymlops.table.core import *
 import threading
-import sqlite3
 
 lock = threading.Lock()
 
@@ -33,6 +32,7 @@ class LocalStorage(TablePipeObjectBase, threading.Thread):
         _cur = None
         # 创建链接
         try:
+            import sqlite3
             _conn = sqlite3.connect(db_name, timeout=1, check_same_thread=False)
             _cur = _conn.cursor()
             columns_str = ",".join([item + " varchar" for item in self.table_columns])
