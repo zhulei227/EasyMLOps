@@ -16,3 +16,4 @@ scikit-learn>=0.21
 #faiss-cpu
 #faiss-gpu
 #elasticsearch==7.7.0
+#kafka-python

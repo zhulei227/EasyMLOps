@@ -30,11 +30,13 @@ class ReduceMemUsage(TablePipeObjectBase):
                 for int_type in int_types:
                     if c_min > np.iinfo(int_type).min and c_max < np.iinfo(int_type).max:
                         return int_type, (np.iinfo(int_type).min, np.iinfo(int_type).max)
+                return np.int64, (np.iinfo(np.int64).min, np.iinfo(np.int64).max)
             elif "float" in col_type_str or "double" in col_type_str:
                 float_types = [np.float16, np.float32, np.float64]
                 for float_type in float_types:
                     if c_min > np.finfo(float_type).min and c_max < np.finfo(float_type).max:
                         return float_type, (np.finfo(float_type).min, np.finfo(float_type).max)
+                return np.float64, (np.finfo(np.float64).min, np.finfo(np.float64).max)
             else:
                 return str, None
         else:

@@ -369,7 +369,7 @@ class TablePipeObjectBase(PipeObjectBase):
         for value in values:
             index_map[value] = True
         index = x_.map(index_map).fillna(False)
-        return index.astype(np.bool)
+        return index.astype(bool)
 
     def set_master_pipe(self, master_pipe):
         """
