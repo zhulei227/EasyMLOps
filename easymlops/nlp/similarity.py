@@ -34,7 +34,8 @@ class ElasticSearchSimilarity(TablePipeObjectBase):
         self.add_production_data = add_production_data
         self.tag = tag
         self.index = None
-        self.es = self.create_connect(self.es_args, self.es_kwargs)
+        self.es = None
+        self.activate_connect()
 
     @staticmethod
     def create_connect(es_args, es_kwargs):
@@ -45,6 +46,12 @@ class ElasticSearchSimilarity(TablePipeObjectBase):
         except Exception as e:
             print(f"connect to es exception:{e}")
         return _es
+
+    def activate_connect(self):
+        try:
+            self.es.index(index=self.index_name, id="check_connect", body={})
+        except:
+            self.es = self.create_connect(self.es_args, self.es_kwargs)
 
     def before_fit(self, s: dataframe_type, **kwargs) -> dataframe_type:
         s = super().before_fit(s)
@@ -63,14 +70,17 @@ class ElasticSearchSimilarity(TablePipeObjectBase):
                 "_source": record
             }
             acs.append(data)
+        self.activate_connect()
         helpers.bulk(self.es, acs)
 
     def apply_single(self, s: dict_type):
         # 搜索最相近的几个值
+        # 查询长度默认限制为1024
         body = {
+            '_source': [self.col],
             'query': {
                 'match': {
-                    f'{self.col}': f'{s[self.col]}'
+                    f'{self.col}': f'{s[self.col][:1024]}'
                 }
             },
             'sort': {
@@ -85,12 +95,17 @@ class ElasticSearchSimilarity(TablePipeObjectBase):
             rst = {}
         else:
             rst = dict()
-            for k, raw_data in enumerate(self.es.search(index=self.index_name, body=body)["hits"]["hits"]):
-                rst[f"{self.tag}_top_{k + 1}_raw_data"] = raw_data["_source"][self.col]
-                rst[f"{self.tag}_top_{k + 1}_measure"] = raw_data["_score"]
-        if len(rst) == 0:
-            for k in range(self.search_top_k):
+            try:
+                for k, raw_data in enumerate(self.es.search(index=self.index_name, body=body)["hits"]["hits"]):
+                    rst[f"{self.tag}_top_{k + 1}_raw_data"] = raw_data["_source"][self.col]
+                    rst[f"{self.tag}_top_{k + 1}_measure"] = raw_data["_score"]
+            except:
+                pass
+        # 空值处理
+        for k in range(self.search_top_k):
+            if f"{self.tag}_top_{k + 1}_raw_data" not in rst:
                 rst[f"{self.tag}_top_{k + 1}_raw_data"] = "nan"
+            if f"{self.tag}_top_{k + 1}_measure" not in rst:
                 rst[f"{self.tag}_top_{k + 1}_measure"] = 0
         return rst
 
@@ -122,7 +137,7 @@ class ElasticSearchSimilarity(TablePipeObjectBase):
         return rst
 
     def query(self, body):
-        self.es = self.create_connect(self.es_args, self.es_kwargs)
+        self.activate_connect()
         df = pd.DataFrame()
         try:
             results = self.es.search(index=self.index_name, body=body)["hits"]["hits"]
@@ -132,11 +147,11 @@ class ElasticSearchSimilarity(TablePipeObjectBase):
                     rst_source["hit_score_"] = rs["_score"]
                 df = df.append(rst_source, ignore_index=True)
         except:
-            self.es = self.create_connect(self.es_args, self.es_kwargs)
+            self.activate_connect()
         return df
 
     def search(self, body):
-        self.es = self.create_connect(self.es_args, self.es_kwargs)
+        self.activate_connect()
         try:
             return self.es.search(index=self.index_name, body=body)
         except:
