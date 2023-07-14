@@ -75,17 +75,23 @@
 <li class="toctree-l3"><a class="reference internal" href="#fasttext">FastText词向量</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#id13">文本分类</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id14">相似文本检索</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id13">文本分类</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id14">使用传统分类模型</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#textcnn">使用TextCNN模型</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#textrnn">使用TextRNN模型</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#han">使用HAN模型</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id15">相似文本检索</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#elasticsearch">基于ElasticSearch的文本检索</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#transform">transform接口</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id15">扩展接口</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id16">扩展接口</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#faiss">基于Faiss的特征向量检索</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id16">transform接口的方式</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id17">transform接口的方式</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#search">search接口的方式</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id17">更多</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id18">更多</a></li>
 </ul>
 </li>
 </ul>
@@ -98,7 +104,6 @@
 <li class="toctree-l1"><a class="reference internal" href="cap7_pipeline.html">pipeline操作</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cap8_deploy.html">生产部署</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cap9_storage.html">特征存储&amp;监控&amp;分析</a></li>
-<li class="toctree-l1"><a class="reference internal" href="easymlops.html">API Refrence(Version=0.1.2)</a></li>
 </ul>
 
         </div>
@@ -136,13 +141,13 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   label | review                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-|-----:|--------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 6761 |       0 | 房间设备陈旧而且不齐全,一点也不象四星的酒店.所以房价显高.我就不明白河南的所谓四星级酒店凭什么比成都、南宁等省会城市的四星房价还高。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-|  166 |       1 | 房间比较干净舒适！松江商务型酒店比较少！这家酒店还可以！                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-|  104 |       1 | 总体感觉还不错。位置很中心，去商业区很方便。上次晚到还提供了升房。就是客房协调出了一些问题，升上去的一间房居然里面还有行李，可见内部沟通有问题。如果时间早还没问题，只是那时已经很晚，当事人总会有不舒服的地方                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| 5652 |       0 | ctrip标上四星,但只能用金玉其外败絮其内来来形容,这件酒店外表好看而已,内部最多和如家或者7天这些廉价酒店打平手,我住过所有星级的酒店,就是这间最不符合4星的标准,如果以北京的北方佳苑和广州的华夏酒店为标准4星参考,他在我眼里和街边的小酒店没差别,我真的不知道他的四星从哪里来,前台态度差劲,连最基本的笑脸迎人都没有,酒店3楼的餐厅更是差极了,而菜单里没几样菜有的,摆明砍客,还摆出要嘛被砍,要嘛就别来吃的样子,菜的味道更不敢恭维,我第一次入住酒店后马上再出去找酒店的,紫光的位置也不太好,连沙滩都不能直接进去,建议去阳江的住南方假日酒店,服务态度好多了,而且前面就可以直接到沙滩,靠山面海,真正的海景房!或者就是住我第二天入住的小港湾山庄,这是在悬崖边的,晚上可以在小亭子听海喝喝茶也不错,离酒店不远就有一间旺角海鲜大排档,除了海虾,其他的都比外面便宜太多了,鱼虾蟹随便叫!这两间都是真正的海景房,标三星也非常符合,重点是这两三星都比4四星好太多了,所以建议大家千万不要入住所谓的阳江最好最高级的4星紫江,花钱买罪受! |
-|  404 |       1 | 上周去住了两晚,本来想住飞,订的时候没房了,携程给推荐了这家,服务真的不错,还有水果,阎蕾小姐还亲自打电话问候,每年都去潍坊好七八次,这地就常住了.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |   label | review                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+|-----:|--------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 6406 |       0 | 第一次住此类酒店，感觉就是原来的招待所做了一次整洁的装修。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 4451 |       1 | 大床房很舒服,宽敞,干净,安静,早餐一般.去的时候他们在搞活动,住一天送一天,门市价也只要245,只比携程价高几块钱,要不是赶时间,真想多住一天.开车的话要从毫州东出口下高速,不然到市里不好找.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 4035 |       1 | 我是第二次入住这个酒店了，蛮喜欢它的，相比而言，它比三亚湾酒店便宜且交通便利，去机场、南山、天涯海角、西岛都很方便；另外海滩及外围环境比大东海的酒店安静、清爽。房间很大干净，有阳台海景不错，游泳池也不错，好几个各有特色，适合小孩老人玩耍。酒店外是三亚有名的椰梦长廊，跨过此条小马路就是沙滩，马路边有许多出租、公交中巴和旅游车经过，所以出行很方便。另外还有小摩的，一块钱一位，超便宜，可在傍晚坐上摩的出游，享受海风和椰林！缺点：酒店设施相比较大东海的银泰酒店较为陈旧，色彩灰暗，但服务员较热情，大堂的前台太小了，不知那么大的大堂为什么会有这么不气派的前台？另外就是吃饭问题，酒店附近没有大东海那么多的小吃店，跟摩的去了一家海鲜店，味道还好，却被大斩一把（还好提前已做好被斩的准备，所以买单时也不惊慌了）！如果怕麻烦又可不考虑价格，建议还是在酒店用餐，中餐还不错，广粤味，可以推荐。SPA是去年第一次入住时去过，感觉没有太特别的，但价格偏高。 |
+| 3176 |       1 | 没说的，怎能一个好字了得。可能说香格里拉的环境吧，反正觉得住在这里很惬意。酒店的服务很好，床也很舒服。前面就是一个小草原，还有牛在里面迟早。周边的环境那是安静得不行。不过因为酒店是木结构，楼上走动的声音很容易传到楼下。                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 1564 |       1 | 非常舒服和享受的酒店,房间设施没的说,五星级,隔音很好,早晚都很安静,由于不在闹市区解放碑,价格比较合理,感觉是重庆性价比最高的五星酒店,出酒店往左手走路边就有小吃摊,从早到晚都有吃的(是酒店服务生推荐的,我们去吃了早餐,很市井,很可口),喜欢品尝当地风情的朋友可以去.2天后又住了一晚洲际,感觉不如希尔顿,因为洲际地处步行街,人较多,服务就跟不上,等2个小时房间才收拾出来.所以下次来重庆还会住这里.                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 </pre></div>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
@@ -552,6 +557,8 @@
 </section>
 <section id="id13">
 <h2>文本分类<a class="headerlink" href="#id13" title="此标题的永久链接">¶</a></h2>
+<section id="id14">
+<h3>使用传统分类模型<a class="headerlink" href="#id14" title="此标题的永久链接">¶</a></h3>
 <p>借助于table中的分类器，可以做文本分类任务了</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.classification</span> <span class="kn">import</span> <span class="n">LGBMClassification</span>
 </pre></div>
@@ -566,18 +573,85 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |     差评 |       好评 |
-|-----:|---------:|-----------:|
-| 1744 | 0.996622 | 0.00337761 |
-| 1979 | 0.986792 | 0.0132082  |
-| 7739 | 0.258539 | 0.741461   |
-| 3345 | 0.527271 | 0.472729   |
-| 1275 | 0.888017 | 0.111983   |
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |     差评 |      好评 |
+|-----:|---------:|----------:|
+| 1290 | 0.775422 | 0.224578  |
+| 2137 | 0.956067 | 0.0439326 |
+| 4286 | 0.924261 | 0.0757392 |
+| 2431 | 0.925053 | 0.0749471 |
+| 7587 | 0.132295 | 0.867705  |
 </pre></div>
 </div>
 </section>
-<section id="id14">
-<h2>相似文本检索<a class="headerlink" href="#id14" title="此标题的永久链接">¶</a></h2>
+<section id="textcnn">
+<h3>使用TextCNN模型<a class="headerlink" href="#textcnn" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">easymlops.table.preprocessing</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">easymlops.nlp.text_classification</span> <span class="kn">import</span> <span class="n">TextCNNClassification</span><span class="p">,</span><span class="n">TextRNNClassification</span><span class="p">,</span><span class="n">HANClassification</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;review&quot;</span><span class="p">]))</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">VocabIndex</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">TextCNNClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span><span class="s2">&quot;差评&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;好评&quot;</span><span class="p">}),</span><span class="n">col</span><span class="o">=</span><span class="s2">&quot;review&quot;</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |       差评 |       好评 |
+|-----:|-----------:|-----------:|
+| 1290 | 0.514985   | 0.485015   |
+| 2137 | 0.993963   | 0.0060366  |
+| 4286 | 0.99272    | 0.00727981 |
+| 2431 | 0.9925     | 0.00749955 |
+| 7587 | 0.00285256 | 0.997148   |
+</pre></div>
+</div>
+</section>
+<section id="textrnn">
+<h3>使用TextRNN模型<a class="headerlink" href="#textrnn" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;review&quot;</span><span class="p">]))</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractChineseWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWords</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">VocabIndex</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">TextRNNClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span><span class="s2">&quot;差评&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;好评&quot;</span><span class="p">}),</span><span class="n">col</span><span class="o">=</span><span class="s2">&quot;review&quot;</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>|      |      差评 |        好评 |
+|-----:|----------:|------------:|
+| 1290 | 0.725946  | 0.274054    |
+| 2137 | 0.996532  | 0.00346801  |
+| 4286 | 0.99497   | 0.00503042  |
+| 2431 | 0.999079  | 0.000920466 |
+| 7587 | 0.0221832 | 0.977817    |
+</pre></div>
+</div>
+</section>
+<section id="han">
+<h3>使用HAN模型<a class="headerlink" href="#han" title="此标题的永久链接">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">=</span><span class="n">NLPPipeline</span><span class="p">()</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FixInput</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">FillNa</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;review&quot;</span><span class="p">]))</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">ExtractJieBaWordsWithSentSplit</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">VocabIndexWithSentSplit</span><span class="p">())</span>\
+   <span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">HANClassification</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span><span class="s2">&quot;差评&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;好评&quot;</span><span class="p">}),</span><span class="n">col</span><span class="o">=</span><span class="s2">&quot;review&quot;</span><span class="p">))</span>
+
+<span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x_test_new</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id15">
+<h2>相似文本检索<a class="headerlink" href="#id15" title="此标题的永久链接">¶</a></h2>
 <p>相似文本检索通常有两类方式：</p>
 <ul class="simple">
 <li><p>一类是通过字符串匹配的方式</p></li>
@@ -640,8 +714,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id15">
-<h4>扩展接口<a class="headerlink" href="#id15" title="此标题的永久链接">¶</a></h4>
+<section id="id16">
+<h4>扩展接口<a class="headerlink" href="#id16" title="此标题的永久链接">¶</a></h4>
 <p>另外该模块额外提供了<code class="docutils literal notranslate"><span class="pre">query</span></code>和<code class="docutils literal notranslate"><span class="pre">search</span></code>的扩展接口，这部分的功能实现与后续<code class="docutils literal notranslate"><span class="pre">ElasticSearchStorage</span></code>完全一致，还请直接参考后续存储模块的介绍</p>
 </section>
 </section>
@@ -689,8 +763,8 @@
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;easymlops.nlp.core.pipeline_object.NLPPipeline at 0x16ff0ad9388&gt;
 </pre></div>
 </div>
-<section id="id16">
-<h4>transform接口的方式<a class="headerlink" href="#id16" title="此标题的永久链接">¶</a></h4>
+<section id="id17">
+<h4>transform接口的方式<a class="headerlink" href="#id17" title="此标题的永久链接">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_test_new</span><span class="o">=</span><span class="n">nlp</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -738,8 +812,8 @@
 </pre></div>
 </div>
 </section>
-<section id="id17">
-<h4>更多<a class="headerlink" href="#id17" title="此标题的永久链接">¶</a></h4>
+<section id="id18">
+<h4>更多<a class="headerlink" href="#id18" title="此标题的永久链接">¶</a></h4>
 <p>这里的<code class="docutils literal notranslate"><span class="pre">FaissSimlarity</span></code>是直接作为一个相似度检索任务的类，而有时候我们的主任务可能不是做相似文本检索，比如做文本分类，只是偶尔会用到中间层特征做相似文本检索，后续在<code class="docutils literal notranslate"><span class="pre">特征存储</span></code>中提供了更通用的方式，可以查看<code class="docutils literal notranslate"><span class="pre">FaissStorage</span></code>的使用方式</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
