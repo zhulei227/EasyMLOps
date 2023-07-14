@@ -17,3 +17,6 @@ scikit-learn>=0.21
 #faiss-gpu
 #elasticsearch==7.7.0
 #kafka-python
+#torch==1.12.0
+#torchtext==0.4.0
+#pyltp==0.4.0

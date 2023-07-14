@@ -443,3 +443,178 @@ class ExtractJieBaWords(PreprocessBase):
 
     def udf_set_params(self, params: dict_type):
         self.cut_all = params["cut_all"]
+
+
+class VocabIndex(PreprocessBase):
+    """
+    构建字典，并转换为index，空格分隔
+    """
+
+    def __init__(self, cols="all", max_len=32, fill_index=0, **kwargs):
+        super().__init__(cols=cols, **kwargs)
+        self.max_len = max_len
+        self.fill_index = fill_index
+        self.vocab_map = dict()
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        # 构建字典
+        for col in self.cols:
+            vocab = dict()
+            words = set()
+            for line in s[col].tolist():
+                for word in line.strip().split(" "):
+                    words.add(word)
+            for index, word in enumerate(words):
+                vocab[word] = index + 1
+            self.vocab_map[col] = vocab
+
+    def apply_function(self, col, s):
+        vocab = self.vocab_map[col]
+        indices = []
+        for word in str(s).strip().split(" "):
+            indices.append(vocab.get(word, self.fill_index))
+
+        # 截取max len
+        if self.max_len is not None:
+            indices = indices[:self.max_len]
+            if len(indices) < self.max_len:
+                indices = indices + [self.fill_index] * (self.max_len - len(indices))
+        # 转字符串格式
+        indices = [str(i) for i in indices]
+        return " ".join(indices)
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        for col in self.cols:
+            s[col] = s[col].apply(lambda x: self.apply_function(col, x))
+        return s
+
+    def udf_transform_single(self, s: dict_type, **kwargs):
+        for col in self.cols:
+            s[col] = self.apply_function(col, s[col])
+        return s
+
+    def udf_get_params(self) -> dict_type:
+        return {"vocab_map": self.vocab_map, "max_len": self.max_len, "fill_index": self.fill_index}
+
+    def udf_set_params(self, params: dict_type):
+        self.vocab_map = params["vocab_map"]
+        self.max_len = params["max_len"]
+        self.fill_index = params["fill_index"]
+
+
+class ExtractJieBaWordsWithSentSplit(PreprocessBase):
+    """
+    先分句，再分词
+    """
+
+    def __init__(self, cols="all", cut_all=False, **kwargs):
+        super().__init__(cols=cols, **kwargs)
+        from pyltp import SentenceSplitter
+        import jieba
+        self.jieba_model = jieba
+        self.jieba_model.setLogLevel(jieba.logging.INFO)
+        self.sent_model = SentenceSplitter()
+        self.cut_all = cut_all
+
+    def apply_function(self, s):
+
+        sents = self.sent_model.split(s)
+        rest = []
+        for sent in sents:
+            rest.append(" ".join(self.jieba_model.cut(str(sent), cut_all=self.cut_all)))
+        return "|".join(rest)
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        for col in self.cols:
+            s[col] = s[col].apply(lambda x: self.apply_function(x))
+        return s
+
+    def udf_transform_single(self, s: dict_type, **kwargs):
+        for col in self.cols:
+            s[col] = self.apply_function(s[col])
+        return s
+
+    def udf_get_params(self) -> dict_type:
+        return {"cut_all": self.cut_all}
+
+    def udf_set_params(self, params: dict_type):
+        self.cut_all = params["cut_all"]
+
+
+class VocabIndexWithSentSplit(PreprocessBase):
+    """
+    构建字典，并转换为index，句子用"|"分割，词用" "分割
+    """
+
+    def __init__(self, cols="all", max_sent_len=5, max_len=32, fill_index=0, **kwargs):
+        super().__init__(cols=cols, **kwargs)
+        self.max_sent_len = max_sent_len
+        self.max_len = max_len
+        self.fill_index = fill_index
+        self.vocab_map = dict()
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        # 构建字典
+        for col in self.cols:
+            vocab = dict()
+            words = set()
+            for line in s[col].tolist():
+                for sent in line.strip().split("|"):
+                    for word in sent.strip().split(" "):
+                        words.add(word)
+            for index, word in enumerate(words):
+                vocab[word] = index + 1
+            self.vocab_map[col] = vocab
+
+    def apply_function(self, col, s):
+        vocab = self.vocab_map[col]
+        sents = []
+
+        for sent in str(s).strip().split("|"):
+            indices = []
+            for word in str(sent).strip().split(" "):
+                indices.append(vocab.get(word, self.fill_index))
+            sents.append(indices)
+
+        # 截取max_sent_len
+        if self.max_sent_len is not None:
+            sents = sents[:self.max_sent_len]
+            if len(sents) < self.max_sent_len:
+                for _ in range(self.max_sent_len - len(sents)):
+                    sents.append([])
+        # 截取max_len
+        if self.max_len is not None:
+            sents_ = []
+            for indices in sents:
+                indices = indices[:self.max_len]
+                if len(indices) < self.max_len:
+                    indices = indices + [self.fill_index] * (self.max_len - len(indices))
+                sents_.append(indices)
+            sents = sents_
+
+        # 转字符串格式
+        rest = []
+        for indices in sents:
+            indices = [str(i) for i in indices]
+            rest.append(" ".join(indices))
+        return "|".join(rest)
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        for col in self.cols:
+            s[col] = s[col].apply(lambda x: self.apply_function(col, x))
+        return s
+
+    def udf_transform_single(self, s: dict_type, **kwargs):
+        for col in self.cols:
+            s[col] = self.apply_function(col, s[col])
+        return s
+
+    def udf_get_params(self) -> dict_type:
+        return {"vocab_map": self.vocab_map, "max_sent_len": self.max_sent_len,
+                "max_len": self.max_len, "fill_index": self.fill_index}
+
+    def udf_set_params(self, params: dict_type):
+        self.vocab_map = params["vocab_map"]
+        self.max_sent_len = params["max_sent_len"]
+        self.max_len = params["max_len"]
+        self.fill_index = params["fill_index"]

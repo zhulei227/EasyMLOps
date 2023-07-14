@@ -804,6 +804,106 @@ table[-1].get_branch_pipe(0).search(body=body)
 
 
 
+## Kafka存储  
+这里主要作为生产者的角色往kafka发送数据，具体的消费者需要自行实现
+
+
+```python
+import pandas as pd
+data=pd.read_csv("./data/demo.csv",encoding="gbk").sample(frac=1)
+print(data.head(5).to_markdown())
+```
+
+    |     |   PassengerId |   Survived |   Pclass | Name                    | Sex    |   Age |   SibSp |   Parch | Ticket     |    Fare |   Cabin | Embarked   |
+    |----:|--------------:|-----------:|---------:|:------------------------|:-------|------:|--------:|--------:|:-----------|--------:|--------:|:-----------|
+    | 152 |           153 |          0 |        3 | Meo, Mr. Alfonzo        | male   |  55.5 |       0 |       0 | A.5. 11206 |  8.05   |     nan | S          |
+    | 485 |           486 |          0 |        3 | Lefebre, Miss. Jeannie  | female | nan   |       3 |       1 | 4133       | 25.4667 |     nan | S          |
+    |  57 |            58 |          0 |        3 | Novel, Mr. Mansouer     | male   |  28.5 |       0 |       0 | 2697       |  7.2292 |     nan | C          |
+    | 344 |           345 |          0 |        2 | Fox, Mr. Stanley Hubert | male   |  36   |       0 |       0 | 229236     | 13      |     nan | S          |
+    | 301 |           302 |          1 |        3 | McCoy, Mr. Bernard      | male   | nan   |       2 |       0 | 367226     | 23.25   |     nan | Q          |
+    
+
+
+```python
+x_train=data[:500]
+x_test=data[500:]
+y_train=x_train["Survived"]
+y_test=x_test["Survived"]
+del x_train["Survived"]
+del x_test["Survived"]
+```
+
+
+```python
+from easymlops import TablePipeLine
+from easymlops.table.preprocessing import *
+from easymlops.table.encoding import *
+from easymlops.table.classification import *
+```
+
+
+```python
+table=TablePipeLine()
+table.pipe(FixInput())\
+  .pipe(FillNa())\
+  .pipe(OneHotEncoding(cols=["Pclass", "Sex"], drop_col=False)) \
+  .pipe(WOEEncoding(cols=["Ticket", "Embarked", "Cabin", "Sex", "Pclass"], y=y_train)) \
+  .pipe(LabelEncoding(cols=["Name"]))\
+  .pipe(LGBMClassification(y=y_train,native_init_params={"max_depth":2},native_fit_params={"num_boost_round":128},prefix="lgbm"))
+
+table.fit(x_train)
+```
+
+
+
+
+    <easymlops.table.core.pipeline_object.TablePipeLine at 0x27f2525b8c8>
+
+
+
+挂载
+
+
+```python
+from easymlops.table.storage import KafkaStorage
+table[-1].set_branch_pipe(KafkaStorage(bootstrap_servers="192.168.244.133:9092",topic_name="label_encoding",cols=['lgbm_0','lgbm_1']))
+```
+
+### 模拟线上数据流
+
+
+```python
+i=0
+for record in tqdm(x_test[:5].to_dict("record")):
+    table.transform_single(record,storage_base_dict={"key":i})
+    i+=1
+```
+
+    100%|███████████████████████████████████████████████████████████████████████████████████| 5/5 [00:00<00:00, 166.62it/s]
+    
+
+### 模拟消费
+
+
+```python
+from kafka import KafkaConsumer
+import json
+consumer = KafkaConsumer('label_encoding',group_id="easymlops", bootstrap_servers="192.168.244.133:9092",value_deserializer=lambda m: json.loads(m.decode('ascii')))
+```
+
+
+```python
+for message in consumer:
+    print(message)
+```
+
+    ConsumerRecord(topic='label_encoding', partition=0, offset=100, timestamp=1680707688289, timestamp_type=0, key=None, value={'lgbm_0': '0.8178924384195481', 'lgbm_1': '0.182107561580452', 'storage_key': '0', 'storage_transform_time': '2023-04-05 23:14:48.271271'}, headers=[], checksum=None, serialized_key_size=-1, serialized_value_size=139, serialized_header_size=-1)
+    ConsumerRecord(topic='label_encoding', partition=0, offset=101, timestamp=1680707688290, timestamp_type=0, key=None, value={'lgbm_0': '0.7956256701057736', 'lgbm_1': '0.20437432989422644', 'storage_key': '1', 'storage_transform_time': '2023-04-05 23:14:48.275281'}, headers=[], checksum=None, serialized_key_size=-1, serialized_value_size=141, serialized_header_size=-1)
+    ConsumerRecord(topic='label_encoding', partition=0, offset=102, timestamp=1680707688290, timestamp_type=0, key=None, value={'lgbm_0': '0.7603010291586166', 'lgbm_1': '0.23969897084138336', 'storage_key': '2', 'storage_transform_time': '2023-04-05 23:14:48.280271'}, headers=[], checksum=None, serialized_key_size=-1, serialized_value_size=141, serialized_header_size=-1)
+    ConsumerRecord(topic='label_encoding', partition=0, offset=103, timestamp=1680707688290, timestamp_type=0, key=None, value={'lgbm_0': '0.010905936465706449', 'lgbm_1': '0.9890940635342935', 'storage_key': '3', 'storage_transform_time': '2023-04-05 23:14:48.284272'}, headers=[], checksum=None, serialized_key_size=-1, serialized_value_size=142, serialized_header_size=-1)
+    ConsumerRecord(topic='label_encoding', partition=0, offset=104, timestamp=1680707688299, timestamp_type=0, key=None, value={'lgbm_0': '0.6324117990867535', 'lgbm_1': '0.36758820091324645', 'storage_key': '4', 'storage_transform_time': '2023-04-05 23:14:48.289273'}, headers=[], checksum=None, serialized_key_size=-1, serialized_value_size=141, serialized_header_size=-1)
+    
+
 
 ```python
 

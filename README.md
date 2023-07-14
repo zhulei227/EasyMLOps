@@ -1,11 +1,11 @@
 # EasyMLOps  
   
 ## 介绍   
-`EasyMLOps`包以`Pipline`的方式构建建模任务，可直接进行模型训练、预测(离线，在线)，测试(离线在线预测一致性、预测性能)、特征存储、监控、分析等功能，通过外套一层Flask或FastApi即可直接部署生产，更多内容请访问[使用文档1>>](http://www.easymlops.com) 或 [使用文档2>>](http://43.153.61.105)
+`EasyMLOps`包以`Pipline`的方式构建建模任务，可直接进行模型训练、预测(离线，在线)，测试(离线在线预测一致性、预测性能)、特征存储、监控、分析等功能，通过外套一层Flask或FastApi即可直接部署生产
 
 ## 安装
 ```bash
-pip install easymlops
+pip install easymlops-版本号
 ```  
 
 ## 使用

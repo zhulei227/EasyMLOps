@@ -14,21 +14,8 @@
 
 ## 安装
 ```bash
-pip install easymlops
+pip install easymlops-版本号
 ```  
-或
-
-```bash
-pip install git+https://github.com/zhulei227/EasyMLOps
-```  
-或
-
-```bash
-git clone https://github.com/zhulei227/EasyMLOps.git
-cd EasyMLOps
-python setup.py install
-```  
-或  
 
 将整个easymlops包拷贝到你所运行代码的同级目录，然后安装依赖包  
 ```bash
@@ -36,11 +23,6 @@ pip install -r requirements.txt
 ```  
 
 **注意：这里只安装必需的一些依赖包，需要用到扩展功能还请自行安装，建议先运行小批量数据，根据提示安装所缺的pip包**
-
-## 问题反馈&建议  
-
-大家在使用过程中遇到的问题或有好的建议，欢迎到github提交issue:  
- https://github.com/zhulei227/EasyMLOps
 
 
 ```python
