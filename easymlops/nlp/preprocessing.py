@@ -222,6 +222,28 @@ class RemoveWhitespace(PreprocessBase):
         return {}
 
 
+class ExpandWhitespace(PreprocessBase):
+    """
+    扩充空格
+    """
+
+    def __init__(self, cols="all", **kwargs):
+        super().__init__(cols=cols, **kwargs)
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        for col in self.cols:
+            s[col] = s[col].apply(lambda x: " ".join(str(x)))
+        return s
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        for col in self.cols:
+            s[col] = " ".join(str(s[col]))
+        return s
+
+    def udf_get_params(self):
+        return {}
+
+
 class RemoveStopWords(PreprocessBase):
     """
     移除停用词

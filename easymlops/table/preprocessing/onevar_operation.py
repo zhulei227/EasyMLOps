@@ -685,7 +685,7 @@ class Bins(PreprocessBase):
 
     def transform_single(self, s: dict_type, **kwargs) -> dict_type:
         input_dataframe = pd.DataFrame([s])
-        return self.transform(input_dataframe, **kwargs).to_dict("record")[0]
+        return self.transform(input_dataframe, **kwargs).to_dict("records")[0]
 
     def udf_get_params(self):
         return {"n_bins": self.n_bins, "strategy": self.strategy, "bin_detail": self.bin_detail,

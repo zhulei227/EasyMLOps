@@ -24,6 +24,8 @@ class ClassificationBase(TablePipeObjectBase):
         super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         if cols is None or type(cols) == str:
             self.cols = []
+        else:
+            self.cols = cols
         self.support_sparse_input = support_sparse_input
         self.drop_input_data = drop_input_data
         self.y = copy.deepcopy(y)
@@ -91,7 +93,7 @@ class ClassificationBase(TablePipeObjectBase):
     def udf_transform_single(self, s: dict_type, **kwargs):
         input_dataframe = pd.DataFrame([s])
         input_dataframe = input_dataframe[self.cols]
-        return self.udf_transform(input_dataframe, **kwargs).to_dict("record")[0]
+        return self.udf_transform(input_dataframe, **kwargs).to_dict("records")[0]
 
     def udf_get_params(self) -> dict_type:
         return {"id2label": self.id2label, "label2id": self.label2id, "num_class": self.num_class, "cols": self.cols,
@@ -144,8 +146,8 @@ class LGBMClassification(ClassificationBase):
         else:
             s_ = s
 
-        if self.dataset_params.get("feature_name") is None:
-            self.dataset_params["feature_name"] = self.cols
+        # if self.dataset_params.get("feature_name") is None:
+        #     self.dataset_params["feature_name"] = self.cols
         self.lgb_model = lgb.train(params=self.native_init_params,
                                    train_set=lgb.Dataset(data=s_, label=self.y, **self.dataset_params),
                                    **self.native_fit_params)
@@ -176,7 +178,7 @@ class LGBMClassification(ClassificationBase):
         else:
             input_dataframe = pd.DataFrame([s])
             input_dataframe = input_dataframe[self.cols]
-            return self.udf_transform(input_dataframe, **kwargs).to_dict("record")[0]
+            return self.udf_transform(input_dataframe, **kwargs).to_dict("records")[0]
 
     def udf_get_params(self) -> dict_type:
         params = {"lgb_model": self.lgb_model, "use_faster_predictor": self.use_faster_predictor}

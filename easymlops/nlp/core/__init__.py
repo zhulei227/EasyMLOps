@@ -1,2 +1,2 @@
-from .pipe_object import *
-from .pipeline_object import *
+from .pipe import *
+from .pipeline import *
