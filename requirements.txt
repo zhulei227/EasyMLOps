@@ -8,7 +8,7 @@ scikit-learn>=0.21
 #psutil
 #gensim
 #pyyaml<=5.4
-#lightgbm
+#lightgbm>=3
 #jieba
 #pyahocorasick
 #sqlite
@@ -17,6 +17,8 @@ scikit-learn>=0.21
 #faiss-gpu
 #elasticsearch==7.7.0
 #kafka-python
-#torch==1.12.0
+#torch==1.12.0+cu113
+#torchvision=0.13.0+cu113
 #torchtext==0.4.0
 #pyltp==0.4.0
+#toad==0.1.2

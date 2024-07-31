@@ -11,6 +11,7 @@ class FasterLgbSinglePredictor(object):
         assert self.model["version"] == "v3"
         self.cache_num = cache_num
         self.feature_names = self.model["feature_names"]
+        self.leaf_map_describe = {}  # tree_id,leaf_index,leaf_describe
         self.init_average_value()
         self.forest_cache = ForestCache(cache_num=self.cache_num)
 
@@ -18,6 +19,35 @@ class FasterLgbSinglePredictor(object):
         for i in range(len(self.model["tree_info"])):
             tree = self.model["tree_info"][i]["tree_structure"]
             self.post_tree_avg_value_update(tree)
+            self.leaf_map_describe[i] = {}
+            self.build_leaf_map_describe(i, tree, "", self.model["feature_names"])
+
+    def build_leaf_map_describe(self, tree_id, tree_structure, current_describe, feature_names):
+        if "split_feature" in tree_structure:  # 内部节点
+            if tree_structure["default_left"]:
+                # left
+                new_left_describe = f"{current_describe}|{feature_names[tree_structure['split_feature']]} " \
+                                    f"{tree_structure['decision_type']} " \
+                                    f"{tree_structure['threshold']}".strip("|")
+                self.build_leaf_map_describe(tree_id, tree_structure["left_child"], new_left_describe, feature_names)
+                # right
+                new_right_describe = f"{current_describe}|{feature_names[tree_structure['split_feature']]} " \
+                                     f"not {tree_structure['decision_type']} " \
+                                     f"{tree_structure['threshold']}".strip("|")
+                self.build_leaf_map_describe(tree_id, tree_structure["right_child"], new_right_describe, feature_names)
+            else:
+                # left
+                new_left_describe = f"{current_describe}|{feature_names[tree_structure['split_feature']]} " \
+                                    f"not {tree_structure['decision_type']} " \
+                                    f"{tree_structure['threshold']}".strip("|")
+                self.build_leaf_map_describe(tree_id, tree_structure["left_child"], new_left_describe, feature_names)
+                # right
+                new_right_describe = f"{current_describe}|{feature_names[tree_structure['split_feature']]} " \
+                                     f"{tree_structure['decision_type']} " \
+                                     f"{tree_structure['threshold']}".strip("|")
+                self.build_leaf_map_describe(tree_id, tree_structure["right_child"], new_right_describe, feature_names)
+        else:  # 叶子节点
+            self.leaf_map_describe[tree_id][tree_structure["leaf_index"]] = current_describe
 
     def post_tree_avg_value_update(self, tree: dict):
         if tree.get("left_child") is not None:
@@ -33,11 +63,13 @@ class FasterLgbSinglePredictor(object):
     def predict(self, input_dict: dict):
         # 遍历统计每棵树的score以及contrib
         rst = dict()
+        leaf_index = []
         for i in range(len(self.model["tree_info"])):
             num_leaves = self.model["tree_info"][i]["num_leaves"]
             tree = self.model["tree_info"][i]["tree_structure"]
             current_rst = self.forest_cache.predict(i, input_dict, num_leaves, tree, self.feature_names)
             # 合并
+            leaf_index.append(current_rst.get("_leaf_index"))
             for key in current_rst.keys():
                 if rst.get(key) is None:
                     rst[key] = 0
@@ -48,9 +80,14 @@ class FasterLgbSinglePredictor(object):
             score = MathUtils.sigmoid(score)
         elif self.model["objective"] in ["tweedie", "poisson"]:
             score = np.exp(score)
-        rst.pop("_predict_value")
-        rst.pop("_bias")
-        return {"score": score, "contrib": rst}
+        # 删除不需要的key
+        pop_keys = []
+        for key in rst.keys():
+            if key.startswith("_"):
+                pop_keys.append(key)
+        for key in pop_keys:
+            rst.pop(key)
+        return {"score": score, "contrib": rst, "leaf_index": leaf_index}
 
 
 class ForestCache(object):
@@ -72,7 +109,6 @@ class TreeCache(object):
         self.count = 0
         self.cache_num = cache_num
         self.condition_maps = dict()
-        self.cache_values = dict()
         self.cache_contrib_values = dict()
 
     def predict(self, line: dict, num_leaves: int, tree: dict, feature_names: list):
@@ -111,6 +147,7 @@ class TreeCache(object):
             # 判断是否叶子节点
             if tree.get("left_child") is None:
                 contrib_map["_predict_value"] = tree.get("leaf_value")
+                contrib_map["_leaf_index"] = tree.get("leaf_index")
                 break
         for column in columns:
             conditions[column] = line.get(column)

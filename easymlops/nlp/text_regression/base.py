@@ -3,17 +3,19 @@ import pandas as pd
 from easymlops.table.utils import PandasUtils
 
 
-class ClassificationBase(TablePipeObjectBase):
+class RegressionBase(TablePipeObjectBase):
     """
     dnn文本分类模型Base类
     """
 
-    def __init__(self, y: series_type = None, col="all", skip_check_transform_type=True, drop_input_data=True,
+    def __init__(self, y: series_type = None, col="all", pred_name="pred", skip_check_transform_type=True,
+                 drop_input_data=True,
                  native_init_params=None, native_fit_params=None,
                  **kwargs):
         """
         :param y:
         :param col: 用于模型训练的col,只支持对单个col进行文本分类
+        :param pred_name: 模型输出的预测名称，默认pred
         :param skip_check_transform_type: 跳过类型检测
         :param drop_input_data: 删掉输入数据，默认True，不然输出为x1,x2,..,xn,y
         :param native_init_params: 底层分类模型的init入参，调用格式为BaseModel(**native_init_params)
@@ -22,17 +24,9 @@ class ClassificationBase(TablePipeObjectBase):
         """
         super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.col = col
+        self.pred_name = pred_name
         self.drop_input_data = drop_input_data
         self.y = copy.deepcopy(y)
-        self.id2label = {}
-        self.label2id = {}
-        self.num_class = None
-        if self.y is not None:
-            for idx, label in enumerate(self.y.value_counts().index):
-                self.id2label[idx] = label
-                self.label2id[label] = idx
-            self.y = self.y.apply(lambda x: self.label2id.get(x))
-            self.num_class = len(self.id2label)
         # 底层模型自带参数
         self.native_init_params = copy.deepcopy(native_init_params)
         self.native_fit_params = copy.deepcopy(native_fit_params)
@@ -81,12 +75,9 @@ class ClassificationBase(TablePipeObjectBase):
         return self.udf_transform(input_dataframe, **kwargs).to_dict("record")[0]
 
     def udf_get_params(self) -> dict_type:
-        return {"id2label": self.id2label, "label2id": self.label2id, "num_class": self.num_class, "col": self.col,
-                "drop_input_data": self.drop_input_data}
+        return {"pred_name": self.pred_name, "col": self.col, "drop_input_data": self.drop_input_data}
 
     def udf_set_params(self, params: dict):
-        self.id2label = params["id2label"]
-        self.label2id = params["label2id"]
-        self.num_class = params["num_class"]
+        self.pred_name = params["pred_name"]
         self.col = params["col"]
         self.drop_input_data = params["drop_input_data"]

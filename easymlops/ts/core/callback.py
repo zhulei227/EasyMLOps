@@ -1,4 +1,4 @@
-from easymlops.table.core import TablePipeObjectBase, TablePipeLine
+from .pipeline import *
 from easymlops.table.utils import *
 import copy
 import datetime
@@ -9,7 +9,7 @@ import pandas as pd
 """
 
 
-def run_batch_single_transform(module: TablePipeObjectBase, s_):
+def run_batch_single_transform(module: PipeBase, s_):
     """
     分别获取检测离线批量和在线单条的预测结果，以及统计运算性能
 
@@ -44,7 +44,7 @@ def run_batch_single_transform(module: TablePipeObjectBase, s_):
     return batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem
 
 
-def check_shape(module: TablePipeObjectBase, batch_transform, single_transform):
+def check_shape(module: PipeBase, batch_transform, single_transform):
     """
     检测离线批量和在线单条的输出的shape是否一致
 
@@ -75,7 +75,7 @@ def check_columns(self, batch_transform, single_transform):
                     self.name, col))
 
 
-def check_data_type(module: TablePipeObjectBase, batch_transform, single_transform):
+def check_data_type(module: PipeBase, batch_transform, single_transform):
     """
     检测离线批量和在线单条的输出的数据类型是否一致
 
@@ -92,7 +92,7 @@ def check_data_type(module: TablePipeObjectBase, batch_transform, single_transfo
                     module.name, col, batch_transform[col].dtype, single_transform[col].dtype))
 
 
-def check_data_same(module: TablePipeObjectBase, batch_transform, single_transform):
+def check_data_same(module: PipeBase, batch_transform, single_transform):
     """
     检测离线批量和在线单条的输出的数值是否一致
 
@@ -162,7 +162,7 @@ def check_data_same(module: TablePipeObjectBase, batch_transform, single_transfo
                             module.name, col, min(3, len(error_info)), error_info))
 
 
-def check_transform_function(module: TablePipeObjectBase, s_):
+def check_transform_function(module: PipeBase, s_):
     """
     测试离线批量和在线单条的shape,输出名称,数据类型,数值是否一致
 
@@ -189,7 +189,7 @@ def check_transform_function(module: TablePipeObjectBase, s_):
     return batch_transform
 
 
-def leak_check_type_is_same(module: TablePipeObjectBase, type1, type2):
+def leak_check_type_is_same(module: PipeBase, type1, type2):
     """
     弱化数据类型后，是否一致，比如int32和int64看作同一种数据类型
 
@@ -214,7 +214,7 @@ def leak_check_type_is_same(module: TablePipeObjectBase, type1, type2):
     return False
 
 
-def leak_check_value_is_same(module: TablePipeObjectBase, ser1, ser2):
+def leak_check_value_is_same(module: PipeBase, ser1, ser2):
     """
     所有数值的检测
 
@@ -229,7 +229,7 @@ def leak_check_value_is_same(module: TablePipeObjectBase, ser1, ser2):
         return False
 
 
-def check_transform_function_pipeline(module: TablePipeLine, x, sample=1000, return_x=False):
+def check_transform_function_pipeline(module: TSPipeLine, x, sample=1000, return_x=False):
     """
     check_transform_function函数的pipeline版本检测
 
@@ -241,7 +241,7 @@ def check_transform_function_pipeline(module: TablePipeLine, x, sample=1000, ret
     """
     x_ = copy.deepcopy(x[:min(sample, len(x))])
     for model in module.models:
-        if issubclass(model.__class__, TablePipeLine):
+        if issubclass(model.__class__, TSPipeLine):
             # 如果是Pipe类型，则返回transform后的x供下一个Pipe模块调用
             x_ = check_transform_function_pipeline(model, x_, return_x=True)
         else:
@@ -251,7 +251,7 @@ def check_transform_function_pipeline(module: TablePipeLine, x, sample=1000, ret
         return x_
 
 
-def run_transform_and_check(module: TablePipeLine, x_, check_col, check_type, check_value):
+def run_transform_and_check(module: TSPipeLine, x_, check_col, check_type, check_value):
     """
     分别跑transform和transform_single后做检测输出是否一致
 
@@ -282,7 +282,7 @@ def run_transform_and_check(module: TablePipeLine, x_, check_col, check_type, ch
     return batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem
 
 
-def check_two_batch_transform_same(module: TablePipeLine, cur_batch_transform, pre_batch_transform, check_col,
+def check_two_batch_transform_same(module: TSPipeLine, cur_batch_transform, pre_batch_transform, check_col,
                                    check_type,
                                    check_cur_value, check_pre_value):
     """
@@ -305,194 +305,3 @@ def check_two_batch_transform_same(module: TablePipeLine, cur_batch_transform, p
               "when input \033[1;43m[{}]\033[0m or \033[1;43m[{}]\033[0m, "
               "there will be different final output".format(check_col, check_type, check_cur_value,
                                                             check_pre_value))
-
-
-def check_null_value(module: TablePipeLine, x: dataframe_type, sample=100,
-                     null_values=None):
-    """
-    检测取不同空值情况下的输出是否一样
-
-    :param module:
-    :param x:
-    :param sample:
-    :param null_values:
-    :return:
-    """
-    if null_values is None:
-        null_values = [None, np.nan, "null", "NULL", "nan", "NaN", "", "none", "None", " "]
-    cols = x.columns.tolist()
-    for col in cols:
-        total_single_operate_times = []
-        x_ = copy.deepcopy(x[:min(sample, len(x))])
-        # 真删除
-        del x_[col]
-        pre_null = "__delete__"
-        pre_batch_transform, pre_single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
-            run_transform_and_check(module, x_, check_col=col, check_type="null", check_value=pre_null)
-        total_single_operate_times.extend(single_operate_times)
-        # 检测后面各类null值
-        for null_value in null_values:
-            cur_null = null_value
-            x_ = copy.deepcopy(x[:min(sample, len(x))])
-            x_[col] = null_value
-            cur_batch_transform, cur_single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
-                run_transform_and_check(module, x_, check_col=col, check_type="null", check_value=cur_null)
-
-            # 上一个空和当前空对比
-            check_two_batch_transform_same(module, cur_batch_transform, pre_batch_transform, check_col=col,
-                                           check_type="null", check_cur_value=cur_null,
-                                           check_pre_value=pre_null)
-            pre_batch_transform, pre_single_transform, pre_null = cur_batch_transform, cur_single_transform, cur_null
-            total_single_operate_times.extend(single_operate_times)
-        print(
-            "column:[{}] check [null value] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
-            .format(col, np.round(np.mean(total_single_operate_times), 2), max_cpu_percent,
-                    int(max_used_mem - min_used_mem)))
-
-
-def check_extreme_value(module: TablePipeLine, x: dataframe_type, sample=100,
-                        number_extreme_values=None,
-                        category_extreme_values=None):
-    """
-    检验输入极端值的情况下，还能不能有输出
-
-    :param module:
-    :param x:
-    :param sample:
-    :param number_extreme_values:
-    :param category_extreme_values:
-    :return:
-    """
-    if number_extreme_values is None:
-        number_extreme_values = [np.inf, 0.0, -1, 1, -1e-7, 1e-7, np.iinfo(np.int64).min,
-                                 np.iinfo(np.int64).max, np.finfo(np.float64).min,
-                                 np.finfo(np.float64).max]
-    if category_extreme_values is None:
-        category_extreme_values = ["", "null", None, "1.0", "0.0", "-1.0", "-1", "none", "NaN", "None"]
-    cols = x.columns.tolist()
-    for col in cols:
-        total_single_operate_times = []
-        total_min_used_mem = np.iinfo(np.int64).max
-        total_max_used_mem = np.iinfo(np.int64).min
-        total_max_cpu_percent = 0
-        if "int" in str(x[col].dtype).lower() or "float" in str(x[col].dtype).lower():
-            extreme_values = number_extreme_values
-        else:
-            extreme_values = category_extreme_values
-        # 检测后面各类null值
-        for extreme_value in extreme_values:
-            x_ = copy.deepcopy(x[:min(sample, len(x))])
-            x_[col] = extreme_value
-            batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
-                run_transform_and_check(module, x_, check_col=col, check_type="extreme", check_value=extreme_value)
-
-            total_single_operate_times.extend(single_operate_times)
-            total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
-            total_min_used_mem = min(total_min_used_mem, min_used_mem)
-            total_max_used_mem = max(total_max_used_mem, max_used_mem)
-        print("column:[{}] check [extreme value] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
-              .format(col, np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
-                      int(total_max_used_mem - total_min_used_mem)))
-    # 全局测试
-    # 1.纯空测试
-    module.transform_single({})
-    # 2.其余各类值全部赋值测试
-    total_single_operate_times = []
-    total_min_used_mem = np.iinfo(np.int64).max
-    total_max_used_mem = np.iinfo(np.int64).min
-    total_max_cpu_percent = 0
-    for extreme_value in number_extreme_values + category_extreme_values:
-        x_ = copy.deepcopy(x[:min(sample, len(x))])
-        for col in x_.columns:
-            x_[col] = extreme_value
-        batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
-            run_transform_and_check(module, x_, check_col="__all__", check_type="extreme", check_value=extreme_value)
-        total_single_operate_times.extend(single_operate_times)
-        total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
-        total_min_used_mem = min(total_min_used_mem, min_used_mem)
-        total_max_used_mem = max(total_max_used_mem, max_used_mem)
-    print("column:[__all__] check [extreme value] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
-          .format(np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
-                  int(total_max_used_mem - total_min_used_mem)))
-
-
-def check_inverse_dtype(module: TablePipeLine, x: dataframe_type, sample=100,
-                        number_inverse_values=None,
-                        category_inverse_values=None):
-    """
-    检测数据类型反转后，还能不能跑出结果
-
-    :param module:
-    :param x:
-    :param sample:
-    :param number_inverse_values:
-    :param category_inverse_values:
-    :return:
-    """
-    if number_inverse_values is None:
-        number_inverse_values = ["", "null", None, "1.0", "0.0", "-1.0", "-1"]
-    if category_inverse_values is None:
-        category_inverse_values = [0.0, -1, 1, -1e-7, 1e-7, np.iinfo(np.int64).min,
-                                   np.iinfo(np.int64).max, np.finfo(np.float64).min, np.finfo(np.float64).max]
-    cols = x.columns.tolist()
-    for col in cols:
-        total_single_operate_times = []
-        total_min_used_mem = np.iinfo(np.int64).max
-        total_max_used_mem = np.iinfo(np.int64).min
-        total_max_cpu_percent = 0
-        if "int" in str(x[col].dtype).lower() or "float" in str(x[col].dtype).lower():
-            inverse_values = number_inverse_values
-        else:
-            inverse_values = category_inverse_values
-        # 检测后面各类inverse值
-        for inverse_value in inverse_values:
-            x_ = copy.deepcopy(x[:min(sample, len(x))])
-            x_[col] = inverse_value
-            batch_transform, single_transform, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
-                run_transform_and_check(module, x_, check_type="inverse", check_col=col, check_value=inverse_value)
-            total_single_operate_times.extend(single_operate_times)
-            total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
-            total_min_used_mem = min(total_min_used_mem, min_used_mem)
-            total_max_used_mem = max(total_max_used_mem, max_used_mem)
-        print("column:[{}] check [inverse type] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
-              .format(col, np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
-                      int(total_max_used_mem - total_min_used_mem)))
-
-
-def check_int_trans_float(module: TablePipeLine, x: dataframe_type, sample=100):
-    """
-    将原始int数据类型转为float
-
-    :param module:
-    :param x:
-    :param sample:
-    :return:
-    """
-    cols = x.columns.tolist()
-    x_ = copy.deepcopy(x[:min(sample, len(x))])
-    base_batch_transform, _, _, _, _, _ = \
-        run_transform_and_check(module, x_, check_col="__base__", check_type="int trans float",
-                                check_value="float type data")
-    for col in cols:
-        if "int" in str(x[col].dtype).lower():
-            x_ = copy.deepcopy(x[:min(sample, len(x))])
-            x_[col] = x_[col].astype(float)
-            total_single_operate_times = []
-            total_min_used_mem = np.iinfo(np.int64).max
-            total_max_used_mem = np.iinfo(np.int64).min
-            total_max_cpu_percent = 0
-            float_batch_transform, _, single_operate_times, max_cpu_percent, min_used_mem, max_used_mem = \
-                run_transform_and_check(module, x_, check_col=col, check_type="int trans float",
-                                        check_value="float type data")
-            total_single_operate_times.extend(single_operate_times)
-            total_max_cpu_percent = max(total_max_cpu_percent, max_cpu_percent)
-            total_min_used_mem = min(total_min_used_mem, min_used_mem)
-            total_max_used_mem = max(total_max_used_mem, max_used_mem)
-            # float和base对比
-            check_two_batch_transform_same(module, base_batch_transform, float_batch_transform, check_col=col,
-                                           check_type="int trans float", check_cur_value="__int__",
-                                           check_pre_value="__float__")
-            print(
-                "column:[{}] check [int trans float] complete,speed:[{}ms]/it,cpu:[{}%],memory:[{}K]"
-                .format(col, np.round(np.mean(total_single_operate_times), 2), int(total_max_cpu_percent),
-                        int(total_max_used_mem - total_min_used_mem)))

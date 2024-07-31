@@ -298,3 +298,12 @@ class SelectCols(PreprocessBase):
 
     def udf_get_params(self):
         return {}
+
+
+class DoNoThing(TablePipeObjectBase):
+    """
+    顾名思义，啥也不做，透传
+    """
+
+    def udf_get_params(self):
+        return {}

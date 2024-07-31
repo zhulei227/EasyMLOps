@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, TensorDataset
 """
 
 
-class TextCNNClassification(ClassificationBase):
+class TextCNNRegression(RegressionBase):
     def __init__(self, y=None, **kwargs):
         super().__init__(y=y, **kwargs)
         self.text_cnn = None
@@ -73,7 +73,7 @@ class TextCNNClassification(ClassificationBase):
         train_dataset, val_x, val_y = self.early_stopping_before(x, y)
 
         # 2.构建text_cnn模型
-        self.text_cnn = TextCNN(self.num_class, self.vocab_size,
+        self.text_cnn = TextCNN(vocab_size=self.vocab_size,
                                 filter_num=self.native_init_params.get("filter_num", 128),
                                 filter_sizes=self.native_init_params.get("filter_sizes", [3, 4, 5]),
                                 embedding_dim=self.native_init_params.get("embedding_dim", 128),
@@ -94,10 +94,10 @@ class TextCNNClassification(ClassificationBase):
                                     drop_last=True)
             for batch_x, batch_y in dataloader:
                 self.text_cnn.train()
-                batch_x, batch_y = batch_x.to(self.cuda), batch_y.to(self.cuda)
+                batch_x, batch_y = batch_x.to(self.cuda), batch_y.to(self.cuda).float()
                 optimizer.zero_grad()
-                logits = self.text_cnn(batch_x)
-                loss = F.cross_entropy(logits, batch_y)
+                predict = self.text_cnn(batch_x)
+                loss = F.mse_loss(predict, batch_y)
                 loss.backward()
                 optimizer.step()
                 step += 1
@@ -110,8 +110,7 @@ class TextCNNClassification(ClassificationBase):
         x = s[self.col].tolist()
         x = torch.tensor(list(map(lambda line: [int(item) for item in line.strip().split(" ")], x)))
         x = x.to(self.cuda)
-        result = pd.DataFrame(torch.softmax(self.text_cnn(x), dim=1).detach().numpy(),
-                              columns=[self.id2label.get(i) for i in range(self.num_class)], index=s.index)
+        result = pd.DataFrame(self.text_cnn(x).detach().numpy(), columns=[self.pred_name], index=s.index)
         return result
 
     def update_device(self, cuda):
@@ -121,7 +120,7 @@ class TextCNNClassification(ClassificationBase):
     def udf_set_params(self, params: dict):
         self.vocab_size = params["vocab_size"]
         self.native_init_params = params["native_init_params"]
-        self.text_cnn = TextCNN(self.num_class, self.vocab_size,
+        self.text_cnn = TextCNN(vocab_size=self.vocab_size,
                                 filter_num=self.native_init_params.get("filter_num", 128),
                                 filter_sizes=self.native_init_params.get("filter_sizes", [3, 4, 5]),
                                 embedding_dim=self.native_init_params.get("embedding_dim", 128))
@@ -133,7 +132,7 @@ class TextCNNClassification(ClassificationBase):
 
 
 class TextCNN(nn.Module):
-    def __init__(self, num_class, vocab_size, filter_num=256, filter_sizes=[3, 4, 5], embedding_dim=128,
+    def __init__(self, vocab_size, filter_num=256, filter_sizes=[3, 4, 5], embedding_dim=128,
                  use_pretrained_embedding=False,
                  pretrained_embedding=None, fine_tune=True, dropout=0.5):
         super().__init__()
@@ -145,7 +144,7 @@ class TextCNN(nn.Module):
         self.convs = nn.ModuleList(
             [nn.Conv2d(1, filter_num, (fsz, embedding_dim)) for fsz in filter_sizes])
         self.dropout = nn.Dropout(dropout)
-        self.linear = nn.Linear(len(filter_sizes) * filter_num, num_class)
+        self.linear = nn.Linear(len(filter_sizes) * filter_num, 1)
 
     def forward(self, x):
         # 输入x的维度为(batch_size, max_len), max_len可以通过torchtext设置或自动获取为训练样本的最大=长度
