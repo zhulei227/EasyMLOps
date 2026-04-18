@@ -73,6 +73,13 @@ easymlops/
 │   ├── text_regression/    # Text regression
 │   └── similarity/         # Similarity search (Faiss, ES)
 ├── ts/                    # Time series processing
+│   ├── core/              # Core pipeline base classes
+│   ├── statistical/       # Statistical models (ARIMA, SARIMA, GARCH)
+│   ├── deep_learning/     # Deep learning models (N-BEATS, N-HiTS, DeepAR, GP)
+│   ├── transformer/       # Transformer models (TFT, Informer, Autoformer, etc.)
+│   ├── state_space/       # State space models (DeepState, Mamba, Liquid S4)
+│   ├── generative/       # Generative models (VAE, Normalizing Flow, Diffusion)
+│   └── dnn/               # DNN models (CNN for time series)
 ├── yolo/                  # YOLO vision tasks
 │   ├── detection/          # Object detection
 │   ├── segmentation/       # Instance segmentation
@@ -416,6 +423,53 @@ The Time Series Pipeline handles time series forecasting.
 | Class | Description |
 |-------|-------------|
 | **TSCNNRegression** | CNN for time series regression |
+
+#### Statistical Models (`easymlops.ts.statistical`)
+
+| Class | Description |
+|-------|-------------|
+| **ArimaRegression** | ARIMA time series forecasting |
+| **SarimaRegression** | SARIMA seasonal time series forecasting |
+| **ArimaxRegression** | ARIMAX time series with exogenous variables |
+| **SarimaxRegression** | SARIMAX seasonal time series with exogenous variables |
+| **GarchRegression** | GARCH volatility model |
+
+#### Deep Learning Models (`easymlops.ts.deep_learning`)
+
+| Class | Description |
+|-------|-------------|
+| **NBeatsRegression** | N-BEATS time series forecasting |
+| **NHiTSRegression** | N-HiTS time series forecasting |
+| **DeepARRegression** | DeepAR time series forecasting |
+| **GPRegression** | Gaussian Process time series forecasting |
+
+#### Transformer Models (`easymlops.ts.transformer`)
+
+| Class | Description |
+|-------|-------------|
+| **TFTRegression** | Temporal Fusion Transformer |
+| **InformerRegression** | Informer time series forecasting |
+| **AutoformerRegression** | Autoformer time series forecasting |
+| **FEDformerRegression** | FEDformer time series forecasting |
+| **PatchTSTRegression** | PatchTST time series forecasting |
+| **TimesNetRegression** | TimesNet time series forecasting |
+| **iTransformerRegression** | iTransformer time series forecasting |
+
+#### State Space Models (`easymlops.ts.state_space`)
+
+| Class | Description |
+|-------|-------------|
+| **DeepStateRegression** | Deep State time series forecasting |
+| **MambaRegression** | Mamba state space time series forecasting |
+| **LiquidS4Regression** | Liquid S4 state space time series forecasting |
+
+#### Generative Models (`easymlops.ts.generative`)
+
+| Class | Description |
+|-------|-------------|
+| **VAERegression** | VAE variational autoencoder time series |
+| **NormalizingFlowRegression** | Normalizing Flow time series |
+| **DiffusionRegression** | Diffusion time series forecasting |
 
 ### YOLO Vision
 
