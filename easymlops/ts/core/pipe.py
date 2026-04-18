@@ -282,6 +282,47 @@ class PipeBase(PipeObjectBase):
         for index in range(len(params["branch_pipes"])):
             self.branch_pipes[index].set_params(params["branch_pipes"][index])
 
+    def save(self, path):
+        """
+        存储模型至path路径
+
+        :param path:
+        :return:
+        """
+        import pickle
+        params = self.get_params()
+        with open(path, "wb") as f:
+            pickle.dump(params, f)
+
+    def load(self, path):
+        """
+        从path路径加载模型
+
+        :param path:
+        :return:
+        """
+        import pickle
+        with open(path, "rb") as f:
+            params = pickle.load(f)
+        self.set_params(params)
+
+    def auto_test(self, x_, sample=200):
+        """
+        自动测试接口
+
+        :param x_:
+        :param sample:
+        :return:
+        """
+        x = x_[:sample]
+        from easymlops.ts.core.callback import check_transform_function
+        check_transform_function_describe = """
+###################################################################
+一致性测试和性能测试:check_transform_function                      
+###################################################################"""
+        print(check_transform_function_describe)
+        self.callback(check_transform_function, x, sample=sample)
+
     @staticmethod
     def extract_dict(s: dict_type, keys: list) -> dict_type:
         """

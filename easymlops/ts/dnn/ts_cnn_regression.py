@@ -1,11 +1,13 @@
-from ..core import *
-import pandas as pd
 import torch
-from torch import Tensor
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 import pickle
+import pandas as pd
+import numpy as np
+from easymlops.ts.core.pipe import PipeBase, M2MRollingPipeBase
+
+Tensor = torch.Tensor
 
 """
 代码参考:https://github.com/WoBruceWu/text-classification
