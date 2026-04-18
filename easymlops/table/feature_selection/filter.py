@@ -161,7 +161,9 @@ class Chi2Filter(FilterBase):
         from sklearn.feature_selection import chi2
         assert self.y is not None and len(self.y) == len(s)
         self.filter_value_dist = dict()
-        for idx, filter_value in enumerate(chi2(s[self.cols], self.y)[0]):
+        s_ = copy.deepcopy(s[self.cols]).values
+        s_ = np.where(s_ < 0, 0, s_)
+        for idx, filter_value in enumerate(chi2(s_, self.y)[0]):
             self.filter_value_dist[self.cols[idx]] = filter_value
         del self.y
         self.selected_cols = []

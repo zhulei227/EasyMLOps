@@ -61,6 +61,12 @@ class TSPipeLine(PipeBase):
         self.models.append(model)
         return self
 
+    def __sub__(self, model):
+        """
+        pipe函数的简洁写法
+        """
+        return self.pipe(model)
+
     def __getitem__(self, index):
         # 切片方式
         if isinstance(index, slice):
@@ -306,6 +312,22 @@ class TSPipeLine(PipeBase):
     def reset_cache_data(self):
         for model in self.models:
             model.reset_cache_data()
+
+    def _print_structs(self, prefix, struct):
+        if type(struct[2]) == list:
+            print(prefix + struct[1].__module__ + "." + struct[1].__name__)
+            for s_ in struct[2]:
+                self._print_structs(prefix + "|--", s_)
+        else:
+            print(prefix + struct[1].__module__ + "." + struct[1].__name__)
+
+    def print_structs(self):
+        """
+        打印模型结构
+        """
+        structs = [self.extract_structs(model) for model in self.models]
+        for struct in structs:
+            self._print_structs("", struct)
 
     def auto_test(self, x_, sample=200):
         """

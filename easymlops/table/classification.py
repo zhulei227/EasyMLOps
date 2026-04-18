@@ -5,21 +5,32 @@ from easymlops.table.utils import PandasUtils
 
 class ClassificationBase(TablePipeObjectBase):
     """
-    分类模型Base类
+    分类模型基类。
+    
+    提供分类模型的通用框架，支持多种底层分类算法。
+    
+    Example:
+        >>> class MyClassifier(ClassificationBase):
+        ...     def udf_fit(self, s, **kwargs):
+        ...         self.model.fit(s, self.y, **self.native_fit_params)
+        ...         return self
     """
-
+    
     def __init__(self, y: series_type = None, cols="all", skip_check_transform_type=True, drop_input_data=True,
                  native_init_params=None, native_fit_params=None, support_sparse_input=False,
                  **kwargs):
         """
-        :param y:
-        :param cols: 用于模型训练的cols
-        :param skip_check_transform_type: 跳过类型检测
-        :param drop_input_data: 删掉输入数据，默认True，不然输出为x1,x2,..,xn,y
-        :param native_init_params: 底层分类模型的init入参，调用格式为BaseModel(**native_init_params)
-        :param native_fit_params:底层分类模型的fit入参，调用格式为BaseModel.fit(x,y,**native_fit_params)
-        :param support_sparse_input:是否支持稀疏矩阵，如果输入数据中有稀疏数据，需要设置为True
-        :param kwargs:
+        初始化分类模型。
+        
+        Args:
+            y: 目标变量
+            cols: 用于模型训练的列
+            skip_check_transform_type: 跳过类型检测
+            drop_input_data: 是否删除输入数据，默认True
+            native_init_params: 底层分类模型的init参数
+            native_fit_params: 底层分类模型的fit参数
+            support_sparse_input: 是否支持稀疏矩阵输入
+            **kwargs: 其他父类参数
         """
         super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         if cols is None or type(cols) == str:
@@ -38,7 +49,6 @@ class ClassificationBase(TablePipeObjectBase):
                 self.label2id[label] = idx
             self.y = self.y.apply(lambda x: self.label2id.get(x))
             self.num_class = len(self.id2label)
-        # 底层模型自带参数
         self.native_init_params = copy.deepcopy(native_init_params)
         self.native_fit_params = copy.deepcopy(native_fit_params)
         if self.native_init_params is None:
@@ -47,6 +57,7 @@ class ClassificationBase(TablePipeObjectBase):
             self.native_fit_params = dict()
 
     def before_fit(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """fit前处理，选择用于训练的列。"""
         s = super().before_fit(s, **kwargs)
         assert self.y is not None
         if len(self.cols) == 0:
@@ -58,6 +69,7 @@ class ClassificationBase(TablePipeObjectBase):
             return s[self.cols]
 
     def before_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """transform前处理，选择用于预测的列。"""
         s = super().before_transform(s, **kwargs)
         if self.check_list_same(s.columns.tolist(), self.cols):
             return s
@@ -65,16 +77,19 @@ class ClassificationBase(TablePipeObjectBase):
             return s[self.cols]
 
     def transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """批量数据转换。"""
         s_ = self.after_transform(self.udf_transform(self.before_transform(s, **kwargs), **kwargs), **kwargs)
         if not self.drop_input_data:
             s_ = PandasUtils.concat_duplicate_columns([s, s_])
         return s_
 
     def before_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """单条数据转换前处理。"""
         s = super().before_transform_single(s, **kwargs)
         return self.extract_dict(s, self.cols)
 
     def transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """单条数据转换。"""
         s_ = copy.deepcopy(s)
         s_ = self.after_transform_single(
             self.udf_transform_single(self.before_transform_single(s_, **kwargs), **kwargs), **kwargs)
@@ -85,17 +100,21 @@ class ClassificationBase(TablePipeObjectBase):
             return s_
 
     def udf_fit(self, s, **kwargs):
+        """用户自定义的fit实现。"""
         return self
 
     def udf_transform(self, s, **kwargs):
+        """用户自定义的transform实现。"""
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs):
+        """用户自定义的单条数据预测实现。"""
         input_dataframe = pd.DataFrame([s])
         input_dataframe = input_dataframe[self.cols]
         return self.udf_transform(input_dataframe, **kwargs).to_dict("records")[0]
 
     def udf_get_params(self) -> dict_type:
+        """获取参数。"""
         return {"id2label": self.id2label, "label2id": self.label2id, "num_class": self.num_class, "cols": self.cols,
                 "drop_input_data": self.drop_input_data, "support_sparse_input": self.support_sparse_input}
 
@@ -239,18 +258,22 @@ class LogisticRegressionClassification(ClassificationBase):
 
 class SVMClassification(ClassificationBase):
 
-    def __init__(self, y=None, gamma=2, c=1, kernel="rbf", **kwargs):
+    def __init__(self, y=None, gamma=2, c=1, kernel="rbf", use_gpu=True, **kwargs):
         super().__init__(y=y, **kwargs)
         self.native_init_params.update(
             {"kernel": kernel, "decision_function_shape": "ovo", "gamma": gamma, "C": c, "probability": True})
         self.svm = None
+        self.use_gpu = use_gpu
 
     def udf_fit(self, s: dataframe_type, **kwargs):
         if self.support_sparse_input:
             s_ = PandasUtils.pd2csr(s)
         else:
             s_ = s
-        from sklearn.svm import SVC
+        if self.use_gpu:
+            from thundersvm import SVC
+        else:
+            from sklearn.svm import SVC
         self.svm = SVC(**self.native_init_params)
         self.svm.fit(s_, self.y, **self.native_fit_params)
         return self
