@@ -1,167 +1,258 @@
-# EasyMLOps  
-  
-## 介绍   
-`EasyMLOps`包以`Pipline`的方式构建建模任务，可直接进行模型训练、预测(离线，在线)，测试(离线在线预测一致性、预测性能)、特征存储、监控、分析等功能，通过外套一层Flask或FastApi即可直接部署生产
+# EasyMLOps
 
-## 安装
+[![Python Version](https://img.shields.io/pypi/pyversions/easymlops)](https://pypi.org/project/easymlops/)
+[![License](https://img.shields.io/pypi/l/easymlops)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/yourusername/easymlops?style=social)](https://github.com/yourusername/easymlops/stargazers)
+
+[中文版](./README_zh.md) | English
+
+EasyMLOps is an efficient Machine Learning Operations framework that builds modeling tasks through Pipeline approach. It supports model training, prediction, testing, feature storage, monitoring and more. Simply wrap with Flask or FastApi to deploy to production.
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [Table Data Processing](#table-data-processing)
+  - [NLP Text Processing](#nlp-text-processing)
+  - [YOLO Vision Tasks](#yolo-vision-tasks)
+  - [OCR Text Recognition](#ocr-text-recognition)
+- [Modules](#modules)
+- [Environment Dependencies](#environment-dependencies)
+- [Documentation](#documentation)
+- [License](#license)
+
+## Features
+
+- 🚀 **Unified Pipeline Architecture** - Clean API design with chainable calls
+- 📊 **Table Data Processing** - Data cleaning, feature encoding, dimensionality reduction, feature selection, factorization machines, classification/regression
+- 📝 **NLP Tasks** - Text cleaning, tokenization, feature extraction, text classification, similarity search
+- 🖼️ **YOLO Vision Tasks** - Object detection, instance segmentation, image classification, pose estimation, rotated object detection
+- 🔤 **OCR Text Recognition** - Supports 80+ languages
+- 🤖 **AutoML** - Automated machine learning
+- 💾 **Model Persistence** - Easy model save and load
+
+## Installation
+
+### Install from PyPI
+
 ```bash
-pip install easymlops-版本号
-```  
+pip install easymlops
+```
 
-## 使用
+### Install from source
 
+```bash
+pip install -e .
+```
+
+## Quick Start
+
+### Table Data Processing
 
 ```python
 import pandas as pd
-data=pd.read_csv("./data/demo.csv")
-print(data.head(5).to_markdown())
-```
-
-    |    |   PassengerId |   Survived |   Pclass | Name                                                | Sex    |   Age |   SibSp |   Parch | Ticket           |    Fare | Cabin   | Embarked   |
-    |---:|--------------:|-----------:|---------:|:----------------------------------------------------|:-------|------:|--------:|--------:|:-----------------|--------:|:--------|:-----------|
-    |  0 |             1 |          0 |        3 | Braund, Mr. Owen Harris                             | male   |    22 |       1 |       0 | A/5 21171        |  7.25   | nan     | S          |
-    |  1 |             2 |          1 |        1 | Cumings, Mrs. John Bradley (Florence Briggs Thayer) | female |    38 |       1 |       0 | PC 17599         | 71.2833 | C85     | C          |
-    |  2 |             3 |          1 |        3 | Heikkinen, Miss. Laina                              | female |    26 |       0 |       0 | STON/O2. 3101282 |  7.925  | nan     | S          |
-    |  3 |             4 |          1 |        1 | Futrelle, Mrs. Jacques Heath (Lily May Peel)        | female |    35 |       1 |       0 | 113803           | 53.1    | C123    | S          |
-    |  4 |             5 |          0 |        3 | Allen, Mr. William Henry                            | male   |    35 |       0 |       0 | 373450           |  8.05   | nan     | S          |
-    
-
-
-```python
-# 拆分训练测试
-x_train=data[:500]
-x_test=data[500:]
-y_train=x_train["Survived"]
-y_test=x_test["Survived"]
-del x_train["Survived"]
-del x_test["Survived"]
-```
-
-### 表格型任务
-
-
-```python
 from easymlops import TablePipeLine
 from easymlops.table.preprocessing import *
 from easymlops.table.encoding import *
-from easymlops.table.decomposition import *
 from easymlops.table.classification import *
 from easymlops.table.ensemble import *
-```
 
+# Load data
+data = pd.read_csv("./data/demo.csv")
+x_train = data[:500]
+x_test = data[500:]
+y_train = x_train["Survived"]
+del x_train["Survived"]
+del x_test["Survived"]
 
-```python
+# Build Pipeline
 table = TablePipeLine()
 table.pipe(FixInput()) \
   .pipe(FillNa()) \
-  .pipe(Parallel([OneHotEncoding(cols=["Pclass", "Sex"]), LabelEncoding(cols=["Sex", "Pclass"]),
-                    TargetEncoding(cols=["Name", "Ticket", "Embarked", "Cabin", "Sex"], y=y_train)])) \
-  .pipe(Parallel([PCADecomposition(n_components=2, prefix="pca"), NMFDecomposition(n_components=2, prefix="nmf")]))\
-  .pipe(Parallel([LGBMClassification(y=y_train, prefix="lgbm"), LogisticRegressionClassification(y=y_train, prefix="lr")]))
+  .pipe(Parallel([
+      OneHotEncoding(cols=["Pclass", "Sex"]),
+      LabelEncoding(cols=["Sex", "Pclass"]),
+      TargetEncoding(cols=["Name", "Ticket"], y=y_train)
+  ])) \
+  .pipe(Parallel([
+      LGBMClassification(y=y_train, prefix="lgbm"),
+      LogisticRegressionClassification(y=y_train, prefix="lr")
+  ]))
 
+# Train and predict
 table.fit(x_train)
-```
+result = table.transform(x_test)
+print(result.head(5))
 
-
-
-
-    <easymlops.table.core.pipeline_object.TablePipeLine at 0x213de1f9988>
-
-
-
-
-```python
-print(table.transform(x_test).head(5).to_markdown())
-```
-
-    |     |   lgbm_0 |    lgbm_1 |     lr_0 |     lr_1 |
-    |----:|---------:|----------:|---------:|---------:|
-    | 500 | 0.965218 | 0.0347825 | 0.651417 | 0.348583 |
-    | 501 | 0.98153  | 0.0184698 | 0.65506  | 0.34494  |
-    | 502 | 0.979139 | 0.0208607 | 0.647266 | 0.352734 |
-    | 503 | 0.808796 | 0.191204  | 0.656613 | 0.343387 |
-    | 504 | 0.184484 | 0.815516  | 0.449149 | 0.550851 |
-    
-
-
-```python
+# Single prediction
 table.transform_single(x_test.to_dict("record")[0])
 ```
 
+#### Factorization Machines (FM/FFM/DeepFM)
 
+```python
+from easymlops.table.fm import FMClassification, DeepFMClassification
 
+# FM Classification
+fm = FMClassification(
+    y=label,
+    cols=["feature1", "feature2", "feature3"],
+    field_dims=[5, 10, 8],
+    embed_dim=8,
+    epochs=10
+)
+pipeline = TablePipeLine().pipe(fm)
+pipeline.fit(df).transform(df)
 
-    {'lgbm_0': 0.9652175316373408,
-     'lgbm_1': 0.03478246836265923,
-     'lr_0': 0.6514166695229407,
-     'lr_1': 0.3485833304770593}
+# DeepFM Classification
+deepfm = DeepFMClassification(
+    y=label,
+    cols=["feature1", "feature2", "feature3"],
+    field_dims=[5, 10, 8],
+    embed_dim=8,
+    hidden_layers=[64, 32],
+    epochs=10
+)
+```
 
+#### LightGBM Leaf Node Encoding
 
+```python
+from easymlops.table.encoding import LGBMLeafEncoder
 
-### 文本特征提取
+encoder = LGBMLeafEncoder(y=label, n_estimators=10, max_depth=5)
+pipeline = TablePipeLine().pipe(encoder)
+pipeline.fit(df)
+result = pipeline.transform(df)
 
+# Get leaf node descriptions
+descriptions = encoder.describe()
+```
 
+#### Evaluation Metrics
+
+```python
+from easymlops.table.utils import (
+    calc_precision_recall_at_thresholds,
+    plot_pr_curve,
+    calc_roc_at_thresholds,
+    plot_roc_curve
+)
+
+# P-R Curve
+result = calc_precision_recall_at_thresholds(y_true, y_pred, bins=10)
+plot_pr_curve(y_true, y_preds_dict, save_path="pr_curve.png")
+
+# ROC Curve
+result = calc_roc_at_thresholds(y_true, y_pred, bins=10)
+plot_roc_curve(y_true, y_preds_dict, save_path="roc_curve.png")
+```
+
+### NLP Text Processing
 
 ```python
 from easymlops import NLPPipeline
 from easymlops.nlp.preprocessing import *
 from easymlops.nlp.representation import *
-```
 
-
-```python
 nlp = NLPPipeline()
 nlp.pipe(FixInput()) \
   .pipe(FillNa()) \
-  .pipe(SelectCols(cols=["Name"]))\
-  .pipe(ReplaceDigits())\
-  .pipe(RemovePunctuation())\
-  .pipe(Parallel([Word2VecModel(embedding_size=4), FastTextModel(embedding_size=4)]))
+  .pipe(SelectCols(cols=["Name"])) \
+  .pipe(ReplaceDigits()) \
+  .pipe(RemovePunctuation()) \
+  .pipe(Word2VecModel(embedding_size=4))
 
 nlp.fit(x_train)
+result = nlp.transform(x_test)
 ```
 
-
-
-
-    <easymlops.nlp.core.pipeline_object.NLPPipeline at 0x213e69dda88>
-
-
-
+### YOLO Vision Tasks
 
 ```python
-print(nlp.transform(x_test).head(5).to_markdown())
+from easymlops.yolo.detection import YOLODetection
+from easymlops.yolo.segmentation import YOLOSegmentation
+from easymlops.yolo.classification import YOLOClassification
+from easymlops.yolo.pose import YOLOPose
+from easymlops.yolo.obb import YOLOOBB
+
+# Object Detection
+pipe = YOLODetection(model_name="yolo11n", device="cpu")
+
+# Instance Segmentation
+pipe = YOLOSegmentation(model_name="yolo11n-seg")
+
+# Image Classification
+pipe = YOLOClassification(model_name="yolo11n-cls", imgsz=224)
+
+# Pose Estimation
+pipe = YOLOPose(model_name="yolo11n-pose")
+
+# Rotated Object Detection
+pipe = YOLOOBB(model_name="yolo11n-obb")
+
+# Train and predict
+df = pd.DataFrame({"image_path": ["path/to/image.jpg"]})
+result = pipe.fit(df).transform(df)
 ```
 
-    |     |   w2v_Name_0 |   w2v_Name_1 |   w2v_Name_2 |   w2v_Name_3 |   fasttext_Name_0 |   fasttext_Name_1 |   fasttext_Name_2 |   fasttext_Name_3 |
-    |----:|-------------:|-------------:|-------------:|-------------:|------------------:|------------------:|------------------:|------------------:|
-    | 500 |   -0.0160304 |   0.00341222 |     0.131879 |    0.227311  |        0.0470462  |       -0.00434371 |        0.0662056  |        0.0268283  |
-    | 501 |   -0.168437  |  -0.0802843  |     0.188844 |    0.0576391 |        0.00569692 |       -0.00443027 |        0.00559943 |        0.0177013  |
-    | 502 |   -0.168437  |  -0.0802843  |     0.188844 |    0.0576391 |       -0.00195689 |       -0.0279951  |        0.00245144 |        0.0229158  |
-    | 503 |   -0.233626  |  -0.181061   |     0.165193 |    0.226518  |        0.00192385 |       -0.0182485  |       -0.005737   |        0.032779   |
-    | 504 |   -0.233626  |  -0.181061   |     0.165193 |    0.226518  |        0.010348   |       -0.0144759  |        0.028474   |        0.00600368 |
-    
-
+### OCR Text Recognition
 
 ```python
-nlp.transform_single(x_test.to_dict("record")[0])
+from easymlops.ocr import EasyOCRText
+
+df = pd.DataFrame({"image_path": ["path/to/image.jpg"]})
+pipe = EasyOCRText(lang="en", gpu=False)
+result = pipe.fit(df).transform(df)
 ```
 
+## Modules
 
+| Module | Description |
+|--------|-------------|
+| **TablePipeLine** | Table data processing: data cleaning, feature encoding, dimensionality reduction, feature selection, **Factorization Machines (FM/FFM/DeepFM)**, classification/regression, Stacking |
+| **NLPPipeline** | NLP tasks: text cleaning, tokenization, feature extraction, text classification, similarity search |
+| **TSPipeLine** | Time series tasks: time series processing, DNN models |
+| **YOLO Module** | Vision tasks: object detection, instance segmentation, image classification, pose estimation, rotated object detection |
+| **OCRPipeLine** | OCR tasks: text detection and recognition, supports 80+ languages |
+| **AutoML** | Automated machine learning |
 
+## Environment Dependencies
 
-    {'w2v_Name_0': -0.01603037677705288,
-     'w2v_Name_1': 0.003412220859900117,
-     'w2v_Name_2': 0.13187919557094574,
-     'w2v_Name_3': 0.227310910820961,
-     'fasttext_Name_0': 0.04704619571566582,
-     'fasttext_Name_1': -0.004343707114458084,
-     'fasttext_Name_2': 0.06620561331510544,
-     'fasttext_Name_3': 0.026828348636627197}
+### YOLO Vision Tasks
 
-
-
-
-```python
-
+```bash
+pip install ultralytics-opencv-headless
+# or
+pip install numpy>=1.24.4,<2 torch>=1.12.0 torchvision>=0.13.0 ultralytics
 ```
+
+### OCR Text Recognition
+
+```bash
+pip install easyocr
+pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
+```
+
+## Documentation
+
+For detailed usage instructions, please refer to the documentation in the [skills](./skills) directory:
+
+- [SKILL.md](./skills/SKILL.md) - Main documentation
+- [01_table.md](./skills/docs/01_table.md) - Table Data Processing
+- [02_nlp.md](./skills/docs/02_nlp.md) - NLP Tasks
+- [03_timeseries.md](./skills/docs/03_timeseries.md) - Time Series Tasks
+- [04_pipeline.md](./skills/docs/04_pipeline.md) - Pipeline Operations
+- [05_persistence.md](./skills/docs/05_persistence.md) - Model Persistence
+- [06_deploy.md](./skills/docs/06_deploy.md) - Production Deployment
+- [07_storage.md](./skills/docs/07_storage.md) - Feature Storage
+- [08_automl.md](./skills/docs/08_automl.md) - AutoML
+- [09_cheatsheet.md](./skills/docs/09_cheatsheet.md) - Quick Reference
+- [10_example.md](./skills/docs/10_example.md) - Complete Examples
+- [11_yolo.md](./skills/docs/11_yolo.md) - YOLO Vision Tasks
+- [12_ocr.md](./skills/docs/12_ocr.md) - OCR Text Recognition
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
