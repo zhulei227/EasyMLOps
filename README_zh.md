@@ -36,7 +36,6 @@ EasyMLOps 提供统一的基于 Pipeline 的机器学习工作流架构。通过
 - **Pipe**: 处理和转换数据的独立单元
 - **Pipeline**: 按顺序处理数据的管道链
 - **Parallel**: 并行执行多个管道
-- **Stacking**: 组合多个模型进行集成学习
 
 ## 特性
 
@@ -54,22 +53,40 @@ EasyMLOps 提供统一的基于 Pipeline 的机器学习工作流架构。通过
 easymlops/
 ├── core/           # 核心 Pipeline 基类
 ├── table/          # 表格数据处理
-│   ├── preprocessing/    # 数据预处理
-│   ├── encoding/         # 特征编码
-│   ├── classification/   # 分类模型
-│   ├── regression/       # 回归模型
-│   ├── ensemble/         # 集成方法
-│   ├── fm/               # 因子分解机
-│   ├── decomposition/    # 特征降维
-│   ├── feature_selection/# 特征选择
-│   ├── strategy/         # 建模策略
-│   ├── storage/          # 特征存储
-│   └── utils/            # 工具函数
-├── nlp/            # 自然语言处理
-├── ts/             # 时序数据
-├── yolo/           # YOLO 视觉任务
-├── ocr/            # OCR 文本识别
-└── automl/         # AutoML
+│   ├── preprocessing/      # 数据预处理
+│   ├── encoding/           # 特征编码
+│   ├── classification/     # 分类模型
+│   ├── regression/         # 回归模型
+│   ├── ensemble/           # 集成方法
+│   ├── fm/                 # 因子分解机
+│   ├── decomposition/      # 特征降维
+│   ├── feature_selection/  # 特征选择
+│   ├── strategy/           # 建模策略
+│   ├── storage/            # 特征存储
+│   ├── utils/              # 工具函数
+│   ├── sqls/               # SQL 操作
+│   └── perfopt/            # 性能优化
+├── nlp/                   # 自然语言处理
+│   ├── preprocessing/      # 文本清洗、分词
+│   ├── representation/    # 文本向量化 (TFIDF, Word2Vec等)
+│   ├── text_classification/ # 文本分类 (CNN, RNN, HAN)
+│   ├── text_regression/   # 文本回归
+│   └── similarity/         # 相似度检索 (Faiss, ES)
+├── ts/                    # 时序数据处理
+├── yolo/                  # YOLO 视觉任务
+│   ├── detection/          # 目标检测
+│   ├── segmentation/       # 实例分割
+│   ├── classification/     # 图像分类
+│   ├── pose/              # 姿态估计
+│   └── obb/               # 旋转目标检测
+├── ocr/                   # OCR 文本识别
+│   └── easyocr/           # EasyOCR 集成
+├── automl/                # AutoML
+│   ├── llms/              # LLM 集成
+│   ├── tools/              # 工具管理器
+│   └── sessions/          # 会话管理器
+└── storage/               # 存储后端
+    └── feature_storage/    # 特征存储
 ```
 
 ## 安装
@@ -259,25 +276,44 @@ table.transform_single(x_test.to_dict("record")[0])
 | 类名 | 说明 |
 |------|------|
 | **Parallel** | 并行运行多个管道 |
-| **Stacking** | 堆叠集成 |
 
 #### 10. 特征降维 (`easymlops.table.decomposition`)
 
 | 类名 | 说明 |
 |------|------|
-| **PCA** | 主成分分析 |
-| **SVD** | 奇异值分解 |
-| **TCA** | 迁移成分分析 |
+| **Decomposition** | 降维基类 |
+| **PCADecomposition** | 主成分分析 |
+| **NMFDecomposition** | 非负矩阵分解 |
+| **KernelPCADecomposition** | 核PCA |
+| **FastICADecomposition** | 快速独立成分分析 |
+| **DictionaryLearningDecomposition** | 字典学习 |
+| **MiniBatchDictionaryLearningDecomposition** | 迷你批字典学习 |
+| **LDADecomposition** | 潜在狄利克雷分配 |
+| **TSNEDecomposition** | t-SNE |
+| **MDSDecomposition** | 多维缩放 |
+| **IsomapDecomposition** | Isomap |
+| **SpectralEmbeddingDecomposition** | 谱嵌入 |
+| **LocallyLinearEmbeddingDecomposition** | 局部线性嵌入 |
+| **TCADecomposition** | 迁移成分分析 |
 
 #### 11. 特征选择 (`easymlops.table.feature_selection`)
 
 | 类名 | 说明 |
 |------|------|
-| **VarianceThreshold** | 删除低方差特征 |
-| **SelectKBest** | 选择 top K 特征 |
-| **FeatureEmbedding** | 基于嵌入的特征重要性 |
+| **FilterBase** | 过滤法特征选择基类 |
+| **MissRateFilter** | 按缺失率过滤 |
+| **VarianceFilter** | 按方差过滤 |
+| **PersonCorrFilter** | 按皮尔逊相关系数过滤 |
+| **Chi2Filter** | 按卡方检验过滤 |
+| **PValueFilter** | 按p值过滤 |
+| **MutualInfoFilter** | 按互信息过滤 |
+| **IVFilter** | 按信息价值过滤 |
+| **PSIFilter** | 按群体稳定性指数过滤 |
+| **EmbedBase** | 嵌入法特征选择基类 |
+| **LREmbed** | 基于逻辑回归的特征重要性 |
+| **LGBMEmbed** | 基于LightGBM的特征重要性 |
 
-#### 12. 评估指标 (`easymlops.table.eval`)
+#### 12. 评估指标 (`easymlops.table.utils`)
 
 | 函数 | 说明 |
 |------|------|
@@ -287,6 +323,19 @@ table.transform_single(x_test.to_dict("record")[0])
 | calc_roc_at_thresholds | 计算不同阈值下的 ROC 指标 |
 | plot_roc_curve | 绘制 ROC 曲线并计算 AUC |
 
+#### 13. SQL 操作 (`easymlops.table.sqls`)
+
+| 类名 | 说明 |
+|------|------|
+| **SQL** | 在 DataFrame 上执行 SQL 查询 |
+
+#### 14. 性能优化 (`easymlops.table.perfopt`)
+
+| 类名 | 说明 |
+|------|------|
+| **ReduceMemUsage** | 减少 DataFrame 内存占用 |
+| **Dense2Sparse** | 将密集型 DataFrame 转换为稀疏格式 |
+
 ### NLP Pipeline
 
 NLP Pipeline 用于处理自然语言处理任务。
@@ -295,34 +344,47 @@ NLP Pipeline 用于处理自然语言处理任务。
 
 | 类名 | 说明 |
 |------|------|
-| **NLPPreprocessBase** | NLP 预处理基类 |
-| **FixInput** | 确保 DataFrame 输入 |
-| **FillNa** | 填充缺失文本值 |
+| **PreprocessBase** | NLP 预处理基类 |
+| **Lower** | 转换为小写 |
+| **Upper** | 转换为大写 |
+| **RemoveDigits** | 移除数字 |
 | **ReplaceDigits** | 替换数字为标记 |
 | **RemovePunctuation** | 移除标点符号 |
-| **RemoveStopwords** | 移除停用词 |
-| **RemoveHtml** | 移除 HTML 标签 |
-| **LowerCase** | 转换为小写 |
-| **RemoveUrl** | 移除 URLs |
-| **RemoveEmail** | 移除邮箱地址 |
+| **ReplacePunctuation** | 替换标点符号 |
+| **Replace** | 替换指定字符 |
+| **RemoveWhitespace** | 移除空白字符 |
+| **ExpandWhitespace** | 展开空白字符 |
+| **RemoveStopWords** | 移除停用词 |
+| **ExtractKeyWords** | 提取关键词 |
+| **AppendKeyWords** | 追加关键词 |
+| **ExtractChineseWords** | 提取中文词语 |
+| **ExtractNGramWords** | 提取 n-gram 词 |
+| **ExtractJieBaWords** | 使用 jieba 提取词语 |
+| **VocabIndex** | 将词语转换为词汇索引 |
+| **ExtractJieBaWordsWithSentSplit** | 分句后提取词语 |
+| **VocabIndexWithSentSplit** | 分句后转换为词汇索引 |
 
 #### 2. 表示 (`easymlops.nlp.representation`)
 
 | 类名 | 说明 |
 |------|------|
-| **NLPRepresentationBase** | 文本表示基类 |
-| **TfidfModel** | TF-IDF 向量化 |
+| **RepresentationBase** | 文本表示基类 |
+| **BagOfWords** | 词袋模型 |
+| **TFIDF** | TF-IDF 向量化 |
+| **LdaTopicModel** | LDA 主题模型 |
+| **LsiTopicModel** | LSI 主题模型 |
 | **Word2VecModel** | Word2Vec 词嵌入 |
-| **BertModel** | BERT 词嵌入 |
+| **Doc2VecModel** | Doc2Vec 词嵌入 |
+| **FastTextModel** | FastText 词嵌入 |
 
 #### 3. 文本分类 (`easymlops.nlp.text_classification`)
 
 | 类名 | 说明 |
 |------|------|
 | **TextClassificationBase** | 文本分类基类 |
-| **TextCNN** | TextCNN 分类器 |
-| **TextRNN** | TextRNN 分类器 |
-| **HAN** | 层次注意力网络 |
+| **TextCNNClassification** | TextCNN 分类器 |
+| **TextRNNClassification** | TextRNN 分类器 |
+| **HANClassification** | 层次注意力网络 |
 
 #### 4. 文本回归 (`easymlops.nlp.text_regression`)
 
@@ -335,8 +397,8 @@ NLP Pipeline 用于处理自然语言处理任务。
 
 | 类名 | 说明 |
 |------|------|
-| **CosineSimilarity** | 余弦相似度检索 |
-| **EuclideanSimilarity** | 欧氏距离检索 |
+| **ElasticSearchSimilarity** | ElasticSearch 相似度检索 |
+| **FaissSimilarity** | Faiss 相似度检索 |
 
 ### 时序 Pipeline
 
@@ -394,25 +456,30 @@ AutoML 模块提供自动化机器学习能力。
 
 | 类名 | 说明 |
 |------|------|
-| **AutoMLSession** | AutoML 会话管理器 |
-| **AutoMLPipe** | AutoML Pipeline |
-| **AutoMLPipeV250429** | AutoML Pipeline v2 |
+| **AutoMLTab** | AutoML 表格数据处理 |
+| **AutoML** | AutoML 主类 |
 
 #### LLM 集成 (`easymlops.automl.llms`)
 
 | 类名 | 说明 |
 |------|------|
-| **LLMBase** | LLM 基类 |
-| **ChatGPT** | OpenAI ChatGPT 集成 |
-| **DeepSeek** | DeepSeek 集成 |
+| **LLM** | LLM 基类 |
+| **OllamaLLM** | Ollama LLM 集成 |
+| **SparkLLM** | Spark LLM 集成 |
+| **ZhiPuLLM** | 智谱 LLM 集成 |
+| **KimiLLM** | Kimi LLM 集成 |
 
 #### 工具 (`easymlops.automl.tools`)
 
 | 类名 | 说明 |
 |------|------|
-| **AutoMLTool** | AutoML 工具基类 |
-| **CodeTool** | 代码执行工具 |
-| **SearchTool** | 网页搜索工具 |
+| **LLMToolManager** | LLM 工具管理器 |
+
+#### 会话 (`easymlops.automl.sessions`)
+
+| 类名 | 说明 |
+|------|------|
+| **LLMSessionManager** | LLM 会话管理器 |
 
 ## 高级用法示例
 
