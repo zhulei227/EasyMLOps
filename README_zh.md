@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/pypi/l/easymlops)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/yourusername/easymlops?style=social)](https://github.com/yourusername/easymlops/stargazers)
 
-[中文版](./README_zh.md) | English
+[中文版](./README.md) | English
 
 EasyMLOps is an efficient Machine Learning Operations framework that builds modeling tasks through Pipeline approach. It supports model training, prediction, testing, feature storage, monitoring and more. Simply wrap with Flask or FastApi to deploy to production.
 

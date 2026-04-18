@@ -1,14 +1,31 @@
-numpy>=1.17
+numpy>=1.24.4,<2
 tqdm
-dask>=0.17
-pandas>=0.25
-scipy
-scikit-learn>=0.21
+dask>=2023.3.0
+pandas>=1.5.3
+scipy>=1.10.1
+scikit-learn>=1.0.2
+lightgbm>=3.3.2
+statsmodels>=0.13.2
+threadpoolctl>=3.4.0
+# YOLO 视觉任务
+# ultralytics-opencv-headless==8.4.24
+# torch>=1.12.0
+# torchvision>=0.13.0
+# OCR 文本识别
+# easyocr
+# torch>=1.12.0
+# torchvision>=0.13.0
+# opencv-python-headless<4.10
+# Pillow<10
+# hill_climbing==0.1.6 #有些适配问题,直接把源码拷贝到了项目中:easymlops.table.strategy.hill_climbing
+# networkx==3.4
+# FuzzyTM==1.0.0 # gensim
+#gensim==4.3.0
+#ollama==0.4.8
+#openai==1.76.2
 #func_timeout
 #psutil
-#gensim
 #pyyaml<=5.4
-#lightgbm>=3
 #jieba
 #pyahocorasick
 #sqlite
@@ -22,3 +39,4 @@ scikit-learn>=0.21
 #torchtext==0.4.0
 #pyltp==0.4.0
 #toad==0.1.2
+#thundersvm==0.3.12
