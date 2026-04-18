@@ -36,7 +36,6 @@ EasyMLOps provides a unified Pipeline-based architecture for machine learning wo
 - **Pipe**: Individual processing units that transform data
 - **Pipeline**: A chain of pipes that process data sequentially
 - **Parallel**: Execute multiple pipes concurrently
-- **Stacking**: Combine multiple models for ensemble learning
 
 ## Features
 
@@ -54,22 +53,40 @@ EasyMLOps provides a unified Pipeline-based architecture for machine learning wo
 easymlops/
 ├── core/           # Core pipeline base classes
 ├── table/          # Tabular data processing
-│   ├── preprocessing/    # Data preprocessing
-│   ├── encoding/         # Feature encoding
-│   ├── classification/   # Classification models
-│   ├── regression/       # Regression models
-│   ├── ensemble/         # Ensemble methods
-│   ├── fm/               # Factorization Machines
-│   ├── decomposition/    # Dimensionality reduction
-│   ├── feature_selection/# Feature selection
-│   ├── strategy/         # Modeling strategies
-│   ├── storage/          # Feature storage
-│   └── utils/            # Utility functions
-├── nlp/            # Natural language processing
-├── ts/             # Time series
-├── yolo/           # YOLO vision tasks
-├── ocr/            # OCR text recognition
-└── automl/         # AutoML
+│   ├── preprocessing/      # Data preprocessing
+│   ├── encoding/           # Feature encoding
+│   ├── classification/     # Classification models
+│   ├── regression/         # Regression models
+│   ├── ensemble/           # Ensemble methods
+│   ├── fm/                 # Factorization Machines
+│   ├── decomposition/      # Dimensionality reduction
+│   ├── feature_selection/  # Feature selection
+│   ├── strategy/           # Modeling strategies
+│   ├── storage/            # Feature storage
+│   ├── utils/              # Utility functions
+│   ├── sqls/               # SQL operations
+│   └── perfopt/            # Performance optimization
+├── nlp/                   # Natural language processing
+│   ├── preprocessing/      # Text cleaning, tokenization
+│   ├── representation/     # Text embedding (TFIDF, Word2Vec, etc.)
+│   ├── text_classification/ # Text classification (CNN, RNN, HAN)
+│   ├── text_regression/    # Text regression
+│   └── similarity/         # Similarity search (Faiss, ES)
+├── ts/                    # Time series processing
+├── yolo/                  # YOLO vision tasks
+│   ├── detection/          # Object detection
+│   ├── segmentation/       # Instance segmentation
+│   ├── classification/     # Image classification
+│   ├── pose/               # Pose estimation
+│   └── obb/                # Oriented bounding box
+├── ocr/                   # OCR text recognition
+│   └── easyocr/            # EasyOCR integration
+├── automl/                # AutoML
+│   ├── llms/               # LLM integrations
+│   ├── tools/              # Tool managers
+│   └── sessions/           # Session managers
+└── storage/               # Storage backends
+    └── feature_storage/    # Feature store
 ```
 
 ## Installation
@@ -259,25 +276,44 @@ The Table Pipeline is the core module for tabular data processing.
 | Class | Description |
 |-------|-------------|
 | **Parallel** | Run multiple pipes in parallel |
-| **Stacking** | Stacking ensemble |
 
 #### 10. Dimensionality Reduction (`easymlops.table.decomposition`)
 
 | Class | Description |
 |-------|-------------|
-| **PCA** | Principal Component Analysis |
-| **SVD** | Singular Value Decomposition |
-| **TCA** | Transfer Component Analysis |
+| **Decomposition** | Base class for dimensionality reduction |
+| **PCADecomposition** | Principal Component Analysis |
+| **NMFDecomposition** | Non-negative Matrix Factorization |
+| **KernelPCADecomposition** | Kernel PCA |
+| **FastICADecomposition** | Fast Independent Component Analysis |
+| **DictionaryLearningDecomposition** | Dictionary Learning |
+| **MiniBatchDictionaryLearningDecomposition** | Mini-batch Dictionary Learning |
+| **LDADecomposition** | Latent Dirichlet Allocation |
+| **TSNEDecomposition** | t-SNE |
+| **MDSDecomposition** | Multidimensional Scaling |
+| **IsomapDecomposition** | Isomap |
+| **SpectralEmbeddingDecomposition** | Spectral Embedding |
+| **LocallyLinearEmbeddingDecomposition** | Locally Linear Embedding |
+| **TCADecomposition** | Transfer Component Analysis |
 
 #### 11. Feature Selection (`easymlops.table.feature_selection`)
 
 | Class | Description |
 |-------|-------------|
-| **VarianceThreshold** | Remove low variance features |
-| **SelectKBest** | Select top K features |
-| **FeatureEmbedding** | Feature importance via embedding |
+| **FilterBase** | Base class for filter-based feature selection |
+| **MissRateFilter** | Filter by missing rate |
+| **VarianceFilter** | Filter by variance |
+| **PersonCorrFilter** | Filter by Pearson correlation |
+| **Chi2Filter** | Filter by chi-square test |
+| **PValueFilter** | Filter by p-value |
+| **MutualInfoFilter** | Filter by mutual information |
+| **IVFilter** | Filter by Information Value |
+| **PSIFilter** | Filter by Population Stability Index |
+| **EmbedBase** | Base class for embedding-based feature selection |
+| **LREmbed** | Feature importance via Logistic Regression |
+| **LGBMEmbed** | Feature importance via LightGBM |
 
-#### 12. Evaluation Metrics (`easymlops.table.eval`)
+#### 12. Evaluation Metrics (`easymlops.table.utils`)
 
 | Function | Description |
 |----------|-------------|
@@ -287,6 +323,19 @@ The Table Pipeline is the core module for tabular data processing.
 | calc_roc_at_thresholds | Calculate ROC metrics at thresholds |
 | plot_roc_curve | Plot ROC curve with AUC |
 
+#### 13. SQL Operations (`easymlops.table.sqls`)
+
+| Class | Description |
+|-------|-------------|
+| **SQL** | Execute SQL queries on DataFrame |
+
+#### 14. Performance Optimization (`easymlops.table.perfopt`)
+
+| Class | Description |
+|-------|-------------|
+| **ReduceMemUsage** | Reduce memory usage of DataFrame |
+| **Dense2Sparse** | Convert dense DataFrame to sparse format |
+
 ### NLP Pipeline
 
 The NLP Pipeline handles natural language processing tasks.
@@ -295,34 +344,47 @@ The NLP Pipeline handles natural language processing tasks.
 
 | Class | Description |
 |-------|-------------|
-| **NLPPreprocessBase** | Base class for NLP preprocessing |
-| **FixInput** | Ensure DataFrame input |
-| **FillNa** | Fill missing text values |
+| **PreprocessBase** | Base class for NLP preprocessing |
+| **Lower** | Convert to lowercase |
+| **Upper** | Convert to uppercase |
+| **RemoveDigits** | Remove digits |
 | **ReplaceDigits** | Replace digits with token |
 | **RemovePunctuation** | Remove punctuation |
-| **RemoveStopwords** | Remove stopwords |
-| **RemoveHtml** | Remove HTML tags |
-| **LowerCase** | Convert to lowercase |
-| **RemoveUrl** | Remove URLs |
-| **RemoveEmail** | Remove email addresses |
+| **ReplacePunctuation** | Replace punctuation |
+| **Replace** | Replace specified characters |
+| **RemoveWhitespace** | Remove whitespace |
+| **ExpandWhitespace** | Expand whitespace |
+| **RemoveStopWords** | Remove stopwords |
+| **ExtractKeyWords** | Extract keywords |
+| **AppendKeyWords** | Append keywords |
+| **ExtractChineseWords** | Extract Chinese words |
+| **ExtractNGramWords** | Extract n-gram words |
+| **ExtractJieBaWords** | Extract words using jieba |
+| **VocabIndex** | Convert words to vocabulary indices |
+| **ExtractJieBaWordsWithSentSplit** | Extract words with sentence splitting |
+| **VocabIndexWithSentSplit** | Convert words to indices with sentence splitting |
 
 #### 2. Representation (`easymlops.nlp.representation`)
 
 | Class | Description |
 |-------|-------------|
-| **NLPRepresentationBase** | Base class for text representation |
-| **TfidfModel** | TF-IDF vectorization |
+| **RepresentationBase** | Base class for text representation |
+| **BagOfWords** | Bag of Words model |
+| **TFIDF** | TF-IDF vectorization |
+| **LdaTopicModel** | LDA Topic Model |
+| **LsiTopicModel** | LSI Topic Model |
 | **Word2VecModel** | Word2Vec embeddings |
-| **BertModel** | BERT embeddings |
+| **Doc2VecModel** | Doc2Vec embeddings |
+| **FastTextModel** | FastText embeddings |
 
 #### 3. Text Classification (`easymlops.nlp.text_classification`)
 
 | Class | Description |
 |-------|-------------|
 | **TextClassificationBase** | Base class for text classification |
-| **TextCNN** | Text CNN classifier |
-| **TextRNN** | Text RNN classifier |
-| **HAN** | Hierarchical Attention Network |
+| **TextCNNClassification** | Text CNN classifier |
+| **TextRNNClassification** | Text RNN classifier |
+| **HANClassification** | Hierarchical Attention Network |
 
 #### 4. Text Regression (`easymlops.nlp.text_regression`)
 
@@ -335,8 +397,8 @@ The NLP Pipeline handles natural language processing tasks.
 
 | Class | Description |
 |-------|-------------|
-| **CosineSimilarity** | Cosine similarity search |
-| **EuclideanSimilarity** | Euclidean distance search |
+| **ElasticSearchSimilarity** | ElasticSearch similarity search |
+| **FaissSimilarity** | Faiss similarity search |
 
 ### Time Series Pipeline
 
@@ -394,25 +456,30 @@ The AutoML module provides automated machine learning capabilities.
 
 | Class | Description |
 |-------|-------------|
-| **AutoMLSession** | AutoML session manager |
-| **AutoMLPipe** | AutoML pipeline |
-| **AutoMLPipeV250429** | AutoML pipeline v2 |
+| **AutoMLTab** | AutoML tabular data processing |
+| **AutoML** | Main AutoML class |
 
 #### LLM Integration (`easymlops.automl.llms`)
 
 | Class | Description |
 |-------|-------------|
-| **LLMBase** | Base class for LLMs |
-| **ChatGPT** | OpenAI ChatGPT integration |
-| **DeepSeek** | DeepSeek integration |
+| **LLM** | Base class for LLMs |
+| **OllamaLLM** | Ollama LLM integration |
+| **SparkLLM** | Spark LLM integration |
+| **ZhiPuLLM** | ZhiPu LLM integration |
+| **KimiLLM** | Kimi LLM integration |
 
 #### Tools (`easymlops.automl.tools`)
 
 | Class | Description |
 |-------|-------------|
-| **AutoMLTool** | Base class for AutoML tools |
-| **CodeTool** | Code execution tool |
-| **SearchTool** | Web search tool |
+| **LLMToolManager** | LLM tool manager |
+
+#### Sessions (`easymlops.automl.sessions`)
+
+| Class | Description |
+|-------|-------------|
+| **LLMSessionManager** | LLM session manager |
 
 ## Advanced Usage Examples
 
