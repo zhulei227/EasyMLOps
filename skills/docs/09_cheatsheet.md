@@ -253,7 +253,7 @@
 |------|------|
 | EvalFunction | 评估函数 |
 | FasterLgbMulticlassPredictor | 快速LGB多类预测 |
-| FasterLgbPredictorSingle | 快速LGB单类预测 |
+| FasterLgbSinglePredictor | 快速LGB单类预测 |
 | CpuMemDetector | CPU/内存检测 |
 | PandasUtils | Pandas工具 |
 
