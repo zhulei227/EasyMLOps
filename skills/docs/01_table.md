@@ -352,34 +352,29 @@ table.pipe(ReduceMemUsage())
 table.pipe(Dense2Sparse())
 ```
 
-### 评估 (eval)
+### SQL表达式 (sqls)
 
 ```python
-from easymlops.table.eval import Eval
+from easymlops.table.sqls import SQL
 
 # 使用SQL表达式对数据进行计算评估
 # 格式："(a+b)/c as col1, c//d as col2"
-table.pipe(Eval(sql="(a+b)/c as col1, c//d as col2"))
-
-# 模型评估
-table.pipe(Eval(
-    label="Survived",
-    metrics=["accuracy", "precision", "recall", "f1"]
-))
+table.pipe(SQL(sql="(a+b)/c as col1, c//d as col2"))
 ```
 
 ### 嵌入式
 
 ```python
-from easymlops.table.feature_selection import LGBMFeatureSelection
+from easymlops.table.feature_selection import LGBMEmbed
 # 使用LGBM进行特征重要性选择
+table.pipe(LGBMEmbed(label="Survived", n_estimators=100))
 ```
 
 ### 工具模块 (utils)
 
 ```python
 from easymlops.table.utils import EvalFunction, FasterLgbMulticlassPredictor
-from easymlops.table.utils import FasterLgbPredictorSingle
+from easymlops.table.utils import FasterLgbSinglePredictor
 from easymlops.table.utils import CpuMemDetector
 from easymlops.table.utils import PandasUtils
 from easymlops.table.utils import calc_precision_recall_at_thresholds, calc_precision_recall_at_quantiles, plot_pr_curve
@@ -428,7 +423,7 @@ aucs = plot_roc_curve(y_true, y_preds_dict_roc, bins=10, save_path="roc_curve.pn
 # {'Model_A': 0.92, 'Model_B': 0.85, 'Model_C': 0.78}
 
 # 快速LGB单类预测器
-predictor = FasterLgbPredictorSingle(
+predictor = FasterLgbSinglePredictor(
     model_path="model.lgb",
     feature_names=[...]
 )
