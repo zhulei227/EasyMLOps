@@ -73,6 +73,13 @@ easymlops/
 │   ├── text_regression/   # 文本回归
 │   └── similarity/         # 相似度检索 (Faiss, ES)
 ├── ts/                    # 时序数据处理
+│   ├── core/              # 核心Pipeline基类
+│   ├── statistical/       # 统计模型 (ARIMA, SARIMA, GARCH)
+│   ├── deep_learning/     # 深度学习模型 (N-BEATS, N-HiTS, DeepAR, GP)
+│   ├── transformer/       # Transformer模型 (TFT, Informer, Autoformer等)
+│   ├── state_space/       # 状态空间模型 (DeepState, Mamba, Liquid S4)
+│   ├── generative/       # 生成模型 (VAE, Normalizing Flow, Diffusion)
+│   └── dnn/               # DNN模型 (CNN时序)
 ├── yolo/                  # YOLO 视觉任务
 │   ├── detection/          # 目标检测
 │   ├── segmentation/       # 实例分割
@@ -416,6 +423,53 @@ NLP Pipeline 用于处理自然语言处理任务。
 | 类名 | 说明 |
 |------|------|
 | **TSCNNRegression** | 时序 CNN 回归 |
+
+#### 统计模型 (`easymlops.ts.statistical`)
+
+| 类名 | 说明 |
+|------|------|
+| **ArimaRegression** | ARIMA 时间序列预测 |
+| **SarimaRegression** | SARIMA 季节性时间序列预测 |
+| **ArimaxRegression** | ARIMAX 带外生变量的时间序列预测 |
+| **SarimaxRegression** | SARIMAX 带外生变量的季节性预测 |
+| **GarchRegression** | GARCH 波动率模型 |
+
+#### 深度学习模型 (`easymlops.ts.deep_learning`)
+
+| 类名 | 说明 |
+|------|------|
+| **NBeatsRegression** | N-BEATS 时间序列预测 |
+| **NHiTSRegression** | N-HiTS 时间序列预测 |
+| **DeepARRegression** | DeepAR 时间序列预测 |
+| **GPRegression** | 高斯过程时间序列预测 |
+
+#### Transformer模型 (`easymlops.ts.transformer`)
+
+| 类名 | 说明 |
+|------|------|
+| **TFTRegression** | Temporal Fusion Transformer |
+| **InformerRegression** | Informer 时间序列预测 |
+| **AutoformerRegression** | Autoformer 时间序列预测 |
+| **FEDformerRegression** | FEDformer 时间序列预测 |
+| **PatchTSTRegression** | PatchTST 时间序列预测 |
+| **TimesNetRegression** | TimesNet 时间序列预测 |
+| **iTransformerRegression** | iTransformer 时间序列预测 |
+
+#### 状态空间模型 (`easymlops.ts.state_space`)
+
+| 类名 | 说明 |
+|------|------|
+| **DeepStateRegression** | Deep State 时间序列预测 |
+| **MambaRegression** | Mamba 状态空间时间序列预测 |
+| **LiquidS4Regression** | Liquid S4 状态空间时间序列预测 |
+
+#### 生成模型 (`easymlops.ts.generative`)
+
+| 类名 | 说明 |
+|------|------|
+| **VAERegression** | VAE 变分自编码器时间序列预测 |
+| **NormalizingFlowRegression** | Normalizing Flow 时间序列预测 |
+| **DiffusionRegression** | Diffusion 时间序列预测 |
 
 ### YOLO 视觉
 
