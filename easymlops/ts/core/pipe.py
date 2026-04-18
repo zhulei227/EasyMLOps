@@ -2,7 +2,6 @@ import pandas as pd
 import copy
 import numpy as np
 from tqdm import tqdm
-from numpy_ext import rolling_apply
 from easymlops.core import PipeObjectBase
 import warnings
 
@@ -535,6 +534,7 @@ class M2MRollingPipeBase(PipeBase):
         raise Exception("need to implement!")
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        from numpy_ext import rolling_apply
         inputs = []
         for input_col_name in self.input_cols:
             inputs.append(s[input_col_name].values * 1.0)
@@ -552,6 +552,7 @@ class M2MRollingPipeBase(PipeBase):
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        from numpy_ext import rolling_apply
         for input_col_name in self.input_cols:
             self.history_data[input_col_name].append(s[input_col_name])
         inputs = []

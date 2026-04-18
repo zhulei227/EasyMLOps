@@ -5,14 +5,30 @@ from easymlops.nlp.core import *
 
 class PreprocessBase(NLPPipeObjectBase):
     """
-    文本清洗基础类
+    文本预处理基类。
+    
+    所有文本预处理类的父类，提供列选择的标准框架。
+    
+    Example:
+        >>> class MyPreprocess(PreprocessBase):
+        ...     def udf_transform(self, s, **kwargs):
+        ...         return s
     """
-
+    
     def __init__(self, cols="all", skip_check_transform_type=True, **kwargs):
+        """
+        初始化文本预处理。
+        
+        Args:
+            cols: 要操作的列
+            skip_check_transform_type: 跳过类型检测
+            **kwargs: 其他父类参数
+        """
         super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.cols = cols
 
     def before_fit(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """fit前处理，确定要操作的列。"""
         s = super().before_fit(s, **kwargs)
         if str(self.cols).lower() in ["none", "all", "null"]:
             self.cols = self.input_col_names
@@ -20,110 +36,162 @@ class PreprocessBase(NLPPipeObjectBase):
         return s
 
     def udf_get_params(self):
+        """获取参数。"""
         return {"cols": self.cols}
 
     def udf_set_params(self, params: dict_type):
+        """设置参数。"""
         self.cols = params["cols"]
 
 
 class Lower(PreprocessBase):
     """
-    所有英文字符转小写
+    文本转小写。
+    
+    将所有英文字符转换为小写。
+    
+    Example:
+        >>> pipe = Lower(cols=["text"])
     """
-
+    
     def __init__(self, cols="all", **kwargs):
+        """初始化转小写预处理。"""
         super().__init__(cols=cols, **kwargs)
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """批量转换为小写。"""
         for col in self.cols:
             s[col] = s[col].astype(str).str.lower()
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """单条转换为小写。"""
         for col in self.cols:
             s[col] = str(s[col]).lower()
         return s
 
     def udf_get_params(self):
+        """获取参数。"""
         return {}
 
 
 class Upper(PreprocessBase):
     """
-    所有英文字符转大写
+    文本转大写。
+    
+    将所有英文字符转换为大写。
+    
+    Example:
+        >>> pipe = Upper(cols=["text"])
     """
-
+    
     def __init__(self, cols="all", **kwargs):
+        """初始化转大写预处理。"""
         super().__init__(cols=cols, **kwargs)
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """批量转换为大写。"""
         for col in self.cols:
             s[col] = s[col].astype(str).str.upper()
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """单条转换为大写。"""
         for col in self.cols:
             s[col] = str(s[col]).upper()
         return s
 
     def udf_get_params(self):
+        """获取参数。"""
         return {}
 
 
 class RemoveDigits(PreprocessBase):
     """
-    移除所有数字字符
+    移除数字字符。
+    
+    从文本中移除所有数字字符。
+    
+    Example:
+        >>> pipe = RemoveDigits(cols=["text"])
     """
-
+    
     def __init__(self, cols="all", **kwargs):
+        """初始化移除数字。"""
         super().__init__(cols=cols, **kwargs)
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """批量移除数字字符。"""
         for col in self.cols:
             s[col] = s[col].astype(str).str.replace(r"\d+", "")
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """单条移除数字字符。"""
         for col in self.cols:
             s[col] = re.sub(r"\d+", "", str(s[col]))
         return s
 
     def udf_get_params(self):
+        """获取参数。"""
         return {}
 
 
 class ReplaceDigits(PreprocessBase):
     """
-    替换数字为指定的字符
+    替换数字字符。
+    
+    将数字替换为指定字符。
+    
+    Example:
+        >>> pipe = ReplaceDigits(cols=["text"], symbols="X")
     """
-
+    
     def __init__(self, cols="all", symbols="[d]", **kwargs):
+        """
+        初始化替换数字。
+        
+        Args:
+            cols: 要操作的列
+            symbols: 替换字符
+            **kwargs: 其他父类参数
+        """
         super().__init__(cols=cols, **kwargs)
         self.symbols = symbols
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """批量替换数字字符。"""
         for col in self.cols:
             s[col] = s[col].astype(str).str.replace(r"\d+", self.symbols)
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """单条替换数字字符。"""
         for col in self.cols:
             s[col] = re.sub(r"\d+", self.symbols, str(s[col]))
         return s
 
     def udf_get_params(self):
+        """获取参数。"""
         return {"symbols": self.symbols}
 
     def _set_params(self, params: dict_type):
+        """设置参数。"""
         self.symbols = params["symbols"]
 
 
 class RemovePunctuation(PreprocessBase):
     """
-    移除标点符号
+    移除标点符号。
+    
+    从文本中移除所有标点符号。
+    
+    Example:
+        >>> pipe = RemovePunctuation(cols=["text"])
     """
-
+    
     def __init__(self, cols="all", **kwargs):
+        """初始化移除标点。"""
         super().__init__(cols=cols, **kwargs)
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:

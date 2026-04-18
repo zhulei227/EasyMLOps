@@ -1,0 +1,599 @@
+#1.第一次发送tool和simple_describe给llm,获取tools列表
+#2.第二次发送tool+出入参详情给llm,获取单个tool+param
+#3.如果param格式有误,在找llm做一次修正
+
+woe_encoding:
+  class: WOEEncoding
+  can_use_time: 1
+  require_label: True
+  simple_describe: 将离散型特征转换为woe编码的数值型特征,unique_rate>0.5不建议使用
+  describe: f"""woe encoding的tool,将离散型特征转换为数值型特征,unique_rate>0.5不建议使用,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":"all"} or {"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: [ str,list ]
+        describe: 默认取值为"all",表示对所有可操作的特征进行操作,也可通过list,比如["col1","col2"]对指定特征进行操作
+    required: [ "cols" ]
+target_encoding:
+  class: TargetEncoding
+  can_use_time: 1
+  require_label: True
+  simple_describe: 将离散型特征转换为target编码的数值型特征,unique_rate>0.5不建议使用
+  describe: f"""target encoding的tool,将离散型特征转换为数值型特征,unique_rate>0.5不建议使用,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":"all"} or {"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: [ str,list ]
+        describe: 默认取值为"all",表示对所有可操作的变量进行操作,也可通过list,比如["col1","col2"]对指定特征进行操作
+    required: [ "cols" ]
+normalizer:
+  class: Normalizer
+  can_use_time: 1
+  simple_describe: 对数值型特征进行归一化处理:(x-mean)/std
+  describe: f"""对数值型特征的归一化工具,(x-mean)/std,将特征约束到一个0附近的取值空间,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":"all"} or {"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: [ str,list ]
+        describe: 默认取值为"all",表示对所有可操作的变量进行操作,也可通过list,比如["col1","col2"]对指定特征进行操作
+    required: [ "cols" ]
+bins:
+  class: Bins
+  can_use_time: 1
+  simple_describe: 对数值型特征进行分箱,避免离群点影响,unique_rate>0.5的数值特征建议使用
+  describe: f"""对数值型特征进行分箱操作,分箱特征有利于提升模型的鲁棒性,但精度通常会有下降,unique_rate>0.5的数值特征建议使用,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "prefix": "bins_" }
+  parameters_template: '{"cols":"all","n_bins":10,"strategy":"quantile"} or {"cols":["col1","col2"],"n_bins":10,"strategy":"quantile"}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: [ str,list ]
+        describe: 默认取值为"all",表示对所有可操作的变量进行操作,也可通过list,比如["col1","col2"]对指定特征进行操作
+      n_bins:
+        default: 10
+        type: int
+        describe: 分箱数
+      strategy:
+        default: quantile
+        type: str
+        enum: [ quantile,uniform,kmeans ]
+        describe: 分箱策略,uniform/quantile/kmeans分别表示等距/等位/kmeans聚类分箱
+    required: [ "cols","strategy" ]
+drop_cols:
+  class: DropCols
+  can_use_time: 1
+  simple_describe: 删除特定的特征,比如std接近0,或者unique_rate接近1的特征
+  describe: f"""删除特定的特征,通常是那些不适合入模的特征,比如std接近0,或者unique_rate接近1的特征,通常为一些取值相同或者id,时间类特征,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  default_parameters: { "cols": [ "n" ] }
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: None
+        type: list
+        describe: 删除特定的特征,比如["col1","col2"],表示删除col1和col2
+    required: [ "cols" ]
+tanh:
+  class: Tanh
+  can_use_time: 1
+  simple_describe: 对数值型特征做tanh非线性变换
+  describe: f"""对数值型特征做tanh非线性变换,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为all,表示对所有特征做变换,也可以对局部特征做变换,比如["col1","col2"],表示变换col1和col2特征
+    required: [ "cols" ]
+sigmoid:
+  class: Sigmoid
+  can_use_time: 1
+  simple_describe: 对数值型特征做sigmoid非线性变换
+  describe: f"""对数值型特征做sigmoid非线性变换,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为all,表示对所有特征做变换,也可以对局部特征做变换,比如["col1","col2"],表示变换col1和col2特征
+    required: [ "cols" ]
+relu:
+  class: Relu
+  can_use_time: 1
+  simple_describe: 对数值型特征做relu非线性变换
+  describe: f"""对数值型特征做relu非线性变换,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为all,表示对所有特征做变换,也可以对局部特征做变换,比如["col1","col2"],表示变换col1和col2特征
+    required: [ "cols" ]
+swish:
+  class: Swish
+  can_use_time: 1
+  simple_describe: 对数值型特征做swish非线性变换
+  describe: f"""对数值型特征做swish非线性变换,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为all,表示对所有特征做变换,也可以对局部特征做变换,比如["col1","col2"],表示变换col1和col2特征
+    required: [ "cols" ]
+lightgbm_regression:
+  class: LGBMRegression
+  require_label: True
+  can_use_time: 1
+  simple_describe: lightgbm对某些数值特征建模,可以用于增强特征表达能力,也可以作为预测输出
+  describe: f"""lightgbm regression模型,通常作为回归任务的最后一个tool,也可以用在中间对数值特征表示能力做增强,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"prefix": "lightgbm_" }
+  parameters_template: '{"cols":["col1","col2"],"drop_input_data":False}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示对当前所有特征建模,也可以输出list,比如["col1","col2"],表示对col1和col2特征建模
+      drop_input_data:
+        default: True
+        type: bool
+        describe: 默认为True,表示删除除开模型输出意外的其他所有特征,这通常用于最后一个tool,如果只是想增强特征表达,请设置为False
+    required: [ "cols" ]
+logistic_regression:
+  class: LogisticRegression
+  require_label: True
+  can_use_time: 1
+  simple_describe: logistic regression对某些数值特征建模,可以用于增强特征表达能力,也可以作为预测输出
+  describe: f"""logistic regression模型,通常作为回归任务的最后一个tool,也可以用在中间对数值型特征表示能力做增强,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"prefix": "logistic_" }
+  parameters_template: '{"cols":["col1","col2"],"drop_input_data":False}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示对当前所有特征建模,也可以输出list,比如["col1","col2"],表示对col1和col2特征建模
+      drop_input_data:
+        default: True
+        type: bool
+        describe: 默认为True,表示删除除开模型输出意外的其他所有特征,这通常用于最后一个tool,如果只是想增强特征表达,请设置为False
+    required: [ "cols" ]
+linear_regression:
+  class: LinearRegression
+  require_label: True
+  can_use_time: 1
+  simple_describe: linear regression对某些数值特征建模,可以用于增强特征表达能力,也可以作为预测输出
+  describe: f"""linear regression模型,通常作为回归任务的最后一个tool,也可以用在中间对数值型特征表示能力做增强,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"prefix": "linear_" }
+  parameters_template: '{"cols":["col1","col2"],"drop_input_data":False}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示对当前所有特征建模,也可以输出list,比如["col1","col2"],表示对col1和col2特征建模
+      drop_input_data:
+        default: True
+        type: bool
+        describe: 默认为True,表示删除除开模型输出意外的其他所有特征,这通常用于最后一个tool,如果只是想增强特征表达,请设置为False
+    required: [ "cols" ]
+ridge_regression:
+  class: RidgeRegression
+  require_label: True
+  can_use_time: 1
+  simple_describe: ridge regression对某些数值特征建模,可以用于增强数值型特征表达能力,也可以作为预测输出
+  describe: f"""ridge regression模型,通常作为回归任务的最后一个tool,也可以用在中间对数值型特征表示能力做增强,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"prefix": "ridge_" }
+  parameters_template: '{"cols":["col1","col2"],"drop_input_data":False}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示对当前所有特征建模,也可以输出list,比如["col1","col2"],表示对col1和col2特征建模
+      drop_input_data:
+        default: True
+        type: bool
+        describe: 默认为True,表示删除除开模型输出意外的其他所有特征,这通常用于最后一个tool,如果只是想增强特征表达,请设置为False
+    required: [ "cols" ]
+ridge_cv_regression:
+  class: RidgeCVRegression
+  require_label: True
+  can_use_time: 1
+  simple_describe: ridge cv regression对某些数值特征建模,可以用于增强特征表达能力,也可以作为预测输出
+  describe: f"""ridge cv regression模型,通常作为回归任务的最后一个tool,也可以用在中间对数值型特征表示能力做增强,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"prefix": "ridge_cv_" }
+  parameters_template: '{"cols":["col1","col2"],"drop_input_data":False}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示对当前所有特征建模,也可以输出list,比如["col1","col2"],表示对col1和col2特征建模
+      drop_input_data:
+        default: True
+        type: bool
+        describe: 默认为True,表示删除除开模型输出意外的其他所有特征,这通常用于最后一个tool,如果只是想增强特征表达,请设置为False
+    required: [ "cols" ]
+word2vec:
+  class: Word2VecModel
+  can_use_time: 1
+  simple_describe: word2vec模型,可以用于增强文本特征(sample中绝大多数为非数值型)的表达能力,该tool需要优先使用
+  describe: f"""word2vec模型,用于增强文本特征(sample中绝大多数为非数值型)的表达能力,该tool需要优先使用,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False }
+  parameters_template: '{"cols":["col1","col2"],"embedding_size":16,"min_count":5}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,但文本特征(sample中绝大多数为非数值型)通常只有少数,用list格式["col1","col2"],只对col1和col2文本特征建模
+      embedding_size:
+        default: 16
+        type: int
+        describe: 默认为16,表示embedding的维度
+      min_count:
+        default: 5
+        type: int
+        describe: 默认为5,表示窗口长度
+    required: [ "cols" ]
+doc2vec:
+  class: Doc2VecModel
+  can_use_time: 1
+  simple_describe: doc2vec模型,可以用于增强文本特征(sample中绝大多数为非数值型)的表达能力,该tool需要优先使用
+  describe: f"""doc2vec模型,用于增强文本特征(sample中绝大多数为非数值型)的表达能力,该tool需要优先使用,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False }
+  parameters_template: '{"cols":["col1","col2"],"embedding_size":16,"min_count":5}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,但文本特征(sample中绝大多数为非数值型)通常只有少数,用list格式["col1","col2"],只对col1和col2文本特征建模
+      embedding_size:
+        default: 16
+        type: int
+        describe: 默认为16,表示embedding的维度
+      min_count:
+        default: 5
+        type: int
+        describe: 默认为5,表示窗口长度
+    required: [ "cols" ]
+fasttext:
+  class: FastTextModel
+  can_use_time: 1
+  simple_describe: fasttext模型,可以用于增强文本特征(sample中绝大多数为非数值型)的表达能力,该tool需要优先使用
+  describe: f"""fasttext模型,用于增强文本特征(sample中绝大多数为非数值型)的表达能力,该tool需要优先使用,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False }
+  parameters_template: '{"cols":["col1","col2"],"embedding_size":16,"min_count":5}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,但文本特征(sample中绝大多数为非数值型)通常只有少数,用list格式["col1","col2"],只对col1和col2文本特征建模
+      embedding_size:
+        default: 16
+        type: int
+        describe: 默认为16,表示embedding的维度
+      min_count:
+        default: 5
+        type: int
+        describe: 默认为5,表示窗口长度
+    required: [ "cols" ]
+pca:
+  class: PCADecomposition
+  can_use_time: 1
+  simple_describe: 对数值型特征进行pca降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer
+  describe: f"""对数值型特征进行pca降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"n_components": 10 }
+  parameters_template: '{"cols":["col1","col2"],"n_components":10}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,也可以用list格式["col1","col2"],只对col1和col2特征处理
+      n_components:
+        default: 10
+        type: int
+        describe: 默认为10,表示降维后的维度
+    required: [ "cols" ]
+kernel_pca:
+  class: KernelPCADecomposition
+  can_use_time: 1
+  simple_describe: 对数值型特征进行kernel pca降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer
+  describe: f"""对数值型特征进行kernel pca降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"n_components": 10 }
+  parameters_template: '{"cols":["col1","col2"],"n_components":10}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,也可以用list格式["col1","col2"],只对col1和col2特征处理
+      n_components:
+        default: 10
+        type: int
+        describe: 默认为10,表示降维后的维度
+    required: [ "cols" ]
+ica:
+  class: FastICADecomposition
+  can_use_time: 1
+  simple_describe: 对数值型特征进行ica降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer
+  describe: f"""对数值型特征进行ica降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"n_components": 10 }
+  parameters_template: '{"cols":["col1","col2"],"n_components":10}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,也可以用list格式["col1","col2"],只对col1和col2特征处理
+      n_components:
+        default: 10
+        type: int
+        describe: 默认为10,表示降维后的维度
+    required: [ "cols" ]
+lle:
+  class: LocallyLinearEmbeddingDecomposition
+  can_use_time: 1
+  simple_describe: 对数值型特征进行lle局部线性嵌入降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer
+  describe: f"""对数值型特征进行lle局部线性嵌入降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"n_components": 10 }
+  parameters_template: '{"cols":["col1","col2"],"n_components":10}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,也可以用list格式["col1","col2"],只对col1和col2特征处理
+      n_components:
+        default: 10
+        type: int
+        describe: 默认为10,表示降维后的维度
+    required: [ "cols" ]
+nmf:
+  class: NMFDecomposition
+  can_use_time: 1
+  simple_describe: 对数值型特征进行nmf非负矩阵分解降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer以及relu
+  describe: f"""对数值型特征进行nmf非负矩阵分解降维,一定程度上可用增强特征的表达能力,建议在降维度前先对数值特征做normalizer以及relu,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"n_components": 10 }
+  parameters_template: '{"cols":["col1","col2"],"n_components":10}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        default: all
+        type: list
+        describe: 默认为"all",表示处理所有特征,也可以用list格式["col1","col2"],只对col1和col2特征处理
+      n_components:
+        default: 10
+        type: int
+        describe: 默认为10,表示降维后的维度
+    required: [ "cols" ]
+add:
+  class: Add
+  can_use_time: 1
+  simple_describe: 对两个数值型变量做加法运算
+  describe: f"""对两个数值型变量做加法运算,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"left_col_name":"col1","right_col_name":"col2"}'
+  parameters:
+    type: object
+    properties:
+      left_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+      right_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+    required: [ "left_col_name","right_col_name" ]
+subtract:
+  class: Subtract
+  can_use_time: 1
+  simple_describe: 对两个数值型变量做减法运算
+  describe: f"""对两个数值型变量做减法运算,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"left_col_name":"col1","right_col_name":"col2"}'
+  parameters:
+    type: object
+    properties:
+      left_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+      right_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+    required: [ "left_col_name","right_col_name" ]
+multiply:
+  class: Multiply
+  can_use_time: 1
+  simple_describe: 对两个数值型变量做乘法运算
+  describe: f"""对两个数值型变量做乘法运算,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"left_col_name":"col1","right_col_name":"col2"}'
+  parameters:
+    type: object
+    properties:
+      left_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+      right_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+    required: [ "left_col_name","right_col_name" ]
+divide:
+  class: Divide
+  can_use_time: 1
+  simple_describe: 对两个数值型变量做除法运算
+  describe: f"""对两个数值型变量做除法运算,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"left_col_name":"col1","right_col_name":"col2"}'
+  parameters:
+    type: object
+    properties:
+      left_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+      right_col_name:
+        type: str
+        describe: 需要输入一个数值型变量的col
+    required: [ "left_col_name","right_col_name" ]
+date_day_diff:
+  class: DateDayDiff
+  can_use_time: 1
+  simple_describe: 计算两个时间中的天数差异
+  describe: f"""计算两个时间中的天数差异,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"left_col_name":"col1","right_col_name":"col2"}'
+  parameters:
+    type: object
+    properties:
+      left_col_name:
+        type: str
+        describe: 需要输入一个形如"2024-08-31 12:31:45"的日期格式变量的col
+      right_col_name:
+        type: str
+        describe: 需要输入一个形如"2024-08-31 12:31:45"的日期格式变量的col
+    required: [ "left_col_name","right_col_name" ]
+date_month_info:
+  class: DateMonthInfo
+  can_use_time: 1
+  simple_describe: 提取时间中的月份
+  describe: f"""提取时间中的月份,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        type: list
+        describe: 需要形如"2024-08-31 12:31:45"的日期格式变量的col
+    required: [ "cols" ]
+date_hour_info:
+  class: DateHourInfo
+  can_use_time: 1
+  simple_describe: 提取时间中的小时
+  describe: f"""提取时间中的小时,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        type: list
+        describe: 需要形如"2024-08-31 12:31:45"的日期格式变量的col
+    required: [ "cols" ]
+date_minute_info:
+  class: DateMinuteInfo
+  can_use_time: 1
+  simple_describe: 提取时间中的分钟
+  describe: f"""提取时间中的分钟,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        type: list
+        describe: 需要形如"2024-08-31 12:31:45"的日期格式变量的col
+    required: [ "cols" ]
+date_total_minute_info:
+  class: DateTotalMinuteInfo
+  can_use_time: 1
+  simple_describe: 提取时间中的当日累积分钟数
+  describe: f"""提取时间中的当日累积分钟数,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"cols":["col1","col2"]}'
+  parameters:
+    type: object
+    properties:
+      cols:
+        type: list
+        describe: 需要形如"2024-08-31 12:31:45"的日期格式变量的col
+    required: [ "cols" ]
+eval:
+  class: Eval
+  can_use_time: 1
+  simple_describe: 使用类似sql的语法进行特征加工
+  describe: f"""使用类似sql的语法进行特征加工,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"sql":"col1+col2 as new_col1,exp(col2*log(col3)+col4)//col5 as new_col2"}'
+  parameters:
+    type: object
+    properties:
+      sql:
+        type: str
+        describe: 对一组特征进行四则或数学运算,必须带上as,后面接新特征名称;如果要进行多组计算以","分割
+    required: [ "sql" ]
+cross_cate_with_num:
+  class: CrossCategoryWithNumber
+  can_use_time: 5
+  simple_describe: 对一个离散变量和一个数值变量做交叉,衍生出更多的变量,建议多次使用
+  describe: f"""对一个离散变量和一个数值变量做交叉,衍生出更多的变量,建议多次使用,具体操作对离散变量做group操作,计算连续变量在相应分组中的mean,median,std等统计特征,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"left_col_name":"col1","right_col_name":"col2"}'
+  parameters:
+    type: object
+    properties:
+      left_col_name:
+        type: str
+        describe: 需要输入一个unique较小的离散型变量或int类型变量的col
+      right_col_name:
+        type: str
+        describe: 需要输入一个unique较大的数值型变量的col
+    required: [ "left_col_name","right_col_name" ]
+cross_num_with_num:
+  class: CrossNumberWithNumber
+  can_use_time: 5
+  simple_describe: 对一个数值变量和一个数值变量做交叉,衍生出更多的变量
+  describe: f"""对一个数值变量和一个数值变量做交叉,衍生出更多的变量,比对对俩特征做加减乘除等操作,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  parameters_template: '{"left_col_name":"col1","right_col_name":"col2"}'
+  parameters:
+    type: object
+    properties:
+      left_col_name:
+        type: str
+        describe: 需要输入一个unique较大的数值型变量的col
+      right_col_name:
+        type: str
+        describe: 需要输入一个unique较大的数值型变量的col
+    required: [ "left_col_name","right_col_name" ]
+auto_residual_regression:
+  class: AutoResidualRegression
+  can_use_time: 1
+  require_label: True
+  simple_describe: 对预测目标做残差版预测,用于增强特征表达能力
+  describe: f"""对预测目标做残差版预测,用于增强特征表达能力,入参默认值及其解释,见parameters,你需要返回如{}这样的参数形式"""
+  default_parameters: { "drop_input_data": False,"pred_name": "auto_residual_regression_feature_enhance" }
+  parameters_template: '{"layers":3}'
+  parameters:
+    type: object
+    properties:
+      layers:
+        type: int
+        describe: 需要构建残差结构的层数,默认为3
+    required: [ "layers" ]

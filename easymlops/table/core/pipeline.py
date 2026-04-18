@@ -62,6 +62,18 @@ class TablePipeLine(TablePipeObjectBase):
         self.models.append(model)
         return self
 
+    def __sub__(self, model):
+        """
+        pipe函数的简洁写法
+        """
+        return self.pipe(model)
+
+    def __or__(self, model):
+        """
+        pipe函数的简洁写法
+        """
+        return self.pipe(model)
+
     def __getitem__(self, index):
         # 切片方式
         if isinstance(index, slice):
@@ -94,11 +106,12 @@ class TablePipeLine(TablePipeObjectBase):
             if show_process:
                 print(model.name)
             if idx == len(self.models) - 1:
-                model.fit(x_, **kwargs)
+                model.fit(x_, show_process=show_process, **kwargs)
                 # pipeline的最后一个pipe也要做transform，不过只处理一条数据，为的是调用transform过程中需要保留的一些参数
-                model.transform(copy.deepcopy(x_[:1]), **kwargs)
+                model.transform(copy.deepcopy(x_[:1]), show_process=show_process, **kwargs)
             else:
-                x_ = model.fit(x_, **kwargs).transform(x_, **kwargs)
+                x_ = model.fit(x_, show_process=show_process, **kwargs) \
+                    .transform(x_, show_process=show_process, **kwargs)
         return self
 
     def _match_index_pipe(self, match_index) -> TablePipeObjectBase:
@@ -160,7 +173,7 @@ class TablePipeLine(TablePipeObjectBase):
         for model in tqdm(run_models) if show_process else run_models:
             if show_process:
                 print(model.name)
-            x_ = model.transform(x_, **kwargs)
+            x_ = model.transform(x_, show_process=show_process, **kwargs)
         return x_
 
     def transform_single(self, x, show_process=False, run_to_layer=None, logger=None, prefix="step",
@@ -199,9 +212,9 @@ class TablePipeLine(TablePipeObjectBase):
                                             log_base_dict=log_base_dict, storage_base_dict=storage_base_dict,
                                             **kwargs)
             else:
-                x_ = model.transform_single(x_, logger=logger,
-                                            log_base_dict=log_base_dict,
-                                            storage_base_dict=storage_base_dict, **kwargs)
+                x_ = model.transform_single(x_, show_process=show_process,
+                                            logger=logger,
+                                            log_base_dict=log_base_dict, storage_base_dict=storage_base_dict, **kwargs)
                 self._save_log(logger=logger, log_base_dict=log_base_dict,
                                step="{}-{}".format(prefix, current_layer_deep), transform=x_, pipe_name=model.name)
         return x_
@@ -304,6 +317,22 @@ class TablePipeLine(TablePipeObjectBase):
         params = params["params"]
         for i, param in enumerate(params):
             self.models[i].set_params(param)
+
+    def _print_structs(self, prefix, struct):
+        if type(struct[2]) == list:
+            print(prefix + struct[1].__module__ + "." + struct[1].__name__)
+            for s_ in struct[2]:
+                self._print_structs(prefix + "|--", s_)
+        else:
+            print(prefix + struct[1].__module__ + "." + struct[1].__name__)
+
+    def print_structs(self):
+        """
+        打印模型结构
+        """
+        structs = [self.extract_structs(model) for model in self.models]
+        for struct in structs:
+            self._print_structs("", struct)
 
     def auto_test(self, x_, sample=100):
         """

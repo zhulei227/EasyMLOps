@@ -35,9 +35,11 @@ class FasterLgbMulticlassPredictor(object):
         score = {}
         contrib = {}
         for idx, single_model in self.model_map.items():
+            if idx not in contrib:
+                contrib[idx] = {}
             pred = single_model.predict(input_dict)
             score[idx] = pred.get("score")
-            contrib.update(pred.get("contrib"))
+            contrib[idx].update(pred.get("contrib"))
         objective = self.model.get("objective", "")
         if "multiclass" in objective:
             # softmax

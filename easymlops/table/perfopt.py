@@ -4,15 +4,29 @@ import scipy.sparse as sp
 
 class ReduceMemUsage(TablePipeObjectBase):
     """
-    功能性：通过修改数据类型减少内存使用量 \n
+    内存优化Pipe。
+    
+    通过修改数据类型减少内存使用量。
+    自动检测并转换整数和浮点数的最小数据类型。
+    
+    Example:
+        >>> pipe = ReduceMemUsage()
     """
-
+    
     def __init__(self, skip_check_transform_type=True, **kwargs):
+        """
+        初始化内存优化Pipe。
+        
+        Args:
+            skip_check_transform_type: 跳过类型检测
+            **kwargs: 其他父类参数
+        """
         super().__init__(skip_check_transform_type=skip_check_transform_type, **kwargs)
         self.type_map_detail = dict()
 
     @staticmethod
     def extract_dict(s: dict_type, keys: list):
+        """从字典中提取指定键。"""
         new_s = dict()
         for key in keys:
             new_s[key] = s[key]
@@ -20,6 +34,15 @@ class ReduceMemUsage(TablePipeObjectBase):
 
     @staticmethod
     def get_type(ser: series_type):
+        """
+        获取列的最优数据类型。
+        
+        Args:
+            ser: 数据Series
+            
+        Returns:
+            (数据类型, (最小值, 最大值))
+        """
         col_type = ser.dtype
         col_type_str = str(col_type).lower()
         if col_type != object:
@@ -43,11 +66,22 @@ class ReduceMemUsage(TablePipeObjectBase):
             return str, None
 
     def udf_fit(self, s: dataframe_type, **kwargs):
+        """
+        训练阶段，确定每列的最优数据类型。
+        
+        Args:
+            s: 输入数据
+            **kwargs: 其他参数
+            
+        Returns:
+            self
+        """
         for col in self.input_col_names:
             self.type_map_detail[col] = self.get_type(s[col])
         return self
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """批量数据类型转换。"""
         for col, ti in self.type_map_detail.items():
             tp, ran = ti
             try:
@@ -60,6 +94,7 @@ class ReduceMemUsage(TablePipeObjectBase):
         return s
 
     def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """单条数据类型转换。"""
         for col, ti in self.type_map_detail.items():
             tp, ran = ti
             try:
@@ -72,22 +107,29 @@ class ReduceMemUsage(TablePipeObjectBase):
         return s
 
     def udf_get_params(self) -> dict_type:
+        """获取参数。"""
         return {"type_map_detail": self.type_map_detail}
 
     def udf_set_params(self, params: dict):
+        """设置参数。"""
         self.type_map_detail = params["type_map_detail"]
 
 
 class Dense2Sparse(ReduceMemUsage):
     """
-    功能性：通过将稠密矩阵压缩为稀疏矩阵减少内存使用； \n
-    注意：1）矩阵中0比较多时效果显著；2）注意后续pipe object要支持csr结构的稀疏矩阵
+    稠密转稀疏矩阵Pipe。
+    
+    通过将稠密矩阵压缩为稀疏矩阵减少内存使用。
+    适用于0值较多的数据。
+    注意：后续pipe object需要支持csr结构的稀疏矩阵。
     """
-
+    
     def __init__(self, **kwargs):
+        """初始化稠密转稀疏Pipe。"""
         super().__init__(**kwargs)
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """转换为稀疏矩阵。"""
         if not hasattr(s, "sparse"):
             s = pd.DataFrame.sparse.from_spmatrix(data=sp.csr_matrix(s), columns=self.input_col_names, index=s.index)
         for col, ti in self.type_map_detail.items():
@@ -102,4 +144,5 @@ class Dense2Sparse(ReduceMemUsage):
         return s
 
     def udf_get_params(self) -> dict_type:
+        """获取参数。"""
         return {}

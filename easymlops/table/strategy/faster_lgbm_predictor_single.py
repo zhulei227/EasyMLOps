@@ -47,7 +47,10 @@ class FasterLgbSinglePredictor(object):
                                      f"{tree_structure['threshold']}".strip("|")
                 self.build_leaf_map_describe(tree_id, tree_structure["right_child"], new_right_describe, feature_names)
         else:  # 叶子节点
-            self.leaf_map_describe[tree_id][tree_structure["leaf_index"]] = current_describe
+            if "leaf_index" not in tree_structure:  # 没有train起来的清空
+                self.leaf_map_describe[tree_id][0] = "__all__"
+            else:
+                self.leaf_map_describe[tree_id][tree_structure["leaf_index"]] = current_describe
 
     def post_tree_avg_value_update(self, tree: dict):
         if tree.get("left_child") is not None:
@@ -57,7 +60,10 @@ class FasterLgbSinglePredictor(object):
             tree["avg_value"] = avg_value
             rst = [avg_value, tree["internal_count"]]
         else:
-            rst = [tree["leaf_value"], tree["leaf_count"]]
+            if tree.get("leaf_count"):
+                rst = [tree["leaf_value"], tree["leaf_count"]]
+            else:  # 没有train起来,leaf_value就是所有y的均值
+                rst = [tree["leaf_value"], 1]
         return rst
 
     def predict(self, input_dict: dict):
@@ -118,36 +124,40 @@ class TreeCache(object):
         conditions = dict()
         contrib_map = dict()
         columns = set()
-        current_value = tree["avg_value"]
+        if tree.get("avg_value"):
+            current_value = tree["avg_value"]
+        else:
+            current_value = tree["leaf_value"]
         contrib_map["_bias"] = current_value
         for j in range(num_leaves):
-            decision_type = tree["decision_type"]
-            if "<=" == decision_type:
-                threshold = tree["threshold"]
-                default_left = tree["default_left"]
-                split_feature = feature_names[tree["split_feature"]]
-                columns.add(split_feature)
-                next_decision = self.decision(line.get(split_feature), threshold, default_left)
-            else:
-                thresholds = tree["threshold"]
-                default_left = tree["default_left"]
-                split_feature = feature_names[tree["split_feature"]]
-                columns.add(split_feature)
-                next_decision = self.decision2(line.get(split_feature), thresholds, default_left)
-            tree = tree.get(next_decision)
-            if tree.get("avg_value") is not None:
-                next_value = tree.get("avg_value")
-            else:
-                next_value = tree.get("leaf_value")
-            if contrib_map.get(split_feature) is None:
-                contrib_map[split_feature] = 0
+            decision_type = tree.get("decision_type")
+            if decision_type:
+                if "<=" == decision_type:
+                    threshold = tree["threshold"]
+                    default_left = tree["default_left"]
+                    split_feature = feature_names[tree["split_feature"]]
+                    columns.add(split_feature)
+                    next_decision = self.decision(line.get(split_feature), threshold, default_left)
+                else:
+                    thresholds = tree["threshold"]
+                    default_left = tree["default_left"]
+                    split_feature = feature_names[tree["split_feature"]]
+                    columns.add(split_feature)
+                    next_decision = self.decision2(line.get(split_feature), thresholds, default_left)
+                tree = tree.get(next_decision)
+                if tree.get("avg_value") is not None:
+                    next_value = tree.get("avg_value")
+                else:
+                    next_value = tree.get("leaf_value")
+                if contrib_map.get(split_feature) is None:
+                    contrib_map[split_feature] = 0
 
-            contrib_map[split_feature] = contrib_map.get(split_feature) + next_value - current_value
-            current_value = next_value
+                contrib_map[split_feature] = contrib_map.get(split_feature) + next_value - current_value
+                current_value = next_value
             # 判断是否叶子节点
             if tree.get("left_child") is None:
                 contrib_map["_predict_value"] = tree.get("leaf_value")
-                contrib_map["_leaf_index"] = tree.get("leaf_index")
+                contrib_map["_leaf_index"] = tree.get("leaf_index",0)
                 break
         for column in columns:
             conditions[column] = line.get(column)
