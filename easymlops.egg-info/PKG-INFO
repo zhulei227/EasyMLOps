@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: easymlops
+Version: 0.2.2
+Summary: MLOps Toolkit In Pipeline
+Author: zhulei227
+License: Apache-2.0
+Requires-Python: >=3.6
+License-File: LICENSE
