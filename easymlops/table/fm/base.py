@@ -1,10 +1,14 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from easymlops.table.core import *
 import pandas as pd
 import numpy as np
 
 
-pd.options.mode.copy_on_write = True
+# copy_on_write 仅在 pandas>=1.5 存在，低版本环境下忽略
+try:
+    pd.options.mode.copy_on_write = True
+except Exception:
+    pass
 
 
 class FMBase(TablePipeObjectBase):

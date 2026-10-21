@@ -1,4 +1,5 @@
 from easymlops.table.core import *
+import copy
 import pandas as pd
 from easymlops.table.utils import PandasUtils
 
@@ -131,7 +132,7 @@ class LGBMRegression(RegressionBase):
     """
     
     def __init__(self, y=None, support_sparse_input=False, verbose=-1, objective="regression",
-                 use_faster_predictor=True, dataset_params=None, **kwargs):
+                 use_faster_predictor=True, dataset_params=None, weight=None, **kwargs):
         """
         初始化LightGBM回归模型。
         
@@ -142,9 +143,11 @@ class LGBMRegression(RegressionBase):
             objective: 目标函数，默认regression
             use_faster_predictor: 是否使用预测加速
             dataset_params: 透传DataSet参数
+            weight: 样本权重，长度需与y一致；同时传入dataset_params={"weight":...}时以dataset_params为准
             **kwargs: 其他父类参数
         """
         super().__init__(y=y, support_sparse_input=support_sparse_input, **kwargs)
+        self.weight = copy.deepcopy(weight)
         self.native_init_params.update({
             'objective': objective,
             'verbose': verbose
@@ -173,8 +176,12 @@ class LGBMRegression(RegressionBase):
             s_ = PandasUtils.pd2csr(s)
         else:
             s_ = s
+        dataset_params = dict(self.dataset_params)
+        if self.weight is not None and "weight" not in dataset_params:
+            assert len(self.weight) == len(self.y), "weight length must match y length"
+            dataset_params["weight"] = self.weight
         self.lgb_model = lgb.train(params=self.native_init_params,
-                                   train_set=lgb.Dataset(data=s_, label=self.y, **self.dataset_params),
+                                   train_set=lgb.Dataset(data=s_, label=self.y, **dataset_params),
                                    **self.native_fit_params)
         if self.use_faster_predictor:
             from easymlops.table.utils import FasterLgbSinglePredictor
