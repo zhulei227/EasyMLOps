@@ -45,6 +45,7 @@ EasyMLOps 提供统一的基于 Pipeline 的机器学习工作流架构。通过
 - 🖼️ **YOLO 视觉任务** - 目标检测、实例分割、图像分类、姿态估计、旋转目标检测
 - 🔤 **OCR 文本识别** - 支持 80+ 语言
 - 🤖 **AutoML** - 自动化机器学习
+- 🩺 **模型诊断** - PSI 漂移监控、概率校准、KS/Lift/评分卡刻度、不平衡重采样、样本加权
 - 💾 **模型持久化** - 便捷的模型保存与加载
 
 ## 架构
@@ -320,7 +321,7 @@ table.transform_single(x_test.to_dict("record")[0])
 | **LREmbed** | 基于逻辑回归的特征重要性 |
 | **LGBMEmbed** | 基于LightGBM的特征重要性 |
 
-#### 12. 评估指标 (`easymlops.table.utils`)
+#### 12. 评估与诊断指标 (`easymlops.table.utils`)
 
 | 函数 | 说明 |
 |------|------|
@@ -329,6 +330,11 @@ table.transform_single(x_test.to_dict("record")[0])
 | plot_pr_curve | 绘制精确率-召回率曲线 |
 | calc_roc_at_thresholds | 计算不同阈值下的 ROC 指标 |
 | plot_roc_curve | 绘制 ROC 曲线并计算 AUC |
+| calc_psi | 两个分布间的 PSI（群体稳定性指数） |
+| calc_ks | KS 统计量及对应分数阈值 |
+| calc_lift | 按分数分箱的 Lift/增益表 |
+| prob2score | 概率转评分卡刻度（base_score/PDO） |
+| resample | 类不平衡重采样（过采样/欠采样/SMOTE） |
 
 #### 13. SQL 操作 (`easymlops.table.sqls`)
 
@@ -342,6 +348,41 @@ table.transform_single(x_test.to_dict("record")[0])
 |------|------|
 | **ReduceMemUsage** | 减少 DataFrame 内存占用 |
 | **Dense2Sparse** | 将密集型 DataFrame 转换为稀疏格式 |
+
+#### 15. 概率校准 (`easymlops.table.calibration`)
+
+| 类名 | 说明 |
+|------|------|
+| **IsotonicCalibrationPipe** | 基于保序回归的概率校准（按类别列 one-vs-rest 逐类校准） |
+
+```python
+from easymlops.table.calibration import IsotonicCalibrationPipe
+
+# 推荐（无偏）：先拟合主 pipeline，再在验证集预测上拟合校准并 append
+table.fit(x_train)
+calib = IsotonicCalibrationPipe(y=y_val, cols=[1])
+calib.fit(table.transform(x_val))
+table.pipe(calib)   # append 后 save/load/transform 均正常
+```
+
+#### 16. 漂移监控 (`easymlops.table.drift`)
+
+| 类名 | 说明 |
+|------|------|
+| **DriftMonitorPipe** | 透传式逐列 PSI 漂移监控（`last_psi_report_` / `last_drift_cols_`） |
+
+```python
+from easymlops.table.drift import DriftMonitorPipe
+
+table.pipe(DriftMonitorPipe(psi_threshold=0.25))   # 透传，也可作为 branch pipe 挂载
+table.fit(x_train)
+table.transform(x_online)
+print(table.models[1].last_psi_report_)            # {列名: PSI值}
+```
+
+> 说明：`LGBMClassification` / `LGBMRegression` 支持 `weight=` 样本权重；
+> `easymlops.table.utils.resample(x, y, method=...)` 返回行对齐的 (x, y)，
+> 用于**构建 pipeline 之前**的样本再平衡。
 
 ### NLP Pipeline
 

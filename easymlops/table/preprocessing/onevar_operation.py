@@ -1,6 +1,10 @@
 from .core import *
 
-pd.options.mode.copy_on_write = True
+# copy_on_write 仅在 pandas>=1.5 存在，低版本环境下忽略
+try:
+    pd.options.mode.copy_on_write = True
+except Exception:
+    pass
 
 
 class Replace(PreprocessBase):

@@ -59,10 +59,10 @@ nlp.pipe(RemoveStopWords())    # 删除停用词
 # 分词
 nlp.pipe(ExtractJieBaWords())  # jieba分词
 nlp.pipe(ExtractChineseWords()) # 中文分词
-nlp.pipe(ExtractNGramWords(n=2)) # N-gram词
+nlp.pipe(ExtractNGramWords(n_grams=2)) # N-gram词
 
 # 关键词提取
-nlp.pipe(ExtractKeyWords(topk=10))
+nlp.pipe(ExtractKeyWords())  # 可传 key_words/key_words_path 指定词表
 
 # 词汇索引
 nlp.pipe(VocabIndex())
@@ -73,25 +73,25 @@ x_train_processed = nlp.fit(x_train).transform(x_test)
 
 ---
 
-## 2.2 文本特征表示
+## 2.3 文本特征表示
 
 ```python
 from easymlops.nlp.representation import BagOfWords, TFIDF, Word2VecModel, Doc2VecModel, FastTextModel
 
 # 词袋模型
-nlp.pipe(BagOfWords(max_features=5000))
+nlp.pipe(BagOfWords(native_init_params={"max_features": 5000}))
 
 # TF-IDF
-nlp.pipe(TFIDF(max_features=5000, ngram_range=(1, 2)))
+nlp.pipe(TFIDF(native_init_params={"max_features": 5000, "ngram_range": (1, 2)}))
 
 # Word2Vec
-nlp.pipe(Word2VecModel(vector_size=100, window=5, min_count=1))
+nlp.pipe(Word2VecModel(embedding_size=100, min_count=1))
 
 # Doc2Vec
-nlp.pipe(Doc2VecModel(vector_size=100, window=5, min_count=1))
+nlp.pipe(Doc2VecModel(embedding_size=100, min_count=1))
 
 # FastText
-nlp.pipe(FastTextModel(vector_size=100, window=5, min_count=1))
+nlp.pipe(FastTextModel(embedding_size=100, min_count=1))
 
 # LSI主题模型
 nlp.pipe(LsiTopicModel(num_topics=10))
@@ -102,7 +102,7 @@ nlp.pipe(LdaTopicModel(num_topics=10))
 
 ---
 
-## 2.3 文本分类
+## 2.4 文本分类（依赖 torch，签名未在本环境验证）
 
 ```python
 from easymlops.nlp.text_classification import TextCNNClassification, TextRNNClassification, HANClassification
@@ -134,7 +134,7 @@ nlp.pipe(HANClassification(
 
 ---
 
-## 2.4 文本回归
+## 2.5 文本回归（依赖 torch，签名未在本环境验证）
 
 ```python
 from easymlops.nlp.text_regression import TextCNNRegression
@@ -148,13 +148,13 @@ nlp.pipe(TextCNNRegression(
 
 ---
 
-## 2.5 相似文本检索
+## 2.6 相似文本检索
 
 ```python
 from easymlops.nlp.similarity import FaissSimilarity, ElasticSearchSimilarity
 
 # Faiss相似度检索
-nlp.pipe(FaissSimilarity(index_type="IVF", metric="L2"))
+nlp.pipe(FaissSimilarity(search_top_k=3))
 
 # ElasticSearch相似度检索
 nlp.pipe(ElasticSearchSimilarity(index_name="texts"))

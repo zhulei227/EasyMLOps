@@ -6,7 +6,7 @@
 from easymlops.table.storage import LocalStorage
 
 # 初始化存储
-storage = LocalStorage(path="./storage")
+storage = LocalStorage(db_name="local.db", table_name="temp")
 
 # 保存特征
 storage.save_features(features, "feature_name")
@@ -29,7 +29,7 @@ feature_list = storage.list_features()
 from easymlops.table.storage import FaissStorage
 
 # 初始化存储
-storage = FaissStorage(dim=128, index_type="IVF", metric="L2")
+storage = FaissStorage(create_index_measure="L2", storage_path="./faiss_storage")
 
 # 添加向量
 storage.add_vectors(vectors, ids)
@@ -56,9 +56,8 @@ from easymlops.table.storage import ElasticSearchStorage
 
 # 初始化存储
 storage = ElasticSearchStorage(
-    hosts=["localhost:9200"],
-    index="features",
-    doc_type="feature"
+    index_name="features",
+    es_args=None,  # ES 连接参数，透传给 elasticsearch 客户端
 )
 
 # 保存文档
@@ -83,14 +82,14 @@ storage.create_index(mappings={...})
 
 ---
 
-## 7.4 HBase 存储
+## 7.4 HBase 存储（类名为 HbaseStorage）
 
 ```python
-from easymlops.table.storage import HBaseStorage
+from easymlops.table.storage import HbaseStorage
 
 # 初始化存储
-storage = HBaseStorage(
-    table="features",
+storage = HbaseStorage(
+    table_name="features",
     host="localhost",
     port=9090
 )
@@ -121,8 +120,8 @@ from easymlops.table.storage import KafkaStorage
 
 # 初始化存储
 storage = KafkaStorage(
-    bootstrap_servers=["localhost:9092"],
-    topic="features"
+    bootstrap_servers="localhost:9092",
+    topic_name="features"
 )
 
 # 发送特征
@@ -140,9 +139,8 @@ for message in storage.consume():
 
 # 消费者组
 storage = KafkaStorage(
-    bootstrap_servers=["localhost:9092"],
-    topic="features",
-    group_id="consumer_group_1"
+    bootstrap_servers="localhost:9092",
+    topic_name="features"
 )
 ```
 
@@ -155,5 +153,5 @@ storage = KafkaStorage(
 | LocalStorage | 小规模数据 | 简单、无需额外依赖 | 不支持分布式 |
 | FaissStorage | 向量检索 | 高效的向量相似度搜索 | 需要Faiss |
 | ESStorage | 全文检索 | 支持复杂查询 | 资源消耗大 |
-| HBaseStorage | 大规模KV存储 | 高扩展性 | 需要HBase集群 |
+| HbaseStorage | 大规模KV存储 | 高扩展性 | 需要HBase集群 |
 | KafkaStorage | 消息队列 | 异步、解耦 | 需要Kafka集群 |

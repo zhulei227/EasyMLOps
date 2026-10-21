@@ -45,6 +45,7 @@ EasyMLOps provides a unified Pipeline-based architecture for machine learning wo
 - 🖼️ **YOLO Vision Tasks** - Object detection, instance segmentation, image classification, pose estimation, rotated object detection
 - 🔤 **OCR Text Recognition** - Supports 80+ languages
 - 🤖 **AutoML** - Automated machine learning
+- 🩺 **Diagnostics** - PSI drift monitoring, probability calibration, KS/lift/scorecard metrics, imbalance resampling, sample weighting
 - 💾 **Model Persistence** - Easy model save and load
 
 ## Architecture
@@ -320,7 +321,7 @@ The Table Pipeline is the core module for tabular data processing.
 | **LREmbed** | Feature importance via Logistic Regression |
 | **LGBMEmbed** | Feature importance via LightGBM |
 
-#### 12. Evaluation Metrics (`easymlops.table.utils`)
+#### 12. Evaluation & Diagnostic Metrics (`easymlops.table.utils`)
 
 | Function | Description |
 |----------|-------------|
@@ -329,6 +330,11 @@ The Table Pipeline is the core module for tabular data processing.
 | plot_pr_curve | Plot Precision-Recall curve |
 | calc_roc_at_thresholds | Calculate ROC metrics at thresholds |
 | plot_roc_curve | Plot ROC curve with AUC |
+| calc_psi | Population Stability Index between two distributions |
+| calc_ks | KS statistic and its score threshold |
+| calc_lift | Lift/gain table by score bins |
+| prob2score | Convert probability to scorecard scale (base_score/PDO) |
+| resample | Class-imbalance resampling (oversample/undersample/SMOTE) |
 
 #### 13. SQL Operations (`easymlops.table.sqls`)
 
@@ -342,6 +348,41 @@ The Table Pipeline is the core module for tabular data processing.
 |-------|-------------|
 | **ReduceMemUsage** | Reduce memory usage of DataFrame |
 | **Dense2Sparse** | Convert dense DataFrame to sparse format |
+
+#### 15. Probability Calibration (`easymlops.table.calibration`)
+
+| Class | Description |
+|-------|-------------|
+| **IsotonicCalibrationPipe** | Isotonic-regression probability calibration (one-vs-rest per class column) |
+
+```python
+from easymlops.table.calibration import IsotonicCalibrationPipe
+
+# Recommended (unbiased): fit the main pipeline first, then calibrate on validation predictions
+table.fit(x_train)
+calib = IsotonicCalibrationPipe(y=y_val, cols=[1])
+calib.fit(table.transform(x_val))
+table.pipe(calib)   # append; save/load/transform work as usual
+```
+
+#### 16. Drift Monitoring (`easymlops.table.drift`)
+
+| Class | Description |
+|-------|-------------|
+| **DriftMonitorPipe** | Pass-through per-column PSI drift monitor (`last_psi_report_` / `last_drift_cols_`) |
+
+```python
+from easymlops.table.drift import DriftMonitorPipe
+
+table.pipe(DriftMonitorPipe(psi_threshold=0.25))   # pass-through, also usable as a branch pipe
+table.fit(x_train)
+table.transform(x_online)
+print(table.models[1].last_psi_report_)            # {col: psi}
+```
+
+> Note: LGBMClassification / LGBMRegression support `weight=` for sample weighting;
+> `easymlops.table.utils.resample(x, y, method=...)` returns aligned (x, y) for
+> rebalancing **before** building a pipeline.
 
 ### NLP Pipeline
 

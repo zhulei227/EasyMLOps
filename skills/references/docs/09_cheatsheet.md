@@ -6,7 +6,7 @@
 |------|------|---------|
 | FixInput | 固定输入列顺序和数据类型 | cols |
 | DoNoThing | 空操作 | - |
-| FillNa | 空值填充 | cols, strategy |
+| FillNa | 空值填充 | cols, fill_mode, fill_detail |
 | TransToCategory | 转换为类别 | cols |
 | TransToFloat | 转换为浮点 | cols |
 | TransToInt | 转换为整数 | cols |
@@ -15,16 +15,16 @@
 | SelectCols | 选择列 | cols |
 | DropCols | 删除列 | cols |
 | ReName | 重命名 | cols |
-| Replace | 替换值 | cols, old, new |
-| ClipString | 字符串裁剪 | cols, start, end |
-| Clip | 数值裁剪 | cols, lower, upper |
+| Replace | 替换值 | cols, source_values, target_value |
+| ClipString | 字符串裁剪 | cols, clip_detail |
+| Clip | 数值裁剪 | clip_detail, percent_range |
 | IsNull | 空值判断 | cols |
 | IsNotNull | 非空判断 | cols |
 | Abs | 绝对值 | cols |
-| MapValues | 值映射 | cols, mapping |
-| MinMaxScaler | 归一化 | cols |
-| Normalizer | 标准化 | cols |
-| Bins | 分箱 | cols, n_bins |
+| MapValues | 值映射 | cols, map_detail |
+| MinMaxScaler | 归一化 | decimals（作用于全部数值列） |
+| Normalizer | 标准化 | decimals（作用于全部数值列） |
+| Bins | 分箱 | n_bins, strategy |
 | Tanh | Tanh激活 | cols |
 | Relu | ReLU激活 | cols |
 | Sigmoid | Sigmoid激活 | cols |
@@ -38,30 +38,30 @@
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| Add | 加法 | cols, new_col |
-| Subtract | 减法 | cols, new_col |
-| Multiply | 乘法 | cols, new_col |
-| Divide | 除法 | cols, new_col |
-| DivideExact | 精确除法 | cols, new_col |
-| Mod | 取模 | cols, new_col |
-| Equal | 等于 | cols, new_col |
-| GreaterThan | 大于 | cols, new_col |
-| GreaterEqualThan | 大于等于 | cols, new_col |
-| LessThan | 小于 | cols, new_col |
-| LessEqualThan | 小于等于 | cols, new_col |
-| And | 与运算 | cols, new_col |
-| Or | 或运算 | cols, new_col |
-| DateDayDiff | 日期天数差 | cols, new_col |
+| Add | 加法 | left_col_name, right_col_name, output_col_name |
+| Subtract | 减法 | left_col_name, right_col_name, output_col_name |
+| Multiply | 乘法 | left_col_name, right_col_name, output_col_name |
+| Divide | 除法 | left_col_name, right_col_name, output_col_name |
+| DivideExact | 精确除法 | left_col_name, right_col_name, output_col_name |
+| Mod | 取模 | left_col_name, right_col_name, output_col_name |
+| Equal | 等于 | left_col_name, right_col_name, output_col_name |
+| GreaterThan | 大于 | left_col_name, right_col_name, output_col_name |
+| GreaterEqualThan | 大于等于 | left_col_name, right_col_name, output_col_name |
+| LessThan | 小于 | left_col_name, right_col_name, output_col_name |
+| LessEqualThan | 小于等于 | left_col_name, right_col_name, output_col_name |
+| And | 与运算 | left_col_name, right_col_name, output_col_name |
+| Or | 或运算 | left_col_name, right_col_name, output_col_name |
+| DateDayDiff | 日期天数差 | left_col_name, right_col_name, output_col_name |
 
 ## 预处理 (preprocessing) - 多列操作
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| Sum | 求和 | cols, new_col |
-| Mean | 平均值 | cols, new_col |
-| Median | 中位数 | cols, new_col |
-| CrossCategoryWithNumber | 类别×数值 | cols, new_col |
-| CrossNumberWithNumber | 数值×数值 | cols, new_col |
+| Sum | 求和 | cols, output_col_name |
+| Mean | 平均值 | cols, output_col_name |
+| Median | 中位数 | cols, output_col_name |
+| CrossCategoryWithNumber | 类别×数值 | left_col_name, right_col_name, operate_name |
+| CrossNumberWithNumber | 数值×数值 | left_col_name, right_col_name, operate_name |
 | ExtractLastName | 提取姓氏 | name_col, new_col, split_char |
 
 ## 编码 (encoding)
@@ -70,8 +70,8 @@
 |------|------|---------|
 | LabelEncoding | 标签编码 | cols |
 | OneHotEncoding | 独热编码 | cols |
-| TargetEncoding | 目标编码 | cols, label |
-| WOEEncoding | WOE编码 | cols, label |
+| TargetEncoding | 目标编码 | cols, y |
+| WOEEncoding | WOE编码 | cols, y |
 
 ## 降维 (decomposition)
 
@@ -95,31 +95,31 @@
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| MissRateFilter | 缺失率过滤 | threshold |
-| VarianceFilter | 方差过滤 | threshold |
-| PersonCorrFilter | Pearson相关 | threshold |
-| Chi2Filter | 卡方检验 | k |
-| PValueFilter | P值过滤 | k |
-| MutualInfoFilter | 互信息 | k |
-| IVFilter | IV值过滤 | threshold |
-| PSIFilter | PSI稳定性 | threshold |
+| MissRateFilter | 缺失率过滤 | max_threshold |
+| VarianceFilter | 方差过滤 | min_threshold |
+| PersonCorrFilter | Pearson相关 | y, min/max_threshold |
+| Chi2Filter | 卡方检验 | y, min/max_threshold |
+| PValueFilter | P值过滤 | y, min/max_threshold |
+| MutualInfoFilter | 互信息 | y, min/max_threshold |
+| IVFilter | IV值过滤 | y, min/max_threshold |
+| PSIFilter | PSI稳定性 | oot_x, min/max_threshold |
 
 ## 特征选择 (feature_selection) - 嵌入式
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| LREmbed | 逻辑回归嵌入 | label, C |
-| LGBMEmbed | LightGBM嵌入 | label, n_estimators |
+| LREmbed | 逻辑回归嵌入 | y, min_threshold |
+| LGBMEmbed | LightGBM嵌入 | y, objective, importance_type |
 
 ## 分类 (classification)
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| LGBMClassification | LightGBM | label, n_estimators |
+| LGBMClassification | LightGBM | y, use_faster_predictor, weight（样本权重，长度=y） |
 | LogisticRegressionClassification | 逻辑回归 | label |
 | SVMClassification | SVM | label |
 | DecisionTreeClassification | 决策树 | label |
-| RandomForestClassification | 随机森林 | label, n_estimators |
+| RandomForestClassification | 随机森林 | y, n_estimators |
 | KNeighborsClassification | KNN | label, n_neighbors |
 | GaussianNBClassification | 高斯朴素贝叶斯 | label |
 | MultinomialNBClassification | 多项式朴素贝叶斯 | label |
@@ -129,7 +129,7 @@
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| LGBMRegression | LightGBM | label, n_estimators |
+| LGBMRegression | LightGBM | y, use_faster_predictor, weight（样本权重，长度=y） |
 | LogisticRegression | 逻辑回归 | label |
 | LinearRegression | 线性回归 | label |
 | RidgeRegression | 岭回归 | label |
@@ -147,7 +147,7 @@
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
 | Normalization | 高级归一化 | cols |
-| MapValues | 值映射 | cols, mapping |
+| MapValues | 值映射 | cols, map_detail |
 
 ## 性能优化 (perfopt)
 
@@ -190,11 +190,11 @@
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| BagOfWords | 词袋模型 | max_features |
-| TFIDF | TF-IDF | max_features, ngram_range |
-| Word2VecModel | Word2Vec | vector_size |
-| Doc2VecModel | Doc2Vec | vector_size |
-| FastTextModel | FastText | vector_size |
+| BagOfWords | 词袋模型 | native_init_params |
+| TFIDF | TF-IDF | native_init_params |
+| Word2VecModel | Word2Vec | embedding_size, min_count |
+| Doc2VecModel | Doc2Vec | embedding_size, min_count |
+| FastTextModel | FastText | embedding_size, min_count |
 | LdaTopicModel | LDA主题 | num_topics |
 | LsiTopicModel | LSI主题 | num_topics |
 
@@ -216,7 +216,7 @@
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| FaissSimilarity | Faiss相似度 | index_type, metric |
+| FaissSimilarity | Faiss相似度 | search_top_k, create_index_param |
 | ElasticSearchSimilarity | ES相似度 | index_name |
 
 ## 存储 (storage)
@@ -226,20 +226,18 @@
 | LocalStorage | 本地文件存储 |
 | FaissStorage | Faiss向量存储 |
 | ElasticSearchStorage | ES存储 |
-| HBaseStorage | HBase存储 |
+| HbaseStorage | HBase存储 |
 | KafkaStorage | Kafka消息队列 |
 
 ## 策略 (strategy)
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| HillClimbingStackingRegression | Hill Climbing + Stacking | label, n_folds |
-| AutoResidualRegression | 自动残差回归 | label, base_model, n_estimators |
+| HillClimbingStackingRegression | Hill Climbing + Stacking | y, eval_function, n_splits |
+| AutoResidualRegression | 自动残差回归 | y |
 | FactorStrategy | 因子策略 | - |
 | VarRuler | 变异性规则 | - |
-| LGBMRegressionLayers | LGBM回归层 | label, n_estimators |
-| Climber | 爬山法基类 | X, y, metric, n_folds |
-| ClimberCV | CV爬山法 | X, y, metric, n_folds |
+| LGBMRegressionLayers | LGBM回归层 | y, pred_name |
 | FasterLgbSinglePredictor | 快速LGB单类预测 | model_path, input_names |
 | ForestCache | 森林缓存 | - |
 | TreeCache | 树缓存 | - |
@@ -256,6 +254,35 @@
 | FasterLgbSinglePredictor | 快速LGB单类预测 |
 | CpuMemDetector | CPU/内存检测 |
 | PandasUtils | Pandas工具 |
+
+## 诊断工具 (utils，本仓库扩展，实测见 tests/test_diag_tools.py)
+
+| 函数 | 说明 | 关键参数 |
+|------|------|---------|
+| calc_psi | 两分布间 PSI（以 expected 分位数分箱），<0.1 稳定 / >0.25 显著漂移 | expected, actual, bins |
+| calc_ks | KS 统计量及对应分数阈值，返回 {"ks", "ks_threshold"} | y_true, y_score |
+| calc_lift | 按分数降序等频分箱的 Lift/增益表（bin/samples/bads/bad_rate/lift/cum_gain） | y_true, y_score, bins |
+| prob2score | 概率转评分卡刻度（分数越高风险越低） | prob, base_score=600, pdo=20, base_odds=1/19 |
+| resample | 类不平衡重采样，返回行对齐的 (x, y)；**须在构造 pipeline 前调用**（y 在构造时绑定） | x, y, method(oversample/undersample/smote), random_state |
+
+## 校准 (calibration，本仓库扩展)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| IsotonicCalibrationPipe | 保序回归概率校准（按类别列 one-vs-rest 逐类） | y, cols, out_of_bounds="clip", null_fill=0.5 |
+
+推荐用法（无偏）：主 pipeline 先 fit，再 `calib.fit(table.transform(x_val)); table.pipe(calib)`；
+简便用法（有偏）：`IsotonicCalibrationPipe(y=y_train)` 直接挂入 pipeline 后统一 fit。
+
+## 漂移监控 (drift，本仓库扩展)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| DriftMonitorPipe | 透传式逐列 PSI 监控，transform 后读 `last_psi_report_`/`last_drift_cols_`/`psi_history_` | cols(默认全部数值列), bins=10, psi_threshold=0.25 |
+
+注意：pipe 的 `name` 默认是类对象而非字符串，检索用
+`[m for m in pipeline.models if isinstance(m, DriftMonitorPipe)]` 或整数索引；
+模型分数监控可传 `cols=[正类列名]` 挂在模型 pipe 之后。
 
 ## 核心基类
 

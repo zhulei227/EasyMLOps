@@ -9,9 +9,10 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# 加载模型
-with open("table_pipeline.pkl", "rb") as f:
-    pipeline = pickle.load(f)
+# 加载模型（save 存的是参数字典，用实例方法 load 恢复）
+from easymlops import TablePipeLine
+pipeline = TablePipeLine()
+pipeline.load("table_pipeline.pkl")
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -41,8 +42,9 @@ import pandas as pd
 app = FastAPI()
 
 # 加载模型
-with open("table_pipeline.pkl", "rb") as f:
-    pipeline = pickle.load(f)
+from easymlops import TablePipeLine
+pipeline = TablePipeLine()
+pipeline.load("table_pipeline.pkl")
 
 class InputData(BaseModel):
     features: dict
@@ -50,9 +52,9 @@ class InputData(BaseModel):
 @app.post("/predict")
 def predict(data: InputData):
     try:
-        df = pd.DataFrame([data.features])
-        result = pipeline.transform(df)
-        return {"prediction": result.tolist()}
+        # 单条请求用 transform_single（返回 dict），避免每次构造 DataFrame
+        result = pipeline.transform_single(data.features)
+        return {"prediction": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

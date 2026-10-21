@@ -22,12 +22,12 @@ del x_test["Survived"]
 table = TablePipeLine()
 table.pipe(FixInput())\
      .pipe(TransToCategory(cols=["Sex", "Embarked", "Cabin"]))\
-     .pipe(FillNa(strategy="mean"))\
+     .pipe(FillNa(fill_mode="mean"))\
      .pipe(LabelEncoding())\
-     .pipe(LGBMClassification(label="Survived", n_estimators=100))
+     .pipe(LGBMClassification(y=y_train, use_faster_predictor=False))
 
 # 训练
-table.fit(x_train, y=y_train)
+table.fit(x_train)
 
 # 预测
 predictions = table.transform(x_test)
@@ -66,9 +66,9 @@ nlp.pipe(Lower())\
    .pipe(RemovePunctuation())\
    .pipe(ExtractJieBaWords())\
    .pipe(RemoveStopWords())\
-   .pipe(TFIDF(max_features=5000))\
-   .pipe(TextCNNClassification(
-       label="label",
+   .pipe(TFIDF(native_init_params={"max_features": 5000}))\
+   .pipe(TextCNNClassification(   # 依赖 torch，签名未在本环境验证
+       y=y_train,
        vocab_size=5000,
        embedding_dim=128,
        num_filters=100,
@@ -115,17 +115,13 @@ del x_test["SalePrice"]
 # 构建Pipeline
 table = TablePipeLine()
 table.pipe(FixInput())\
-     .pipe(FillNa(strategy="mean"))\
+     .pipe(FillNa(fill_mode="mean"))\
      .pipe(LabelEncoding())\
      .pipe(MinMaxScaler())\
-     .pipe(LGBMRegression(
-         label="SalePrice",
-         n_estimators=200,
-         learning_rate=0.05
-     ))
+     .pipe(LGBMRegression(y=y_train, use_faster_predictor=False))
 
 # 训练
-table.fit(x_train, y=y_train)
+table.fit(x_train)
 
 # 预测
 predictions = table.transform(x_test)
@@ -158,16 +154,16 @@ table = TablePipeLine()
 
 # 1. 数据清洗
 table.pipe(FixInput())\
-     .pipe(FillNa(strategy="mean"))\
+     .pipe(FillNa(fill_mode="mean"))\
      .pipe(TransToCategory(cols=["cat1", "cat2"]))
 
 # 2. 特征编码
 table.pipe(LabelEncoding())
 
 # 3. 特征选择 - 过滤式
-table.pipe(MissRateFilter(threshold=0.5))\
-     .pipe(VarianceFilter(threshold=0.0))\
-     .pipe(PersonCorrFilter(threshold=0.8))
+table.pipe(MissRateFilter(max_threshold=0.5))\
+     .pipe(VarianceFilter(min_threshold=0.001))\
+     .pipe(PersonCorrFilter(y=y_train, max_threshold=0.8))
 
 # 4. 特征降维
 table.pipe(PCADecomposition(n_components=20))
@@ -203,30 +199,26 @@ x_test = data[800:]
 y_train = x_train["label"]
 y_test = x_test["label"]
 
-# 定义基模型
-base_models = [
-    ("lgbm", LGBMClassification(label="label", n_estimators=50)),
-    ("rf", RandomForestClassification(label="label", n_estimators=50)),
-    ("dt", DecisionTreeClassification(label="label"))
-]
-
-# 定义元模型
-meta_model = LGBMRegression(label="label", n_estimators=20)
-
-# 构建Stacking Pipeline
+# 基模型输出先经 Parallel 拼接，再做 Hill Climbing 加权
+# （0.2.2 的 HillClimbingStackingRegression 没有 base_models/meta_model 参数）
 table = TablePipeLine()
 table.pipe(FixInput())\
-     .pipe(FillNa(strategy="mean"))\
+     .pipe(FillNa(fill_mode="mean"))\
      .pipe(LabelEncoding())\
+     .pipe(Parallel([
+         LGBMClassification(y=y_train, prefix="lgbm", use_faster_predictor=False),
+         RandomForestClassification(y=y_train, prefix="rf"),
+         DecisionTreeClassification(y=y_train, prefix="dt"),
+     ]))\
      .pipe(HillClimbingStackingRegression(
-         label="label",
-         base_models=base_models,
-         meta_model=meta_model,
-         n_folds=5
+         y=y_train,
+         eval_function="accuracy",
+         eval_function_direct="maximize",
+         n_splits=5
      ))
 
 # 训练
-table.fit(x_train, y=y_train)
+table.fit(x_train)
 
 # 预测
 predictions = table.transform(x_test)
@@ -244,7 +236,7 @@ print(accuracy_score(y_test, predictions))
 # 保存为production.py
 
 from flask import Flask, request, jsonify
-import pickle
+from easymlops import TablePipeLine
 import pandas as pd
 import logging
 
@@ -254,9 +246,9 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# 加载模型
-with open("models/table_pipeline.pkl", "rb") as f:
-    pipeline = pickle.load(f)
+# 加载模型（save 存的是参数字典，用实例方法 load 恢复）
+pipeline = TablePipeLine()
+pipeline.load("models/table_pipeline.pkl")
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -264,13 +256,12 @@ def predict():
         data = request.json
         logger.info(f"Received request: {data}")
         
-        df = pd.DataFrame([data])
-        result = pipeline.transform(df)
+        result = pipeline.transform_single(data)
         
-        logger.info(f"Prediction result: {result.tolist()}")
+        logger.info(f"Prediction result: {result}")
         return jsonify({
             "status": "success",
-            "prediction": result.tolist()
+            "prediction": result
         })
     except Exception as e:
         logger.error(f"Error: {str(e)}")
@@ -325,8 +316,8 @@ texts = pd.DataFrame({
 nlp = NLPPipeline()
 nlp.pipe(Lower())\
    .pipe(ExtractJieBaWords())\
-   .pipe(TFIDF(max_features=100))\
-   .pipe(FaissSimilarity(index_type="IVF", metric="L2"))
+   .pipe(TFIDF(native_init_params={"max_features": 100}))\
+   .pipe(FaissSimilarity(search_top_k=3))
 
 # 训练 (构建索引)
 nlp.fit(texts)
@@ -362,11 +353,9 @@ automl = AutoMLTab(
 # 运行AutoML
 automl.run()
 
-# 获取最佳pipeline
-best_pipeline = automl.get_best_pipeline()
-
-# 预测
-predictions = automl.predict(x_test)
+# 预测（0.2.2 没有 run()/predict()/get_best_pipeline()）
+automl.fit()
+predictions = automl.transform(x_test)
 
 # 保存AutoML结果
 automl.save("automl_result.pkl")

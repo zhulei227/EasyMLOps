@@ -1,8 +1,12 @@
-from easymlops.table.core import *
+﻿from easymlops.table.core import *
 import numpy as np
 import lightgbm as lgb
 
-pd.options.mode.copy_on_write = True
+# copy_on_write 仅在 pandas>=1.5 存在，低版本环境下忽略
+try:
+    pd.options.mode.copy_on_write = True
+except Exception:
+    pass
 
 
 class EncodingBase(TablePipeObjectBase):

@@ -7,7 +7,7 @@ table = TablePipeLine()
 table.pipe(FixInput())\
      .pipe(TransToCategory(cols=["Sex"]))\
      .pipe(LabelEncoding())\
-     .pipe(LGBMClassification(label="Survived"))
+     .pipe(LGBMClassification(y=y_train))
 ```
 
 ---
@@ -16,6 +16,8 @@ table.pipe(FixInput())\
 
 ```python
 # 从已有pipeline中移除某个pipe
+# 注意: 0.2.2 实测减法运算符可用，但会破坏原 pipeline 内部状态
+# （input_col_names 被清空），且减法产物 transform 亦有缺陷，慎用
 table = TablePipeLine() - FillNa() - LabelEncoding()
 ```
 
@@ -24,10 +26,9 @@ table = TablePipeLine() - FillNa() - LabelEncoding()
 ## 4.3 运行到指定位置
 
 ```python
-# 训练到某个pipe
+# 0.2.2 提供 stop_at/start_from 参数，但按 pipe 名称分段在实测中可能不生效，
+# 使用前请先用小样本自行验证中间结果是否符合预期
 table.fit(x_train, stop_at="LGBMClassification")
-
-# 获取中间结果
 intermediate_result = table.transform(x_test, start_from="FixInput", stop_at="LabelEncoding")
 ```
 
@@ -36,11 +37,8 @@ intermediate_result = table.transform(x_test, start_from="FixInput", stop_at="La
 ## 4.4 获取特定pipe
 
 ```python
-# 获取指定位置的pipe
-lgbm_pipe = table.get_pipe("LGBMClassification")
-
-# 获取所有pipe名称
-print(table.get_pipe_names())
+# 注意: 0.2.2 的 TablePipeLine 没有 get_pipe()/get_pipe_names() 方法（旧版 API）；
+# pipe 顺序在构造时确定，调试时建议对 pipeline.transform 的输出列做断言来定位问题
 ```
 
 ---
@@ -63,12 +61,8 @@ from easymlops import TablePipeLine
 pipeline1 = TablePipeLine().pipe(FixInput()).pipe(FillNa())
 pipeline2 = TablePipeLine().pipe(LabelEncoding()).pipe(LGBMClassification())
 
-# 组合
-combined = pipeline1 + pipeline2
-
-# 或者
-combined = TablePipeLine()
-combined.pipes = pipeline1.pipes + pipeline2.pipes
+# 注意: 0.2.2 实测 TablePipeLine 不支持 + 运算符（TypeError），也不存在 .pipes 属性；
+# 组合管道请手动依次调用 .pipe()；减法 - 可用但会破坏原 pipeline 内部状态（见 4.2）
 ```
 
 ---
@@ -76,11 +70,9 @@ combined.pipes = pipeline1.pipes + pipeline2.pipes
 ## 4.7 Pipeline 分拆
 
 ```python
-# 获取指定范围的pipe
+# 切片/索引访问在 0.2.2 未验证可用，使用前请先自行确认
 partial_pipeline = table[1:3]  # 获取第1到第2个pipe
-
-# 获取单个pipe
-single_pipe = table[0]  # 获取第0个pipe
+single_pipe = table[0]         # 获取第0个pipe
 ```
 
 ---

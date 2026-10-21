@@ -133,7 +133,7 @@ class LGBMClassification(ClassificationBase):
     """
 
     def __init__(self, y=None, verbose=-1, objective="multiclass",
-                 use_faster_predictor=True, support_sparse_input=False, dataset_params=None, **kwargs):
+                 use_faster_predictor=True, support_sparse_input=False, dataset_params=None, weight=None, **kwargs):
         """
 
         :param y:
@@ -142,9 +142,11 @@ class LGBMClassification(ClassificationBase):
         :param use_faster_predictor:transform_single中是否使用预测加速
         :param support_sparse_input:是否支持稀疏数据，需要input数据中有稀疏数据才启用
         :param dataset_params: 透传DataSet用,lgb.Dataset(data=xx, label=xx, feature_name=xx,**self.dataset_params)
+        :param weight: 样本权重，长度需与y一致；同时传入dataset_params={"weight":...}时以dataset_params为准
         :param kwargs:
         """
         super().__init__(y=y, support_sparse_input=support_sparse_input, **kwargs)
+        self.weight = copy.deepcopy(weight)
         self.native_init_params.update({
             'objective': objective,
             'num_class': self.num_class,
@@ -167,8 +169,12 @@ class LGBMClassification(ClassificationBase):
 
         # if self.dataset_params.get("feature_name") is None:
         #     self.dataset_params["feature_name"] = self.cols
+        dataset_params = dict(self.dataset_params)
+        if self.weight is not None and "weight" not in dataset_params:
+            assert len(self.weight) == len(self.y), "weight length must match y length"
+            dataset_params["weight"] = self.weight
         self.lgb_model = lgb.train(params=self.native_init_params,
-                                   train_set=lgb.Dataset(data=s_, label=self.y, **self.dataset_params),
+                                   train_set=lgb.Dataset(data=s_, label=self.y, **dataset_params),
                                    **self.native_fit_params)
         if self.use_faster_predictor:
             from easymlops.table.utils import FasterLgbMulticlassPredictor

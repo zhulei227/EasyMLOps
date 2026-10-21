@@ -2,17 +2,12 @@
 
 ```python
 from easymlops import TSPipeLine
-from easymlops.ts.dnn import TSCNNRegression
+from easymlops.ts.dnn import TSCNNRegression  # 需要 torch
 
 ts = TSPipeLine()
 
-# 时序CNN回归
-ts.pipe(TSCNNRegression(
-    label="target",
-    seq_len=30,
-    features=[...],
-    ...
-))
+# 时序CNN回归（torch 依赖，签名未在本环境验证）
+ts.pipe(TSCNNRegression(label="target", seq_len=30))
 
 # 训练
 ts.fit(x_train, y=y_train)
@@ -30,7 +25,7 @@ from easymlops.table.preprocessing import *
 
 # 使用表格预处理
 ts.pipe(FixInput())
-ts.pipe(FillNa(strategy="mean"))
+ts.pipe(FillNa(fill_mode="mean"))
 ts.pipe(MinMaxScaler(cols=[...]))
 ```
 
@@ -121,16 +116,18 @@ df = pd.DataFrame({
     'value': np.cumsum(np.random.randn(200)) + 100
 })
 
-# 创建并训练模型
-pipe = ArimaRegression(input_cols=["value"], time_period=30, forecast_horizon=7)
+# 创建并训练模型（真实签名: input_cols, p, d, q, seasonal_*, exog_cols）
+pipe = ArimaRegression(input_cols=["value"], p=2, d=1, q=2)
 pipe.fit(df)
 
-# 预测
+# 预测（forecast 步数 = transform 输入行数，结果追加到 output_col 列）
 result = pipe.transform(df)
 
-# 保存和加载模型
-pipe.save("arima_model.pkl")
-pipe.load("arima_model.pkl")
+# 保存和加载模型（注意: TS 基类 save/load 只存参数不含拟合结果，
+# 加载后 results=None 无法预测；持久化请用 pickle 整体序列化对象）
+import pickle
+with open("arima_model.pkl", "wb") as f:
+    pickle.dump(pipe, f)
 ```
 
 ### 深度学习模型
@@ -143,11 +140,9 @@ df = pd.DataFrame({
     'value': np.cumsum(np.random.randn(200)) + 100
 })
 
-# 创建并训练模型
+# 创建并训练模型（依赖 torch，签名未在本环境验证，参数以 inspect.signature 为准）
 pipe = NBeatsRegression(
     input_cols=["value"],
-    time_period=30,
-    forecast_horizon=7,
     epochs=5
 )
 pipe.fit(df)
@@ -155,9 +150,7 @@ pipe.fit(df)
 # 预测
 result = pipe.transform(df)
 
-# 保存和加载模型
-pipe.save("nbeats_model.pkl")
-pipe.load("nbeats_model.pkl")
+# 保存和加载模型（同上: 建议用 pickle 整体序列化）
 ```
 
 ### 带外生变量的模型
@@ -176,8 +169,7 @@ df = pd.DataFrame({
 pipe = ArimaxRegression(
     input_cols=["value"],
     exog_cols=["feature1", "feature2"],
-    time_period=30,
-    forecast_horizon=7
+    p=1, d=1, q=1
 )
 pipe.fit(df)
 

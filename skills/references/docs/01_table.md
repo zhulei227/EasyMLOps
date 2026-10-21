@@ -37,16 +37,16 @@ x_train_processed = table.fit(x_train).transform(x_test)
 from easymlops.table.preprocessing import FillNa
 
 # 方式1: 均值填充
-table.pipe(FillNa(cols=["Age"], strategy="mean"))
+table.pipe(FillNa(cols=["Age"], fill_mode="mean"))
 
 # 方式2: 中位数填充
-table.pipe(FillNa(cols=["Age"], strategy="median"))
+table.pipe(FillNa(cols=["Age"], fill_mode="median"))
 
 # 方式3: 众数填充
-table.pipe(FillNa(cols=["Embarked"], strategy="mode"))
+table.pipe(FillNa(cols=["Embarked"], fill_mode="mode"))
 
 # 方式4: 指定值填充
-table.pipe(FillNa(cols=["Age"], strategy="constant", fill_value=0))
+table.pipe(FillNa(cols=["Age"], fill_detail={"Age": 0}))
 ```
 
 ### 一元操作
@@ -55,19 +55,19 @@ table.pipe(FillNa(cols=["Age"], strategy="constant", fill_value=0))
 from easymlops.table.preprocessing import Replace, Clip, MinMaxScaler, Normalizer, Bins
 
 # 替换值
-table.pipe(Replace(cols=["Sex"], old="male", new="M"))
+table.pipe(Replace(cols=["Sex"], source_values=["male"], target_value="M"))
 
-# 数值裁剪
-table.pipe(Clip(cols=["Age"], lower=0, upper=100))
+# 数值裁剪（clip_detail: {列名: (下限, 上限)}）
+table.pipe(Clip(clip_detail={"Age": (0, 100)}))
 
-# 归一化
-table.pipe(MinMaxScaler(cols=["Age", "Fare"]))
+# 归一化（作用于全部数值列）
+table.pipe(MinMaxScaler())
 
-# 标准化
-table.pipe(Normalizer(cols=["Age", "Fare"]))
+# 标准化（作用于全部数值列）
+table.pipe(Normalizer())
 
-# 分箱
-table.pipe(Bins(cols=["Age"], n_bins=5, strategy="equal_width"))
+# 分箱（默认按分位数）
+table.pipe(Bins(n_bins=5))
 ```
 
 ### 二元操作
@@ -76,13 +76,13 @@ table.pipe(Bins(cols=["Age"], n_bins=5, strategy="equal_width"))
 from easymlops.table.preprocessing import Add, Subtract, Multiply, Divide
 
 # 两列运算
-table.pipe(Add(cols=["col1", "col2"], new_col="sum"))
-table.pipe(Subtract(cols=["col1", "col2"], new_col="diff"))
-table.pipe(Multiply(cols=["col1", "col2"], new_col="product"))
-table.pipe(Divide(cols=["col1", "col2"], new_col="ratio"))
+table.pipe(Add(left_col_name="col1", right_col_name="col2", output_col_name="sum"))
+table.pipe(Subtract(left_col_name="col1", right_col_name="col2", output_col_name="diff"))
+table.pipe(Multiply(left_col_name="col1", right_col_name="col2", output_col_name="product"))
+table.pipe(Divide(left_col_name="col1", right_col_name="col2", output_col_name="ratio"))
 
 # 日期操作
-table.pipe(DateDayDiff(cols=["date1", "date2"], new_col="days_diff"))
+table.pipe(DateDayDiff(left_col_name="date1", right_col_name="date2", output_col_name="days_diff"))
 ```
 
 ### 更多预处理操作
@@ -99,17 +99,17 @@ from easymlops.table.preprocessing import Sum, Mean, Median
 table.pipe(DoNoThing())
 
 # 字符串裁剪
-table.pipe(ClipString(cols=["Name"], start=0, end=10))
+table.pipe(ClipString(clip_detail={"Name": (0, 10)}))
 
 # 空值判断
-table.pipe(IsNull(cols=["Age"], new_col="is_age_null"))
-table.pipe(IsNotNull(cols=["Age"], new_col="is_age_not_null"))
+table.pipe(IsNull(cols=["Age"], prefix="is_age_null"))
+table.pipe(IsNotNull(cols=["Age"], prefix="is_age_not_null"))
 
 # 绝对值
 table.pipe(Abs(cols=["diff"]))
 
 # 值映射
-table.pipe(MapValues(cols=["Sex"], mapping={"male": 0, "female": 1}))
+table.pipe(MapValues(map_detail={"Sex": {"male": 0, "female": 1}}))
 
 # 激活函数
 table.pipe(Tanh(cols=["feature"]))
@@ -118,21 +118,21 @@ table.pipe(Sigmoid(cols=["feature"]))
 table.pipe(Swish(cols=["feature"]))
 
 # 日期特征提取
-table.pipe(DateMonthInfo(cols=["date"], new_col="month"))
-table.pipe(DateHourInfo(cols=["date"], new_col="hour"))
-table.pipe(DateMinuteInfo(cols=["date"], new_col="minute"))
-table.pipe(DateTotalMinuteInfo(cols=["date"], new_col="total_minute"))
+table.pipe(DateMonthInfo(cols=["date"], prefix="month"))
+table.pipe(DateHourInfo(cols=["date"], prefix="hour"))
+table.pipe(DateMinuteInfo(cols=["date"], prefix="minute"))
+table.pipe(DateTotalMinuteInfo(cols=["date"], prefix="total_minute"))
 
 # 类别与数值交叉
-table.pipe(CrossCategoryWithNumber(cols=["City", "Price"], new_col="city_price"))
+table.pipe(CrossCategoryWithNumber(left_col_name="City", right_col_name="Price", operate_name="city_price"))
 
 # 数值与数值交叉
-table.pipe(CrossNumberWithNumber(cols=["Price", "Quantity"], new_col="price_qty"))
+table.pipe(CrossNumberWithNumber(left_col_name="Price", right_col_name="Quantity", operate_name="price_qty"))
 
 # 多列汇总操作
-table.pipe(Sum(cols=["col1", "col2", "col3"], new_col="total"))
-table.pipe(Mean(cols=["col1", "col2", "col3"], new_col="avg"))
-table.pipe(Median(cols=["col1", "col2", "col3"], new_col="mid"))
+table.pipe(Sum(cols=["col1", "col2", "col3"], output_col_name="total"))
+table.pipe(Mean(cols=["col1", "col2", "col3"], output_col_name="avg"))
+table.pipe(Median(cols=["col1", "col2", "col3"], output_col_name="mid"))
 ```
 
 ### 自定义Pipe模块
@@ -213,10 +213,10 @@ table.pipe(LabelEncoding(cols=["Sex", "Embarked"]))
 table.pipe(OneHotEncoding(cols=["Sex", "Embarked"]))
 
 # 目标编码 (需要指定 label 参数)
-table.pipe(TargetEncoding(cols=["Sex"], label="Survived"))
+table.pipe(TargetEncoding(cols=["Sex"], y=y_train))
 
 # WOE编码
-table.pipe(WOEEncoding(cols=["Sex"], label="Survived"))
+table.pipe(WOEEncoding(cols=["Sex"], y=y_train))
 ```
 
 ---
@@ -276,29 +276,29 @@ table.pipe(LocallyLinearEmbeddingDecomposition(n_components=2))
 from easymlops.table.feature_selection import MissRateFilter, VarianceFilter, PersonCorrFilter
 from easymlops.table.feature_selection import Chi2Filter, IVFilter, PSIFilter
 
-# 缺失率过滤
-table.pipe(MissRateFilter(threshold=0.5))
+# 缺失率过滤（保留缺失率 <= max_threshold 的列）
+table.pipe(MissRateFilter(max_threshold=0.5))
 
-# 方差过滤
-table.pipe(VarianceFilter(threshold=0.0))
+# 方差过滤（剔除方差 < min_threshold 的列）
+table.pipe(VarianceFilter(min_threshold=0.001))
 
-# Pearson相关系数过滤
-table.pipe(PersonCorrFilter(threshold=0.8))
+# Pearson相关系数过滤（与目标相关性在 [min, max] 区间的列保留）
+table.pipe(PersonCorrFilter(y=y_train, max_threshold=0.8))
 
 # 卡方检验
-table.pipe(Chi2Filter(k=10))
+table.pipe(Chi2Filter(y=y_train))
 
 # P值过滤
-table.pipe(PValueFilter(k=10))
+table.pipe(PValueFilter(y=y_train))
 
 # 互信息过滤
-table.pipe(MutualInfoFilter(k=10))
+table.pipe(MutualInfoFilter(y=y_train))
 
-# IV值过滤
-table.pipe(IVFilter(threshold=0.02))
+# IV值过滤（保留 IV >= min_threshold 的列）
+table.pipe(IVFilter(y=y_train, min_threshold=0.02))
 
-# PSI稳定性过滤
-table.pipe(PSIFilter(threshold=0.1))
+# PSI稳定性过滤（需提供跨期数据 oot_x）
+table.pipe(PSIFilter(oot_x=x_oot, max_threshold=0.1))
 ```
 
 ### 嵌入式
@@ -307,10 +307,10 @@ table.pipe(PSIFilter(threshold=0.1))
 from easymlops.table.feature_selection import LREmbed, LGBMEmbed
 
 # 逻辑回归嵌入式特征选择
-table.pipe(LREmbed(label="Survived", C=1.0))
+table.pipe(LREmbed(y=y_train))
 
 # LightGBM嵌入式特征选择
-table.pipe(LGBMEmbed(label="Survived", n_estimators=100))
+table.pipe(LGBMEmbed(y=y_train))
 ```
 
 ### TCA 迁移学习
@@ -320,9 +320,8 @@ from easymlops.table.decomposition import TCADecomposition
 
 # TCA (Transfer Component Analysis) 迁移学习降维
 table.pipe(TCADecomposition(
-    n_components=10,
-    kernel_type="linear",
-    mu=1.0
+    dim=10,
+    kernel_type="primal"
 ))
 ```
 
@@ -367,7 +366,7 @@ table.pipe(SQL(sql="(a+b)/c as col1, c//d as col2"))
 ```python
 from easymlops.table.feature_selection import LGBMEmbed
 # 使用LGBM进行特征重要性选择
-table.pipe(LGBMEmbed(label="Survived", n_estimators=100))
+table.pipe(LGBMEmbed(y=y_train))
 ```
 
 ### 工具模块 (utils)
@@ -380,12 +379,8 @@ from easymlops.table.utils import PandasUtils
 from easymlops.table.utils import calc_precision_recall_at_thresholds, calc_precision_recall_at_quantiles, plot_pr_curve
 from easymlops.table.utils import calc_roc_at_thresholds, plot_roc_curve
 
-# 评估函数
-eval_func = EvalFunction(
-    y_true,
-    y_pred,
-    metric="accuracy"
-)
+# 评估函数（0.2.2 中 EvalFunction 无构造参数）
+eval_func = EvalFunction()
 
 # 阈值评估：计算不同阈值下的precision、recall、F1
 result = calc_precision_recall_at_thresholds(y_true, y_pred, bins=10)
@@ -423,10 +418,9 @@ aucs = plot_roc_curve(y_true, y_preds_dict_roc, bins=10, save_path="roc_curve.pn
 # {'Model_A': 0.92, 'Model_B': 0.85, 'Model_C': 0.78}
 
 # 快速LGB单类预测器
-predictor = FasterLgbSinglePredictor(
-    model_path="model.lgb",
-    feature_names=[...]
-)
+import lightgbm as lgb  # 入参为 lgb booster.dump_model() 字典
+booster = lgb.Booster(model_file="model.lgb")
+predictor = FasterLgbSinglePredictor(model=booster.dump_model())
 
 # CPU/内存检测
 detector = CpuMemDetector()
@@ -490,33 +484,28 @@ check_int_trans_float(pipeline, x, sample=100)
 ```python
 from easymlops.table.classification import *
 
-# LightGBM分类
-table.pipe(LGBMClassification(
-    label="Survived",
-    n_estimators=100,
-    learning_rate=0.1,
-    num_leaves=31
-))
+# LightGBM分类（不接受 n_estimators/learning_rate 等参数，建议关闭 faster predictor 兼容 lightgbm 4.x）
+table.pipe(LGBMClassification(y=y_train, use_faster_predictor=False))
 
 # 逻辑回归
-table.pipe(LogisticRegressionClassification(label="Survived"))
+table.pipe(LogisticRegressionClassification(y=y_train))
 
 # SVM分类
-table.pipe(SVMClassification(label="Survived"))
+table.pipe(SVMClassification(y=y_train))
 
 # 决策树
-table.pipe(DecisionTreeClassification(label="Survived"))
+table.pipe(DecisionTreeClassification(y=y_train))
 
 # 随机森林
-table.pipe(RandomForestClassification(label="Survived", n_estimators=100))
+table.pipe(RandomForestClassification(y=y_train, n_estimators=100))
 
 # K近邻
-table.pipe(KNeighborsClassification(label="Survived", n_neighbors=5))
+table.pipe(KNeighborsClassification(y=y_train, n_neighbors=5))
 
 # 朴素贝叶斯
-table.pipe(GaussianNBClassification(label="Survived"))
-table.pipe(MultinomialNBClassification(label="Survived"))
-table.pipe(BernoulliNBClassification(label="Survived"))
+table.pipe(GaussianNBClassification(y=y_train))
+table.pipe(MultinomialNBClassification(y=y_train))
+table.pipe(BernoulliNBClassification(y=y_train))
 ```
 
 ---
@@ -526,27 +515,23 @@ table.pipe(BernoulliNBClassification(label="Survived"))
 ```python
 from easymlops.table.regression import *
 
-# LightGBM回归
-table.pipe(LGBMRegression(
-    label="SalePrice",
-    n_estimators=100,
-    learning_rate=0.1
-))
+# LightGBM回归（不接受 n_estimators/learning_rate，建议关闭 faster predictor）
+table.pipe(LGBMRegression(y=y_train, use_faster_predictor=False))
 
 # 线性回归
-table.pipe(LinearRegression(label="SalePrice"))
+table.pipe(LinearRegression(y=y_train))
 
 # 岭回归
-table.pipe(RidgeRegression(label="SalePrice"))
+table.pipe(RidgeRegression(y=y_train))
 
 # RidgeCV回归
-table.pipe(RidgeCVRegression(label="SalePrice"))
+table.pipe(RidgeCVRegression(y=y_train))
 
 # SVM回归
-table.pipe(SVMRegression(label="SalePrice"))
+table.pipe(SVMRegression(y=y_train))
 
 # 逻辑回归
-table.pipe(LogisticRegression(label="SalePrice"))
+table.pipe(LogisticRegression(y=y_train))
 ```
 
 ---
@@ -558,9 +543,9 @@ from easymlops.table.ensemble import Parallel
 
 # 并行训练多个模型
 table.pipe(Parallel([
-    ("lgbm", LGBMClassification(label="Survived")),
-    ("rf", RandomForestClassification(label="Survived")),
-], n_jobs=-1))
+    LGBMClassification(y=y_train, prefix="lgbm", use_faster_predictor=False),
+    RandomForestClassification(y=y_train, prefix="rf"),
+]))
 ```
 
 ## 1.8 因子分解机 (Factorization Machine)
@@ -618,11 +603,11 @@ table.pipe(FMRegression(
 ```python
 from easymlops.table.strategy import HillClimbingStackingRegression
 
-# Hill Climbing + Stacking
+# Hill Climbing（对各候选模型输出做爬山法加权，无 base_models/meta_model 参数）
 table.pipe(HillClimbingStackingRegression(
-    label="target",
-    base_models=[...],
-    meta_model=...
+    y=y_train,
+    eval_function="rmse",
+    n_splits=5
 ))
 ```
 
@@ -632,7 +617,7 @@ table.pipe(HillClimbingStackingRegression(
 from easymlops.table.strategy import AutoResidualRegression, FactorStrategy, VarRuler
 
 # 自动残差回归
-table.pipe(AutoResidualRegression(label="target"))
+table.pipe(AutoResidualRegression(y=y_train))
 
 # 因子策略
 table.pipe(FactorStrategy())
@@ -648,18 +633,13 @@ from easymlops.table.strategy import LGBMRegressionLayers, AutoResidualRegressio
 
 # LGBM回归层（用于深度学习中的自定义层）
 table.pipe(LGBMRegressionLayers(
-    label="target",
-    n_estimators=100,
-    learning_rate=0.1,
-    num_leaves=31,
-    output_name="lgbm_output"
+    y=y_train,
+    pred_name="lgbm_output"
 ))
 
 # 自动残差回归（LGBMRegressionLayers的子类）
 table.pipe(AutoResidualRegression(
-    label="target",
-    base_model=None,
-    n_estimators=100
+    y=y_train
 ))
 ```
 
@@ -669,11 +649,9 @@ table.pipe(AutoResidualRegression(
 from easymlops.table.strategy import FasterLgbSinglePredictor
 
 # 快速LGB单类预测器
-predictor = FasterLgbSinglePredictor(
-    model_path="model.lgb",
-    input_names=["feature1", "feature2"],
-    output_name="prediction"
-)
+import lightgbm as lgb  # 入参为 lgb booster.dump_model() 字典
+booster = lgb.Booster(model_file="model.lgb")
+predictor = FasterLgbSinglePredictor(model=booster.dump_model())
 
 # 预测
 result = predictor.predict(data)
@@ -682,42 +660,19 @@ result = predictor.predict(data)
 ### 爬山法 (Hill Climbing)
 
 ```python
-from easymlops.table.strategy.hill_climbing import Climber, ClimberCV, HillClimbingStackingRegression
+# 0.2.2 中 easymlops.table.strategy.hill_climbing 不导出 Climber/ClimberCV；
+# 直接使用 easymlops.table.strategy.HillClimbingStackingRegression(y=y_train, n_splits=5)
+from easymlops.table.strategy import HillClimbingStackingRegression
 
-# 爬山法基类
-climber = Climber(
-    X=X_train,
-    y=y_train,
-    metric="rmse",
-    n_folds=5,
-    random_state=42
-)
-
-# CV爬山法
-climber_cv = ClimberCV(
-    X=X_train,
-    y=y_train,
-    metric="rmse",
-    n_folds=5,
-    random_state=42
-)
-
-# Hill Climbing Stacking
 hc_stacking = HillClimbingStackingRegression(
-    label="target",
-    n_folds=5,
-    metric="rmse",
-    random_state=42
+    y=y_train,
+    eval_function="rmse",
+    n_splits=5
 )
 ```
 
 ### 工具类
 
 ```python
-from easymlops.table.strategy.hill_climbing.utils import COLORS
-
-# 颜色工具类（用于命令行输出）
-print(COLORS.RED + "错误信息" + COLORS.RESET)
-print(COLORS.GREEN + "成功信息" + COLORS.RESET)
-print(COLORS.YELLOW + "警告信息" + COLORS.RESET)
+# COLORS 等工具类在 0.2.2 中未随 hill_climbing 子模块导出，如需使用请以实际安装版本为准
 ```

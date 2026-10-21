@@ -21,17 +21,15 @@ automl = AutoMLTab(
     load_self_tool=True           # 是否加载自带工具
 )
 
-# 运行AutoML
-automl.run()
+# 运行AutoML（自动迭代建模，受 max_iter/max_time/early_stop_steps 约束）
+automl.fit()
 
-# 预测
-predictions = automl.predict(x_test)
+# 预测（0.2.2 没有 run()/predict()/get_best_model() 方法）
+predictions = automl.transform(x_test)
+single = automl.transform_single(x_test.to_dict("records")[0])
 
-# 获取最佳模型
-best_model = automl.get_best_model()
-
-# 获取评估历史
-eval_history = automl.get_evaluation_history()
+# 保存 / 加载
+automl.save("automl_model.pkl")
 ```
 
 ---
@@ -42,27 +40,16 @@ eval_history = automl.get_evaluation_history()
 from easymlops.automl.llms import OllamaLLM, SparkLLM, ZhiPuLLM, KimiLLM
 
 # Ollama
-ollama = OllamaLLM(
-    model_name="llama2",
-    base_url="http://localhost:11434"
-)
+ollama = OllamaLLM(model="qwen2:1.5b")  # Ollama 服务地址由其自身配置决定
 
 # Spark (讯飞)
-spark = SparkLLM(
-    app_id="xxx",
-    api_key="xxx",
-    api_secret="xxx"
-)
+spark = SparkLLM(api_password="xxx", model="lite")
 
 # 智谱
-zhipu = ZhiPuLLM(
-    api_key="xxx"
-)
+zhipu = ZhiPuLLM(api_password="xxx", model="glm-4-9b")
 
 # Kimi (月之暗面)
-kimi = KimiLLM(
-    api_key="xxx"
-)
+kimi = KimiLLM(api_key="xxx")
 
 # 在AutoML中使用
 automl = AutoMLTab(
@@ -151,20 +138,13 @@ automl = AutoMLTab(
 ### 回调配置
 
 ```python
+# 注意: 0.2.2 的 AutoMLTab 没有 callbacks 参数；
+# 可用参数见 8.1（trn_path/val_path/label/task_type/eval_metric/.../describe_feature_function）
 from easymlops.automl import AutoMLTab
-
-def on_iteration_end(iteration, metrics):
-    print(f"Iteration {iteration}: {metrics}")
-
-def on_error(error):
-    print(f"Error: {error}")
 
 automl = AutoMLTab(
     trn_path="train.csv",
     label="target",
-    callbacks={
-        "on_iteration_end": on_iteration_end,
-        "on_error": on_error
-    }
+    describe_feature_function=lambda df: df.describe()
 )
 ```
