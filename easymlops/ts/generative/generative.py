@@ -3,12 +3,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 from easymlops.ts.core.pipe import PipeBase
+from easymlops.ts.core.torch_base import TorchForecastMixin
 import warnings
 
-warnings.filterwarnings("ignore")
 
-
-class VAERegression(PipeBase):
+class VAERegression(TorchForecastMixin, PipeBase):
     """
     Variational Autoencoder (VAE) 时间序列预测模型
     """
@@ -16,6 +15,7 @@ class VAERegression(PipeBase):
     def __init__(self, output_col="vae_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  hidden_dim=64, latent_dim=16,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -34,6 +34,7 @@ class VAERegression(PipeBase):
         self.forecast_horizon = forecast_horizon
         self.hidden_dim = hidden_dim
         self.latent_dim = latent_dim
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -76,9 +77,24 @@ class VAERegression(PipeBase):
 
         return VAE(self.time_period, self.hidden_dim, self.latent_dim, self.forecast_horizon)
 
+    def _window_tensor(self, seq):
+        # VAE 输入为 (1, L) 扁平窗口
+        return torch.FloatTensor(np.asarray(seq, dtype=np.float32)).unsqueeze(0).to(self.device)
+
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"hidden_dim": self.hidden_dim, "latent_dim": self.latent_dim})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.hidden_dim = params["hidden_dim"]
+        self.latent_dim = params["latent_dim"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -103,7 +119,7 @@ class VAERegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             recon, mu, logvar = self.model(X_tensor)
             recon_loss = nn.MSELoss()(recon, y_tensor)
@@ -112,6 +128,7 @@ class VAERegression(PipeBase):
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -131,18 +148,20 @@ class VAERegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class NormalizingFlowRegression(PipeBase):
+class NormalizingFlowRegression(TorchForecastMixin, PipeBase):
     """
     Normalizing Flows 时间序列预测模型
     """
 
-    def __init__(self, output_col="nf_predict", input_cols=None,
+    def __init__(self, output_col="normalizingflow_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  hidden_dim=64, num_layers=3,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -161,6 +180,7 @@ class NormalizingFlowRegression(PipeBase):
         self.forecast_horizon = forecast_horizon
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -204,9 +224,24 @@ class NormalizingFlowRegression(PipeBase):
 
         return NormalizingFlow(self.time_period, self.hidden_dim, self.num_layers, self.forecast_horizon)
 
+    def _window_tensor(self, seq):
+        # NormalizingFlow 输入为 (1, L) 扁平窗口
+        return torch.FloatTensor(np.asarray(seq, dtype=np.float32)).unsqueeze(0).to(self.device)
+
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"hidden_dim": self.hidden_dim, "num_layers": self.num_layers})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.hidden_dim = params["hidden_dim"]
+        self.num_layers = params["num_layers"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -232,13 +267,14 @@ class NormalizingFlowRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             pred, _ = self.model(X_tensor)
             loss = criterion(pred, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -258,11 +294,12 @@ class NormalizingFlowRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class DiffusionRegression(PipeBase):
+class DiffusionRegression(TorchForecastMixin, PipeBase):
     """
     Diffusion Model 时间序列预测模型
     """
@@ -270,6 +307,7 @@ class DiffusionRegression(PipeBase):
     def __init__(self, output_col="diffusion_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  hidden_dim=64, num_steps=100,
+                 epochs=30,
                  **kwargs):
         """
 
@@ -288,6 +326,7 @@ class DiffusionRegression(PipeBase):
         self.forecast_horizon = forecast_horizon
         self.hidden_dim = hidden_dim
         self.num_steps = num_steps
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.beta_start = 0.0001
@@ -319,9 +358,37 @@ class DiffusionRegression(PipeBase):
 
         return DiffusionModel(self.time_period, self.hidden_dim, self.forecast_horizon)
 
+    def _window_tensor(self, seq):
+        # Diffusion 输入为 (1, L) 扁平窗口
+        return torch.FloatTensor(np.asarray(seq, dtype=np.float32)).unsqueeze(0).to(self.device)
+
+    def _predict_first_step(self, window) -> float:
+        # 采样式预测: 从纯噪声出发逐步去噪(与批量 transform 同口径)
+        self.model.eval()
+        with torch.no_grad():
+            x = self._window_tensor(window)
+            y_sample = torch.randn(1, self.forecast_horizon).to(self.device)
+            for t in reversed(range(self.num_steps)):
+                t_tensor = torch.full((1,), t / self.num_steps).to(self.device)
+                pred = self.model(x, t_tensor)
+                y_sample = y_sample - pred * 0.01
+            pred = y_sample.cpu().numpy()[0]
+        return float(pred[0]) * self.data_std + self.data_mean
+
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"hidden_dim": self.hidden_dim, "num_steps": self.num_steps})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.hidden_dim = params["hidden_dim"]
+        self.num_steps = params["num_steps"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -350,7 +417,7 @@ class DiffusionRegression(PipeBase):
         alphas_cumprod = torch.cumprod(alphas, dim=0)
 
         self.model.train()
-        for epoch in range(30):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             idx = torch.randint(0, self.num_steps, (X_tensor.size(0),)).to(self.device)
             alpha = alphas_cumprod[idx].view(-1, 1)
@@ -362,6 +429,7 @@ class DiffusionRegression(PipeBase):
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -387,5 +455,6 @@ class DiffusionRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s

@@ -3,12 +3,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 from easymlops.ts.core.pipe import PipeBase
+from easymlops.ts.core.torch_base import TorchForecastMixin
 import warnings
 
-warnings.filterwarnings("ignore")
 
-
-class NBeatsRegression(PipeBase):
+class NBeatsRegression(TorchForecastMixin, PipeBase):
     """
     N-BEATS时间序列预测模型
     """
@@ -54,6 +53,19 @@ class NBeatsRegression(PipeBase):
 
         return SimpleNBeats(self.time_period, self.hidden_units, self.forecast_horizon)
 
+    def _window_tensor(self, seq):
+        # NBeats 输入为 (1, L) 二维张量
+        return torch.FloatTensor(np.asarray(seq, dtype=np.float32)).unsqueeze(0).to(self.device)
+
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"hidden_units": self.hidden_units})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.hidden_units = params["hidden_units"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
             numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
@@ -96,6 +108,7 @@ class NBeatsRegression(PipeBase):
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -125,7 +138,7 @@ class NBeatsRegression(PipeBase):
         return s
 
 
-class NHiTSRegression(PipeBase):
+class NHiTSRegression(TorchForecastMixin, PipeBase):
     """
     N-HiTS时间序列预测模型
     """
@@ -171,6 +184,19 @@ class NHiTSRegression(PipeBase):
 
         return SimpleNHiTS(self.time_period, self.hidden_units, self.forecast_horizon)
 
+    def _window_tensor(self, seq):
+        # NHiTS 输入为 (1, L) 二维张量
+        return torch.FloatTensor(np.asarray(seq, dtype=np.float32)).unsqueeze(0).to(self.device)
+
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"hidden_units": self.hidden_units})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.hidden_units = params["hidden_units"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
             numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
@@ -213,6 +239,7 @@ class NHiTSRegression(PipeBase):
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -242,7 +269,7 @@ class NHiTSRegression(PipeBase):
         return s
 
 
-class DeepARRegression(PipeBase):
+class DeepARRegression(TorchForecastMixin, PipeBase):
     """
     DeepAR时间序列预测模型
     """
@@ -284,6 +311,15 @@ class DeepARRegression(PipeBase):
                 return out
 
         return SimpleDeepAR(1, self.hidden_size, self.forecast_horizon)
+
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"hidden_size": self.hidden_size})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.hidden_size = params["hidden_size"]
+        self._dl_set_params(params)
 
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
@@ -327,6 +363,7 @@ class DeepARRegression(PipeBase):
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -351,7 +388,8 @@ class DeepARRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats/NHiTS 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
@@ -412,6 +450,38 @@ class GPRegression(PipeBase):
 
         return self
 
+    def udf_get_params(self) -> dict:
+        # getattr 兜底: 模板模型未 fit 时(如作为 GroupForecast 模板)也可安全序列化
+        return {"output_col": self.output_col, "input_cols": self.input_cols,
+                "time_period": self.time_period, "forecast_horizon": self.forecast_horizon,
+                "length_scale": self.length_scale, "variance": self.variance,
+                "data_mean": getattr(self, "data_mean", 0.0),
+                "data_std": getattr(self, "data_std", 1.0),
+                "X_train": getattr(self, "X_train", None),
+                "y_train": getattr(self, "y_train", None),
+                "K_inv": getattr(self, "K_inv", None)}
+
+    def udf_set_params(self, params: dict):
+        self.output_col = params["output_col"]
+        self.input_cols = params["input_cols"]
+        self.time_period = params["time_period"]
+        self.forecast_horizon = params["forecast_horizon"]
+        self.length_scale = params["length_scale"]
+        self.variance = params["variance"]
+        self.data_mean = params["data_mean"]
+        self.data_std = params["data_std"]
+        self.X_train = params["X_train"]
+        self.y_train = params["y_train"]
+        self.K_inv = params["K_inv"]
+
+    def udf_transform_single(self, s: dict, **kwargs) -> dict:
+        # GP 为非 torch 实现: 输出训练序列末端之后的下一步预测
+        x_next = np.array([[len(self.X_train)]], dtype=np.float64)
+        mu = self._rbf_kernel(x_next, self.X_train, self.length_scale, self.variance) \
+            @ self.K_inv @ self.y_train
+        s[self.output_col] = float(mu[0]) * self.data_std + self.data_mean
+        return s
+
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
         target = s[self.input_cols[0]].values.astype(np.float64)
         target_norm = (target - self.data_mean) / self.data_std
@@ -426,5 +496,6 @@ class GPRegression(PipeBase):
         pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats/NHiTS 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s

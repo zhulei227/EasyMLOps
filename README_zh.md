@@ -450,14 +450,31 @@ NLP Pipeline 用于处理自然语言处理任务。
 
 ### 时序 Pipeline
 
-时序 Pipeline 用于处理时间序列预测任务。
+时序 Pipeline 用于处理时间序列预测任务, 全面支持面板(多实体)数据: 预处理/特征/统计模型均提供 `group_cols`(分组) 与 `time_col`(组内时间排序) 能力, 批量 transform 为纯函数, 单条 `transform_single` 流式演进且口径一致。
 
 #### 核心类 (`easymlops.ts.core`)
 
 | 类名 | 说明 |
 |------|------|
-| **TSPipeLine** | 时序 Pipeline |
+| **TSPipeLine** | 时序 Pipeline(支持 Parallel 并行分支) |
 | **TSPipeObjectBase** | 时序管道基类 |
+| **GroupTSBase** | 分组时序操作基类(组内排序/组键/写回) |
+| **GroupForecast** | 分组预测包装器: 把任意单序列预测模型扩展为每组独立拟合(深度模型面板数据的推荐方案) |
+
+#### 分组预处理与特征 (`easymlops.ts.preprocessing` / `easymlops.ts.features`)
+
+| 类名 | 说明 |
+|------|------|
+| **TSDiff / TSPctChange / TSLogReturn** | 可逆变化量(差分/百分比/对数收益), 组边界 seed 还原 |
+| **TSBoxCox** | Box-Cox/Yeo-Johnson 幂变换(可逆, lambda 随 save/load 持久化) |
+| **TSZScoreScaler / TSMinMaxScaler** | 可逆标准化(全局/分组) |
+| **TSFillNa** | 时序感知缺失填充(ffill/linear/value, 组内不跨组) |
+| **TimeResample / TimeGapsFill** | 重采样与时间网格补齐 |
+| **LagFeature / RollingFeature / EWMAFeature / ExpandingFeature** | 滞后/滚动/指数加权/累积特征 |
+| **SeasonalMean / MovingAverageTrend / FourierFeature / STLDecompose** | 季节项/趋势/傅里叶/STL 分解 |
+| **RollingCorrCov** | 双列滚动相关/协方差 |
+
+> 工具 (`easymlops.ts.utils`): `split_time_series`(防泄漏切分)、`walk_forward_eval`(滚动回测)、`calc_adf/kpss/acf_pacf`(平稳性与自相关)、`calc_mape/smape/mase`、`calc_sample_entropy/calc_hurst`。
 
 #### DNN 模型 (`easymlops.ts.dnn`)
 
@@ -511,6 +528,46 @@ NLP Pipeline 用于处理自然语言处理任务。
 | **VAERegression** | VAE 变分自编码器时间序列预测 |
 | **NormalizingFlowRegression** | Normalizing Flow 时间序列预测 |
 | **DiffusionRegression** | Diffusion 时间序列预测 |
+
+> 预测类模型 fit 后 `save/load` 会持久化拟合结果(统计模型存模型对象, torch 深度模型存 state_dict), load 后无需重新 fit 即可预测; 深度模型面板数据用 `GroupForecast` 包装。
+
+#### 分组面板示例
+
+```python
+from easymlops import TSPipeLine
+from easymlops.ts.statistical import ArimaRegression
+from easymlops.ts.core.group_forecast import GroupForecast
+from easymlops.ts.utils import split_time_series
+
+# 防泄漏切分(组内按时间, 同一实体不跨边界)
+train, test = split_time_series(data, time_col="date", group_cols=["group"], test_size=0.3)
+
+# 分组 ARIMA: 每个实体独立拟合, forecast 延续各自序列
+arima = ArimaRegression(input_cols=["value"], p=1, d=1, q=1,
+                        group_cols=["group"], time_col="date")
+arima.fit(train)
+pred = arima.transform(test)          # 追加 arima_predict 列, 行数守恒
+
+# 分组深度模型: GroupForecast 包装(每组一份独立模型副本)
+from easymlops.ts.transformer.transformer import TFTRegression
+gf = GroupForecast(model=TFTRegression(input_cols=["value"], time_period=30,
+                                       forecast_horizon=7, epochs=5),
+                   group_cols=["group"], time_col="date")
+gf.fit(train)
+out = gf.transform(test)              # 追加 tft_predict 列
+gf.save("gf.pkl")                     # 各组模型权重随参数持久化
+
+# 单条推理(按记录组键分发)
+gf.transform_single(dict(test.iloc[0]))
+```
+
+#### 测试门禁
+
+```bash
+python tests/test_ts_all.py   # 11 个套件全量验收, 任一失败退出码为 1, 可直接接入 CI
+```
+
+端到端示例见 `docs/ts_end2end_demo.ipynb`。
 
 ### YOLO 视觉
 

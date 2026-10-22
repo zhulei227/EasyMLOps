@@ -5,3 +5,6 @@
 *.db
 *.cache
 ./tests/
+build/
+dist/
+easymlops.egg-info/

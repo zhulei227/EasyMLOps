@@ -450,14 +450,31 @@ The NLP Pipeline handles natural language processing tasks.
 
 ### Time Series Pipeline
 
-The Time Series Pipeline handles time series forecasting.
+The Time Series Pipeline handles time series forecasting with full panel (multi-entity) support: preprocessing/features/statistical models all accept `group_cols` (grouping) and `time_col` (in-group time ordering). Batch `transform` is a pure function while single-record `transform_single` evolves streaming state with consistent semantics.
 
 #### Core Classes (`easymlops.ts.core`)
 
 | Class | Description |
 |-------|-------------|
-| **TSPipeLine** | Time series pipeline |
+| **TSPipeLine** | Time series pipeline (supports Parallel branches) |
 | **TSPipeObjectBase** | Base class for TS pipes |
+| **GroupTSBase** | Grouped TS operation base (in-group sorting/group keys/write-back) |
+| **GroupForecast** | Grouped forecasting wrapper: fits an independent model copy per group (recommended for deep models on panel data) |
+
+#### Grouped Preprocessing & Features (`easymlops.ts.preprocessing` / `easymlops.ts.features`)
+
+| Class | Description |
+|-------|-------------|
+| **TSDiff / TSPctChange / TSLogReturn** | Invertible changes (diff / pct-change / log-return) with seed-based group boundary restore |
+| **TSBoxCox** | Box-Cox / Yeo-Johnson power transform (invertible, lambda persisted) |
+| **TSZScoreScaler / TSMinMaxScaler** | Invertible scalers (global / per-group) |
+| **TSFillNa** | Time-aware missing value filling (ffill / linear / value, no cross-group leakage) |
+| **TimeResample / TimeGapsFill** | Resampling and time grid completion |
+| **LagFeature / RollingFeature / EWMAFeature / ExpandingFeature** | Lag / rolling / EWMA / expanding features |
+| **SeasonalMean / MovingAverageTrend / FourierFeature / STLDecompose** | Seasonal / trend / Fourier / STL decomposition |
+| **RollingCorrCov** | Two-column rolling correlation / covariance |
+
+> Utils (`easymlops.ts.utils`): `split_time_series` (leak-free split), `walk_forward_eval` (rolling backtest), `calc_adf/kpss/acf_pacf`, `calc_mape/smape/mase`, `calc_sample_entropy/calc_hurst`.
 
 #### DNN Models (`easymlops.ts.dnn`)
 
@@ -511,6 +528,46 @@ The Time Series Pipeline handles time series forecasting.
 | **VAERegression** | VAE variational autoencoder time series |
 | **NormalizingFlowRegression** | Normalizing Flow time series |
 | **DiffusionRegression** | Diffusion time series forecasting |
+
+> Fitted forecasting models persist their state through `save/load` (statistical models store fitted objects, torch deep models store state_dicts); no re-fit needed after `load`. For panel data with deep models, wrap them in `GroupForecast`.
+
+#### Grouped Panel Example
+
+```python
+from easymlops import TSPipeLine
+from easymlops.ts.statistical import ArimaRegression
+from easymlops.ts.core.group_forecast import GroupForecast
+from easymlops.ts.utils import split_time_series
+
+# Leak-free split (in-group by time, entities never cross the boundary)
+train, test = split_time_series(data, time_col="date", group_cols=["group"], test_size=0.3)
+
+# Grouped ARIMA: an independent model per entity
+arima = ArimaRegression(input_cols=["value"], p=1, d=1, q=1,
+                        group_cols=["group"], time_col="date")
+arima.fit(train)
+pred = arima.transform(test)          # appends arima_predict, row count preserved
+
+# Grouped deep model via GroupForecast
+from easymlops.ts.transformer.transformer import TFTRegression
+gf = GroupForecast(model=TFTRegression(input_cols=["value"], time_period=30,
+                                       forecast_horizon=7, epochs=5),
+                   group_cols=["group"], time_col="date")
+gf.fit(train)
+out = gf.transform(test)              # appends tft_predict
+gf.save("gf.pkl")                     # per-group model weights persisted
+
+# Single-record inference (dispatched by group key)
+gf.transform_single(dict(test.iloc[0]))
+```
+
+#### Test Gate
+
+```bash
+python tests/test_ts_all.py   # 11 suites, non-zero exit on any failure, CI-ready
+```
+
+See `docs/ts_end2end_demo.ipynb` for an end-to-end example.
 
 ### YOLO Vision
 

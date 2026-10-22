@@ -4,9 +4,8 @@ import torch
 import torch.nn as nn
 import math
 from easymlops.ts.core.pipe import PipeBase
+from easymlops.ts.core.torch_base import TorchForecastMixin
 import warnings
-
-warnings.filterwarnings("ignore")
 
 
 class PositionalEncoding(nn.Module):
@@ -24,7 +23,7 @@ class PositionalEncoding(nn.Module):
         return x + self.pe[:, :x.size(1), :]
 
 
-class TFTRegression(PipeBase):
+class TFTRegression(TorchForecastMixin, PipeBase):
     """
     Temporal Fusion Transformer时间序列预测模型
     """
@@ -32,6 +31,7 @@ class TFTRegression(PipeBase):
     def __init__(self, output_col="tft_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  d_model=64, nhead=4, num_layers=2, dropout=0.1,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -54,6 +54,7 @@ class TFTRegression(PipeBase):
         self.nhead = nhead
         self.num_layers = num_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -78,9 +79,23 @@ class TFTRegression(PipeBase):
 
         return TFT(1, self.d_model, self.nhead, self.num_layers, self.forecast_horizon, self.dropout)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "nhead": self.nhead,
+                       "num_layers": self.num_layers, "dropout": self.dropout})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.nhead = params["nhead"]
+        self.num_layers = params["num_layers"]
+        self.dropout = params["dropout"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -106,13 +121,14 @@ class TFTRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -132,11 +148,12 @@ class TFTRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class InformerRegression(PipeBase):
+class InformerRegression(TorchForecastMixin, PipeBase):
     """
     Informer时间序列预测模型
     """
@@ -144,6 +161,7 @@ class InformerRegression(PipeBase):
     def __init__(self, output_col="informer_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  d_model=64, nhead=4, num_layers=2, dropout=0.1,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -166,6 +184,7 @@ class InformerRegression(PipeBase):
         self.nhead = nhead
         self.num_layers = num_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -190,9 +209,23 @@ class InformerRegression(PipeBase):
 
         return Informer(self.d_model, self.nhead, self.num_layers, self.forecast_horizon, self.dropout)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "nhead": self.nhead,
+                       "num_layers": self.num_layers, "dropout": self.dropout})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.nhead = params["nhead"]
+        self.num_layers = params["num_layers"]
+        self.dropout = params["dropout"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -218,13 +251,14 @@ class InformerRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -244,11 +278,12 @@ class InformerRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class AutoformerRegression(PipeBase):
+class AutoformerRegression(TorchForecastMixin, PipeBase):
     """
     Autoformer时间序列预测模型
     """
@@ -256,6 +291,7 @@ class AutoformerRegression(PipeBase):
     def __init__(self, output_col="autoformer_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  d_model=64, nhead=4, num_layers=2, dropout=0.1,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -278,6 +314,7 @@ class AutoformerRegression(PipeBase):
         self.nhead = nhead
         self.num_layers = num_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -305,9 +342,23 @@ class AutoformerRegression(PipeBase):
 
         return Autoformer(self.d_model, self.nhead, self.num_layers, self.forecast_horizon, self.dropout)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "nhead": self.nhead,
+                       "num_layers": self.num_layers, "dropout": self.dropout})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.nhead = params["nhead"]
+        self.num_layers = params["num_layers"]
+        self.dropout = params["dropout"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -333,13 +384,14 @@ class AutoformerRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -359,11 +411,12 @@ class AutoformerRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class FEDformerRegression(PipeBase):
+class FEDformerRegression(TorchForecastMixin, PipeBase):
     """
     FEDformer时间序列预测模型
     """
@@ -372,6 +425,7 @@ class FEDformerRegression(PipeBase):
                  time_period=30, forecast_horizon=7,
                  d_model=64, nhead=4, num_layers=2, dropout=0.1,
                  mode_select="random", mode_len=3,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -396,6 +450,7 @@ class FEDformerRegression(PipeBase):
         self.nhead = nhead
         self.num_layers = num_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.mode_select = mode_select
         self.mode_len = mode_len
         self.model = None
@@ -422,9 +477,26 @@ class FEDformerRegression(PipeBase):
 
         return FEDformer(self.d_model, self.nhead, self.num_layers, self.forecast_horizon, self.dropout)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "nhead": self.nhead,
+                       "num_layers": self.num_layers, "dropout": self.dropout,
+                       "mode_select": self.mode_select, "mode_len": self.mode_len})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.nhead = params["nhead"]
+        self.num_layers = params["num_layers"]
+        self.dropout = params["dropout"]
+        self.mode_select = params["mode_select"]
+        self.mode_len = params["mode_len"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -450,13 +522,14 @@ class FEDformerRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -476,11 +549,12 @@ class FEDformerRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class PatchTSTRegression(PipeBase):
+class PatchTSTRegression(TorchForecastMixin, PipeBase):
     """
     PatchTST时间序列预测模型
     """
@@ -489,6 +563,7 @@ class PatchTSTRegression(PipeBase):
                  time_period=30, forecast_horizon=7,
                  d_model=128, nhead=4, num_layers=3, dropout=0.1,
                  patch_len=16, stride=8,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -513,6 +588,7 @@ class PatchTSTRegression(PipeBase):
         self.nhead = nhead
         self.num_layers = num_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.patch_len = patch_len
         self.stride = stride
         self.model = None
@@ -533,8 +609,8 @@ class PatchTSTRegression(PipeBase):
                 self.fc = nn.Linear(d_model, forecast_horizon)
 
             def forward(self, x):
-                B, L, _ = x.shape
-                x = x.unfold(1, self.patch_len, self.stride).transpose(1, 2)
+                # x: (B, L, 1) -> (B, n_patches, patch_len) -> (B, n_patches, d_model)
+                x = x.squeeze(-1).unfold(1, self.patch_len, self.stride)
                 x = self.patch_projection(x)
                 x = self.pos_encoder(x)
                 x = self.transformer_encoder(x)
@@ -545,9 +621,26 @@ class PatchTSTRegression(PipeBase):
         return PatchTST(self.patch_len, self.stride, self.d_model, self.nhead,
                        self.num_layers, self.forecast_horizon, self.dropout)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "nhead": self.nhead,
+                       "num_layers": self.num_layers, "dropout": self.dropout,
+                       "patch_len": self.patch_len, "stride": self.stride})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.nhead = params["nhead"]
+        self.num_layers = params["num_layers"]
+        self.dropout = params["dropout"]
+        self.patch_len = params["patch_len"]
+        self.stride = params["stride"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -555,7 +648,8 @@ class PatchTSTRegression(PipeBase):
         self.data_std = np.std(target) + 1e-8
         target_norm = (target - self.data_mean) / self.data_std
 
-        self.time_period = min(128, len(target_norm) - self.forecast_horizon)
+        self.time_period = max(min(self.time_period, len(target_norm) - self.forecast_horizon),
+                               self.patch_len)
 
         X, y = [], []
         for i in range(len(target_norm) - self.time_period - self.forecast_horizon):
@@ -573,13 +667,14 @@ class PatchTSTRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -599,11 +694,12 @@ class PatchTSTRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class TimesNetRegression(PipeBase):
+class TimesNetRegression(TorchForecastMixin, PipeBase):
     """
     TimesNet时间序列预测模型
     """
@@ -611,6 +707,7 @@ class TimesNetRegression(PipeBase):
     def __init__(self, output_col="timesnet_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  d_model=64, d_ff=128, num_kernels=3, num_layers=2, dropout=0.1,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -635,6 +732,7 @@ class TimesNetRegression(PipeBase):
         self.num_kernels = num_kernels
         self.num_layers = num_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -644,7 +742,11 @@ class TimesNetRegression(PipeBase):
                 super().__init__()
                 self.input_projection = nn.Linear(1, d_model)
                 self.conv_layers = nn.ModuleList([
-                    nn.Conv1d(d_model, d_ff, kernel_size=3, padding=1)
+                    nn.Sequential(
+                        nn.Conv1d(d_model, d_ff, kernel_size=3, padding=1),
+                        nn.ReLU(),
+                        nn.Conv1d(d_ff, d_model, kernel_size=1),
+                    )
                     for _ in range(num_kernels)
                 ])
                 self.layers = nn.ModuleList([
@@ -669,9 +771,25 @@ class TimesNetRegression(PipeBase):
         return TimesNet(self.d_model, self.d_ff, self.num_kernels, self.num_layers,
                        self.forecast_horizon, self.dropout)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "d_ff": self.d_ff,
+                       "num_kernels": self.num_kernels, "num_layers": self.num_layers,
+                       "dropout": self.dropout})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.d_ff = params["d_ff"]
+        self.num_kernels = params["num_kernels"]
+        self.num_layers = params["num_layers"]
+        self.dropout = params["dropout"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -697,13 +815,14 @@ class TimesNetRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -723,11 +842,12 @@ class TimesNetRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class iTransformerRegression(PipeBase):
+class iTransformerRegression(TorchForecastMixin, PipeBase):
     """
     iTransformer时间序列预测模型
     """
@@ -735,6 +855,7 @@ class iTransformerRegression(PipeBase):
     def __init__(self, output_col="itransformer_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  d_model=64, nhead=4, num_layers=2, dropout=0.1,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -757,12 +878,13 @@ class iTransformerRegression(PipeBase):
         self.nhead = nhead
         self.num_layers = num_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def _build_model(self):
         class iTransformer(nn.Module):
-            def __init__(self, d_model, nhead, num_layers, forecast_horizon, dropout):
+            def __init__(self, time_period, d_model, nhead, num_layers, forecast_horizon, dropout):
                 super().__init__()
                 self.input_projection = nn.Linear(time_period, d_model)
                 self.pos_encoder = PositionalEncoding(d_model)
@@ -780,11 +902,26 @@ class iTransformerRegression(PipeBase):
                 out = self.fc(x)
                 return out
 
-        return iTransformer(self.d_model, self.nhead, self.num_layers, self.forecast_horizon, self.dropout)
+        return iTransformer(self.time_period, self.d_model, self.nhead, self.num_layers,
+                            self.forecast_horizon, self.dropout)
+
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "nhead": self.nhead,
+                       "num_layers": self.num_layers, "dropout": self.dropout})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.nhead = params["nhead"]
+        self.num_layers = params["num_layers"]
+        self.dropout = params["dropout"]
+        self._dl_set_params(params)
 
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -810,13 +947,14 @@ class iTransformerRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -836,5 +974,6 @@ class iTransformerRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s

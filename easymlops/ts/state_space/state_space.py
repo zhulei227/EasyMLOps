@@ -3,12 +3,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 from easymlops.ts.core.pipe import PipeBase
+from easymlops.ts.core.torch_base import TorchForecastMixin
 import warnings
 
-warnings.filterwarnings("ignore")
 
-
-class DeepStateRegression(PipeBase):
+class DeepStateRegression(TorchForecastMixin, PipeBase):
     """
     Deep State时间序列预测模型 (状态空间模型)
     """
@@ -16,6 +15,7 @@ class DeepStateRegression(PipeBase):
     def __init__(self, output_col="deepstate_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  hidden_size=64, num_layers=2, latent_dim=16,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -36,6 +36,7 @@ class DeepStateRegression(PipeBase):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.latent_dim = latent_dim
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -59,9 +60,22 @@ class DeepStateRegression(PipeBase):
 
         return DeepState(1, self.hidden_size, self.num_layers, self.latent_dim, self.forecast_horizon)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"hidden_size": self.hidden_size, "num_layers": self.num_layers,
+                       "latent_dim": self.latent_dim})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.hidden_size = params["hidden_size"]
+        self.num_layers = params["num_layers"]
+        self.latent_dim = params["latent_dim"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -87,13 +101,14 @@ class DeepStateRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -113,11 +128,12 @@ class DeepStateRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class MambaRegression(PipeBase):
+class MambaRegression(TorchForecastMixin, PipeBase):
     """
     Mamba时间序列预测模型 (状态空间模型)
     """
@@ -125,6 +141,7 @@ class MambaRegression(PipeBase):
     def __init__(self, output_col="mamba_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  d_model=64, d_state=16, d_conv=4, expand=2,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -147,6 +164,7 @@ class MambaRegression(PipeBase):
         self.d_state = d_state
         self.d_conv = d_conv
         self.expand = expand
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -167,7 +185,7 @@ class MambaRegression(PipeBase):
             def forward(self, x):
                 xz = self.in_proj(x)
                 x_inner, z = xz.chunk(2, dim=-1)
-                x_conv = self.conv1d(x_inner.transpose(1, 2))[:, :, :-1].transpose(1, 2)
+                x_conv = self.conv1d(x_inner.transpose(1, 2))[:, :, :x_inner.size(1)].transpose(1, 2)
                 x_ssm = torch.nn.functional.silu(x_conv + x_inner)
                 y = self.out_proj(x_ssm * torch.nn.functional.silu(z))
                 return y
@@ -188,9 +206,23 @@ class MambaRegression(PipeBase):
 
         return MambaModel(self.d_model, self.d_state, self.d_conv, self.expand, self.forecast_horizon)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "d_state": self.d_state,
+                       "d_conv": self.d_conv, "expand": self.expand})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.d_state = params["d_state"]
+        self.d_conv = params["d_conv"]
+        self.expand = params["expand"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -216,13 +248,14 @@ class MambaRegression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -242,11 +275,12 @@ class MambaRegression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s
 
 
-class LiquidS4Regression(PipeBase):
+class LiquidS4Regression(TorchForecastMixin, PipeBase):
     """
     Liquid S4时间序列预测模型 (状态空间模型)
     """
@@ -254,6 +288,7 @@ class LiquidS4Regression(PipeBase):
     def __init__(self, output_col="liquids4_predict", input_cols=None,
                  time_period=30, forecast_horizon=7,
                  d_model=64, n_layers=2, dropout=0.1,
+                 epochs=50,
                  **kwargs):
         """
 
@@ -274,6 +309,7 @@ class LiquidS4Regression(PipeBase):
         self.d_model = d_model
         self.n_layers = n_layers
         self.dropout = dropout
+        self.epochs = epochs
         self.model = None
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -282,25 +318,24 @@ class LiquidS4Regression(PipeBase):
             def __init__(self, d_model, dropout=0.1):
                 super().__init__()
                 self.d_model = d_model
-                self.input_proj = nn.Linear(1, d_model)
                 self.state_proj = nn.Linear(d_model, d_model)
                 self.output_proj = nn.Linear(d_model, d_model)
                 self.dropout = nn.Dropout(dropout)
 
             def forward(self, x):
-                x = self.input_proj(x)
                 h = torch.tanh(self.state_proj(x))
                 h = self.dropout(h)
-                out = self.output_proj(h)
-                return out
+                return self.output_proj(h) + x
 
         class LiquidS4Model(nn.Module):
             def __init__(self, d_model, n_layers, forecast_horizon, dropout=0.1):
                 super().__init__()
+                self.input_proj = nn.Linear(1, d_model)
                 self.layers = nn.ModuleList([LiquidS4Layer(d_model, dropout) for _ in range(n_layers)])
                 self.fc = nn.Linear(d_model, forecast_horizon)
 
             def forward(self, x):
+                x = self.input_proj(x)
                 for layer in self.layers:
                     x = layer(x)
                 out = self.fc(x[:, -1, :])
@@ -308,9 +343,22 @@ class LiquidS4Regression(PipeBase):
 
         return LiquidS4Model(self.d_model, self.n_layers, self.forecast_horizon, self.dropout)
 
+    def udf_get_params(self) -> dict:
+        params = self._dl_get_params()
+        params.update({"d_model": self.d_model, "n_layers": self.n_layers,
+                       "dropout": self.dropout})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.d_model = params["d_model"]
+        self.n_layers = params["n_layers"]
+        self.dropout = params["dropout"]
+        self._dl_set_params(params)
+
     def udf_fit(self, s: pd.DataFrame, **kwargs):
         if self.input_cols is None or len(self.input_cols) == 0:
-            self.input_cols = [s.columns[0]]
+            numeric_cols = s.select_dtypes(include=[np.number]).columns.tolist()
+            self.input_cols = numeric_cols[:1] if numeric_cols else [s.columns[0]]
 
         target = s[self.input_cols[0]].values.astype(np.float32)
 
@@ -336,13 +384,14 @@ class LiquidS4Regression(PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
-        for epoch in range(50):
+        for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
 
+        self._after_fit_(target_norm)
         return self
 
     def udf_transform(self, s: pd.DataFrame, **kwargs) -> pd.DataFrame:
@@ -362,5 +411,6 @@ class LiquidS4Regression(PipeBase):
             pred = pred * self.data_std + self.data_mean
 
         s = s.copy()
-        s[self.output_col] = pred[:len(s)]
+        # 与 NBeats 同约定: 输出 horizon 首步预测, 标量广播保持行数守恒
+        s[self.output_col] = pred[0] if len(pred) > 0 else 0
         return s

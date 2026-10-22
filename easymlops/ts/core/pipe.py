@@ -358,10 +358,13 @@ class PipeBase(PipeObjectBase):
                     break
         return flag
 
+    # 同一类对只告警一次, 避免每次 fit/save 重复刷屏(键继承导致的良性重合)
+    _param_conflict_warned = set()
+
     @staticmethod
     def check_key_conflict(param1: dict_type, param2: dict_type, class1, class2):
         """
-        检测param1和param2中的key是否有冲突
+        检测param1和param2中的key是否有冲突(同类对仅首次告警)
 
         :param param1:
         :param param2:
@@ -371,6 +374,10 @@ class PipeBase(PipeObjectBase):
         """
         same_param_names = list(set(param1.keys()) & set(param2.keys()))
         if len(same_param_names) > 0:
+            pair = (str(class1), str(class2))
+            if pair in PipeBase._param_conflict_warned:
+                return
+            PipeBase._param_conflict_warned.add(pair)
             print("the {} and {} use same parameter names \033[1;43m[{}]\033[0m,please check if conflict,".format
                   (class1, class2, same_param_names))
 
