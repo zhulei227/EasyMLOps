@@ -30,8 +30,8 @@ python setup.py sdist bdist_wheel
 # ② 基于远程 main 建发布工作树
 git fetch github main
 git worktree add -b release-0.2.5 "$env:TEMP/easymlops_release" github/main
-# ③ 同步内容（/XF .git 保护工作树链接文件；排除构建产物）
-robocopy . "$env:TEMP/easymlops_release" /MIR /XD build dist easymlops.egg-info .codebuddy /XF .git *.pyc
+# ③ 同步内容（/XF .git 保护工作树链接文件；dist/ 随 git 树发布，仅排除 build/egg-info）
+robocopy . "$env:TEMP/easymlops_release" /MIR /XD build easymlops.egg-info .codebuddy /XF .git *.pyc
 # ④ 提交并推送（快进）
 Set-Location "$env:TEMP/easymlops_release"; git add -A; git commit -m "release: v0.2.5"
 git push github release-0.2.5:main

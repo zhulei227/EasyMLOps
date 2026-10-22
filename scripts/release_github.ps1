@@ -42,9 +42,9 @@ git branch -D "release-$Version" 2>$null | Out-Null
 git worktree add -b "release-$Version" $wt github/main
 if (-not (Test-Path (Join-Path $wt ".git"))) { throw "worktree .git link missing" }
 
-# ---- 3. 同步项目内容(排除构建产物/本地杂项; /XF .git 保护工作树链接) ----
+# ---- 3. 同步项目内容(dist/ 随 git 树发布; 排除本地杂项; /XF .git 保护工作树链接) ----
 robocopy $projectDir $wt /MIR `
-    /XD .git build dist easymlops.egg-info .codebuddy .idea __pycache__ .pytest_cache `
+    /XD .git build easymlops.egg-info .codebuddy .idea __pycache__ .pytest_cache `
     /XF .git "*.pyc" /NFL /NDL /NJH | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "robocopy failed with code $LASTEXITCODE" }
 if (-not (Test-Path (Join-Path $wt ".git"))) { throw "robocopy deleted .git link" }
