@@ -1,218 +1,140 @@
 # 时序任务 (TSPipeLine)
 
-```python
-from easymlops import TSPipeLine
-from easymlops.ts.dnn import TSCNNRegression  # 需要 torch
+> 以下内容已对照 easymlops 0.2.4 实测校正（分组面板、持久化、单条推理均验证通过）。
 
-ts = TSPipeLine()
+## 分组面板能力（0.2.4 核心增强）
 
-# 时序CNN回归（torch 依赖，签名未在本环境验证）
-ts.pipe(TSCNNRegression(label="target", seq_len=30))
+时序模块全面支持面板（多实体）数据：预处理/特征/统计模型均提供 `group_cols`（分组，低基数维度如渠道/省市）与 `time_col`（组内时间排序）参数。
 
-# 训练
-ts.fit(x_train, y=y_train)
+- 批量 `transform` 是**纯函数**（不推进缓存）；单条 `transform_single` 流式演进，两者语义一致（预测类模型除外，见下）
+- 组内计算不跨组（fillna/lag/rolling 均按组隔离）；未见新组自动 warmup 或回退
+- `sort_rows=False`（默认）保持原行序与 index，行数守恒，兼容 auto_test
 
-# 预测
-predictions = ts.transform(x_test)
-```
+### 分组预处理与特征
 
-## 时序数据处理
+| 类 | 说明 |
+|----|------|
+| `TSDiff` / `TSPctChange` / `TSLogReturn` | 可逆变化量（差分/百分比/对数收益），组边界用 fit 时保存的 seed 还原 |
+| `TSBoxCox` | Box-Cox/Yeo-Johnson 幂变换（可逆；lambda 自动估计并裁剪至 [-2,2]，随 save/load 持久化） |
+| `TSZScoreScaler` / `TSMinMaxScaler` | 可逆标准化（`per_group=True` 时按组学统计量） |
+| `TSFillNa` | 时序填充（ffill/linear/value，组内不跨组） |
+| `FixTimeInput` / `TimeResample` / `TimeGapsFill` | 时间解析/重采样/网格补齐（后两者会改变行数，勿纳入 auto_test） |
+| `LagFeature` / `RollingFeature` / `EWMAFeature` / `ExpandingFeature` | 滞后/滚动/指数加权/累积特征（组内因果） |
+| `SeasonalMean` / `MovingAverageTrend` / `FourierFeature` / `STLDecompose` | 季节项/趋势/傅里叶/STL 分解 |
+| `RollingCorrCov` | 双列滚动相关/协方差 |
 
-TSPipeLine 继承自 TablePipeLine，因此也可以使用表格数据的预处理方法：
+### 工具 (`easymlops.ts.utils`)
 
-```python
-from easymlops.table.preprocessing import *
-
-# 使用表格预处理
-ts.pipe(FixInput())
-ts.pipe(FillNa(fill_mode="mean"))
-ts.pipe(MinMaxScaler(cols=[...]))
-```
-
-## 回调函数
+`split_time_series`（防泄漏切分）、`walk_forward_eval`（滚动回测）、`calc_adf/kpss/acf_pacf`（平稳性）、`calc_mape/smape/mase`（评估）、`calc_sample_entropy/calc_hurst`（复杂度/持续性）。
 
 ```python
-from easymlops.ts.core.callback import *
+from easymlops.ts.utils import split_time_series
 
-# 形状检查
-check_shape(ts_pipe, batch_transform, single_transform)
-
-# 列检查
-check_columns(ts_pipe, batch_transform, single_transform)
-
-# 数据类型检查
-check_data_type(ts_pipe, batch_transform, single_transform)
-
-# 数据一致性检查
-check_data_same(ts_pipe, batch_transform, single_transform)
+# 防泄漏切分: 组内按时间切, 同一实体不跨 train/test 边界
+train, test = split_time_series(data, time_col="date", group_cols=["group"], test_size=0.3)
 ```
 
-## 时间序列模型
-
-easymlops.ts 模块实现了多种时间序列预测模型。
-
-### 统计模型 (`easymlops.ts.statistical`)
+## 统计模型 (`easymlops.ts.statistical`)
 
 | 类名 | 说明 |
 |------|------|
-| **ArimaRegression** | ARIMA 时间序列预测 |
-| **SarimaRegression** | SARIMA 季节性时间序列预测 |
-| **ArimaxRegression** | ARIMAX 带外生变量的时间序列预测 |
+| **ArimaRegression** | ARIMA（真实签名: `output_col, input_cols, p, d, q, seasonal_*, seasonal_period, exog_cols, group_cols, time_col`） |
+| **SarimaRegression** | SARIMA 季节性（seasonal_* 默认开启, 默认周期 12） |
+| **ArimaxRegression** | ARIMAX 带外生变量 |
 | **SarimaxRegression** | SARIMAX 带外生变量的季节性预测 |
-| **GarchRegression** | GARCH 波动率模型 |
+| **GarchRegression** | GARCH 波动率（依赖 arch, 0.2.4 起已声明） |
 
-### 深度学习模型 (`easymlops.ts.deep_learning`)
-
-| 类名 | 说明 |
-|------|------|
-| **NBeatsRegression** | N-BEATS 时间序列预测 |
-| **NHiTSRegression** | N-HiTS 时间序列预测 |
-| **DeepARRegression** | DeepAR 时间序列预测 |
-| **GPRegression** | 高斯过程时间序列预测 |
-
-### Transformer模型 (`easymlops.ts.transformer`)
-
-| 类名 | 说明 |
-|------|------|
-| **TFTRegression** | Temporal Fusion Transformer |
-| **InformerRegression** | Informer 时间序列预测 |
-| **AutoformerRegression** | Autoformer 时间序列预测 |
-| **FEDformerRegression** | FEDformer 时间序列预测 |
-| **PatchTSTRegression** | PatchTST 时间序列预测 |
-| **TimesNetRegression** | TimesNet 时间序列预测 |
-| **iTransformerRegression** | iTransformer 时间序列预测 |
-
-### 状态空间模型 (`easymlops.ts.state_space`)
-
-| 类名 | 说明 |
-|------|------|
-| **DeepStateRegression** | Deep State 时间序列预测 |
-| **MambaRegression** | Mamba 状态空间时间序列预测 |
-| **LiquidS4Regression** | Liquid S4 状态空间时间序列预测 |
-
-### 生成模型 (`easymlops.ts.generative`)
-
-| 类名 | 说明 |
-|------|------|
-| **VAERegression** | VAE 变分自编码器时间序列预测 |
-| **NormalizingFlowRegression** | Normalizing Flow 时间序列预测 |
-| **DiffusionRegression** | Diffusion 时间序列预测 |
-
-### 核心基类
-
-所有时间序列模型继承自以下基类：
-
-- **PipeBase** (`easymlops.ts.core.pipe`) - 管道基类，提供 save/load 功能
-
-## 使用示例
-
-### 统计模型
+0.2.4 起全部迁移到分组框架：提供 `group_cols` 时**每个实体独立拟合一个模型**，forecast 延续各自序列；`transform_single` 为该组 forecast 1 步。
 
 ```python
-from easymlops.ts.statistical.arima import ArimaRegression
+from easymlops.ts.statistical import ArimaRegression
+from easymlops.ts.utils import split_time_series
 
-# 准备数据
-df = pd.DataFrame({
-    'value': np.cumsum(np.random.randn(200)) + 100
-})
+train, test = split_time_series(data, time_col="date", group_cols=["group"], test_size=0.3)
 
-# 创建并训练模型（真实签名: input_cols, p, d, q, seasonal_*, exog_cols）
-pipe = ArimaRegression(input_cols=["value"], p=2, d=1, q=2)
-pipe.fit(df)
+# 分组 ARIMA: 面板数据每组独立建模
+pipe = ArimaRegression(input_cols=["value"], p=1, d=1, q=1,
+                       group_cols=["group"], time_col="date")
+pipe.fit(train)
+result = pipe.transform(test)      # 追加 arima_predict 列, 行数守恒
 
-# 预测（forecast 步数 = transform 输入行数，结果追加到 output_col 列）
-result = pipe.transform(df)
+# 持久化: 模型对象随 save/load 持久化, load 后无需重新 fit(0.2.4 起)
+pipe.save("arima.pkl")
+loaded = ArimaRegression(input_cols=["value"], p=1, d=1, q=1,
+                         group_cols=["group"], time_col="date")
+loaded.load("arima.pkl")
 
-# 保存和加载模型（注意: TS 基类 save/load 只存参数不含拟合结果，
-# 加载后 results=None 无法预测；持久化请用 pickle 整体序列化对象）
-import pickle
-with open("arima_model.pkl", "wb") as f:
-    pickle.dump(pipe, f)
+# 单条推理: 该组 forecast 1 步
+pipe.transform_single(dict(test.iloc[0]))["arima_predict"]
 ```
 
-### 深度学习模型
+## 深度学习模型（torch，0.2.4 已实测签名/持久化/单条推理）
+
+| 模块 | 类 |
+|------|----|
+| `easymlops.ts.deep_learning` | **NBeatsRegression / NHiTSRegression / DeepARRegression / GPRegression** |
+| `easymlops.ts.transformer` | **TFTRegression / InformerRegression / AutoformerRegression / FEDformerRegression / PatchTSTRegression / TimesNetRegression / iTransformerRegression** |
+| `easymlops.ts.state_space` | **DeepStateRegression / MambaRegression / LiquidS4Regression** |
+| `easymlops.ts.generative` | **VAERegression / NormalizingFlowRegression / DiffusionRegression** |
 
 ```python
 from easymlops.ts.deep_learning.nbeats import NBeatsRegression
 
-# 准备数据
-df = pd.DataFrame({
-    'value': np.cumsum(np.random.randn(200)) + 100
-})
-
-# 创建并训练模型（依赖 torch，签名未在本环境验证，参数以 inspect.signature 为准）
-pipe = NBeatsRegression(
-    input_cols=["value"],
-    epochs=5
-)
+pipe = NBeatsRegression(input_cols=["value"], time_period=30,
+                        forecast_horizon=7, epochs=5)   # epochs 控制训练轮数
 pipe.fit(df)
-
-# 预测
-result = pipe.transform(df)
-
-# 保存和加载模型（同上: 建议用 pickle 整体序列化）
+result = pipe.transform(df)        # 追加 nbeats_predict 列（首步预测, 标量广播, 行数守恒）
+pipe.save("nbeats.pkl")            # state_dict 随 save/load 持久化
+pipe.transform_single(dict(df.iloc[-1]))["nbeats_predict"]
 ```
 
-### 带外生变量的模型
+要点：
+- 批量 `transform` 是多步 forecast（取输入序列末窗），与逐条 `transform_single`（以 fit 序列为历史起点推进窗口）语义不同；预测类 pipe 不纳入 auto_test
+- VAE/Diffusion 的 transform 含随机采样，复现需固定 `torch.manual_seed`
+
+## GroupForecast：深度模型的面板分组
+
+深度模型自身不支持 `group_cols`；面板数据用 `GroupForecast` 包装（每组 deepcopy 一份模板模型独立拟合），支持 save/load 与单条推理：
 
 ```python
-from easymlops.ts.statistical.arima import ArimaxRegression
+from easymlops.ts.core.group_forecast import GroupForecast
+from easymlops.ts.transformer.transformer import TFTRegression
 
-# 准备数据
-df = pd.DataFrame({
-    'value': np.cumsum(np.random.randn(200)) + 100,
-    'feature1': np.random.randn(200) * 10,
-    'feature2': np.random.randn(200) * 5
-})
-
-# 创建并训练模型 (使用外生变量)
-pipe = ArimaxRegression(
-    input_cols=["value"],
-    exog_cols=["feature1", "feature2"],
-    p=1, d=1, q=1
-)
-pipe.fit(df)
-
-# 预测
-result = pipe.transform(df)
+gf = GroupForecast(model=TFTRegression(input_cols=["value"], time_period=30,
+                                       forecast_horizon=7, epochs=5),
+                   group_cols=["group"], time_col="date")
+gf.fit(train)
+out = gf.transform(test)           # 追加 tft_predict 列
+gf.save("gf.pkl")                  # 各组模型权重全部持久化
 ```
 
-## 测试脚本
+## 回调检查
 
-测试脚本位于 `tests/` 目录：
+```python
+from easymlops.ts.core.callback import check_shape, check_columns, check_data_type
+# 注意: 预测类 pipe 的批量(多步 forecast)与单条(1 步)语义不同, 不适用数值一致性检查
+```
 
-| 测试文件 | 说明 |
-|----------|------|
-| `test_ts_statistical.py` | 统计模型测试 |
-| `test_ts_deep_learning.py` | 深度学习模型测试 |
-| `test_ts_transformer.py` | Transformer模型测试 |
-| `test_ts_state_space.py` | 状态空间模型测试 |
-| `test_ts_generative.py` | 生成模型测试 |
-| `test_ts_all.py` | 所有模型汇总测试 |
-
-## 测试运行
+## 测试
 
 ```bash
-# 运行统计模型测试
-python tests/test_ts_statistical.py
-
-# 运行所有测试
-python tests/test_ts_all.py
+python tests/test_ts_all.py    # 门禁: 11 个套件全量验收, 任一失败退出码为 1
 ```
+
+| 套件 | 覆盖 |
+|------|------|
+| `test_ts_ops.py` (P0) | 基础特征/可逆变换/分组边界 |
+| `test_ts_ops_p1.py` (P1) | 重采样/扩展特征/平稳性/Parallel 分支 |
+| `test_ts_ops_p2.py` (P2) | 变化量/幂变换/二阶滚动/STL/熵 |
+| `test_ts_ops_p3.py` (P3) | 统计模型分组迁移对拍 statsmodels |
+| `test_ts_ops_p4.py` (P4) | 深度模型权重持久化/单条推理/input_cols 解析 |
+| `test_ts_ops_p5.py` (P5) | GroupForecast 分组预测包装器 |
+| `test_ts_statistical/deep_learning/transformer/state_space/generative.py` | 各模型套件 |
 
 ## 环境依赖
 
 | 模型类别 | 依赖 |
 |----------|------|
-| 统计模型 | pandas, numpy, statsmodels |
-| 深度学习模型 | pandas, numpy, torch, statsmodels |
-| Transformer模型 | pandas, numpy, torch, statsmodels |
-| 状态空间模型 | pandas, numpy, torch, statsmodels |
-| 生成模型 | pandas, numpy, torch, statsmodels |
-
-## 注意事项
-
-1. 统计模型测试可以直接运行
-2. 深度学习/Transformer等模型需要正确的 PyTorch 环境
-3. GARCH 模型需要 numba 依赖
-4. 所有模型都支持 save/load 功能进行模型持久化
+| 预处理/特征 | pandas, numpy（已随包声明） |
+| 统计模型 | statsmodels（已声明）, GARCH 另需 arch（已声明） |
+| 深度/Transformer/状态空间/生成模型 | torch（可选依赖, 需自行安装） |

@@ -7,9 +7,10 @@
 ## ① 数据与口径 checklist
 
 - [ ] 序列粒度：月/周/日；长度建议 >= 2 个完整季节周期
-- [ ] 预测步数 = transform 输入的行数（0.2.2 语义），滚动多步预测需自写循环
+- [ ] 预测步数 = transform 输入的行数（0.2.4 语义），滚动多步预测需自写循环或用 `walk_forward_eval`
+- [ ] 多实体面板数据：统计模型直接传 `group_cols/time_col`；深度模型用 `GroupForecast` 包装
 - [ ] 外生变量（如假期、利率）用 `ArimaxRegression(exog_cols=...)`
-- [ ] 评估：留出最后 H 期做 holdout，MAE/MAPE 自算
+- [ ] 评估：留出最后 H 期做 holdout，或用 `easymlops.ts.utils.walk_forward_eval` 滚动回测
 
 ## ② Pipeline 模板（实测 API）
 
@@ -26,13 +27,14 @@ ax = ArimaxRegression(input_cols=["loss_ratio"], exog_cols=["holiday", "rate"],
 ax.fit(df)
 ```
 
-- **滚动预测**（walk-forward）：外补自写循环——每次用历史 fit、预测 1 步、滚动推进
-- **持久化**：TS 基类 save/load 只存参数不含拟合结果，用 pickle 整体序列化
+- **滚动预测**（walk-forward）：优先用 `easymlops.ts.utils.walk_forward_eval`（组内展开、防泄漏）
+- **多序列面板**：`ArimaRegression(group_cols=["region"], time_col="date")` 每地区独立建模；深度模型用 `GroupForecast` 包装
+- **持久化**：0.2.4 起拟合结果随 save/load 持久化（统计模型存模型对象，深度模型存 state_dict），load 后无需重新 fit
 
 ## ③ 迭代路径
 
 1. 朴素基线（上期值/同期值）→ 2. ARIMA 定阶（p,d,q 网格）→ 3. 季节项 seasonal_*
-4. 外生变量 Arimax → 5. 多序列分型号/分地区建模 → 6. 滚动回测
+4. 外生变量 Arimax → 5. 多序列分型号/分地区建模（group_cols 或 GroupForecast）→ 6. 滚动回测（walk_forward_eval）
 
 ## ④ 股价/收益率预测：定位与限制（重要）
 
@@ -45,4 +47,4 @@ ax.fit(df)
 
 ## ⑤ 工具缺口
 
-walk-forward 回测、Prophet/深度时序对比（ts 深度模型需 torch 且未验证）、多序列面板建模——外补。
+Prophet 对比（外补）；深度时序模型（NBeats/TFT/Mamba 等）0.2.4 已实测可用（需 torch），分组面板用 `GroupForecast`。

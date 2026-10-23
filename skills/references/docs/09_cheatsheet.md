@@ -284,6 +284,68 @@
 `[m for m in pipeline.models if isinstance(m, DriftMonitorPipe)]` 或整数索引；
 模型分数监控可传 `cols=[正类列名]` 挂在模型 pipe 之后。
 
+## 时序预处理 (ts.preprocessing)
+
+| 类名 | 说明 |
+|------|------|
+| FixTimeInput | 时间列解析/去重/排序 |
+| DateFeatureExtract | 日期特征提取（year/month/weekday + sin/cos 周期编码） |
+| TSFillNa | 时序感知填充（ffill/linear/value，组内不跨组） |
+| TSDiff | 一阶差分（可逆，periods） |
+| TSPctChange | 百分比变化（可逆） |
+| TSLogReturn | 对数收益（可逆） |
+| TSZScoreScaler | Z-Score 标准化（可逆，per_group） |
+| TSMinMaxScaler | Min-Max 标准化（可逆，per_group） |
+| TimeResample | 时间重采样（会改变行数） |
+| TimeGapsFill | 时间网格补齐（会改变行数） |
+| TSBoxCox | Box-Cox/Yeo-Johnson 幂变换（可逆，lambda 持久化） |
+
+## 时序特征 (ts.features)
+
+| 类名 | 说明 |
+|------|------|
+| LagFeature | 滞后特征（lags） |
+| RollingFeature | 滚动统计（mean/std/min/max/skew/kurt，window/min_periods） |
+| EWMAFeature | 指数加权移动平均（span/halflife） |
+| ExpandingFeature | 累积扩展统计 |
+| MovingAverageTrend | 移动平均趋势（center 可选） |
+| SeasonalMean | 季节均值 profile（seasonal/deseasonal/both） |
+| FourierFeature | 傅里叶周期特征（period, order） |
+| RollingCorrCov | 双列滚动相关/协方差 |
+| STLDecompose | STL 分解（trend/seasonal/resid） |
+
+## 时序统计模型 (ts.statistical)
+
+| 类名 | 说明 |
+|------|------|
+| ArimaRegression | ARIMA（group_cols/time_col 分组；save/load 持久化模型对象） |
+| SarimaRegression | SARIMA 季节性 |
+| ArimaxRegression | ARIMAX（exog_cols 外生变量） |
+| SarimaxRegression | SARIMAX 季节性 |
+| GarchRegression | GARCH 波动率（arch） |
+
+## 时序深度模型（需 torch）
+
+| 模块 | 类名 |
+|------|------|
+| ts.deep_learning | NBeatsRegression, NHiTSRegression, DeepARRegression, GPRegression |
+| ts.transformer | TFTRegression, InformerRegression, AutoformerRegression, FEDformerRegression, PatchTSTRegression, TimesNetRegression, iTransformerRegression |
+| ts.state_space | DeepStateRegression, MambaRegression, LiquidS4Regression |
+| ts.generative | VAERegression, NormalizingFlowRegression, DiffusionRegression |
+
+> 深度模型面板分组用 `GroupForecast(model=..., group_cols=..., time_col=...)` 包装；save/load 持久化 state_dict；`transform_single` 输出首步预测。
+
+## 时序工具 (ts.utils)
+
+| 函数 | 说明 |
+|------|------|
+| split_time_series | 防泄漏切分（time_col/group_cols/test_size） |
+| walk_forward_eval | 滚动回测（组内展开） |
+| calc_adf / calc_kpss | 平稳性检验 |
+| calc_acf_pacf | 自相关/偏自相关 |
+| calc_mape / calc_smape / calc_mase | 评估指标 |
+| calc_sample_entropy / calc_hurst | 复杂度/趋势持续性 |
+
 ## 核心基类
 
 | 类名 | 说明 |
@@ -294,6 +356,9 @@
 | NLPPipeline | NLP Pipeline，NLP任务处理流水线 |
 | TSPipeLine | 时序 Pipeline，时序任务处理流水线 |
 | NLPPipeObjectBase | NLP Pipe对象基类，继承自TablePipeObjectBase |
+| GroupTSBase | 分组时序操作基类（组内排序/组键/写回） |
+| GroupForecast | 分组预测包装器（每组独立拟合一份模型副本） |
+| TorchForecastMixin | torch 预测模型 Mixin（权重持久化 + 单条推理） |
 | PreprocessBase | 预处理基类，数据预处理基础类 |
 | EncodingBase | 编码基类，特征编码基础类 |
 | Decomposition | 降基基类，特征降维基础类 |

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""示例5：FastAPI 模型部署（已验证跑通，easymlops 0.2.2）
+"""示例5：FastAPI 模型部署（已验证跑通，easymlops 0.2.4）
 前置: 先运行 example_classification.py 生成 scripts/output/cls_model.pkl
 依赖: pip install fastapi uvicorn
 运行: python scripts/deploy_fastapi.py

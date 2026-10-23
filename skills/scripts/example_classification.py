@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""示例2：分类任务训练、预测、评估、持久化（已验证跑通，easymlops 0.2.2）
+"""示例2：分类任务训练、预测、评估、持久化（已验证跑通，easymlops 0.2.4）
 运行: python scripts/example_classification.py
 产物: scripts/output/cls_model.pkl（供 deploy_fastapi.py 使用）
 """

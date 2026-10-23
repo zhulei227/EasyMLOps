@@ -108,13 +108,13 @@ python scripts/deploy_fastapi.py   # 然后访问 http://127.0.0.1:8901/health �
 
 ## 离线安装
 
-skill 已随附 wheel（`assets/easymlops-0.2.2-py3-none-any.whl`），可直接本地化安装：
+skill 已随附 wheel（`assets/easymlops-0.2.4-py3-none-any.whl`，与 PyPI 最新版本一致），可直接本地化安装：
 
 ```bash
-pip install <本skill目录>/assets/easymlops-0.2.2-py3-none-any.whl
+pip install <本skill目录>/assets/easymlops-0.2.4-py3-none-any.whl
 ```
 
-注意：wheel 不携带依赖，核心功能仍需安装 lightgbm、scikit-learn、pandas，以及隐式依赖 psutil、matplotlib（未在 easymlops 依赖声明中）；时序/部署另需 statsmodels、fastapi、uvicorn。
+注意：wheel 不携带依赖，核心功能仍需安装 lightgbm、scikit-learn、pandas；0.2.4 起 psutil、matplotlib、arch（GARCH）已在依赖声明中；时序深度模型另需 torch，部署另需 fastapi、uvicorn。
 
 ## 额外依赖（按需安装）
 
@@ -131,7 +131,7 @@ pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 
 ## 参考文档（references/docs/）
 
-以下文档已全部对照 easymlops 0.2.2 实测校正（含导入、构造参数、方法存在性），可直接按文档编写代码；标注"依赖 torch，签名未验证"的章节除外。
+以下文档已全部对照 easymlops 0.2.4 实测校正（含导入、构造参数、方法存在性），可直接按文档编写代码。torch 深度模型签名与持久化亦在 0.2.4 实测通过（见文末版本实测陷阱第 7 条）。
 
 按需加载对应文档，不要一次性全部读取：
 
@@ -183,7 +183,7 @@ pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 
 注：以上为原书方法论的自有语言提炼笔记（原书 CC BY-NC-SA，禁止商用），细节以原书（mlyearning.org 可免费获取）为准。与 playbooks/00_framework.md 的 7 步迭代闭环配套使用：①② 对应 01/04 文档，④⑤ 对应 02/03 文档，⑥⑦ 对应 05 文档。
 
-## 诊断工具扩展（本仓库源码新增，assets 中 0.2.2 wheel 不含）
+## 诊断工具扩展（0.2.4 wheel 已包含以下全部能力）
 
 为补齐 playbooks 反复外补的评估/诊断缺口，本仓库源码新增以下能力（`tests/test_diag_tools.py` 全部实测通过，含 auto_test 验收）：
 
@@ -210,7 +210,7 @@ pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 - 使用 `easymlops.table.callback` 中的 `check_shape` / `check_columns` / `check_data_type` / `check_transform_function_pipeline` 验证 pipeline 正确性。
 - 部署时用 `transform_single` 处理单条请求；保存的 pkl 在加载后无需重新 fit。
 
-## 版本实测陷阱（对照 easymlops 0.2.2 验证，docs 部分描述有漂移）
+## 版本实测陷阱（对照 easymlops 0.2.4 验证，docs 部分描述有漂移）
 
 以下差异已在真实环境验证，编写代码时以本节为准：
 
@@ -223,7 +223,7 @@ pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 7. **TS 预测模型的 `save/load` 会持久化拟合结果**：统计模型（ArimaRegression 家族/GarchRegression）持久化模型对象，torch 深度模型（NBeats/NHiTS/DeepAR/GP/TFT 家族/DeepState/Mamba/LiquidS4/VAE/NF/Diffusion）经 `TorchForecastMixin` 持久化 state_dict，load 后无需重新 fit 即可 transform。批量 transform 是多步 forecast（深度模型取输入序列末窗、统计模型从训练末端 forecast），与逐条 `transform_single`（以 fit 序列为历史起点推进窗口、输出首步预测）语义不同，预测类 pipe 不纳入 auto_test。VAE/Diffusion 的 transform 含随机采样，复现需固定 torch 种子。**深度模型不支持 `group_cols`**：面板数据用 `easymlops.ts.core.group_forecast.GroupForecast(model=模板模型, group_cols=..., time_col=...)` 包装（每组 deepcopy 一份模板独立拟合），同样支持 save/load 与单条推理。
 8. **字符串列必须在模型 pipe 之前完成编码**（如 `OneHotEncoding`/`LabelEncoding`），否则 lightgbm 报 "pandas dtypes must be int, float or bool"。`OneHotEncoding(drop_col=True)` 为默认但原列可能保留，依赖 `LabelEncoding` 原地覆盖来消除原字符串列。
 9. **`TablePipeLine` 无 `get_pipe_names()`/`pipes` 属性**，`transform` 的 `stop_at`/`start_from` 参数按 pipe 名匹配可能静默失效，调试时不要依赖它做分段排查。
-10. **隐式依赖**：`psutil`、`matplotlib` 未在依赖声明中，但导入 easymlops 必须；部署还需自行安装 `fastapi`、`uvicorn`。
+10. **依赖**：0.2.4 起 `psutil`、`matplotlib`、`arch`（GARCH）已在依赖声明中；部署仍需自行安装 `fastapi`、`uvicorn`；TS 深度模型需 `torch`（可选依赖）。
 11. **`Sum`/`Mean`/`Median` 默认 `drop_input=True`**，transform 后只输出汇总列、输入列被消费；需保留输入列时显式传 `drop_input=False`。二元运算（`Add` 等）则保留输入列。
 12. **`LGBMLeafEncoder` 会把输出整体替换为叶子列**（`leaf_0..N`），不要与其它特征混在同一条管道尾部。
 13. **运算符**：`-` 减法可用但会破坏原 pipeline 内部状态（input_col_names 被清空）且减法产物 transform 有缺陷；`+` 组合不支持（TypeError）。

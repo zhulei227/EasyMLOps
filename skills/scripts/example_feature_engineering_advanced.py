@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""示例1b：自助特征工程 · 降维/SQL/Pipeline操作/质量检查/性能优化（easymlops 0.2.2 实测跑通）
+"""示例1b：自助特征工程 · 降维/SQL/Pipeline操作/质量检查/性能优化（easymlops 0.2.4 实测跑通）
 
 覆盖 4 大板块：
   5. 特征降维（PCA）
@@ -84,7 +84,7 @@ print("[7 操作] p[0] 类型: %s" % type(first_pipe).__name__)
 print("[7 单条] transform_single 返回键数: %d" % len(p.transform_single(num_df.to_dict("records")[0])))
 
 # 减法: 从 pipeline 中移除某个 pipe
-# 注意: 0.2.2 实测减法会破坏原 pipeline 内部状态（input_col_names 被清空），
+# 注意: 0.2.4 实测减法会破坏原 pipeline 内部状态（input_col_names 被清空），
 # 且减法产物 transform 也有缺陷，故放在本板块最后，仅演示构造
 minus = p - Tanh(cols=["income"])
 print("[7 操作] 减法移除 Tanh 返回: %s" % type(minus).__name__)
@@ -125,7 +125,7 @@ full.pipe(FixInput(reduce_mem_usage=False)) \
 full.fit(df)
 final = full.transform(df)
 final.to_csv(os.path.join(OUT, "fe_sample_full.csv"), index=False)
-# 注: 复杂管道（含交叉特征等）在 0.2.2 的 transform_single 可能触发
+# 注: 复杂管道（含交叉特征等）在 0.2.4 的 transform_single 可能触发
 # input_col_names=None 缺陷，单条推理建议用单行 DataFrame + transform
 one = full.transform(df.head(1))
 print("[9 全流程] %d 列 -> %d 列 | 单行推理列数: %d"

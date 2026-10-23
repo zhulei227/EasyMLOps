@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""示例3：回归任务训练与预测（已验证跑通，easymlops 0.2.2）
+"""示例3：回归任务训练与预测（已验证跑通，easymlops 0.2.4）
 运行: python scripts/example_regression.py
 """
 import os

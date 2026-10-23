@@ -379,7 +379,7 @@ from easymlops.table.utils import PandasUtils
 from easymlops.table.utils import calc_precision_recall_at_thresholds, calc_precision_recall_at_quantiles, plot_pr_curve
 from easymlops.table.utils import calc_roc_at_thresholds, plot_roc_curve
 
-# 评估函数（0.2.2 中 EvalFunction 无构造参数）
+# 评估函数（0.2.4 中 EvalFunction 无构造参数）
 eval_func = EvalFunction()
 
 # 阈值评估：计算不同阈值下的precision、recall、F1
@@ -660,7 +660,7 @@ result = predictor.predict(data)
 ### 爬山法 (Hill Climbing)
 
 ```python
-# 0.2.2 中 easymlops.table.strategy.hill_climbing 不导出 Climber/ClimberCV；
+# 0.2.4 中 easymlops.table.strategy.hill_climbing 不导出 Climber/ClimberCV；
 # 直接使用 easymlops.table.strategy.HillClimbingStackingRegression(y=y_train, n_splits=5)
 from easymlops.table.strategy import HillClimbingStackingRegression
 
@@ -674,5 +674,5 @@ hc_stacking = HillClimbingStackingRegression(
 ### 工具类
 
 ```python
-# COLORS 等工具类在 0.2.2 中未随 hill_climbing 子模块导出，如需使用请以实际安装版本为准
+# COLORS 等工具类在 0.2.4 中未随 hill_climbing 子模块导出，如需使用请以实际安装版本为准
 ```

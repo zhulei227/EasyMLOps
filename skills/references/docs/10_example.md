@@ -200,7 +200,7 @@ y_train = x_train["label"]
 y_test = x_test["label"]
 
 # 基模型输出先经 Parallel 拼接，再做 Hill Climbing 加权
-# （0.2.2 的 HillClimbingStackingRegression 没有 base_models/meta_model 参数）
+# （0.2.4 的 HillClimbingStackingRegression 没有 base_models/meta_model 参数）
 table = TablePipeLine()
 table.pipe(FixInput())\
      .pipe(FillNa(fill_mode="mean"))\
@@ -353,7 +353,7 @@ automl = AutoMLTab(
 # 运行AutoML
 automl.run()
 
-# 预测（0.2.2 没有 run()/predict()/get_best_pipeline()）
+# 预测（0.2.4 没有 run()/predict()/get_best_pipeline()）
 automl.fit()
 predictions = automl.transform(x_test)
 

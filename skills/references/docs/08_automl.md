@@ -24,7 +24,7 @@ automl = AutoMLTab(
 # 运行AutoML（自动迭代建模，受 max_iter/max_time/early_stop_steps 约束）
 automl.fit()
 
-# 预测（0.2.2 没有 run()/predict()/get_best_model() 方法）
+# 预测（0.2.4 没有 run()/predict()/get_best_model() 方法）
 predictions = automl.transform(x_test)
 single = automl.transform_single(x_test.to_dict("records")[0])
 
@@ -138,7 +138,7 @@ automl = AutoMLTab(
 ### 回调配置
 
 ```python
-# 注意: 0.2.2 的 AutoMLTab 没有 callbacks 参数；
+# 注意: 0.2.4 的 AutoMLTab 没有 callbacks 参数；
 # 可用参数见 8.1（trn_path/val_path/label/task_type/eval_metric/.../describe_feature_function）
 from easymlops.automl import AutoMLTab
 
