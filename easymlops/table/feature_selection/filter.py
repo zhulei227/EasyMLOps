@@ -336,3 +336,74 @@ class PSIFilter(FilterBase):
             self.dist_detail = params["dist_detail"]
         else:
             self.dist_detail = []
+
+
+class CorrFilter(FilterBase):
+    """
+    高相关列去重过滤器（v0.2.5 新增）：对数值列计算相关矩阵，|corr| 超过阈值的
+    列对中删除一列（提供 y 时保留与目标相关性更高的列，否则保留顺序靠前的列）。
+    Kaggle 常用于树模型前的冗余特征清理。
+
+    Args:
+        threshold: 相关性阈值（|corr| > threshold 视为冗余）
+        y: 目标变量（可选，用于决定保留哪一列）
+        cols: 参与筛选的列；"all"/None 表示全部列（非数值列自动跳过）
+
+    Example:
+        >>> from easymlops.table.feature_selection import CorrFilter
+        >>> pipe = CorrFilter(threshold=0.95, y=y_train)
+        >>> pipe.fit(train_df)
+        >>> pipe.dropped_cols_   # 被删除的列
+    """
+
+    def __init__(self, threshold=0.95, y=None, **kwargs):
+        super().__init__(**kwargs)
+        self.threshold = threshold
+        self.y = y
+        self.dropped_cols_ = []
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        numeric_cols = [c for c in self.cols if np.issubdtype(s[c].dtype, np.number)]
+        if len(numeric_cols) < 2:
+            self.selected_cols = list(self.cols)
+            self.dropped_cols_ = []
+            self.filter_value_dist = {}
+            return self
+
+        if self.y is not None:
+            target_corr = {c: abs(float(pd.Series(s[c].values).corr(
+                pd.Series(np.asarray(self.y, dtype=float))))) for c in numeric_cols}
+        else:
+            target_corr = {c: 0.0 for c in numeric_cols}
+
+        corr_matrix = s[numeric_cols].corr().abs()
+        dropped = set()
+        # 按列对相关性从高到低贪心处理
+        pairs = []
+        for i, a in enumerate(numeric_cols):
+            for b in numeric_cols[i + 1:]:
+                pairs.append((corr_matrix.loc[a, b], a, b))
+        pairs.sort(key=lambda x: -x[0])
+        for corr_value, a, b in pairs:
+            if corr_value <= self.threshold:
+                break
+            if a in dropped and b in dropped:
+                continue
+            # 保留与目标相关性更高(或顺序靠前)的列
+            drop = b if target_corr.get(a, 0) >= target_corr.get(b, 0) else a
+            if drop in dropped:
+                drop = b if drop == a else a
+            dropped.add(drop)
+
+        self.dropped_cols_ = sorted(dropped)
+        self.selected_cols = [c for c in self.cols if c not in dropped]
+        self.filter_value_dist = {"dropped_cols": ",".join(self.dropped_cols_)}
+        return self
+
+    def udf_get_params(self):
+        return {"threshold": self.threshold, "dropped_cols_": self.dropped_cols_,
+                "y_len": len(self.y) if self.y is not None else 0}
+
+    def udf_set_params(self, params: dict_type):
+        self.threshold = params["threshold"]
+        self.dropped_cols_ = params["dropped_cols_"]

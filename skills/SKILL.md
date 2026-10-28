@@ -236,6 +236,13 @@ python scripts/_tech_scan.py                                     # 技术×词�
 | SeedAveraging | `easymlops.table.ensemble` | 同构模型多种子训练并平均预测；`base_pipe` 须绑定 y，种子注入 `native_init_params`（LGBM 用 `seed`，sklearn 用 `random_state`）；LGBM 需配 bagging/feature_fraction 才能使种子生效 |
 | PseudoLabelPipe | `easymlops.table.ensemble` | 伪标签半监督：`fit(train_df, unlabeled=test_df)`，分类按 `confidence` 筛高置信样本回填重训；transform 委托最终模型 |
 | PredictionPostProcess | `easymlops.table.postprocess` | 预测后处理：`clip=(min,max)` / `threshold` 二值化 / `round_digits` / `mapping`，挂 Pipeline 尾部 |
+| GroupAggregateFeatures | `easymlops.table.features` | 分组聚合特征：按 `group_cols` 对数值列 mean/std/min/max/median/count 回填到行，未见组回退全局值 |
+| CountEncoding | `easymlops.table.encoding` | 频次编码：类别取值出现次数/占比（`normalize`） |
+| CategoryCross | `easymlops.table.encoding` | 类别×类别交叉列（拼接新类别），接 TargetEncoding/CountEncoding 完成编码 |
+| ClusterFeatures | `easymlops.table.features` | KMeans 簇编号+距离特征 |
+| QuantileClip | `easymlops.table.features` | 分位数截断 Winsorize（自动上下界） |
+| LogTransform / SqrtTransform | `easymlops.table.features` | log1p / 平方根变换（右偏分布） |
+| CorrFilter | `easymlops.table.feature_selection` | 高相关列去重（`threshold`，可传 `y` 保留与目标更相关者） |
 | 单 pipe save/load | 任意 table pipe | `pipe.save(path)` / `pipe.load(path)`（参数快照，模型类 pipe 含底层模型对象；0.2.5 起基类支持） |
 
 ## 版本实测陷阱（对照 easymlops 0.2.4 验证，docs 部分描述有漂移）

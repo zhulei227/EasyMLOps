@@ -856,3 +856,143 @@ class WOEEncoding(EncodingBase):
             self.dist_detail = []
         self.woe_map_detail = params["woe_map_detail"]
         self.drop_col = params["drop_col"]
+
+
+class CountEncoding(EncodingBase):
+    """
+    频次编码（v0.2.5 新增）：用类别取值在训练集中的出现次数（或占比）替换原值，
+    高基数类别特征的常用处理（Kaggle: count/frequency encoding）。
+
+    Args:
+        cols: 要操作的列
+        normalize: True=输出出现占比(0~1)，False=输出出现次数
+        error_value: 训练集未见取值的返回值（默认 0）
+
+    Example:
+        >>> from easymlops.table.encoding import CountEncoding
+        >>> pipe = CountEncoding(cols=["city"], normalize=True)
+        >>> pipe.fit(df)
+    """
+
+    def __init__(self, cols="all", normalize=False, error_value=0, **kwargs):
+        super().__init__(cols=cols, **kwargs)
+        self.normalize = normalize
+        self.error_value = error_value
+        self.count_map_detail = dict()
+
+    def show_detail(self):
+        """显示频次编码的映射细节。"""
+        return pd.DataFrame([self.count_map_detail])
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        total = max(len(s), 1)
+        for col, _ in self.cols:
+            value_counts = s[col].value_counts()
+            if self.normalize:
+                value_counts = value_counts / total
+            self.count_map_detail[col] = value_counts.to_dict()
+        return self
+
+    def apply_function_single(self, col: str, x):
+        return np.float64(self.count_map_detail.get(col, dict()).get(x, self.error_value))
+
+    def apply_function_series(self, col: str, x: series_type):
+        return x.map(self.count_map_detail.get(col, dict())).fillna(self.error_value).astype(np.float64)
+
+    def udf_get_params(self) -> dict_type:
+        return {"count_map_detail": self.count_map_detail, "normalize": self.normalize,
+                "error_value": self.error_value}
+
+    def udf_set_params(self, params: dict):
+        self.count_map_detail = params["count_map_detail"]
+        self.normalize = params["normalize"]
+        self.error_value = params["error_value"]
+
+
+class CategoryCross(TablePipeObjectBase):
+    """
+    类别×类别交叉特征（v0.2.5 新增）：将多列类别取值拼接为一个新类别列
+    （如 city×product → "beijing_sku42"），通常接 TargetEncoding/CountEncoding
+    完成编码（Kaggle: categorical combination）。
+
+    Args:
+        cols: 交叉组合列表，每项为 2 个及以上列名的 list，
+              如 [["city", "product"], ["city", "channel"]]
+        sep: 取值拼接分隔符（同时用于输出列名）
+        drop_origin_cols: 是否删除参与交叉的原列（默认保留）
+        error_value: 训练集未见组合的填充值
+        fillna_value: 参与交叉的列含缺失时的填充值
+
+    Example:
+        >>> from easymlops.table.encoding import CategoryCross, TargetEncoding
+        >>> cross = CategoryCross(cols=[["city", "product"]])
+        >>> te = TargetEncoding(cols=[("city_product_cross", "city_product_cross")], y=y)
+        >>> pipeline.pipe(cross).pipe(te)
+    """
+
+    def __init__(self, cols, sep="_", drop_origin_cols=False, error_value="__other__",
+                 fillna_value="__nan__", **kwargs):
+        super().__init__(**kwargs)
+        self.cols = [list(c) if not isinstance(c, str) else [c] for c in cols]
+        for combo in self.cols:
+            if len(combo) < 2:
+                raise Exception("CategoryCross each combo needs >= 2 cols, got {}".format(combo))
+        self.sep = sep
+        self.drop_origin_cols = drop_origin_cols
+        self.error_value = error_value
+        self.fillna_value = fillna_value
+        self.seen_combos_ = {}   # 组合元组 -> 见过取值组合的集合
+
+    @staticmethod
+    def _join(row_values, sep):
+        return sep.join(str(v) for v in row_values)
+
+    def _cross_col_name(self, combo):
+        return self.sep.join(combo) + "_cross"
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        for combo in self.cols:
+            for col in combo:
+                if col not in s.columns:
+                    raise Exception("col {} not in input".format(col))
+            joined = s[combo].astype(str).fillna(self.fillna_value).agg(self.sep.join, axis=1)
+            self.seen_combos_[tuple(combo)] = set(joined.tolist())
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        result = s.copy()
+        origin_cols = []
+        for combo in self.cols:
+            joined = result[combo].astype(str).fillna(self.fillna_value).agg(self.sep.join, axis=1)
+            new_col = self._cross_col_name(combo)
+            result[new_col] = joined.where(joined.isin(self.seen_combos_[tuple(combo)]),
+                                           self.error_value)
+            origin_cols.extend(combo)
+        if self.drop_origin_cols:
+            result = result.drop(columns=[c for c in set(origin_cols) if c in result.columns])
+        return result
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        for combo in self.cols:
+            values = [self.fillna_value if s.get(c) is None else str(s.get(c)) for c in combo]
+            joined = self.sep.join(values)
+            new_col = self._cross_col_name(combo)
+            s[new_col] = joined if joined in self.seen_combos_.get(tuple(combo), set()) \
+                else self.error_value
+            if self.drop_origin_cols:
+                for c in combo:
+                    s.pop(c, None)
+        return s
+
+    def udf_get_params(self) -> dict_type:
+        return {"cols": self.cols, "sep": self.sep, "drop_origin_cols": self.drop_origin_cols,
+                "error_value": self.error_value, "fillna_value": self.fillna_value,
+                "seen_combos_": self.seen_combos_}
+
+    def udf_set_params(self, params: dict):
+        self.cols = params["cols"]
+        self.sep = params["sep"]
+        self.drop_origin_cols = params["drop_origin_cols"]
+        self.error_value = params["error_value"]
+        self.fillna_value = params["fillna_value"]
+        self.seen_combos_ = params["seen_combos_"]

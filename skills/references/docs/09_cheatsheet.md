@@ -150,6 +150,16 @@
 |------|------|---------|
 | PredictionPostProcess | 预测列 clip/round/二值化/自定义映射，挂管道尾部 | cols, clip, threshold, round_digits, mapping |
 
+## 表格特征工程 (features，v0.2.5)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| GroupAggregateFeatures | 按 key 列 groupby 聚合回填(mean/std/min/max/median/count)，未见组回退全局值 | group_cols, agg_cols, stats, drop_key_cols, out_prefix |
+| ClusterFeatures | KMeans 簇编号+到各簇中心距离 | cols, n_clusters, add_cluster_id, add_distances, out_prefix |
+| QuantileClip | 分位数截断 Winsorize（自动上下界） | cols, lower, upper |
+| LogTransform | log1p 变换（右偏分布） | cols |
+| SqrtTransform | 平方根变换（计数/右偏） | cols |
+
 ## 扩展模块 (extend)
 
 | 类名 | 说明 | 关键参数 |
