@@ -259,10 +259,35 @@ class TablePipeObjectBase(PipeObjectBase):
             branch_pipe.transform_single(copy.deepcopy(s), **kwargs)
         return s
 
+    def save(self, path):
+        """
+        保存pipe参数(快照)至path路径。拟合结果是否包含取决于子类udf_get_params
+        (模型类pipe会持久化底层模型对象)。
+
+        Args:
+            path: 保存路径
+        """
+        import pickle
+        params = self.get_params()
+        with open(path, "wb") as f:
+            pickle.dump(params, f)
+
+    def load(self, path):
+        """
+        从path路径加载pipe参数快照。
+
+        Args:
+            path: 加载路径
+        """
+        import pickle
+        with open(path, "rb") as f:
+            params = pickle.load(f)
+        self.set_params(params)
+
     def get_params(self) -> dict_type:
         """
         获取参数。
-        
+
         Returns:
             参数字典
         """

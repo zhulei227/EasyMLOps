@@ -7,3 +7,5 @@
 ./tests/
 build/
 easymlops.egg-info/
+kaggle_solutions/
+.playwright-cli/

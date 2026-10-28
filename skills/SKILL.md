@@ -210,6 +210,15 @@ pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 - 使用 `easymlops.table.callback` 中的 `check_shape` / `check_columns` / `check_data_type` / `check_transform_function_pipeline` 验证 pipeline 正确性。
 - 部署时用 `transform_single` 处理单条请求；保存的 pkl 在加载后无需重新 fit。
 
+## v0.2.5 新增 pipe（Kaggle 优胜方案高频技术，实测见 tests/test_new_pipes.py）
+
+| Pipe | 导入 | 说明 |
+|------|------|------|
+| SeedAveraging | `easymlops.table.ensemble` | 同构模型多种子训练并平均预测；`base_pipe` 须绑定 y，种子注入 `native_init_params`（LGBM 用 `seed`，sklearn 用 `random_state`）；LGBM 需配 bagging/feature_fraction 才能使种子生效 |
+| PseudoLabelPipe | `easymlops.table.ensemble` | 伪标签半监督：`fit(train_df, unlabeled=test_df)`，分类按 `confidence` 筛高置信样本回填重训；transform 委托最终模型 |
+| PredictionPostProcess | `easymlops.table.postprocess` | 预测后处理：`clip=(min,max)` / `threshold` 二值化 / `round_digits` / `mapping`，挂 Pipeline 尾部 |
+| 单 pipe save/load | 任意 table pipe | `pipe.save(path)` / `pipe.load(path)`（参数快照，模型类 pipe 含底层模型对象；0.2.5 起基类支持） |
+
 ## 版本实测陷阱（对照 easymlops 0.2.4 验证，docs 部分描述有漂移）
 
 以下差异已在真实环境验证，编写代码时以本节为准：

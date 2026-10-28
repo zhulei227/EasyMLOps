@@ -1,3 +1,8 @@
+import copy
+
+import numpy as np
+import pandas as pd
+
 from easymlops.table.core import *
 from easymlops.table.utils import PandasUtils
 
@@ -129,3 +134,197 @@ class Parallel(TablePipeObjectBase):
             pipe_params = pipe_objects_params[i]
             obj = self.pipe_objects[i]
             obj.set_params(pipe_params)
+
+
+class SeedAveraging(TablePipeObjectBase):
+    """
+    同构模型多种子训练并平均预测（Kaggle 标配 bagging，v0.2.5 新增）。
+
+    对 base_pipe 深拷贝 n_seeds 份，向 native_init_params 注入不同种子后分别
+    训练，transform 时对各组预测取算术平均（分类=平均概率，回归=平均预测值）。
+
+    Args:
+        base_pipe: 已配置好的模型 pipe 模板（须在构造时绑定 y），作为每组训练副本
+        n_seeds: 种子数量
+        seed_start: 起始种子（第 i 个模型种子 = seed_start + i）
+        seed_param: 注入 native_init_params 的种子参数名
+                    （lightgbm 用 "seed"，sklearn 模型用 "random_state"）
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> model = SeedAveraging(
+        ...     base_pipe=LGBMClassification(y=y_train, native_init_params={"learning_rate": 0.05}),
+        ...     n_seeds=5)
+        >>> model.fit(train_df)
+        >>> pred = model.transform(test_df)   # 平均后的概率列（列名=类别）
+    """
+
+    def __init__(self, base_pipe=None, n_seeds=5, seed_start=42, seed_param="seed", **kwargs):
+        super().__init__(**kwargs)
+        self.base_pipe = base_pipe
+        self.n_seeds = int(n_seeds)
+        self.seed_start = int(seed_start)
+        self.seed_param = seed_param
+        self.seed_pipes_ = []
+
+    def udf_fit(self, s, **kwargs):
+        if self.base_pipe is None:
+            raise Exception("SeedAveraging requires base_pipe (with y bound at construction)")
+        self.seed_pipes_ = []
+        for i in range(self.n_seeds):
+            m = copy.deepcopy(self.base_pipe)
+            if hasattr(m, "native_init_params"):
+                m.native_init_params[self.seed_param] = self.seed_start + i
+            m.fit(s, **kwargs)
+            self.seed_pipes_.append(m)
+        return self
+
+    @staticmethod
+    def _average_frames(frames):
+        result = frames[0].copy()
+        for frame in frames[1:]:
+            result = result + frame
+        return result / float(len(frames))
+
+    def udf_transform(self, s, **kwargs):
+        if not self.seed_pipes_:
+            raise Exception("SeedAveraging is not fitted, call fit before transform")
+        outs = [m.transform(s, **kwargs) for m in self.seed_pipes_]
+        return self._average_frames(outs)
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        if not self.seed_pipes_:
+            raise Exception("SeedAveraging is not fitted, call fit before transform")
+        outs = [m.transform_single(copy.deepcopy(s), **kwargs) for m in self.seed_pipes_]
+        return {k: float(np.mean([o[k] for o in outs])) for k in outs[0].keys()}
+
+    def udf_get_params(self) -> dict_type:
+        return {"base_class": self.base_pipe.__class__ if self.base_pipe is not None else None,
+                "base_params": self.base_pipe.get_params() if self.base_pipe is not None else None,
+                "n_seeds": self.n_seeds, "seed_start": self.seed_start, "seed_param": self.seed_param,
+                "seed_pipes_params": [m.get_params() for m in self.seed_pipes_]}
+
+    def udf_set_params(self, params: dict_type):
+        self.n_seeds = params["n_seeds"]
+        self.seed_start = params["seed_start"]
+        self.seed_param = params["seed_param"]
+        if params["base_class"] is not None:
+            self.base_pipe = params["base_class"]()
+            self.base_pipe.set_params(params["base_params"])
+        else:
+            self.base_pipe = None
+        self.seed_pipes_ = []
+        for pipe_params in params["seed_pipes_params"]:
+            m = params["base_class"]()
+            m.set_params(pipe_params)
+            self.seed_pipes_.append(m)
+
+
+class PseudoLabelPipe(TablePipeObjectBase):
+    """
+    伪标签半监督（pseudo-labeling，v0.2.5 新增）。
+
+    先在有标签数据上训练 base_pipe 副本，对无标签数据预测；分类任务保留
+    置信度 >= confidence 的样本并打上伪标签，回归任务直接用预测值作为伪标签；
+    将伪标签样本拼回训练集重新训练（可迭代 n_rounds 轮）。transform 委托给
+    最终模型。
+
+    Args:
+        base_pipe: 已配置好的模型 pipe 模板（须在构造时绑定 y）
+        confidence: 分类伪标签的置信度阈值（max prob >= confidence 才保留）
+        n_rounds: 伪标签迭代轮数
+        unlabeled: 无标签数据（也可在 fit 时通过 unlabeled= 传入）
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> model = PseudoLabelPipe(
+        ...     base_pipe=LGBMClassification(y=y_train), confidence=0.9, n_rounds=1)
+        >>> model.fit(train_df, unlabeled=test_df)   # test_df 无标签
+        >>> pred = model.transform(test_df)
+    """
+
+    def __init__(self, base_pipe=None, confidence=0.9, n_rounds=1, unlabeled=None, **kwargs):
+        super().__init__(**kwargs)
+        self.base_pipe = base_pipe
+        self.confidence = float(confidence)
+        self.n_rounds = int(n_rounds)
+        self.unlabeled = unlabeled
+        self.model_ = None
+
+    def _is_classification(self):
+        return getattr(self.base_pipe, "num_class", None) is not None
+
+    def _new_model(self):
+        m = copy.deepcopy(self.base_pipe)
+        if hasattr(m, "weight"):
+            m.weight = None   # 扩充后样本长度变化, 原权重失效
+        return m
+
+    def udf_fit(self, s, **kwargs):
+        if self.base_pipe is None:
+            raise Exception("PseudoLabelPipe requires base_pipe (with y bound at construction)")
+        unlabeled = kwargs.pop("unlabeled", None)
+        if unlabeled is None:
+            unlabeled = self.unlabeled
+        self.model_ = self._new_model()
+        self.model_.fit(s, **kwargs)
+        if unlabeled is None or len(unlabeled) == 0 or self.n_rounds < 1:
+            return self
+        cols = self.model_.cols
+        feats = unlabeled[cols]
+        for _ in range(self.n_rounds):
+            preds = self.model_.transform(feats)
+            if self._is_classification():
+                conf = preds.max(axis=1)
+                pseudo_labels = preds.idxmax(axis=1)
+                mask = conf >= self.confidence
+                if int(mask.sum()) == 0:
+                    break
+                pseudo_ids = pseudo_labels[mask].map(self.model_.label2id)
+                y_ext = pd.concat([self.base_pipe.y.reset_index(drop=True),
+                                   pseudo_ids.reset_index(drop=True)], axis=0,
+                                  ignore_index=True)
+            else:
+                mask = pd.Series(True, index=preds.index)
+                pred_col = preds.columns[0]
+                y_ext = pd.concat([self.base_pipe.y.reset_index(drop=True),
+                                   preds[mask][pred_col].reset_index(drop=True)], axis=0,
+                                  ignore_index=True)
+            ext_feats = feats.loc[mask].reset_index(drop=True)
+            train_ext = pd.concat([s.reset_index(drop=True), ext_feats], axis=0)
+            self.model_ = self._new_model()
+            self.model_.y = y_ext
+            self.model_.fit(train_ext, **kwargs)
+        return self
+
+    def udf_transform(self, s, **kwargs):
+        if self.model_ is None:
+            raise Exception("PseudoLabelPipe is not fitted, call fit before transform")
+        return self.model_.transform(s, **kwargs)
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        if self.model_ is None:
+            raise Exception("PseudoLabelPipe is not fitted, call fit before transform")
+        return self.model_.transform_single(s, **kwargs)
+
+    def udf_get_params(self) -> dict_type:
+        return {"base_class": self.base_pipe.__class__ if self.base_pipe is not None else None,
+                "base_params": self.base_pipe.get_params() if self.base_pipe is not None else None,
+                "base_y": self.base_pipe.y if self.base_pipe is not None else None,
+                "confidence": self.confidence, "n_rounds": self.n_rounds,
+                "model_params": self.model_.get_params() if self.model_ is not None else None}
+
+    def udf_set_params(self, params: dict_type):
+        self.confidence = params["confidence"]
+        self.n_rounds = params["n_rounds"]
+        if params["base_class"] is not None:
+            self.base_pipe = params["base_class"]()
+            self.base_pipe.set_params(params["base_params"])
+            self.base_pipe.y = params["base_y"]
+        else:
+            self.base_pipe = None
+        if params["model_params"] is not None:
+            self.model_ = params["base_class"]()
+            self.model_.set_params(params["model_params"])
+        else:
+            self.model_ = None

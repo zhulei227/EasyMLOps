@@ -140,7 +140,15 @@
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
-| Parallel | 并行集成 | models, n_jobs |
+| Parallel | 并行集成 | pipe_objects, drop_input_data |
+| SeedAveraging | 同构模型多种子训练并平均预测（v0.2.5） | base_pipe(须绑定 y), n_seeds, seed_start, seed_param |
+| PseudoLabelPipe | 伪标签半监督（v0.2.5） | base_pipe(须绑定 y), confidence, n_rounds, unlabeled |
+
+## 预测后处理 (postprocess，v0.2.5)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| PredictionPostProcess | 预测列 clip/round/二值化/自定义映射，挂管道尾部 | cols, clip, threshold, round_digits, mapping |
 
 ## 扩展模块 (extend)
 
