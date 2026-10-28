@@ -407,3 +407,164 @@ class CorrFilter(FilterBase):
     def udf_set_params(self, params: dict_type):
         self.threshold = params["threshold"]
         self.dropped_cols_ = params["dropped_cols_"]
+
+
+def _lgb_importance(s: dataframe_type, y, feature_cols, task="classification",
+                    native_init_params=None, seed=42):
+    """训练 LightGBM 并返回 {col: importance}（惰性导入 lightgbm）。"""
+    import lightgbm as lgb
+    x = s[feature_cols].fillna(0).to_numpy(dtype=float)
+    params = {"verbosity": -1, "seed": seed}
+    if native_init_params:
+        params.update(native_init_params)
+    if task == "classification":
+        num_class = len(np.unique(y))
+        if num_class <= 2:
+            params.update({"objective": "binary"})
+        else:
+            params.update({"objective": "multiclass", "num_class": num_class})
+        model = lgb.LGBMClassifier(**params)
+    else:
+        params.update({"objective": "regression"})
+        model = lgb.LGBMRegressor(**params)
+    model.fit(x, y)
+    return dict(zip(feature_cols, model.feature_importances_))
+
+
+class NullImportanceFilter(FilterBase):
+    """
+    空重要性筛选（v0.2.5 新增，Kaggle 特征筛选利器）：将 y 随机打乱训练 LGBM
+    得到"空重要性"分布，真实重要性显著高于空分布分位数（默认 >75 分位）的
+    特征才保留——能有效剔除"碰巧重要"的噪声特征。
+
+    Args:
+        y: 目标变量（必填）
+        task: "classification" / "regression"
+        n_runs: y 打乱次数（越大分布越稳，耗时越长）
+        percentile: 空重要性分位数阈值（默认 75）
+        native_init_params: 透传 LGBM 的参数（如 {"n_estimators": 100}）
+        random_state: 随机种子
+        cols: 参与筛选的列；"all"/None 表示全部列（非数值列自动跳过）
+
+    Example:
+        >>> from easymlops.table.feature_selection import NullImportanceFilter
+        >>> pipe = NullImportanceFilter(y=y_train, n_runs=10)
+        >>> pipe.fit(train_df)
+        >>> pipe.selected_cols
+    """
+
+    def __init__(self, y=None, task="classification", n_runs=20, percentile=75,
+                 native_init_params=None, random_state=42, **kwargs):
+        kwargs.setdefault("min_threshold", 0.0)   # score > 0 才保留
+        super().__init__(**kwargs)
+        self.y = y
+        self.task = task
+        self.n_runs = int(n_runs)
+        self.percentile = percentile
+        self.native_init_params = native_init_params
+        self.random_state = random_state
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        if self.y is None:
+            raise Exception("NullImportanceFilter requires y at construction")
+        numeric_cols = [c for c in self.cols if np.issubdtype(s[c].dtype, np.number)]
+        y = np.asarray(self.y)
+        real_imp = _lgb_importance(s, y, numeric_cols, self.task,
+                                   self.native_init_params, self.random_state)
+        null_imps = {c: [] for c in numeric_cols}
+        for i in range(self.n_runs):
+            y_shuffled = y.copy()
+            np.random.RandomState(self.random_state + i + 1).shuffle(y_shuffled)
+            imp = _lgb_importance(s, y_shuffled, numeric_cols, self.task,
+                                  self.native_init_params, self.random_state + i + 1)
+            for c in numeric_cols:
+                null_imps[c].append(imp[c])
+        self.filter_value_dist = {
+            c: float(real_imp[c] - np.percentile(null_imps[c], self.percentile))
+            for c in numeric_cols
+        }
+        # 非数值列不参与打分, 直接保留
+        self.selected_cols = [c for c in self.cols
+                              if c not in numeric_cols or
+                              self.filter_value_dist[c] > self.min_threshold]
+        return self
+
+    def udf_get_params(self):
+        return {"task": self.task, "n_runs": self.n_runs, "percentile": self.percentile,
+                "native_init_params": self.native_init_params,
+                "random_state": self.random_state,
+                "y_len": len(self.y) if self.y is not None else 0}
+
+    def udf_set_params(self, params: dict_type):
+        self.task = params["task"]
+        self.n_runs = params["n_runs"]
+        self.percentile = params["percentile"]
+        self.native_init_params = params["native_init_params"]
+        self.random_state = params["random_state"]
+
+
+class RFEFilter(FilterBase):
+    """
+    递归特征消除（v0.2.5 新增）：以 LightGBM 重要性做贪心后向消除，每轮删除
+    最不重要的 step 个特征，直到剩余 n_features_to_select 个。
+
+    Args:
+        y: 目标变量（必填）
+        n_features_to_select: 最终保留的特征数
+        task: "classification" / "regression"
+        step: 每轮删除的特征数（默认 1；设大可加速）
+        native_init_params: 透传 LGBM 的参数
+        random_state: 随机种子
+        cols: 参与筛选的列；"all"/None 表示全部列（非数值列自动跳过）
+
+    Example:
+        >>> from easymlops.table.feature_selection import RFEFilter
+        >>> pipe = RFEFilter(y=y_train, n_features_to_select=10)
+        >>> pipe.fit(train_df)
+        >>> pipe.selected_cols
+    """
+
+    def __init__(self, y=None, n_features_to_select=10, task="classification", step=1,
+                 native_init_params=None, random_state=42, **kwargs):
+        super().__init__(**kwargs)
+        self.y = y
+        self.n_features_to_select = int(n_features_to_select)
+        self.task = task
+        self.step = max(1, int(step))
+        self.native_init_params = native_init_params
+        self.random_state = random_state
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        if self.y is None:
+            raise Exception("RFEFilter requires y at construction")
+        numeric_cols = [c for c in self.cols if np.issubdtype(s[c].dtype, np.number)]
+        remaining = list(numeric_cols)
+        y = np.asarray(self.y)
+        final_imp = None
+        while len(remaining) > self.n_features_to_select:
+            imp = _lgb_importance(s, y, remaining, self.task,
+                                  self.native_init_params, self.random_state)
+            drop_count = min(self.step, len(remaining) - self.n_features_to_select)
+            drop_cols = sorted(imp, key=lambda c: imp[c])[:drop_count]
+            remaining = [c for c in remaining if c not in drop_cols]
+            final_imp = imp
+        if len(remaining) == len(numeric_cols):
+            final_imp = _lgb_importance(s, y, remaining, self.task,
+                                        self.native_init_params, self.random_state)
+        self.selected_cols = [c for c in self.cols if c in remaining or
+                              not np.issubdtype(s[c].dtype, np.number)]
+        self.filter_value_dist = final_imp if final_imp else {}
+        return self
+
+    def udf_get_params(self):
+        return {"n_features_to_select": self.n_features_to_select, "task": self.task,
+                "step": self.step, "native_init_params": self.native_init_params,
+                "random_state": self.random_state,
+                "y_len": len(self.y) if self.y is not None else 0}
+
+    def udf_set_params(self, params: dict_type):
+        self.n_features_to_select = params["n_features_to_select"]
+        self.task = params["task"]
+        self.step = params["step"]
+        self.native_init_params = params["native_init_params"]
+        self.random_state = params["random_state"]

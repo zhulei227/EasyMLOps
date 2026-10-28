@@ -160,6 +160,30 @@
 | LogTransform | log1p 变换（右偏分布） | cols |
 | SqrtTransform | 平方根变换（计数/右偏） | cols |
 
+## 特征选择扩展 (feature_selection，v0.2.5)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| NullImportanceFilter | 空重要性筛选：y 打乱训练得空分布，真实重要性 > 分位阈值才保留 | y, n_runs, percentile, task, native_init_params |
+| RFEFilter | LGBM 重要性贪心后向消除 | y, n_features_to_select, task, step |
+
+## 文本特征 (text_features，v0.2.5)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| TextTfidfSvd | 文本列 → TF-IDF → TruncatedSVD 压缩特征追加 | cols, n_components, tfidf_params, drop_origin_cols |
+
+## 超参搜索 (tuner，v0.2.5，需 optuna)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| OptunaTuner | Optuna 贝叶斯搜索 native_init_params，CV 评估后全量重训 | model_class, fixed_params(含 y), search_space, n_trials, cv, task |
+
+## 目标编码增强 (encoding，v0.2.5)
+
+TargetEncoding 新增：`smoothing_k`（标准平滑 (count*mean+k*global)/(count+k)）与
+`cv`（>1 时 `fit_transform_oof(df)` 返回训练行折外编码，防目标泄漏；`transform` 始终用全量映射）。
+
 ## 扩展模块 (extend)
 
 | 类名 | 说明 | 关键参数 |

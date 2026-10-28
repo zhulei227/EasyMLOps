@@ -540,28 +540,40 @@ class LGBMLeafEncoder(EncodingBase):
 class TargetEncoding(EncodingBase):
     """
     目标编码。
-    
+
     根据目标变量的均值对类别特征进行编码。
     支持平滑处理和最小样本数限制。
-    
+
     Args:
         error_value: 找不到列取值时返回的值
-        smoothing: 是否使用平滑处理
+        smoothing: 是否使用平滑处理（按组占比向全局均值收缩）
         min_sample: 最小样本数限制
-    
+        smoothing_k: 标准平滑强度（v0.2.5 新增）：
+                     encoded = (count*mean + k*global) / (count + k)，k>0 时生效
+        cv: 折外(OOF)编码折数（v0.2.5 新增）；>1 时配合 fit_transform_oof 使用，
+            训练行由"排除自身所在折"的映射编码，防止目标泄漏；transform 始终用全量映射
+        random_state: OOF 分折随机种子
+
     Example:
         >>> encoding = TargetEncoding(cols=["city"], y=y, smoothing=True, min_sample=100)
+        >>> # 防泄漏: 训练特征用折外编码
+        >>> te = TargetEncoding(cols=["city"], y=y, cv=5)
+        >>> train_encoded = te.fit_transform_oof(train_df)
     """
-    
-    def __init__(self, cols="all", error_value=-1, smoothing=False, min_sample=100, **kwargs):
+
+    def __init__(self, cols="all", error_value=-1, smoothing=False, min_sample=100,
+                 smoothing_k=0.0, cv=0, random_state=42, **kwargs):
         """
         初始化目标编码。
-        
+
         Args:
             cols: 要操作的列
             error_value: 找不到col取值时返回的值，也可以设置为np.nan待后续处理
             smoothing: 是否使用平滑处理
             min_sample: 需要满足的最小样本量
+            smoothing_k: 标准平滑强度 k（0 表示不启用）
+            cv: 折外编码折数（0 表示不启用）
+            random_state: OOF 分折随机种子
             **kwargs: 其他父类参数
         """
         super().__init__(cols=cols, **kwargs)
@@ -569,6 +581,10 @@ class TargetEncoding(EncodingBase):
         self.target_map_detail = dict()
         self.smoothing = smoothing
         self.min_sample = min_sample
+        self.smoothing_k = float(smoothing_k)
+        self.cv = int(cv)
+        self.random_state = random_state
+        self.oof_encodings_ = None
 
     def show_detail(self):
         """显示目标编码的详细信息。"""
@@ -578,42 +594,83 @@ class TargetEncoding(EncodingBase):
                 data.append([col, bin_value, target_value])
         return pd.DataFrame(data=data, columns=["col", "bin_value", "target_value"])
 
+    def _compute_col_map(self, col: str, values: series_type, target: series_type) -> dict:
+        """计算 col 的目标均值映射（含 smoothing_k 标准平滑 / 旧版占比平滑 / min_sample）。"""
+        tmp = pd.DataFrame({"col_": values.values, "y_": target.values})
+        total_target_value = float(np.mean(target))
+        total_count = len(target)
+        col_map = list(tmp.groupby(["col_"]).agg({"y_": ["mean"]}).to_dict().values())[0]
+        col_map_count = list(tmp.groupby(["col_"]).agg({"y_": ["count"]}).to_dict().values())[0]
+        for col_name, target_value in col_map.items():
+            col_count = col_map_count.get(col_name)
+            if self.smoothing_k and self.smoothing_k > 0:
+                # 标准平滑: (count*mean + k*global) / (count + k)
+                target_value = (col_count * target_value +
+                                self.smoothing_k * total_target_value) / (col_count + self.smoothing_k)
+                col_map[col_name] = target_value
+            if self.smoothing:
+                col_rate = col_count / total_count
+                col_map[col_name] = col_rate * target_value + (1 - col_rate) * total_target_value
+            if self.min_sample:
+                col_count = col_map_count.get(col_name)
+                if col_count < self.min_sample:
+                    col_map[col_name] = self.error_value
+        return col_map
+
+    def _compute_oof(self, s: dataframe_type):
+        """计算训练行的折外编码（cv>1 时防目标泄漏）。"""
+        from sklearn.model_selection import KFold, StratifiedKFold
+        y = self.y
+        if y.nunique() <= 10:
+            splitter = StratifiedKFold(n_splits=self.cv, shuffle=True,
+                                       random_state=self.random_state)
+            splits = splitter.split(s, y)
+        else:
+            splitter = KFold(n_splits=self.cv, shuffle=True,
+                             random_state=self.random_state)
+            splits = splitter.split(s)
+        oof_arrays = {col: np.full(len(s), np.nan) for col, _ in self.cols}
+        for train_idx, valid_idx in splits:
+            for col, _ in self.cols:
+                fold_map = self._compute_col_map(col, s.iloc[train_idx][col], y.iloc[train_idx])
+                encoded = s.iloc[valid_idx][col].map(fold_map)
+                oof_arrays[col][valid_idx] = encoded.fillna(self.error_value).to_numpy()
+        return {col: pd.Series(oof_arrays[col], index=s.index) for col in oof_arrays}
+
+    def fit_transform_oof(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """
+        fit 并返回训练行的折外编码（cv>1 时防目标泄漏；cv=0 时等价于普通 transform）。
+
+        Args:
+            s: 输入数据（须与构造时传入的 y 对齐）
+
+        Returns:
+            DataFrame: 列已替换为（折外）目标编码的完整数据
+        """
+        self.fit(s, **kwargs)
+        result = s.copy()
+        for col, new_col in self.cols:
+            if self.oof_encodings_ is not None:
+                result[new_col] = self.oof_encodings_[col]
+            else:
+                result[new_col] = self.apply_function_series(col, s[col])
+        return result
+
     def udf_fit(self, s: dataframe_type, **kwargs):
         """
         训练阶段，计算各列取值对应的目标均值。
-        
+
         Args:
             s: 输入数据
             **kwargs: 其他参数
-            
+
         Returns:
             self
         """
         assert self.y is not None and len(self.y) == len(s)
-        s["y_"] = self.y
-        # smoothing用
-        total_target_value = np.mean(self.y)
-        total_count = len(self.y)
         for col, _ in self.cols:
-            tmp_ = s[[col, "y_"]]
-            col_map = list(tmp_.groupby([col]).agg({"y_": ["mean"]}).to_dict().values())[0]
-            # update smoothing
-            if self.smoothing:
-                col_map_count = list(tmp_.groupby([col]).agg({"y_": ["count"]}).to_dict().values())[0]
-                for col_name, target_value in col_map.items():
-                    col_count = col_map_count.get(col_name)
-                    col_rate = col_count / total_count
-                    new_target_value = col_rate * target_value + (1 - col_rate) * total_target_value
-                    col_map[col_name] = new_target_value
-            # update min_sample
-            if self.min_sample:
-                col_map_count = list(tmp_.groupby([col]).agg({"y_": ["count"]}).to_dict().values())[0]
-                for col_name, _ in col_map.items():
-                    col_count = col_map_count.get(col_name)
-                    if col_count < self.min_sample:
-                        col_map[col_name] = self.error_value
-            self.target_map_detail[col] = col_map
-        del s["y_"]
+            self.target_map_detail[col] = self._compute_col_map(col, s[col], self.y)
+        self.oof_encodings_ = self._compute_oof(s) if self.cv and self.cv > 1 else None
         return self
 
     def apply_function_single(self, col: str, x):
@@ -629,7 +686,9 @@ class TargetEncoding(EncodingBase):
     def udf_get_params(self) -> dict_type:
         """获取参数。"""
         return {"target_map_detail": self.target_map_detail, "error_value": self.error_value,
-                "smoothing": self.smoothing, "min_sample": self.min_sample}
+                "smoothing": self.smoothing, "min_sample": self.min_sample,
+                "smoothing_k": self.smoothing_k, "cv": self.cv,
+                "random_state": self.random_state}
 
     def udf_set_params(self, params: dict_type):
         """设置参数。"""
@@ -637,6 +696,9 @@ class TargetEncoding(EncodingBase):
         self.error_value = params["error_value"]
         self.smoothing = params["smoothing"]
         self.min_sample = params["min_sample"]
+        self.smoothing_k = params["smoothing_k"]
+        self.cv = params["cv"]
+        self.random_state = params["random_state"]
 
 
 class LabelEncoding(EncodingBase):
