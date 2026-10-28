@@ -42,3 +42,4 @@ python -m twine upload dist/easymlops-0.2.5*
 3. **PyPI 版本不可覆盖**：同名版本上传一次后即锁定，需递增版本号。
 4. **twine 1.6.0**：可用但老旧；若 PyPI 拒绝（API 变更），`pip install -U twine`。
 5. **kaggle_solutions/**：本地私有语料目录，已加入 `.gitignore`，不随仓库发布。
+6. **.ps1 必须带 UTF-8 BOM**：Windows PowerShell 5.1 对无 BOM 文件按系统 ANSI(GBK) 解码，中文注释的字节序列会破坏字符串解析（报"字符串缺少终止符"）。`scripts/release_github.ps1` 已带 BOM，编辑后需保持。

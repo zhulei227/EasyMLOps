@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 # EasyMLOps GitHub/PyPI 发布脚本（v0.2.4 起简化版）
 #
 # 背景: 本仓库(easymlops-trae)自 v0.2.4 起为独立 git 仓库, 本地 main 分支
