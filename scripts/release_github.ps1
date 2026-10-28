@@ -7,7 +7,7 @@
 #
 # 用法:
 #   1. 修改 easymlops/__init__.py 的 __version__
-#   2. powershell -File scripts/release_github.ps1 -Version 0.2.5 [-UploadPyPI] [-SkipPush]
+#   2. powershell -ExecutionPolicy Bypass -File scripts/release_github.ps1 -Version 0.2.6 [-UploadPyPI] [-SkipPush]
 param(
     [Parameter(Mandatory = $true)][string]$Version,
     [switch]$UploadPyPI,
@@ -18,7 +18,8 @@ $projectDir = Split-Path -Parent $PSScriptRoot
 
 # ---- 0. 前置校验: 版本号一致 ----
 $init = Get-Content (Join-Path $projectDir "easymlops/__init__.py") -Raw
-if ($init -notmatch [regex]::Escape("__version__ = `"$Version`"")) {
+$expected = '__version__ = "{0}"' -f $Version
+if ($init.Contains($expected) -eq $false) {
     throw "easymlops/__init__.py 中 __version__ 与 -Version $Version 不一致, 请先修改版本号"
 }
 
@@ -45,4 +46,5 @@ if ($UploadPyPI) {
     python -m twine upload "dist/easymlops-$Version-py3-none-any.whl" "dist/easymlops-$Version.tar.gz"
 }
 
-Write-Host "`nrelease v$Version done" -ForegroundColor Green
+Write-Host ""
+Write-Host "release v$Version done" -ForegroundColor Green
