@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/cassava-leaf-disease-classification/discussion/221150
+fetched: 2026-10-27
+chars: 829
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Makerere University AI Lab · Research Code Competition · 6 years ago
+Late Submission
+more_horiz
+Cassava Leaf Disease Classification
+
+Identify the type of disease present on a Cassava Leaf image
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

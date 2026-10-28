@@ -1,0 +1,52 @@
+url: https://www.kaggle.com/c/tabular-playground-series-feb-2021/discussion/222762
+fetched: 2026-10-27
+chars: 709
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Kaggle · Playground Prediction Competition · 6 years ago
+Late Submission
+more_horiz
+Tabular Playground Series - Feb 2021
+
+Practice your ML skills on this approachable dataset!
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

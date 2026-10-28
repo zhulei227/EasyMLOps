@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/overfitting/discussion/601
+fetched: 2026-10-27
+chars: 836
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Sali Mali · Featured Prediction Competition · 15 years ago
+Late Submission
+more_horiz
+Don't Overfit!
+
+With nearly as many variables as training cases, what are the best techniques to avoid disaster?
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

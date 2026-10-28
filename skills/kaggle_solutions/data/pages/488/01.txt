@@ -1,0 +1,151 @@
+url: https://www.kaggle.com/c/geolifeclef-2022-lifeclef-2022-fgvc9/discussion/327055
+fetched: 2026-10-27
+chars: 8627
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+🥇 1st place solution description — GeoLifeCLEF 2022 - LifeCLEF 2022 x FGVC9
+🥇 1st place solution description
+
+GeoLifeCLEF 2022 - LifeCLEF 2022 x FGVC9
+
+Solution Writeup · 1st place · May 26, 2022
+
+I was thinking how to explain it without spending too much hours but as clear as possible, probably later I will make a graphical representation of the entire data pipeline, models and inference and also maybe a notebook with some preprocessing functions and our best part of the entire experimental pytorch lightning pipeline, but for now I will share what I was writing on the Competitiors Feedback form about our best solution and what we tried that didn't work well. Sorry if I'm not accurate or I don't explain it with more details, it is probably a little bit too dense, specially for those who haven't been fully involved on the competition. What's more, for those of you who can speak or understand Spanish, you can take a look at my Team partner @juansensio Youtube channel were he shared a couple of Twitch lives were he was starting to solve this challenge and he defined the pytorch lightning workflow pipeline, updating metrics to Weights and Biases: https://www.youtube.com/c/sensio-ia
+
+Best solution description:
+
+Ensemble of 3 models: 1- The first one was a bi-modal network with Nir+G+B on a pretrained resnet34 stacking its final layer to a FCN of 3 layers with the inputs of the environmental vectors + lat + lon + country + alt mean + max-min alt + "dothot" encoding (this is how I called the somehow softmax-onehot encoding) of landcovers, these two backbones were connected to the final 17k class layer.
+
+2- The second model was similar to the previous but the CNN was a mobilenetv3 100 large pretrained model with the input of R+G+B+Nir, the FC network was the same of the previous one and between the two stacked final layers of these two models we added an extra Linear Layer of 2048 with dropout and ReLu and then the final 17k layer for classification.
+
+3- The third model was a Random Forest with 32 estimators and a depth of 12, using as inputs the same as the previous FC networks: the environmental vectors + lat + lon + country + alt mean + max-min alt + dothot encoding (softmax-onehot encoding) of landcovers, and also in addition the 25, 50 and 75% percentiles of each of the R/G/B/Nir layers, so 81 input features in total, adding also the validation data to the training.
+
+In addition the first two models had Data Augmentation on the CNN models of random vertical and horizontal flips, rotations and 5-10% of Brightness and Contrast. We also implemented Test Time Augmentation of 5 random image transformations for each sample and then we merged these with the mean probabilities of every prediciton. We applied this same strategy of the mean probablities to merge the 3 models ensemble. Finally we tried to retrain a little further the models adding validation data to train data and it improved a little but probably we could do it better.
+
+Our setup is a rtx3090 with 24gb of vram, with a 12th gen i7 and 64gb of ram from my side and Juan has also a heavy dutty rig with two rtx3090. It's been so much helpful that amount of VRAM for the CNNs but also I needed so much CPU RAM for the Random Forests with 17k classes.
+
+Things that we also tried but performed worse:
+
+We tried to aggregate close labels to have multi label observations, we tried it in different ways and different loss functions but none resulted better than single labels, but something tells me that there has to be a way to make it work. Regarding to labels aggregation, I noticed that at some spots there were up to some hundreds of different labels together, which means that there is a theoretical minimum top30 error to achieve as at some point, even with an ideally perfect model, you will have to bet on 30 labels among 50, 100 or more which are really correct in that location.
+
+We also tried other backbones in the CNN models, we tried to train without transfer learning on these, we tried to put three different backbones for 1. RGBNir + 2. Alt tiffs + 3. Landcover tiffs and then adding this to the FC tabular data backbone to name the most relevant. None of these gave us the best results but probably there is room for some of those to make it better. I also tried gradient boosted trees but with 17k classes this would need probably around a terabyte of RAM I guess.
+
+Conclusion:
+
+At the end I value very positvely our experience participating in this competition, I personally learnt and practised some different new techniques and types of data but I would like to highlight two: the use of multi-modal networks were you can mix structured and unstructured data with their own backbones to finally merge them in the same final layers and also to tackle a problem of presence-only data, something that I have never before encountered or thinked of, but it could really be in other areas like medicine, financial and more, where you can have latent or hidden variables.
+
+Thank you very much to the organizers and the Kaggle team. Also a big aplause to all the people who collect this kind of ecological bio data out there, it's incredible to have almost two millions of data points together with this level of diversity. And finally good job to all the other teams and members who have participated and have motivated us to keep pushing until the last day, I wish that our notes give you all more knowledge and I'm curious to see and learn from what else has been tried and done to achieve almost as good results as ours!
+
+Best Regards!
+
+Enric Domingo
+
+Authors
+Enric Domingo
+
+edomingo
+
+Juan Sensio
+
+juansensio
+
+arrow_drop_up
+11
+Share
+more_horiz
+Citation
+
+Enric Domingo, Juan Sensio. 🥇 1st place solution description. https://www.kaggle.com/competitions/geolifeclef-2022-lifeclef-2022-fgvc9/writeups/sensio-team-1st-place-solution-description. 2022. Kaggle
+
+comment
+5 Comments
+Hotness
+Marília Prata
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Though I' m very late (10 months). A huge congratulations for your 1st place on that Research competition (GeoLifeCLEF 2022 ) Enric. Better late, than ever : )
+
+reply
+Reply
+Enric Domingo
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much Marília! Now it's that time of year again for the CLEF competitions, including the GeoLifeCLEF 2023. (Although I'm currently focused on other competitions, I'm not participating in GeoLifeCLEF this year :P)
+
+reply
+Reply
+Louis Chirol
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing your solution! It appears I tried to do a very similar thing as you did with feature fusion, but could not get good results with training, maybe due to my limited hardware, or something I missed in my code.
+
+reply
+Reply
+Enric Domingo
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi Louis, find here a Linkedin link with a visual schema of that implementation (apparently it is not possible to attach images right now here): https://www.linkedin.com/posts/e-domingo_geolifeclef-kaggle-ml-activity-6935271949359067136-1HnT?utm_source=linkedin_share&utm_medium=member_desktop_web
+
+Also I would mention that maybe I unintentionally missed some details like the sklearn random forest parameter "criterion" which I changed from default "gini" to "entropy", it took double the time to train but with better results. Probably there are some other missing things like the number of perceptrons in the MLPs of the bi modal networks which were 256, 512, 1024 if I remember it correctly with dropout in every layer of 0.2 and maybe the way to preprocess data and the data augmentation strategy. A part from that I could be still missing something else and also you would need at least 24gb of vram in your gpu to train with same batch sizes as I did and 64gb of ram to fit the random forest model and train it. Finally maybe the training seed could also affect by having different trainig results but for this case I didn't use a deterministic process and a fixed random seed. Sorry for not being more precise but there were many experiments and little changes and it's been difficult at the end to keep and explain just what worked and discard many other things that we tried and performed worse.
+
+reply
+Reply
+
+This comment has been deleted.

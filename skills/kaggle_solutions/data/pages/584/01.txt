@@ -1,0 +1,528 @@
+url: https://www.kaggle.com/c/open-problems-single-cell-perturbations/discussion/459258
+fetched: 2026-10-27
+chars: 19475
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution Writeup for Open Problems – Single-Cell Perturbations — Open Problems – Single-Cell Perturbations
+1st Place Solution Writeup for Open Problems – Single-Cell Perturbations
+
+Open Problems – Single-Cell Perturbations
+
+Solution Writeup · 1st place · Dec 13, 2023
+
+I would like to thank the organizers and Kaggle for hosting this exciting competition. I am also grateful to the participants who shared starter notebooks, datasets, and insightful ideas. Below is a more detailed writeup of my solution, including late findings.
+
+Competition Page
+
+https://www.kaggle.com/competitions/open-problems-single-cell-perturbations/overview
+
+https://openproblems.bio/
+
+1. Integration of Biological Knowledge
+
+Since the input features only consisted of pairs of short keywords, that is, cell types and small molecule names, and given the large size of the target variable, I was quickly convinced that I needed to somehow enrich the input feature space. I therefore dedicated my first days of the competition to this task. First, I searched for biological word/term embeddings in the literature, and found the paper ''BioWordVec, improving biomedical word embeddings with subword information and MeSH’’ by Zhang et al [1]. The paper directed me to the code on Github where I could find pretrained embeddings for biological terms. This was motivated by the fact that 1) I would be able to find most cell types, and small molecule names in such embeddings, and 2) The embeddings would encode rich information about the general meaning of each term. With these embeddings, I created larger input features and trained a regression model. This achieved 0.767 on the public leaderboard. With a better hyperparameter search and feature engineering, I improved the score to 0.614. As this seemed to be a good direction to go, I decided to further enrich the input features. This time, I searched for the definition of each cell type and small molecule name on wikipedia. For this, I used the python library wikipedia https://pypi.org/project/wikipedia/. I then represented each cell type and small molecule name by a few sentences describing it, then I bootstrapped an embedding from the descriptions. For example, Nk cells were described by: ''Natural killer cells, also known as NK cells or large granular lymphocytes (LGL), are a type of cytotoxic lymphocyte critical to the innate immune system that belong to the rapidly expanding family of known innate lymphoid cells (ILC) and represent 5–20% of all circulating lymphocytes in humans. The role of NK cells is analogous to that of cytotoxic T cells in the vertebrate adaptive immune response. NK cells provide rapid responses to virus-infected cell and other intracellular pathogens acting at around 3 days after infection, and respond to tumor formation.’’ I also explored different numbers of sentences to describe each cell type and small molecule. While this is interesting from the biological point of view, it did not improve the leaderboard score. In fact, the score became worse (0.656 vs. 0.614 previously). This can be explained by the fact that such natural language descriptions came with some noise, and pretrained embeddings were probably not computed to deal with this. Fine-tuning the embeddings on natural language descriptions of biological terms also fell short.
+
+Because my initial idea about input feature enrichment did not meet my expectations, I decided to look for alternatives. Thanks to the discussions in the forum, I came across a notebook proposing to use SMILES to encode chemical structures of small molecules. I immediately decided to use ChemBERTa embeddings of SMILES encodings and observed a significant improvement in the evaluation metric MRRMSE on the validation data splits (I used a 5 fold cross-validation setting throughout the competition). With this, I developed additional data augmentation techniques, including the mean, standard deviation, and (25%, 50%, 75%) percentiles of differential expressions per cell type and small molecule in the training data.
+
+2. Exploration of the Problem
+
+As mentioned in the previous section, I started the competition by trying to build rich features for the input pairs (cell_type, sm_name). Ultimately, the use of ChemBERTa features of small molecules’ SMILES appeared to be an important step towards this goal. Combined with the mean, standard deviation, and (25%, 50%, 75%) percentiles per cell type and small molecule, I achieved an optimal input feature representation.
+
+In my experiments, I used a 5-fold cross-validation setting with a fixed seed (42). It was hard to achieve a good score on the validation sets of the 2nd and 4th folds. On these folds, the MRRMSE on the validation set was approximately 1.19, and 1.15 on average, respectively. On the 1st, 3rd and 5th folds the average scores were 0.86, 0.86, and 0.90, respectively. The scores are the average across different model architectures (LSTM, 1d-CNN, GRU) and different input feature combinations (''initial’’, ''light’’, ''heavy’’). The three different input feature representations are as follows: “initial”: ChemBERTa embeddings, 1 hot encoding of cell_type/sm_name pairs, mean, std, percentiles of targets per cell_type and sm_name “light”: ChemBERTa embeddings, 1 hot encoding of cell_type/sm_name pairs, mean targets per cell_type and sm_name “heavy”: ChemBERTa embeddings, 1 hot encoding of cell_type/sm_name pairs, mean, 25%, 50%, 75% percentiles of targets per cell_type and sm_name The figure below shows the training curves (MRRMSE) per fold averaged over all three model architectures. 
+
+The differences in the validation MRRMSE in the above figure motivated me to take a closer look into the validation sets, where I found different distributions of cell types. The figure below shows the predominant cell types per fold and the corresponding average (across models and different input feature representations) validation MRRMSE. 
+
+In the validation sets of the 1st, 3rd, and 5th folds, the predominant cell types (in terms of percentage) are ''T regulatory cells’’, ''B cells’’, and ''Nk cells’’, respectively. On the 2nd and 4th folds, ''T cells CD8+’’ and ''Myeloid cells’’ are the most represented cell types in the validation sets, respectively. The percentage is computed as the number of occurrences of a cell type in the validation set divided by the number of occurrences of that cell type in the training set. From the bar-plots above, the cell types that are easier to predict are ''T regulatory cells’’, ''B cells’’, and ''Nk cells’’, while ''T cells CD8+’’ and ''Myeloid cells’’ are the hardest to predict. Based on this observation, an ideal training set should include more ''T cells CD8+’’ and ''Myeloid cells’’ than the rest of the cell types. In this way, trained ML models would be able to generalize to other cell types.
+
+3. Model Design
+Model Architecture
+
+I tried different model architectures, including gradient boosting models, MLP, and 2D CNN which did not work so well. I finally selected LSTM, GRU, and 1-d CNN architectures as they performed better on the validation sets. Below I show a rough implementation of the GRU model.
+
+dims_dict = {'conv': {'heavy': 13400, 'light': 4576, 'initial': 8992},
+                       'rnn': {'linear': {'heavy': 99968, 'light': 24192, 'initial': 29568},
+                                  'input_shape': {'heavy': [779,142], 'light': [187,202], 'initial': [229,324]}
+                     }}
+class GRU(nn.Module):
+    def __init__(self, scheme):
+        super(GRU, self).__init__()
+        self.name = 'GRU'
+        self.scheme = scheme
+        self.gru = nn.GRU(dims_dict['rnn']['input_shape'][self.scheme][1], 128, num_layers=2, batch_first=True)
+        self.linear = nn.Sequential(
+            nn.Linear(dims_dict['rnn']['linear'][self.scheme], 1024),
+            nn.Dropout(0.3),
+            nn.ReLU(),
+            nn.Linear(1024, 512),
+            nn.Dropout(0.3),
+            nn.ReLU())
+        self.head = nn.Linear(512, 18211)
+
+        self.loss1 = nn.MSELoss()
+        self.loss2 = LogCoshLoss()
+        self.loss3 = nn.L1Loss()
+        self.loss4 = nn.BCELoss()
+
+    def forward(self, x, y=None):
+        shape1, shape2 = dims_dict['rnn']['input_shape'][self.scheme]
+        x = x.reshape(x.shape[0],shape1,shape2)
+        if y is None:
+            out, hn = self.gru(x)
+            out = out.reshape(out.shape[0],-1)
+            out = torch.cat([out, hn.reshape(hn.shape[1], -1)], dim=1)
+            out = self.head(self.linear(out))
+            return out
+        else:
+            out, hn = self.gru(x)
+            out = out.reshape(out.shape[0],-1)
+            out = torch.cat([out, hn.reshape(hn.shape[1], -1)], dim=1)
+            out = self.head(self.linear(out))
+            loss1 = 0.4*self.loss1(out, y) + 0.3*self.loss2(out, y) + 0.3*self.loss3(out, y)
+            yhat = torch.sigmoid(out)
+            yy = torch.sigmoid(y)
+            loss2 = self.loss4(yhat, yy)
+            return 0.8*loss1 + 0.2*loss2
+
+
+In my late experiments, I realized that 1d-CNN and GRU are actually the best architectures as they achieve the best scores alone (0.733 for GRU and 0.745 for 1d-CNN on Private LB). LSTM alone achieves 0.839 on Private LB. With 0.25xLSTM + 0.65xCNN the Private LB is 0.725, and with 0.25xLSTM + 0.65xGRU the Private LB is 0.723.
+
+Loss Functions and Optimizer
+
+I simultaneously optimized 4 loss functions via weighted averaging: MSE, MAE, LogCosh, and BCE. The weights are 0.32, 0.24, 0.24, and 0.2, respectively. This was found to enhance the predictive performance of models. The Adam optimizer with learning rate 0.001 for LSTM and CNN, and 0.0003 for GRU was used to train the models. LogCosh is defined as:
+
+class LogCoshLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, y_prime_t, y_t):
+        ey_t = (y_t - y_prime_t)/3 # divide by 3 to avoid numerical overflow in cosh
+        return torch.mean(torch.log(torch.cosh(ey_t + 1e-12)))
+
+
+LogCosh is similar to MAE with the difference being that it is a softer version that can allow smoother convergence. It was adapted from https://github.com/tuantle/regression-losses-pytorch.
+
+The BCE loss is indeed special as it is often used for classification tasks. However, I argue that it sends better signals to the models and optimizers when the target values are close to zero. To demonstrate this, consider the following two pieces of code:
+
+m1 = nn.Sigmoid()
+loss = nn.BCELoss()
+input = torch.tensor([0.05], requires_grad=True).unsqueeze(0)
+target = torch.sigmoid(torch.tensor([-0.05], requires_grad=False).unsqueeze(0))
+output1 = loss(m1(input), target)
+print(output1.item()) # 0.694
+
+m2 = nn.Identity()
+loss = nn.MSELoss()
+input = torch.tensor([0.05], requires_grad=True).unsqueeze(0)
+target = torch.tensor([-0.05], requires_grad=False).unsqueeze(0)
+output2 = loss(m2(input), target)
+print(output2.item())# 0.010
+
+
+With this example, one can observe that the MSELoss tells the model and optimizer that "it is ok, there is no mistake here". Obviously, there is a mistake, and BCELoss can see it as it returns a high loss value (0.694 compared to 0.010 for MSELoss). My choice of the BCELoss in this competition is motivated by the fact that most target values are from a Gaussian distribution with mean 0 as can be seen in the figure below. 
+
+Hyperparameters
+250 epochs of training
+Learning rate 0.001 for LSTM and CNN, and 0.0003 for GRU
+Gradient norm clip value: [5.0, 1.0, 1.0] for the three schemes ''initial'', ''light'', and ''heavy''
+4. Robustness
+
+I conducted 4 experiments using different subsets of the training data, and monitored the private leaderboard score. I considered subsets of the initial training data (de_train) with sizes 25%, 50%, 75%, and 100%. Below 25%, we cannot cover all small molecules in the test set (id_map) even with a stratified split on sm_name, and hence the one hot encoding algorithm cannot run. With 25%, I achieved 0.946. With 50%, I achieved 0.815. With 75% of the training data, it is 0.769, and with the full data the private leaderboard is 0.719 (which is better than my winning submission because I removed padding in the ChemBERTa model). The figure below shows the robustness of my approach as a decreasing curve, i.e., improvement of the MRRMSE with increasing training data amount. 
+
+My second data augmentation technique can be regarded as noise addition. I randomly replace 30% of the input features’ entries with zeros, and add the resulting input feature together with the correct target as a new training datapoint. This has proven to improve the predictive performance of my models. In this sense, my models are robust to the noise as their performance is not hindered but rather improved. The biological motivation here is that we might not need to know the complete chemical structure of a molecule (assuming the dropped input features are from sm_name) to know its impact on a cell. Similarly, there might be a biological disorder in a cell, and we would still expect that cell to respond to a molecule (drug) in the same way as a normal cell.
+
+Below is the data augmentation function
+
+def augment_data(x_, y_):
+    copy_x = x_.copy()
+    new_x = []
+    new_y = y_.copy()
+    dim = x_.shape[2]
+    k = int(0.3*dim)
+    for i in range(x_.shape[0]):
+        idx = random.sample(range(dim), k=k)
+        copy_x[i,:,idx] = 0
+        new_x.append(copy_x[i])
+    return np.stack(new_x, axis=0), new_y
+
+5. Documentation and Code Style
+
+The documentation and software dependencies are available on Github at https://github.com/Jean-KOUAGOU/1st-place-solution-single-cell-pbs
+
+6. Reproducibility
+
+Code is available and well documented on Github at https://github.com/Jean-KOUAGOU/1st-place-solution-single-cell-pbs. Reproduction scripts are added.
+
+Sources
+
+[1] BioWordVec, improving biomedical word embeddings with subword information and MeSH Pytorch Regression Loss Functions [ChemBERTa](https://huggingface.co/DeepChem/ChemBERTa-77M-MTR
+
+Author
+JK-Piece
+
+jeannkouagou
+
+arrow_drop_up
+50
+Share
+more_horiz
+Citation
+
+JK-Piece. 1st Place Solution Writeup for Open Problems – Single-Cell Perturbations. https://www.kaggle.com/competitions/open-problems-single-cell-perturbations/writeups/n-jean-kouagou-1st-place-solution-writeup-for-open. 2023. Kaggle
+
+comment
+19 Comments
+Hotness
+makio323
+
+Posted 3 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations on the 1st place! Thank you very much for sharing your detailed solution and what worked and what did not. I see an exciting intersection of yours and 2nd one - using mean along with std of targets per cell_type and sm_name as features.
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you Makio. Indeed, there is an intersection, which is interesting!
+
+reply
+Reply
+makio323
+
+Posted 3 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I wish you success in future competitions as well!
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Reproduce 1st Place Private Leaderboard Notebook: https://www.kaggle.com/code/jeannkouagou/1st-place-solution Note: Run ChemBERTa Model with random LM head (600-d) and no padding to obtain 0.719 on Private LB
+
+reply
+Reply
+Meraj Hasan
+
+Posted 3 years ago
+
+· 1030th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Excellent work
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you Miraj. I appreciate
+
+reply
+Reply
+Yonggie
+
+Posted 3 years ago
+
+· 1013th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Clear code in github and clear explanation in the post! Congrates!
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you @zechengyin
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations with the victory ! Would you be so kind to share your submission files for further research purposes , please.
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi @alexandervc. Thanks. Here are the submissions: https://www.kaggle.com/code/jeannkouagou/submit-best
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot !
+
+reply
+Reply
+jingfeng ou
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+class LogCoshLoss(nn.Module): def init(self): super().init()
+
+def forward(self, y_prime_t, y_t):
+    ey_t = (y_t - y_prime_t)/3 # divide by 3 to avoid numerical overflow in cosh
+    return torch.mean(torch.log(torch.cosh(ey_t + 1e-12)))
+
+
+Is 1e-12 here misplaced?
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi @jingfengou. Adding 1e-12 is not necessary. But it can act as a small regularizer
+
+reply
+Reply
+maxleverage
+
+Posted 3 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, what's the rationale behind the sigmoid output head?
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for the question. Maybe I was not precise enough. In Section "Loss Functions and Optimizers", I wrote The BCE loss is indeed special as it is often used for classification tasks. However, I argue that it helps models better learn the signs of the predicted values as they are mostly close to zero.
+
+I actually meant that the BCE loss applied on the sigmoid of predictions and targets returns a higher loss (i.e., sends a better signal to the optimizer) when the values involved are close to zero; indeed, most values are close to zero, see plot above. To demonstrate this, let's consider the two pieces of code below:
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+m1 = nn.Sigmoid()
+loss = nn.BCELoss()
+input = torch.tensor([0.05], requires_grad=True).unsqueeze(0)
+target = torch.sigmoid(torch.tensor([-0.05], requires_grad=False).unsqueeze(0))
+output1 = loss(m1(input), target)
+print(output1.item()) # 0.694
+
+m2 = nn.Identity()
+loss = nn.MSELoss()
+input = torch.tensor([0.05], requires_grad=True).unsqueeze(0)
+target = torch.tensor([-0.05], requires_grad=False).unsqueeze(0)
+output2 = loss(m2(input), target)
+print(output2.item())# 0.010
+
+
+With this, one can observe that the MSELoss tells the model and optimizer that "it is ok, there is no mistake here" Oppositely, the BCELoss considers this to be a huge mistake.
+
+reply
+Reply
+Ankush H V
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Why do you think CNN was a good choice for this task
+
+reply
+Reply
+Vinit Shah
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Good work, congrats!
+
+reply
+Reply
+1
+Abhishek Gupta
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrates sir
+
+reply
+Reply
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you @abhishekgupta18895
+
+reply
+Reply
+
+This comment has been deleted.
+
+JK-Piece
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot @manavtrivedi
+
+reply
+Reply

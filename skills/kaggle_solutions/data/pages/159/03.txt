@@ -1,0 +1,5 @@
+url: https://github.com/skrypka/crowdflower-search
+fetched: 2026-10-27
+chars: 47
+
+FETCH_FAILED: IncompleteRead(363464 bytes read)

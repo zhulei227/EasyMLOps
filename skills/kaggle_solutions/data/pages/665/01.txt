@@ -1,0 +1,503 @@
+url: https://www.kaggle.com/c/cmi-detect-behavior-with-sensor-data/writeups/cmi-1st-place-solution
+fetched: 2026-10-27
+chars: 11048
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — CMI - Detect Behavior with Sensor Data
+1st place solution
+
+CMI - Detect Behavior with Sensor Data
+
+Solution Writeup · 1st place · Sep 3, 2025
+
+Links to code:
+
+Training code on github
+Inference notebook
+Solution Writeup
+
+Congratulations to all the winners and a big respect to the organizers for putting together such a challenging and rewarding competition.
+Special thanks to my teammates yuanzhe zhou and Devin Anzelmo for the great collaboration and team spirit.
+
+Solution Overview
+
+Large ensembles for IMU-only and all-features samples, assembled as weighted sum of logits
+
+Post-processing to take into account limited number of samples with each class and with each orientation per subject (already described here)
+
+Additional models for orientation prediction
+
+Devin's part
+
+1. Preprocessing/feature engineering:
+
+Removed subjects who wore device incorrectly from both training and validation
+
+For TOF subsample by taking nine 2x2 squares and calculating mean for each (turn -1 to null first)
+
+Some models trained with temporal difference of above TOF features and thermal
+
+IMU: raw 7 + temporal diff of acc, rotational diff as posted in notebooks, as well as magnitude of acc/rot; 16 total
+
+preprocess left handed to match right handed for IMU and THM/TOF. Flip acc_x, convert rot to xyz euler and flip sign for y and z
+
+robust scaler
+
+2. Augmentation:
+
+up scaling/down scaling all features
+
+random noise
+
+3. Models:
+
+CNN GRU with different stems for different features. Feature extractor is four branches of CNN with no pooling
+
+Pure CNN. Same feature extractor as above but three blocks of residual at end with expanding kernal (5, 9, 13)
+
+dense GRU, scores lower but helps a little in ensemble
+
+some self excitation models, some not combining helps
+
+3D CNN for TOF data scores about 0.83 but blends well
+
+4. Training:
+
+batch size 64
+
+train for 60-80 (depending on model) iters with AdamW lr = 0.0005
+
+5. Ensemble:
+
+blend IMU models with all-features models
+
+blend TOF-only model improves all data score
+
+Ogurtsov's part
+
+1. Filtering data:
+
+[all models] remove sequence SEQ_011975 without gesture
+
+[all models] remove sequences with gesture/total ratio < 0.2 (this subset includes almost all shortest sequences)
+
+[models with THM and TOF data] remove sequences with TOF completely missing (missing values patterns in TOF - 0%, 20% or 100%; 20% missing is ok)
+
+few models were trained without "problematic" subjects SUBJ_045235 and SUBJ_019262
+
+2. Preprocessing:
+
+fill quaternion missing values, if possible
+
+mirror data for left-handed subjects
+
+replace -1 TOF values with 500 because -1 encodes large distance
+
+ultimate filling NaNs with seq.ffill().bfill().fillna(0)
+
+pad/crop by 94 percentile in each fold (~120 max seq length)
+
+no scalers - it gave the largest improvement at early stage
+
+3. Feature engineering:
+
+nothing for THM and TOF
+
+35 IMU features:
+
+['acc_x', 'acc_y', 'acc_z', 'acc_mag', 'acc_mag_jerk', 'jerk_x', 'jerk_y', 'jerk_z', 'jerk_magnitude', 'acc_xy_corr', 'acc_xz_corr', 'acc_yz_corr',    
+rot_w', 'rot_x', 'rot_y', 'rot_z', 'rot_angle', 'rot_angle_vel', 'angular_vel_x', 'angular_vel_y', 'angular_vel_z', 'angular_vel_magnitude', 'angular_distance',    
+acc_x2', 'acc_y2', 'acc_z2', 'acc_mag2', 'acc_mag_jerk2', 'jerk_x2', 'jerk_y2', 'jerk_z2', 'jerk_magnitude2', 'acc_xy_corr2', 'acc_xz_corr2', 'acc_yz_corr2']
+
+
+acc_x2 and other ***2 features are important part of the solution.
+These features are calculated on values transformed by remove_gravity_from_acc().
+
+4. Models:
+
+bunch of models with different architectures for training on IMU-only data and similar models for training with all features
+
+main differences in time dimension processing: LSTM-, attention- or CNN-based
+
+key part - independent processing groups of features at first layers
+
+5. Augmentations:
+
+mixup with MIXUP_ALPHA = 0.4
+
+augmentation from CMI | Sequence Data Augmentation (thanks moth):
+
+transforms = Compose([    
+    TimeShift(p = 0.35, padding_mode = "zero", max_shift_pct = 0.25),    
+    TimeStretch(p = 0.35, max_rate = 1.5, min_rate = 0.5),    
+])
+
+
+with some variations.
+
+It was hard to pick up right augmetations with right probability & strength and apply it in the correct order.
+
+6. Training:
+
+CV5 with group by subject K-fold, 5 models are used on inference
+
+200 or 220 epochs, patience 30 or 35
+
+torch.optim.Adam with lr = 4e-4 or lr = 5e-4 and weight_decay = 3e-4
+
+CosineAnnealingWarmRestarts; LinearLR + CosineAnnealingWarmRestarts for attention-based models
+
+one model was trained with focal loss and class weights (class weights obviously mean nothing for mixup samples, maybe it can serve as regularization)
+
+one model contains bug in cross-attention (shared weights for 3 different attentions) but works pretty well
+
+7. Some tricks:
+
+pick best result for each fold among 3 runs
+
+increase sequence length by 5 on inference (it doesn't improve CV score but effectively decorrelates models)
+
+zyz's part
+
+1.1. Using the pipeline structure from CMI3 Pyroch Baseline+model_add, Aug, folds
+
+1.2. Fixing many bugs improved my score to 0.85.
+
+Models: simple combinations of RNN and CNN1D.
+
+Feature engineering using pytorch, which avoids problem of consistency but makes the training slower.
+
+Basic preprocessing mentioned by most teams: fillnan, handedness, etc.
+
+Post-processing based on data structure.
+
+Augmentation idea from teammates:
+
+6.1. Mask data during training helps.
+
+Authors
+yuanzhe zhou
+
+yuanzhezhou
+
+Ogurtsov
+
+ogurtsov
+
+Devin Anzelmo
+
+devinanzelmo
+
+arrow_drop_up
+81
+Share
+more_horiz
+Citation
+
+yuanzhe zhou, Ogurtsov, Devin Anzelmo. 1st place solution. https://www.kaggle.com/competitions/cmi-detect-behavior-with-sensor-data/writeups/cmi-1st-place-solution. 2025. Kaggle
+
+3
+9
+comment
+16 Comments
+1 appreciation comment
+Hotness
+Sam Bui
+
+Posted a year ago
+
+· 170th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations! I have some question about Devin's part's Preprocessing.
+
+Removed subjects who wore device incorrectly from both training and validation
+
+How do you know that subjects wore device incorrectly?
+
+For TOF subsample by taking nine 2x2 squares and calculating mean for each (turn -1 to null first)
+
+How do you guy do this? I mean, TOF is a matrix 8x8, using 2x2 square so it must need 16 squares. Or if you do with stride=2?
+
+reply
+Reply
+Kurise
+
+Posted a year ago
+
+· 100th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! I have a question about your scales. I also train on no scales data which is better for my model but the scaler data is also better for my inference. I don't know why it will work.
+
+reply
+Reply
+yuanzhe zhou
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It is more about the initialization of the neural network, which is more related to lucky seed. The scale of the provided data is already very good, just divide by 10 is enough.
+
+reply
+Reply
+1
+Sangram Patil
+
+Posted a year ago
+
+· 255th in this Competition
+
+arrow_drop_up
+0
+more_vert
+which is more related to lucky seed.
+
+
+@yuanzhezhou may i ask which seed value or values do you use in traning ?
+
+reply
+Reply
+yuanzhe zhou
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I did not change the seed use by the public notebook, which is 42. it is important not to tune seed for better score
+
+reply
+Reply
+1
+Ogurtsov
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Scaled data on train + not scaled on inference could work only if scaling changes data to a very small extent.
+
+reply
+Reply
+1
+moth
+
+Posted a year ago
+
+· 375th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! I am glad my augmentations worked for you. For me the one that worked the best (besides mixup) was adding random peaks or valleys. This is similar to masking. Another good one is channel dropout :)
+
+reply
+Reply
+Ogurtsov
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Your aug notebook helped me make progress when I got stuck at some moment.
+
+reply
+Reply
+emoji_people
+Fae Gaze
+
+Posted a year ago
+
+· 343rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the 1st place! Really impressive ensemble design and feature engineering across IMU, TOF, and THM.
+
+I had a question regarding CV and data imbalance: since some classes/orientations are underrepresented, did you find that group K-fold by subject was sufficient, or did you try any balancing strategies to make sure rare cases were well-covered during validation?
+
+reply
+Reply
+Ogurtsov
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I used K-fold by subject from the very beginning and didn't try anything else.
+
+reply
+Reply
+Theo Viel
+
+Posted a year ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratz !
+
+I have some questions :)
+
+How does your ensemble perform without PP ?
+How did you implement PP ? Using optimization heuristics / using a transformer model ?
+reply
+Reply
+
+This comment has been deleted.
+
+Ogurtsov
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Exact pure score without post-processing for best submit is unknown, we literally had no submits left to check. Our sub-ensembles at the team merging moment scored like 0.873-0.874 (public scores) and were significantly improved further. We used optimization heuristics, targets/positions distribution information was explicitly available only for small fraction of base models (72-classes).
+
+reply
+Reply
+Theo Viel
+
+Posted a year ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the quick replies.
+Looks like we have comparable ensembles without PP but your PP is stronger !
+
+reply
+Reply
+MYSO
+
+Posted a year ago
+
+· 1006th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Do you mean bugs in my code? If so, could you share what you fixed?
+
+reply
+Reply
+yuanzhe zhou
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hello, it is a good notebook. It was the only pytorch notebook that could train&submit to get good score at that time. The problem is that, many details are limitting further development. For example, ema is never used for validation, Scaler should not use global statistics, etc.
+
+reply
+Reply
+Ricardo Pirabed A.A.
+
+Posted a year ago
+
+· 1828th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wow! Congratulations ! that’s great work. It was clear from the beginning that feature engineering would have a significant impact, the dataset has many faces 😅
+One question: What was the level of scores for your GRU model ?
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (1)
+Joseph Ekpe
+
+Posted a year ago
+
+· 2536th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations

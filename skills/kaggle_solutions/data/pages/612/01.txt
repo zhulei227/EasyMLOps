@@ -1,0 +1,436 @@
+url: https://www.kaggle.com/c/birdclef-2024/discussion/512197
+fetched: 2026-10-27
+chars: 13812
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — BirdCLEF 2024
+1st place solution
+
+BirdCLEF 2024
+
+Solution Writeup · 1st place · Mar 11, 2025
+
+Written by me and @arsenypoyda.
+
+Brief introduction about happiness!
+
+First of all, we want to thank the BirdCLEF Host and Kaggle Team for this competition. Two days ago, we found out that we were in 1st place, and it was unbelievable. Of course, it’s just luck, as the difference between us and 2 or 3 places is negligible, but nevertheless. Moreover, that day, we not only became Kaggle masters but also received a master's degree from the university (double masters 🙂).
+
+Overview
+Data/labels preprocessing.
+BirdCLEF 2024 train_audio
+pseudo labeled unlabeled_soundscapes
+
+For the final submissions, we use only 2024 data, both train_audio and unlabeled_soundscapes. At the very beginning of the competition, we found that random fold0 gives much better results than other folds. To find out why this happens, we calculated various statistics related to signal strength (see the picture below) and found that fold0’s statistics are lower than other folds’.  So for ensembles, instead of folds0-4, we use fold0 and 0.8 quantile of statistics T = std + var + rms + pwr, and this worked well. Seemingly, noisy and too loud audio harms the models.
+
+There are some duplicate audio files in the train data, so we discard them. Data in train_audio is also filtered with Google-bird-vocalization-classifier: if the classifier’s max prediction doesn’t match with the primary label, the chunk is dropped (maybe there is no bird sound or it has a bad quality). If the classifier’s max prediction matches with the secondary label, we replace the primary label with the secondary label. Moreover, if the file has secondary labels, then we take the primary label with 0.5, and the remaining 0.5 is evenly distributed among the secondary labels. We also add pseudo labels obtained with Google classifier to the resulting labels with a coefficient of 0.05. The soundscapes are labeled with an ensemble of Google classifier, and our best models trained only with train_audio. Finally, if the sound is too short, we use cyclic padding.
+
+Model input
+
+Models are trained on 10-second chunks that consist of two 5-second adjacent chunks with averaged labels. The idea is that a 10-second chunk provides processing of full chirps or full periods of chirps (if they are cropped by 5-second chunks).
+
+Mel parameters (10 seconds -> 1x128x640):
+n_fft = 1024
+hop_length = 500
+n_mels = 128
+fmin = 40
+fmax = 15000
+power = 2
+Models
+efficientnet_b0 pretrained on ImageNet
+regnety_008 pretrained on ImageNet
+We tried other models:
+seresnext gives the same results as efficientnet, but the inference time is almost 3 times longer.
+We saw that 3rd place (NVBird) uses efficientvit due to its high speed. In our case, ViTs work significantly worse.
+Modifications like CNN from BirdCLEF 2021 2nd place solution and SED work slower and provide worse results than pure backbones. We are convinced that overly complex models do not work better than simple ones.
+
+We don't experiment with larger models since we have no computation resources and use only Kaggle kernels.
+
+Training!
+Parameters:
+CrossEntropyLoss
+AdamW
+CosineAnnealingLR scheduler
+Initial learning rate 1e-3…3e-3
+7–12 epochs
+Batch size = 96 Training time of one model on Kaggle kernel P100 takes up to 2 hours.
+Data augmentation:
+random audio segment
+XY masking
+horizontal cutmix
+
+First of all, we use only CE loss, not BCE (BCE shows significantly worse results than CE). It can be connected with the specificity of train data. There are too many labels (182), and almost always, only one of them is present (with augmentations up to 2-3). So, the problem is reduced to a multiclass one. During the training, CE loss leads to the multiclass problem, and logits are passed through SoftMax. However, in the inference, we do not use softmax and pass logits through sigmoid (postprocessing is discussed in the next section in detail).
+
+Second, we use audio segmentation. During the epoch, the model sees only one random chunk from each file. The problem is that the train_audio has many small files (+ some really large ones), and unlabeled_soundscapes have few large files. So, we divide the audio into X-second segments that are considered as separate files. We tried X = {20, 30, 60}, which led to a different number of epochs: the smaller the X, the fewer the number of epochs (because the number of steps per epoch is greater). As a result, we balance the train_audio and unlabeled_soundscapes.
+
+Postprocessing
+
+To predict chunk n, the models take 10 seconds: 5 seconds from the chunk n and 2.5 seconds from the previous and next chunks. 
+
+Although logits are passed through softmax during the train, we use sigmoid in the inference. The two most important things in the inference pipeline are chunks averaging and ensembling with min() reduction. In the figure below, we demonstrate the best pipeline for each class in chunk n. 
+
+Using the sigmoid with CE-trained models leads to the predictions being noisy, so min() just lowers uncertain predictions. 
+
+Inference time optimization
+Compilation with OpenVINO (fixed model input)
+Parallel mel spectrograms computing with joblib
+Storing all the computed mel spectrograms in RAM As a result, one model processes the entire test data in ~18 minutes on Kaggle CPU kernel. An ensemble of 6 models, taking into account the creation of mel spectrograms, takes ~2 hours.
+What didn't work
+
+everything else…
+
+Negligible change in score
+183 “nocall” class We add nocall samples from external data to the train and use an additional 183 class. For inference, we take only 182 classes with bird calls. There was no improvement in the public score. Now, we observe a significant increase in private score (0.655 -> 0.671)…
+Mel spectrogram normalization
+Other mel spectrogram parameters
+Input image size 224x224
+15 second chunk as model input
+Softmax temperature
+Weight averaging (SWA and EMA)
+Pseudo labeling with softmax temperature
+Pretraining on the previous years data
+Noticeable decrease in score
+BCEloss, BCEloss with positive weights, focalloss
+Other augmentations (mixup, noise, pixdrop, blur, audio 1d augmentations, horizontal flip)
+STFT instead of mel spectrogram
+Additional data from Xeno-canto We tried different approaches to improve the quality of additional data, such as filtering with Google classifier or BirdNet, taking random fold, and taking some quantile of statistics T. The best solution is not to use additional data… The private score also proves it.
+Pseudo labeling of train data with high coefficient It seems that pseudo-labeling for train_audio is a way of label smoothing, so it is better to use a small coefficient.
+Train on 10 second chunks and inference on 5 second chunks
+Train additional models to detect bird calls
+The scores for such models are close to random/constant prediction
+Multistage training We tried to train several epochs on the train_audio and then on the unlabeled_soundscapes and vice versa. We also tried to train on the whole data and finetune on the train_audio or unlabeled_soundscapes.
+Main steps to success
+
+The table below shows changes relative to the baseline (our 1st submission) pipeline that gives noticeable improvement to the score.
+
+baseline
+efficientnet_b0
+CEloss
+softmax for the inference
+first 5 seconds from each file
+fold0 out of train_audio without duplicates
+Main steps	Private score	Public score
+baseline	0.544028	0.599798
+sigmoid for the inference	0.588338	0.628777
+random 5 second chunk	0.601803	0.638572
+XY masking	0.601909	0.639358
+horizontal cutmix	0.615368	0.670460
+pseudo labeled unlabeled_soundscapes	0.639777	0.687000
+60 second segmentation	0.649936	0.691752
+secondary labels	0.642781	0.695215
+filtering train_audio chunks with Google classifier	0.655190	0.703051
+10 seconds input	0.670410	0.716058
+ensemble (mean) 5 efficientnet_b0	0.686169	0.724319
+ensemble (min) 5 efficientnet_b0	0.688977	0.734945
+✅ ensemble (min) 6 efficientnet_b0	0.689146	0.738566
+ensemble: mean[min(3 efficientnet_b0), min(3 regnety)]	0.691749	0.733836
+✅ ensemble: mean[3 efficientnet_b0, 3 regnety]	0.690391	0.729178
+
+Surprisingly, the results are very stable: correlation of public and private score is 0.96.
+
+Inference Notebook: https://www.kaggle.com/code/chemrovkirill/birdclef-2024-1st-place-inference
+
+Thanks for reading!
+
+Authors
+Kirill Chemrov
+
+chemrovkirill
+
+Arseny Poyda
+
+arsenypoyda
+
+arrow_drop_up
+107
+Share
+more_horiz
+Citation
+
+Kirill Chemrov, Arseny Poyda. 1st place solution. https://www.kaggle.com/competitions/birdclef-2024/writeups/team-kefir-1st-place-solution. 2024. Kaggle
+
+37
+13
+11
+comment
+17 Comments
+2 appreciation comments
+Hotness
+Dieter
+
+Posted 2 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Its not Psi’s CNN. I read this now several times in BirdCLEF solutions. Just because someone gets the chance to post submission summary doesn't mean he developed the solution alone. Its a team result.
+
+reply
+Reply
+Kirill Chemrov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+You're right! Corrected
+
+reply
+Reply
+Muhammed Tausif
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Exactly, correct.
+
+reply
+Reply
+Rinku Sahu
+
+Posted 2 years ago
+
+· 702nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations Team. I'm trying to understand your approach, but I'm having difficulty with the "averaged labels" concept. Since each audio file has a single label, dividing it into 5-second chunks should still result in the same label for each chunk. Could you please clarify what you mean by "averaged labels"?
+
+Model input Models are trained on 10-second chunks that consist of two 5-second adjacent chunks with averaged labels. The idea is that a 10-second chunk provides processing of full chirps or full periods of chirps (if they are cropped by 5-second chunks).
+
+reply
+Reply
+Kirill Chemrov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Sorry for the late reply. You are right about train_audio data. As for unlabeled_soundscapes, we pseudo-label each 5-second chunk, so two adjacent chunks may have different labels.
+
+reply
+Reply
+Rinku Sahu
+
+Posted 2 years ago
+
+· 702nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+That's great. Thank you for clarification 😀.
+
+reply
+Reply
+Cody_Null
+
+Posted 2 years ago
+
+· 293rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great work, congratulations! Happy to learn from this one! I guess I should have spend more time with augmentations, pseudo labeling, and post processing!
+
+reply
+Reply
+Salman Ahmed
+
+Posted a year ago
+
+· 432nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @chemrovkirill and @arsenypoyda, Thank you for sharing the detailed solution.
+
+I have a question, when you created pseudo labels for unlabeled_soundscapes, how did you apply CE loss, if no specie was detected? Did you set a threshold to include or exclude those chunks?
+
+If multiple species are detected in unlabeled_soundscapes, did you normalized it to have the sum of 1 for passing in to CE loss?
+
+reply
+Reply
+Arijit Pal
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Sorry for the delayed comment, but I just had to say — this is truly impressive work. Your solution is incredibly detailed, well-structured, and clearly thought through. Really great job — it definitely deserves recognition!
+
+reply
+Reply
+thacrobatheskis
+
+Posted 2 years ago
+
+· 308th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Sorry to comment so late after your post :) Thanks for the detailed description of the solution, as well as for the excellent presentation on youtube!
+
+we calculated various statistics related to signal strength
+
+I'm having trouble reproducing the same values that you got when calculating these statistics. By any chance were they computed after normalizing the samples using the global mean/std of all samples in the dataset?
+
+Did you apply the same normalization to the audio samples before computing the mel spectrograms, or were the spectrograms derived directly from raw audio?
+
+reply
+Reply
+Sonu Jha
+
+Posted 2 years ago
+
+· 620th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Can someone please tell me, how fold0.ckpt, fold1.ckpt, fold3.ckp has been generated ? I am not able to find the script in github.
+
+reply
+Reply
+Kirill Chemrov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We omitted script and config for training these models. However, the idea is simple. We just train the efficientnet_b0 model on the train_audio only. Folds 0, 1, 3 are chosen due to high public score.
+
+reply
+Reply
+Sonu Jha
+
+Posted 2 years ago
+
+· 620th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, You explained it so well that it's easy for me to understand/replicate the top competition solution for the first time.
+
+reply
+Reply
+Matin Maki Abdullrahman
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I appreciate the information you provided; it’s extremely helpful. Thank you!
+
+reply
+Reply
+Yassine Alouini
+
+Posted 2 years ago
+
+· 381st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+That's a great write-up, thanks for sharing and congratulations on the first position!
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (2)
+CodeHacker
+
+Posted 2 years ago
+
+· 91st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Nice work! Thanks for sharing.
+
+Thibault Barthelet
+
+Posted 2 years ago
+
+· 854th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks for this, very helpful !

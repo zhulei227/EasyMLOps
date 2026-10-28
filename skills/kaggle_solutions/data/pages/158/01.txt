@@ -1,0 +1,99 @@
+url: https://github.com/adbrebs/taxi
+fetched: 2026-10-27
+chars: 8184
+
+GitHub - adbrebs/taxi: Winning entry to the Kaggle taxi competition · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ adbrebs taxi Repository navigation Code Issues 9  ( 9 ) Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ taxi Public Notifications You must be signed in to change notification settings Fork 92  ( 92 ) Star 265  ( 265 ) You must be signed in to star a repository About Winning entry to the Kaggle taxi competition Resources Readme Activity Stars 265 stars Watchers 22 watching Forks 92 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 196 Commits 196 Commits Folders and files Name Name Last commit message Last commit date config config     data data     data_analysis data_analysis     doc doc     model model     visualizer visualizer     .gitignore .gitignore     Makefile Makefile     README.md README.md     __init__.py __init__.py     error.py error.py     ext_saveload.py ext_saveload.py     ext_test.py ext_test.py     prepare.sh prepare.sh     pvalue.py pvalue.py     train.py train.py     View all files Repository files navigation README More items Code of the winning entry to the Kaggle ECML/PKDD taxi destination competition . Our approach is described in our paper . 
+ Dependencies 
+ We used the following packages developped at the MILA lab: 
+
+ Theano. A general GPU-accelerated python math library, with an interface similar to numpy (see [3, 4]). See http://deeplearning.net/software/theano/ 
+ Blocks. A deep-learning and neural network framework for Python based on Theano. As Blocks evolves very rapidly, we suggest you use commit 1e0aca9171611be4df404129d91a991354e67730 , which we had the code working on. See https://github.com/mila-udem/blocks 
+ Fuel. A data pipelining framework for Blocks. Same that for Blocks, we suggest you use commit ed725a7ff9f3d080ef882d4ae7e4373c4984f35a . See https://github.com/mila-udem/fuel 
+
+ We also used the scikit-learn Python library for their mean-shift clustering algorithm. numpy, cPickle and h5py are also used at various places. 
+ Structure 
+ Here is a brief description of the Python files in the archive: 
+
+ config/*.py : configuration files for the different models we have experimented with the model which gets the best solution is mlp_tgtcls_1_cswdtx_alexandre.py 
+ data/*.py : files related to the data pipeline:
+
+ __init__.py contains some general statistics about the data 
+ csv_to_hdf5.py : convert the CSV data file into an HDF5 file usable directly by Fuel 
+ hdf5.py : utility functions for exploiting the HDF5 file 
+ init_valid.py : initializes the HDF5 file for the validation set 
+ make_valid_cut.py : generate a validation set using a list of time cuts. Cut lists are stored in Python files in data/cuts/ (we used a single cut file) 
+ transformers.py : Fuel pipeline for transforming the training dataset into structures usable by our model 
+
+ data_analysis/*.py : scripts for various statistical analyses on the dataset
+
+ cluster_arrival.py : the script used to generate the mean-shift clustering of the destination points, producing the 3392 target points 
+
+ model/*.py : source code for the various models we tried
+
+ __init__.py contains code common to all the models, including the code for embedding the metadata 
+ mlp.py contains code common to all MLP models 
+ dest_mlp_tgtcls.py containts code for our MLP destination prediction model using target points for the output layer 
+
+ error.py contains the functions for calculating the error based on the Haversine Distance 
+ ext_saveload.py contains a Blocks extension for saving and reloading the model parameters so that training can be interrupted 
+ ext_test.py contains a Blocks extension that runs the model on the test set and produces an output CSV submission file 
+ train.py contains the main code for the training and testing 
+
+ How to reproduce the winning results? 
+ There is an helper script prepare.sh which might help you (by performing steps 1-6 and some other checks), but if you encounter an error, the script will re-execute all the steps from the beginning (before the actual training, steps 2, 4 and 5 are quite long). 
+ Note that some script expect the repository to be in your PYTHONPATH (go to the root of the repository and type export PYTHONPATH="$PWD:$PYTHONPATH" ). 
+
+ Set the TAXI_PATH environment variable to the path of the folder containing the CSV files. 
+ Run data/csv_to_hdf5.py "$TAXI_PATH" "$TAXI_PATH/data.hdf5" to generate the HDF5 file (which is generated in TAXI_PATH , along the CSV files). This takes around 20 minutes on our machines. 
+ Run data/init_valid.py valid.hdf5 to initialize the validation set HDF5 file. 
+ Run data/make_valid_cut.py test_times_0 to generate the validation set. This can take a few minutes. 
+ Run data_analysis/cluster_arrival.py to generate the arrival point clustering. This can take a few minutes. 
+ Create a folder model_data and a folder output (next to the training script), which will receive respectively a regular save of the model parameters and many submission files generated from the model at a regular interval. 
+ Run ./train.py dest_mlp_tgtcls_1_cswdtx_alexandre to train the model. Output solutions are generated in output/ every 1000 iterations. Interrupt the model with three consecutive Ctrl+C at any times. The training script is set to stop training after 10 000 000 iterations, but a result file produced after less than 2 000 000 iterations is already the winning solution. We trained our model on a GeForce GTX 680 card and it took about an afternoon to generate the winning solution.
+When running the training script, set the following Theano flags environment variable to exploit GPU parallelism:
+ THEANO_FLAGS=floatX=float32,device=gpu,optimizer=fast_run 
+
+ More information in this pdf 
+ About Winning entry to the Kaggle taxi competition Resources Readme Activity Stars 265 stars Watchers 22 watching Forks 92 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

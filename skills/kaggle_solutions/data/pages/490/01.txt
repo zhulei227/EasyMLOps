@@ -1,0 +1,196 @@
+url: https://www.kaggle.com/c/hotel-id-to-combat-human-trafficking-2022-fgvc9/discussion/328281
+fetched: 2026-10-27
+chars: 5903
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution - New augmentation method + 5 model ensemble — Hotel-ID to Combat Human Trafficking 2022 - FGVC9
+1st place solution - New augmentation method + 5 model ensemble
+
+Hotel-ID to Combat Human Trafficking 2022 - FGVC9
+
+Solution Writeup · 1st place
+
+Thanks to the sponsors and Kaggle for organizing this important research challenge.
+
+TLDR: Solution architecture includes 5 model ensemble at two different image sizes with embedding dimension reduced by PCA. Secret sauce is a newly developed augmentation method designed to deal with large occlusions while maintaining semantic cohesion of the overall scene.
+
+Augmentation - Introducing BlendFlip:
+
+The core problem in this challenge is dealing with large masked occlusions in test/query images. For this my goal was to inpaint the masked region while attempting to:
+
+maintain semantic cohesion with the overall scene
+maintain continuity around masked edges
+fill in visually realistic content
+
+When looking at hotel room images, a common pattern is many vertical and horizontal features against repeating backgrounds. For instance wall corners that run vertical, door frames that run vertical and horizontal, pictures on walls that are square, etc. This observation gave me the idea to apply image patches from the same image directly adjacent to the masked region and essentially flip them into the masked region, and then blend the flips from the vertical and horizontal direction, hence the name BlendFlip.
+
+BlendFlip algorithm:
+
+Determine max distance between masked region edges in the vertical direction (image top to mask top, mask bottom to image bottom). Do same for horizontal. Max direction becomes the regions to be used for inpainting.
+Flip max vertical region into masked region. If initial flip doesn’t fill entire masked region, keep flipping in vertical region until masked region is filled, cut off at edge of masked region.
+Repeat step 2 for horizontal region.
+Take 50/50 blend of step2 and step3 (cv2.addWeighted) as final inpainted region.
+
+BlendFlip helps address 2 1/2 of the 3 problems listed above. It helps maintain semantic cohesion with visually realistic content. It maintains continuity on 2 of the 4 sides of the masked edges. I tried GAN's, traditional CV inpainting methods, variations of CutMix, but BlendFlip significantly outperformed them all.
+
+  
+
+The goal of blendflip is NOT to predict what might be in the occluded region, but rather maintain the integrity of the image embedding from the non-occluded regions.
+
+Solution architecture
+
+The overall solution architecture is shown in the diagram below. Images of sizes 1024x1024 (longest max side scaled to 1024, aspect ratio maintained) or 384x384 are fed into 5 models of various architecture. Each model is trained with ArcFace loss and the embedding size of each is 1536D. The embeddings are then concatenated and reduced to a total of 3072D via PCA (size determined by maintaining 99% of variance of embedding concat), and then KNN performed. Each model is trained with a 50% probability of BlendFlip on each image. BlendFlip is performed on all test images prior to inference. No post processing or re-ranking was applied.
+
+For the CVPR paper I will include proper ablation studies and relative impact of the solution ingredients. BlendFlip accounted for ~0.03-0.04 mAP.
+
+Author
+David Austin
+
+tivfrvqhs5
+
+arrow_drop_up
+30
+Share
+more_horiz
+Citation
+
+David Austin. 1st place solution - New augmentation method + 5 model ensemble. https://www.kaggle.com/competitions/hotel-id-to-combat-human-trafficking-2022-fgvc9/writeups/david-1st-place-solution-new-augmentation-method-5. 2022. Kaggle
+
+comment
+8 Comments
+Hotness
+Hien Tq
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Hi, I am a beginner. I just partly understand your solution. Will you public your code?
+
+reply
+Reply
+Sohier Dane
+
+Kaggle Staff
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+That's a really cool approach, thanks for sharing!
+
+reply
+Reply
+Michal
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats to the 1st place, amazing results and nice solution! BlendFlip is very interesting idea, so glad to see some innovative approach for the occlusions, I believe it may become a thing how to deal with them in similar problems (I will definitely give it a try next time).
+
+Can't wait to see the relative impact of the solution ingredients. Would you mind sharing the effect of PCA here? I am pretty curious.
+
+I can't see in the description if you used any external data, does it mean you managed to get the results with only competition data? That would be really impressive.
+
+reply
+Reply
+David Austin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Would you mind sharing the effect of PCA here?
+
+Performing PCA gives about a 0.01 mAP improvement (vs simple concat of embeddings) while reducing dimensionality at the same time.
+
+I can't see in the description if you used any external data, does it mean you managed to get the results with only competition data?
+
+I used a very small amount of data from FGVC8, only from classes where <8 samples existed in FGVC9.
+
+reply
+Reply
+Marília Prata
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+A huge Congrats David in such an important competition. Beautiful augmentation and Solution architecture.
+
+reply
+Reply
+bobam
+
+Posted 4 years ago
+
+· 39th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Super cool!
+
+reply
+Reply
+David Roberts
+
+Posted 4 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Brilliant @tivfrvqhs5. Thanks for explaining.
+
+reply
+Reply
+
+This comment has been deleted.

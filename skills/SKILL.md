@@ -150,6 +150,25 @@ pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 | YOLO 视觉任务 | [11_yolo.md](./references/docs/11_yolo.md) |
 | OCR 文本识别 | [12_ocr.md](./references/docs/12_ocr.md) |
 
+## Kaggle 优胜方案挖掘（kaggle_solutions/ 子技能，离线自包含）
+
+内含 **721 场比赛元数据 + 1275 篇头部优胜方案全文**（离线语料随仓库分发），用于为当前建模任务匹配历史优胜打法并挖掘可落地为 pipe 的技术。
+
+```bash
+cd skills/kaggle_solutions
+python scripts/kaggle_solutions.py search <关键词> --solutions   # 检索比赛/方案
+python scripts/kaggle_solutions.py read <number> <rank>          # 读离线方案全文
+python scripts/kaggle_solutions.py grep "pseudo-labeling"        # 语料全文检索
+python scripts/match_task.py "当前任务描述" --out report.md        # 任务→相似比赛→优化清单
+python scripts/embedding_index.py build                          # 重建 TF-IDF 语义索引(下载新语料后)
+python scripts/_tech_scan.py                                     # 技术×词频统计(补 pipe 优先级依据)
+```
+
+注意：
+- 语料增量下载需 playwright-cli + Edge/Chrome（`scripts/download_solutions.py`），下载后重建索引
+- `data/index/`（0.7MB）为可再生缓存，已 gitignore；`data/pages/` 与元数据随仓库分发
+- 挖掘结论与 pipe 落地节奏见 docs/RELEASE.md 同代的 `tests/test_new_pipes.py`（SeedAveraging/PseudoLabelPipe/PredictionPostProcess 即来源于此）
+
 ## 业务任务 Playbook（references/playbooks/，迭代优化指导）
 
 面向具体业务场景的建模迭代闭环指导，每篇含：标签/样本 checklist、实测 API 的 Pipeline 模板、迭代路径、工具缺口（外补方案）。业务规则留作业务方填写。

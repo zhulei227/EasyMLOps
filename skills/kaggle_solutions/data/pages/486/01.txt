@@ -1,0 +1,197 @@
+url: https://www.kaggle.com/c/g-research-crypto-forecasting/discussion/286676
+fetched: 2026-10-27
+chars: 5476
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+G-Research · Featured Code Competition · 4 years ago
+Late Submission
+more_horiz
+G-Research Crypto Forecasting
+
+Use your ML expertise to predict real crypto market data
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+· Posted 5 years ago
+·
+
+arrow_drop_up
+35
+more_vert
+1st Place of Jane Street 🏆 ➜ Adapted to Crypto 👌
+1st Place of Jane Street 🏆 ➜ Adapted to Crypto 👌
+
+TL;DR: Here it is
+
+Hi Guys,
+
+I just finished converting the 1st place winning solution of Yirun Zhang from Jane Street market prediction competition earlier this year.
+
+The notebook is right here.
+
+It is a simple starter notebook using purged group time series. There are many configuration variables to allow you to experiment. Use either GPU or TPU. You can control which years are loaded, which neural networks are used, and whether to use feature engineering.
+
+You can experiment with different data preprocessing, model architecture, loss, optimizers, and learning rate schedules. The extra datasets contain the full history of the assets at the same format of the competition, so you can input that into your model too.
+
+The solution: Encoder + MLP:
+
+The main idea of using an encoder is the denoise the data. After many attempts at using an unsupervised autoencoder, the choice landed on a bottleneck encoder as this will preserve the intra-feature relations.
+
+Main Ideas:
+
+In Jane street competition, Yirun has used a supervised autoencoder MLP approach and his teammates use XGBoost. Their final submission is a simple blend of these two models. Here, We explain Yirun's approach in detail.
+
+The supervised autoencoder approach was initially proposed in Bottleneck encoder + MLP + Keras Tuner and was adapted to this competition here, where one supervised autoencoder is trained separately before cross-validation (CV) split. Yirun have realized that this training may cause label leakage because the autoencoder has seen part of the data in the validation set in each CV split and it can generate label-leakage features to overfit. So, his approach was to train the supervised autoencoder along with MLP in one model in each CV split. The training processes and explanations are given in the notebook and the following statements.
+
+The Model:
+
+Use autoencoder to create new features, concatenating with the original features as the input to the downstream MLP model
+Train autoencoder and MLP together in each CV split to prevent data leakage
+Add target information to autoencoder (supervised learning) to force it to generate more relevant features, and to create a shortcut for backpropagation of gradient
+Add Gaussian noise layer before encoder for data augmentation and to prevent overfitting
+Use swish activation function instead of ReLU to prevent ‘dead neuron’ and smooth the gradient
+Batch Normalisation and Dropout are used for MLP
+Use Keras Tuner to find the optimal hyperparameter set
+
+This notebook follows the ideas presented in my "Initial Thoughts" [here][1].
+
+Happy Kaggling! Cheers ^^
+
+Please sign in to reply to this topic.
+
+comment
+6 Comments
+Hotness
+sylvain92
+
+Posted 3 years ago
+
+arrow_drop_up
+-1
+more_vert
+
+Hi, we are building a team to go further on crypto prediction based on this notebook and correlation between cryptos, who want to join (only expert on ML/DL with value added please)
+
+Dmitriy777
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+hello my mail avtosubaru25@gmail.com
+
+dragon zhang
+
+Posted 5 years ago
+
+· 1574th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+got a wierd PB -0.000
+
+Eugeniu
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+This link is dead.
+
+sylvain92
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+HI, did you find the link ? also interested
+
+Gabriele T.
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I have copied it here from the original notebook. https://www.kaggle.com/code/gabrielet/1st-place-of-jane-street-adapted-to-cr-e71493/edit
+
+Gabriele T.
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+However, I think there might be a problem in the way the model is fitted, in particular for the outputs.
+
+The fit below is defined using x_train and y_train for labels: history = model.fit( x_train, y_train, epochs = EPOCHS[fold], callbacks = [sv,get_lr_callback(BATCH_SIZES[fold])], validation_data = (x_val, y_val), verbose=VERBOSE )
+
+Whereas the model outputs have [decoder, out_ae, out] model = tf.keras.models.Model(inputs = inp, outputs = [decoder, out_ae, out]).
+
+In the original model of Yirun Zhang and coworkers for the winning solution on the Jane Street challenge the model is fitted as one would expect returning 3 outputs: [X[tr], y[tr], y[tr]]
+
+history = model.fit(X[tr], [X[tr], y[tr], y[tr]], validation_data = (X[te], [X[te], y[te], y[te]]),
+
+See: https://github.com/MingjieWang0606/Kaggle-Jane-Street-AE-MLP-xgb-TOP1/blob/main/current-1th-jane-street-ae-mlp-xgb.ipynb
+
+sylvain92
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi, i think the link is dead too…. but maybe i mistake. Do you still work on the model ? i look for partnership to investigate furthermore predicting crypto. I have good dataset with 3K features, feel free to contact me
+
+dragon zhang
+
+Posted 5 years ago
+
+· 1574th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thx. I would like to try try.

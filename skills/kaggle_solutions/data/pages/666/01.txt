@@ -1,0 +1,451 @@
+url: https://www.kaggle.com/c/make-data-count-finding-data-references/writeups/1st-place-solution
+fetched: 2026-10-27
+chars: 17805
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Make Data Count - Finding Data References
+1st Place Solution
+
+Solution using EUPMC- and DataCite-based dataset mentions classified into types by Catboost and Qwen
+
+Make Data Count - Finding Data References
+
+Solution Writeup · 1st place · Sep 10, 2025
+
+Thank you, Kaggle and Make Data Count for organizing this competition! We are very happy to have won first place.
+
+Competition overview
+
+In this competition, we had to detect datasets mentioned in scientific articles and predict what is the dataset type (Primary/Secondary). There were two kinds of dataset mentions: DOIs (e.g. “https://doi.org/10.7937/k9/tcia.2015.pf0m9rei”) and accession ids (e.g. “SAMN16233650”, “CHEMBL1257578”, “PF15461”). Primary means that data was generated for that article. Secondary means that the data was reused, previously existing.
+
+Labeling
+
+As mentioned many times (link; link, link) in the discussions during the competition, the training and test-set articles had missing labels and were not human-labeled from scratch.
+
+Dataset mention pairs in labels were built on EUPMC NER-based text-mined accession IDs and DataCite dataset DO-to-article mappings, as confirmed by the host. This means that the labels contained similar biases to the EUPMC NER model and did not include any accession id that the NER model did not detect in the article or which the NER model did detect but which did not pass the host's filtering logic of accession ids due to regex constraints.
+
+Due to this, relying on EUPMC and DataCite as dataset mention sources outperformed any pure regex or other extraction approach.
+
+Metric and validation
+
+Some articles were sparsely labeled - meaning that if the labellers detected at least one dataset id to be missing from the article, they labeled it type “Missing” and did not provide any other truly not-missing labels for that article. Even though these sparsely labelled articles did not account towards the competition metric F1 score, they created incorrect FPs in local validation if you did not discard them in your validation metric like suggested by @mccocoful.
+
+Even though the adjusted F1 score gave a better indication of LB performance than the non-adjusted F1, the correlation was still somewhat shaky and not always reliable. The correlation was better for DOIs. We used LB submissions to determine if a particular accession id family (e.g. BioSample, UniProt, MetaboLights) was within the public test set or not.
+
+When taking into account that sparsely labelled articles did not matter, the distribution of accession ids and dataset DOIs was by our estimates roughly 70%-30%. In addition, dataset DOIs articles seldom had more than 2-3 dataset mentions while there could be tens of accession ids per article. We agree with @suicaokhoailang's opinion that it might have been better if F1 was macro.
+
+Summary of our solution
+DOI mentions are based on Data Citation Corpus mention pairs where DataCite is source.
+Accession id mentions are partly based on selected accession id families from Data Citation Corpus pairs where eupmc is source and partly on selected families from dataset id - article id mappings in original EUPMC source.
+We keep only dataset ids that appear in the article text.
+DOI classification is done with blended predictions from 6 Catboost models. Most important are features we created by gathering and comparing article and dataset DOI titles and authors.
+Accession id classification is done with a simple 0-shot prompt using Qwen where we only show the context snippet around the accession id from the article text. An exception to this are BioSample (SAMN) accession ids where we also give the article title, authors, published year and accession id BioSample submitter and date to the prompt along with the context snippet.
+Detailed solution
+
+The process has 2 steps: 1) determining which dataset ids to include as dataset mentions for an article, 2) predicting their type as Primary or Secondary.
+
+We used different logic for dataset DOIs and accession ids in both steps.
+
+First we have the DOI detection and type prediction pipeline. Then we predict accession ids only for articles for which no DOI was predicted. Contrary to public discussions, not predicting any accession ids for articles that got DOI predictions gave a boost to our LB score.
+
+We converted PDFs to plain text using PyMuPDF, same as most other competitors.
+
+DOI
+Stage 1: mention-level detection
+Source of DOI mention candidates was Data Citation Corpus V4.1 where source == DataCite. Version 4.1 was selected over V3 of the Corpus because it showed slightly better results on the training set labels.
+From Corpus DataCite DOIs we kept only DOIs that appeared in PDF or XML of the article. TXT conversions from PDFs had to be cleaned of whitespace and unicode normalized before regex matching to get good recall. From 325 ground truth training set non-missing dataset DOIs, this approach gets 321 mention-level predictions of which 302 are true positives and 19 are false positives. That approach misses 23 training dataset DOIs due to the article or mention pair not being present within the corpus. False positives are usually due to version mismatch or errors in training set labeling. Mention-level DOI F1 score was 0.9350, calculated only on non-missing DOI labels.
+100% recall for the training set dataset DOIs can be achieved if using DataCite API or data dump in complement with the Corpus. However, adding dataset DOI mentions straight from DataCite produced more False Positives in local CV which is why we kept to using only the Corpus.
+Stage 2: type classification
+We did not use context around the DOI in articles, type classification is fully metadata-based.
+Corpus already has some metadata, for example dataset title, article publisher, journal. We gathered additional metadata for:
+Article metadata via Crossref: authors, title, published year, publisher, journal. Even though Corpus has article publisher and journal, it is sometimes missing or a bit different from what we extracted from Crossref.
+Dataset DOI metadata via DataCite: authors, published year.
+Feature engineering: most focus was on comparing dataset and article titles, authors and published year. The article publisher, journal and dataset repository were also kept as categorical features. Also derived some additional features like the number of DOI predictions per article.
+DOI type classification was done using Catboost only. Trained 6-fold type-stratified Catboost grouped by article ids. Grouping by articles is important because the test set also has new articles and we need to imitate that.
+Most important features in Catboost were title similarity and authors similarity features.
+On the training set, type classification OOF F1 score was 0.87. Calculated on only the 302 TP mention-level non-missing DOIs.
+If we take into account the mention-level FP and FN, the overall triple match (article_id, dataset_id, type) OOF F1 score calculated only on DOI labels was 0.82.
+ACCESSION IDS
+Stage 1: mention-level detection
+Our solution does not extract accession id mentions from articles. Instead we used Data Citation Corpus V4.1 with source filtered to include only “eupmc”. Complementary to the Corpus we used the original EUPMC text-mined accession id - article id mappings which can be found here.
+The reason for using both is that the Coprus does not include all EUPMC accession id families. In the Corpus documentation is a list of which are included. For example cellosaurus is not included in the Corpus while it does exist in the test set labels.
+In addition, many families are filtered and records removed in Corpus compared to the original EUPMC mapping. One such example is the Protein Data Bank which has much less accession ids in Corpus than in original EUPMC. In this case the Corpus Protein Data Bank accession ids are more in agreement with the test set labels than the original eupmc ones.
+We put consideration to which accession id families to include from Corpus and which from original EUPMC mapping. To decide we experimented on the training set as well as made submissions to see the effect on LB score. Because time and subs were limited, our final list of families is probably not optimal and could be made better.
+Corpus “eupmc”-source families/repositories:
+Final submission list of included: ArrayExpress, InterPro, ChEMBL, CATH, Electron Microscopy Public Image Archive (EMPIAR), PRIDE Proteomics Identification Database, NCBI Reference Sequence Database, UniProt, Ensembl, Pfam Protein Families, BioProject, The Protein Data Bank, UniParc, IntAct, Orphadata, Reactome, BioStudies, MetaboLights, RNAcentral, The Electron Microscopy Data Bank (EMDB), GISAID, NCBI dbGaP, BioModels, BioSample, Gene Expression Omnibus, BioImage Archive, The International Genome Sample Resource, TreeFam, Complex Portal (CP), MGnify, Molecular INTeraction Database.
+Additionally we saw that the European Nucleotide Archive had many FP and worsened the score when including it unfiltered. However, with filters it gave a boost to the score. We included accession ids starting with SR|STH|CP|KX|BX|CAB|EFO|SCV|VCV|ERR or with K followed by 5 digits.
+NOT included from Corpus: Genome assembly database, The European Genome-phenome Archive (EGA), AlphaFold Protein Structure Database, HUGO Gene Nomenclature Committee, dbSNP Reference SNP, DataverseNO, Mendeley, Dryad, OSU OREME, NASA Langley Atmospheric Science Data Center Distributed Active Archive Center, PANGAEA.
+EUPMC original mapping families:
+Final submission list of included: gisaid, arrayexpress, interpro, chembl, bioproject, pfam, ensembl, cellosaurus, cath, empiar, hpa, pxd, biomodels, dbgap, biosample, biostudies, emdb, intact, metabolights, metagenomics, rfam, rnacentral, uniparc, reactome, geo, refseq, refsnp.
+Did NOT include: alphafold, bia, brenda, chebi, complexportal, doi, ebisc, efo, ega, eudract, gca, gen, go, hgnc, hipsci, mint, orphadata, treefam, uniprot.
+We left the accession id casing as is in the Corpus meaning that they are lowercase or uppercase depending on how they were mined by EUPMC / appeared in the article.
+We kept only accession ids that appeared in the article.
+Stage 2: type classification
+LLM-based classification. Did not force any types for specific accession ids.
+Model Qwen2.5-Coder (32B, AWQ quantization) + vLLM. Coder was better in classification than base model.
+Task prompt asked the model to classify an accession id mention as Primary or Secondary based on the context snippet around the accession id from the article. It was 0-shot with a very simple prompt.
+Incorporated article metadata (title, authors, journal, year) and BioSample metadata (submitter name and date) for SAMN ids. The article metadata was from EUPMC and the BioSample metadata was gathered via NCBI API. Our aim here was not to force SAMN to Primary in case the private test had Secondary SAMN types. On public LB this yielded the same result as forcing SAMN to Primary. On private LB our worries did not come true and the metadata-enriched prompt logic gave a 0.001 lower score.
+Used MultipleChoiceLogitsProcessor to constrain outputs to A or B.
+As an additional rule-based postprocessing step, set the type for each accession id to the most frequent type prediction within the same accession id family/repository for that article.
+
+Note: BioSample (SAMN) was the only accession id family for which we enriched the LLM prompt with accession id submitter name and date. This logic has potential to increase type classification for other families as well. We only tried the same approach with PDB and BioProject accession ids but did not have enough subs to make it work.
+
+Final submission runtime and scores (F1)
+Metric	DOI-only	ACC-only	Full solution
+Runtime on train	13m	16m	29m
+Train F1 basic, all non-missing labels	0.569	0.472	0.720
+Train F1 adjusted, w/o sparsely labelled articles	0.573	0.611	0.889
+Public LB	0.362	0.754	0.890
+Private LB	0.350	0.664	0.797
+
+The runtime could be optimized (and Polars used instead of Pandas) but our focus was elsewhere. Runtime includes Catboost training.
+
+What did not work
+Qwen was worse in classifying dataset DOI type than Catboost, even when giving article and dataset metadata together with a context snippet. Also adding Qwen as Catboost predictions reviewer did not help.
+Using dataset DOI - article relationship type (e.g. IsSupplementTo) from DataCite in trying to determine the DOI type. Maybe did not experiment enough.
+Using article context features in DOI type classification. Either we did not experiment enough or the signal was already good enough by comparing article-dataset titles, authors and published years.
+Making Qwen accession id type classification prompt fancier, adding article metadata, writing the prompt in Chinese.
+PDF to text parsing with higher quality OCR models like the ones used in Marker gave better quality text output but was too slow to use.
+Appreciation
+
+Thanks to all who shared ideas in the Discussions. Special thanks to:
+
+@mccocoful, for sharing his work and tips which helped us get started.
+@rdmpage, for many insights about the data and labelling.
+@sergiosaharovskiy, for sharing Protein Data Bank data which we used in earlier versions of our work.
+@suicaokhoailang, for your remarks in the Discussions that made us laugh out loud.
+
+Code
+
+Kaggle notebook for 1st Place Solution is here.
+
+Authors
+Ali
+
+asalhi
+
+Kea Kohv
+
+keakohv
+
+arrow_drop_up
+61
+Share
+more_horiz
+Citation
+
+Ali, Kea Kohv. 1st Place Solution. https://www.kaggle.com/competitions/make-data-count-finding-data-references/writeups/1st-place-solution. 2025. Kaggle
+
+12
+comment
+19 Comments
+1 appreciation comment
+Hotness
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. This is very helpful. However, I do have a question I am sure you had many high scores, what was the rational or how did you exactly select the best 2 in your case for submission?
+
+reply
+Reply
+1
+Ali
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We tried to balance risks, actually 😅
+We were afraid of SAMN to primary, we were afraid of acc_ids with no effect on LB.
+But in the end, we selected the subs with high doi and high acc_id score (with less risks) - so, for example, no fixed to primary SAMN.
+
+reply
+Reply
+Quan Vu
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+I still prefer a solution where ML wins over LLM. Congratulations 🎉
+
+reply
+Reply
+2
+Mohamad Hallak
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. well done.
+
+reply
+Reply
+2
+YichiZ
+
+Posted a year ago
+
+· 38th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning the 1st place🎉! A very impressive solution, especially for the classification of DOIs, by discarding LLM and choosing ML, it is truly inspiring! We also attempted to match the ACCESSION IDS using the corpus, but failed to find a suitable match.
+
+reply
+Reply
+1
+Kea Kohv
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! And, yes, Catboost is one of my favourite ML models so I was happy it worked here :) Simple and fast.
+
+reply
+Reply
+YichiZ
+
+Posted a year ago
+
+· 38th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+In the early stage of the competition, before we had access to the DOI corpus, we had attempted to use ML methods such as catboost to filter and classify DOI IDs. However, the results were not satisfactory. Therefore, your use of the catboost approach was very inspiring. It is truly fast and efficient! Thank you for sharing the method of using a corpus for ID filtering! Once again, congratulations to you all!🎉
+
+reply
+Reply
+1
+Khushi Yadav
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+a very Congratulations.
+
+reply
+Reply
+2
+cm391
+
+Posted a year ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! A very clever solution and seemingly a great partnership!
+
+reply
+Reply
+2
+Kea Kohv
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! It was a joy to work with Ali. He's great :)
+
+reply
+Reply
+1
+Mohan Krishna Thalla
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the 1st place! 🎉 Really liked how you combined CatBoost for DOI classification with LLMs for accession IDs smart balance of structured features and context.
+
+reply
+Reply
+1
+Bill Fan
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+would you like to share you code? thanks very much
+
+reply
+Reply
+Kea Kohv
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hey, Bill! Our code is published, you can find it here.
+
+reply
+Reply
+Vivek Kumar
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning the 1st place🎉!
+
+reply
+Reply
+1
+Abdullah
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work. Keep Pushing Forward.
+
+reply
+Reply
+1
+Ladipo Samson
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on 1st place! 🎉 Love how you blended CatBoost + Qwen super smart use of metadata too.
+
+reply
+Reply
+1
+BwandoWando
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @keakohv and @asalhi for winning first place! 🥳🙂
+
+reply
+Reply
+1
+ZAID
+
+Posted a year ago
+
+· 545th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on 1st place 🎉 Awesome solution and really inspiring work!
+
+reply
+Reply
+2
+Kea Kohv
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! 🙂
+
+reply
+Reply
+Appreciation (1)
+aberry
+
+Posted a year ago
+
+· 570th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congrats !

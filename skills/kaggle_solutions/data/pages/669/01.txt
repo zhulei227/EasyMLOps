@@ -1,0 +1,725 @@
+url: https://www.kaggle.com/c/stanford-rna-3d-folding/writeups/1st-place-solution
+fetched: 2026-10-27
+chars: 19993
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Stanford RNA 3D Folding
+1st Place Solution
+
+Hybrid TBM + DRfold2 Approach
+
+Stanford RNA 3D Folding
+
+Solution Writeup · 1st place · Sep 29, 2025
+
+Thank you Kaggle and the competition hosts, for this incredible competition and the opportunity to participate. Your passion for this challenge was truly infectious and served as one of my driving forces throughout the competition.
+
+Since this is my first gold and my first win on Kaggle, I would like to take the opportunity to thank @jhoward for the fast.ai course, @radek1 for their book which was an inspiration in my ML journey. Khan Academy for helping me rethink mathematics, and @huggingface for their amazing deep learning courses.
+
+Competition Strategy
+
+My approach was clear from the outset. Without GPUs, training a model from scratch or fine-tuning was not viable. My early research - drawing on CASP results, literature, and conference talks, including one by host @rhijudas - showed that Template-Based Modeling approaches consistently dominated. Based on this, I committed to TBM from day one and spent the next 90 days refining my method.
+
+Next, I focused on the evaluation metric, since understanding it determines the exploration path. TM-score has two key properties: it is normalized by structure length (so 50nt and 200nt RNAs are compared on the same 0-1 scale), and it is robust to local errors - a small number of misplaced nucleotides does not disproportionately lower the score. This insight allowed me to prioritize getting the overall fold correct over achieving atomic-level precision.
+
+Data Strategy and Model Selection
+
+The host-provided dataset was comprehensive. I systematically processed all CIF files in the provided PDB_RNA directory with comprehensive nucleotide mapping (93 variants including modified bases) and disorder-aware coordinate extraction. This process ensured complete coverage of the available structural data, capturing modified nucleotides that standard parsers might otherwise miss.
+
+After exploring nearly all available open-source models, I selected DRfold2 as the optimal choice due to its extensive potential for optimization. Rather than fine-tuning the model itself, I focused on enhancing its optimization and selection modules. This strategy improved prediction quality while ensuring the pipeline could execute efficiently on Kaggle GPUs.
+
+Template-Based Modeling (TBM)
+
+TBM follows a five-step process:
+
+1. The Search - Finding Similar Structures
+
+The goal is identifying database structures that resemble the target sequence through sequence alignment.
+
+2. The Alignment - Sequence Mapping
+
+This step creates the translation guide between query and template using global sequence alignment with gap penalties optimized for RNA.
+
+3. The Transfer - Coordinate Inheritance
+
+Straightforward copying of 3D coordinates for all matched positions. This leverages the evolutionary tendency for RNA to conserve 3D structure more than sequence.
+
+4. The Gap Fill - Geometric Backbone Reconstruction
+
+For insertions and deletions, I relied on geometric principles maintaining RNA's characteristic backbone:
+
+Maintains C1'-C1' distance (~5.9Å between consecutive nucleotides)
+For compressed gaps: extends the backbone with realistic curvature using sinusoidal perturbations perpendicular to the backbone direction
+For normal gaps: uses linear interpolation between flanking coordinates
+Terminal extensions follow the established backbone direction
+
+5. Adaptive Refinement - Confidence-Based Optimization
+
+The refinement intensity adapts to template confidence score:
+
+High-confidence templates (>0.8 similarity): minimal constraints, preserving template geometry
+Medium-confidence templates: moderate sequential distance constraints (5.5-6.5Å)
+Low-confidence templates: additional steric clash prevention and light base-pairing constraints.
+Constraint strength scales as: 0.8 × (1 - min(confidence, 0.8))
+DRfold2 Enhancements
+Selection Module
+Double Precision Calculations: Consistent float64 operations reduce numerical errors for more reliable model rankings
+Vectorized Distance Calculations: GPU-accelerated pairwise distance computation via torch.cdist
+Optimized Energy Functions: Pre-computed cubic spline coefficients enable fast structure scoring without repeated spline fitting
+
+These improvements were motivated by the authors' own observations that DRfold2 sometimes failed to select its best models. For example, they report cases where the 5th-ranked model significantly outperformed the top-ranked one (p. 8, lines 305–317), underscoring the need for more robust post-processing and ranking protocols (p. 9, lines 319–321).
+
+My modifications directly targeted this weakness by making scoring and ranking more accurate and consistent.
+
+Optimization Module
+PyTorch LBFGS: Native optimizer with automatic differentiation delivers more accurate gradients and better convergence than SciPy implementations.
+GPU Acceleration: Energy calculations and gradient computations performed on GPU where possible.
+External Knowledge Integration: Enhanced capabilities through Boltz-1 integration (credit to @youhanlee) - (2nd notebook submission)
+
+The authors themselves highlight the flexibility of DRfold2's optimization framework, demonstrating this by integrating AlphaFold3 conformations as an additional potential term (p. 9, lines 327–329). This hybrid approach yielded significantly better results than either method alone, achieving higher TM-scores and lower RMSDs (p. 9, lines 331–334). They conclude that such integration represents a promising direction for future improvements (p. 10, lines 370–372).
+
+My own optimization experiments followed this spirit of extensibility, focusing on GPU acceleration and integration of Boltz-1.
+
+Hybrid Strategy
+
+The final pipeline uses a strategic combination:
+
+Template-based modeling: For shorter sequences and when time budget is exhausted.
+DRfold2: For the rest of sequences where deep learning excels.
+Graceful fallback: DRfold2 failures automatically fall back to template approach.
+
+Special shoutout to @hengck23 for consistently sharing valuable research papers, open-source models, and insights that served as invaluable resources for the community.
+
+Author
+g john rao
+
+jaejohn
+
+arrow_drop_up
+97
+Share
+more_horiz
+Project Links
+[sub-2] hybrid - single model
+
+a year ago · 89 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+[sub-1] 4/4 hybrid - final take
+
+a year ago · 36 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+rna_all_data
+
+a year ago · Usability 2.4
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+DRfold2 Repo
+
+2 years ago · Usability 3.8
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+DRfold2-models
+
+2 years ago · Usability 0.6
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+biopython
+
+2 years ago · Usability 1.9
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+fairscale-0413
+
+4 years ago · Usability 1.9
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+rna_prediction_boltz
+
+2 years ago · Usability 1.9
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+[export] merge all data
+
+a year ago · 11 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+cif to csv
+
+a year ago · 13 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+rna-wheels
+
+a year ago · Usability 3.8
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+RNA 3D Folds: TBM-only approach
+
+a year ago · 157 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Citation
+
+g john rao. 1st Place Solution. https://www.kaggle.com/competitions/stanford-rna-3d-folding/writeups/1st-place-solution. 2025. Kaggle
+
+15
+14
+comment
+18 Comments
+1 appreciation comment
+Hotness
+Rhiju Das
+
+Competition Host
+
+Posted a year ago
+
+arrow_drop_up
+5
+more_vert
+
+Another question -- was DL even necessary? Do you have a notebook that just provides 5 models from the template search pipeline? Does it do about as well as the hybrid notebooks that also include models from DRFold2?
+
+reply
+Reply
+1
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+wow, i just submitted the TBM-only notebook and it scored: 0.59298
+
+my winning score using hybrid approach is: 0.57773
+
+edit: i have made the notebook public: https://www.kaggle.com/code/jaejohn/rna-3d-folds-tbm-only-approach
+
+reply
+Reply
+5
+1
+2
+3
+Rhiju Das
+
+Competition Host
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow, indeed!
+
+What was the special sauce compared to the earlier template-only notebook (https://www.kaggle.com/code/jaejohn/rna-3d-folding-template-based-0-321) ?
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I rescored the winning notebook with DRFold2 disabled, and it scored: 0.58487
+
+The other notebook which scored 0.59298 actually uses a different approach (slightly more complex - with clustering, diversity selection, and feature-based grouping)
+
+Going from earlier template-only notebook to the high scoring one - I think it was consistently iterating with trial and error, until I took the lead on the leaderboard, then diversified to DL approach, thinking I needed it to secure the lead. The key difference between the two notebooks would be: dataset size, enhanced template selection and composite similarity scoring.
+
+reply
+Reply
+CATANOMALY
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thank you for sharing your process 🌷🌷
+
+reply
+Reply
+Pi
+
+Posted a year ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thanks for sharing your solution! It's very well-thought and I really enjoy your 2 key properties about TM-scores.
+
+I read your solution notebook and saw you choose the similarity sequence by a composite_score:
+
+composite_score = (
+        0.4 * global_score + 
+        0.3 * local_score + 
+        0.2 * feature_similarity + 
+        0.1 * kmer_similarity
+    )
+
+
+feature_similarity score really caught my attention. Here the features were extracted by _extract_enhanced_rna_features function. Are there anything specific why these dinucleotides are considered as features for calculating similarity?
+
+# 2. Dinucleotide frequencies (reduced set - most important for RNA)
+    important_dinucs = ['AU', 'UA', 'GC', 'CG', 'GU', 'UG', 'AA', 'UU', 'GG', 'CC']
+    for dinuc in important_dinucs:
+        count = 0
+        for i in range(len(seq) - 1):
+            if seq[i:i+2] == dinuc:
+                count += 1
+        freq = count / (len(seq) - 1) if len(seq) > 1 else 0
+        features.append(freq)
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi, thanks! I tested it using all 16 dinucleotides and it scored: 0.5895 (decreased score vs 0.59298 with 10). It only contributes about 4% of the total similarity metric (20% to the feature_similarity score, which itself is only 20% of the composite_score). I think it is about adding a bit of sequence composition awareness, the left out 6 were probably adding noise as per my tests.
+
+reply
+Reply
+1
+Pi
+
+Posted a year ago
+
+· 9th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, John! I have another question: since one sequence can correspond to multiple structures, I was wondering — your similarity search is based only on sequences, but did you also try grouping them first and then applying a further selection step based on structural features?
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, sorry for the delayed response.
+
+I was focused on maximizing structural diversity, so treated them as separate templates. The rationale was that different conformations of the same sequence provide different structural information, which could be valuable for template-based modeling. The clustering step helps ensure the selected templates are diverse. (implemented this in the TBM-only notebook)
+
+I think for TBM, if a sequence is highly similar to the query, having multiple conformations of it can be more useful than forcing sequence diversity. But it's an interesting alternative perspective worth testing.
+
+reply
+Reply
+Rhiju Das
+
+Competition Host
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+@jaejohn It's amazing that the template discovery code is based on an 'off-the-shelf' aligner from Biopython.
+
+Can I ask how did you figure out the parameter settings for the aligner?
+
+In particular, did you use an off-line validation set that you could share?
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+hi, the parameter settings were determined through trial and error, using the leaderboard score as my only feedback mechanism.
+
+I did not use any offline validation set beyond the leaderboard feedback.
+
+also worth noting: as the dataset grew over time, the parameters needed retuning.
+
+reply
+Reply
+2
+Irakoze Ntawigenga Kelly
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+thank you for sharing the solution, hoping to learn from it!
+
+reply
+Reply
+Venky
+
+Posted 7 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the win!
+I also went with a template-based approach but only handled the 4 standard bases your 93 nucleotide variant mapping with disorder-aware extraction was clearly a big differentiator.
+I'm currently participating in Part 2 of the competition and this would be incredibly useful.
+Any chance you'd be willing to share that CIF extraction notebook?
+Would love to learn from it.
+Thanks! 🎉
+
+reply
+Reply
+Yiheng Wu
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thanks a lot for sharing your solution! I've tried your TBM-only notebook (https://www.kaggle.com/code/jaejohn/rna-3d-folds-tbm-only-approach) on a recently deposit PDB 9hro, but got extended rod-like regions. Presumably these are the regions without templates. Do you see that often?
+One thing different perhaps is, I didn't find these csvs
+
+train_seqs_v2 = pd.read_csv('/kaggle/input/rna-cif-to-csv/rna_sequences.csv') 
+train_labels_v2 = pd.read_csv('/kaggle/input/rna-cif-to-csv/rna_coordinates.csv')
+
+
+(I guess you generated them yourselves)
+so I used the commented part and the data from kaggle data for the template library
+
+# train_seqs_v2 = pd.read_csv('/kaggle/input/extended-rna/train_sequences_v2.csv')
+# train_labels_v2 = pd.read_csv('/kaggle/input/extended-rna/train_labels_v2.csv')
+
+
+and this contains only 5k instead of 18k in your notebook. Would you think this is the main reason for this, and things would be much better when used the whole template library? Or is there anything else that I am missing?
+
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi, sorry for the delayed response. The template library size is likely the main issue.
+
+The dataset is publicly available here: https://www.kaggle.com/datasets/jaejohn/rna-cif-to-csv
+
+reply
+Reply
+1
+2
+Andrew Grinenko
+
+Posted 8 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Where did you get it?
+
+reply
+Reply
+Debopriyo Sanyal
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Where can I check out the winning solution’s code?
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi! the winning notebook is located here: https://www.kaggle.com/code/jaejohn/sub-2-hybrid-single-model
+
+TBM-only notebook which scores better is located here:https://www.kaggle.com/code/jaejohn/rna-3d-folds-tbm-only-approach
+
+reply
+Reply
+Dhruva Gadipathi
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi! I have joined this competition really early on, and am relatively new to RNA 3D Structure prediction. I have done alot of things using the data for my Science Fair, namely with GNNs and other related Graph Learning architectures. So, only recently I have started to look into TBM. I have seen countless examples of TBM, but never an actual notebook walking through the steps. By any chances, are any of these notebooks showing TBM? I don't really get the TBM procedure, but I am eager to learn. Do you have any resources, or even a notebook showing the steps to TBM so that I may replicate it? Thank you so much!
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+hi, i have made public my very first implementation of TBM-only approach. It is a basic implementation which was refined over 90-days.
+
+I re-submitted it for private LB scoring and it scores: 0.31098
+
+you may find the notebook here: https://www.kaggle.com/code/jaejohn/rna-3d-folding-template-based-0-321
+
+The notebook is heavily commented to walk you through each step.
+
+reply
+Reply
+2
+Shuxian Zou
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thanks for sharing the solution, very inspiring!
+
+What is the max sequence length for TBM in your solution?
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, thanks!
+
+Instead of hardcoding the sequence length, i went with the first 14 sorted sequences for TBM. Looking back, I think a better approach would be to dynamically adapt based on the confidence score of the template search
+
+reply
+Reply
+Shuxian Zou
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Interesting! Did you observe that as the sequence grows longer, the confidence score of the template search becomes lower, and then at some point, the deep learning method (DRfold2) starts to outperform TBM?
+
+I systematically processed all CIF files in the provided PDB_RNA directory with comprehensive nucleotide mapping (93 variants including modified bases) and disorder-aware coordinate extraction.
+
+During data preprocessing, did you encounter many modified nucleotides? Also, could you elaborate on what you mean by "disorder-aware coordinate extraction"?
+
+reply
+Reply
+g john rao
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+yeah, that was my observation and the reasoning behind sorting sequences, though I didn't analyze individual sequences, so I can't say for sure it holds across all sequences.
+
+For preprocessing, my baseline dataset (19,393 sequences) was parsed with a standard A/U/G/C-only parser. I later found 38 CIF files in the PDB_RNA dir that weren't captured this way. For those, I used a two-step fallback: try standard parsing first, and if that failed, switch to a comprehensive mapping (93 modified nucleotide variants) combined with disorder-aware extraction. All 38 required the fallback, and 36 were successfully processed. So in practice I only recovered 36 (and if i recall correctly, it actually improved the score by 0.02-0.03).
+
+On the disorder-handling side: the parser fails if atoms have multiple conformations (disorder issues). To handle this, BioPython represents such cases with DisorderedAtom wrapper objects. My method detects these (via hasattr(atom, 'selected_child')) and then extracts the selected atom, ensuring safe coordinate access and preventing crashes on structures with multiple recorded positions. By default, BioPython picks the conformer with the highest occupancy, or the first listed if occupancies are equal. Occupancy is a crystallography-specific concept.
+
+reply
+Reply
+3
+Pi
+
+Posted a year ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+During data preprocessing, did you encounter many modified nucleotides?
+
+
+It's not a question for me but I would like to share some information if you're interested in: I've processed the sequence on PDB up to March 31, 2025, around 21.7% RNA chains have modified residues. Among 23,630 RNA chains of 5,964 unique sequences, there are 5,129 RNA chains with modified residues (1,266 unique sequences).
+
+reply
+Reply
+2
+Appreciation (1)
+Irakoze Ntawigenga Kelly
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing your experience!

@@ -1,0 +1,581 @@
+url: https://www.kaggle.com/c/mayo-clinic-strip-ai/discussion/357892
+fetched: 2026-10-27
+chars: 9851
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Mayo Clinic - STRIP AI
+1st place solution
+
+Mayo Clinic - STRIP AI
+
+Solution Writeup · 1st place · Oct 6, 2022
+
+Thanks to Mayo Clinic and Kaggle for this competition. I enjoyed playing around with it. Also thanks to my teammate @evilpsycho42 for all the support. I will try to illustrate my solution here even though I decided to stop working on it a month ago…
+
+Data
+Tiling and pick the top 16 darkest tiles
+Single model
+backbone: swin_large_patch4_window12_384 + customized head
+classification head: customized: replace average pooling with attention pooling
+Loss\Metric
+implement loss\metric following competition metric
+CV Strategy
+5-fold Stratified Grouped KFold
+Stratified by class and grouped by patientid
+What Works
+attention pooling: 5-fold cv average improves from 0.69->0.66
+moco-v3 pretraining: 5-fold cv deviation improves from 0.30->0.15
+ensemble: 5-fold cv average improves from 0.662->0.658 (very small improvement)
+What Doesn't Work
+More tiles
+Different preprocessing
+top 16 highest pixel deviation instead of darkness
+stain normalization
+Final Solution
+Ensemble of swin_large_patch4_window12_384 and coat_lite_medium
+Some luck 🙏
+Some lessons learned from other competitions and applied here:
+Since public LB contains very few samples, we have to do a correct CV, which is what we could do and rely on.
+I tuned models not only to improve the average CV score but also to reduce the deviation of the 5-fold CV, so the model could perform more stable in an unseen test set.
+Implement the right loss and metric: I found a lot of public kernels using logloss as train loss and even evaluation directly instead of implementing competition metric and using it as a loss function for modeling.
+Logloss as evaluation behaves very differently from the competition metric.
+Logloss as training loss cause worse competition metric in my validation.
+Try our best and hope for the best.
+We try our best to do CV correctly, to improve CV score while reducing uncertainty.
+We hope for the best, since the dataset is not large enough to tell the difference between the last few digits, there will always be shakeup as expected. Keep an optimistic mind and move forward (Less painful for a bad shakeup)
+
+My best CV with the highest mean and lowest deviations also achieve the best private scores. 
+
+Submission Kernel: https://www.kaggle.com/code/khyeh0719/mayo-submission
+
+Authors
+khyeh
+
+khyeh0719
+
+KKY
+
+evilpsycho42
+
+arrow_drop_up
+67
+Share
+more_horiz
+Citation
+
+khyeh, KKY. 1st place solution. https://www.kaggle.com/competitions/mayo-clinic-strip-ai/writeups/khyeh-1st-place-solution. 2022. Kaggle
+
+2
+comment
+39 Comments
+Hotness
+Trushant Kalyanpur
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Great work @khyeh0719 and @evilpsycho42 ! Glad to see you both win a competition!!
+
+reply
+Reply
+tdiceman
+
+Posted 4 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats @khyeh0719. Lot of good points here, thanks.
+
+Could you, as short as you like, tell how you used the tiles? As far as I can understand you trained with tile level but with slide level labels with an end-to-end model that includes tile feature aggregation to slide level before classification. Is that right?
+
+reply
+Reply
+khyeh
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I trained in slide level as well by using the attention module across all the tiles for the classification head.
+
+reply
+Reply
+tdiceman
+
+Posted 4 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for clarifying. You did this end to end, right? I mean tiles go as input and slide level prediction as output, with attention aggregation before classification head. I'm sorry, I will go through your code, its just that I cannot read pytorch code well right now :)
+
+Thanks for taking the time.
+
+reply
+Reply
+khyeh
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+yes, you are right, it is end to end.
+
+reply
+Reply
+KKY
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great job, KH!
+
+reply
+Reply
+Dr. Alaa Temimy
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation for winning , great work , keep going :).
+
+reply
+Reply
+Naoto Usuyama
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Awesome work! Very impressive - initially I thought it's going to be close to random guess…
+
+One question: what is the input image size and magnification level? Did you see any improvements with different input size / magnification level?
+
+reply
+Reply
+khyeh
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@naotous I used 384 as the image size since it is the image size required by the transformer-based backbone (SWIN large 384) I also tried BEIT 512, which is another transformer-based backbone that takes 512 as input image size, however, I did not get better results with that.
+
+The BEIT model is larger and easier to get overfitting might be the reason for not giving me improvement.
+I did not try the hybrid SWIN transformer by adding extra convolutions between images and the SWIN backbone to support larger images and to verify your question.
+reply
+Reply
+Naoto Usuyama
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your insights! Very interesting. In addition to potential overfitting issue, I think it's also the patch embedding kernel size is the key difference (Swin 4px vs BEiT 16px?).
+
+reply
+Reply
+Gangin Park
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats and thank you for sharing your solution!
+
+reply
+Reply
+Ahmed Ibrahim
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on winning and great solution!
+
+reply
+Reply
+patriot
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+I would like to ask about the hyperparameters when pre-learning swin-L with mocoV3 and points to note when using self-supervised learning.
+
+reply
+Reply
+khyeh
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@abebe9849 my hyperparameters:
+
+lr = 0.0001 
+batch-size = 4 
+epochs = 20
+
+
+I modified the repo from https://github.com/CupidJay/MoCov3-pytorch to support timm created models (at least swin transformer)
+
+reply
+Reply
+patriot
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I was surprised that contrastive learning worked well with such a small batch size. Did you shorten the epoch experimentally? Since I usually use DINO, I have never been able to acquire effective features in 20 epochs.
+
+reply
+Reply
+khyeh
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@abebe9849 Yes, I tried 10\20\40 epochs, and 20 epochs of moco pretraining worked for me the best in reducing cv variation.
+
+reply
+Reply
+Felicius Brando
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great work congrats! @khyeh0719
+
+reply
+Reply
+Firulyra
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @khyeh0719 🎉
+
+reply
+Reply
+Bocetufy
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @khyeh0719
+
+reply
+Reply
+Harsh Vats
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation @khyeh0719
+
+reply
+Reply
+Muhammad Ammar Jamshed
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations !! Although tell me what were your main challenges with the data!
+
+reply
+Reply
+khyeh
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+the challenge with the data is that I need to do all the preprocessing for the train da dataset on the Kaggle before moving into my rented server…
+
+reply
+Reply
+djagatiya
+
+Posted 4 years ago
+
+· 28th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @khyeh0719 and @evilpsycho42.
+
+reply
+Reply
+Marília Prata
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing your solution and mostly for sharing your mayo-submission Kaggle Notebook. Congratulations for your 1st Place Khyeh0719!
+
+reply
+Reply
+Godsent Abode
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow! Congratulations @khyeh0719 Very well deserved!🎉
+
+reply
+Reply
+Francesco Uccelli
+
+Posted 4 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Great way to overcome low signals.
+
+reply
+Reply
+Pablo Larrosa
+
+Posted 4 years ago
+
+· 186th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!!! Great job
+
+reply
+Reply
+Theo Viel
+
+Posted 4 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratz on first place ! I could not make tile models competitive, looks like I should've pushed a bit more.
+
+reply
+Reply
+khyeh
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+You got good results in the end still 😁
+
+reply
+Reply
+MITEL-UNIUD
+
+Posted 4 years ago
+
+· 310th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congratulations and thanks for the accurate description of your experience.
+
+reply
+Reply
+Gunes Evitan
+
+Posted 4 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! I think you really predicted that the test is slightly different than the training set. I also wanted to work on attention pooling but I didn't have enough time :/
+
+reply
+Reply
+XXXXlf
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations.
+
+reply
+Reply
+Areej Malkawi
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and Thank you for sharing your experience!
+
+reply
+Reply
+Mara Pl
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi! I am curious what data you used for pretraining?
+
+reply
+Reply
+Giri Kunche
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats team.
+
+reply
+Reply

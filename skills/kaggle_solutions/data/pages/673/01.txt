@@ -1,0 +1,641 @@
+url: https://www.kaggle.com/c/map-charting-student-math-misunderstandings/writeups/1st-place-solution
+fetched: 2026-10-27
+chars: 16458
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — MAP - Charting Student Math Misunderstandings
+1st Place Solution
+
+MAP - Charting Student Math Misunderstandings
+
+Solution Writeup · 1st place · Oct 18, 2025
+
+Solution Writeup
+
+I would like to thank the competition hosts and Kaggle for organizing this interesting challenge。
+Winning 1st place in an NLP competition for the first time feels great! Below is my solution writeup.
+
+1. Data
+
+I dropped duplications, resulting in 35,960 samples. Created 5-fold cross-validation splits stratified by "Category".
+
+2. Modeling
+
+I modeled the problem as a suffix classification task.
+
+Given the same context(prefix), models are trained to predict the correct suffix from a set of candidates.
+
+Context is formatted as follows:
+
+<|im_start|>user
+**Question:** {QuestionText}
+**Choices:** {MC_Choices}
+**Correct Answer:** {Answer}
+**Common Misconceptions:** {MisconceptionCandidates}
+**Student Answer:** {MC_Answer}
+**Student Explanation:** {StudentExplanation}
+<|im_end|>
+<|im_start|>assistant
+
+
+Suffixes are formatted in submission format.
+
+False_Correct:NA<|im_end|>
+
+
+Each QuestionId has 8, 10 or 12 possible suffix candidates based on possible misconceptions of the question.
+
+Last-token features of [prefix ++ suffix0, prefix ++ suffix1, ...] are extracted and fed into a nn.Linear(hidden_size, 1) to get logits, then cross-entropy loss is computed.
+In practice, I organized inputs in prefix-shared format: prefix ++ suffix0 ++ suffix1 ++ ..., using custom attention masks with FlexAttention.
+
+def custom_mask(b, h, q_idx, kv_idx):
+    causal = q_idx >= kv_idx
+    is_prefix = suffix_ids[kv_idx] == -1
+    same_suffix = (suffix_ids[q_idx] == suffix_ids[kv_idx])
+    same_doc = doc_ids[q_idx] == doc_ids[kv_idx]
+    return causal & (same_suffix | is_prefix) & same_doc
+
+3. Training
+
+While working on the WSDM Cup competition earlier this year, I implemented offload_adam to enable efficient full-parameter training of models up-to 32B on single A100 80G GPU. So in this competition, I could run all experiments on single A100 80G or RTX Pro 6000 Blackwell. Most of the training runs were performed with same hyperparameters: epoch=1, batch_size=32, learning_rate=1e-5.
+
+Probably due to label noise (mainly Neither), validation score varies a lot using different seeds. I had to use ensemble of multiple runs with different seeds to get a stable validation score.
+
+I did a 5-fold x 5-seeds run using Qwen3-8B. 3 seeds ensemble seemed to be stable, so I used the most difficult fold and ensemble of 3 runs for further experiments. This approach is not new - the 1st place solution in "Feedback Prize - Predicting Effective Arguments" also used 3-seed ensemble for validation.
+
+Main Validation Results (seed ensemble [seed1, seed2, seed3])
+
+model	loss	MAP@3
+deepseek-ai/DeepSeek-R1-Distill-Qwen-7B	0.2716 [0.2809, 0.2871, 0.2835]	0.9444 [0.9426, 0.9428, 0.9421]
+Qwen/Qwen3-8B	0.2677 [0.2813, 0.2777, 0.2756]	0.9455 [0.9433, 0.9450, 0.9437]
+zai-org/GLM-Z1-9B-0414	0.2627 [0.2783, 0.2762, 0.2761]	0.9469 [0.9455, 0.9433, 0.9452]
+deepseek-ai/DeepSeek-R1-Distill-Qwen-14B	0.2621 [0.2782, 0.2698, 0.2738]	0.9464 [0.9421, 0.9443, 0.9450]
+Qwen/Qwen3-14B	0.2614 [0.2707, 0.2744, 0.2695]	0.9477 [0.9442, 0.9451, 0.9461]
+Qwen/Qwen3-32B	0.2589 [0.2687, 0.2718, 0.2700]	0.9484 [0.9465, 0.9451, 0.9454]
+zai-org/GLM-Z1-32B-0414	0.2560 [0.2713, 0.2681, 0.2682]	0.9480 [0.9450, 0.9463, 0.9462]
+Qwen/Qwen3-32B+zai-org/GLM-Z1-32B-0414	0.2530	0.9496
+
+The experimental results clearly demonstrated that:
+
+I should not trust single-seed validation score
+The larger the model, the better the performance
+It might be better to trust loss rather than MAP@3
+
+I also compared multi-fold ensemble with multi-seed ensemble. Multi-seed ensemble was much better. Therefore, for the final submission, I trained Qwen/Qwen3-32B and zai-org/GLM-Z1-32B-0414 on full dataset with 3 different seeds and slightly different data format each.
+
+Auxiliary SFT Loss Experiment
+
+In the final days of the competition, I experimented with using Qwen/Qwen3-235B-A22B-Thinking-2507-FP8 to generate short justifications for the labels, and trained models with auxiliary SFT loss on the generated content.
+
+An example of generated justification:
+
+True_Correct:NA
+The categorization **True_Correct** with **NA** misconception is justified because:  
+- **Answer correctness**: The student's answer \( \frac{1}{3} \) is mathematically correct. With 9 total triangles and 6 shaded, 3 are unshaded. Simplifying \( \frac{3}{9} \) yields \( \frac{1}{3} \), matching the required simplest form.  
+- **Explanation quality**: The explanation ("There is 9 triangles and 3 aren't shaded") correctly identifies the total parts (9) and unshaded parts (3), demonstrating valid reasoning for the fraction \( \frac{3}{9} = \frac{1}{3} \). It is concise but clear and mathematically sound.  
+- **Misconception**: No error exists in the reasoning (e.g., miscounting shaded/unshaded parts or incorrect simplification), so "NA" applies. The explanation omits explicit simplification but implies it by providing the correct simplified answer.
+
+
+This approach showed some improvement for deepseek-ai/DeepSeek-R1-Distill-Qwen-7B, but had minimal effect on Qwen/Qwen3-8B. I included it in the ensemble, though I estimate its contribution is marginal. Anyway, it was an interesting attempt.
+
+4. Inference
+
+There are two main challenges for inference: compute and memory.
+
+Compute
+
+For short-sequence prefilling workload, the main bottleneck is matrix multiplications in nn.Linear layers. T4, while claiming 65TFLOPS of FP16 on whitepaper, could only achieve unstable 20TFLOPS in practice.
+
+The W8A8 INT8 kernel in LMDeploy achieves stable 40+TFLOPS. To enable W8A8 INT8 inference, I quantized models using SmoothQuant(alpha=0.75). Ensemble performance in validation is almost identical to unquantized models.
+
+Memory
+
+I used layer-wise inference to enable 32B model inference on a single T4 GPU:
+
+Initialize and keep only 2 transformer layers on GPU
+Overlapping execution of current layer with loading states of next layer from disk
+
+I used 640 samples (40 micro batches of 16 samples) in each forward run to keep GPUs busy.
+
+It takes around 65 minutes to finish inference of 16,000 samples with T4×2. Implementing prefix-caching/sharing of question context could further reduce inference time (more than half of the tokens could be cached), but I didn't implement it.
+
+Kaggle Notebook Environment Notes
+
+Kaggle notebook environment's storage caused me some trouble.
+
+/kaggle/input - Not local storage, very slow access
+/tmp/ - Local Copy-on-Write storage with capacity limits, files cannot be truly deleted
+/kaggle/working - Regular local storage, files can be deleted to free up space
+
+I initially stored checkpoints of layers in /tmp, which led to a crash due to capacity overflow. After debugging, I only had time to submit an ensemble of 4 models (out of 6 uploaded). Anyway, the results were still quite good.
+
+5. Summary
+
+For me, the most critical aspect of this competition was finding the right way to obtain reliable validation scores. Single-seed validation scores were highly unstable and misleading. Multi-seed ensemble provided stable and trustworthy validation metrics, which then enabled effective model tuning and selection.
+
+Submission notebook
+Training
+
+Author
+tascj
+
+tascj0
+
+arrow_drop_up
+191
+Share
+more_horiz
+Citation
+
+tascj. 1st Place Solution. https://www.kaggle.com/competitions/map-charting-student-math-misunderstandings/writeups/1st-place-solution. 2025. Kaggle
+
+1
+9
+comment
+28 Comments
+1 appreciation comment
+Hotness
+Yurnero
+
+Posted a year ago
+
+arrow_drop_up
+8
+more_vert
+
+I guess that is the first time a kaggler achieved a 1-sub win in a not random competition. Huge meta achievement. Congratulations with top-1 overall rank!
+
+reply
+Reply
+LX
+
+Posted a year ago
+
+· 30th in this Competition
+
+arrow_drop_up
+1
+more_vert
+ I used the most difficult fold and ensemble of 3 runs for further experiments.
+
+
+Is the "most difficult fold" mentioned here referring to selecting one out of the five folds as the validation data in 5-fold cross-validation, and then using 3 training seeds to validate the score of this 20% validation set?
+
+After validation, when inferring on the test set, do we train on the full dataset, or just use the already trained model?
+
+reply
+Reply
+tascj
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I selected the fold with the lowest validation score as my fixed validation set. Each experiment used 3 seeds trained on the other 80% of data.
+
+For final submission, I retrained models on the full dataset.
+
+reply
+Reply
+Brainydaps
+
+Posted 8 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @tascj0 I was wondering if you would be interested in being a featured author/data scientist on our company's website? I havent found a way to reach out to you personally.
+
+reply
+Reply
+WOOSUNG YOON
+
+Posted a year ago
+
+· 180th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your detailed solution. It was very insightful.
+
+I have a question about the 40 micro-batches of 16 samples.
+Is this setup specific to layer-wise offloading on a T4 GPU to address I/O bottlenecks,
+or is it a general approach? Could you also share the code for implementing this?
+
+To be precise,
+It seems likely that the following feature implemented on GitHub is related to this function.
+Is it possible to explain in words how this works?
+
+reply
+Reply
+tascj
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+I didn't carefully test this. For my input format, 640 samples were sufficient to hide the time of loading layer states from disk. Kaggle's storage is very slow. With local NVMe storage, 32 samples were enough, while local GPUs are much faster.
+Splitting into micro-batches is to prevent OOM.
+
+The submission notebook is public now.
+
+reply
+Reply
+WOOSUNG YOON
+
+Posted a year ago
+
+· 180th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@tascj0
+Thank you for the clear explanation.
+I will practice applying your submission notebook code to the Qwen-2.5 14b model. 😄
+I learned a lot.
+
+reply
+Reply
+Ali_Haider_Ahmad
+
+Posted a year ago
+
+· 389th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wow! This is art!
+
+reply
+Reply
+moth
+
+Posted a year ago
+
+arrow_drop_up
+-1
+more_vert
+
++70.000
+New badge earned: One shot, One kill
+New badge earned: Champion
+
+reply
+Reply
+3
+ODBAYAR O
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+I loved this! Goodluck!
+
+reply
+Reply
+Muhammad Awais
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Great job. This motivates me to learn more about these models.
+
+reply
+Reply
+DRBendermun
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Your work is impressive!
+
+reply
+Reply
+Sudharsan Velumani
+
+Posted a year ago
+
+· 818th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+Thank you for this awesome and detailed soultion.
+
+Did you use any external datasets for training the model or you just used only the competition dataset ?
+
+reply
+Reply
+Navneet
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+The Art of Winning @tascj0
+
+reply
+Reply
+Gaurav Rawat
+
+Posted a year ago
+
+· 59th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great solution and specially love how inference was squeezed lot to learn there .. But I do had a curious question does a difference of scores in range of 0.00x really make these solutions so much better where single model scores ranged between 0.94x and ensembles 0.946-0.949? Specially when dealing with real life scenarios as even a qwen3 single model on LORA with kaggle compute does score around 0.942 range .
+
+reply
+Reply
+tascj
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+In Kaggle competitions, there's often a gap between "climbing the leaderboard" and "solving the problem". It depends on the competition design choices by the host.
+
+reply
+Reply
+1
+Bilzard
+
+Posted a year ago
+
+· 229th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@tascj0 Congratulations on 1st place with only single submission.
+
+I modeled the problem as a suffix classification task.
+Given the same context(prefix), models are trained to predict the correct suffix from a set of candidates.
+
+At first glance, suffix prediction tasks looks similar to CAUSAL_LM or SEQ_CLS tasks. The main difference is label expression is fed as input, not output (if my understanding is correct).
+
+What do you think is the advantage of suffix prediction over CAUSAL_LM or SEQ_CLS tasks for this competition? Do the task design itself is superior to these tasks?
+
+reply
+Reply
+tascj
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I tested several different modeling paradigms and didn't observe significant performance differences between them. I chose the suffix classification approach because I thought it was the most natural way to frame the problem - it explicitly encodes the label candidates as input and is agnostic to their order. It also resulted in reasonable total token counts.
+
+reply
+Reply
+ShelterW
+
+Posted a year ago
+
+· 69th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I think the biggest trick to improving the score is adding Common Misconceptions to the prompt, but I still find the suffix classification setup with auxiliary SFT loss really interesting and well thought-out.
+Congratulations on your impressive achievement !
+
+reply
+Reply
+Hatix Ntsoa
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Simply great
+
+reply
+Reply
+Psi
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Ensembling multiple large models using smooth quant and LMDeploy and then doing the sub literally last minute deserves a lot of respect. I am curious how confident you were this will all run through fine :)
+
+reply
+Reply
+tascj
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+The inference parts (w8a8 quantization, layer-wise) were developed during the WSDM Cup competition, so they were already validated.
+I did extensive testing back then. The samples' sequence length is very short for this task, so directly estimating inference time linearly from TFLOPS should work fine.
+
+reply
+Reply
+@kaggleqrdl
+
+Posted a year ago
+
+· 1530th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+it is a bit weird, I have to say, to risk like this. Power outages, family emergencies, someone pulling a fire alarm, etc.
+
+You must have a lot of access to spare compute if you can do this sort of thing. Or a risk junkie :)
+
+reply
+Reply
+emoji_people
+Tom
+
+Posted a year ago
+
+· 877th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@tascj0 should give a 1-shot-1st-place badge for you.
+
+reply
+Reply
+3
+@kaggleqrdl
+
+Posted a year ago
+
+· 1530th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Well done. I believe you are the new reigning #1 kaggler in competitions with this win.
+
+Would it be fair to say that your CV technique won the day? It's something I will certainly be storing away for future reference.
+
+reply
+Reply
+tascj
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I haven't carefully checked other teams' solutions yet, but I noticed many teams trained for 2-3 epochs, so the situation might be somewhat different.
+
+reply
+Reply
+AI-Cat
+
+Posted a year ago
+
+· 224th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Excellent work, and thank you for sharing at least a brief description of your wonderful solution. I don't understand what inspired you to reach the compelling conclusion that your MAP@3 metric was worse than LOSS. I don't see any serves; only one serve is counted, and it's already a queen. How can you tell if a bad metric or model is overfitting? What's the most important thing to look for in this case?
+
+reply
+Reply
+tascj
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I agree this isn't a rigorous conclusion - the data in the table alone doesn't really prove this point.
+
+reply
+Reply
+Mao
+
+Posted a year ago
+
+· 135th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Brilliant!
+
+reply
+Reply
+Appreciation (1)
+Irakoze Ntawigenga Kelly
+
+Posted a year ago
+
+· 258th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, happy to learn from this!

@@ -1,0 +1,103 @@
+url: https://www.kaggle.com/katemelianova/ds4g-spatial-panel-data-modeling
+fetched: 2026-10-27
+chars: 1090
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Ekaterina Melianova +1 · 7y ago · 12,543 views
+arrow_drop_up
+99
+Copy & Edit
+177
+file_download
+Download
+more_vert
+DS4G: Spatial Panel Data Modeling
+Notebook
+Input
+Output
+Logs
+Comments (11)
+history
+Version 19 of 19
+Runtime
+play_arrow
+
+47m 28s
+
+Input
+Competitions
+
+DS4G - Environmental Insights Explorer
+
+Datasets
+
+[Private Dataset]
+
+DS4G Puerto Rico Electricity Consumption by month
+
+PR plants coordinates EIA
+
+PR population data GPWv411
+
+trending_flat
+
+See All
+
+Tags
+Geospatial Analysis
+Language
+
+R
+
+Competition Notebook
+
+DS4G - Environmental Insights Explorer
+
+Collaborators
+
+Ekaterina Melianova (Owner)
+
+Artem Volgin (Editor)
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+9 files
+output
+Output
+0 files
+list_alt
+Logs
+2848.0 second run - successful
+comment
+Comments
+11 comments

@@ -1,0 +1,45 @@
+url: https://www.kaggle.com/c/herbarium-2020-fgvc7/discussion/154186
+fetched: 2026-10-27
+chars: 557
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Fine-Grained Visual Categorization 7 · Research Prediction Competition · 6 years ago
+Late Submission
+more_horiz
+Herbarium 2020 - FGVC7
+
+Identify plant species from herbarium specimens. Data from New York Botanical Garden.
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Failed to load the discussion topic

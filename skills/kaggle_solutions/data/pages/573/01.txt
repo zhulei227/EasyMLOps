@@ -1,0 +1,1017 @@
+url: https://www.kaggle.com/c/kaggle-llm-science-exam/discussion/446422
+fetched: 2026-10-27
+chars: 32702
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Kaggle - LLM Science Exam
+1st Place Solution
+
+Kaggle - LLM Science Exam
+
+Solution Writeup · 1st place · Oct 23, 2023
+
+Thanks for this well executed competition that attracted a lot of interested from the community. Thanks a lot as well to my great teammates @ybabakhin and @philippsinger.
+
+Check out our tldr summary here!
+
+Context Retrieval
+
+We started working on this competition very early and quickly faced a performance cap with the simple classification approach for both deberta and LLM models.
+
+So, the next step was to explore the context retrieval from Wikipedia articles. Our first submission was with the all-MiniLM-L6-v2 model. And to our surprise, this first attempt was much better than all our previous non-context models. From that point we were mostly focusing on improving the context retrieval part, while keeping the modeling part almost the same. We tried the majority all models from the top-20 list on MTEB Leaderboard: https://huggingface.co/spaces/mteb/leaderboard. In the end, we had a local choice of about 300 combinations of Retrieval + LLM models + different Wikipedia dumps. Our final submission has contexts from e5-base-v2, e5-large-v2, gte-base, gte-large and bge-large models.
+
+Apart from exploring various models, we also tried different ways to encode both Wikipedia chunks and Prompts+Answers from the competition data. For Wikipedia we were mostly encoding title of the article + article chunk, and for the question the final model has 2 variations:
+
+Just a simple concatenation: “{prompt} {A}, {B}, {C}, {D}, {E}”
+Search contexts individually for each “{prompt} {A}”, “{prompt} {B}”, etc. option, and sort them by similarity in the end.
+
+Our Wikipedia dumps had from 30M to 60M text chunks. However, we’ve implemented a pretty quick and scalable similarity search on GPUs. Firstly, we split the whole 60M database into smaller parts, and load them one after another. Then we calculate a similarity matrix between each part and whole test data (using simple matrix multiplication for torch tensors on GPU). All we have to do now is to store the global Top-k list among all parts. And to make it twice faster we’re doing it on 2 GPUs in parallel.
+
+Different Wikipedia dumps
+
+As most teams, we started out using the public wiki as our source of context and embeddings. We invested quite some time to create our own wiki corpus. First, we recreated the above wiki taking a snapshot from a newer date closer to the start of the competition. We added a few extra post processing steps, such as joining very small paragraphs (usually subtitles) with the subsequent paragraph. When investigating errors in the context matches, we noticed that all public wikipedia dump parsers are not properly expanding lua code which is often used on wikipedia to render values in scientific articles. To include these into our context, we decided to use the cirrussearch dump which is a dump of all (almost) fully rendered wikipedia pages. Unfortunately, this dump doesn’t include newline characters, so we merged the sentences together to different target lengths of either 256, 512 or 1024 characters while not breaking any sentences. In the end we considered all of these wikis (and multiple embeddings for each) for the blend and it helped to increase diversity. As a standalone wikipedia corpus, the cirrussearch wiki with a target length of 512 characters was best for us.
+
+We also tried to filter the wikis for science articles, but never achieved a significant improvement on public leaderboard over using the whole wiki corpus. Apparently, the embedding models are strong enough to not get distracted by irrelevant articles and we decided to play safe and included the full wikis in our final submissions.
+
+Longer contexts
+
+We started by using a single most similar wiki chunk for both train and inference. However, we quickly noticed that increasing the context length during the inference might improve the results. The optimal strategy for us was to train models with 3-chunk contexts and run inference with 5-chunks. Increasing it further for training was too slow, and increasing it more for inference was probably adding too much noise to the context. One interesting test that we’ve done was to inverse the order of contexts during the inference which dropped the score quite a bit. So, it might mean that models learnt the position of the “best” context.
+
+Data and validation strategy
+
+For training we mostly used only the publicly shared datasets. And adding more data wasn’t helpful for our models. For the validation, we used the original 200 samples provided as our validation data since the very beginning. However, after introducing the context retrieval part, we quickly got to 0.99 performance there. For the rest of the competition we were using 6k STEM questions from one of the publicly shared dataset.
+
+Models
+
+Our final ensemble is a combination of fine-tuned 7B & 13B LLMs. All models are trained in binary fashion, meaning a single sample for each of the five options and final predicted probabilities are used for ranking. This makes the models independent of the ordering of answers. For training data, we found the following steps to be useful:
+
+Pick synthetically generated multi-choice samples. There are many of such samples shared on Kaggle. Interestingly, data quantity was not too important here to improve performance.
+For each sample, we generate the context using our RAG embedding approaches. This allows us to generate multiple contexts like in inference and adding noise here is helpful for training. Training on the true context the question was generated on, was a bit worse than training on the generated context.
+
+We train all models with LORA on all linear layers. We use a binary classification head after the final next-token logits. We also use a lower learning rate for the head vs. the LORA layers. We did tuning on LORA settings, learning rate, and other minor things, but they were not that impactful as for some other deep learning use cases. All models are trained over a single epoch with typical cosine lr decay and BCE loss, picking the last checkpoint.
+
+We had most success with the following LLM models:
+
+Llama-2-7b
+Mistral-7B-v0.1
+xgen-7b-8k-base
+Llama-2-13b
+
+The following diagram explains our architecture and inference setup on a high level:
+
+First, we feed the context and the question through the backbone and save the past_key_values. For each question, we only need to do this once as each answer has the same context and question. This is a big benefit of decoder only models for such use-cases and saves a lot of runtime.
+We then have another backbone forward on each of the five answers where each one gets the past_key_values of the previous forward as cache input. We can run this in a batch of five now.
+We take the final next token prediction of each output which are the logits over the full vocabulary and feed this through a final classification head trained from scratch. This head now learns to map the output of the LLM across the full vocabulary to a single binary prediction whether the answer is correct or not.
+The final ordering is then simply determined by sorting the predicted probabilities.
+
+One downside of this binary approach is that each sample lacks the cross-information from all the other options which might hold individual signal. We experimented a lot with multi-class model or simply adding the other answers as context to the binary model, but there can be a huge positional bias added by doing so. Hence, we tried to solve this with TTA approaches, using various ordered combinations of the answers, which definitely helped, but was more shaky and could not outcompete the binary model.
+
+We still came up with, what we think is a pretty clever idea, another solution to help the models a bit with learning cross-information across samples not adding a positional bias. Here, the idea is to add the average next token logits of all other options as an additional input to the final classification head. So the final head gets logits for all possible tokens for the answer at hand, and the average of all logits for all possible tokens of all the other four answers. This does not add positional bias and gives extra information that boosted CV and LB and worked well when blended with the simpler approach.
+
+As you may have guessed already from our team name, we used a forked H2O LLM Studio to experiment and to train our models. We have added a fully flexible way of training causal classification models. The merged PR allows to train binary and multiclass classification LLM models using the core techniques used in our solution. You can just add a csv with a binary target and input text and train models.
+
+Inference solution
+
+Our final ensemble is a blend of five 7B models and one 13B model. Each model uses a different context approach using different wikis, embeddings and topk. The pipeline fits precisely into 9-hour runtime and utilizes 2.5TB of input data.
+
+We have shared our inference code now:
+
+A winning kernel with 0.933 Private: https://www.kaggle.com/code/ybabakhin/1st-place-team-h2o-llm-studio A single model with 0.932 Private: https://www.kaggle.com/code/ybabakhin/1st-place-single-model-inference
+
+Authors
+Psi
+
+philippsinger
+
+Yauhen Babakhin
+
+ybabakhin
+
+Pascal Pfeiffer
+
+ilu000
+
+arrow_drop_up
+219
+Share
+more_horiz
+Citation
+
+Psi, Yauhen Babakhin, Pascal Pfeiffer. 1st Place Solution. https://www.kaggle.com/competitions/kaggle-llm-science-exam/writeups/team-h2o-llm-studio-1st-place-solution. 2023. Kaggle
+
+8
+comment
+59 Comments
+4 appreciation comments
+Hotness
+Yauhen Babakhin
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+14
+more_vert
+
+We have shared our inference code now:
+
+A winning kernel with 0.933 Private: https://www.kaggle.com/code/ybabakhin/1st-place-team-h2o-llm-studio
+A single model with 0.932 Private: https://www.kaggle.com/code/ybabakhin/1st-place-single-model-inference
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 626th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Awesome, thanks for the notebooks!
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+13
+more_vert
+
+Out of curiosity, ran our whole ensemble without any context, so completely voiding RAG: 
+
+I am pleasently surprised by the scores, they are quite higher than I expected, especially given they are trained on RAG task.
+
+Curious how 70b zero-shot without any RAG would perform. @simjeg any idea? The early RAG results there were only a tiny bit better than this.
+
+reply
+Reply
+simjeg
+
+Posted 3 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@philippsinger I just published a new notebook to try. Game on ^^ (no sanity check at all, hope it does not crash). Note that I'm using a non-finetuned model here.
+
+reply
+Reply
+simjeg
+
+Posted 3 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+However with Version 1 of my previous notebook I had LB 0.836 / 0.832 with context, so your ensemble will probably be better. Wait and see…
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+3 more replies
+arrow_drop_down
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+12
+more_vert
+
+We have now added a fully flexible way of training causal classification models in H2O LLM Studio: https://github.com/h2oai/h2o-llmstudio
+
+The merged PR allows to train binary and multiclass classification LLM models using the core techniques used in our solution. You can just add a csv with a binary target and input text and train models.
+
+So you can do the following pipeline:
+
+Prepare a csv with context, question, and answer input text and binary classification target
+Train a binary causal classification model in H2O LLM Studio using BinaryCrossEntropy and optimizing metric
+Push the model to HF via GUI, the pushed model will have a model card explaining how to do inference
+Infer it in Kaggle notebooks
+reply
+Reply
+Amril Nurman Malaysian
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Psi, I can't seem to find any documentation on training causal classification in H2O LLM studio. do you have a tutorial on this. Especially it will be helpful to provide a notebook that can demonsrate how to use H2O in the context of Kaggle LLM Science Exam
+
+reply
+Reply
+moth
+
+Posted 3 years ago
+
+arrow_drop_up
+5
+more_vert
+
+Silly question, how can you use 2.46 TB of data when the private dataset quota per user is 150 GB?
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+19
+more_vert
+
+You can attach kernel outputs and obviously public datasets. There is no actual limit of how much data you can attach.
+
+reply
+Reply
+Jeremy Howard
+
+Posted 3 years ago
+
+· 637th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+OMG kernel outputs - I hadn't thought of using that as a primary data source! :O How big are kernel outputs allowed to be?
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+20GB is the maximum
+
+reply
+Reply
+moth
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! So you attached ~100 notebooks output? Insane
+
+reply
+Reply
+Nguyễn Gia Bảo
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! I wanna ask how you can download a large model to Kaggle GPU?
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+· 95th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations Pascal and team! Beautiful solution. I love that your input data source is 2.46TB. Haha 😀 that's crazy!
+
+reply
+Reply
+Chan Kha Vu
+
+Posted 3 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+They are definitely pushing the Kaggle compute and storage to the absolute limits 😂
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Haha a little bit, actually those 2.5TB also include unused model weights etc., so realistically it is a bit less. Surprisingly, we barely had any failed submits.
+
+reply
+Reply
+QUOCTUONG
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the solution of the H20 team. I'm a newbie. The solution is really useful and there are a lot of techniques to learn. Can I ask for advice so that my submits does not fail? This is an error I often encounter and I have no experience solving it. 
+
+reply
+Reply
+Raja Biswas
+
+Posted 3 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Many congratulations Team H2O LLM Studio on your well-deserved win! 🔥 Thank you for the insightful write-up. Learned a lot from the design choices you made in the solution pipeline and the reasoning behind them!
+
+I wonder if you have explored fine-tuning of the retrievers e.g. using the generated MCQs and corresponding contexts as positive pairs. Not sure if it can boost the final score but it may help in reducing optimal number of chunks passed to the model during inference?
+
+Excellent idea too in using average next token logits from all options to pass on the cross-option information (something like late interaction…) 🙌. I am wondering if you encountered any training instabilities in this approach as compared to the standard one? When we explored span classification approach with deberta e.g.: [CLS] <question> [SEP] <retrieved context> [SEP] <option A> [SEP]<option B> [SEP]<option C> [SEP]<option D> [SEP] <option E> [SEP] - it was more sensitive to data-quality issues (e.g. wrong option picked by LLM at the time of generation or presence of multi-option correct MCQs).
+
+Thanks again for the excellent write-up!!
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+We had it on our list of things we thought to potentially be very useful early on in the competition, and given our experience with NLP metric learning it was definitely on the list. But we were kind-of surprised how well the pretrained embedders worked on this task. We tried a bit of fine-tuning, but couldn't get anything better quickly and focused on other things. I still think there might be some room.
+
+Training was very stable overall, but we started right from the get-go to give the classifier head a lower learning rate based on experience, which might have helped.
+
+And congrats also on the result, we kept each other (hopefully) motivated earlier in the competition :)
+
+reply
+Reply
+Pascal Pfeiffer
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+We also tried to train multiclass heads, but noticed that the order of samples has a huge impact on the score and even with a 120 TTA, the scores were not really better than binary classification (5 forward passes, and much cheaper in terms of runtime).
+
+The same issue holds for binary classification with the addition of the other 4 possible answers. If other answers are provided, the order has a way too large impact, thus we went with the idea of using the mean (impact of order is removed) of their last layer embeddings.
+
+reply
+Reply
+Raja Biswas
+
+Posted 3 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks for the explanations! Indeed, the positional bias was tricky when model had access to all options together. The cross-option averaged logits approach to bypass the bias, while making model aware of other options is really innovative!! In our case, mean pooling of tokens from each option separately and computing logits based on that representation were helpful (so that model doesn't need to additionally figure out where each option starts and ends).
+
+PS: Awesome work on H20 LLM Studio!
+
+reply
+Reply
+Chan Kha Vu
+
+Posted 3 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Wow! This solution is truly a work of art. One of the best NLP solutions I've read on Kaggle, and I think this is the first competition that uses LLMs.
+
+One interesting test that we’ve done was to inverse the order of contexts during the inference which dropped the score quite a bit. So, it might mean that models learnt the position of the “best” context.
+
+Have you tried inverting during training as well, so that the position of the chunk with highest retrieval score is closer to the question & answer option?
+
+Training on the true context the question was generated on, was a bit worse than training on the generated context.
+
+I've noticed in this competition that training on worse context is better than training on the results of my final context retrieval. I tried to train my little deberta-large models on Chris 60k dataset with the original context (retrieved by a public notebook) and with the context from my final retrieval pipeline. The difference for a single model is 0.003 on public LB and 0.002 on private LB. My intuition here is that those models were already trained on full Wikipedia, and through the training process we are trying to achieve 2 things:
+
+"Unleashing" the model's "knowledge" of Wikipedia
+Teach it to use context (i.e. reading comprehension skill)
+
+So, by training on worse context, we're shifting the focus to the 1st thing (unleashing the knowledge and preparing the model for the worst-case scenario of inferencing with bad context). I'm curious to know what are your thoughts and intuition on that?
+
+reply
+Reply
+Pascal Pfeiffer
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Have you tried inverting during training as well, so that the position of the chunk with highest retrieval score is closer to the question & answer option?
+
+Yes, we did exactly this after we saw this behaviour.
+
+I'm curious to know what are your thoughts and intuition on that?
+
+I believe it helps the regularization and to learn that context may not always include the correct answers.
+
+reply
+Reply
+Daniel Phalen
+
+Posted 3 years ago
+
+· 36th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+We also found a similar result that inverting gave much worse results. There is a recent paper analyzing the effects, similar to 'primacy/recency' effects in human memory:
+
+Lost in the Middle: How Language Models Use Long Contexts
+
+I'm not sure the fine tuning we do would be enough to fix the pre-training and other things inherent to the transformer architecture. From the paper:
+
+To better understand why language models struggle to access and use information in the middle of their input contexts, we conduct preliminary investigations into the role of model architecture (decoder-only vs. encoder-decoder), query-aware contextualization, and instruction fine-tuning (§5). We find that encoder-decoder models are relatively robust to changes in the position of relevant information within their input context when evaluated on sequences within its training-time sequence length, but they show a U-shaped curve when evaluated on sequences longer than those seen during training (§5.1). In addition, query-aware contextualization (placing the query before and after the documents or key-value pairs) enables models to perform the synthetic key-value task perfectly, but minimally changes trends in multi-document QA (§5.2). Finally, even base language models (i.e., without instruction fine-tuning) show a U-shaped performance curve as we vary the position of relevant information in the input context.
+
+reply
+Reply
+CPMP
+
+Posted 3 years ago
+
+· 54th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Great solution. I'll reread how you fine tuned your 7B models as I clearly miss something here.
+
+We have a similar retrieval, but I was worried of too much data explaining why I got Kaggle errors. My largest input is only 650GB:
+
+Given that one got a Kaggle error I didn't add two more embedding that I had. This would move me to 1TB, still short of you.
+
+I only kept paragraphs larger than 150 chars, which seems to explain most of the difference with you.
+
+Regarding pytorch vs Faiss, I started as you, with dot product in pytorch and top k, but I found that Faiss was actually faster. I also found a Faiss benchmark showing a 2x speedup over pytorch but I can't find it again.
+
+reply
+Reply
+corochann
+
+Posted 3 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I was waiting for the write-up, thank you for sharing! Surprized to see 2.46TB of input is used to obtain various context retrieval…
+
+I have 2 questions.
+
+1.
+
+Our final ensemble is a blend of five 7B models and one 13B model. Each model uses a different context
+
+How did you ensemble these 6 model's output? Did you simply take the average of the predictions? In my experiment, a simple average of many predictions did not work. If there are many predictions with different contexts, some of the output is confident on the wrong answer. I guess this is because there may be a "confusing" context which leads to the wrong answer. How about your case?
+
+2.
+
+For the 2.46 TB of input mainly comes from the embedding of all Wikipedia chunk in different embedding models without any quantization ? You did not use faiss library but executed a similarity search with own code. Is this because you can run similarity calculation by chunk, so that you can run NN search for such a big dataset? I guess if we use faiss library, index (embeddings) must fit on kaggle kernel RAM, 13GB.
+
+reply
+Reply
+Pascal Pfeiffer
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I was waiting for the write-up, thank you for sharing! Surprized to see 2.46TB of input is used to obtain various context retrieval…
+
+I have 2 questions.
+
+1.
+
+Our final ensemble is a blend of five 7B models and one 13B model. Each model uses a different context
+
+How did you ensemble these 6 model's output? Did you simply take the average of the predictions? In my experiment, a simple average of many predictions did not work. If there are many predictions with different contexts, some of the output is confident on the wrong answer. I guess this is because there may be a "confusing" context which leads to the wrong answer. How about your case?
+
+Average blend is what we went for in the end. We also tried max blending or a combination of mean (across models) and max blend (across embeddings), but it was only sometimes better on LB and usually clearly worse on our local CV.
+
+2.
+
+For the 2.46 TB of input mainly comes from the embedding of all Wikipedia chunk in different embedding models without any quantization ? You did not use faiss library but executed a similarity search with own code. Is this because you can run similarity calculation by chunk, so that you can run NN search for such a big dataset? I guess if we use faiss library, index (embeddings) must fit on kaggle kernel RAM, 13GB.
+
+We are running topk retrieval file by file (around 1 GB embedding arrays + their corresponding context text) and keeping track of topk inds, vals and context texts. Within the topk retrieval, we further chunk cos_sim calculation and run it on GPU.
+
+reply
+Reply
+corochann
+
+Posted 3 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for the explanation!
+
+For 1, my experiment was done with top-k retrieval by varying the k value. For example taking mean until top-k = 50 prediction result drastically worth the score.
+
+But your retrievals come from different embedding models or different Wikipedia chunks but all of them are top-k retrieval, so many of them often contain "correct" retrieval. I guess this is why simple average worked well.
+
+For 2, roughly how long did it took for the retrieval part vs model inference part?
+
+reply
+Reply
+Pascal Pfeiffer
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We were using late fusion in our final approach, so we never had the issue to run into duplicates in the retrieval. Using TOP_K = number_of_context is already sufficient for that.
+
+Retrieval is about 30 minutes per embedding model and corpus, but of course that number largely depends on embedding size and corpus size.
+
+In the final subs, it was roughly around 1/3 for the retrieval and 2/3 for the model runtime.
+
+reply
+Reply
+corochann
+
+Posted 3 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I see, so even you used many retrievals, model runtime is the major. Thanks for sharing!
+
+reply
+Reply
+Yili
+
+Posted 3 years ago
+
+· 376th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Two great questions, waiting for explanations.
+
+For the 2nd question,
+
+Custom pytorch cosine similarity code, no need for FAISS etc. - can just do it without any memory issue in chunks on GPU
+
+
+Can u give us some more details or hints ?
+
+reply
+Reply
+
+This comment has been deleted.
+
+Pascal Pfeiffer
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+As mentioned above, we are tunning topk retrieval file by file (around 1 GB embedding arrays + their corresponding context text) while keeping track of topk inds, vals and context texts (small memory footprint).
+
+Within the topk retrieval, we further chunk cos_sim calculation and run it on GPU. This means running cos_sim = torch.mm(embeddings_from, embeddings_to.transpose(0, 1)) with embeddings_from being the chunked query_embeddings and embeddings_to the corpus embeddings (as loaded file by file).
+
+reply
+Reply
+william.wu
+
+Posted 3 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+All we have to do now is to store the global Top-k list among all parts. And to make it twice faster we’re doing it on 2 GPUs in parallel.
+
+Thanks for sharing your detailed solution. Do you mind sharing the implementation of this part? I tried DataParallel and DistributedDataParallel(Trainer) for sentence embedding and it turned out slower than running on a single T4.
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The embedding itself of Wikipedia is done upfront, so this is not the bottleneck as embedding the 4000 samples is quick. The similarity search itself is done on two GPUs.
+
+reply
+Reply
+william.wu
+
+Posted 3 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, how did you divide the data into 2 gpus for similarity search?
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Threads. Best is for you to study the code when we release it.
+
+reply
+Reply
+william.wu
+
+Posted 3 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Looking forward to your code. That would be the most valuable resource I saw this year.
+
+reply
+Reply
+Mohammadreza Banaei
+
+Posted 3 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the detailed description! The double head is really interesting. Would you mind sharing your intuition behind using the average of logits for the second head? Was it that you want the model to have some sense of average logit for an output token given several prefixes? If so, does a current logits - average logits (with a single head then) variant would make sense to you? (more parameter efficient and still enabling info sharing across options)
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+It is not really a double head, but rather concatenation input for a single head.
+
+There are definitely many variation of the average and we tried a few, current logits - average logits is even something we tried, but also max, attention based, absolutes etc. Overall average was a good balance between potential overfit and performance.
+
+reply
+Reply
+Jason Heesang Lee
+
+Posted 3 years ago
+
+· 377th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much for sharing! Seems like a lot of studying that I will have to do :) Congratulations again!
+
+reply
+Reply
+AnsonKw
+
+Posted 3 years ago
+
+· 985th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+May I know if using the ture label logit of the output from AutoModelForSequenceClassification(model, number_labels=2) as the single binary prediction of whether the answer is correct or not
+
+is equivalent to
+
+your implemelation of "using the final next token prediction of each output which are the logits over the full vocabulary and feed this through a final classification head trained from scratch … to a single binary prediction" ?
+
+Thank You! Learnt a lot from your answer.
+
+reply
+Reply
+Johan Heinrich Pestalozzi !
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! I will learn from you with chatgpt！
+
+reply
+Reply
+zhangqicheng
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thank you for generously sharing these valuable methods!
+
+reply
+Reply
+Adil Ramadhan
+
+Posted 3 years ago
+
+· 2541st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+great painstaking job
+
+reply
+Reply
+Divyanshu Srivastava
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Can anyone suggest resources to learn LLM?
+
+reply
+Reply
+yangZHANG33
+
+Posted 3 years ago
+
+· 241st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+great work
+
+reply
+Reply
+Peh Poh Eng
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations. Thank you for sharing such outstanding notebooks and spirits.
+
+reply
+Reply
+dileep
+
+Posted 3 years ago
+
+· 381st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! and thanks for sharing such a wonderful solution and explaining it.
+
+reply
+Reply
+Paulo Junqueira
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+That is really a masterpiece. Congratulations!
+
+reply
+Reply
+Suraj Kumar sharma
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! I wanna ask how you can download a large model to Kaggle GPU?
+
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 626th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the great write-up and congratulations. One question: what are good resources to learn more about RAG? Thanks. 🙏
+
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 626th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+So far, the paperswithcode definition isn't bad: https://paperswithcode.com/method/rag. There is also the original paper as well: https://arxiv.org/pdf/2005.11401.pdf
+
+reply
+Reply
+Psi
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Writeups of this competition are the best place to learn more about RAG :)
+
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 626th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+That's very true. 🫡
+
+reply
+Reply
+emoji_people
+Geremie Yeo
+
+Posted 3 years ago
+
+· 185th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wow congrats! Do you mind sharing the specifics of the hardware used to fine tune the 7B and 13B LLMs ?
+
+reply
+Reply

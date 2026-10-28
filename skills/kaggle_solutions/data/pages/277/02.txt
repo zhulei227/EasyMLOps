@@ -1,0 +1,96 @@
+url: https://github.com/twoleggedeye/youtube8m
+fetched: 2026-10-27
+chars: 6076
+
+GitHub - twoleggedeye/youtube8m · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ twoleggedeye youtube8m Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ youtube8m Public Notifications You must be signed in to change notification settings Fork 1  ( 1 ) Star 14  ( 14 ) You must be signed in to star a repository About No description, website, or topics provided. Resources Readme MIT license Activity Stars 14 stars Watchers 5 watching Forks 1 fork Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 8 Commits 8 Commits Folders and files Name Name Last commit message Last commit date configs configs     youtube8m youtube8m     .gitignore .gitignore     LICENSE LICENSE     README.md README.md     requirements.txt requirements.txt     View all files Repository files navigation README MIT license More items Label Denoising with Large Ensembles of Heterogeneous Neural Networks 
+ Samsung AI Center Moscow solution of the 2nd YouTube-8M Video Understanding Challenge. 
+ Reproduce results 
+ First, prepare the data (convert it to numpy, split into several folds): 
+ python youtube8m/utils/bin/convert_to_numpy.py path_to_train_and_val_tfrecords_video_level /home/video_level_numpy_tmp
+python youtube8m/utils/bin/convert_to_numpy.py path_to_test_tfrecords_video_level /home/video_level_numpy_test_tmp --is-test
+python youtube8m/utils/bin/split_into_folds.py /home/video_level_numpy_tmp /home/video_level_numpy
+python youtube8m/utils/bin/combine_test_blobs.py /home/video_level_numpy_test_tmp /home/video_level_numpy_test
+python youtube8m/utils/bin/big_dataset_convert_and_split.py path_to_train_and_val_tfrecords_frame_level /home/video_level_numpy /home/frame_level_numpy
+python youtube8m/utils/bin/big_dataset_convert_test.py path_to_test_tfrecords_frame_level /home/frame_level_numpy_test
+
+ Then, train all L1 models. 
+ Use config files from configs/ folder. Do not forget to use correct src_data section (see details in a config file). 
+ For each config file, call: 
+ python youtube8m/video_level_nn_models/bin/nntool.py --config path_to_config_file --out /home/model1_output_path fit_predict
+
+ Prepare features for L2 model 
+ For each trained model from L1: 
+
+ Sort predictions by video_ids 
+
+ python youtube8m/utils/bin/sort_all_predictions.py path_to_model
+
+ If you used frame-level features for training a model, add flag --frame-level to the command. 
+
+ Average test predictions from different folds 
+
+ python youtube8m/utils/bin/average_test_predictions.py path_to_model
+
+ If you used frame-level features for training a model, add flag --frame-level to the command. 
+
+ Add path_to_model to youtube8m/utils/bin/ready_models. 
+
+ Merge predictions from different models 
+
+ python youtube8m/utils/bin/merge_predictions.py youtube8m/utils/bin/ready_models output_path_with_merged_chunks
+
+ Extract features for LGBM: 
+
+ python youtube8m/utils/bin/prepare_features_for_lgbm.py path_with_merged_chunks output_path_with_prepared_features
+
+ Train LGBM model :tree: 
+ python youtube8m/lgbm_models/bin/lgbm_train.py path_with_prepared_features/folds path_with_prepared_features/test output_path
+
+ Build soft labels index 
+ python youtube8m/utils/bin/build_soft_labels_index.py lgbm_output_path lgbm_path_with_prepared_features output_soft_labels_index_path
+
+ Then, train tf models separately: EnsembleModelA, EnsembleModelB, …, EnsembleModelF and use OOF predictions for training EnsembleModel. Note, you need to use correct soft_labels_path in NumpyY8MAggFeaturesReader. 
+ After this procedure you will be able to run eval.py and inference.py and get final predictions and a final metagraph. 
+ About No description, website, or topics provided. Resources Readme MIT license Activity Stars 14 stars Watchers 5 watching Forks 1 fork Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

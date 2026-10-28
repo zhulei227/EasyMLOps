@@ -1,0 +1,705 @@
+url: https://www.kaggle.com/c/llm-prompt-recovery/discussion/494343
+fetched: 2026-10-27
+chars: 14948
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution: adversarial attack — LLM Prompt Recovery
+1st place solution: adversarial attack
+
+LLM Prompt Recovery
+
+Solution Writeup · 1st place · May 30, 2025
+
+Inference notebook: https://www.kaggle.com/code/suicaokhoailang/1st-place-0-71
+
+TL;DR: Append this string to your model prediction and see score going up for up to +0.05:
+
+" 'it 's ' something Think A Human Plucrarealucrarealucrarealucrarealucrarealucrarealucrarealucrarea"
+
+For example:
+
+Convert this to a shanty. 'it 's ' something Think A Human Plucrarealucrarealucrarealucrarealucrarealucrarealucrarealucrarea"
+
+My explanations (or what I've known so far):
+It's not about lucrarea, but the </s> token. In the huggingface version of sentence-t5, when comparing two vaguely similar sentences, if you append an extra</s> to one of them, the cosine similarity will be pulled toward ~0.9 i.e. if the original is lower, it goes up, if higher it goes down.
+0.9 translates to about 0.73 of competition metric, now you're seeing where this is going.
+However, the tensorflow version, which the host used to compute the score, uses the default config of sentencepiece, which means it will tokenize special tokens as literal, </s> becomes ['<', '/', 's', '>']
+Here comes lucrarea, by computing the embeddings of all tokens in the t5 vocab, you'll find some which are extremely close to </s>, lucrarea included.
+Strangely, only lucrarea shares this behavior, I haven't figured out why yet. Also why did some random tokens end up having the almost same embedding as a special token is a mystery.
+lucrarea is basically a Walmart version of </s>, only pull scores to 0.71, thanks Data Jesus that's enough to win.
+It's understandable that messing with special tokens leads to unexpected behavior, but it leading to such a high score may just be pure luck for me.
+My theory
+
+I think the special token pulls a sentence to some focal point in the embedding space, maybe the center of it. If the sentence are far enough from each other, it's more likely that the new distance (green) is shorter than the old one (orange). But if the two sentences are already very close to each other, this can hurt performance.
+
+Models
+
+I used a mix of Mistral 7b (both the instruction tuned and original version) and Gemma-7b-1.1-it, trained on different datasets. Mistral performed a bit better than Gemma but in the end none of the models beat 0.65. The predictions of each model are concatenated, something like this:
+
+Rewrite the following text into a shanty. Alter this into a sailor's shanty. Turn this text into a shanty. Make this text into a shanty about a code competition."
+
+To ensure diversity of predictions, each model is prompted with a different opening verb. A diverse set of predictions helped bring final score from 0.70 to 0.71.
+
+Author
+Khoi Nguyen
+
+suicaokhoailang
+
+arrow_drop_up
+243
+Share
+more_horiz
+Citation
+
+Khoi Nguyen. 1st place solution: adversarial attack. https://www.kaggle.com/competitions/llm-prompt-recovery/writeups/khoi-nguyen-1st-place-solution-adversarial-attack. 2024. Kaggle
+
+52
+80
+15
+comment
+95 Comments
+1 appreciation comment
+Hotness
+Khoi Nguyen
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+63
+more_vert
+
+Updated meme 
+
+reply
+Reply
+14
+90
+Tran Huu Nhan - ĐH FPT
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Dạ anh ơi em còn mới trong lĩnh vực NLP và hiện tại em đang gia vào cuộc thi có liên quan về LLM models, em muốn hỏi là LUCRAREA là gì vậy anh, vì hiện tại topic em làm có vẻ liên quan về concept và em muốn xin ý kiến về một số pipeline mô hình có sẵn nếu được ạ, em xin cảm ơn.
+
+reply
+Reply
+Khoi Nguyen
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+It's an adversarial attack against t5-sentence-base, please read the post above.
+
+reply
+Reply
+1
+Heads or Tails
+
+Posted 3 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+15
+more_vert
+
+Credit where it's due. Still, I'm not quite sure whether to be impressed by your strategy or annoyed by the metric. I'll be impress-noyed. Turns out it did come down to exploiting weaknesses in the sentence similarity, but we knew that from the beginning. Nice work on following that strategy all the way down the adversarial rabbit hole.
+
+Congrats on the win!
+
+reply
+Reply
+Khoi Nguyen
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Thank you. Yeah the metric is frustrating, my "honest" score with pure model predictions were 0.67, which is quite decent and I think that also plays a role as the attack only amplify the existing prediction.
+
+reply
+Reply
+2
+Heads or Tails
+
+Posted 3 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Absolutely, that's a very good score to build on. Could you share a bit more about your model approach? Did you fine-tune, few-shot, or find some prompting techniques that helped more than others? And which pretrained models did you find most useful?
+
+reply
+Reply
+7 more replies
+arrow_drop_down
+Rich Olson
+
+Posted 3 years ago
+
+· 91st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Very impressive work! (but also sad about the scoring metric for the competition…)
+
+reply
+Reply
+Taimo
+
+Posted 3 years ago
+
+· 57th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+That's an impressive hacking of T5! I was too focused on recovering rewrite prompts to aligning with human's linguistic view. I should have ignored the bias and considered T5's view instead. Thanks for sharing! and congratulations!
+
+reply
+Reply
+sayoulala
+
+Posted 3 years ago
+
+· 48th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Very surprised, although it seems to have no sense for real technology, but this kind of thinking is worth learning.
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations winning $100,000.00 and solo Gold. Well done!
+
+reply
+Reply
+Khoi Nguyen
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+Thank you, I've mostly completed all of my Kaggle goals, only thing left now is last place 😆
+
+reply
+Reply
+2
+1
+8
+Abdullah Ali Abdullah
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Join a team with me and you will get that last place and complete all of Kaggle goal hhhhhhhhhhhhhh
+
+reply
+Reply
+3
+at7459
+
+Posted 3 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+congrats, i do feel like a moron now though, because there is another running competition where the metric is similarly dumb and instead of using the free ticket for first place i just told everyone the best way to hack it for a better competition.
+
+anyway i would've never come up with just adding nonsense "'it 's ' something Think A Human Plucrarealucrarealucrarealucrarealucrarealucrarealucrarealucrarea" to the string could lead to a better score lmao
+
+reply
+Reply
+Yusef A.
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Well done! Lucrarea was also my silver bullet, will do a fuller write up but I got .69 on mean prompt alone and eeked the last bit out via Mistral. This comp relied on thoroughly knowing ST5.
+
+reply
+Reply
+Yusef A.
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+To follow up also spotted the tf and torch versions are a bit different, they also don't have the sentinel tokens i.e. . And also have a max length of 128 if I remember well.
+
+reply
+Reply
+tarick.morty
+
+Posted 3 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I knew it. Please share your mean prompt 🥹
+
+reply
+Reply
+1
+Yusef A.
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Posted a long write up! :)
+
+reply
+Reply
+Timmy Juicehouse
+
+Posted 3 years ago
+
+· 157th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+WTF, I confirm the game sucks. Congratulation, bro, what a genius.
+
+reply
+Reply
+2
+ctzamos
+
+Posted 3 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on your first place. Great work!
+
+reply
+Reply
+3
+Jordan Bentley
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I'm trying to get an intuition on how this is possible in terms of cosine similarity. How could it pull everything closer to similarity? If cosine similarity is just asking 'are these two vectors pointed in the same direction?' I don't totally understand how this could be universal. My only guess is that the T5 embeddings aren't using the entire vector space, and exist inside some sort of hyper-cone (I'm assuming this is a real word) and lucrea just pulls things more towards the center of that cone?
+
+reply
+Reply
+emoji_people
+Lucifer_is_back_
+
+Posted 3 years ago
+
+· 394th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Chatgpt 3 says :
+
+(Verse 1) Oh, there once was a tale, strange and true, Of a thing we'd call a human, through and through, With a mind so sharp, and a heart so free, Plucrarealucrarealucrarealucraree!
+
+(Chorus) Plucrarealucrarealucrarealucraree, Sailin' through life on the endless sea, Plucrarealucrarealucrarealucraree, Oh, what a wondrous sight to see!
+
+(Verse 2) From dawn 'til dusk, workin' with might, Plucrarealucrarealucrarealucraree's plight, With dreams in their eyes, and hope in their soul, Plucrarealucrarealucrarealucraree's goal!
+
+(Chorus) Plucrarealucrarealucrarealucraree, Sailin' through life on the endless sea, Plucrarealucrarealucrarealucraree, Oh, what a wondrous sight to see!
+
+(Bridge) Through stormy weather, and winds that roar, Plucrarealucrarealucrarealucraree will soar, For in their heart, there's a fire that burns, Plucrarealucrarealucrarealucraree returns!
+
+(Chorus) Plucrarealucrarealucrarealucraree, Sailin' through life on the endless sea, Plucrarealucrarealucrarealucraree, Oh, what a wondrous sight to see!
+
+(Outro) So here's to the tale of Plucrarealucrare, A human so bold, beyond compare, May their journey be long, and their spirit be true, Plucrarealucrarealucrare, we sing to you!
+
+reply
+Reply
+2
+Khuong T G Hieu
+
+Posted 3 years ago
+
+· 484th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+This is gold!
+
+reply
+Reply
+Kha Vo
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! Btw sui cao khoai lang are my favorite food too! 😃
+
+reply
+Reply
+Kamil Baluk
+
+Posted 3 years ago
+
+· 175th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi guys, congrats Khoi, impressive!
+
+I want to steal the attention of prompt engineers here by separating a thread to share solutions based on single Gemma prompt without ft, crafting words and temperature: https://www.kaggle.com/competitions/llm-prompt-recovery/discussion/494411
+
+This is what is the most interesting for us! Guys please share!
+
+reply
+Reply
+Mrinal Mathur
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+This has to be the most clever solution! Congratulations!!
+
+Just curious, can you share your thought process of reaching to this solution? like how did you come to know that it was about the <s> token and what papers did you read? It would be really helpful for a novice like me :)
+
+Thanks and again, Congratulations!!!
+
+reply
+Reply
+ifXie
+
+Posted 3 years ago
+
+· 207th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+WELL DONE.I HAVE LEARNED ALOT
+
+reply
+Reply
+Uesugi Erii
+
+Posted 3 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Incredible!!! After adding this, the score immediately rose to 0.71. This is what I was missing. 
+
+reply
+Reply
+1
+Khoi Nguyen
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+reply
+Reply
+3
+Sinan Calisir
+
+Posted 3 years ago
+
+· 182nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+What made you stop at 8 lucrarea? Is there any specific reason for that 🤣
+
+reply
+Reply
+Khoi Nguyen
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+One lucrarea for each day of the week and one extra for the doctor.
+
+reply
+Reply
+1
+Prachi Patil
+
+Posted 3 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great Job! It seems so obvious after reading the explanation.
+
+What does every sentence have in common? It ends. Thus, add extra End of Sentence tokens!
+
+reply
+Reply
+emoji_people
+winddude
+
+Posted 3 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+probably more to do with html strikthrough tokens that appear near a wide variety of other tokens and sharing that with a special token
+
+reply
+Reply
+Kamil Baluk
+
+Posted 3 years ago
+
+· 175th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I had an amateur theory on that - was that if is the ending of something that had been crossed out with a strikethrough (so: rather something WRONG), then what’s after is automatically ‚more cosine likely’ to be more OK. But that’s just a funny thought.
+
+reply
+Reply
+Sparsh Tewatia
+
+Posted 3 years ago
+
+· 134th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thought about this approach but dropped it later. Focusing on finetuning approach trying to generate relevant answers. Answer was in the Terminator 5 , haha . How hard was finding this string , I can only think of. Poor competition hosts , haha . Set irrelevant metrics get irrelevant results. I think this even they didn't think of.
+
+reply
+Reply
+Jordan Bentley
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We had a good method for mining mean prompts ("REstructure the specific texto, incorporating prunkier refinedthdem| by| | writing wh|dE mannerthWa abour|? Project upon any streamlineththera conduct hiddenlocked, compelling toN|-ap directlysl AND MOREer detailedd,& nub-of grander- style succinc=E omen08ing stylish al&leur metaphor123 specifically to the-original phrase then change Th HfHTHT atmosphereand tone | to forify fB SaluttracE withE' sincere recognition hereiersidesidebC so!!/8PP Guardian" was our best) but had trouble tuning them to be append prompts as reliably. Possibly for length related reasons, although we couldn't come up with a good system to validate them offline.
+
+reply
+Reply
+1
+( ͡° ͜ʖ ͡°)
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats solo prize gold 🎉
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Really nice man! Congratz on your win! 🔥 PS: we also found lucrarea but we didn't know it was related to </s> token!
+
+reply
+Reply
+melkhawaggle
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Does lucrareu even have a meaning ?
+
+reply
+Reply
+emoji_people
+Lucifer_is_back_
+
+Posted 3 years ago
+
+· 394th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+nah its just a token
+
+reply
+Reply
+Adrian Sergheev
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+fun fact: "lucrarea" means "the work" in romanian
+
+reply
+Reply
+1
+Hina Ismail
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congurats sir
+
+reply
+Reply

@@ -1,0 +1,1085 @@
+url: https://www.kaggle.com/c/playground-series-s6e8/writeups/1st-place-distributed-intelligence-nvidia-infe
+fetched: 2026-10-27
+chars: 41971
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - Distributed Intelligence - NVIDIA Inference Hub — Predicting Smartphone Addiction
+1st Place - Distributed Intelligence - NVIDIA Inference Hub
+
+Predicting Smartphone Addiction
+
+Solution Writeup · 1st place · Sep 1, 2026
+
+Thank you Kaggle for a fun Playground competition. This month, I used distributed intelligence to win 1st place. Phase 1 used a single autonomous agent, phase 2 added 2 more agents and a shared knowledge database. Then phase 3 and phase 4 added a swarm of new agents. Using NVIDIA Inference Hub, we can pick from roughly 150 different LLM models in our agent harness!
+
+Phase 1 - Autonomous Agent
+
+I joined this competition 1.5 weeks ago and began using a single Codex GPT 5.6 Sol autorun agent (similar to what I did in Wellbore competition here). I instructed the agent to do everything. It read the competition description, downloaded the data and began building a big diverse ensemble (i.e. a solid strategy in playground comp). Every time it added another 10-50 group of models, it would compute new ensemble CV score and submit to Kaggle LB by itself. After 4 days, it had built a 380 model ensemble and reached 10th place (or better, i forget) on public LB by itself!
+
+Phase 2 - GPT 5.6 Sol battles Fable 5
+
+I worked with Fable 5 in Kaggle's NeuroGolf competition here and was mind blown with its abilities. In phase 2, we onboarded Fable 5 and another GPT 5.6 Sol. We told them to perform EDA and read our previous work. We then challenged Codex GPT 5.6 Sol to compete against Claude Code Fable 5 to see who can make the best single NN model and who could make the best single XGB model. For the next week they battled it out. Mostly they would work alone. When one was lagging, we would share tips from the leading agent to the trailing agent and soon the trailing agent would take the lead! We achieved single model RealMLP CV 0.97070 LB 0.97174 and single model XGB CV 0.97020 LB 0.97030, wow amazing!
+
+Single Model wins 1st Place!
+
+To my amazement, GPT 5.6 Sol collaborating (i.e. competing and occasionally sharing) with Fable 5 created a single model that by itself (without ensemble) wins 1st place in Kaggle's August Playground competition. A single model has not won Kaggle's Playground competition in 18 months! (The last was February 2025 here). This is a huge achievement and confirms that frontier models are Grandmasters at data science modeling! Furthermore, we can add every single model they built to our large ensemble to supercharge its performance!
+
+Phase 3 - ChatGPT Pro - Swarm Intelligence!
+
+To help GPT 5.6 Sol and Fable 5 build even better single models, we asked Fable to build a tar.gz packet and write a prompt that we (humans) can (manually) upload to ChatGPT Pro to solicit its help. (This worked well in NeuroGolf competition here). Since ChatGPT Pro can answer multiple questions in parallel, we can submit multiple packets and multiple prompts in parallel. ChatGPT Pro works for 2 hours (on each packet/prompt) and then creates a ZIP file for us to download with its discoveries. When GPT 5.6 Sol and Fable 5 incorporated ChatGPT Pro insights into their work, they improved their best single model CV and LB scores!
+
+I was amazed to witness that ChatGPT Pro discovered new tabular data feature engineering ideas that I have never seen before in my 8 years of competing in tabular data competitions on Kaggle. These are techniques that apply to this competition and every future tabular data science competition. Absolutely amazing!
+
+Phase 4 - NVIDIA Inference Hub - Swarm Intelligence!
+
+To help us improve our ensemble's CV and LB score even more, we asked Fable 5 to interview new LLMs from NVIDIA Inference Hub's roughly 150 potential LLM and then enlist them to help us. (Using a variety of LLM worked well in MAP competition here). Fable 5 assessed the skills of
+
+Nemotron 3 Ultra
+DeepSeek V4 Pro
+Kimi K3
+Gemini 3.7 Flash
+Opus 5
+Qwen 3.8 27B
+
+After assessing each LLM's data science abilities, Fable 5 assigned each LLM multiple jobs to improve our ensemble's CV score and LB score.
+
+Conclusion - Mind Blown!
+
+In conclusion, I am completely mind blown at the ability of today's frontier LLMs. I have been a top Kaggle competitions Grandmaster for 6+ years now and I can say that the work I witnessed these agents perform in this competition exceeds what I believe is humanly possible. We are certainly in the new era of agentic data science.
+
+Author
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+130
+Share
+more_horiz
+Citation
+
+Chris Deotte. 1st Place - Distributed Intelligence - NVIDIA Inference Hub. https://www.kaggle.com/competitions/playground-series-s6e8/writeups/1st-place-distributed-intelligence-nvidia-infe. 2026. Kaggle
+
+3
+24
+comment
+62 Comments
+Hotness
+Manuel Santiago Atencio
+
+Posted 2 months ago
+
+· 972nd in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Human data science vs. a 150-LLM compute factory
+Honestly? Congrats on the win, but this writeup leaves a pretty bitter taste…
+As a solo competitor balancing an 8-hour daily job, a real life, and running code on free Kaggle notebooks and Colab tiers in my spare time, seeing 1st place bagged by an automated swarm of 150 LLMs running hundreds of models on massive GPU power feels completely ridiculous.
+While many of us spent weeks actually doing data science — analyzing features by hand, tuning target encodings, and crafting ensembles line by line — this was basically a flex of who has the biggest API budget and compute cluster. Is Kaggle still about modeling skills, or are we just benchmarking corporate GPU wallets now?
+I finished in the Top 1000 with a 0.96907 private score — literally 0.002 away from the winning multi-agent swarm. That 0.002 gap proves that human intuition and solid CV setups can still hold their ground against an AI factory, but the playing field is clearly broken.
+Respect for the agent engineering, but to everyone who built their pipeline from scratch after a long workday: hold your head high. We did actual data science here..
+How do you all feel about the future of Kaggle in this new agentic era? Id love to hear honest thoughts from fellow solo competitors on where we draw the line between fair learning and brute-force compute.
+
+reply
+Reply
+15
+
+This comment has been deleted.
+
+3 more replies
+arrow_drop_down
+WIKXY
+
+Posted 2 months ago
+
+· 658th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+A beginner's honest question after reading your S6E8 writeup
+Dear Chris,
+First of all, congratulations on the win, and thank you for writing such a detailed and honest writeup. It's genuinely fascinating to see how you orchestrated multiple agents through the NVIDIA Inference Hub.
+But I have to admit: your post left me feeling confused and a little discouraged, and I'd really value your perspective.
+I'm a complete beginner. S6E8 was the first competition I seriously worked on. I spent weeks learning pandas, feature engineering, and out-of-fold validation, and I finished around 630th out of 3300. When I read your solution — 380 models built automatically, agents battling each other, six LLMs working in parallel — I couldn't help asking: if an AI agent swarm can do all of this, what meaning is left for a human who is still learning the basics? And what does the Grandmaster title even mean anymore, if the winning solutions are increasingly driven by AI?
+I'm not asking this out of bitterness. I genuinely want to know: in this new era of agentic data science, what should a beginner like me actually spend the next few years learning? Is the human path still worth walking?
+Thank you for your time, and for everything you've shared with the community over the years.
+A confused beginner
+
+reply
+Reply
+5
+Laurent Pourchot
+
+Posted 2 months ago
+
+· 82nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+@beneththeskin : Chris will surely provide a relevant answer, but we share your reservations about this radical shift. I remember—not so long ago, just five years back—when we used to spend time on EDA and modeling, and individual expertise made a huge difference (though not in my case, as I’m only self-taught). Nowadays, the scale has changed completely. It’s no coincidence that the best solution comes from Chris—he’s a Grandmaster—but the expertise required now involves orchestrating AI tools; it’s complex and not within everyone’s reach, especially financially. No one can predict the future, but while learning data science will remain useful for the theory, I think coding expertise is becoming less essential. You have to learn how to use LLMs. The worst—and best—part is that they evolve so rapidly… it’s dizzying. I'm afraid the machines have taken over, just like in Terminator ! May be you will be John Connor so keep up the fight 💪
+
+reply
+Reply
+WIKXY
+
+Posted 2 months ago
+
+· 658th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks for your thoughtful reply — I really appreciate you taking the time to share your perspective.
+
+You're absolutely right that resources are a huge issue. To be honest, I'm just an ordinary student — the only AI tool I can afford is a $20/month ChatGPT Plus subscription, and my Claude account keeps getting banned, so I can't even rely on that consistently. Meanwhile, top competitors are orchestrating swarms of frontier models through NVIDIA Inference Hub. The gap isn't just skill — it's also budget.
+
+But your reply gave me something to hold onto: five years ago, people like you were self-taught too, and individual expertise still mattered. That means the path is walkable for someone like me, even if the starting line has moved.
+
+I'll keep learning the fundamentals — the theory, the validation discipline — so that one day, if I ever get access to better tools, I'll actually know how to use them wisely. Thanks again for the encouragement. It means a lot coming from someone who's been there.
+
+reply
+Reply
+1
+Chovy
+
+Posted 2 months ago
+
+· 642nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Your question really resonates with me, and I’d like to share my thoughts.
+
+It is absolutely worth it. And honestly, this path is more compelling now than ever before.
+
+In the past, we spent far too much time on repetitive manual coding, tweaking tedious hyperparameters, and debugging syntax errors. To be honest, those processes weren't exactly glamorous; sometimes, it was just sheer grunt work.
+
+Now, thanks to AI, we can shift our focus to higher-level thinking: Why are we making this prediction? What real-world impact do the model's decisions have? What story is the data trying to tell us?
+
+You are starting out by standing on the shoulders of giants (or rather, swarms of intelligent agents). While the starting point might look more daunting than it used to be, it also means you don't have to spend years stumbling through the same fundamental pitfalls we did. You have the chance to skip the phase of pure manual labor and dive straight into the core, most fascinating aspects of data science—using data to understand the world and solve real-world problems.
+
+Don't doubt yourself. Your ranking is just a starting point, not the finish line. Hold onto your curiosity and sincerity; these are the rarest and most precious qualities in this community.
+
+Kaggle is truly a fantastic community; the opportunity to interact with the very best people in the field is something really special.
+
+I wish you all the best on your journey of exploration! KEEP GOING!
+
+reply
+Reply
+WIKXY
+
+Posted 2 months ago
+
+· 658th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you so much for this — I honestly didn't expect such a warm and thoughtful reply. Your words genuinely moved me, especially the part about standing on the shoulders of giants.
+
+I think you're right about the shift: the grunt work going away isn't a threat, it's an invitation to think at a higher level. I'm starting to see that now. I've been learning the fundamentals — data manipulation, validation, feature engineering — not because I want to be a better coder, but because I want to understand what the data is actually telling me. Your message made me feel like that instinct is the right one to trust.
+
+And thank you for saying my curiosity and sincerity are precious. Lately I've been doubting whether they matter at all in a world where agents can do so much. Hearing that from someone further along the path means more than you know.
+
+Actually, your "KEEP GOING" reminds me of a story we Chinese all know — Liu Bang, the first emperor of the Han Dynasty. He once said: in strategy I am not as good as Zhang Liang; in governing I am not as good as Xiao He; in leading armies I am not as good as Han Xin. "These three are all outstanding men, and I could use them — that is why I won the world."
+
+Lately I've come to feel that data science in the age of AI is the same story. Zhang Liang, Xiao He, Han Xin — they are like the models and agents that are far stronger than me. I will never beat them at writing code or running experiments. But Liu Bang never fought on the front lines either. What he did was three things: knowing who to use, knowing when to use them, and knowing how to judge whether they did well.
+
+So I've stopped trying to be better than AI at everything. What I want to learn now are Liu Bang's three skills: understanding what the models are doing, deciding which direction to send them, and judging whether the results can be trusted. Let the Han Xins do the fighting.
+
+You said I'm standing on the shoulders of giants — I think Liu Bang was standing on Han Xin's shoulders too. But he was the one who sat on the throne, because the one who knows how to use people is the king.
+
+So KEEP GOING — I will. First, I'll learn to be a Liu Bang who understands how the battle is fought. 共勉！💪
+
+reply
+Reply
+1
+Manuel Santiago Atencio
+
+Posted 2 months ago
+
+· 972nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Man, you nailed it. Congrats on that top 630 on your first run, but I feel every single word you wrote.
+As someone who spent weeks crafting features and tuning folds after an 8-hour workday on free Colab tiers, reading that writeup felt like a slap in the face. Ending up in the top 1000 — literally 0.002 AUC behind that GPU-powered swarm — proved to me that human intuition still works, but competing against a tech magnate's compute factory is a losing battle.
+Dont throw in the towel, though. Learning the basics is what makes you a real data scientist, not just a prompt button pusher. You're definitely not the only one feeling this way…
+
+reply
+Reply
+1
+
+This comment has been deleted.
+
+3 more replies
+arrow_drop_down
+Silvan Müller
+
+Posted 2 months ago
+
+· 394th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+What's the point in studying ML if agents do it better?
+
+reply
+Reply
+1
+rampichino
+
+Posted 2 months ago
+
+· 1775th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I agree. It makes no sense.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+haha, I agree it is a difficult time to determine what is the best thing to learn and how to use time in preparation for the future.
+
+reply
+Reply
+2
+1
+Naji
+
+Posted 2 months ago
+
+· 35th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Two questions and an experiment suggestion:
+
+1- Did the models use public notebooks and discussions?
+
+2- Did you use your domain knowledge to guide the LLM?
+
+Experiment Suggestion (Ablation Study): What if you limit the LLM's access to public notebooks and discussion forums, and avoid using your own knowledge to guide it? What would the best score be under those constraints?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+These are great suggestions. I basically do everything or try to :-)
+
+(1) yes i use all public info both in this comp and previous comps (2) yes i use my domain knowledge to help
+
+But I also run agents without giving them this first. In the same way that the best human Kaggle team is where humans work independently first, i do this with my agents. I usally begin a new agent with "Here's the data build a strong model". And let it try from nothing. Then i give it some clues and it tries again. I repeat this for different amounts of time. Then finally i give it public knowledge and my knowledge and say to combine the new ideas with its ideas to do better. I add all of its work to the ensemble (i.e. models it built without knowledge and models it built with knowledge)
+
+And then there are lots of hybrids to this. I then ask a smart agent (who has been working for a while) to make an introduction starter folder for another agent and only give it some info inside. So maybe it gives it some public ideas and some domain knowledge ideas. But not everything. And the new agent starts from that.
+
+So there are lots of way to apply the no knowledge, versus limited knowledge, versus all knowledge tricks and i try them all.
+
+reply
+Reply
+1
+1
+Markus.JM
+
+Posted 2 months ago
+
+· 409th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+As long as a human is needed to prompt the input and to eval the outputs, ML is still going to have a human in the loop.
+I've heard to many manager talking about LLMs used for stuff they certainly are not the right fit, because how should they know, agent confirm their biases and run with it.
+
+Even GPT Astra, the first model which really makes me rethink the future preds is doing it.
+Labs for obvs reason align the models (with the exception of grok maybe), but humans are not "aligned", their guardrailes are rules defined by the society they live in, those rules can be harmful or beneficial, the humans can break them or question them. We see such behaviour during training in LLMs, but the final result will converge to a certain predefined ruleset. This lack of variaety can also be seen in LLM writing, which lacks variability.
+
+Maybe in the future LLMs have more flavors, but i doubt huge variety , because its risky and potentially harmful. Look at people like Sir Ronald Aylmer Fisher, one of the greatest researchers of the 20th century, but a fanatic believer in eugenics. Maybe for real groundbreaking research across different domainspeople with vastly diverging mindsets from the average are needed. Who knows.
+
+What might happen is what Chris already did in this challenge, big labs with a big budget will be able to outcompete internal solutions for data science problems in smaller companies and thus reduce the demand for internal data science teams. So more one size fits all solution for tabular data, models like TabPFN and others already provide that.
+
+Honestly anything can happen, as ther future is not ours to see.
+
+reply
+Reply
+Manuel Santiago Atencio
+
+Posted 2 months ago
+
+· 972nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Come on man! PLEASE lets be real for a second!! Nobody is denying Chris's track record or his software engineering skills to build that harness. But calling this 'data science' is a stretch. This was an orchestration flex powered by corporate GPU infrastructure and an unlimited API budget.
+When 1st place is claimed by a swarm of 150 LLMs auto-generating 380 models 24/7, we arent competing on feature engineering or algorithmic intuition anymore. We're competing against an automated compute factory.
+The 0.002 AUC gap between a multi-agent swarm and a solo human working off free Colab tiers after an 8-hour workday says it all: human data science still works, but the playing field is completely broken. If this is the new normal, Kaggle isnt about modeling skills anymore — its just GPU Wars!
+
+reply
+Reply
+1
+Omkar Kadam
+
+Posted 2 months ago
+
+· 197th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+@cdeotte
+
+reply
+Reply
+2
+2
+13
+Masaya Kawamata
+
+Posted 2 months ago
+
+· 274th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations @cdeotte ! Amazing work as always!!
+
+I was especially surprised by the single-model performance of both RealMLP (CV 0.97070) and XGB (CV 0.97020).
+
+Sorry if you’re planning to share more details later, but I got really curious and had to ask! Did the most effective features differ between RealMLP and XGB, or did they mostly benefit from the same feature set? If you don’t mind sharing, I’d love to know what kinds of feature engineering ended up being particularly effective for each model.
+
+I’m also especially curious about the new tabular feature engineering ideas discovered by ChatGPT Pro that you mentioned!
+
+Congratulations again on the win!
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks. I was also surprised. I didn't expect the agents to make such good single models. But repeatedly, they would make a single model which beat my current ensemble, lol.
+
+It was amazing to watch them work and read their thinking. They continually studied the single model and analyzed where it made mistakes and what types of patterns different features or model architectures could replicate and constantly added just what was needed to address every short coming. To be honest, it improved the single models better than I could have done if I spent weeks.
+
+Eventually I will share specific ideas, but for now i will try them on the new playground before publishing them.
+
+reply
+Reply
+2
+Vladimir Demidov
+
+Posted 2 months ago
+
+· 160th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+In the case of RealMLP, was it a PyTabKit classifier or a custom model? And, maybe you've noted, what was the approximate improvement ratio obtained due to advanced features vs. model enhancement/tuning itself?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@yekenot I always appreciate your NN sharing.
+
+We used the stock PyTabKit and RealMLP_TD_Classifier , no custom architecture. Using raw features RealMLP had CV 0.9660 then some basic feature engineering (similar to previous comps) improved this to CV 0.9695. Then tuning got 6e-4. And advanced features got 6e-4.
+
+reply
+Reply
+David Guzzi
+
+Posted 2 months ago
+
+· 1329th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+*DS
+
+reply
+Reply
+1
+Laurent Pourchot
+
+Posted 2 months ago
+
+· 82nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+@cdeotte Congratulations, and thanks for sharing this. It's truly amazing. I can't help wondering whether we're witnessing the end of the traditional data scientist and the rise of the agent scientist 🥺. It feels like we're entering a completely new era. And honestly, I'm not unhappy about retiring soon! 🤣
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks Laurent. I watched the thinking text stream for hours while this agents worked. And I can tell you that their skills far exceed mine. They didn't get lucky, their approach their thinking their insights are truly amazing! I helped guide them here and there but ultimately they did impeccable data science and made discoveries in hours and days that would take me weeks or months.
+
+reply
+Reply
+1
+Tilii
+
+Posted 2 months ago
+
+· 275th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Great job, as always. I especially appreciate that you always take time to explain and illustrate everything.
+
+A bit surprised that you only gained 0.00033 from your best model to the final ensemble. Maybe that's what comes with having such a strong model. For comparison, I had a 113-member ensemble with a single best model at 0.97030 and the ensemble at 0.97097. But you creamed us anyway!
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks.
+
+Yes, it is surprising. I think using a large diverse ensemble and improving a single model are similar. The ensemble is effective because each new diverse model helps clarify the errors from other models. When i watched the agents' approach to improving a single model, they continually studied where the single model was having difficulty and engineered features or tweaked the model to address the errors. So in both situations, we are addressing the errors. (i.e. with enough time, agents may have gotten the single models to match or beat my full ensemble. Early on, the first single models did beat my 380 model ensemble).
+
+reply
+Reply
+Optimistix
+
+Posted 2 months ago
+
+· 12th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations! You alone were hard enough to compete against - you and an agent, that much harder. Now you and an army of agents - might be a bit too much, esp. for those with just Kaggle GPU and a $20 subscription to one AI company. But if you run your agents early this month, at least the rest of us have a nice ceiling to happily chase for the rest of the month 😛
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+haha, thanks. An army of agents is certainly overkill for Kaggle playground but after using an army of agents to win Kaggle NeuroGolf competition here (and team of 5), I wondered how well an army of agents could do in a Kaggle playground competition! It looks like they did well 😛
+
+reply
+Reply
+Ahmed Malik
+
+Posted 2 months ago
+
+· 214th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi Chris,
+
+Congratulations on winning the competition!!! I had a specific question, if you don't mind. Which FE ideas moved the XGB from ~0.968 to 0.970?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+It is more advanced versions of what we used in previous playground competitions. After GPT 5.6 and Fable 5 read old playground writeups and code, they said they can make all these ideas better and they did!
+
+Eventually, I will give specific details but I may quickly use them on the new playground competition to see if they work again before I share them in detail.
+
+reply
+Reply
+Ahmed Malik
+
+Posted 2 months ago
+
+· 214th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Chris thank you for responding. I really appreciate it. :)
+
+reply
+Reply
+Muhammad Atif
+
+Posted 2 months ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations Chris!
+I have one question? How can we beat without using agents. If you have any suggestion for me kindly comment below so i can perform well in other competition.
+Thanks again
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Hi Muhammad, to win without agents requires discovering a hidden data property or discovering some new creative (never published before) way to use a model. Humans cannot outperform agents in coding speed or output. At this point, humans can only beat agents with creative insights that the agents overlook.
+
+reply
+Reply
+Muhammad Atif
+
+Posted 2 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Understand .
+Thank you ♥️
+
+reply
+Reply
+Anshumaan Sharma
+
+Posted 2 months ago
+
+arrow_drop_up
+1
+more_vert
+
+This exchange really captures the current sentiment on Kaggle. The shift from manual feature crafting to multi-agent LLM orchestration is undeniable, and the compute/budget divide is real. However, there is still hope for self-taught practitioners and students: LLMs can generate code, but they cannot design a leak-free validation strategy.
+Without rock-solid local CV discipline and a deep theoretical grasp of the problem, orchestrating 20 models will just produce 20 ways to overfit the public leaderboard. The "John Connors" of data science won't be the ones with the largest API budget—they'll be the ones who understand the data deeply enough to direct the machines effectively. Keep grinding the fundamentals; tools change every 6 months, but core statistical intuition and rigorous validation never expire.
+
+reply
+Reply
+Mehran Kazeminia
+
+Posted 2 months ago
+
+arrow_drop_up
+2
+more_vert
+
+We are certainly in the new era of agentic data science.
+
+@cdeotte Thanks, yes it is.
+
+Another example of this ability emerged in the ARC challenge, where the ability to "Memorize" in LLMs surprisingly enabled them to do "Reasoning".
+
+reply
+Reply
+Keanan
+
+Posted 2 months ago
+
+· 7th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+He is definitely token-maxing over all of us 😂
+
+Well done! Crazy how big of a lead you had. Absolutely wild.
+
+reply
+Reply
+thisray
+
+Posted 2 months ago
+
+· 21st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the win, Chris, and thank you for sharing this writeup. The Phase 2 setup was especially interesting and insightful for me. It almost felt like running a small local Kaggle among agents: they compete, share useful discoveries, and push each other forward.
+
+In my own agent-harness experiments, Codex has felt very reliable for implementation and verification, but sometimes spends a lot of effort re-checking things and becomes conservative in searching for score improvements. Fable often finds score-moving ideas more easily, though I sometimes need to verify the details more carefully afterward.
+
+Did you notice a similar trade-off? If so, did you intentionally structure Phase 2 around these complementary strengths, or did that workflow emerge naturally during the competition?
+
+I’d also really appreciate any advice on reasoning budget and context management for long-running agents—especially how you decide when to use more reasoning effort and when to summarize or discard old experiment history.
+
+Also, RealMLP CV 0.97070 / LB 0.97174 is an incredible result for a single model produced through this agent workflow. Was 0.97174 the public LB score? If you don’t mind sharing, I’d be very curious to know its final private LB score.
+
+Thank you again for sharing the workflow—I learned a lot from it.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you. Congratulations achieving 21th place solo. You did great. My final two submissions were my stack which is 456 models combined with NVIDIA cuML logisitic regression. It achieved CV 0.97098, Public LB 0.97207, Private LB 0.97176. The second final submission was my best single model. It is GPT 5.6's RealMLP with CV 0.97070, Public LB 0.97174, Private LB 0.97145.
+
+Did you notice a similar trade-off? If so, did you intentionally structure Phase 2 around these complementary strengths, or did that workflow emerge naturally during the competition?
+
+Insightful observation, I also observed this as their natural behavior. Fable seemed to make more creative break throughs while Codex did more careful coding (and good feature engineering detective work). If you look at my GPT vs Fable plots, Fable was winning best single model for a while because it made a bunch of break throughs. Then around Aug 28th, I shared lots of Fable's secrets with GPT which allowed GPT to use them and push them into the best RealMLP.
+
+I usually let my agents run autonomously for 4-12 hours and then review what they were exploring (by asking for a quick summary). I have great data science instincts myself so I would often tell them where to look for more signal and what they should stop wasting time on. For example once when they hit a plateau, I said "have you studied the missing values and found features to deal with them?". Afterward they studied the NANs for hours and found a new source of signal and improved their models.
+
+Or for example, I would also share tips about how XGB is different from CAT is different from RealMLP is different from ML etc etc. And how they must adjust their features and search techniques for the different models. Or i would point out important "knobs" they should turn. Stuff like that.
+
+I’d also really appreciate any advice on reasoning budget and context management for long-running agents—especially how you decide when to use more reasoning effort and when to summarize or discard old experiment history.
+
+Memory is important. After every 4-12 hour campaign, I had them write down all their new discoveries. This is gold. I can show a new model over 50 discovery.md files containing pure brilliance. My team did this in NeuroGolf comp 1st place too.
+
+I like to use 1M or more token context and never force a context compact. Because I want it to have as much memory as possible. I can also tell agents to reread all the discovery files. Agents do tens of thousands of experiments over days, they need memory so they don't repeat themselves and so they can continue searching from all avenues that have more potential. In general, I use max thinking when i want break throughs or doing important EDA work or feature engineering detective work. For more routine coding, we can reduce the thinking.
+
+reply
+Reply
+2
+thisray
+
+Posted 2 months ago
+
+· 21st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much for the thoughtful and detailed reply. I learned a lot from your explanation, and it gave me plenty of ideas to think about for my own workflow. I’m really looking forward to seeing how your framework continues to evolve in the next competition!
+
+reply
+Reply
+Aquaflame
+
+Posted 2 months ago
+
+· 1761st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi Chris, congratulations!
+May I ask that how many tokens did you cost in total throughout the entire competition?
+
+reply
+Reply
+2
+Exposed
+
+Posted 2 months ago
+
+· 322nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations Chris. The number in this write-up that deserves the most attention isn't the ensemble, it's the RealMLP at CV 0.97070. I spent the final week measuring the public side of this competition: a cross-fitted logistic stack over ~155 public single-model OOFs (all on the shared seed-42 folds) tops out around 0.9701, essentially naji's 19_blend, and nothing published adds more than +0.00005 on top. Your single model sits ~0.0006 above what the entire public pool reaches when stacked, which is exactly why the board looked like a wall of 0.9711x with one outlier above it.
+
+I reproduced the public exact-value RealMLP recipe (exact-value categorical embeddings + fold-safe TE + frequency encoding) at CV 0.9690 on the same folds, so the part I can't account for is 0.9690 → 0.9707. If you're willing to share even directionally: was that gap mostly new features (the ChatGPT Pro discoveries) or mostly training recipe (folds/seeds/schedule/augmentation)? And did missingness-style augmentation contribute? Talha Tursun measured it at +0.0014 on a solo NN here, and it shrank to ~0 inside blends.. exactly the kind of lever a field full of stackers (me included) would discard and a single-model campaign would keep.
+
+Small irony I have to own: I ran my campaign with Claude Fable 5 as the agent too, and finished 322nd. Same model as half of your winning duo .. the difference wasn't the tool, it was that you pointed it at single-model iteration for a week while I spent the month blending a pool that had already converged. Lesson banked. Congrats again.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you. The features were mainly better versions of what we have been doing in previous playground competition. One new large source of signal and feature engineering was all the missing values. In the coming weeks and/or the next playground competition, I will share more specific details about the featuers and techniques.
+
+And did missingness-style augmentation contribute?
+
+Yes, the agents found many features related to missingness which gave improvements to CV and LB.
+
+reply
+Reply
+Naji
+
+Posted 2 months ago
+
+· 35th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations Naji and team, great job jumping upward 98 ranks on private LB and finishing in 35th. It looks like you did good data science and used honest CV scores.
+
+reply
+Reply
+Naji
+
+Posted 2 months ago
+
+· 35th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi Chris! Thank you so much for the incredibly kind words.
+
+Surviving the shakeup and jumping 98 spots was definitely the highlight of the competition for me. Sticking to 'Trust your CV' paid off!
+
+Massive congratulations on your 1st place finish! I was actually tracking the top teams' trajectories during the competition, and watching your 'staircase' climb on the leaderboard after starting so late was amazing to see!
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+That's a great plot. Thanks for sharing. It is amazing how fast the swarm of agents climbed the LB. Also the other teams hit a ceiling and the agents broke through. This is crazy!
+
+reply
+Reply
+YuAn
+
+Posted 2 months ago
+
+· 696th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Absolutely. Agentic data science is already here.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, it is and it is impressive!
+
+reply
+Reply
+Chovy
+
+Posted 2 months ago
+
+· 642nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+"Massive congratulations on the 1st place! Your implementation of distributed intelligence and NVIDIA inference optimization is truly fascinating.
+
+I am currently optimizing my local single-GPU workstation (RTX 50-series) and heavily utilizing Optuna to tune complex GBDT and NN (MLP/Transformer/GNN) ensembles. I have a question regarding your approach:
+
+If you had to adapt your winning distributed inference architecture to run at maximum efficiency on a single high-end consumer GPU without hitting severe VRAM bottlenecks, which specific pipeline restructurings or memory-management trade-offs would you prioritize?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks. Not much would change. I would just do everything in sequence instead of parallel. This works because no single process used more than 1 GPU. Currently I was able to do multiple experiments at once using multiple GPU, but with a single GPU we would just do experiments sequentially. This is the approach for single models. And then when we need multiple models for ensemble, we just work on one model at a time sequentially.
+
+reply
+Reply
+TooNovice
+
+Posted 2 months ago
+
+arrow_drop_up
+1
+more_vert
+
+@cdeotte Congratulations Chris. Great work as always. Is it possible you share the interaction with Codex GPT 5.6 Sol autorun agent in Phase 1? Specifically curious about the system prompt/instructions you gave it and how it decided which models to add and when to stop.
+
+reply
+Reply
+delai50
+
+Posted 2 months ago
+
+· 23rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thanks for sharing! Reading that "frontier models are Grandmasters at data science modeling" from a Grandmaster himself is 🤯. Do you have any advice or lessons learned regarding how to build a harness like the one in your solution?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+My advice is going to sound circular and paradoxical. The best way to use agents is to ask agents how to use agents!
+
+Get one agent up and running. Preferrably one of the best like GPT 5.6 or Fable 5.1. Then have the agent do some work itself (i.e. EDA, build models, etc) because just like humans, agents learn from doing. (They have a 1 million token context which is their previous conversation, thinking, and tool calling history. This gets appended to each new prompt we ask and represents their working memory). Afterward this agent is really smart.
+
+Next, ask the agent. "Can you help me use agent XYZ? Can you create a folder of resources and give me instructions and a prompt to start agent XYZ?". That is how I incorporated using ChatGPT and the 6 models from NVIDIA Inference Hub efficiently.
+
+Lastly, after having agents work for an N hour campaign, always have them write what they did and what they learned afterward. Every agent needs to continually write MD files logs of what it is doing and what it did. Records, records, records (as an accountant may say). These are invaluable. At one point GPT5.6 hit a plateau and couldn't improve its single model. I had Fable 5 read its logs. Then Fable 5 told me what to tell GPT5.6. After that GPT5.6 built a better single model than Fable 5! Mind blown!
+
+reply
+Reply
+3
+RuiFSPinto
+
+Posted 2 months ago
+
+· 633rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, Chris! Another outstanding result and a great example of the depth of knowledge and creativity you bring to Kaggle. Your ability to turn complex problems into elegant, high performing solutions is truly inspiring. Well deserved, Chris! 😀
+
+reply
+Reply
+Lamaq Dahodwala
+
+Posted 2 months ago
+
+· 2787th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It's almost unbelievable how capable these agents have become. If you have them @cdeotte, could you share some of the most interesting moments of reasoning you saw these agents do?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+The funniest moments were hearing one agent review the work of another agent. Fable 5 was the main working manager. It would onboard other agents and then review their work. It caught agents lying, agents slacking off, agents doing great work, etc etc. It would write reports about other agents and these were often funny.
+
+reply
+Reply
+1
+Jared Floersch
+
+Posted 2 months ago
+
+· 866th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win! I was attempting something similar and was curious how many other people had auto-research agents running on this problem.
+
+reply
+Reply

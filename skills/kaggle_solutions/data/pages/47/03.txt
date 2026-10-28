@@ -1,0 +1,162 @@
+url: http://webmining.olariu.org/my-first-kaggle-competition-and-how-i-ranked/
+fetched: 2026-10-27
+chars: 8581
+
+My first Kaggle competition (and how I ranked 3rd) | Andrei&#039;s Web Mining Blog 
+
+ Andrei&#039;s Web Mining Blog 
+ Useless results of curiosity 
+
+ Menu 
+ Skip to content 
+
+ Home 
+ About me 
+ RSS Feed 
+
+ My first Kaggle competition (and how I ranked 3rd) 
+
+ Posted on October 17, 2012 by Andrei Olariu 
+
+ 1. Intro 
+First, a few words about Kaggle . It&#8217;s a website/community for machine learning competitions. Companies and organizations share a problem (most of the time it&#8217;s an actual real world problem), provide a dataset and offer prizes for the best performing models. Some examples of current competitions: predict customer retention, discover dark matter by how it bends light in space photos (AWESOME), predict diseases in patients based on their history (and win $3 million!) and so on. 
+ I was planning to join a competition on Kaggle since I found out about the website (in spring, I think), but I never found the time to. And then I got an email about a new competition &#8211; to detect insults in comments . I had a little knowledge on text mining, I also had some free time, so I downloaded the dataset and started coding. 
+ Impermium, the company behind this competition, came with some prize money. First place got $7000, while second place got $2500. Third place got just the eternal glory, yay! 
+ For implementation, I used python, the wonderful scikit-learn library (for the SVM implementation) and the neurolab library (for the neural network implementation). 
+ 2. General System Architecture 
+Here I&#8217;ll briefly describe the architecture of the model that performed the best. This architecture will be expanded afterwards. 
+ First, all texts were preprocessed. Then they were fed into 3 different classifiers: word-level SVM, character-level SVM and a dictionary-based classifier. The output from each classifier, along with some other features, were fed into a neural network. 
+ 3. Tokenizing 
+This step was a lot more important than I first imagined. Here are some of the things that I tried and improved (or at least seemed to) the model score: 
+&#8211; removing links, html entities and html code 
+&#8211; formatting whitespaces (removing duplicates, removing newlines and tabs) 
+&#8211; removing non-ascii characters (I didn&#8217;t think people curse using special characters; I would reconsider this decision, given more time) 
+&#8211; adding special tokens in texts for character groups such as: #$%#$ (some people curse like this), ?!???, !!!!!! 
+&#8211; removing repeated letters: coooool -&gt; cool, niiiice -&gt; niice (yes, this is not the best implementation, but it usually works) 
+&#8211; replacing smileys by 2 tokens, one for positive smileys and one for negative smileys (&#8220;saddies&#8221;?) 
+&#8211; removing dots inside words (some people put dots inside curse words &#8211; they&#8217;re not getting away with this!) 
+&#8211; grouping together sequences of one-letter words &#8211; like &#8220;f u c k&#8221; (some people split a curse word in letters &#8211; they&#8217;re not getting away with it!) 
+&#8211; trying to group consecutive words (like &#8220;fu ck&#8221;) using a dictionary (some people split curse words in 2 &#8211; they&#8217;re not getting away with it!) 
+ 4. Classifiers 
+The first classifier was an SVM on word ngrams, with n from 1 to 4. Not a lot can be said here, I just imported it, fed it the ngrams generated from the tokenized text and let scikit-learn do its stuff. 
+ The second classifier was another SVM, this time on character ngrams, with n from 4 to 10. 
+ The third classifier was a custom build dictionary based classifier. It used a curse words dictionary (which I found online and then enriched with words I found in the misclassified examples). This classifier just looked if the text had words from the dictionary and also words like &#8220;you&#8221;, &#8220;your&#8221;, &#8220;yourself&#8221; (which you use when cursing somebody). It then computed a simple score based on the distances between the curse words and the &#8220;you&#8221;-words. 
+ The final classifier was used to combine the previous ones. I used a neural network, but I&#8217;m sure other techniques can be applied here. The network had a hidden layer of 3 neurons and was trained using the function &#8220;train_rprop&#8221; (from the neurolab library). I took advantage of the network&#8217;s flexibility and added some more features as inputs: 
+&#8211; the ratio of curse words 
+&#8211; the text length 
+&#8211; the ratio of *, ! or ? 
+&#8211; the ratio of capital letter (should have used words in all caps instead) 
+ 5. Epilogue 
+I used k-folds cross-validation for model selection (scikit-learn comes with some nifty tools here also). 
+ In total, I worked around one week for this. I tried a lot more models and approaches, but what I&#8217;ve showed here got the best score. I&#8217;d love to share the code, but it&#8217;s written so crappily (due to some hard core time constraints) that I&#8217;m too ashamed to release it. Still, if anybody wants it, please contact me &#8211; I&#8217;ll share it after explicitly agreeing to one condition: Don&#8217;t make fun of it. Screw that, code available here . 
+ I think 3rd place is a very good result (considering it&#8217;s my first competition ever). Still, I noticed that there were a lot of mislabeled examples (perhaps more than the 1% stated on the contest page). This might have had an influence on the final ranking (the difference between the winner&#8217;s score and the fifth score was less than 1%). 
+ Yet again, I always say &#8220;Fortune favors the brave&#8221; (I don&#8217;t believe in luck). Jumping to some actionable information, light bending dark matter detection sounds pretty cool! 
+
+ This entry was posted in Kaggle and tagged insults , kaggle , neuralnetwork , svm , textmining . Bookmark the permalink .
+
+ Post navigation 
+
+ &larr; My talk at SYNASC 2012 Event Recommendation Contest on Kaggle &rarr; 
+
+ 7 thoughts on &ldquo; My first Kaggle competition (and how I ranked 3rd) &rdquo; 
+
+ Darshan Chaudhary says: 
+
+ July 23, 2014 at 6:37 pm 
+
+ Awesome ! 
+ Thanks for speaking English and not scaring a beginner like me ! 
+
+ Reply 
+
+ edoardo says: 
+
+ April 26, 2015 at 7:19 pm 
+
+ Thank you, very useful! 
+
+ Reply 
+
+ Pingback: Kaggle Competition Past Winner Solutions - The Big Data Blog 
+
+ Pingback: Kaggle 机器学习竞赛冠军及优胜者的源代码汇总 - 大数据之美 
+
+ salvu65 says: 
+
+ March 18, 2017 at 11:53 pm 
+
+ Hello Andrei, 
+ Found your explanation very useful and am trying out your script but am having errors in line 59 of main.py r2 = np.array(m2.classify(texts)) that is causing an IndexError: string index out of range starting from line 59 in main, lin 13 in dictionary.py, line 33 and 148 in nlp_dict.py and then lines 214, 258, 376 and 665 in porter.py. 
+ I am using the files suggested in an anaconda 4.3 environment running python 2.7. Can you please help me out of this jam? 
+ Thanks. 
+
+ Reply 
+
+ salvu65 says: 
+
+ March 24, 2017 at 8:24 pm 
+
+ The error given was due to some bug in the porter.py. I managed to run the script finally and the results are really awesome. Although as some others noted, there must be errors in the data. 
+
+ Reply 
+
+ Andrei Olariu says: 
+
+ March 25, 2017 at 4:30 pm 
+
+ I&#8217;m glad you got it working eventually. Sorry for not being of much help. Regarding misclasified examples, I used to complain too. But Kaggle datasets are pretty high quality (and convenient), having to build a dataset on your own or at work is a lot of pain. 
+
+ Reply 
+
+ Leave a Reply Cancel reply Your email address will not be published. Required fields are marked * Comment * Name * 
+ Email * 
+ Website 
+ Save my name, email, and website in this browser for the next time I comment. 
+ Captcha * 
+ Time limit is exhausted. Please reload the CAPTCHA. 
+
+ &nbsp;&times;&nbsp; 
+ n&#105;ne 
+ &nbsp;=&nbsp; 
+ &#101;&#105;ghty one 
+
+ &#916; 
+ This site uses Akismet to reduce spam. Learn how your comment data is processed. 
+
+ Search 
+
+ Archives Archives 
+
+ Select Month 
+ May 2021 &nbsp;(1) 
+ November 2017 &nbsp;(1) 
+ August 2016 &nbsp;(1) 
+ March 2015 &nbsp;(1) 
+ February 2015 &nbsp;(1) 
+ April 2014 &nbsp;(1) 
+ November 2013 &nbsp;(1) 
+ April 2013 &nbsp;(1) 
+ March 2013 &nbsp;(1) 
+ February 2013 &nbsp;(1) 
+ October 2012 &nbsp;(1) 
+ September 2012 &nbsp;(1) 
+ April 2012 &nbsp;(1) 
+ February 2012 &nbsp;(1) 
+ December 2011 &nbsp;(1) 
+ November 2011 &nbsp;(3) 
+
+ Categories 
+
+ Curiosity (6)
+
+ Hackathon (2)
+
+ Kaggle (5)
+
+ Research (4)
+
+ Uncategorized (1)
+
+ Proudly powered by WordPress 
+ | 
+ Theme: The Night Watch by Themepost

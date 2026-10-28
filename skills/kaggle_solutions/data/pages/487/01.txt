@@ -1,0 +1,771 @@
+url: https://www.kaggle.com/c/h-and-m-personalized-fashion-recommendations/discussion/324070
+fetched: 2026-10-27
+chars: 16693
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — H&M Personalized Fashion Recommendations
+1st place solution
+
+H&M Personalized Fashion Recommendations
+
+Solution Writeup · 1st place · May 23, 2022
+
+Thanks to H&M and Kaggle Team giving us such a wonderful competition.Thanks my team mate @h4211819 finally we got 1st place.This competition has no leak,stable cv-lb correlation,and infinite possibilities to improve, we really enjoyed exploring the accuracy boundaries of infinite possibilities.
+
+Overview
+
+The most interesting part of this competition is we need to generate train and test by ourself, the candinate generation strategy is the key to beyond limitation of accuracy ,good feature engineering or modeling could be close to the limitation .Our solution is using various retrieval strategies + feature engineering + GBDT, seems simple but powerful.
+
+We mainly generate recent popular items because fashion changing fast and has seasonality,tried to add cold start items but they will never be ranked to top12 due to lacking of interaction information. user and item interaction information are always the most important of recommendation problem,the features we created are almost interaction features,image and text features didn't help but should be useful for cold start problem.
+
+Almost 50% users have no transactions in recent 3months,so we created many cumulative features for them,and last week,last month,last season features for active users.
+
+We use 6 weeks data as train,last week as valid,retrieve 100 caninates for each user,it has stable cv-lb correlation.We focus on improving single lightgbm model to the last week, cv is 0.0430 and lb is 0.0362.At last week I have to rent gcp's big memory server and vast.ai's gpu server to run bigger models to get higher accuracy.
+
+Retrieval(aka: candidate generation | recall)
+
+At early stage,we focus on increasing the hit number of retrieved 100 candidates,try various strategies to cover more positive sample.
+
+WeekNo	HitNum@100
+2020-09-16	39142
+2020-09-09	38427
+2020-09-02	41019
+Ranking
+
+Feature Engineering basiclly,features are created base on retrieval strategies,create user-item interaction for repurchase,create collaborative filtering score for itemcf,create similarity for embedding retrieval,create item count for popularity……
+
+Type	Description
+Count	user-item, user-category of last week/month/season/same week of last year/all, time weighted count…
+Time	first,last days of tranactions…
+Mean/Max/Min	aggregation of age,price,sales_channel_id…
+Difference/Ratio	difference between age and mean age of who purchased item, ratio of one user's purchased item count and the item's count
+Similarity	collaborative filtering score of item2item, cosine similarity of item2item(word2vec), cosine similarity of user2item(ProNE)
+
+Downsampling If we retrieve 100~500 candidates for each user,the negative samples number is very big,so negative downsampling is must,we found 1 million ~ 2 million negative samples for each week has better performace . neg_samples = 1000000;seed = 42 train[train['label']>0].append(train[train['label']==0].sample(neg_samples, random_state=seed))
+
+Model Our best single model is a lightgbm(cv:0.0441,lb:0.0367),finally we trained 5 lightgbm classifier and 7 catboost classifier for ensemble(lb:0.0371).catboost's lb score is much worse than lightgbm,lightgbm has very stable cv-lb correlation. 
+
+Optimization
+we use TreeLite to accelerate lightgbm inference speed (2X faster),catboost-gpu is 30X faster than lightgbm-cpu inference.
+transform all the categorical features(including two way) to label encoding,use reduce_mem_usage,
+create a feature store,save intermediate features files to dictionary , final features to feather,exsiting features will not be create again
+split all the users to 28 group,inference simultaneously with multiple servers.
+Machine
+
+I have a desktop with 128G RAM,64 vcore CPU,TITAN RTX GPU.It's enough to run most of our models to win.My teammate has a desktop with 64G RAM.At last week ,we use 300G RAM gcp instances.
+
+Authors
+senkin13
+
+senkin13
+
+30CrMnSiA
+
+h4211819
+
+arrow_drop_up
+431
+Share
+more_horiz
+Citation
+
+senkin13, 30CrMnSiA. 1st place solution. https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/writeups/senkin13-30crmnsia-1st-place-solution. 2022. Kaggle
+
+2
+comment
+221 Comments
+61 appreciation comments
+Hotness
+narsil (jobs-in-data.com)
+
+Posted 4 years ago
+
+arrow_drop_up
+24
+more_vert
+
+It is an amazing win and huge congrats to you!
+
+Gradient Boosted Trees >= NN in recommender systems.
+
+Gradient boosted trees do not receive nearly as much coverage in papers & research compared to their capabilities and importance for real-life production use-cases vs Neural Networks! And why? Because they do not resemble our brain and hence no promise of the "general AI"?
+
+I admit, a little bit of self confirmation bias speaks through me, because the LGBM + Manual Feature Engineering is also the technology choice that we made at my company for the recommender system. How many discussions we had that maybe there is some hidden "gold" in the user-item interactions…
+
+Turns out there is none. It is a super strong result to see this win! Thank you guys! You made my day!
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+13
+more_vert
+
+Totally agree with you, technology should be appropriate for business not just seems modern or fashionable
+
+reply
+Reply
+Homoalways
+
+Posted 4 years ago
+
+· 2324th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@narsil I think one reason for success of gradient boosting models(over nns) for this competition is that we don't have as much compute power and as much time to try&tune as engineering teams in big companys. We also have less data(e.g. exposed but not bought samples). Big companys do use nns for recommendation(though gbms are also used in industry).
+
+reply
+Reply
+canfaneat
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+so you mean that gradient boosting models is better than nns ? I wonder if there are any stronger nn models can do better
+
+reply
+Reply
+narsil (jobs-in-data.com)
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@homoalways Even in big companies, Trees + Manual FE have some big advantages over NNs. Cost, where you point out, is one of them. Also, manually engineered features can be easily debugged. They provide an additional layer of visibility into the model. By contrast, imagine debugging equivalent embeddings (pre final layer) in NNs.
+
+reply
+Reply
+Giba
+
+Posted 4 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+Congrats @senkin13 & @h4211819 ! Great solution.
+
+Have you tried FIL library for LightGBM inference? In my tests it can be 10x faster than cpu inference.
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+never heard of FIL library,thanks for sharing
+
+reply
+Reply
+
+This comment has been deleted.
+
+biubiuG
+
+Posted 4 years ago
+
+· 84th in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+thanks for your great solution sharing…looking forward your code sharing..
+
+reply
+Reply
+HAO
+
+Posted 4 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Very organized pipline and strong win. For some ideas, I also came up with, but because of the ineffeciency of the pipeline and I didn't organize everything as well as you did, so I came up so many bugs all along the way. The idea iteration speed is also not that satisfying. Learn from the best! Thanks for the sharing again!
+
+reply
+Reply
+sirius
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations! Very solid work One question is what's the improvement of graph embedding in your recalling and ranking? That's a part which I wanna try but didn't have enough time. Thanks for your sharing.
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+about 0.002 up
+
+reply
+Reply
+sirius
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wow, that's really powerful!
+
+reply
+Reply
+Clear n' Simple
+
+Posted 4 years ago
+
+· 52nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+In your chart, where you write Top N, do you use the same N for each retrieval method?
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+different N by adjusting manually to optimize the hit number
+
+reply
+Reply
+Clear n' Simple
+
+Posted 4 years ago
+
+· 52nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you!
+
+What do you do if some customers don't have 'N' candidates for a given strategy? For example, if you first take top 10 repurchase candidates, what do you do for customers who have less than 20 previously purchased items?
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+we don't need to take same N for each strategy,make sure total candidates is 100.At least we have top 100 popular items for all users.
+
+reply
+Reply
+Rohit Kumar
+
+Posted 4 years ago
+
+arrow_drop_up
+4
+more_vert
+
+This was super helpful for a begginer like me. Thanks My Besto Friendo.
+
+reply
+Reply
+Paweł Jankiewicz
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats! I like the mention of a feature store. It seems very useful to not recalculate the features every time.
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes,although I spent much time on creating pipeline and feature store,it helped us do more experiments without bugs
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+myaun
+
+Posted 4 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! I didn't see anything special about it; just a great solution where every single process is deeply validated and refined, including optimizing the development! Thanks for sharing!
+
+reply
+Reply
+tarick.morty
+
+Posted 4 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations on winning the competition, it's really amazing. We were having difficulty dealing with 6 weeks of data, so I can imagine how challenging it'd have been to manage so much of data.
+
+reply
+Reply
+Hyungeun Jo
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats🎉🎉 and thanks for sharing your great work. It's quite impressive😄. If you don't mind, I want to ask some question about your work.
+
+How did you trained ProNE graph embedding model using bipartite graph(using two kinds of nodes : user and item)? I've checked the github for ProNE, it's basically using homogeneous information. Can you explain more detail about the preprocessing for bipartite graph using hm dataset or any reference about this?
+
+Could you explain more detail about the optimization of the ranking model ? If there are various kinds of candidates from different strategies, how did you set the target variables for each candidates?
+
+Again, thanks for your sharing!
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+you can refer to this github, nodes are user and item. https://github.com/shenweichen/GraphEmbedding.
+
+we don't need to set the target variables for different strategies,just merge them to top 100 deduplicated candidates for each user,if user-item pair existed in next week,the target is 1 else 0.
+
+reply
+Reply
+chuan
+
+Posted 4 years ago
+
+· 221st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and thanks for sharing! I have one question: how to calculate HitNum@100 in the Retrieval module?Is it equal to the number of positive samples in the top100 recall items?
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+yes,equal to the number of positive samples in the top100 recall items
+
+reply
+Reply
+chuan
+
+Posted 4 years ago
+
+· 221st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks for your reply!
+
+reply
+Reply
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Shivangjay
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Epic work!!
+
+reply
+Reply
+biubiuG
+
+Posted 4 years ago
+
+· 84th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great work!, what's "the logistic regression with categorical information"?
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+train a logistic regression model to retrieve from top 1000 popular candidates to 50~200 candidates
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+ktakita
+
+Posted 4 years ago
+
+· 159th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulation! and thank you for sharing! If you don't mind, I'd like to know how to calc collaborative filtering score of item2item. I would be glad to know if you have any reference materials for the collaborative filtering score of item2item.
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+you can see this article https://songxia-sophia.medium.com/collaborative-filtering-recommendation-with-co-occurrence-algorithm-dea583e12e2a
+
+reply
+Reply
+ktakita
+
+Posted 4 years ago
+
+· 159th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! Thank you! I learned a lot!!
+
+reply
+Reply
+Niek van der Zwaag
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on 1st and sharing an impressive solution 🙌 Looking forward to seeing it be expanded on to learn more from it.
+
+reply
+Reply
+qyxs
+
+Posted 4 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Nice job both of you two grandmasters.
+
+reply
+Reply
+IgorMuniz
+
+Posted 4 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! If it isn't my mistake you guys led the competition from the start. That's impressive! Could you please describe the used hardware for your solution?
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I have a desktop with 128G RAM,64 vcore CPU,TITAN RTX GPU.It's enough to run most of our models to win.But bigger model need 300G RAM so I have to use gcp.
+
+reply
+Reply
+evancallaghan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great work!
+
+reply
+Reply
+Ruiqi Gao
+
+Posted 4 years ago
+
+· 627th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I have a very simple question to ask, how do you divide the time to get the data source for your ranking model? For example, train the recall model with the training set of the first week, then get the recall results of the second week, and use the recall results to train the ranking model. After that, train the recall model with the data from the first two weeks, then get the recall results from the third week, and use the recall results to train the ranking model …… Until the recall model is trained with the training set of the first six weeks and the final validation set is ranked to get the result.
+
+Thanks!
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+the simplest model is using last week data as samples of ranking model,recall top N candidates from previous data by rules or model,the overlap of recall data and last week data is positive samples,other recall data is negative samples. I sugguest you read the code of kernel someone have publiced their code.
+
+reply
+Reply
+Clear n' Simple
+
+Posted 4 years ago
+
+· 52nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your first place finish!
+
+Very happy for you - you've put in years of kaggle work, and hard work finally paid off!
+
+reply
+Reply
+Clear n' Simple
+
+Posted 4 years ago
+
+· 52nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+What retrieval did you use for customers without history?
+
+Just 12 most popular items, or something more? On your CV, do you know what part of the score was attributable to the new customers?
+
+reply
+Reply
+senkin13
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+just most popular items.I have not checked but I think everyone have no big difference of new customers' score because it's hard to predict.
+
+reply
+Reply
+Grzesiek Zyśk
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Interesting :) Thx for sharing
+
+reply
+Reply
+Wahyu Dwi Prasetio
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great work! Thank you for this knowledge
+
+reply
+Reply

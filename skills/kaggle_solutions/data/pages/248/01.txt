@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/passenger-screening-algorithm-challenge/discussion/45805#261052
+fetched: 2026-10-27
+chars: 879
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Department of Homeland Security · Featured Prediction Competition · 9 years ago
+Late Submission
+more_horiz
+Passenger Screening Algorithm Challenge
+
+Improve the accuracy of the Department of Homeland Security's threat recognition algorithms
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.

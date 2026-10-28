@@ -1,0 +1,108 @@
+url: https://github.com/lucaseustaquio/kdd-cup-2013-track1
+fetched: 2026-10-27
+chars: 5603
+
+GitHub - lucaseustaquio/kdd-cup-2013-track1: KDD CUP 2013 - Track 1 - 2nd place model · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ lucaseustaquio kdd-cup-2013-track1 Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ kdd-cup-2013-track1 Public Notifications You must be signed in to change notification settings Fork 18  ( 18 ) Star 16  ( 16 ) You must be signed in to star a repository About KDD CUP 2013 - Track 1 - 2nd place model Resources Readme Activity Stars 16 stars Watchers 5 watching Forks 18 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 7 Commits 7 Commits Folders and files Name Name Last commit message Last commit date .gitignore .gitignore     README.md README.md     SETTINGS.json SETTINGS.json     TDM_TitleKeywords.py TDM_TitleKeywords.py     combine_train_valid.R combine_train_valid.R     data.build.R data.build.R     feature_engineering.R feature_engineering.R     final_model.Rproj final_model.Rproj     fn.base.R fn.base.R     model_description.md model_description.md     prediction.R prediction.R     View all files Repository files navigation README More items kdd-cup-2013-track1 
+ KDD CUP 2013 - Track 1 - 2nd place model 
+ License 
+ Copyright [2013] [Dmitry Efimov, Lucas Silva, Ben Solecki ]
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0 
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 
+ How to use it 
+
+ The hardware / OS platform you used
+Windows 7 Professional x64 or Ubuntu (tested on 12.04) 
+
+ Any necessary 3rd-party software (+ installation steps) 
+
+ R 2.15.3 ( http://www.r-project.org/ )
+Packages: rjson, RPostgreSQL, data.table, hexbin, gbm, tm, parallel, doSNOW, foreach, Metrics, cvTools, lme4, rlecuyer 
+ Python 2.6 ( http://www.python.org/download/releases/2.6/ )
+Packages: csv, json, os, pickle, psycopg2, textmining, re 
+ How to train models and make predictions on a new test set 
+ The file list with description 
+
+ SETTINGS.json
+File of paths and login information for Postgree SQL. 
+
+ TDM_TitleKeywords.py
+File to generate table Keywords in Postgree SQL. 
+
+ feature_engineering.R
+Main files of feature engineering 
+
+ data.build.R
+File with additional feature engineering 
+
+ prediction.R
+Main file for prediction 
+
+ fn.base.R
+File with helper functions 
+
+ Track2_Dup.csv
+File of author duplicates from Track 2 
+
+ Track2_Dup_Greedy.csv
+File of greedy author duplicates from Track 2 
+
+ To calculate model 
+
+ Set paths and login information for Postgree SQL in SETTINGS.json. 
+ Add all the inputs csvs to the directory data. 
+ Run TDM_TitleKeywords.py in Python 2.6. 
+ Set working directory in R to the directory contained R files. 
+ Run feature_engineering.R. 
+ Run prediction.R. 
+ The file prediction.csv contains final prediction for the Test set. 
+
+ About KDD CUP 2013 - Track 1 - 2nd place model Resources Readme Activity Stars 16 stars Watchers 5 watching Forks 18 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

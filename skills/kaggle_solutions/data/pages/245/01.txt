@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/porto-seguro-safe-driver-prediction/discussion/44629
+fetched: 2026-10-27
+chars: 822
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Porto Seguro · Featured Prediction Competition · 9 years ago
+Late Submission
+more_horiz
+Porto Seguro’s Safe Driver Prediction
+
+Predict if a driver will file an insurance claim next year.
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

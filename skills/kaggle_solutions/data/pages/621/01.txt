@@ -1,0 +1,532 @@
+url: https://www.kaggle.com/c/llm-20-questions/discussion/531106
+fetched: 2026-10-27
+chars: 13836
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — LLM 20 Questions
+1st Place Solution
+
+LLM 20 Questions
+
+Solution Writeup · 1st place · Aug 30, 2024
+
+I would like to express my sincere gratitude to the organizers for creating this competition, tirelessly working to fix bugs in the matching system, and striving to ensure fairness for all competitors.
+
+It's worth noting, however, that the leaderboard remained somewhat unstable until the end, and any competitor in the gold zone could have potentially secured the win.
+
+Thus, I present this solution with a mix of humility and gratitude for my fortunate outcome.
+
+Results
+Agent 1: 1259.9 (1st place)
+Agent 2: 1228.2 (equivalent to 4th place)
+Guesser Strategy
+
+Recognizing that top-performing Answerers were likely to implement Agent Alpha mode, I decided to incorporate it into my Guesser strategy for competitive play.
+
+The next question was whether to ask "Is it Agent Alpha?" as the first question, or to force the Agent Alpha mode to reduce a turn.
+
+Ultimately, I chose to ask "Is it Agent Alpha?" due to the significant advantage it provided in non-Agent Alpha matchups. This approach was necessary to recover from the "pit of dumbness" caused by the small percentage of Agent Alpha Answerers in the low score region. Additionally, losing when at the top of the leaderboard but paired with a low-scoring agent results in a substantial point loss.
+
+In hindsight, a Force Agent Alpha approach might have been viable, given the final competition landscape.
+
+Agent Alpha
+
+Keyword List: I created a list of potential keywords (116,937 nouns) using Python's NLTK library. Only nouns were selected as the competition specified that keywords would be "things."
+
+Keyword Probability Estimation: To optimize Agent Alpha's reward expectation, I estimated the likelihood of each keyword appearing in the test data by considering:
+
+Number of words in the keyword
+English word frequency using the English Word Frequency dataset
+"Thing-ness" probability estimated using GPT-4o mini
+
+The "thing-ness" was calculated by asking GPT-4o mini the following question and then obtaining the probability that the next token would be "Yes" or "No":
+
+"Would the word '{keyword}' generally be considered a thing?"
+
+The scatter plot demonstrates the impact of the probability calculation. Public keywords tend to have a lower thing probability rank (meaning high probability) and a low frequency rank (meaning high frequency). The ranks and values are inverted because I ranked the keywords from high value to low value.
+
+Using this heatmap, we can calculate the probability of each keyword being included in the private keyword list, based on the observation that the public keyword list closely resembles the private one.
+
+In the actual calculation, a smoothing factor was introduced, but the essence remains the same.
+
+For keywords not found in the English Word Frequency dataset (primarily compound words), only the thing-ness was used to determine the probability.
+
+Below is a table of a few examples:
+
+Keyword	Probability
+towel	0.222
+titanium	0.130
+chocolate egg	0.050
+axis	0.046
+mindset	0.012
+banana boat	0.005
+toolmaker	0.002
+celastrus	0.002
+ticktacktoo	0.002
+
+With the probability of each keyword being in the private list established, we can perform an efficient binary search that always narrows down the probability by half, rather than focusing solely on the number of keywords. This results in a more efficient search.
+
+My first-place agent uses this biased keyword probability, while the fourth-place agent assumes equal probability for every keyword. The impact of the biased probability method is evident in the average win reward as a Guesser calculated by @lohmaa [post].
+
+I did not come up with dynamically generated keywords that were not in the prepared keyword list, so a huge applause for those who achieved it.
+
+Natural Questions
+
+I employed an entropy-based approach quite similar to the maejimakun solution, selecting questions that minimized expected entropy. For the specific equations, please refer to their solution (and don't forget to upvote!).
+
+The main difference lies in how the keywords and questions were chosen:
+
+The final list comprised the top ~35,000 keywords ranked by their estimated probability (as described earlier). They were actually constructed in a different way, but it seemed that it is almost equivalent to this explanation.
+Three types of questions were used:
+26 alphabet-specific questions (e.g., "Does the keyword begin with the letter 'a'?")
+~3,000 from winning games in the public leaderboard
+~10,000 generated using GPT-4o mini
+
+To generate questions using GPT-4o mini, I simulated matches and prompted the model to create questions that could effectively differentiate between likely keywords at each stage of the game.
+
+For example, to distinguish between "apple," "banana," "orange," and "mango," I would ask GPT-4o:
+
+"You are playing the 20 Question Game, and currently have to ask a question to guess the keyword. The current keyword candidates are 'apple, banana, orange, mango'. What question would narrow down the keyword candidates to half? Output only the question."
+
+A typical response might be: "Is the fruit typically yellow when ripe?"
+
+To construct the probability table, a strategy similar to the maejimakun team was used. Three LLMs (Meta-Llama-3-8B-Instruct, Phi-3-small-8k-instruct, and gemma-7b-it) were used to estimate p(keyword, question) for each keyword-question pair. The results from the LLMs were averaged at the end.
+
+Each LLM was prompted with: "The keyword is {keyword}. {question} Answer the question above with 'Yes' or 'No'." The probabilities were derived from the likelihood of "Yes" and "No" being the next token.
+
+Given the final table's massive size (approximately 35,000 x 13,000 = 455,000,000), I leveraged vllm for faster processing. Initially working with a 4090 GPU locally, I scaled up to a rented 8x RTX 4090 setup on Runpod for the final week of the competition when I realized time was running short.
+
+This approach proved highly effective, securing a top position on the public leaderboard when there were fewer Agent Alpha Answerers at the top. The investment in computational resources (approximately $500 in server costs) was well justified by the final results.
+
+Answerer
+
+For the Answerer component, I employed a dual-LLM approach, leveraging two distinct models to handle different types of questions:
+
+General-Purpose LLM:
+Model: meta-llama/Meta-Llama-3-8B-Instruct
+Purpose: Handling a wide range of general questions about the keyword
+Specialized Mathematical LLM:
+Model: DeepSeek-Math
+Background: This model gained popularity during the recent "AI Mathematical Olympiad - Progress Prize 1" competition, which focused on solving mathematical problems using LLMs.
+Functionality: DeepSeek-Math takes mathematical problems as input and outputs Python programs to solve them. For simpler queries, it provides direct answers without generating code.
+Purpose: Addressing complex, mathematically-oriented questions about the keyword
+
+The integration of DeepSeek-Math significantly enhanced the Answerer's capability to handle intricate queries such as:
+
+"Does the keyword contain the letter 'a'?"
+"Does the keyword have two or more vowels?"
+
+This specialized model allowed for high-accuracy responses to questions requiring precise letter counting or pattern recognition within the keyword.
+
+Model Selection Logic: The choice between the two models was determined by a rule-based system, primarily triggered by the presence of specific keywords like "letter" in the question. While this approach proved effective, I believe there might be room for improvement in the model selection process.
+
+Final Thoughts
+
+I thoroughly enjoyed this competition, despite some challenges such as the inclusion of public keywords during the evaluation period, the slow convergence of scores, and the continuous oscillation of scores at the top of the leaderboard.
+
+As noted by @jeannkouagou [post], the final day of the evaluation period was particularly stressful, making it difficult to sleep (the competition ended at 9:00 AM here in Japan).
+
+I'm relieved that the competition has finally concluded, and I'm looking forward to getting some well-deserved rest.
+
+Thank you for reading, and once again, my sincere gratitude to the hosts for organizing this competition.
+
+Code
+
+The code is available here. If you wish to test Agent Alpha and don't have a GPU, you may need to change device="cuda" to device="cpu" in the utils/beta.py file.
+
+Author
+c-number
+
+cnumber
+
+arrow_drop_up
+90
+Share
+more_horiz
+Citation
+
+c-number. 1st Place Solution. https://www.kaggle.com/competitions/llm-20-questions/writeups/c-number-1st-place-solution. 2024. Kaggle
+
+6
+17
+comment
+32 Comments
+5 appreciation comments
+Hotness
+shash
+
+Posted 2 years ago
+
+arrow_drop_up
+6
+more_vert
+
+Great strategy, using LLMs for keyword probability!
+
+reply
+Reply
+Kha Vo
+
+Posted 2 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+I really like your ideas here:
+
+Generate 13k questions based on simulated games. This is out of my consideration.
+Mindful with answerer duty and deploy deepseek-math. This is groundbreaking and can help you to easily win free games with rule based questioner.
+Careful selection of alpha private keyword list. Using thingness probability assigned to each keyword and guide the search helped you win alpha match-ups more on average and finally win the contest.
+
+Congratulations!
+
+reply
+Reply
+Azat Akhtyamov
+
+Posted 2 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Are we allowed to use commercial models like GPT? My understanding was that data from Claude, Openai, etc counts as "external dataset" and should be shared with the public.
+
+reply
+Reply
+c-number
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Seems the host have decided OK because this competition is different from the usual machine learning competitions that require training on a dataset.
+
+reply
+Reply
+Azat Akhtyamov
+
+Posted 2 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Oups… Had to spin a heavy machine for Llama-405b during the competition…
+
+reply
+Reply
+corochann
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the solo 1st! Your idea & effort deserve it!
+
+I didn't join the competition, but this competition rule was so unique. I couldn't imagine the approach ends with 455M size table optimization.. Thank you for sharing.
+
+reply
+Reply
+JK-Piece
+
+Posted 2 years ago
+
+· 197th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @cnumber. Well deserved win, your agent consistently remained in the top 5 or so for a long time even on public leaderboard. Thanks of course for sharing your code
+
+reply
+Reply
+Vladislav Kuznetsov
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+You've done a great job! Congratulations!
+
+reply
+Reply
+Junchi
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+MrSimple
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the solo 1st!
+
+reply
+Reply
+Tanishk Patil
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+victor barra
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great solution!
+
+reply
+Reply
+francesco fiamingo
+
+Posted 2 years ago
+
+· 415th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Big respect!! Great job!! Tks for sharing!
+
+reply
+Reply
+YFrite
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Awesome solution!
+
+reply
+Reply
+Muhammad Al-laithi
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. This is great work!
+
+reply
+Reply
+Jasper Butcher
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Absolutely amazing -- well deserved first place!
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 2 years ago
+
+· 233rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning this competition. Thanks for sharing details of your solution with code. Very interesting approach indeed. Your comments on how this solution can work on languages other than English.
+
+reply
+Reply
+hoon0303
+
+Posted 2 years ago
+
+· 47th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing an good solution. Congratulations on winning the gold medal!
+
+reply
+Reply
+Prashant Kumar
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+You truly deserve the highest recognition, your approach is outstanding—congratulations!
+
+reply
+Reply
+EUISANG LEE
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. This is great work!
+
+reply
+Reply
+Andrew Tratz
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing solution and congratulations on the well-deserved win. Your approach to the keyword frequencies is the best I've seen, and the entropy-based offline LLM solution also provided amazing results.
+
+reply
+Reply
+Bo Peng
+
+Posted 2 years ago
+
+· 69th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats. Well done and great job getting #1 place.
+
+reply
+Reply
+KKY
+
+Posted 2 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You deserve the top position, amazing approach and congrats!
+
+reply
+Reply
+Jimoh Yusuf
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+This is so cool!
+
+reply
+Reply
+Benadet Drekem
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Good, but I still have something to ask please what is the meaning code
+
+reply
+Reply
+hichem laribi
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations , great work 🥳
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.

@@ -1,0 +1,87 @@
+url: https://www.kaggle.com/tkubacka/a-story-told-through-a-heatmap
+fetched: 2026-10-27
+chars: 1085
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Teresa Kubacka · 7y ago · 15,855 views
+arrow_drop_up
+214
+Copy & Edit
+137
+file_download
+Download
+more_vert
+A story told through a heatmap
+Notebook
+Input
+Output
+Logs
+Comments (34)
+history
+Version 2 of 2
+Runtime
+play_arrow
+
+1m 30s
+
+Input
+Competitions
+
+2019 Kaggle Machine Learning & Data Science Survey
+
+Language
+
+Python
+
+Table of Contents
+Who codes what and how long - a story told through a heatmap
+Chapter 1: the heatmap comes to life
+Chapter 2: how to use the heatmap as a tool to generate further insights
+Chapter 3: insights from the survey
+Wrap up
+Competition Notebook
+
+2019 Kaggle Machine Learning & Data Science Survey
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+1 file
+output
+Output
+0 files
+list_alt
+Logs
+89.7 second run - successful
+comment
+Comments
+34 comments

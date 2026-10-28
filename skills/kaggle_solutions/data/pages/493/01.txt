@@ -1,0 +1,117 @@
+url: https://www.kaggle.com/c/herbarium-2022-fgvc9/discussion/329299
+fetched: 2026-10-27
+chars: 2803
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Herbarium 2022 - FGVC9
+1st place solution
+
+Herbarium 2022 - FGVC9
+
+Solution Writeup · 1st place
+
+Optimization on single model:
+
+change	public	private
+swin-B 224 baseline	0.77223	0.78442
+add cross-entropy losses on genera,species, family	0.7829	0.79544
+learning rate from 2e-4 to 5e-4	0.79444	0.80501
++5crop (resize 256, 288, 320, 384, 448 and center crop 224)	0.80088	0.80981
+replacing cross-entropy by subcenter-arcface with dynamic margins	0.81532	0.82267
++ extra fc by cross-entropy, add to subcenter-arcface output after softmax	0.82201	0.82929
++ data augmentation the same with Swin-Transformer	0.8315	0.83554
+from swin-B224 to SwinB384	0.8468	0.85245
++5crop (resize 400, 416, 448, 480, 512 and center crop 384)	0.84895	0.85654
++Freeze layers (not update parameters) from 100 to 0	0.85499	0.86055
++square resize and test crop from 384	0.85563	0.86201
++from swin base to swin V2	0.85851	0.86282
+
+Backbones:
+
+id	backbone	public	private
+0	swin-B	0.85499	0.86055
+1	convnext-B	0.85464	0.85956
+2	deit-iii B	0.84423	0.8495
+3	resnest-101	0.83208	0.83838
+4	efficient-B6	0.83841	0.84321
+5	cswin-L	0.84373	0.8501
+6	swin-L	0.85057	0.85607
+7	swinv2-B	0.85851	0.86282
+
+Fusion： we utilize the scores on public dataset as the weight.
+
+fusion approach	public	private
+fusion models (0,1,2)	0.86366	0.8679
+fusion models (0,1,2,3,4)	0.86619	0.87185
+fusion models (0,1,2,3,4,5,6,7)	0.87193	0.87662
+
+Other settings: Batch size is always 512 (256 for big models), trained with 100epochs. torch.amp is adopted. Following solutions， we adopt similar Post-Process and obtain 0.001 improvement. We use Swin-B pretrained on Imagenet22k for initialization, for other backbones, we try to use Imagenet22k pretrained weights if possible. We freeze partial layers to enlarge the batchsize during the training process, We then reduce the batch size and train the full parameters.
+
+Something less effective: class-aware sampling data cleaning
+
+Tagged
+Intermediate
+Classification
+Authors
+Rolling
+
+zhiling9681
+
+Shuhao
+
+shuhaocui
+
+arrow_drop_up
+5
+Share
+more_horiz
+Citation
+
+Rolling, Shuhao. 1st place solution. https://www.kaggle.com/competitions/herbarium-2022-fgvc9/writeups/mtcv-1st-place-solution. 2022. Kaggle
+
+comment
+1 Comment
+Hotness
+John Park
+
+Competition Host
+
+Posted 4 years ago
+
+· 33rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @shuhaocui, congratulations and thank you very much for the detailed explanation of your methods. Would you please fill out this form as well? https://forms.gle/n8Bsr5ZfkK4VLP1f7 Thank you.
+
+reply
+Reply

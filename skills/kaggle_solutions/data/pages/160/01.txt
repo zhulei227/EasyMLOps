@@ -1,0 +1,5 @@
+url: https://github.com/btgraham/SparseConvNet/tree/kaggle_Diabetic_Retinopathy_competition
+fetched: 2026-10-27
+chars: 39
+
+FETCH_FAILED: HTTP Error 404: Not Found

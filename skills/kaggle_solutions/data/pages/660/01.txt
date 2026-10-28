@@ -1,0 +1,829 @@
+url: https://www.kaggle.com/c/konwinski-prize/writeups/eduardo-rocha-de-andrade-1st-place-solution-write-
+fetched: 2026-10-27
+chars: 24785
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution Write Up — Konwinski Prize
+1st Place Solution Write Up
+
+Konwinski Prize
+
+Solution Writeup · 1st place · Jul 28, 2025
+
+Before anything else I'd like to thank the Kaggle team and the host for this amazing competition. This is not only a very interesting problem to work but I can only imagine how difficult it must have been to prepare a competition as complex as this one in terms of infra/engineering.
+
+I joined this competition quite late (~1 month before finishing) so I knew I was probably better off trying to find some open-source solution that I could adapt instead of coding anything from scratch. After I bit of research, I decided to base my solution on top of Agentless 1.5.
+
+TLDR:
+
+Agentless 1.5 with a lot of modifications to support local models, optimize runtime and improve quality for "weaker" 32b models
+
+Main Keypoints:
+Improved context retrieval for generating F2P tests
+Patch rejection made by both F2P and P2P (unit) tests
+Qwen2.5 Coder 32B model
+Search/replace diff format for patch generation (much better than generating diff directly)
+Retry mechanism if no F2P manages to reproduce the GitHub issue
+Concurrent execution of package installation and tests execution
+Global and local time management system for controlling runtime
+
+
+(for better experience, click with right mouse button and open image in a new tab)
+
+Solution in detail
+Patch Rejection
+
+The first stage of my pipeline is to generate tests that are capable of reproduce the Github issue and, later, evaluate if a potential patch candidate actually fixes the issue. I'll share the prompt I used for this as it helps a lot with the explanation:
+
+generate_tests_prompt_template_with_related_content = """
+We are currently solving the following issue within our repository. Here is the issue text:
+--- BEGIN ISSUE ---
+{problem_statement}
+--- END ISSUE ---
+
+Here is the related content from other tests in the repository, which you can use as example on how to import modules, instantiate classes, and use functions:
+--- BEGIN RELATED CONTENT ---
+{file_contents}
+--- END RELATED CONTENT ---
+
+Please generate a complete test that can be used to reproduce the issue.
+
+The complete test should contain the following:
+1. Necessary imports, this include any native python imports as well as imports from the repository. Also pay attention to custom Exceptions and Classes.
+2. If the test script requires any setup or initialization, make sure to include it in the test.
+3. Code to reproduce the issue described in the issue text
+4. Print "Issue reproduced" if the outcome indicates that the issue is reproduced
+5. Print "Issue resolved" if the outcome indicates that the issue has been successfully resolved. This should test both if the issue was resolved and if it presents the expected behavior. *Treat this similarly to an unit test that someone would add to the code base to assess if the issue is resolved or not*. The only difference is that this is a standalone script instead of using frameworks like pytest or unittest.
+6. Print "Other issues" if the outcome indicates there are other issues with the source code
+7. If the repo is django make sure to add `import django` and `django.setup()` at the beginning of the test.
+
+Here is an example:
+
+\`\`\`python
+from sqlfluff import lint
+
+def test__rules__std_L060_raised() -> None:
+    try:
+        sql = "SELECT   IFNULL(NULL, 100),
+            NVL(NULL,100);"
+        result = lint(sql, rules=["L060"])
+        assert len(result) == 2
+    except:
+        print("Other issues")
+        return
+
+    try:
+        assert result[0]["description"] == "Use 'COALESCE' instead of 'IFNULL'."
+        assert result[1]["description"] == "Use 'COALESCE' instead of 'NVL'."
+        print("Issue resolved")
+    except AssertionError:
+        print("Issue reproduced")
+        return
+
+    return
+
+test__rules__std_L060_raised()
+\`\`\`
+
+Please ensure the generated test reflects the issue described in the provided issue text.
+The generated test should be able to be used to both reproduce the issue as well as to verify the issue has been fixed.
+Note that we won't have internet access when running the tests, so avoid using any code that requires internet access like downloading files, making API calls or using datasets. Instead you could try to mock the data or use a small toy example.
+Wrap the complete test in \`\`\`python...\`\`\`.
+"""
+
+
+I used the prompt above to generate 5 F2P candidate test samples for the problem. Then, I would run all the tests and keep only those that actually reproduced the issue and nothing else. For example, if it printed both "Issue reproduced" and "Other issues" I would remove the tests as it looks suspicious.
+
+If none of the 5 F2P candidates managed to reproduce successfully, I would trigger a generation of a second batch of 5 tests but with higher temperature. If none of the 10 tests reproduced the issue, I simply skip the sample as there is no way to assess my candidate repair patches.
+
+Main Differences from Agentless
+
+Here is where I think my solution most improved Agentless. The original codebase does not include context for generating tests -- it simply provides the issue description and asks the model to generate a reproduction tests. After looking at a few samples, I quickly noticed that this strategy works quite well for HUUGE models like Claude/GPT that have an insane amount of memorization capabilities and know by heart how to make correct imports, instatiate the correct classes and proper usage of functions and methods.
+
+On the other hand, a "small" 32B model like Qwen2.5 Coder would most of the time have the correct idea for the tests but fail on importing modules or using the classes -- essentially, silly mistakes that could be corrected by simply providing context to the model.
+
+To find context I simply used a two stage approach: first ask the model to find relevant unit tests files that were important to the problem and, then, providing the model with the skeleton of all functions and classes in those files and ask for which classes/function/methods it wanted to inspect. I also extracted all the imports from those files so that the model could have an idea on how to import stuff.
+
+In order to increase diversity in the tests generation, I also used different levels of context. For example, out of the 5 generation requests, 1 would have example imports statements + all relevant classes/functions/methods. Another request would use only the import statements as context. Finally, the other 3 would be similar to original Agentless and have no context. Additionally, one sample would use greedy decoding and the others temperature/top_p/min_p sampling to maximize diversity.
+
+I also added some other small modifications to the original prompt that helped to guide small models in generating the tests. For example, being explicit about including imports, initialization if needed, etc.. I imagine that for SOTA models like Claude you don't need to be too explicit but for 32B I observed that it definitely helped.
+
+Context localization
+
+If at least 1 F2P test managed to reproduce the issue I would continue the pipeline to generate the fix patch. It started by localizating the relevant files and then finding the relevant classes/methods/functions in those files. Finally, a third stage to generate precise locations, e.g., line number, for the edits.
+
+First and second stages used greedy decoding and, for the fine-grain localization (third stage) I used sampling to generate 2x different edit locations.
+
+All of the steps above is quite similar to what Agentless originally does, I only made small improvements to the prompt and made the heuristic that parsers the model output and look for the files in the repo more generic and robust to small silly mistakes.
+
+Related to runtime, I refactored the code to only generate the repo structure (nested dict containing all the files, functions, classes and their methods, line start and end, etc..) once at the very beginning as the original code would generate at every step and this consumed 5-20s each time.
+
+Repair Patch Generation
+
+For each edit location, I generated 4 repair samples (first with greedy decoding, the others with temperature). So, in total I had 8x candidate repair patches. The prompt I used is the following:
+
+repair_prompt_combine_topn_cot_diff = """
+We are currently solving the following issue within our repository. Here is the issue text:
+--- BEGIN ISSUE ---
+{problem_statement}
+--- END ISSUE ---
+
+Below are some code segments, each from a relevant file. One or more of these files may contain bugs.
+--- BEGIN FILE ---
+\`\`\`
+{content}
+\`\`\`
+--- END FILE ---
+
+Please first localize the bug (or bugs) based on the issue statement, and then generate *SEARCH/REPLACE* edits to fix the issue.
+
+Every *SEARCH/REPLACE* edit must use this format:
+1. The file path
+2. The start of search block: <<<<<<< SEARCH
+3. A contiguous chunk of lines to search for in the existing source code
+4. The dividing line: =======
+5. The lines to replace into the source code
+6. The end of the replace block: >>>>>>> REPLACE
+
+Here is an example:
+
+\`\`\`python
+### mathweb/flask/app.py
+<<<<<<< SEARCH
+from flask import Flask
+=======
+import math
+from flask import Flask
+>>>>>>> REPLACE
+\`\`\`
+
+Please note that the *SEARCH/REPLACE* edit REQUIRES PROPER INDENTATION. If you would like to add the line '        print(x)', you must fully write that out, with all those spaces before the code!
+Wrap the *SEARCH/REPLACE* edit in blocks \`\`\`python...\`\`\`.
+
+Note that some issues (but not all) may require multiple *SEARCH/REPLACE* edits in potentially different files in order to completely fix the issue.
+You are expected to provide all the edits needed to fix the issue but ONLY suggest edits that are NECESSARY to fix the issue.
+"""
+
+
+The output was later processed to obtain the Git diff. I tried generating the git diff directly and I noticed that in many cases it fails to generate a valid patches because if messes up the line counting or any other silly thing. After using a SEARCH/REPLACE scheme (similar to what VsCode does), I noticed the the amount of valid patches increased a LOT.
+
+Evaluating candidate repair patches
+
+After obtaining the 8 candidate repair patches, I started by validating them with a dry-run of git apply to make sure they were valid. Then, I ran them with each of the F2P tests and kept only patches that managed to fix at least one of the tests. Finally, I ran the P2P unit tests that were selected by the model in the very first localization step and compare that with the reference (unit tests result when no repair patch is applied). If the results or similar or better than the reference I submit the sample.
+
+All tests (F2P and P2P) had timeout and ran in parallel to save time.
+
+Time management
+
+I spent a lot of time doing runtime optimizations on the solution and, in the end, my best subs were running in ~5-7 hours (~3 to 10 minutes per sample). Regardless, I added two time protections, one to skip everything remaining if the global runtime was above 20 hours and another to skip the sample if we were more than 12 minutes on that sample.
+
+Other improvements
+
+Above, I tried to list all the most important details of my sub. However, there were countless other minor changes I made to Agentless to make it run faster and be better/more robust with "small" local models. I won't extensively list them here as it would be too much for a single post and, honestly, I didn't properly ablate many of them to be confident on how much they actually impacted the solution.
+
+Thoughts on score and robustness
+
+I submitted my best solution many times with different seeds or with small hparam changes and it always scored from 0.056LB to 0.098LB, so I believe it to be somewhat robust.
+
+That said, there was a time that it failed without me knowing why. It also executes code that is generated by the LLM, which is always a potential risk.
+
+Given how hard the dataset is and how heavily penalized mistakes are, I think luck will play a significant role in the end. My solution also has a lot of moving parts that are potential failure points (even with try-catching everything). So, being completely honest, I'm not very confident that I'll get a good result in the end but, at least, I had fun 🤣
+
+Things I tried and didn't work
+Agent mode, i.e., generating a test, running and then providing the error back to the model to fix (I only tried this very late so I still think it could work with more time)
+Reasoning models (a LOT of thinking and "but wait…" and solutions didn't prove much better than qwen coder)
+Local validation
+I spent almost an week trying to set up a local validation with SweBench verified but in the end only manage to generate a few samples mostly for Django (other repos for some reason would not export the packages), which is what I used locally.
+I also only have a single RTX4090 so 24GB of vRAM does not allow me to test much stuff locally as the context is reduced to ~8K tokens. Thus, I gave up on local validation and used it mostly to code and debug stuff instead of actually trying to get a local score. This is definitively not ideal but it was what I found possible with the time I had left and with the hardware I have available
+Final thoughts
+
+I really enjoyed this competition and learn a lot of stuff. I would most definitely like to participate in a second round if it happens in the future. My only two constructive feedback for the host would be:
+
+Share more "training" samples or share the exact code that is used to create new samples. I felt that there was a lot of (engineering) friction to create a local validation set. Most Kagglers would benefit of having, lets say, 25 training samples and 51 for public LB.
+A dataset with greater amount of easy samples. I know that the goal is to be "faithful" in terms of what we see in reality but, for a competition point of view, too many hard samples makes the LB too discrete and increases a lot the randomness in the evaluation process.
+
+Good luck everyone 😸
+
+Post private LB disclosure (Edit: July 2025)
+
+As pointed out by @huikang, the private result for my sub was 9 correct, 2 wrong and 109 skipped samples. Thinking outside the competition's constraints for a bit, I believe we could improve the results much further by using frontier models like Claude, Gemini and GPT as shown by the public benchmarks. However, even with those, I still think we are still quite far from the 90% score milestone when considering the negative penalty for wrong predictions! Super keen to see how this task develops in the future.
+
+Finally, thanks again to Kaggle and the host, Andy, for this amazing competition!
+
+Link to the code
+
+Author
+Eduardo Rocha de Andrade
+
+arc144
+
+arrow_drop_up
+76
+Share
+more_horiz
+Citation
+
+Eduardo Rocha de Andrade. 1st Place Solution Write Up. https://www.kaggle.com/competitions/konwinski-prize/writeups/eduardo-rocha-de-andrade-1st-place-solution-write-. 2025. Kaggle
+
+11
+comment
+31 Comments
+3 appreciation comments
+Hotness
+Giba
+
+Posted a year ago
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations Eduardo, on taking first place in public and private! It's great to see another Brazilian at the top 🤩!
+What do you think made your solution so robust for new data?
+
+reply
+Reply
+1
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Congratulations Eduardo, on taking first place in public and private! It's great to see another Brazilian at the top 🤩!
+
+Thank you Giba! Always learning from the master! 🙇‍♂️
+
+What do you think made your solution so robust for new data?
+
+Good question.
+It's hard to pinpoint what exactly helped but, after I reached my best public score, I spent the last 2 weeks trying to make it consistent over different submissions (changing the seed). Things I think had a good impact:
+
+Having both F2P and P2P tests. I was quite strict on accepting the patch for submission, so this helped with precision
+Always making sure to have greedy sampling (or very low temp) at pretty much every step in the pipeline (along with other higher temps generations for diversity)
+Related to the above, I also varied the amount of context I provided for the model. For example, when generating the F2P tests I had 3 greedy samples - the first with full context (relevant imports + functions and classes), another with only imports and a third one with no context. I noticed that the optimal amount of context would vary a lot from sample to sample, so this layered approach helped quite a bit in making sure I had good F2P tests.
+Improving the overall runtime of the pipeline also allowed me to generated more samples at each step, which increased the odds that at least one generation was good
+
+In the last week I also tried to have two LLMs (one in each GPU) running in parallel and ensemble the results, which I thought would be really good for both improving the score and robustness but, unfortunately, I couldn't make it work. All the reasoning LLMs I tried were super slow and wouldn't improve much on the Qwen Coder 32B generations.
+
+reply
+Reply
+Hamish
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Eduardo you are a legend! Amazing work buddy! <3
+
+reply
+Reply
+1
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot Hamish!! 🖤
+
+reply
+Reply
+Sinan Calisir
+
+Posted a year ago
+
+· 38th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats, very well deserved!!
+
+reply
+Reply
+2
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks 🙇‍♂️!
+
+reply
+Reply
+1
+yuanzhe zhou
+
+Posted a year ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrat to you and myself :D
+
+reply
+Reply
+1
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks 🙇‍♂️ Congrats on the solo gold as well!!! 🔥
+
+reply
+Reply
+1
+Tong Hui Kang
+
+Posted a year ago
+
+· 66th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on first place on the private leaderboard too!
+
+Edit to add: it seems that you have 9 correct and 2 wrong, with 109 skipped.
+
+reply
+Reply
+3
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Daamn, can't really believe it xD
+Thanks a lot 🙇‍♂️
+
+reply
+Reply
+1
+Andy Konwinski
+
+Competition Host
+
+Posted a year ago
+
+arrow_drop_up
+3
+more_vert
+
+Yes huge congrats @arc144 !!
+
+reply
+Reply
+5
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot Andy! And huge shoutout to you as well for hosting such an amazing competition! 🙇‍♂️
+We still have a long way to go until the 90% milestone xD
+
+reply
+Reply
+Raghav Mishra
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+congrats ..well done!!
+
+reply
+Reply
+1
+Josmar Augusto Fonseca Barbosa
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation Eduardo! Thank you for sharing!
+
+reply
+Reply
+1
+ivan
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations Eduardo! I had no doubt that you win 😎
+
+reply
+Reply
+1
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot Mr. Sorokin! 🔥
+
+reply
+Reply
+Don Woodlock
+
+Posted a year ago
+
+· 185th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congratulations!! And thank you for this write-up.
+
+reply
+Reply
+1
+emoji_people
+Tom
+
+Posted a year ago
+
+· 27th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@arc144 congrats, learn a lot from your solution!
+
+reply
+Reply
+1
+emoji_people
+Adam Logman
+
+Posted a year ago
+
+· 36th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations
+
+reply
+Reply
+1
+Sergey Orloc
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrat! Intresting solution!
+
+reply
+Reply
+1
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrat! I love your solution!
+
+reply
+Reply
+1
+Shohinur Pervez Shohan
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Love the optimization for local models and structured context retrieval. Thanks for sharing!
+
+reply
+Reply
+1
+Ren-Di Wu
+
+Posted 2 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wow, amazing work! I think if the computation is enough maybe we can make an application base o on it! But after all, thanks for sharing!
+
+reply
+Reply
+1
+Raghav Mishra
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Hey,
+
+your solution is indeed interesting and i agree the friction to create local validation set was real..although i didn't spent much time on this comp due to my work but this competition really underscores the LLM hype and grounds us to reality
+
+thanks to organizers and @huikang as well for keeping the spirit alive!!
+
+reply
+Reply
+1
+Tong Hui Kang
+
+Posted 2 years ago
+
+· 66th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Your solution (and the public LB second place solution) definitely is much more legitimate - on the part it involves writing the F2P tests and running the tests the before and after patch.
+
+I did remember spending time to set up code execution but did not progress much.
+
+I would expect that you get first place, unless code execution goes wrong and shuts down the entire notebook.
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks.
+
+Yeah, I'm worried with something like code breaking or even random fluctuations that could lead to a not so good score
+
+reply
+Reply
+Camaro
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats @arc144, and thanks for sharing!
+It looks like your solution has a lot in common with mine, but yours performs better by two instances(7-0 vs. 7-2) on average😂
+Anyway, good luck with the future re-run—I believe you have enough of a margin to win!
+
+reply
+Reply
+1
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks man! Also congrats to you!
+
+I not very confident tbh haha
+
+Let's hope we have luck in the re-run ☘️
+
+reply
+Reply
+CPMP
+
+Posted 2 years ago
+
+· 31st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing, and congrats on the result. Sure this is not the end result but still quite interesting.
+
+How did you run the tests? We struggled with that as we did not want to run them in the main process.
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks and, yeah, everything can still change.
+
+How did you run the tests? We struggled with that as we did not want to run them in the main process.
+
+The model provided the unit test files that were relevant for the issue. Then, I simply run with pytest file.py with timeout as pre-command. I executed with subprocess.run but using another thread to wait for the process
+
+For the F2P tests, the model generated a simple .py script that I executed with subprocess.run and parsed the output
+
+reply
+Reply
+CPMP
+
+Posted 2 years ago
+
+· 31st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks. But you need to install the repo in the subprocess, right? I guess I need to read pytest doc (I am not the one who worked on tests on the team).
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+No worries! Yes, I first install the repo's requirements using subprocess (pretty much the same as in the example kernel). Then, when running tests, I first activate the environment before running pytest -rA file.py or reproduce_bug.py (my F2P tests). The commands are joined together with &&
+
+reply
+Reply
+Tiger2160187
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, Eduardo!
+I just found out this article, seems like some late but not too late on my side.
+I am researching on improving the SWE-bench agent accuracy but here is really strict requirements.
+I'd love to connect with you and collaborate on this project.
+Here's my Contact information.
+Email: jacob14350@gmail.com
+Telegram: @ahmed_jc
+WhatsApp: +1 (606) 443-4119
+I look forward to hearing from you.
+Thank you
+
+reply
+Reply
+Appreciation (3)
+Josmar Augusto Fonseca Barbosa
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing!
+
+YU BO
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing
+
+Don Woodlock
+
+Posted 2 years ago
+
+· 185th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for writing this up.

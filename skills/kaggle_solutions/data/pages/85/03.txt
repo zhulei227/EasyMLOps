@@ -1,0 +1,50 @@
+url: https://github.com/anlthms/mlsp-2013
+fetched: 2026-10-27
+chars: 3421
+
+GitHub - anlthms/mlsp-2013: MLSP 2013 Bird Classification · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ anlthms mlsp-2013 Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ mlsp-2013 Public Notifications You must be signed in to change notification settings Fork 5  ( 5 ) Star 6  ( 6 ) You must be signed in to star a repository About MLSP 2013 Bird Classification Resources Readme MIT license Activity Stars 6 stars Watchers 2 watching Forks 5 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 7 Commits 7 Commits Folders and files Name Name Last commit message Last commit date misc misc     LICENSE LICENSE     README.md README.md     birds.py birds.py     codebook.py codebook.py     runme.sh runme.sh     View all files Repository files navigation README MIT license More items mlsp-2013 
+ MLSP 2013 Bird Classification 
+ See http://www.kaggle.com/c/mlsp-2013-birds/forums/t/5457/congratulations-to-the-winners/29217#post29217 for details. 
+ About MLSP 2013 Bird Classification Resources Readme MIT license Activity Stars 6 stars Watchers 2 watching Forks 5 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

@@ -1,0 +1,130 @@
+url: https://homepages.inf.ed.ac.uk/imurray2/pub/12kaggle_dark/
+fetched: 2026-10-27
+chars: 6806
+
+A Bayesian approach to Observing Dark Worlds 
+
+ A Bayesian approach to Observing Dark Worlds 
+
+ This note also appeared on Kaggle&#8217;s blog . 
+ &#8212; Iain Murray , Version 1.02, 2012-12-19. 
+
+ In December 2012 I entered the
+ Kaggle/Winton Observing Dark
+Worlds competition. See the competition page first, for a great pictorial
+introduction. My&nbsp;predictions placed 2nd out of 357 teams. This short note
+describes my approach. 
+
+ Modeling the data, and making predictions 
+
+ I took the “obvious” Bayesian approach to this challenge, although
+didn&#8217;t implement it quite as carefully as possible. This style of solution
+involves three steps: 1)&nbsp;Build a probabilistic model of the data;
+2)&nbsp;Infer underlying explanations of the test data; 3)&nbsp;Fit the
+&#8216;best&#8217; estimates that minimize the expected error
+(measured by the metric used on the leaderboard). 
+
+ 1) The model: The observed data were positions of galaxies
+and their measured ellipticities. The ellipticities were clearly
+Gaussian-distributed. The dark matter halos exert a &#8220;force&#8221; on the
+galaxies, locally shifting the mean of the distribution over ellipticities. The
+example maximum likelihood code, provided by the organizers, gave me the
+equations to describe how the ellipticities are shifted by a force. That only
+left me to model the force as a function of displacement from a halo center. 
+
+ Based on a quick visualization, I picked a force term of
+ m /max( r , r 0 ), where m is proportional to
+the halo mass, r &nbsp;is the radial distance from the halo center, and
+ r 0 is a core radius inside which the force doesn&#8217;t
+increase. I doubted that this model was quite right, so I also increased the
+variance of the ellipticities inside the halo core, hoping to increase the
+robustness of the model. 
+
+ (I was a little negligent: I should have considered more
+flexible models of the forces, with more free parameters, and learned whether
+and how to use them from the data. I didn&#8217;t make time to do that, or even
+test properly whether increasing the within-core variance was a good idea.
+I&#8217;d be more careful in a real collaboration.) 
+
+ 2) Inference: Given the model, I applied a standard method
+to simulate plausible explanations of the test skies. I used Slice Sampling, an
+easy-to-use Markov chain Monte Carlo (MCMC) method, and didn&#8217;t have to
+tune any tweak parameters. My results on the training skies seemed to be similar
+if I initialized the dark matter halos at their true locations, or randomly, so
+I assumed that the sampler was working well enough for the competition. The
+inference stage was by far the easiest: very little coding or computer time, and
+no tweaking required. 
+
+ If you would like to try out slice sampling, you could play
+with my
+ Octave/Matlab-based MCMC tutorial exercise .
+The
+ original paper (Neal, 2003) 
+is excellent, or for a shorter introduction, see Chapter&nbsp;29 of
+ David MacKay's book . 
+
+ Sampling gives me a bag of samples: a set of plausible dark matter halo
+positions and masses. If I showed you a movie, stepping through the different
+plausible halo locations, you would probably understand roughly what we can and
+can&#8217;t know. You might say something like &#8220;I can see that there&#8217;s
+definitely a halo in the top right, but the other one could be nearly
+anywhere&#8221;. Unfortunately I&#8217;m not able to cram a bag of samples, or
+your verbal explanation, into the .csv submission format defined by the
+competition rules. There are a plethora of possible ways to make a single guess,
+including: picking a random sample, using the most probable sample, or using the
+mean of the samples. But these methods shouldn&#8217;t be used without
+justification. 
+
+ 3) Making a leaderboard submission: A sensible way to make a
+guess, when forced to, is to minimize the expected size of your mistakes. In
+this competition, the size of a mistake was measured in a complicated way: the
+&#8220;Dark Worlds Metric&#8221;. I&#8217;d like to say that I minimized the
+expected value of this metric, but it was hard to deal with. The best prediction
+for a sky depends on the mistakes made in other skies, and I didn&#8217;t know
+which skies would be in the final test set. Rather than considering possible
+test set splits (and possibly inferring the split!), I used a pragmatic hack. I
+optimized the prediction for each sky using the Dark Worlds Metric applied to a
+fictitious test set containing multiple copies of the same sky with different
+halo locations given by the MCMC samples. I hoped that this procedure was close
+enough to the ideal procedure that I would do well. 
+
+ Discussion 
+
+ Given the setup of this competition, I doubt that it is possible to do much
+better than the style of approach described here. Tim Salimans, who won,
+followed a very similar
+approach . He might have solved the optimization problem better (I should
+have used gradient-based optimization, but didn&#8217;t). Tim fixed his
+ r 0 parameters, based on the training data, whereas I left them
+uncertain. I didn&#8217;t work hard enough to notice that these parameters were
+always close to one of two fixed values (an artifact of the competition if
+true). Hierarchical learning of the distribution of such tweak parameters is
+important in real problems, and would be the way to go in future. 
+
+ If the organizers ran MCMC on the model that they actually used to generate
+the data, that would find the best reasonable performance: what could be
+achieved without getting lucky, or fitting to the test data with multiple
+submissions. I have
+ described
+in a separate Forum post how it would also be possible for the
+organizers to tell whether entrants to the competition were just lucky, by
+testing their expected performance over all reasonable explanations of the test
+set, rather than just one. 
+
+ I know from the Forum 
+that some of the competitors near the top of the leaderboard didn't use Bayesian
+approaches: there are other ways to get good predictions, and my approaches to
+machine learning are not always Bayesian either. However, in this problem, the
+Bayesian approach was natural and straightforward. Unlike some methods discussed
+on the Forum, no careful tuning, special consideration of edge effects, or
+choosing of grids was required. The result of inference (given enough samples)
+is a complete description of what is known about the sky. The resulting samples
+aren&#8217;t tied to one evaluation metric, but can be used to find an estimate
+that will work well under any. 
+
+ Thanks very much to the organizers: Tom Kitching, David Harvey, Kaggle, and Winton for a fun competition.
+Congratulations&nbsp;to Tim Salimans for coming first! 
+
+ My code is available . 
+
+ Accessibility &#8212; Iain Murray&#8217;s homepage &#8594; Publications

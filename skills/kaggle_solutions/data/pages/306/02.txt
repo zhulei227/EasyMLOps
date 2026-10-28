@@ -1,0 +1,154 @@
+url: https://github.com/SeuTao/Humpback-Whale-Identification-Challenge-2019_2nd_palce_solution
+fetched: 2026-10-27
+chars: 6914
+
+GitHub - SeuTao/Humpback-Whale-Identification: Humpback Whale Identification · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ SeuTao Humpback-Whale-Identification Repository navigation Code Issues 5  ( 5 ) Pull requests Actions Projects Security and quality Insights More items 
+
+ Humpback-Whale-Identification Public Notifications You must be signed in to change notification settings Fork 86  ( 86 ) Star 253  ( 253 ) You must be signed in to star a repository About Humpback Whale Identification Topics deep-learning whale-identification Resources Readme Activity Stars 253 stars Watchers 1 watching Forks 86 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 47 Commits 47 Commits Folders and files Name Name Last commit message Last commit date bbox_model bbox_model     image_list image_list     loss loss     net net     png png     process process     KaggleWinnerCall.pptx KaggleWinnerCall.pptx     README.md README.md     ensemble.py ensemble.py     include.py include.py     main.py main.py     utils.py utils.py     View all files Repository files navigation README More items Kaggle Humpback Whale Identification Challenge 2019 2nd place code 
+ This is the source code for my part of the 2nd place solution to the Humpback Whale Identification Challenge hosted by Kaggle.com. 
+
+ End to End Whale Identification Model 
+
+ Recent Update 
+ 2019.03.13 : code upload. 
+ Dependencies 
+
+ imgaug == 0.2.8 
+ opencv-python==3.4.2 
+ scikit-image==0.14.0 
+ scikit-learn==0.19.1 
+ scipy==1.1.0 
+ torch==1.0.1. 
+ torchvision==0.2.2 
+
+ Solution Development 
+ single model design 
+
+ Input: 256x512 or 512*512 cropped images; 
+ Backbone: resnet101, seresnet101, seresnext101; 
+ Loss function: arcface loss + triplet loss + focal loss; 
+ optimizer: adam with warm up lr strategy； 
+ Augmentation: blur,grayscale,noise,shear,rotate,perspective transform； 
+ Horizontal flip to create more ids -&gt; 5004*2 
+ Pseudo Labeling 
+
+ Single model performace 
+
+ single model 
+ privare LB 
+
+ resnet101_fold0_256x512 
+ 0.9696 
+
+ seresnet101_fold0_256x512 
+ 0.9691 
+
+ seresnext101_fold0_256x512 
+ 0.9692 
+
+ resnet101_fold0_512x512 
+ 0.9682 
+
+ seresnet101_fold0_512x512 
+ 0.9664 
+
+ seresnext101_fold0_512x512 
+ - 
+
+ Single model performace with pseudo labeling 
+ I generate a pseudo label list containing 1.5k samples when I reached 0.940 in public LB, and I kept using this list till the competition ended. I used the bottleneck feature of the arcface model (my baseline model) to calculate cosine distance of train test images. For those few shot classes (less than 2 samples), I choose 0.65 as the threshold to filter high confidence samples. I think it will be better result using 0.970 LB model to find pseudo label. 
+
+ single model 
+ privare LB 
+
+ resnet101_fold0_256x512 
+ 0.9705 
+
+ seresnet101_fold0_256x512 
+ 0.9704 
+
+ seresnext101_fold0_256x512 
+ - 
+
+ Model ensemble performace 
+
+ single model 
+ privare LB 
+
+ resnet101_seresnet101_seresnext101_fold0_256x512 
+ 0.97113 
+
+ resnet101_seresnet101_seresnext101_fold0_512x512_pseudo 
+ 0.97072 
+
+ 10 models(final submisson) 
+ 0.97209 
+
+ Path Setup 
+ Set the following path to your own in ./process/data_helper.py 
+ PJ_DIR = r'/Kaggle_Whale2019_2nd_place_solution'#project path
+train_df = pd.read_csv('train.csv') #train.csv path
+TRN_IMGS_DIR = '/train/'#train data path
+TST_IMGS_DIR = '/test/' #test data path
+
+ Single Model Training 
+ train resnet101 256x512 fold 0： 
+ CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --mode=train --model=resnet101 --image_h=256 --image_w=512 --fold_index=0 --batch_size=128
+
+ train resnet101 512x512 fold 0： 
+ CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --mode=train --model=resnet101 --image_h=512 --image_w=512 --fold_index=0 --batch_size=128
+
+ predict resnet101 256x512 fold 0 model： 
+ CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --mode=test --model=resnet101 --image_h=256 --image_w=512 --fold_index=0 --batch_size=128 --pretrained_mode=max_valid_model.pth
+
+ train resnet101 256x512 fold 0 with pseudo labeling： 
+ CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --mode=train --model=resnet101 --image_h=256 --image_w=512 --fold_index=0 --batch_size=128 --is_pseudo=True
+
+ predict resnet101 256x512 fold 0 model with pseudo labeling： 
+ CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --mode=test --model=resnet101 --image_h=256 --image_w=512 --fold_index=0 --batch_size=128 --is_pseudo=True --pretrained_mode=max_valid_model.pth
+
+ Final Ensemble 
+ the final submission is the weight average result of 10 ckpts 
+ python ensemble.py
+
+ About Humpback Whale Identification Topics deep-learning whale-identification Resources Readme Activity Stars 253 stars Watchers 1 watching Forks 86 forks Report repository Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

@@ -1,0 +1,719 @@
+url: https://www.kaggle.com/c/playground-series-s4e10/discussion/543725
+fetched: 2026-10-27
+chars: 17965
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution - CatBoost All The Way Down — Loan Approval Prediction
+1st Place Solution - CatBoost All The Way Down
+
+Loan Approval Prediction
+
+Solution Writeup · 1st place · Nov 1, 2024
+
+Hey Kagglers! I used to be pretty active in these playground competitions, but after the December 2023 competition I took a break from Kaggle. On a whim I decided to start working on this one about 10 days ago, and it's been as much of a thrill as it ever was. Getting 1st place was a surprise, to be sure, but a welcome one!
+
+Cross-Validation I'm sure you've heard this before, but setting up a robust cross-validation scheme for evaluating the performance of your predictions is VERY important to doing well in these competitions. I see lots of questions from folks on what kind of feature engineering to do, or how to best ensemble models, impute data, engineer features, etc. For a vast majority of these questions, there's no single answer that is universally true for any dataset. The only way to find out what works for a particular dataset is to try various options and see what performs the best, and that's where cross-validation comes in. In these playground competitions, the data is usually split 60-40 between train and test set, and 20% of the test set is used for the public leaderboard. That means that a CV score measures your performance on 60% of the entire dataset, whereas the public leaderboard measures your performance on only 8%, making cross-validation performance a much more reliable indicator of progress than public leaderboard performance. All of the decisions made below were based on optimizing my cross-validation performance.
+
+Data Preprocessing Shoutout to various member of the community for the tip to treat the numerical features as categorical. What I found most effective was to maintain both the numeric feature and a categorical copy of it. I didn't do any other feature engineering, as my experience from past playground competitions has usually been that feature engineering is of little use. I did include the original dataset.
+
+Modelling
+
+My general approach here is the same as the one I used last competition. For each of XGBoost, LightGBM, and CatBoost, I used Optuna to find 10 different sets of 'optimal hyperparameters' and averaged their predictions to get an overall prediction for each. Shoutout to @omidbaghchehsaraei's post here for the tip to use large max_bin values. I also added a Neural Network that was heavily inspired from @paddykb's notebook here. The performance of each of these models is as follows:
+
+Model	CV Score	Public LB	Private LB
+LightGBM	.96811	.97005	.96637
+XGBoost	.96767	.96989	.96540
+CatBoost	.96972	.97299	.96865
+NN	.96678	.97088	.96577
+
+
+What I think might have been my secret sauce was that for each of these model predictions, I trained a CatBoost model using the initial model predictions as a baseline. An example of how to do this can be found here. I'm not sure exactly what inspired me to do this, perhaps it was from seeing how amazingly well CatBoost performed on this data, but to my surprise CatBoost was able to significantly improve the performance of each of these model predictions, even the ones that were originally generated using CatBoost. The performance of these CatBoost-improved models are as follows:
+
+Initial Model	CV Score	Public LB	Private LB
+LightGBM	.96856	.97048	.96713
+XGBoost	.96815	.97024	.96611
+CatBoost	.96997	.97334	.96903
+NN	.96732	.97117	.96667
+
+
+I find it impressive that the CatBoost model that used CatBoost predictions as a baseline would have been enough for 3rd place. CatBoost was the king for this comp! The final step was a Neural Network to stack these 4 predictions together. This squeezed out the extra last bit of performance needed to bring the solution to the top.
+
+CV Score	Public LB	Private LB
+.97059	.97344	.96938
+Author
+Hardy Xu
+
+hardyxu52
+
+arrow_drop_up
+174
+Share
+more_horiz
+Citation
+
+Hardy Xu. 1st Place Solution - CatBoost All The Way Down. https://www.kaggle.com/competitions/playground-series-s4e10/writeups/hardy-xu-1st-place-solution-catboost-all-the-way-d. 2024. Kaggle
+
+106
+15
+22
+9
+2
+comment
+95 Comments
+17 appreciation comments
+Hotness
+Optimistix
+
+Posted 2 years ago
+
+· 299th in this Competition
+
+arrow_drop_up
+20
+more_vert
+
+Congratulations! Very neat solution. I'd thought of using the 10 best models produced by Optuna and averaging, but only for CatBoost. I'd never seen the option of using a pre-trained model as a baseline for CatBoost until now - thanks for introducing me to this new and cool idea, shall be sure to give it a try in the future.
+
+reply
+Reply
+Thomas Meißner
+
+Posted 2 years ago
+
+· 789th in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+I have never seen this before as well. That is what makes Kaggle so special. There is always someone who discovers a brilliant new idea or technique.
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you! I must confess when I saw you at the top of the public leaderboard, I checked your profile and saw your placements in the past few playground competitions. This result may not have been your best one, but it's incredible how you've been consistently placing in the top 10 throughout the year!
+
+reply
+Reply
+1
+Optimistix
+
+Posted 2 years ago
+
+· 299th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks! It's been a good run for the most part, and I've learned a lot and had great fun. We hadn't seen each other since you took a break this year & I started after that, but it's great to see you, looking forward to more cool solutions from you.
+
+reply
+Reply
+1
+Mart Preusse
+
+Posted 2 years ago
+
+arrow_drop_up
+5
+more_vert
+
+Interesting solution! Congratulations on winning and thanks for sharing the details. I do not fully get how you used the Catboost predictions as baseline. Did you use the oof predictions trained on the full training data and inserted them as baseline or did you make a split as suggested in the link? When you made a split, did you use 50-50? And did you then train the baseline predictions on the 50% split and predict the other 50%? Or did you used predictions based on nested crossvalidation?
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you! Yes, for the baseline I did use oof predictions.
+
+reply
+Reply
+Gerald Schwartz
+
+Posted 2 years ago
+
+· 284th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+As stated in the link, did you use the predicted values rather than predict_proba values or did you round them to integer?
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The baseline needs to consist of 'raw values', which in the context of binary classification means the logits. For XGBoost, LGBM, and CatBoost I don't think there's a prediction function that natively returns logits, so I converted the predicted probabilities into logits for the baseline.
+
+reply
+Reply
+Thomas Meißner
+
+Posted 2 years ago
+
+· 789th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Very cool solution, congrats!
+
+reply
+Reply
+Todd Gardiner
+
+Posted 2 years ago
+
+· 205th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations on the win @hardyxu52!
+
+Classy move sharing the catboost method many of us hadn't seen before.
+
+reply
+Reply
+JuseTiz
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on winning the competition! Thank you for providing such a detailed and valuable description of your solution. I have a couple of questions regarding your approach:
+
+Early Stopping: Did you implement early stopping based on the validation fold during training when evaluating hyperparameters and generating out-of-fold predictions?
+Cross-Validation Strategy: Did you maintain a consistent cross-validation strategy throughout your experiments? Specifically, did you vary the number of cross-validation folds or alter the random seeds?
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Yes, I did use early stopping, although in most instances I early stopped on the optimal Log Loss rather than AUC (the exception was when evaluating hyperparameters). I think this produced better generalization performance, though I'm not entirely sure.
+
+Yes, I did maintain a consistent CV strategy, although in order to reduce the effect of having overly optimistic CV estimates of performance, I varied up the seed depending on the task, e.g. for generating predictions I used 1 seed, for evaluating hyperparameters I used a different seed (also a different CV scheme in this case), and then for ensembling predictions I used yet another seed.
+
+reply
+Reply
+3
+Priyanshu shukla
+
+Posted 2 years ago
+
+· 715th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congrates @hardyxu52
+
+reply
+Reply
+Gage Weaver
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! Thanks for the concise roundup of your steps
+
+reply
+Reply
+Logan Edmiston
+
+Posted 2 years ago
+
+· 923rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+So, if I understand what you are saying correctly, you did the following:
+
+Use CatBoost, XGBoost, LightGBM, and a neural net to make predictions (1/0) on the original data and the competition data combined. The only change you made to this data was to treat every numerical feature as both numerical and categorical. Each of these models was trained after you took the average of 10 runs through optuna tuning for the hyperparameters.
+You then used CatBoost to make probability predictions on the 1/0 predictions from step 1
+You trained a Neural Net to take in values output by the 4 different models and produce a single prediction.
+
+Is that correct?
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+For step 1 I kept predicted probabilities, not 0/1 predictions. Each model was trained 10 times with different sets of hyperparameters to get 10 sets of predicted probabilities that were averaged together.
+
+For step 2, the predictions were still made on the train data. To clarify, the predictions from the previous step are not used as an additional feature here, but they're used as starting points for the CatBoost predictions. When training CatBoost (and gradient boosting algorithms in general), every row has a default prediction value that the algorithm starts from. By comparing how far off this prediction is from the correct value, the algorithm learns to refine this value as it constructs more trees. Instead of having CatBoost use the default prediction values at the start, I had it use the values obtained from step 1.
+
+reply
+Reply
+1
+Logan Edmiston
+
+Posted 2 years ago
+
+· 923rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for taking the time to answer. The clarity is much appreciated
+
+reply
+Reply
+KennyT
+
+Posted 2 years ago
+
+· 165th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@hardyxu52 First, congratulations for your achievement.
+I still did not get the flow. Would you please to clarify the following
+
+For each of XGBoost, LightGBM, and CatBoost, using Optuna to find 10 different sets of 'optimal hyperparameters' and averaged their predictions to get an overall prediction for each
+
+so you end up Step 1, have 3 oof averaged predictions (1 from XGBoost, 1 from LightGBM, and 1 from Catboost)?
+
+I trained a CatBoost model using the initial model predictions as a baseline.
+
+Step 2: Then, you used the averaged prediction from Catboost above as the label (instead of the original label), and train another Catboost models? Then, how to use NN together with the result of Step 1, and Step 2?
+
+reply
+Reply
+Justin
+
+Posted 2 years ago
+
+· 77th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @hardyxu52, when reading your reply a question just popped into my head. For step 2, is it just the idea of epoch? In the second epoch we train the model on the same set of data, the initial 'weights' at the start of the second epoch is the final 'weigths' of the first epoch. Did I understand it correctly? Thank you.
+
+reply
+Reply
+Justin
+
+Posted 2 years ago
+
+· 77th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing! Did you do any imputation?
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+For the GBM models I didn't do any imputation. For the NN model I did median imputation. I didn't find much gains trying more fancy imputation methods.
+
+reply
+Reply
+1
+Justin
+
+Posted 2 years ago
+
+· 77th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for reply. Another question I have is when you use optuna to find the optimal hyperparameters, did you do it by minimizing the average of 5-fold loss or just train_test_split and minimizing the loss on valid set? Thank you.
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I used a 5-fold with 2 repeats, giving me 10 different train-test splits. For each of these splits, I ran an Optuna study to optimize hyperparameters for that split. Taking the optimal hyperparameters from each of those 10 splits gave me 10 different sets of hyperparameters that I used to generate model predictions with a different k-fold setup.
+
+reply
+Reply
+1
+ARRSi
+
+Posted 2 years ago
+
+· 922nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Gratulations man!
+
+reply
+Reply
+Ern711
+
+Posted 2 years ago
+
+· 343rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+First of all, congrats @hardyxu52!
+
+I find using the baseline interesting.
+
+Do I understand you correctly that you used out-of-fold predictions as a baseline and then trained the CatBoost? In that case I think it makes sense that even using predictions from another CatBoost model as a baseline improves it, since these predictions are still more "unbiased" because they are out-of-fold?
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! Yes, out-of-fold predictions were used as the baseline. What you say makes sense, but I think if the performance gains were purely due to the predictions being out-of-fold, I'm not sure that would've translated to an actual improvement in the CV or leaderboard scores.
+
+reply
+Reply
+aldparis
+
+Posted 2 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi @hardyxu52,
+
+Thank you for having shared your solution and congratulations for your victory in the biggest playground series compétition !
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you! Congratulations on your finish as well!
+
+reply
+Reply
+Hanif Imaduddin
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow, great!!
+
+reply
+Reply
+Yağmur Dedekoç
+
+Posted 2 years ago
+
+· 421st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! This first-place finish is truly well-deserved. From your robust cross-validation strategy to the creative use of CatBoost, every step reflects your commitment to winning this competition. Your approach of enhancing other models with CatBoost, and the final touch of combining everything with a neural network, is especially impressive! Your attention to detail and meticulous modeling process proved that winning here takes not only technical skill but also strategic foresight. Reaching the top spot in such a competitive field is an achievement worth celebrating. May this victory be a source of inspiration for your future projects. Congratulations again, and enjoy this well-earned success! @hardyxu52
+
+reply
+Reply
+1
+Ben Greenwalt
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I appreciate the thorough explanation of your methods.
+
+reply
+Reply
+Yousef_Ayman
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations,you deserve 1est place👏
+
+reply
+Reply
+Joel B.
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! You inspire me.
+
+reply
+Reply
+Tariq Bin Bashar
+
+Posted 2 years ago
+
+· 2027th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congrats bro
+
+reply
+Reply
+Cyril Bourgeois
+
+Posted 2 years ago
+
+· 129th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Well Done. Beautiful combination of specific model typologies from various data interpretation into a catboost L2 pivot ^^
+
+reply
+Reply
+mahayasa adiputra
+
+Posted 2 years ago
+
+· 2555th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congratulations, what a great work very inspiring
+
+reply
+Reply
+emoji_people
+benkerrouche abdelbasset
+
+Posted 2 years ago
+
+· 102nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congratulation sir you deserve 1est place
+
+reply
+Reply
+Saim Nasir
+
+Posted 2 years ago
+
+· 2983rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think I should start taking these competitions more seriously, like this is such a inspiring post that i might as well try to perform these steps on my own on the same dataset.
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I'm glad to hear that! Reading these sorts of solutions posts are great for getting ideas, but the best way to learn and get better is to try to apply those ideas to your own work.
+
+reply
+Reply
+1
+Humayra Khanom Rime
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! @hardyxu52
+
+reply
+Reply
+Prashant Kumar
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Appreciate the clear and thorough solution, @hardyxu52, and huge congrats on earning first place! This is really well-executed—congratulations on the win! 🏆
+
+reply
+Reply
+Oscar Aguilar
+
+Posted 2 years ago
+
+· 242nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @hardyxu52!
+
+reply
+Reply

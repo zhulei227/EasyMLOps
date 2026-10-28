@@ -1,0 +1,102 @@
+url: https://github.com/remenberl/KDDCup2013
+fetched: 2026-10-27
+chars: 5687
+
+GitHub - remenberl/KDDCup2013 · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ remenberl KDDCup2013 Repository navigation Code Issues 1  ( 1 ) Pull requests Actions Projects Security and quality Insights More items 
+
+ KDDCup2013 Public Notifications You must be signed in to change notification settings Fork 7  ( 7 ) Star 12  ( 12 ) You must be signed in to star a repository About No description, website, or topics provided. Resources Readme Activity Stars 12 stars Watchers 5 watching Forks 7 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 61 Commits 61 Commits Folders and files Name Name Last commit message Last commit date model0 model0     unused unused     .DS_Store .DS_Store     .gitignore .gitignore     README.md README.md     chinese.py chinese.py     custom_setting.py custom_setting.py     io.py io.py     korean.py korean.py     main.py main.py     name.py name.py     nicknames_v2.py nicknames_v2.py     precision_related.py precision_related.py     recall_related.py recall_related.py     simple_convert.py simple_convert.py     taiwan.py taiwan.py     test.py test.py     View all files Repository files navigation README More items KDDCup2013 Track 2 by SmallData 
+ Before running the algorithm, please ensure the Python 2 version is greater than 2.7. 
+ Computer configuration suggested: 
+ All the code except model 0 has been tested on a PC with 16GB memory with Ubuntu 13.04.
+To run model 0, a 32GB memory machine is needed.
+
+ Package required: 
+ [sklearn](http://scikit-learn.org/stable/install.html): Mainly used for normalizing vectors.
+
+scipy: Mainly used for supporting sparse matrix.
+
+fuzzy: Mainly used for computing distance based on sound of the strings.
+
+ Files: 
+ main.py keeps the entrance of the whole program.
+
+custome_setting.py keeps all the settings of files and parameters.
+
+name.py is a class representing a name with its alternatives and author ids.
+
+io.py is the file responding to read in csv files, serialization files and generate the submission and files for analysis.
+
+recall_related.py keeps functions from step 2 to step 3, aiming at generating possible duplicate author ids to increasing the recall.
+
+precision_related.py keeps functions for step 4 to step 6, aiming at finding out the real duplicates and refinement.
+
+chinese.py keeps name units for chinese names.
+
+taiwan.py keeps name units for taiwanese names.
+
+korean.py keeps last names for korean names.
+
+simple_convert.py transforms nonaskii characters in Author.csv and PaperAuthor.csv to askii characters.
+
+ Folders: 
+ data/ keeps all csv files
+
+serialize/ keeps all intermediate files (run once)
+
+result/ keeps all the saved results like submission files.
+
+model0/ keeps codes for generating confident author duplicates on all the author ids appeared in both Author.csv and PaperAuthor.csv. The generated result is used for building better coauthor, covenue matrices for the main algorithm.
+
+ How to run: 
+
+ Install the necessary packages mentioned at beginning. 
+
+ Copy data set into the data/ folder. 
+
+ Run simple_convert.py to generate cleaned Author.csv and PaperAuthor.csv files. 
+
+ Optional and Time consuming: Run model0/main.py to generate confident duplicate authors in the whole dataset 
+
+ Run main.py to generate submission file under result/ 
+
+ About No description, website, or topics provided. Resources Readme Activity Stars 12 stars Watchers 5 watching Forks 7 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

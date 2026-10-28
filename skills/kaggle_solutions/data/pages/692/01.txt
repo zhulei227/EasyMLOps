@@ -1,0 +1,1008 @@
+url: https://www.kaggle.com/c/playground-series-s6e2/writeups/1st-place-solution-diversity-selection-and-t
+fetched: 2026-10-27
+chars: 27879
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Diversity, Selection, and Trusting the CV–LB Relation — Predicting Heart Disease
+1st Place Solution — Diversity, Selection, and Trusting the CV–LB Relation
+
+Predicting Heart Disease
+
+Solution Writeup · 1st place · Mar 1, 2026
+
+Wow — I’m genuinely so happy to be writing 1st place solution!!
+
+I had been competing in this series for well over a year, so finally finishing 1st place means a lot to me.
+
+I’m a little busy at the moment, but I still wanted to get the main ideas written down while everything was fresh, so for now I used an LLM to help organize the solution into a readable write-up. I’ll probably come back and revise / expand some parts later.
+
+Huge thanks to @cdeotte, @tilii, @mahoganybuttstrings, @optimistix— and definitely not limited to them. I learned so much from the discussions, comments, shared ideas, and from this community as a whole throughout the competition.
+
+Final Result
+
+Final Submission:
+
+CV: 0.9557801
+Public LB: 0.95396
+Private LB: 0.95535
+
+Best Submission I obtained:
+
+CV: 0.9557901
+Public LB: 0.955394
+Private LB: 0.95536
+
+Best CV I obtained during the competition:
+
+CV: 0.955865
+Public LB: 0.955393
+Private LB: 0.95534
+
+However, I did not choose that highest-CV submission as my final submission, because I suspected split overfitting.
+
+This point ended up being one of the most important lessons of the competition, and it is also why I think the better title for this write-up is not “Trust your CV”, but rather:
+
+Trust the CV–LB relation.
+
+1. Overall Strategy
+
+In this competition, I did not aim to build one overwhelmingly dominant model.
+
+Instead, my overall strategy was:
+
+Create many slightly different models → select effective combinations → combine them with a simple linear model.
+
+More concretely:
+
+Generate multiple feature representations.
+Train many different model types.
+Collect approximately 150 OOF predictions.
+Use Optuna to search for good subsets.
+Combine selected OOFs with Ridge regression.
+
+The central idea was diversity.
+
+I was not looking for one “magic” model. Rather, I wanted many reasonably strong models that made slightly different mistakes, and then combine them in a simple and robust way.
+
+2. Feature Engineering
+
+Rather than searching for one optimal feature set, I created multiple representations of the same base features. Each transformation acted as a component that could later be combined flexibly.
+
+2.1 Binning
+
+I discretized numerical features using:
+
+Quantile-based binning (qcut)
+Equal-width binning (cut)
+Simple rounding (for example, Age/5, BP/10)
+
+Tree-based models sometimes benefit from grouped values. Different binning schemes produce slightly different split structures, which helps increase diversity.
+
+2.2 Digit Features
+
+For numerical variables, I extracted:
+
+Integer digit positions (units, tens, hundreds, etc.)
+The first few decimal digits when applicable
+
+This may look unusual, but digit-based features sometimes capture hidden structure in tabular competitions.
+
+2.3 Treating All Features as Categorical
+
+I also converted all base features into string format and treated them as categorical variables.
+
+2.4 Frequency Encoding
+
+For each feature, I added its frequency (how often each value appears).
+
+Rare values can carry useful signal, and frequency encoding often complements target encoding well in boosting models.
+
+2.5 Genetic Programming Features
+
+Using gplearn, I generated nonlinear interaction features automatically.
+
+The goal was not necessarily to create individually dominant features, but rather to introduce alternative representations that improve ensemble diversity.
+
+2.6 Extracting Signals from the Original Dataset
+
+Because this competition dataset was generated from an original dataset, I extracted additional statistics from the original data, such as:
+
+Target mean
+Smoothed target mean
+Weight of Evidence (WoE)
+Entropy
+
+This can be viewed as a kind of external target encoding, and in synthetic Playground competitions this type of information is often useful.
+
+2.7 Denoising Variational Autoencoder (DVAE)
+
+I trained a Denoising Variational Autoencoder on the base features.
+
+A DVAE adds noise to the inputs and learns to reconstruct the original data. The encoder then provides compressed latent representations.
+
+The main purpose here was not necessarily to improve single-model CV, but to create additional nonlinear representations that increase OOF diversity.
+
+3. Model Training
+
+Using the feature sets above, I trained a wide range of models:
+
+XGBoost
+LightGBM
+CatBoost
+RealMLP
+Regularized Greedy Forest (RGF)
+TabICL
+AutoGluon
+
+All OOF predictions were generated using 5-fold StratifiedKFold with shuffle=True and random_state=42.
+
+Performance was evaluated using overall OOF AUC.
+
+4. Representative Single-Model Performance
+
+Below are representative OOF AUC scores for models that were selected at least five times during the Optuna search.
+
+All scores were computed using 5-fold StratifiedKFold and evaluated using overall OOF AUC.
+
+Feature Set	Model	CV
+BASE+BIN+DIGIT+ALL_CATS	AutoGluon	0.955747
+BASE+BIN+DIGIT+ALL_CATS	RealMLP	0.955739
+ORIG+TE+EMB*	RealMLP	0.955726
+BASE+GP_FEAT+ALL_CATS	RealMLP	0.955720
+BASE+BIN+DIGIT+ALL_CATS	CatBoost	0.955686
+BASE+TE	XGBoost	0.955663
+BASE+BIN+DIGIT+ALL_CATS+FREQ	LGBM	0.955652
+BASE+ALL_CATS	XGBoost	0.955619
+ORIG+ALL_CATS	XGBoost	0.955599
+BASE+ORIG+ALL_CATS	XGBoost	0.955597
+BASE	XGBoost	0.955575
+DVAE+ALL_CATS	XGBoost	0.955426
+BASE+BIN+DIGIT+ALL_CATS	RGF	0.954980
+BASE (subsample 100k × 5)	TabICL	0.954971
+
+* ORIG+TE+EMB: all features target-encoded and combined with internal embeddings in RealMLP.
+
+The differences between individual models were small.
+
+However, some models with slightly lower standalone CV — such as RGF and TabICL — were still selected frequently during ensemble search.
+
+This was a good reminder that ensemble contribution is not determined solely by individual CV performance.
+
+5. OOF Selection with Optuna and Ridge Ensemble
+
+In total, I generated approximately 150 OOF predictions.
+
+Simply averaging all of them hurt performance, so I used Optuna to search for effective subsets:
+
+2500 trials
+Each trial selects a subset of OOF predictions
+Objective: maximize overall OOF AUC
+
+Only about one-tenth of the OOFs were consistently selected.
+
+For the final combination, I used Ridge regression.
+
+Ridge worked best because:
+
+It is simple and stable
+It handles correlated predictions well
+It reduces overfitting compared with more flexible meta-models
+
+In my experiments, nonlinear meta-models tended to overfit, while Ridge produced more consistent improvements.
+
+6. Training on Full Data
+
+For GBDT and RGF models:
+
+I retrained on the full dataset after generating OOF
+I used 20 different random seeds
+I averaged predictions across seeds
+I set n_estimators to 1.25 × the average best iteration obtained during CV
+
+In my experiments, this full-data retraining strategy worked better than simply averaging fold models.
+
+7. Trust the CV–LB Relation, Not Just the Best CV
+
+This was probably the most important practical lesson from this competition.
+
+At one point, I obtained a submission with CV = 0.955865, which was my highest CV. However, I did not trust it enough to make it my final submission.
+
+Why?
+
+Because I started to suspect split overfitting.
+
+I ran many hill-climbing experiments and also compared multiple actual submissions to study the relation between CV and leaderboard performance. In particular, I submitted ensembles stopped at different stages and compared their CV–LB behavior.
+
+What I observed was roughly this:
+
+Up to around CV 0.95578, the CV–LB relation looked reasonably consistent
+But once the CV started going beyond 0.95578+, the relation clearly became worse
+Improvements in CV no longer translated into similarly reliable LB improvements
+In some cases, higher CV looked more like exploitation of fold-specific behavior than genuine generalization
+
+Because of this, I decided to select my final submission from the range around:
+
+CV 0.95578 to 0.95580
+
+rather than blindly choosing the numerically best CV.
+
+In hindsight, I think this was the correct decision.
+
+8. What Did Not Work
+
+The following methods did not improve CV in my experiments:
+
+Pseudo labeling (both soft and hard)
+Knowledge distillation
+Very deep GBDT models
+High-order interaction expansion
+Autoencoders other than DVAE
+Nonlinear stacking
+Averaging too many OOFs without selection
+Public leaderboard climbing
+
+This competition reinforced a simple lesson:
+
+More complexity does not necessarily produce better generalization.
+
+9. Key Takeaways
+
+For beginners and intermediate competitors, I think the main lessons are:
+
+You do not always need one dominant “magic” model
+Small differences in feature representation can create useful diversity
+Models with slightly lower CV can still be valuable if they add complementary signals
+Selection can be just as important as generation
+Simple ensembles are often more robust than flexible ones
+A strong CV number alone is not enough — what matters is whether the CV–LB relation remains trustworthy
+Careful validation design is essential when tuning, stacking, and searching many combinations
+
+The most important parts of my solution were:
+
+stable cross-validation
+controlled diversity
+aggressive but disciplined selection
+simple and robust ensembling
+cautious final submission choice based on CV–LB consistency
+10. Cross-Validation Strategy and Leakage Considerations
+
+Finally, I want to discuss CV design a bit more, because it was central to this solution.
+
+10.1 Matching CV Splits Between OOF and Ensemble
+
+When generating OOF predictions and training an ensemble model, the CV splits should be aligned.
+
+If the fold splits used to:
+
+generate OOF predictions for base models, and
+train the ensemble model
+
+are different, leakage can occur.
+
+Why?
+
+Because OOF predictions are only truly out-of-fold with respect to the split used to generate them. If the ensemble is evaluated using a different split, then the meta-model may end up training on samples whose base predictions were indirectly influenced by those same samples.
+
+That can produce overly optimistic CV.
+
+10.2 Early Stopping and Subtle Leakage
+
+Even when the fold splits are the same, there is still a subtle issue if early stopping is used.
+
+For example:
+
+A base model uses fold A as validation
+Best iteration is chosen based on fold A
+The OOF prediction for fold A is produced using that selected iteration
+
+Strictly speaking, fold A has now influenced model selection.
+
+So while this is standard practice and usually acceptable in Kaggle, it is not perfectly leakage-free from a theoretical perspective.
+
+This effect is often small, but it is worth keeping in mind, especially when stacking many models and squeezing out tiny CV gains.
+
+10.3 Nested K-Fold as the Strict Solution
+
+The theoretically correct approach is Nested K-Fold:
+
+Outer folds: generate truly out-of-fold predictions
+Inner folds: tune hyperparameters / determine early stopping
+
+Procedure:
+
+Split data into outer folds
+For each outer fold:
+run inner CV on the training portion
+determine hyperparameters / best iteration
+retrain on the full outer-training data
+predict on the outer-validation fold
+Combine outer-fold predictions into OOF
+
+This ensures that no sample is used, directly or indirectly, to tune the model that predicts it.
+
+However, the computational cost becomes extremely large, especially when managing around 150 OOFs.
+
+10.4 Practical Trade-Off in Kaggle
+
+In practice, especially in Kaggle:
+
+fully nested CV is often too expensive
+early stopping within standard K-Fold is widely accepted
+leakage risk is controlled by limiting model flexibility and avoiding over-searching
+
+Realistic safeguards include:
+
+using fixed CV splits
+avoiding overly flexible meta-models
+limiting ensemble size
+checking CV–LB consistency carefully
+avoiding blind public LB chasing
+
+In many Playground competitions:
+
+train and test distributions are very similar
+training data is larger than test data
+
+Under those conditions, a well-designed validation scheme is often more reliable than public LB movement alone — but only if the CV–LB relation remains healthy.
+
+10.5 Practical Takeaway
+
+Strictly speaking, Nested K-Fold is the only fully leakage-free solution when:
+
+hyperparameter tuning
+early stopping
+model selection
+ensemble selection
+
+are all involved.
+
+But in real competitions, the practical goal is:
+
+Minimize leakage risk and overfitting while preserving a stable CV–LB relation.
+
+In my case, I prioritized:
+
+fixed StratifiedKFold splits
+controlled ensemble size
+simple Ridge stacking
+monitoring CV–LB behavior through actual submissions
+not blindly trusting the highest CV
+
+That balance between theory and practicality was, I believe, one of the keys to finishing in 1st place.
+
+Closing
+
+This competition was a great reminder that ensembling is not just about adding more models.
+
+It is about:
+
+generating meaningful diversity
+selecting carefully
+keeping validation honest
+and knowing when not to trust a tiny CV gain
+
+In the end, my best raw CV was not my best decision.
+
+The winning decision came from trusting the CV–LB relation, not the leaderboard, and not the single highest CV in isolation.
+
+Author
+Masaya Kawamata
+
+masayakawamata
+
+arrow_drop_up
+202
+Share
+more_horiz
+Project Links
+S6E2 | Single RealMLP
+
+9 months ago · 63 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Best Single model
+
+Citation
+
+Masaya Kawamata. 1st Place Solution — Diversity, Selection, and Trusting the CV–LB Relation. https://www.kaggle.com/competitions/playground-series-s6e2/writeups/1st-place-solution-diversity-selection-and-t. 2026. Kaggle
+
+15
+22
+10
+comment
+52 Comments
+2 appreciation comments
+Hotness
+Chris Deotte
+
+Posted 8 months ago
+
+· 69th in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+Congratulations @masayakawamata winning 1st place solo! You built many great models and You did a fantastic job being careful not to overfit. Since this competition was decided in the 5th decimal place, it was especially important to be careful to avoid even the slightest overfitting (which you did fantastically).
+
+I particularly like how you analyzed the CV-LB relation and decided that
+
+Because of this, I decided to select my final submission from the range around:
+CV 0.95578 to 0.95580
+
+This is a great technique. I didn't think to do this. My first final submission ensemble had CV 0.95583 and I called it my "safe one". My second one had CV 0.95588 and it was my "aggressive one". After reading your post and reviewing my work, I believe both of my submissions were too aggressive.
+
+If I remove one potentially overfit model, then the ensemble CV drops to 0.95581 and the private LB improves to 0.95534 top20. So this also supports your conclusion of the range CV 0.95578 to 0.95580
+
+Thanks for all your helpful sharing during the competition. You reminded everyone to "Trust Your CV: A Robust Ensemble Strategy" in your discussion here. And I enjoyed learning something new about NN embeddings here and I enjoyed your insightful experiments on fold number here
+
+reply
+Reply
+Masaya Kawamata
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you so much! — your comment truly means a lot to me.
+And thank you as well for sharing your CV/LB analysis and even summarizing my discussion so thoughtfully.
+
+Honestly, a huge part of what I’ve learned on Kaggle — and what made this result possible — comes from your notebooks and discussions. That’s not an exaggeration. I’ve learned so much from your work, and I’m sure I’ll continue to do so!
+
+I’m really grateful for everything you share with the community. I’ll definitely keep looking up to your insights (like a teacher, if I may 🙂).
+
+reply
+Reply
+Tilii
+
+Posted 8 months ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+It warms my heart both that you won, and that you used genetic programming. Congratulations!
+
+Great explanation of the whole process. Good thing you didn't have the time, or who knows how long this would be 😉
+
+reply
+Reply
+Masaya Kawamata
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you so much! — your words genuinely make me happy.
+I still remember your comment after the October competition. Your warm feedback on my S5E10 solution stayed with me, and honestly, it helped me keep going.
+
+And regarding GP, the inspiration undeniably came from your October approach. So this result is definitely built on what I learned from you.
+
+Thank you again for your continued encouragement!
+
+reply
+Reply
+Wenlei Cao
+
+Posted 8 months ago
+
+· 99th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@masayakawamata, congrates for your first place. well worth it.
+I learned a lot from your writeup. I have two questions if you don't mind.
+
+I have some troubles using ridge ensemble. It works well when the metrics is rsme. This comp is using AUC. so I assume you use RidgeClassifier, am I right?
+I use TabM and RealMLP both, on my hand, TabM perform much better. I suspect I did not use RealMLP correctly. do you have a reference notebook for RealMLP? how do you tune it? using optuna?
+thanks in advance.
+Wenlei
+reply
+Reply
+
+This comment has been deleted.
+
+Masaya Kawamata
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks a lot, Wenlei — I’m really glad the write-up was helpful.
+
+About the ensemble: no, I did not use RidgeClassifier.
+
+What I used was essentially ridge regression on the OOF predictions. In other words, the ensemble weights are learned by minimizing a squared-error objective with L2 regularization, not by optimizing AUC directly. So yes, AUC is only used for evaluation/selection here, not as the training objective of ridge itself.
+
+If you want to optimize the blend more directly for AUC, a hill-climbing style search over weighted averages is arguably more aligned with that goal. However, in this competition, I felt that aggressive weight search tended to overfit quite easily, probably because the dataset was fairly noisy. That impression came mainly from the relationship I saw between CV and public LB. In that kind of setting, ridge often acts as a more conservative and stable blender than HC, since it shrinks weights instead of fitting them too aggressively. I also checked actual submissions, and in my experiments ridge looked more stable than HC on both public and private LB at similar CV levels.
+
+For RealMLP: the official RealMLP_HPO_Classifier is very convenient and efficient, since it performs a nicely vectorized hyperparameter search. I used that, and I also ran separate Optuna searches. For the search space, I mainly relied on the TabArena paper plus my previous experiments. One setting that felt especially helpful for prediction stability was using n_ens=8.
+
+I also published a single RealMLP notebook that reached CV 0.955739 / LB 0.95534:
+here
+
+Hope it helps at least as a reference.
+
+reply
+Reply
+Wenlei Cao
+
+Posted 8 months ago
+
+· 99th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thanks, @masayakawamata, that is good insight. I will give a try on my end. again, congrates!
+
+reply
+Reply
+1
+Durga Kumari
+
+Posted 8 months ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the win🎊 fantastic .
+The idea of selecting the final submission based on CV–LB behavior rather than peak CV is extremely insightful.
+
+I’m curious whether you noticed consistent structural patterns among Optuna-selected OOF subsets, or if multiple different ensembles achieved similar CV?
+
+reply
+Reply
+Masaya Kawamata
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you very much!
+
+Basically, there was a fairly stable core: around 10–13 OOFs were selected in all 10 patterns. My impression is that the remaining 5–7 OOFs changed across patterns and served as the main source of diversity.
+
+So while the overall structure was quite consistent, there were also multiple slightly different ensembles that ended up with very similar CVs.
+
+reply
+Reply
+DavidAror
+
+Posted 8 months ago
+
+arrow_drop_up
+2
+more_vert
+
+This was a very insightful editorial and I found your use of autogluon very innovative. congrats!
+
+reply
+Reply
+David Holzmüller
+
+Posted 8 months ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! For TabICL, did you use TabICLv2?
+
+reply
+Reply
+Masaya Kawamata
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you!
+In this competition, within my experiments, RealMLP was the strongest model both in CV and on Public/Private LB.
+Yes, I used TabICL v2.
+Ideally I wanted to train on the full dataset without subsampling, but due to GPU memory limits, I trained on 100k-sized subsamples and repeated this 5 times.
+
+reply
+Reply
+David Holzmüller
+
+Posted 8 months ago
+
+arrow_drop_up
+2
+more_vert
+
+did you hit GPU memory limits even with CPU/disk offloading? or did you disable the offloading?
+
+reply
+Reply
+Masaya Kawamata
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It’s quite possible that this was due to limitations in my implementation — I suspect that might be the case.
+
+I did try CPU/disk offloading. Based on the paper, I expected the full dataset to run on an A100 40GB/80GB without too much trouble, so I initially thought it should be feasible.
+
+However, when I used the full dataset, I still ran into OOM errors. Increasing the subsample size (e.g., around 400k) technically worked, but the training time became extremely long and didn’t feel very practical in a competition setting.
+
+So in the end, I decided to stick with 100k subsamples repeated multiple times.
+
+reply
+Reply
+Robina Mirbahar
+
+Posted 8 months ago
+
+· 2263rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on getting the first place
+
+reply
+Reply
+1
+Akafi hirsi
+
+Posted 8 months ago
+
+· 48th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi @masayakawamata, congratulations for your first place, very helpful writeup.
+And also thanks for the ideas and advices that share in every competition, learned a lot from you.
+
+reply
+Reply
+1
+benkerrouche abdelbasset
+
+Posted 8 months ago
+
+· 33rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi @masayakawamata, congratulations for your first place
+
+reply
+Reply
+Masaya Kawamata
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you so much!
+Honestly, this result wouldn’t have been possible without what I learned when we teamed up for the image competition. Trying various MLP architectures back then helped me a lot this time as well.
+
+I really appreciate it — thank you again!
+
+reply
+Reply
+1
+Samy Ruiz
+
+Posted 8 months ago
+
+· 1611th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on getting the first place in the competition!
+Your Wripe-up is very insightful. I have discovered new useful approaches in your Feature Engineering section.
+Thank you!
+
+reply
+Reply
+1
+AtypicalNLP
+
+Posted 8 months ago
+
+· 507th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks so much for sharing your insights on the CV-LB relation! This is my first time participating in the Playground Series, and I’ve learned a tremendous amount from your work and explanations, @masayakawamata .Really appreciate it!
+
+reply
+Reply
+1
+Debalina Mitra
+
+Posted 8 months ago
+
+· 3210th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your first place!
+It was my first participation in any public competition on kaggle and the tips and tricks you have shared on your notebook is good learning for me. Thanks for sharing!
+
+reply
+Reply
+1
+Optimistix
+
+Posted 8 months ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats once again! Great writeup, and thanks for all the code and insights, as always.
+
+reply
+Reply
+1
+jonas
+
+Posted 7 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Awesome solution and writeup!!
+
+reply
+Reply
+Pradeep Kumar
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation on the Win!!
+
+reply
+Reply
+Utkarsh Karn
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the amazing 1st place solution! 🎉
+I really enjoyed reading this write-up. The emphasis on model diversity, careful OOF selection, and especially the idea of trusting the CV–LB relationship instead of blindly chasing the highest CV was extremely insightful.
+
+Your explanation about ensemble selection with Optuna and the practical discussion around validation design and potential leakage were particularly valuable. It’s impressive how a relatively simple meta-model like Ridge, combined with disciplined selection, can outperform more complex approaches.
+
+Thank you for sharing such a detailed and thoughtful solution this is incredibly helpful for the community and for learners trying to understand how strong tabular solutions are built.
+
+reply
+Reply
+Navneet
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Bravo & all the best @masayakawamata
+
+reply
+Reply
+Jonathan Harrison
+
+Posted 8 months ago
+
+· 1503rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats great work!!!
+
+reply
+Reply
+1
+Bhawesh Sinha
+
+Posted 8 months ago
+
+· 370th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!!
+
+reply
+Reply
+1
+
+This comment has been deleted.
+
+Aishwarya Sharma
+
+Posted 8 months ago
+
+· 2670th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I spent around an hour with GPT to understand each concept you mentioned in your write up. This was a superb learning lesson for someone like me. Thank you so much !
+
+reply
+Reply
+ansomonium
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning! Your emphasis on ensembles is motivating and thank you.
+
+reply
+Reply
+Kawthar
+
+Posted 8 months ago
+
+· 875th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on securing 1st place @masayakawamata ! Your write-up is super insightful and interesting; I learned so much from it. Reading it has me excited to dive deeper into these techniques, and I can't wait to see more of your work.😊
+
+reply
+Reply
+Mirko
+
+Posted 8 months ago
+
+· 26th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats again @masayakawamata! Your approach to OOF Selection with Optuna and Ridge Ensemble is brilliant—I’ve been manually checking my Ridge ensemble CV to decide which models to keep, but automating that with Optuna is a much more robust strategy. I unfortunately deleted some of my early P6E2 experiments, but I’ll definitely be adopting this workflow moving forward.
+
+I’d also love a clarification on the 'ORIG+TE+EMB' setup: Is the EMB (embeddings) a specific internal parameter of the RealMLP architecture you are using, or a custom preprocessing step?
+
+Lastly, your point on Nested K-Fold as the 'Strict Solution' for early stopping is spot on. I have to try it—it seems essential for avoiding that subtle leakage.
+
+reply
+Reply
+Drei Enriquez
+
+Posted 8 months ago
+
+· 893rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your win! I'm new to Kaggle Competitions and I appreciate how detailed you explained your thought process and way of solving this problem. I see some similarities with my own solution which is a good affirmation that I am walking towards the correct path. Looking forward to further learning and understanding. Great job! 👏👏👏
+
+reply
+Reply
+ELMIR
+
+Posted 8 months ago
+
+· 345th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I fully agree with you, in almost all competitions, the ability to assemble an ensemble of different models, simple or complex, with different parameters trained on different folds, provides a reliable solution in terms of generalization. Congratulations on your top 1 ranking🤙🤙🤙🤙🤙🤙🤙🤙🤙🤙🤙🤙🤙🤙🤙
+
+reply
+Reply

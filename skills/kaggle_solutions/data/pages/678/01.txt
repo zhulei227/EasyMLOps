@@ -1,0 +1,741 @@
+url: https://www.kaggle.com/c/playground-series-s5e11/writeups/1st-place-a-lot-of-features-a-lot-of-models-an
+fetched: 2026-10-27
+chars: 15140
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place - A lot of features, a lot of models, and a little bit of luck — Predicting Loan Payback
+1st place - A lot of features, a lot of models, and a little bit of luck
+
+Predicting Loan Payback
+
+Solution Writeup · 1st place · Dec 1, 2025
+
+Wow! I have always dreamed of getting 1st place and it has finally come true :D. Congrats to everyone who managed to outperform the blind blending notebooks (which for some reason did quite well on private) and many thanks to the people who shared their code and insights including but not limited to: @cdeotte, @masayakawamata, @yekenot, @yeoyunsianggeremie, @jklol86, @mikhailnaumov.
+
+Now onto my solution:
+
+FE
+
+This was probably the most important part of the competition. My best single model has CV 0.92818 LB 0.92923 which would have placed 2nd! It uses the following features:
+
+Combination of base features (pairs) + TE/CE
+Digits of numerical features
+Combination of digits between each numerical feature (pairs, triples, quadruples) + TE/CE. This means I create interaction features between each feature's digits only
+Round features from here
+Some combination of digits and base features
+Some combination of digits from different base features
+TE/CE of base features + some digits on the original dataset
+TE of base features on the original dataset using 'employment_status' as the target
+TE of base features on the train dataset using 'employment_status' and 'debt_to_income_ratio' as the target
+
+Misc. features that improved CV by very little:
+
+Quantile binned numericals
+a 'default_risk' feature I found somewhere
+a categorical version of 'credit_score' (I was going to try out doing this with other numerical features but I sort of forgot)
+
+I know that some of these may be hard to understand so I will publish my best single model code soon (UPD: the notebook can be found here)
+
+Models
+
+I will elaborate on this part later as I am a bit busy but in short, my ensemble has a grand total of 100 models :D!
+
+UPD: The models and their scores (of the best model) as follows:
+
+Model type	CV	Public LB	Private LB
+XGBoost	0.928175	0.92831	0.92923
+LightGBM	0.928081	0.92818	0.92920
+RealMLP	0.927952	0.92812	0.92906
+TabM	0.927833	0.92805	0.92895
+LightGBM-dart	0.927772	0.92822	0.92920
+CatBoost	0.927656	0.92806	0.92899
+XGBoost (reg)	0.927334	0.92789	0.92857
+DANet	0.926766	0.92776	0.92867
+Resnet	0.926557	0.92713	0.92798
+Logistic Regression	0.926291	0.92669	0.92757
+LAMA-DenseLight	0.926145	NA	NA
+Trompt	0.926000	0.92616	0.92756
+Gandalf	0.925989	0.92741	0.92808
+Bartz	0.925944	0.92703	0.92802
+FTTransformer	0.925272	0.92576	0.92704
+Random Forest	0.925079	0.92549	0.92643
+DeepFM	0.924872	0.92537	0.92645
+TabulaRNN	0.924809	0.92587	0.92706
+LNN	0.924702	0.92537	0.92656
+LAMA-Dense	0.924601	0.92535	0.92643
+ExcelFormer	0.923880	0.92379	0.92503
+ModernNCA	0.923170	0.92332	0.92440
+Extra Trees	0.922104	0.92424	0.92549
+
+You might have noticed that some models's scores are pretty terrible. My strategy for this comp was to train as many diverse models as possible and not spend that much time tuning them. I feel like I should change this strategy a bit next comp
+
+Ensembling
+
+Ridge and HC were the best ensemblers in this comp, with HC being slightly better on CV but about the same on PB. I tried stacking with non-linear models like LGBM/CB/different NNs but they were much worse than linear methods.
+
+Conclusion
+
+The formula for getting in top 3 remains the same: a lot of models and a trick or two (which in this case was a lot of FE). As always, happy Kaggling!
+
+Author
+Mahog
+
+mahoganybuttstrings
+
+arrow_drop_up
+94
+Share
+more_horiz
+Project Links
+PG S5E11 - XGB - [CV 0.92818 PB 0.92923]
+
+a year ago · 174 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Citation
+
+Mahog. 1st place - A lot of features, a lot of models, and a little bit of luck. https://www.kaggle.com/competitions/playground-series-s5e11/writeups/1st-place-a-lot-of-features-a-lot-of-models-an. 2025. Kaggle
+
+9
+25
+6
+comment
+43 Comments
+6 appreciation comments
+Hotness
+Yogesh kumar
+
+Posted a year ago
+
+· 2837th in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+Congrats man,
+
+CV → Cross-Validation
+LB → Leaderboard
+PB → Private Leaderboard
+FE → Feature Engineering
+TE → Target Encoding
+CE → Count Encoding (or Frequency Encoding)
+HC → Hierarchical Clustering (used for ensembling)
+LGBM → LightGBM
+CB → CatBoost
+NNs → Neural Networks
+UPD → Update (edited later)
+
+just jotting for my own reading
+
+reply
+Reply
+9
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+One correction: HC means hill climbing
+
+reply
+Reply
+4
+Yogesh kumar
+
+Posted a year ago
+
+· 2837th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thanks bro, where did you read these many algorithms - is it all in the handson ml book?
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+I have not read a single ML book, all my knowledge comes from Kaggle :D
+
+reply
+Reply
+2
+Yogesh kumar
+
+Posted a year ago
+
+· 2837th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+that's really amazing bro, give me some pro tips, i am new here
+
+reply
+Reply
+Tilii
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Thanks for providing the notebook. I tested it with my fold splits. I get different CV scores which is not surprising, but the same private LB score (see the bottom line in the image below).
+
+The next thing I was curious about is whether you have so thoroughly engineered the features in your best model that your ensemble score was pretty much the ceiling. It turns out that's not the case. You can see the ensemble score I get (top line in the image above) after adding your best model to what I have, and it is a nice improvement. The first 5 models that are added to yours are all CatBoost or FMs on either all or mostly categorical features. That accounts for pretty much all the improvement, as the next 20 models add barely 0.00003 on top of that.
+
+I think a change should be made in your notebook that doesn't affect the prediction, but would mess up ensembling. Because you have 20 fold splits in the notebook, this line:
+
+pred /= 5
+
+
+should presumably be:
+
+pred /= 20
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Oh crap, that's why my submission files had values bigger than 1 :V. Your models are really diverse though, my first iteration of HC only improves by 0.00013, and only 0.00025 after 5 iterations
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wait a second, your ensemble has the same CV as mine but private is 0.0001 better?
+
+reply
+Reply
+Tilii
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+From what you write above your scores are CV 0.92818 LB 0.92923. With my fold splits, they are CV 0.928071 private LB 0.92923. After hill climbing, CV 0.92853 private LB 0.92947.
+
+In my hill climbing runs models that are based exclusively or primarily on categorical variables are picked in top 5, but the climb starts with the best XGB model which is based on light FE and TE. The same thing happens with your model as a starting point - most of the improvement comes from categorical models, and then the rest contribute only a tiny amount. I get ~0.0007 CV ensemble improvement from my models alone, and from your model a still respectable ~0.00045 boost.
+
+reply
+Reply
+5 more replies
+arrow_drop_down
+Yogesh kumar
+
+Posted a year ago
+
+· 2837th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+bro this is comment section not notebook 😭
+
+reply
+Reply
+4
+Chris Deotte
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @mahoganybuttstrings winning 1st place solo! This is a fantastic achievement!
+
+And i'm impressed to hear that your single model would achieve 2nd place. That is an awesome model CV 0.92818 LB 0.92923
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! I finally know what its like to be in your shoes :D
+
+reply
+Reply
+1
+Optimistix
+
+Posted a year ago
+
+· 9th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+More like my shoes, or those of someone like me - I do know what if feels like to win a playground competition, but I have no idea what it feels like to be a quadruple (or even single-category) Grandmaster 😀
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+That's a fair point, maybe I should say half a shoe :D (probably even less)
+
+reply
+Reply
+3
+Optimistix
+
+Posted a year ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on a well-deserved victory with a big lead for most of the month! Like @masayakawamata said, it was only a matter of time, as you have been placing high on a consistent basis for a while now.
+
+reply
+Reply
+Navneet
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+I look forward to seeing your notebook. @mahoganybuttstrings
+
+reply
+Reply
+Tilii
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations - you were due for it! You were reeled in, but still a clear win. It was somewhat of a repeat of S5E8, when you were the one doing the reeling in. You and @angelosmar1 found some features that the rest of us didn't, and that's what created a gulf between the 2nd and 3rd place. I look forward to seeing your notebook.
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks and congrats on 6th place! This competition did remind me of S5E8 a lot
+
+reply
+Reply
+Ali_Haider_Ahmad
+
+Posted a year ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Really happy for you.
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks and congrats on 4th place despite joining late!
+
+reply
+Reply
+Masaya Kawamata
+
+Posted a year ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on a truly well-deserved first place!
+Given your consistent and solid performance in every competition, I always believed it was just a matter of time until you achieved this top result. I'm especially amazed by the fact that you were able to develop such a powerful single model(CV 0.92818 LB 0.92923)…!
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks and congrats on 5th place! You are also extremely consistent and I believe you will get 1st place very soon!
+
+reply
+Reply
+Navneet
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Bravo, man and all the best @mahoganybuttstrings
+
+reply
+Reply
+Irakoze Ntawigenga Kelly
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank for sharing this knowledge, it looks like hard working pays!
+
+reply
+Reply
+Eunji Goo
+
+Posted a year ago
+
+· 973rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing! The preprocessing is truly brilliant!
+
+reply
+Reply
+Samith Chimminiyan
+
+Posted a year ago
+
+· 547th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!!!. Well deserved.
+
+reply
+Reply
+GurSimran
+
+Posted a year ago
+
+· 412th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your well-deserved win!! 🤩🤩🥳🥳
+
+From your write-up, i could understand only about 20-30%, which shows that there is so much for me to learn and explore. I'm really looking forward to studying the methods you used in this competition, as they clearly stand out from the rest. Thank you for sharing your work and experience.
+
+I'd love to hear more starting tips you'd recommend based on your experience in this competition and previous ones….
+
+reply
+Reply
+Aqiba Farman
+
+Posted a year ago
+
+· 754th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your big win. Thanks for sharing the notebook. Looking forward to break it down and develop a better understanding.
+
+reply
+Reply
+Navneet
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+BRAVO! SuperDuper
+excellent
+
+reply
+Reply
+Farhad Mohseni
+
+Posted a year ago
+
+· 348th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats for the well deserved first place, I'm just shocked how strong your single XGB is.
+The lesson learned for me was how important feature engineering and understanding the data can be.
+Thanks for sharing your notebook!
+
+reply
+Reply
+gitbyjay25
+
+Posted a year ago
+
+· 1104th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations … & ur approach with trying with small group of features has definetly gave u the best features…
+
+reply
+Reply
+Ankush
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Hey, congrats on the win — that’s amazing!
+And wow, 100 diverse models in your ensemble? That’s a massive setup!
+
+You mentioned that some of the models didn’t perform very well and that you might focus more on tuning next time. That got me wondering: in your experience, what’s the better approach for a competition like this — training a smaller number of well-tuned models (say, around 10 using something like Optuna), or building a huge ensemble of many diverse but lightly-tuned models like you did here?
+
+reply
+Reply
+Shreeram kumar singh
+
+Posted a year ago
+
+· 1373rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Heartiest congratulations on your well-deserved win.
+
+reply
+Reply
+kobby_
+
+Posted a year ago
+
+· 299th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Amazing win @mahoganybuttstrings, and for maintaining your spot from the start. Interestingly, even your single best model would still place 2nd. I was quite absent in this competition, with only 5 submissions. The 5th submission was a quick hillclimb of 4 models (one of them being the amazing bartz notebook you shared) and scored LB = 0.92758 and PB = 0.92880. Once again, Congrats!
+
+reply
+Reply
+ishimasuka
+
+Posted a year ago
+
+· 1356th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congrats man. really inspired by the work!
+
+reply
+Reply
+Mikhail Naumov
+
+Posted a year ago
+
+· 14th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on 1st place. That was incredible work. It's amazing how a complex FE and one strong model achieved such a result. How were the features selected?
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks and congrats on 14th! I just add a small group of features at a time and if they improved CV, I kept them
+
+reply
+Reply
+Jeremiah Adebayo
+
+Posted a year ago
+
+· 964th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats man, looking forward to the breakdown of models you used
+
+reply
+Reply
+Ladipo Samson
+
+Posted a year ago
+
+· 1957th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Massive congratulations — this 1st place is truly well-deserved. 🎉👏
+
+I’m still growing in this field myself, I hope that one day I’ll be able to reach this level of mastery and maybe chase a leaderboard top spot too.
+
+reply
+Reply

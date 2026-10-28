@@ -1,0 +1,343 @@
+url: https://www.kaggle.com/c/tabular-playground-series-may-2022/discussion/328336
+fetched: 2026-10-27
+chars: 7022
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+#1 Solution: A Two-Branch Network — Tabular Playground Series - May 2022
+#1 Solution: A Two-Branch Network
+
+Tabular Playground Series - May 2022
+
+Solution Writeup · 1st place
+
+Our solution is a blend of some variants of the following two-branch network:
+
+How did we arrive at this solution? The introductory text of the competition gives a hint: … includes a number of different feature interactions. This competition is an opportunity to explore various methods for identifying and exploiting these feature interactions. Few people knew what to do with this hint. Fortunately, @sudalairajkumar showed us how to identify the feature interactions with Xgbfir. He even produced a dataset listing all interactions found by the tool.
+
+On the back of an envelope, I constructed a graph of these interactions. The graph had two connected components:
+
+The key idea then was that we needed a network which restricted feature interactions to the connected components of the graph (other interactions produce noise). The two-branch network implements this idea. The left branch learns the interactions among ['f_00', 'f_01', 'f_02', 'f_03', 'f_04', 'f_05', 'f_06', 'f_19', 'f_20', 'f_21', 'f_22', 'f_23', 'f_24', 'f_25', 'f_26', 'f_28', 'f_30', 'ch7'], the right branch processes ['f_07', 'f_08', 'f_09', 'f_10', 'f_11', 'f_12', 'f_13', 'f_14', 'f_15', 'f_16', 'f_17', 'f_18', 'f_29', 'ch0', 'ch1', 'ch2', 'ch3', 'ch4', 'ch5', 'ch6', 'ch8', 'ch9', 'unique_characters', 'i_02_21', 'i_05_22', 'i_00_01_26']. Except for the two-branch architecture, our final implementation doesn't differ from the Advanced Keras notebook.
+
+We worked on a decision tree model as well. Restricting the feature interactions with the hyperparameter interaction_constraints=[features_left, features_right] helped LightGBM reach an lb score of 0.99778, but this was not enough to be included in the blend.
+
+Special thanks go to @cabaxiom for introducing the unique_characters feature, to @wti200 for showing how to analyze feature interactions, to @sudalairajkumar for publishing the Xgbfir output, and of course to @pourchot who with great persistence optimized our network architecture.
+
+Authors
+AmbrosM
+
+ambrosm
+
+Laurent Pourchot
+
+pourchot
+
+arrow_drop_up
+53
+Share
+more_horiz
+Citation
+
+AmbrosM, Laurent Pourchot. #1 Solution: A Two-Branch Network. https://www.kaggle.com/competitions/tabular-playground-series-may-2022/writeups/the-team-1-solution-a-two-branch-network. 2022. Kaggle
+
+comment
+20 Comments
+Hotness
+Laurent Pourchot
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+Hi @ambrosm , it was a fruitful collaboration, you gave the best ideas and I tuned it. I have just published the solution here : https://www.kaggle.com/code/pourchot/tpsmay22-keras-test-tuned The solution was blended in the last days to reach the highest score.
+
+reply
+Reply
+casati8
+
+Posted 4 years ago
+
+· 175th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hallo Laurent,
+
+thank you for sharing your solution. I have a question for you: The values of the predicted targets for the submission are greater than 1. I don't understand why and did you modified these values before the submitted your predictions? My solution produces predicted target values between 0 and 1 and in the description of this competition they say: ".. to predict whether the machine is in state 0 or state 1". My assume that the predicted target values must be in the interval [0..1].
+
+Regards Egbert
+
+reply
+Reply
+Laurent Pourchot
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hello @casati8 , the AUC metric is sensitive to the ranking. I would recommend to read :https://www.analyticsvidhya.com/blog/2020/06/auc-roc-curve-machine-learning/
+
+reply
+Reply
+SRK
+
+Posted 4 years ago
+
+· 123rd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations @ambrosm on the first place finish. Glad that the xgbfir dataset helped.
+
+Also, thanks to all your notebooks and discussion posts in this competition. They are very helpful for all of us.
+
+reply
+Reply
+Chirag Desai
+
+Posted 4 years ago
+
+· 399th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation @ambrosm for getting first place and thanks for explaining the solution. It seems I am very far away from what you guys are doing and capable of 😃.. log way to catch up ..
+
+reply
+Reply
+Ravi Shukla
+
+Posted 4 years ago
+
+· 238th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @pourchot and @ambrosm for winning this competetion. You people truly deserved it. Thanks for providing your winning approach!!
+
+reply
+Reply
+Laurent Pourchot
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @raviista , you re welcome !
+
+reply
+Reply
+Chayan Shrang Raj
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Awesome solution! Very creative! Thanks for sharing! @ambrosm
+
+reply
+Reply
+Adam Wurdits
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations to both of you and thanks for sharing this mind-boggling solution!
+
+reply
+Reply
+Anand Parthiban
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I liked how this solution is presented, and especially like the picture of drawn graph on the envelope. It feels like it gives some insight into your thoughts and problem-solving.
+
+reply
+Reply
+Maximiliano Diaz Battan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Ambros and Pourchot together, hard to beat that team. Thank you very much for being so generous to share your solution, it's quite ingenious. Cogratulations!
+
+reply
+Reply
+Laurent Pourchot
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi @maxdiazbattan , muchas gracias ! 😉 this month was very interesting with lesson on the interaction we all learned.
+
+reply
+Reply
+DeeperNet
+
+Posted 4 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! I have learned so much from you! Thanks.
+
+reply
+Reply
+ArturRa
+
+Posted 4 years ago
+
+· 114th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Brilliant idea, nice solution, laconic report. Congratulations!
+
+reply
+Reply
+Samuel Cortinhas
+
+Posted 4 years ago
+
+· 187th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats both. It's a very creative solution!
+
+reply
+Reply
+Laurent Pourchot
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @samuelcortinhas , thank you
+
+reply
+Reply
+aldparis
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations to you both !
+
+reply
+Reply
+Laurent Pourchot
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@adaubas , merci pour nous 😊
+
+reply
+Reply
+man fau
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+big congratulations. Kudos!!!
+
+reply
+Reply
+Uche
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+👏🏽 Congratulations
+
+reply
+Reply

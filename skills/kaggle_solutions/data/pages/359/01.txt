@@ -1,0 +1,45 @@
+url: https://www.kaggle.com/c/pku-autonomous-driving/discussion/127037
+fetched: 2026-10-27
+chars: 527
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Peking University · Featured Prediction Competition · 7 years ago
+Late Submission
+more_horiz
+Peking University/Baidu - Autonomous Driving
+
+Can you predict vehicle angle in different settings?
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Failed to load the discussion topic

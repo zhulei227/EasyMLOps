@@ -1,0 +1,109 @@
+url: https://github.com/diefimov/amazon_employee_access_2013
+fetched: 2026-10-27
+chars: 6298
+
+GitHub - diefimov/amazon_employee_access_2013: solution of our team Dmitry&amp;Leustagos for Amazon competition (3rd place) · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ diefimov amazon_employee_access_2013 Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ amazon_employee_access_2013 Public Notifications You must be signed in to change notification settings Fork 26  ( 26 ) Star 30  ( 30 ) You must be signed in to star a repository About solution of our team Dmitry&amp;Leustagos for Amazon competition (3rd place) Resources Readme Activity Stars 30 stars Watchers 5 watching Forks 26 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 28 Commits 28 Commits Folders and files Name Name Last commit message Last commit date data data     libfm libfm     log log     lr lr     output-R output-R     README.md README.md     [01]train.gbm.freq.hom2.R [01]train.gbm.freq.hom2.R     [01]train.gbm.freq.hom3.R [01]train.gbm.freq.hom3.R     [01]train.gbm.lme.R [01]train.gbm.lme.R     [01]train.gbm.occurs.R [01]train.gbm.occurs.R     [01]train.glmnet.R [01]train.glmnet.R     [01]train.glmnet2.R [01]train.glmnet2.R     [01]train.libfm.R [01]train.libfm.R     [01]train.lr.R [01]train.lr.R     [01]train.lr2.R [01]train.lr2.R     [01]train.rf.freq.R [01]train.rf.freq.R     [02]train.gbm.freq.hom5.R [02]train.gbm.freq.hom5.R     [02]train.gbm.occurs.xor.libfm.R [02]train.gbm.occurs.xor.libfm.R     [03]ensembling.R [03]ensembling.R     fn.base.R fn.base.R     logistic_regression.py logistic_regression.py     View all files Repository files navigation README More items Out solution for Amazon.com - Employee Access Challenge
+ https://www.kaggle.com/c/amazon-employee-access-challenge 
+3rd place, team Dmitry&amp;Leustagos, members: Lucas Silva, Dmitry Efimov 
+ License 
+ Copyright [2013] [Dmitry Efimov, Lucas Silva]
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0 
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 
+ How to use it 
+
+ The hardware / OS platform you used
+Windows 7 Professional x64 or Ubuntu (tested on 12.04) 
+
+ Any necessary 3rd-party software (+ installation steps) 
+
+ R 2.15.3 ( http://www.r-project.org/ )
+Packages: data.table, gbm, randomForest, glmnet, parallel, doSNOW, foreach, Metrics, cvTools, lme4, rlecuyer 
+ Python 2.6 ( http://www.python.org/download/releases/2.6/ )
+Packages: numpy, sklearn, scipy, itertools, pandas, sys, random, time 
+ libFM ( http://www.libfm.org/ ) 
+ How to train models and make predictions on a new test set 
+ The file list with description 
+
+ Files for models training:
+[01]train.gbm.freq.hom2.R
+[01]train.gbm.freq.hom3.R
+[01]train.gbm.lme.R
+[01]train.gbm.occurs.R
+[01]train.glmnet.R
+[01]train.glmnet2.R
+[01]train.libfm.R
+[01]train.lr.R
+[01]train.lr2.R
+[01]train.rf.freq.R
+[02]train.gbm.freq.hom5.R
+[02]train.gbm.occurs.xor.libfm.R 
+
+ File for the final ensembling
+[03]ensembling.R 
+
+ Python code for logistic regression
+logistic_regression.py 
+
+ File with helper functions
+fn.base.R 
+
+ To calculate model 
+
+ Copy initial train.csv and test.csv to the folder data. 
+ Copy libFM binary file (libfm.exe) to the folder libfm. 
+ Run all R files with prefix [01] (they can be run in parallel).
+To run any R file, open it in R GUI, set directory to the file location and run the code. 
+ Run all R files with prefix [02] 
+ Run [03]ensembling.R 
+ The file prediction.csv contains final prediction for the test set. 
+
+ About solution of our team Dmitry&amp;Leustagos for Amazon competition (3rd place) Resources Readme Activity Stars 30 stars Watchers 5 watching Forks 26 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

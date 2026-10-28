@@ -1,0 +1,418 @@
+url: https://www.kaggle.com/c/smartphone-decimeter-2022/discussion/341111
+fetched: 2026-10-27
+chars: 13319
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Google Smartphone Decimeter Challenge 2022
+1st Place Solution
+
+Google Smartphone Decimeter Challenge 2022
+
+Solution Writeup · 1st place
+
+I am very happy to have won first place in this competition again. I am a researcher in the GNSS and robotics fields, but last year's competition was very inspiring, with many different people working on ideas that I would never have thought of. I would be very happy if you could also share your solutions and ideas.
+
+Smartphone's GNSS observations are very noisy, and the output data has many missing and abnormal values, making it very difficult to estimate positions accurately. I also had difficulty dealing with the differences in observations for different types of smartphones. There were a lot of details to deal with and a lot to do, and I think this competition was unusual and tough for many of us.
+
+Overview
+
+The basic idea of my solution is the same as last year's: global optimization of position and velocity using pseudorange, pseudorange rate (Doppler), and ADR (carrier phase) by Factor Graph Optimization (FGO). For more on FGO, see last year's solution. The key point of this year's method, which contributed to the accuracy, was to separate the velocity and position estimation and process them in two stages. The flow of the proposed method is shown in the following figure. It has a very simple structure. 
+
+Input
+
+gnss_log.txt
+
+GNSS observation data and satellite orbit data (broadcast ephemeris) of base station
+
+For the GNSS base station, I used NGS CORS data at 30-sec intervals. I used a single base station, but I thought @saitodevel01's method of the ensemble of multiple base station analysis results might contribute to accuracy. I should have tried it…
+Velocity estimation stage
+
+Accurate relative position (velocity) can be calculated from ADR time differences, but availability is low because of vulnerability to signal shielding and frequent cycle slips. The velocity is estimated first using Doppler, which is more robust, and then outliers are removed, interpolated, and used as a loose constraint in the next stage of position estimation. At the same time, it can be used to determine that a vehicle is stopped. If velocity is included in the optimization at the same time as position, such interpolation and determination of the stop position become difficult. In the case of data with many missing outliers, elevations, tunnels, etc., it was very effective to estimate and correct the velocity at a separate stage. 
+
+Position estimation stage
+
+Position and receiver clock are estimated by optimizing a graph constructed using pseudorange corrected for bias components using a base station, ADR time difference, and the velocity estimated in the previous stage. For city driving data, where there are many pauses due to traffic signals, the observed pseudorange data at stops are eliminated from the velocity estimated in the previous stage. Between each state (position), the estimated velocity is used to constrain the relative position, and a highly accurate relative position constraint is added when ADR is valid. In addition, as an absolute position constraint, the pseudorange corrected by the base station is used. No post-processing is done and the position estimated by optimization is submitted as the final estimate. 
+
+Optimization
+
+As in the previous year, GTSAM were used. This time, we used a simple M-Estimator for robust optimization instead of Switchable Constraint, which we used last year. Switchable Constraint has the advantage of being able to visualize and tune the values of the weights, but it has the disadvantage of low convergence and processing time. Since the performance was almost the same, I used the M-Estimator with the Huber function, which is suitable for noisy smartphone GNSS observations because the weights are not completely zero. The processing time was about 30 minutes for the entire test data run, allowing for a lot of trial and error in a limited amount of time.
+
+Tips
+
+The device_gnss.csv has missing pseudoranges, so it was more accurate to convert the pseudoranges from gnss_log.txt by myself.
+
+As @saitodevel01 pointed out, there is a problem with Doppler timing misalignment in the XiaomiM8. Apparently, only the Doppler of the XiaomiM8 matches the Android system clock as well as the IMU, not the GPS clock. As noted in the discussion, the velocity was best estimated when an offset of 600 ms was added.
+
+The SamsongGalaxyS20 and XiaomiMi8 differ significantly from the other phones in terms of pseudorange rate and ADR uncertainty provided by the phone. I used a satellite elevation angle-based error model instead of the uncertainty provided by the phone.
+
+With respect to the interpolation method for the velocity, the Akima interpolation method was more accurate than using spline interpolation. Spline interpolation is not good for overshooting.
+
+When the HardwareClockDiscontinuedCount flag changes, cycle slips occur, and ADRs become discontinuous. This occurs only in some runs on Pixel4/4XL. Under these circumstances, ADRs are rarely available.
+
+Ideas that were tried and did not work
+
+Velocity estimation with accelerometer integration. I spent quite a bit of time, but as a result, I did not contribute to accuracy.
+
+Estimation of M-estimator hyper parameter by learning. Tried learning and dynamically applying the appropriate Huber function parameters according to the residuals of the observations but could not go beyond tuning the fixed parameters individually for each run.
+
+A method that optimizes the distance from each satellite individually. This would be so-called tightly coupled, which optimizes the distance and distance rate from each satellite instead of optimizing the position and velocity, but it did not work. I would like to try this as a research project because I feel it has potential.
+
+Other views on the competition
+
+It is regrettable that, as mentioned in this discussion, the mistake in the ground truth had no small impact on the competition. The host said that the test data was correct, but I doubt that the error can really be verified when lever arm offsets of several 10 cm are mixed in. This could be a big problem if we are competing with a difference of a few centimeters since the ground truth bias error directly affects the final leaderboard.
+
+The issue of invalid ADR (carrier phase) data on some GooglePixel 4/4XL runs was honestly something that could not be addressed; I feel that decimeter accuracy cannot be achieved without ADR. In the test data, there were problems with the /2021-08-12-US-MTV-1/GooglePixel4 and /2022-04-25-US-OAK-2/GooglePixel4, but I think these runs should have been excluded from the test data.
+
+I question the setup regarding the fact that the test data includes data that was run in a completely different region than the training data (e.g., runs of OAK and all runs of LAX). If machine learning is to be used in the solution, I believe that at least data that was run in the same region as the training data should have been provided.
+
+After the competition, I noticed that the coordinates of the base station had an offset… After correcting the offset, I made a late submission and got Public: 1.372, Private: 1.197. This is the best score so far. 
+
+If a similar competition is held next year, I am not sure if I will participate. I don't want to look at the GNSS logs on a smartphone for at least a while!
+
+Author
+Taro
+
+taroz1461
+
+arrow_drop_up
+72
+Share
+more_horiz
+Citation
+
+Taro. 1st Place Solution. https://www.kaggle.com/competitions/smartphone-decimeter-2022/writeups/taro-1st-place-solution. 2022. Kaggle
+
+comment
+22 Comments
+1 appreciation comment
+Hotness
+Akio Saito
+
+Posted 4 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you for sharing the solution. However, I think this solution alone does not seem to explain the large gap, especially for private LB. I believe the key to high accuracy is in the use of ADR. I found that ADR is relatively high accuracy, but still contains many outliers that may be due to undetected cycle slips and half cycle ambiguity. How does your "ADR Factor" address these issues?
+
+reply
+Reply
+Taro
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+The ADR observations were processed using the following procedure.
+
+(1) exclude invalid ADRs from the AccumulatedDeltaRangeState (2) exclude cycle slips of ADR from diff(ADR)-PseudorangeRate*dt
+
+Note that (2) includes receiver clock jumps. (2) values are shown in the following figure. As a threshold, I used 1.5 m. When Doppler's accuracy is poor, ADR is almost never obtained, so this will eliminate a significant amount of cycle slips. Of course, this still leaves half-cycle slips and outliers. However, the M-estimator can almost eliminate the influence of these outliers. 
+
+reply
+Reply
+Akio Saito
+
+Posted 4 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This graph clearly shows that outliers remain. And this method was included in your public notebook. I did not understand what the code meant.
+
+Thank you very much. And congratulations on your two consecutive victories.
+
+reply
+Reply
+ForcewithMe
+
+Posted 4 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Taro @taroz1461, King of GSDC 🔥
+
+reply
+Reply
+whoami-anoint
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow! Congratulations and thank you for sharing your thought process
+
+reply
+Reply
+Shadab Akhtar
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+I really like all the explanations and congrats on the results.
+
+reply
+Reply
+Old Monk
+
+Posted 4 years ago
+
+· 300th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Awesome writeup @taroz1461, thanks for sharing, however sad to read the last line, kindly do participate next year we need a hattrick from you :D
+
+reply
+Reply
+Lcy
+
+Posted 4 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I'm really curious about how you code the switchable constraints of GNSS. Is it possible to open source some of the code? Because the performance of the switchable constraint I implemented is far from that you implemented last year, sometimes there will be errors caused by local convergence. And thank you again for your solution, which goes beyond my understanding of GNSS!
+
+reply
+Reply
+Lcy
+
+Posted 4 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your excellent work. I've got a question for you. I tried to build motion factors in my FGO framework, but did not work.How are velocity factor and motion factor constructed, and whether they correspond to the following error functions?
+
+e_vel=pos(k+1)-pos(k)-vel(k)*dt，where pos is to be estimated, and vel has been estimated by Doppler/dAdr
+e_motion(1)=vel(k+1)-vel(k)-acc(k)*dt
+e_motion(2)=acc(k+1)-acc(k) Are both velocity and acceleration considered as states to be estimated here？
+
+And how much should their measurement noise be set?
+
+reply
+Reply
+Agustin222
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Excelent job, I really like all the explanation
+
+reply
+Reply
+Will
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow! Congratulations and thank you for sharing your thought process
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great working method and congrats for the results!
+
+reply
+Reply
+Yanbing Zhang
+
+Posted 4 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great work!
+
+I think it is challenging to switch between Doppler speed and ADR speed. Because they are not necessarily consecutive.
+
+reply
+Reply
+Egor Borisov
+
+Posted 4 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Cool! Thanks for sharing and for your public decision that helps me a lot
+
+reply
+Reply
+Beginnerrrrrr
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+You won the first place in both last year and this year's competition, and both adopted the method of factor graph optimization; However, it is difficult for a novice to build a factor graph optimization project for this competition, so I would like to ask if you can share a factor graph optimization demo for a better understanding of your solution. Thank you very much if you can reply!
+
+reply
+Reply
+Beginnerrrrrr
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@taroz1461
+
+reply
+Reply
+Mo Frank
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+😭+1😭+1😭+1
+
+reply
+Reply
+Gabriel Soares Arantes
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great coding and great explanation. Great job.
+
+reply
+Reply
+The Devastator
+
+Posted 4 years ago
+
+· 399th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+A well deserved solution! The Devastator.
+
+reply
+Reply
+Bulat Gizatullin
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thanks for sharing your ideas
+
+reply
+Reply
+MD. Arif Uz Zaman Badhon
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Awesome….
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (1)
+Omar ElSayed
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+thanks and congrats!

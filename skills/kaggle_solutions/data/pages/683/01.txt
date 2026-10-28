@@ -1,0 +1,816 @@
+url: https://www.kaggle.com/c/nfl-big-data-bowl-2026-prediction/writeups/public-3rd-solution
+fetched: 2026-10-27
+chars: 19728
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — NFL Big Data Bowl 2026 - Prediction
+1st Place Solution
+
+NFL Big Data Bowl 2026 - Prediction
+
+Solution Writeup · 1st place · Dec 4, 2025
+
+I would like to express my gratitude to the organizers for hosting such an exciting competition.
+Now, all I can do is hope that the submission passes the final tests.
+
+As I mentioned in another discussion, my model is trained only on the data provided in the “NFL Big Data Bowl 2026 – Prediction” competition.
+Achieving strong performance with such a limited dataset required powerful data augmentation, well-designed loss functions, and an effective model architecture.
+
+Train and inference notebook are here.
+https://www.kaggle.com/code/chack3/nfl2026-1st-place-inference
+https://www.kaggle.com/code/chack3/nfl2026-1st-place-train
+
+Solution Overview
+1. Feature Engineering
+1.1 Dynamic Features
+
+Use the 20 frames immediately before the pass.
+
+Extract the following 10-dimensional features for each frame:
+
+x, y
+sin(o), cos(o)
+sin(dir) * s, cos(dir) * s
+x - ball_land_x, y - ball_land_y
+x - receiver_x, y - receiver_y
+1.2 Static Features
+
+Total 12 dimensions:
+
+One-hot encoding of player_role (4 dims)
+Number of prediction frames (1)
+The number of frames before the pass used as input (1)
+Passer’s final-frame coordinates (2)
+Ball landing coordinates (2)
+Player’s final-frame coordinates (2)
+1.3 Target
+Predict the displacement (Δx, Δy) from the final input frame.
+The final trajectory is obtained by adding the predicted displacement to the final input coordinates.
+2. Model Architecture
+2.1 Overall Structure
+A play-level model handling up to 22 players.
+Player dimension is frequently reshaped/transposed into the batch axis.
+
+2.2 Dynamic Feature Encoder
+
+Input: (10, player, 20 frames)
+
+Output: (640, player, 1 frame)
+
+Depthwise Conv1d (kernel size = 3) × 7
+
+Each feature → 64 dims → concatenated into 640 dims
+
+No padding (to emphasize the last frame)
+
+20 frames → 5 frames → only the final frame is used
+
+2.3 Static Feature Encoder
+Input: (10, player)
+Output: (64, player)
+Conv1d(kernel=1) → BatchNorm → SiLU
+2.4 Merge Layer
+Concatenate dynamic features (640) + static features (64)
+Project to 256-dimensional player features
+2.5 Inter-player Interaction Layer
+Input: (256, player)
+Output: (256, player)
+Transformer Encoder × 3 layers
+Player masks for variable player counts
+FFN uses SwiGLU
+2.6 Decoder
+Input: (256, player)
+Output: (2, player, 48 frames) + 4 auxiliary outputs
+256 → 1536 → reshape → (32, 48 frames)
+Apply multiple Conv1d (kernel size = 3)
+Final projection: 32 → 2 (xy) + 4 (auxiliary terms)
+3. Training Setup
+3.1 Cross Validation
+Group 5-fold CV using game_id
+Perform 5-fold CV three times with different splits
+3.2 Optimization
+RAdam optimizer
+EMA with decay = 0.9995
+210 epochs, evaluated every 6 epochs
+4. Loss Functions
+4.1 Main Loss: GaussianNLLLoss
+Predicts both mean and variance
+Automatically downweights samples with large variance → robust learning
+Performed better than SmoothL1
+Frame-wise weighting provided no meaningful improvements
+Variance is constrained to positive values using:
+softplus(var) + 1e-3
+4.2 Auxiliary Loss
+
+Computed from predicted xy:
+
+Velocity (1st difference)
+Acceleration (2nd difference)
+
+Also uses GaussianNLLLoss
+
+Helps stabilize and accelerate learning
+
+5. Data Augmentation
+5.1 Rotation Augmentation
+50% chance to randomly rotate the entire play around the mean player position
+Rotation angle sampled uniformly from 0–360°
+Initially used a Gaussian distribution (σ = 5°),
+but increasing variance improved performance → switched to uniform
+Likely beneficial because the target depends on rotation-invariant relative positions
+5.2 Predicting From Earlier Frames
+
+Important for long-pass predictions
+
+Instead of starting prediction at pass-attempt frame,
+use up to 20 frames earlier
+
+The model thus predicts:
+
+(earlier frames) + (original prediction frames)
+
+Improves long trajectories significantly
+
+Add a static feature indicating “how many frames earlier”
+
+(always 0 during test)
+
+The upper diagram shows an example where the data consists of 30 input frames and 9 output frames.
+Blue indicates the portion of the input that is fed into the model, red indicates the data the model is asked to predict, and gray indicates data that is not used.
+
+When we want the model to start predicting from 5 frames before the pass, the configuration becomes as shown in the lower diagram.
+With this adjustment, the output becomes a 14-frame prediction.
+This procedure is applied to all players within a play using the same set of parameters.
+
+5.3 Vertical Flip
+Flip the play along the X-axis
+6. Data Processing
+6.1 Outlier Removal
+
+Remove plays with abnormal length or missing passer:
+
+too_long_ids  = ["2023091100_3167", "2023122100_1450"]
+no_passer_ids = ["2023091001_3216", "2023112606_4180", "2023121009_3594"]
+
+6.2 Other Processing
+If play_direction == left, rotate the play by 180 degrees
+7. Ensemble
+
+Use an ensemble of 100+ models
+
+All models share the same architecture
+
+Diversity arises from:
+
+Different feature configurations
+Different CV splits
+
+Ensemble method: simple average
+
+8. Ablation Study
+
+Changes in scores across epochs for each of the 5 folds.
+
+Looking at the results side by side, it’s interesting to see that rotation augmentation and early-frame prediction help reduce overfitting, the auxiliary loss stabilizes training, and GaussianNLLLoss contributes to improving accuracy.
+
+Author
+ohkawa3
+
+chack3
+
+arrow_drop_up
+149
+Share
+more_horiz
+Project Files
+table_chart
+2023100107_2612_s2.mp4
+get_app
+Download All
+Citation
+
+ohkawa3. 1st Place Solution. https://www.kaggle.com/competitions/nfl-big-data-bowl-2026-prediction/writeups/public-3rd-solution. 2025. Kaggle
+
+18
+comment
+29 Comments
+1 appreciation comment
+Hotness
+gezi
+
+Posted 10 months ago
+
+· 26th in this Competition
+
+arrow_drop_up
+10
+more_vert
+🎉 Congratulations and Ablation Analysis
+
+First of all, congratulations on achieving 3rd place on the LB and currently ranking 1st in the PB rerun!
+
+Thank you so much for your generous sharing - I learned a tremendous amount from your solution. Your selfless decision to share the complete training code also helped me identify my biggest bug. To help the community further, I'd like to share my ablation study results of your training process.
+
+📊 Experimental Setup
+
+I used my own CV grouping strategy (grouped by gameid), removed the 5 IDs you mentioned, and performed standard 10-fold cross-validation. My CV aligns with your reported 0.47.
+
+🔬 Ablation Study Results (10-Fold CV)
+
+Here are the impact measurements for each component:
+
+Model	OOF Score	Impact
+3rd (baseline)	-0.47039	-
+3rd. no_xyshift	-0.46884	~0 (neutral)
+3rd.no_aux	-0.47260	~2-3k
+3rd.no_rot	-0.47313	<3k
+3rd.loss-huber-decay0.ep120	-0.47961	~10k (GNLL loss)
+3rd.no_ema	-0.48702	~17k (but ~8k with LR decay)
+3rd.no_frameshift	-0.50622	~36k (huge!)
+
+Key Findings:
+
+Frame shift augmentation: Massive impact (~36k improvement) 🚀
+GNLL loss: Significant impact (~10k improvement)
+EMA: ~17k impact, but this is due to your fixed LR + EMA strategy. With LR decay and no EMA, the estimated benefit would be ~8k
+Rotation augmentation: Minimal benefit (<3k)
+Auxiliary heads: Small benefit (2-3k)
+XY shift: Basically no benefit (neutral)
+💡 Personal Insights
+
+I actually considered frame shift augmentation during the competition, but my feature system was quite heavy. I was concerned that frame shifting might not align well with the competition's objective of predicting the ball's trajectory while airborne, so I didn't experiment with it.
+
+What I didn't think of was performing dataset-level flip/rotation/shift augmentations - this is the unique brilliance of your solution. Your approach uses cleverly simple features combined with dynamic dataset-level flexible augmentations, with normalization applied at the dataset level after augmentation. This enables much more flexible and complex data augmentation strategies. Thank you again for sharing!
+
+🔍 Additional Finding: Optimal Epoch Count
+
+I noticed that reducing the number of epochs might improve single model CV performance. I ran 5 folds for this experiment:
+
+Model	Weighted Avg	Epochs
+3rd-mtfit-radam-ema-constantlr. lep25	-0.47283	25
+3rd-mtfit-radam-ema-constantlr.ep120	-0.47513	120
+3rd. no_xyshift	-0.47523	210
+3rd (baseline)	-0.47552	210
+3rd-mtfit-radam-ema-constantlr.lep35	-0.47621	35
+3rd-mtfit-radam-ema. ep150	-0.47727	150
+3rd.no_aux	-0.47732	210
+
+Training for fewer epochs (120-150 which means 20 * 6 - 25 * 6 epochs might be better then 35 * 6 epochs) shows slightly better CV scores compared to 210 epochs, suggesting potential overfitting with longer training.
+
+🐛 Potential Bug Found
+
+One small note: An LLM analysis helped me identify a potential bug in the 3rd place code - passer_last_xy appears to retrieve orientation instead of xy coordinates.
+
+Thanks again for your incredible contribution to the community! 🙏
+
+reply
+Reply
+gezi
+
+Posted 10 months ago
+
+· 26th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+ Actually the frame shift gain might be about 10-15k as I noticed it helped overifit a lot(just as the eval loss the post showed), but we could stop train earlier without frame shift aug.
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you very much for the excellent ablation study.
+
+I was concerned that frame shifting might not align well with the competition's objective of predicting the ball's trajectory while airborne, so I didn't experiment with it.
+
+Yes, I initially had the same concern—that it might not be fully aligned with the original problem formulation.
+Instead, I reframed the task as predicting player trajectories from T seconds before the pass (T = 0–2), where the pass timing is given in advance and T is always 0 at test time.
+Based on this interpretation, I incorporated the pass-timing information into the static features.
+
+I made this change about one week before the deadline, and it resulted in a fairly significant improvement, with CV improving from 0.475 to 0.473.
+
+Regarding the effect of xy-shift, I completely agree with your assessment.
+It was a data augmentation I introduced early in the competition, but it remained in the pipeline without being properly re-evaluated until the end—essentially an appendix-like artifact that should have been revisited more carefully.
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+I have released a subset of the training code from the Public 3rd Solution.
+The differences from the final model training code are as follows:
+
+In the final setup, 5-fold splits are generated with three different seeds, resulting in a total of 15 models, whereas this code uses only seed = 0.
+In the final model, multiple models are trained with different dynamic feature configurations, but this code uses only a single configuration.
+
+Overall, the CV score should be around 0.47.
+
+reply
+Reply
+Ming Li321
+
+Posted 10 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you very much
+
+reply
+Reply
+Mahog
+
+Posted a year ago
+
+· 29th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats! One question: how did you converge to that architecture? Even if you give me all the compute resources needed, I still (probably) won't be able to get to your solution. There must have been some intuition right?
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+13
+more_vert
+
+My approach is quite simple: even if I have an idea for the final model, I always start with a very simple baseline.
+For example, I train a 3-layer MLP on the final-frame 6D features and use that as the starting point.
+
+Then I change only one thing at a time, always based on a clear hypothesis.
+If the new result beats the baseline, I adopt it.
+If not, I discard it and try the next idea.
+
+A small example: angles are periodic, so replacing o with sin(o) and cos(o) should make learning easier.
+These kinds of small, hypothesis-driven steps accumulate.
+
+Failed experiments are also valuable—they help me understand why a change didn’t work and guide the next hypothesis.
+
+By repeating this fast cycle of hypothesis → test → analysis, the final pipeline gradually takes shape.
+
+reply
+Reply
+15
+Mahog
+
+Posted a year ago
+
+· 29th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I see, thanks for the reply!
+
+Then I change only one thing at a time, always based on a clear hypothesis. If the new result beats the baseline, I adopt it. If not, I discard it and try the next idea.
+
+The hard part for me is that I often have no ideas to test, but I suppose you gain this skill as you participate in more comps right?
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+14
+more_vert
+
+I think participating in many competitions definitely helps, but to me that’s not the most essential part. What really matters is developing a problem-solving approach and learning how to identify the right questions to ask before exploring different model ideas.
+
+At your level — you already have two solo bronze medals — I don’t think the issue is basic knowledge or lack of technical skill. The next gains usually come from strengthening your ability to analyze the problem space itself:
+understanding what matters in the data, where the uncertainty comes from, and which hypotheses are worth spending time on.
+
+To build this skill, it helps to focus on understanding model behavior, analyzing where errors come from, and validating ideas through small, controlled experiments.
+
+Once you develop the habit of breaking the problem down and forming precise hypotheses, ideas start to appear much more easily — often before touching the model. Competitions help reinforce this, but the core skill is the process you use to reason about the problem.
+
+reply
+Reply
+9
+Mahog
+
+Posted 10 months ago
+
+· 29th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for your (very) helpful advice!
+
+reply
+Reply
+Cebo
+
+Posted a year ago
+
+· 86th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+So smart the predict earlier frames to effectively give yourself more training data.
+
+Also very counter intuitive, to me at least about the rotation… But so cool! Proof that no amount of toiling away with "creating really smart features" and injecting football knowledge (real or perceived) will win against good,well thought out NN experimentation.
+
+You let the model learn its own football knowledge and avoided over fitting by confusing it a bit and forcing it to focus on the player positions relative to each other vs. where they are on the field. Is that a fair description of the rotation trick?
+
+Meanwhile I was trying to add and test features like "is redzone play". Oof.
+
+Good learning experience!
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I also find the rotation augmentation quite puzzling.
+A Gaussian distribution centered at 0 degrees would make sense to me, but a uniform distribution over the full 360 degrees still feels strange.
+
+reply
+Reply
+snehal
+
+Posted a year ago
+
+· 10th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on 5th solo gold (CV/LB is very stable so I'm sure a month from now we'll see the gold ring around your profile)! Amazing solution and thanks for sharing. Seems like what we missed was GaussianNLLLoss and early frame prediction. We tried early frame prediction in the last 2-3 days but couldn't get it to work, something about our setup must have been off. Looking forward to your training code
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you, I hope there are no problems.
+Also, regarding the code, I'm refactoring it now.
+I'm on a business trip this weekend, so it might take until next weekend.
+
+reply
+Reply
+Irakoze Ntawigenga Kelly
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Totally impressed!
+
+reply
+Reply
+Navneet
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Bravo @chack3
+
+reply
+Reply
+Crafty Code
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! but we are waiting for final code to get more depth of it.
+
+reply
+Reply
+Ming Li321
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Excellent engineering ideas and problem-solving strategies, thank you for making me realize that precision is far greater than accumulation
+
+reply
+Reply
+EliKal
+
+Posted a year ago
+
+· 83rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Conv1d > Features engineering 😂
+Congrats!
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes, simple features and depth-wise 1D CNNs are important. Regular 1D CNNs tend to overfit.
+
+reply
+Reply
+adam7
+
+Posted a year ago
+
+· 300th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!
+”A play-level model handling up to 22 players.“
+What should we do if there are fewer than 22 players?
+Is there a specific order among players of different roles?
+
+reply
+Reply
+agenlu
+
+Posted a year ago
+
+· 51st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+He is using a Transformer, no need to bother about specific order among players. That is the whole idea of using an invariant network.
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+If either the input or output has fewer than 22 players, zeros are padded.
+In the transformer and the loss function, masks are used so that the padded information is ignored.
+For convolutions and batch normalization, the padded values are still processed, but this should have little practical impact.
+
+reply
+Reply
+minerppdy
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, and thanks for sharing! It seems that early-frame prediction gives a big boost. Do you think pre-training with frames before passing would show similar benefits?
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I believe it probably has an effect.
+
+reply
+Reply
+Sam Bui
+
+Posted a year ago
+
+· 338th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Could you share your final code? I’d really like to study in more detail what you’ve described.
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+I think I can do it next weekend.
+
+reply
+Reply
+5
+Sam Bui
+
+Posted a year ago
+
+· 338th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you, I’m really looking forward.
+
+reply
+Reply
+WOOSUNG YOON
+
+Posted a year ago
+
+· 23rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I learned a lot.
+You introduced a play-level solution.
+In the Dynamic Feature Encoder,
+are the features then computed independently for each player?
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, that's right.
+
+reply
+Reply
+xz
+
+Posted a year ago
+
+· 52nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing! By predicting earlier frames, do you mean reconstructing the 20 frames used as input or predicting frames before the input frames?
+
+reply
+Reply
+ohkawa3
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Reconstructing inputs and outputs. Explanation and diagrams added to the text.
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (1)
+Samuel Frans
+
+Posted 9 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work

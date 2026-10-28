@@ -1,0 +1,624 @@
+url: https://www.kaggle.com/c/otto-recommender-system/discussion/384022
+fetched: 2026-10-27
+chars: 14333
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — OTTO – Multi-Objective Recommender System
+1st place solution
+
+OTTO – Multi-Objective Recommender System
+
+Solution Writeup · 1st place · Feb 6, 2023
+
+Thank you very much for organizing this fun competition. The problem set up was relatively close to my actual work, and I was glad to learn a lot.
+
+Candidates
+
+The average number of candidates is around 1200.
+
+visited aids in session
+covisitation matrix
+use multiple versions with different weighing by type and aggregation period
+apply covisitation matrix at multiple times like beam search
+NN that predicts subsequent aids
+use multiple versions to create candidates and rerank features
+NN structure is MLP or transformer (there was no big difference)
+I tried to focus on samples that are not predicted well
+I used the same embedding for x_aid and y_aid.
+I used multiple aids in future as positive targets.
+I used prediction target aid type information when calculating session embedding so that session embedding is adjusted according to the prediction target aid type.
+some models are trained by using only non visited aids as targets to avoid overlapping information with revisitation based candidates and features.
+
+ 
+
+Reranker
+model
+
+single LGBMRanker : LB 0.604
+ensemble of 9 LGBMRankers with different hyperparameters : LB 0.605
+I performed ensemble by averaging the predicted scores of the rankers.
+
+I haven't tested if this is a better method than voting etc.
+features
+session * aid
+rank by covisitation matrix at candidate generation
+cosine similarity by NN at candidate generation
+aid info in the session (when it appeared, what type it is, etc)
+aid
+popularity of aids
+It worked well when ranked
+calculated by multiple time windows
+ratio of types
+session
+length
+aid dupplication rate
+ts between the last aid and the second last aid
+
+about 200 features were created
+select about 100 features for each target by lgbm gain importance to reduce memory usage
+
+negative sampling rate
+
+clicks : 5% carts : 25%
+orders : 40%
+I set these values so that the training data can be handled by my machine (the data size is around 35GB for each).
+
+Cv strategy
+
+I followed radek's set up. https://www.kaggle.com/competitions/otto-recommender-system/discussion/364991
+I can get almost perfect correlation between local validation and LB.
+For quick iteration of improvements, I conducted experiments by training with 5% of the data and evaluating with other 10% of the data.
+
+ablation study
+
+ablation study by local validation.
+Information that is involved in both candidate generation and reranker features is removed from both.
+
+condition	clicks_recall@20	carts_recall@20	orders_recall@20	weighted_recall@20
+my solution (LB604)	0.556607	0.436375	0.669644	0.588359
+without visited aid	0.555677	0.435616	0.666456	0.586126
+without covisitation	0.547493	0.430180	0.665553	0.583136
+without nn	0.544811	0.429904	0.666004	0.583055
+without aid feats	0.550472	0.433442	0.666275	0.584845
+without session feats	0.555922	0.435805	0.669734	0.588174
+only single nn	0.532279	0.410148	0.564768	0.515133
+Author
+mrkmakr
+
+mrkmakr
+
+arrow_drop_up
+207
+Share
+more_horiz
+Citation
+
+mrkmakr. 1st place solution. https://www.kaggle.com/competitions/otto-recommender-system/writeups/mrkmakr-1st-place-solution. 2023. Kaggle
+
+3
+15
+comment
+38 Comments
+8 appreciation comments
+Hotness
+CPMP
+
+Posted 4 years ago
+
+· 1548th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congrats on the result. I worked on an extremely similar method. It is quite incredible how close it is to yours.
+
+One things I did, not clear if you did it too from your post, is that I used the same embedding for x_aid and y_aid.
+
+The one thing I didn't do was the topk for sampling negatives. I sampled a large number of negatives (up to 6000). Maybe using topk is what makes your solution so good.
+
+What surprised me is that NN prediciting next click were useful for candidate generation for orders and carts as well. I did train a couple of model to predict next cart and next order, but they don't improve much.
+
+reply
+Reply
+mrkmakr
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you for your comments!
+
+One things I did, not clear if you did it too from your post, is that I used the same embedding for x_aid and y_aid.
+
+I actually did same thing. I also used the same embedding for x_aid and y_aid.
+
+What surprised me is that NN predicitin next click were useful for candidate generation for orders and carts as well. I did train a couple of model to predict next cart and next order, but they don't improve much.
+
+I used multiple aids in future as positive targets, not just the next click. And I uses prediction target type information when calculating session embedding so that session embedding is adjusted according to the prediction target aid type. (I have added more explanations to the main text in response to your question)
+
+reply
+Reply
+CPMP
+
+Posted 4 years ago
+
+· 1548th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Me too, in some variant I predict n next events. I also have some covisit matrix model, where all events in a window of size n must have high cosine and all the rest is negative.
+
+I have mixed feelings now that I see that I was on the right track!
+
+reply
+Reply
+xiaoye
+
+Posted 4 years ago
+
+· 1499th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks for sharing and congratuations
+
+For quick iteration of improvements, I conducted experiments by training with 5% of the data and evaluating with other 10% of the data.
+
+The time needed for an iteration really depressed me: I thought it's too long to finished an iteration, and I was thinking maybe I should use pyspark with clusters. Just curious to know, how long does it take you for one iteration? did you use any tools to accelerate your iteration?
+
+Thanks
+
+reply
+Reply
+mrkmakr
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thank you for your comments!
+
+Just curious to know, how long does it take you for one iteration? did you use any tools to accelerate your iteration?
+
+The time taken for my sampled local validation is.
+
+About 1.5 hours to combine multiple candidates and features from each logic ,
+About 1.5 hours to train and evaluate a reranking model.
+
+Candidates and features by individual logic are calculated once and reused, which is not included in time above. (like training and inference of nn or covisitation matrix, etc.) I didn't use any special tools.
+
+reply
+Reply
+Jack E Martin
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi xiaoye, You mention special tools in your post. I am curious: do you use special tools in your work, and are there any that you might recommend. Are they usually necessary or are they only for convenience?
+
+reply
+Reply
+xiaoye
+
+Posted 4 years ago
+
+· 1499th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi. Jack. sorry for the late reply.
+
+Actually I don't know some special tools. I just found it was too slow to iterate.
+
+Polars is one of the tools that I learned from this competition, and it really help. I also found some people used bigquery from GCP
+
+Hope it helps
+
+reply
+Reply
+Parth Tiwary
+
+Posted 4 years ago
+
+· 114th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing. Awesome work. Solo rank 1 is a rare phenomenon. 🎉
+
+reply
+Reply
+sirius
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! The number of candidates, ~1200, is very impressive! Do you have the CV/LB scores of some smaller num? e.g. 200, as many others do. And in the NN model, what are the x_timeinfos extractly? Time diff between the action and last action?
+
+reply
+Reply
+mrkmakr
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+The number of candidates, ~1200, is very impressive!
+
+the 1200 candidates include candidates for clicks, carts and orders. I didn’t explicitly separate which candidate is for which type, and this may be one reason of the very big candidates number.
+
+Do you have the CV/LB scores of some smaller num? e.g. 200, as many others do.
+
+I didnt test it. This is sligtly difficult to conduct a good experiment now. I dont know a good way to reduce candidates from multiple strategies by not using ranker ML model.
+
+And in the NN model, what are the x_timeinfos extractly? Time diff between the action and last action?
+
+assuming hh = ts // 3600 // 1000,
+
+hh (categorical feature)
+hh // 24 (categorical feature)
+sin(hh % 24 / 24 * np.pi * 2) (numerical feature)
+cos(hh % 24 / 24 * np.pi * 2) (numerical feature)
+
+I have these values for each aid in each session, and I concat these time features timeseries with aid embedding timeseries.
+
+reply
+Reply
+Rayan-aay
+
+Posted 4 years ago
+
+· 180th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+very impressive ! I trained a GNN relatively similar to your method, the difference is that I considered an heterogenous graph with only USERs and their visited AIDs, I didn't exploit the item CF part. thanks for sharing.
+
+reply
+Reply
+EnricRovira
+
+Posted 4 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!! Nice writeup thanks for the insights and the ablation study!
+
+reply
+Reply
+Taha Muhammad Haider
+
+Posted 4 years ago
+
+· 199th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great work on going solo! Congratulations on earning a gold medal on your own!
+
+reply
+Reply
+shimacos
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win! It is very helpful writeup! BTW, I have a few questions.
+
+There seem to be a very large number of candidates for 1200. Did you try anything during the training to reduce the memory?
+What was the Recall when forecasting with NN only?
+reply
+Reply
+mrkmakr
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for your comments!
+
+There seem to be a very large number of candidates for 1200. Did you try anything during the training to reduce the memory?
+
+I didn't do anything special. I did only common things like perform negative sampling, have all features in uint32 type, and reduce features by importance. I used 256GB RAM machine for training with full data.
+
+What was the Recall when forecasting with NN only?
+
+I have added NN only local score in the ablation study section.
+
+reply
+Reply
+huang_jia_li
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the win! It is very helpful writeup! Excuse me, is ablation research a controlled variable?
+
+reply
+Reply
+Piotr Gabrys
+
+Posted 4 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for the write-up! The ablation study is a fantastic source of knowledge!
+
+reply
+Reply
+huang_jia_li
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing, it was very rewarding, but there are still some areas that I don't quite understand.
+
+1.I was wondering how to generate candidates, that is, how to imerge the results of different recall methods, such as visited aids in session,covisitation matrix and NN that predicts subsequent aids. 2.you mentioned in nn models, some models are trained by using only non visited aids as targets to avoid overlapping information with revisitation based candidates and features. I don't quite understand this method, non visited aids should be negative samples. It means some models use non visited aids as negative samples, and some use both non visited aids and random samples. Is my understanding correct and Is this to avoid confusion?~
+
+reply
+Reply
+Ishaan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @mrkmakr ,
+
+Can you share the model latency when inferring results for a single user session ? Thanks !
+
+reply
+Reply
+JJFurf
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@mrkmakr hey, awesome write up! Can you explain the choice of (avg + min) / 2 to aggregate the positive cosine similarities?
+
+reply
+Reply
+DDD
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+good job, learned a lot!
+
+reply
+Reply
+caicai
+
+Posted 4 years ago
+
+· 33rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing and congratuations. "NN structure is MLP or transformer (there was no big difference)" can you explain how to use transformer in this competition. Thank you very much
+
+reply
+Reply
+Adil Ramadhan
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+effective and solid methods, congratulations
+
+reply
+Reply
+Ryan
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+WOW, congrats on first place! Your solution sounds like a well-designed and thoroughly tested approach, taking into consideration both the candidate generation and the reranker. It's impressive that you were able to create over 200 features, and it's great to see the results of your ablation study and how removing certain elements affected the performance.
+
+Your focus on negative sampling rates and finding a balance between having enough data to train your model and being able to handle the data on your machine was smart. Thanks for sharing!
+
+reply
+Reply
+Benny
+
+Posted 4 years ago
+
+· 253rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Let's not boast about the others. The flow chart is really clear, which is also great👍👍
+
+reply
+Reply
+Shahbaz Qaiser
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice approach to the solution
+
+reply
+Reply
+Yuhua Lu
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!! Thank you for the great work!
+
+reply
+Reply
+01001
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Really nice write up!
+
+reply
+Reply
+Leandro Destefani
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi! Can you tell me which site/tool you made the flowchart drawings on? Congratz, by the way :)
+
+reply
+Reply
+George Papachristou
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@mrkmakr really amazing work!! I really love to give attention to every detail and try to understand 1st place solutions. Thank you for sharing🎉💪🤘
+
+reply
+Reply
+ArmanGrewal007
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!!
+
+reply
+Reply
+Grigol
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great solution - clean and effective. Thanks for sharing!
+
+reply
+Reply
+
+This comment has been deleted.

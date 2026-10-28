@@ -1,0 +1,700 @@
+url: https://www.kaggle.com/c/nfl-player-contact-detection/discussion/391635
+fetched: 2026-10-27
+chars: 19023
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — 1st and Future - Player Contact Detection
+1st place solution
+
+1st and Future - Player Contact Detection
+
+Solution Writeup · 1st place · Mar 6, 2023
+
+Thanks to NFL and Kaggle for hosting this interesting competition. My approach comprises three main components
+
+A weak xgb model to remove easy negative samples
+A CNN to classify contact
+A xgb model to post-process the output.
+
+Since my xgb preprocessing was not really good compare to other teams (CV ~ 0.72),I will only elaborate on my CNN and post-processing method in this write-up. 1. 3D CNN for Video Classification 1.1 Input generator
+
+I separate the modeling and training of player-player (PP) and player-ground (PG) contacts. The PP model is trained using input from three sources, namely endzone video, sideline video, and tracking data. On the other hand, the PG model is trained using input from only two sources, namely endzone video and sideline video. Notably, including tracking data does not result in improved performance for the PG model.
+
+1.1.1 Input generator for PP model
+
+The endzone and sideline videos are processed similarly. Firstly, I extract 18 images from neighboring frames, namely {frame[-44], -37, -30, -24, -18, -13, -8, -4, -2, 0, 2, 4, 8, 13, 18, 24, 30, frame[37]}. The frame[-44] represents 44 frames prior to the current sample's estimated frame. This sampling technique enables the model to observe more frames close to the estimated frame.
+
+Next, I mask the players' heads in contact with a black or white circle to guide the model's attention to the relevant players. Rather than using an additional channel, I mark the players' heads directly into the image. I made this decision to maintain the input's 3-channel format, which maximizes the utilization of the pretrained weight file. Finally, I crop each image around the players' contact area using a crop size of 10 times the mean helmet box size within the specified frame range.
+
+To enable the tracking data to be stacked with images from the endzone and sideline, I simulate the tracking data as images. To accomplish this, I use the OpenCV cv2.circle function to plot each player's position in a specific step on a black background. I assign two different colors to represent the two teams, and players in contact are depicted with bigger and brighter circles (radius is 5, and pixel value is 255), while background players are depicted with smaller and darker circles (radius is 3, and pixel value is 127). By integrating this information into the input, the model can learn the interaction of all players from a bird's eye view. The input to the PP model is displayed in the GIF below.
+
+1.1.2 Input generator for PG model The endzone and sideline videos are processed similarly to the PP model, with the exception that the PG model uses a longer input sequence of 23 neighboring frames, ranging from [-54, -48, -42, -36, -30, -24, -18, -13, -8, -4, -2, 0, 2, 4, 8, 13, 18, 24, 30, 36, 42, 48, 54].
+
+The PG model does not include simulated tracking images as they do not improve the PG CV score.
+
+Unlike the PP model, I can use a longer sequence of images in the PG model because the tracking images are not included. In the PP model, the maximum sequence length that can fit into my GPU is 18 images.
+
+1.2 Model Given that the input appears to resemble an action classification task rather than a standard 3D classification, I opted to use an action recognition model to address this problem. After reviewing the mmaction2 repository, it became clear that the CSN series delivered the most impressive results in the Kinetics-400 dataset. As a result, I selected resnet50-irCSN and fine-tuned it for this particular task.
+
+1.3 Training
+
+During training, I apply the following augmentations to the endzone and sideline images and randomly swap them. As for the tracking images, I only use horizontal and vertical flips as augmentations.
+
+base_aug = [
+        A.RandomResizedCrop(always_apply=False, p=1.0, height=cfg.img_size, width=cfg.img_size, scale=(0.7, 1.2), ratio=(0.75, 1.3), interpolation=1),
+        A.OneOf([
+            A.RandomGamma(gamma_limit=(30, 150), p=1),
+            A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.3, p=1),
+            A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2, p=1),
+            A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20, p=1),
+            A.CLAHE(clip_limit=5.0, tile_grid_size=(5, 5), p=1),
+        ], p=0.6),
+        A.HorizontalFlip(p=0.5), 
+        A.ShiftScaleRotate(shift_limit=0.0, scale_limit=0.1, rotate_limit=15,
+                                        interpolation=cv2.INTER_LINEAR, border_mode=cv2.BORDER_CONSTANT, p=0.8),
+        A.Cutout(max_h_size=int(50), max_w_size=int(50), num_holes=2, p=0.5),
+    ]
+
+cfg.train_transform = A.ReplayCompose(base_aug)
+
+
+I used a linear scheduler for the learning rate and trained the model for one epoch. In the final submission, I trained the model using all available data with 4 seeds.
+
+2. XGB Postprocessing I employed a simple xgb model to combine the predictions of pre-xgb and cnn. Through experimentation, I discovered that the optimal feature for post-processing in PP and PG models slightly differs.
+
+2.1 PP postprocessing First, I calculated an ensemble probability from the CNN and preprocessing xgb model as follows: prob = 0.2pre_xgb_prob + 0.8cnn_prob. Then, I used the probability from the 20 neighboring steps as features for the xgb model, i.e., {prob(-10), prob(-9), …, prob(0), prob(1), …, prob(9)}, where prob(-10) represents the probability of the same pair of players in the prior 10 steps. This postprocessing method improved my PP CV score by approximately 0.005.
+
+2.2 PG postprocessing I calculated an ensemble probability from the CNN and preprocessing xgb model as follows: prob = 0.15pre_xgb_prob + 0.85cnn_prob. The feature to xgb model are
+
+The ensemble probability from the 30 neighboring steps {prob(-15), prob(-14), …, prob(0), prob(1), …, prob(14)},
+The pre_xgb_prob and cnn_prob from the 20 neighboring steps. This postprocessing method improved my PG CV score by approximately 0.04.
+
+P/S. Thanks chatGPT for making my explanation better!!
+
+Author
+nvnn
+
+nvnnghia
+
+arrow_drop_up
+138
+Share
+more_horiz
+Citation
+
+nvnn. 1st place solution. https://www.kaggle.com/competitions/nfl-player-contact-detection/writeups/nvnn-1st-place-solution. 2023. Kaggle
+
+comment
+43 Comments
+4 appreciation comments
+Hotness
+Camaro
+
+Posted 4 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations on a strong finish and solo winning this hard competition! Different interval frame sampling and concatenating rgb image and tracking image are beyond my imagination, but seems surprisingly works well. Awesome!!
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you. Congratulations on your strong finish and becoming GM. well done
+
+reply
+Reply
+Camaro
+
+Posted 4 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@nvnnghia Thanks for sharing code too, that's definitely a masterpiece!! Quick question, when I look through your code, I found that the dropout rate is set to 0.5, which seems too large for me. Is it natural for you? Have you experienced it working for other tasks too or did it specifically work for this task? Thanks,
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+dropout 0.5 is natural for me.
+At times, I utilize a larger dropout rate, such as 0.6 or 0.7. If my model appears to overfit easily, one of the initial experiments I aim to conduct is to increase the dropout rate and adjust the intensity of data augmentation.
+reply
+Reply
+David Del Río
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+What do you mean by adjusting the intensity of data augmentation? Thanks in advance!!
+
+reply
+Reply
+Dmytro Poplavskiy
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on winning the competition!
+
+reply
+Reply
+Rob Mulla
+
+Competition Host
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats @nvnnghia on your winning solution! I look forward to learning more about it. The idea of including the NGS data as part of the input image to your CNN is really clever.
+
+I have a few initial questions:
+
+How did you determine the frames you used {frame[-44], -37, -30, -24, -18, -13, -8, -4, -2, 0, 2, 4, 8, 13, 18, 24, 30, frame[37]} - was this decided through experimentation or intution?
+What made you select the resnet50-irCSN as your backbone? Did you have any succsess with other architectures?
+How did you handle cases where helmet boxes are not be seen for both players in sideline/endzone views? Did you only predict if both players were seen in both views?
+In your postprocessing step, you say you combined the 1st stage XGB and CNN outputs like this: prob = 0.2pre_xgb_prob + 0.8cnn_prob. Is there any reason you did not use pre_xgb_prob and cnn_prob directly as features to the postprocessing XGB model?
+
+Thanks again for your solution write up!
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks Rob. I have just added more detail to my writeup to make it more clear based on your questions.
+
+How did you determine the frames you used {frame[-44], -37, -30, -24, -18, -13, -8, -4, -2, 0, 2, 4, 8, 13, 18, 24, 30, frame[37]} - was this decided through experimentation or intution? The decision on the frame sampling was based on both intuition and experiments. Initially, I used an equal gap between frames such as […, 8, 4, 0, 4, 8, …]. However, I realized that the model should see more images near the estimated frame to improve performance, so I changed the sampling frames accordingly. It may seem strange that there is no frame[44], but this is because I pre-generated all inputs and saved them to disk for faster data loading (frame[44] is in my pre-generated data). However, a sequence of 19 images caused my GPU to run OOM, so I simply removed the last image (frame[44]) to avoid this issue.
+What made you select the resnet50-irCSN as your backbone? Did you have any succsess with other architectures? Given that the input appears to resemble an action classification task rather than a standard 3D classification, I opted to use an action recognition model to address this problem. After reviewing the mmaction2 repository, it became clear that the CSN series delivered the most impressive results in the Kinetics-400 dataset. As a result, I selected resnet50-irCSN and fine-tuned it for this particular task. I did tried 2.5D model, 3D model and other action recognition model such as slowfast, but CSN give me best CV score.
+How did you handle cases where helmet boxes are not be seen for both players in sideline/endzone views? Did you only predict if both players were seen in both views? I use a black image for those frames.
+In your postprocessing step, you say you combined the 1st stage XGB and CNN outputs like this: prob = 0.2pre_xgb_prob + 0.8cnn_prob. Is there any reason you did not use pre_xgb_prob and cnn_prob directly as features to the postprocessing XGB model? Thank you for the question. I have updated my post-processing part in the write up to explain this.
+
+Thank you once again for organizing this fascinating NFL competition series. I had the opportunity to participate in all three challenges, and I thoroughly enjoyed the experience.
+
+reply
+Reply
+Rob Mulla
+
+Competition Host
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the answers. That really helps. Congrats again.
+
+reply
+Reply
+Heroseo
+
+Posted 4 years ago
+
+· 183rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wow, Congrats on solo 1st place! It's a really cool, great job.
+
+reply
+Reply
+Leon
+
+Posted 4 years ago
+
+· 137th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! Great idea to put tracking data into CNNs. How much will performance drop if you don't add it?
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I added it when my cv were still low (~0.73) and it boosted my cv to 0.76. I don't know how much it contributed to my final model (cv 0.79+).
+
+reply
+Reply
+Psi
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Is your 0.79+ CV on a single fold or full oof?
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+DanielPuente
+
+Posted 4 years ago
+
+· 810th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations.
+
+Very interesting way of solving the tournament, congratulations. I have a question about how to train the net.
+
+· Have you used a custom loss function to train the resnet?
+
+Thank you very much
+
+reply
+Reply
+Majid Ahmad Khan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your achievement on Kaggle! I'm really impressed with your work and wanted to let you know. By the way, if you have a moment, I would really appreciate it if you could take a look at my profile and give it an upvote if you find my work interesting as well.
+
+reply
+Reply
+Sitraka_Forler
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on winning @nvnnghia ! And thanks for sharing your method wouldn't have though of it…
+
+reply
+Reply
+ayushsingh05
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning and also thanks for sharing the approach
+
+reply
+Reply
+Ravi Shah
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on winning @nvnnghia! Thanks for sharing this write up!
+
+reply
+Reply
+Chris Deotte
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Awesome work Nvnn. Congratulations on first place solo cash gold finish!
+
+reply
+Reply
+Bilzard
+
+Posted 4 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@nvnnghia Congratulation.
+
+About 1st stage, what is the performance of negative sampling? Can I ask the recall and sample reduction ratio?
+
+e.g) For my case,
+
+player-player contact: keeping recall 0.992, reduced ~50% of samples
+player-ground contact: keeping recall 0.992, reduced ~75% of samples
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thanks. After filtering, around 1.4 million samples remained for the PP model, with a recall rate of 99.3%. For the PG model, around 130k samples remained with a recall rate of over 97%.
+
+reply
+Reply
+E-Max AI
+
+Posted 4 years ago
+
+· 66th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation!
+
+reply
+Reply
+emoji_people
+Ahmed Samir
+
+Posted 4 years ago
+
+· 35th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Really brilliant! Congrats on getting the 1st position 🙌
+
+reply
+Reply
+Ethan
+
+Posted 4 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats and thanks for sharing your greate solution! How much does post-processing improve your cv score?
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thanks. pp boost my cv around +0.015. I didn't check LB
+
+reply
+Reply
+nadhir hasan
+
+Posted 4 years ago
+
+· 863rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congratulations!, you idea is amazing. may i know which algorithm did you used to find the bbox to crop the area. are you used YOLO or something else?
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks. I used provided baseline helmet boxes
+
+reply
+Reply
+emoji_people
+Dewei Chen
+
+Posted 4 years ago
+
+· 35th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Could you please tell us your Hardware device for training? and how much GPU RAM size for your model?
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+1x RTX 3090 24Gb VRAM
+
+reply
+Reply
+( ͡° ͜ʖ ͡°)
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+wow congrats
+
+reply
+Reply
+KhanhVD
+
+Posted 4 years ago
+
+· 64th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats bro !!! Waiting for more detail from your solution.
+
+reply
+Reply
+arutema47
+
+Posted 4 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Awesome pipeline, thanks for sharing! Do you have any takes on the shake up? I think you were the only gold medal player who got PB>LB
+
+reply
+Reply
+nvnn
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+To be honest, I'm unsure. From what I've observed, several teams have achieved a high public score within a short inference time, so I guess that that they might be unintentionally filtering out too many true positives from their private test data based on their CV score and public leaderboard feedback. In contrast, I used a filtering threshold that was five times lower than in my CV score to ensure that I didn't miss out on too many true positives in my submission.
+
+reply
+Reply
+Psi
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I am quite confident that threshold filtering is not the reason. We tried a few different thresholds and both public and private behaves as expected for them for us.
+
+reply
+Reply
+HongCheng
+
+Posted 4 years ago
+
+· 59th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation! waiting for more sharing
+
+reply
+Reply
+SFR.LUX
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Bro CV hain't izy …
+
+reply
+Reply
+mLiammm
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Appreciate all the effort you took here! Thanks for sharing
+
+reply
+Reply
+Krishna
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your 1st place solution in the NFL and Kaggle competition! Your approach is well-structured and appears to be very effective. Here are some potential improvements you could consider just for fun and experimentation:
+
+Provide more detail on your xgb preprocessing method. While you mention that it was not as effective as the other teams' approaches, it could still be helpful to understand your thought process and what you tried.
+
+Consider testing other CNN architectures to compare their performance against the resnet50-irCSN model you used. This could help to identify which models are more effective for this type of task.
+
+Experiment with different augmentation techniques during training. Although you included several augmentations, there may be others that could further improve your model's performance.
+
+Consider using an ensemble of models. Ensembling multiple models can help to reduce the risk of overfitting and improve the overall accuracy of the predictions.
+
+Overall, great job on your winning solution!🎉
+
+reply
+Reply
+Tony
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations. Do you run inference for endzone and sideline respectively? If so ,how do you combine they.
+
+reply
+Reply

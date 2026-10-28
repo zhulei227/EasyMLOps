@@ -1,0 +1,45 @@
+url: https://www.kaggle.com/c/airbus-ship-detection/discussion/74443
+fetched: 2026-10-27
+chars: 504
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Airbus · Featured Prediction Competition · 8 years ago
+Late Submission
+more_horiz
+Airbus Ship Detection Challenge
+
+Find ships on satellite images as quickly as possible
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Failed to load the discussion topic

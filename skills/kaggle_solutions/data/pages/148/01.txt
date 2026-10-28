@@ -1,0 +1,63 @@
+url: https://github.com/danzelmo/how-much-did-it-rain
+fetched: 2026-10-27
+chars: 4371
+
+GitHub - danzelmo/how-much-did-it-rain: Code for first place solution to How Much Did it Rain competition · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ danzelmo how-much-did-it-rain Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ how-much-did-it-rain Public Notifications You must be signed in to change notification settings Fork 0  ( 0 ) Star 1  ( 1 ) You must be signed in to star a repository About Code for first place solution to How Much Did it Rain competition Resources Readme Activity Stars 1 star Watchers 1 watching Forks 0 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 3 Commits 3 Commits Folders and files Name Name Last commit message Last commit date code code     .gitignore .gitignore     README.md README.md     documentation.pdf documentation.pdf     View all files Repository files navigation README More items First place solution for How Much Did it Rain? 
+ For a description of my solution see this blog post on kaggle, or this forum post 
+ Running 
+ This should run with python 3 and the newest version of xgboost.The following folders should be in the top level directory, input, code, processed, models, output.
+Look at documentation.pdf for required directory structure and other information on running the code. Put train_2013.csv and test_2014.csv into the input folder. Run ./main.sh in the code folder. 
+ For faster run time 
+ Simple Features and methods
+In train_subset4.py and train_subset5.py change the line use_xtra_features = True to False . 
+ In main.sh comment out the lines 
+ ./make_xtra_features_train.sh and ./make_xtra_features_test.sh . 
+ In make_predictions.py change the line with 
+ fn.make_prediction4(......use_xtra_features=True) to
+ fn.make_prediction4(.....use_xtra_features=False) , 
+ repeat for 
+ fn.make_prediction5(....) 
+ Now run main.sh and it should shave off ~5 hours of run time. Final CRPS of about 0.00750. 
+ About Code for first place solution to How Much Did it Rain competition Resources Readme Activity Stars 1 star Watchers 1 watching Forks 0 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

@@ -1,0 +1,416 @@
+url: https://www.kaggle.com/c/ariel-data-challenge-2025/writeups/1st-place-solution-bayesian-inference-of-course
+fetched: 2026-10-27
+chars: 20013
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution: Bayesian Inference, of course — NeurIPS - Ariel Data Challenge 2025
+1st place solution: Bayesian Inference, of course
+
+No neural networks here...
+
+NeurIPS - Ariel Data Challenge 2025
+
+Solution Writeup · 1st place · Sep 30, 2025
+
+Link to code to train and submit
+This year I'm also releasing the full development history: https://github.com/jcottaar/ariel2
+
+I'd like to start by thanking the organizers for another great competition. I had a rather frustrating start (having somehow managed to lose all my code from last year), but greatly enjoyed it overall. The Bayesian approach is not used nearly as often as it should be these days, and I'm glad to have the opportunity to show its value here.
+
+My solution is quite similar to last year's; my NeurIPS talk from the associated workshop can be a useful introduction. I'll briefly discuss the differences compared to last year in a reply to this post.
+
+1. Introduction
+
+Transit analysis is the most common method for detecting and studying exoplanets. A transit occurs when a planet crosses in front of its star relative to Earth, obscuring part of the starlight. By observing how much the light is reduced (the transit depth) as a function of wavelength, we can learn the properties of the planet. But with a tiny planet passing in front of a huge star, this problem has a very low signal to noise ratio. The challenge to us: find the transit depth, including confidence intervals, from synthetic raw spectroscopic signals as the Ariel satellite might see them in the future (For a more extensive overview, see https://www.kaggle.com/competitions/ariel-data-challenge-2025/overview).
+
+This competition is at first glance a retread of a similar competition last year, but the data is far more realistic this time around. I think I figured out some of the changes, but not all of them - as we'll see later on.
+
+Note that there are two sensors in play, the single-wavelength FGS sensor and the spectroscopic AIRS sensor. In this writeup I'll focus mainly on the AIRS sensor.
+
+My general approach consists of three steps, as visualized below:
+
+Preprocessing: starting from the raw sensor data (expressed in counts), compute the amplitude signal S(λ,t) as a function of wavelength λ and time t.
+Bayesian Inference: from S(λ,t), compute the inferred transit depth D(λ) and an uncertainty margin on this σ(λ) . This step is done using a principled Bayesian approach.
+Fudging: throw the principles out the window, and apply various fudge factors to D(λ) and σ(λ) . These fudge factors are chosen to optimize score on the training data.
+
+In sections 2, 3, and 4, I'll discuss each of these steps in turn. I'll finish with some closing thoughts in section 5 - mainly discussing why my approach isn't actually working…
+
+2. Preprocessing
+
+The raw data is in counts per pixel; we first need to apply several steps to come to a photon count per pixel. This is explained in a notebook shared by the hosts. I use a time binning of 5 frames for AIRS, and 50 frames for FGS (this puts them approximately in sync). Hot pixel invalidation is disabled. I also added a simple cosmic ray removal.
+
+The opportunity for some real improvement lies in the wavelength binning step, i.e. summing over the dispersion axis. The baseline is simple summing, but there's several effects in the data that make it possible to do better. Most notably, there's the infamous jitter, which we can see most clearly by doing a PCA (with some additional preprocessing) over all AIRS frames in the train data:
+
+The jitter shapes presumably correspond to pointing error and defocus.
+
+The jitter shapes sum to approximately zero over the dispersion axis; this is why simple summing works OK. It also means that any more advanced preprocessing scheme is forced to deal with the jitter, so there's a high barrier to entry. Still, there are several effects in the data that such a scheme can take advantage of:
+
+There are invalid pixels.
+The noise is not quite Poisson noise (simple summing minimized noise only for Poisson noise); the noise is lower for brighter pixels, and there are occasional very noisy pixels.
+The jitter shapes don't quite sum to zero, presumably because detector calibration is not perfect.
+There is a constant background signal that we'd like to remove.
+
+I spent more than half of my time on this competition trying to set up a principled preprocessing flow optimally handling all these effects. Unfortunately, I haven't managed this yet - you'll find in the code several disjointed steps attempting to deal with the above. They also tend to work only in certain configurations and combinations, which I don't yet fully understand. It still leads to an improvement of ~0.01 over simple summing - I'll crack this one next year…
+
+3. Bayesian Inference
+
+Now that we have the photon counts as a function of wavelength and time, we are ready to infer the exoplanet transit depth using Bayesian Inference.
+
+Bayesian Inference (BI) is a powerful statistical approach, based around defining a prior (a statistical belief about reality) and observations (some form of new information). Using Bayes' law, we then combine these to find the posterior (an updated belief about reality). In our case, this means:
+
+Prior: a description of the physics that affect the final measured signal, describing for example detector noise, drift, and the transit behavior (including the transit depth itself) as formal distributions.
+Observations: the provided measurements.
+Posterior: a breakdown of the observations into the various elements defined in the prior (see figure below). From this we can simply read out the desired transit depth. Importantly, the posterior is not just a single point, it's a distribution. By taking samples from this distribution we can find the required confidence intervals (and even full covariance matrices, although that is not asked of us here).
+
+There are two key elements to applying BI: defining the prior (section 3.1), and applying Bayes' law to do the inference (section 3.2).
+
+3.1 Prior definition
+
+The signal is decomposed into four key components, as shown visually here:
+
+This table shows a detailed description of all prior elements:
+
+Prior element	Description	Tuning and hyperparameters	Degrees of freedom
+Noise	Uncorrelated Gaussian per time and wavelength	Standard deviations found in preprocessing	1350 (FGS) + 317250 (AIRS)
+Star spectrum	Uncorrelated value per wavelength	Not regularized (infinite sigma)	283
+Drift	Third order polynomial over time and wavelength	Not regularized (infinite sigma)	3 (FGS) + 12 (AIRS)
+Transit window	Found using batman package, with the following free parameters:
+- Transit mid-time t0 (separate for FGS and AIRS)
+- Semi-major axis sma
+- Period P
+- Orbital inclination i
+- Quadratic limb darkening u0 and u1 (including linear dependence on wavelength)
+- Transit depth Rp^2/Rs^2 (see below)	Covariance matrix learned on training set using maximum likelihood estimation (MLE)	11 (6 limb darkening, 2 t0, sma, P, i)
+Transit depth: mean	Single value	Lightly regularized (sigma=0.01)	1
+Transit depth: variation	Decomposed into three components below	Scaling factor determined per planet using MLE (this is the only hyperparameter tuned during inference)	N/A
+Transit depth: variation FGS	Single Gaussian value	Standard deviation found on training set	1
+Transit depth: variation AIRS	Gaussian Process over wavelength, sum of two squared-exponential kernels	Kernel hyperparameters found on training set using maximum likelihood estimation	282
+Transit depth: variation PCA	Fixed basis functions obtained from PCA analysis	PCA shapes and variation magnitudes found on training data (this year there seems to be no train-test population shift for the transit depths)	5
+3.2 Solver
+
+Having defined the prior, finding the posterior is 'just' a matter of applying Bayes' law. The prior is fully Gaussian, which means the inference should just be a single matrix operation. But as usual, there's a snag. In our case, it's that the relationship between the prior parameters and the observation is non-linear (because of the non-linear modeling in batman, and because some prior elements are multiplied rather than added).
+
+To deal with this non-linearity, we linearize the model around the mean of the posterior. This is repeated iteratively (i.e. apply BI -> linearize around the new mean of the posterior -> repeat). Each step we also update the single hyperparameter (the scaling of the transit depth) using gradient descent.
+
+This approach does mean we need a decent starting point, which is handled as follows:
+
+Grid search: sweep over a grid of transit depth and transit mid-time to find initial values. Other transit parameters are set to the given approximation per planet (with no limb darkening).
+BFGS: fit drift and all transit parameters, using BFGS as implemented in scipy.optimize.minimize. In this step we only consider the mean over wavelengths of the AIRS signal.
+Bayesian Inference: the full non-linear BI solver as described above. My winning submission uses 8 iterations of the solver; the code linked here only does 4 iterations to fit training and inference into the 9 hour submission limit (this only costs 0.001 in the score).
+
+The prediction of the transit depth and the covariance matrix of its uncertainty can be read out directly in the posterior. The covariance matrix is approximated based on 200 samples; this is mainly a holdover from last year, when there were too many parameters to construct it explicitly.
+
+There are two additional tricks that I apply if the residual of the first two steps (grid search->BFGS) is suspiciously high:
+
+Use transit parameters for a different planet as starting point.
+Try chopping off the first and last few frames of the signal (these sometimes have a high residual for reasons I don't understand).
+4. Fudging
+
+The prediction and uncertainty obtained above can still be improved further with some post-hoc calibration. Note that this is anathema to a proper Bayesian approach - more on that below.
+
+We adapt the mean of the transit depth per sensor based on fitting:
+
+A constant offset
+A multiplicative factor
+Dependence on the first limb darkening parameter
+
+The variation of the transit depth over wavelength is not fudged, i.e. not changed in this step.
+
+We adapt the uncertainty of the transit depth per sensor based on fitting:
+
+A constant offset
+A multiplicative factor for the mean of the transit depth
+A multiplicative factor for the variation of the transit depth over wavelength
+Dependence on the magnitude of the variation of the transit depth over wavelength
+
+In total, the fudging has 12 parameters to fit. These are determined on the full training set, based on whichever values optimize the competition metric.
+
+5. Final thoughts - we're missing something!
+
+The fact that fudging helps the score is extremely worrying. And it's not subtle: last year, my solution without fudging could have gotten 1st place; my solution this year without fudging would have ended up around ~20th place. It means there's something missing in the prior, i.e. it does not describe reality (or rather the synthetic data generation process) accurately.
+
+I've spent a lot of time trying to find this gap, but haven't gotten much closer. I've come to believe that the issue lies in the transit modeling, but none of the variation I tried (such as different limb darkening models) helped. I'm convinced that finding whatever's going on could boost our scores to well over 0.700.
+
+Some more direct evidence of this issue can be found by comparing different transits for the same planet; the plot below shows the ratio of the transit profiles (with some preprocessing including low pass filtering). Nothing in the prior (and nothing else I can come up with) can explain this. See also this discussion and the code.
+
+
+I hope the organizers are willing to reveal some clues about this, because I don't think we'll figure it out next year either without some help.
+
+Finally, I'll wrap it up with an overview of how much various elements of my solution contribute to the score:
+
+Change to model	Impact on private test score
+Simplified loader (host's flow + cosmic ray removal), no jitter correction or background removal	-0.013
+Don't remove first or last few frames of suspicious transits	-0.002
+Don't use Gaussian Process for transit depth, just use PCA
+Note: this variation does not involve any Gaussian Processes	-0.007
+Don't use PCA for transit depth, just Gaussian Process	-0.011
+Disable all fudging - rely purely on the outcome of the Bayesian predictions	-0.152
+(Last year: -0.000…)
+Replace all fudging by a single multiplicative factor for the uncertainty	-0.017
+Disable fudging of sigma prediction based on AIRS variation	-0.005
+Disable fudging of mean prediction based on limb darkening parameters	-0.005
+Don't regularize the 11 transit parameters in prior	-0.003
+Author
+Jeroen Cottaar
+
+jeroencottaar
+
+arrow_drop_up
+56
+Share
+more_horiz
+Project Links
+[ARIEL2025 1st place] Bayesian exoplanet analysis
+
+a year ago · 22 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+GIT repository with full development history
+
+https://github.com/jcottaar/ariel2
+
+link
+
+github.com
+
+Citation
+
+Jeroen Cottaar. 1st place solution: Bayesian Inference, of course. https://www.kaggle.com/competitions/ariel-data-challenge-2025/writeups/1st-place-solution-bayesian-inference-of-course. 2025. Kaggle
+
+7
+comment
+7 Comments
+Hotness
+Jeroen Cottaar
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Key differences with my 2024 solution:
+
+Use batman to model transits.
+Added limb darkening to the transit model.
+PCA for transit depths is done on the training set, rather than on the test set (no apparent population shift this year). Also uses 5 components instead of 1.
+Simplified Gaussian Process for transit depth (hardly needed still - a solution without any Gaussian Processes anywhere in the prior scores 0.642).
+Drift is modeled as a third-order polynomial rather than a Gaussian Process; less realistic, but matches the synthetic data generation process.
+Initial solver (grid search and BFGS) to find a good starting point for the Bayesian solver; mainly needed because of limb darkening.
+Progress towards proper jitter correction and background removal in preprocessing.
+Extensive post-hoc calibration (i.e. fudging) to deal with gaps in the prior - no fudging was needed last year.
+Significantly reduced computation time and memory usage with code improvements, including moving all preprocessing to GPU.
+reply
+Reply
+emoji_people
+Sakura
+
+Posted a year ago
+
+· 29th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!
+
+I wonder do you have some high-level insights on why Bayesian without NN work well in 2024 and 2025. As our team tried end-to-end deep neural networks (DNNs) which is extremely vulnerable and still need ensemble with other methods for robustness.
+
+My insight is that
+1) The actual noise functions is linearly like so that DNNs overfit it.
+2) The training data is small so that DNNs overfit it.
+3) The data sample is not infomation-abundent along with outliers so that DNNs overfit it.
+
+reply
+Reply
+Jeroen Cottaar
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Bayesian methods have an edge here because the underlying phsyics are relatively simple, but at the same time challenging for neural networks to identify. You just can't get away with ignoring the domain knowledge - neural networks are not going to learn that here (except perhaps if you provide enough training data so that they can essentially memorize all solutions).
+
+reply
+Reply
+Oleh Kivernyk
+
+Posted a year ago
+
+· 854th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the nice summary, @jeroencottaar !
+In your model you did not restrict the quadratic u1/u2 LD coefficients, so they could converge to Limb Brightening regime, right?
+
+reply
+Reply
+Jeroen Cottaar
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+They are regularized but not constrained. I highly doubt they would have negative values though (that's what you mean with limb brightening right?), that'd be very far outside the training population.
+
+I'll run some submission tonight to check this explicitly.
+
+reply
+Reply
+Oleh Kivernyk
+
+Posted a year ago
+
+· 854th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks @jeroencottaar !
+Just for reference - Figure 1 of Kipping paper illustrates physical constraints on quadratic u1, u2 values.
+
+reply
+Reply
+Jeroen Cottaar
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I checked, and see that I already had constraints imposed on the limb darkening parameters. No negative values occcurred in my winning submission.
+
+reply
+Reply
+JungleBeastDS
+
+Posted a year ago
+
+· 14th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats for the 1st place finish!
+
+I'm curious how well your model fits the ingress/egress period.
+
+In my model, I also had to do adjustment to the mean transit depth and I found the likely reason to be the limb darkening model not fitting well near the limbs (as well as lack of observations near the center), which greatly affects the transit depth distortion (measured depth vs (Rp/Rs)2 ) since the stellar flux is heavily dependent on the limb darkening assumption.
+
+reply
+Reply
+Jeroen Cottaar
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The main reason to adjust the mean transit depth is related to how well you do the constant background correction in preprocessing. If you don't do any, you should expect a ~0.6% correction on the AIRS mean. I think my model ends up needing ~0.1%.
+
+In general the ingress/egress period is fitted slightly worse than the rest of the transit (i.e. this range has slightly higher residuals), but not to the degree that it explains the need for fudging in my estimation.
+
+reply
+Reply
+JungleBeastDS
+
+Posted a year ago
+
+· 14th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+There is also the issue that different limb darkening models that can fit the observed data similarly well, but lead to different transit depth estimation.
+Which means there is a limit in how well we can estimate solely from the observed flux data, without incoporating further stellar properties.
+
+To give an example of how limb darkening assumption can seriously affect transit depth estimation:
+I fitted both exponential and quadratic on planet 3814020142's light curve.
+
+The residuals are similar, and the observed dip in flux is similar. However, there is a serious consequence of the choice of parametric limb darkening modeling. The best-ft quadratic model results in a disk-average intensity of 0.907 while the best-fit exponential results in a disk-average intensity of .884. This is because as you can see from the bottom graph, the exponential describes a much sharper drop in intensity towards the limbs.
+
+This means that choosing quadratic limb darkening results in 2.5% higher center-to-disk average intensity ratio. This leads to 1.8% higher (Rp/Rs)^2 estimation in the model. From my observations, polynomial limb darkening with higher linear coefficient tend to overestimate (Rp/Rs)^2.
+
+reply
+Reply
+Jeroen Cottaar
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Interesting. Perhaps the 'missing element' of my prior that leads to the need for fudging is the use of different limb darkening models for different planets (I couldn't get any improvement by switching all planets to a different model, but perhaps I should have been flexible - would have been a nice opportunity for some further Bayesian tricks).
+
+reply
+Reply

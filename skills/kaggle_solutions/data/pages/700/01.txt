@@ -1,0 +1,455 @@
+url: https://www.kaggle.com/c/playground-series-s6e4/writeups/1st-place-one-vs-rest-approach
+fetched: 2026-10-27
+chars: 10425
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place: One vs Rest + Multiclass Models — Predicting Irrigation Need
+1st place: One vs Rest + Multiclass Models
+
+Predicting Irrigation Need
+
+Solution Writeup · 1st place · May 1, 2026
+
+First of all, thanks to Kaggle for this competition. This month dataset and metric were non-standard, which made it more interesting! Also, a huge thanks to @mahoganybuttstrings, @utaazu, @yunsuxiaozi, @include4eto, @yekenot, @mikhailnaumov, @rohit8527kmr7518, @rawashishsin, @wguesdon, @lucasmoraes001, and @ravi20076 for sharing the solutions I used in final submission.
+
+Approach
+
+I used OOF predictions from public notebooks with different FE for ensembling. If public notebook contained only 1 model, I trained other models on same FE in some cases.
+I also made one FE and a set of 6 models myself, where FE is still based on public notebooks.
+
+Key observation I used was mentioned in https://www.kaggle.com/competitions/playground-series-s6e4/discussion/690677 - models almost never confuse Low and High classes. Therefore, I developed an approach with two binary classifiers. The first trained on Low vs Rest target on whole dataset. Since High class part is small, it is almost same as Low vs Medium.
+
+In the second step, I trained Medium vs. High classifier. Only Medium and High classes were used for training, but OOF predictions were generated for the whole dataset. I considered two options: train the second binary classifier on true Medium and High labels or on predicted by the first model. In the final solution, I chose the latter.
+
+Conversion to class probabilities was done by formulas
+
+P(Low) = P(Model_1)
+P(Medium) = (1 - P(Model_1)) * (1 - P(Model_2))
+P(High) = (1 - P(Model_1)) * P(Model_2)
+
+
+This gave XGBoost and RealMLP models with a CV of 0.9805 each.
+
+Ensemble
+
+I applied same scheme with 2 binary classifiers for probabilities blending. Blending was made with transform to logits + LogisticRegressionCV on 5 folds. I also ensured that all OOF predictions were obtained on 5 folds cv. Final cv of ensemble is 0.98155.
+For final predictions, I used two threshold search algorithms—both are greedy selection based on OOF balanced accuracy.
+
+Models
+
+61 oof predictions of models were used in final solution, 30 of them are from @wguesdon, 6 from my approach described above and the rest are from other public contributors. In a few cases, I reran public notebooks with other models.
+In total, there are 17 XGBoost, 11 LightGBM, 10 CatBoost, 9 RealMLP, 3 TabM, 2 LogisticRegression and a few others.
+
+Details can be found in the attached ensemble notebook, which contains both ensembling and training mode for my models.
+I have also attached one of TabM models training, based on https://www.kaggle.com/code/rawashishsin/s6e4-highest-score-xgboost-cv-0-98109 which was not included in best scoring submission.
+
+Conclusion
+
+There are many multiclass and multilabel problems where one-vs-rest is not optimal.
+Here the dataset is specific because models almost never confuse Low and High classes. This made one-vs-rest approach with 2 binary classifiers possible and allowed to focus first on ranking and then on thresholds calibration for balanced accuracy.
+
+Author
+cstdy
+
+kirill0212
+
+arrow_drop_up
+56
+Share
+more_horiz
+Project Links
+PS6e4 Ensemble CV 0.98155
+
+6 months ago · 28 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+PS6e4 TabM CV 0.9796
+
+6 months ago · 3 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Citation
+
+cstdy. 1st place: One vs Rest + Multiclass Models. https://www.kaggle.com/competitions/playground-series-s6e4/writeups/1st-place-one-vs-rest-approach. 2026. Kaggle
+
+11
+6
+comment
+22 Comments
+Hotness
+Dávid Kolumber
+
+Posted 6 months ago
+
+· 2096th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks for the write-up, really appreciate you sharing it.
+
+I’m joining competitions with the goal of becoming first one day, and I genuinely enjoy competing as well as learning from write-ups like this. I always look forward to them after competitions.
+
+I was initially expecting a long, detailed breakdown with 10 different things I had missed, but in the end it turned out to be a rather concise write-up that still captures a few key points I completely overlooked.
+
+FIRST
+I don’t have to overthink or dig everything out myself. Data science is often about simplifying your workflow and focusing on what actually matters.
+
+SECOND
+Another important takeaway for me is that EDA (including EDA of the predictive model) and basic ML intuition are often what people miss when they chase deeper or more complex approaches.
+
+Again. Big thank you on behalf of myself and others like me who are constantly trying to improve and learn.
+
+Congrats on finishing 1st!🥇
+
+reply
+Reply
+Optimistix
+
+Posted 6 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats! Very cool solution. I'd trained binary classifiers on High vs Medium and Medium vs Low, but only used the results as features - they went to the top, but didn't make a huge difference otherwise.
+
+reply
+Reply
+cstdy
+
+Topic Author
+
+Posted 6 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks, and congratulations on 4th place!
+
+reply
+Reply
+Chris Deotte
+
+Posted 6 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Amazing work @kirill0212 ! Congratulations winning 1st place! I like your approach of using 2 binary classifiers instead of 1 multi-class classifier. I also like your large diversity of models. Great job achieving a strong CV score and strong LB score!
+
+reply
+Reply
+cstdy
+
+Topic Author
+
+Posted 6 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, and congratulations on your great solution!
+
+reply
+Reply
+Wahabou Doudou A.fataou
+
+Posted 5 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Une solution très riche
+
+reply
+Reply
+turtle
+
+Posted 6 months ago
+
+· 132nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on 1st place! Thanks for sharing the writeup.
+
+reply
+Reply
+Jerry
+
+Posted 6 months ago
+
+· 590th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! I have a quick question for people who use a lot of models - how do you set it up on Kaggle? Do you just submit one long-running notebook that trains everything, or set up separate notebooks to pretrain the models and feed them to the submission notbook, or do you use some features of the kaggle-cli? I have done a few competitions but still have no idea how to set up things optimally, in last month's competition I have 1 notebook for each model and connect their outputs to submission notebook, but its really manual.
+
+reply
+Reply
+cstdy
+
+Topic Author
+
+Posted 6 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! I usually run multiple notebooks with Save & run all to save OOF and test predictions, then upload them manually to local folder or Kaggle dataset. Then run ensembling notebook on kaggle or locally.
+
+reply
+Reply
+r0tor
+
+Posted 6 months ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on 1st place! Really impressive and elegant solution.
+
+I especially liked the idea of using two binary classifiers instead of treating the task as a standard 3-class problem. The observation that Low and High are almost never confused is very important, and your approach seems to use this structure much better than a direct multiclass model.
+
+Thanks for sharing the writeup and the notebook.
+
+reply
+Reply
+cstdy
+
+Topic Author
+
+Posted 6 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you, and congratulations on 3rd place!
+
+I had many submissions with private scores between 0.981 and 0.9815 and same CV, so I guess final submission selection played a role.
+
+I chose 2 subs with different High class predictions count on test and one of them worked well on private set.
+
+reply
+Reply
+1
+r0tor
+
+Posted 6 months ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I had a very similar experience. Many of my submissions were very close, and the final selection mattered a lot. I also noticed that the number of predicted High samples was one of the key differences between strong submissions. But it was the big LB that turned out due to simple ensembling. It's just that, in my opinion, the problem with the competition was that the 20% test sample that was submitted for submission was very heterogeneous and it was very difficult to choose the 2 final predictions, due to the fact that we still have a chance of retraining due to the severe imbalance of classes.
+
+reply
+Reply
+AshishSinghRawat
+
+Posted 6 months ago
+
+· 72nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great solution and use of public notebooks is amazing, congrats.
+
+reply
+Reply
+Trimut
+
+Posted 6 months ago
+
+· 1022nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+That Low vs Rest → Medium vs High idea is actually crazy smart. I was stuck around ~0.97 and didn’t even think about reframing the problem like that. The whole OOF + logits blending setup is next level. Learned a lot from this, thanks for sharing!
+
+reply
+Reply
+Vandit
+
+Posted 6 months ago
+
+· 480th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congrats, nice approach @kirill0212
+
+reply
+Reply
+emoji_people
+ayushokaay
+
+Posted 6 months ago
+
+· 359th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+nice approach @kirill0212
+
+reply
+Reply
+hato bai
+
+Posted 6 months ago
+
+· 2344th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+COOL！Congratulations
+
+reply
+Reply
+Josue Romaric Edou
+
+Posted 6 months ago
+
+· 1179th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing ! Congratulations
+
+reply
+Reply
+Durga Kumari
+
+Posted 6 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Great approach on the Low vs High separation.
+The two-stage binary approach is really clean and effective. Thanks for sharing it.
+
+reply
+Reply
+Imrankhan
+
+Posted 6 months ago
+
+· 311th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @kirill0212
+
+reply
+Reply
+Vijay Takbhate
+
+Posted 6 months ago
+
+· 1572nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @kirill0212🥳
+
+reply
+Reply
+Mohit
+
+Posted 6 months ago
+
+· 104th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on 1st place!
+
+reply
+Reply
+
+This comment has been deleted.

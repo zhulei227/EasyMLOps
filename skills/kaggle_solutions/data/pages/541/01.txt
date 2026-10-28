@@ -1,0 +1,239 @@
+url: https://www.kaggle.com/c/playground-series-s3e10/discussion/396345
+fetched: 2026-10-27
+chars: 6030
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Binary Classification with a Tabular Pulsar Dataset
+1st place solution
+
+Binary Classification with a Tabular Pulsar Dataset
+
+Solution Writeup · 1st place · Mar 21, 2023
+
+My solution is here. I used GAM, however, with two additional features created with XGB and LASSO. That is, the final model is ensemble, although I think a little less "classic". Importantly, these additional features were not so much important here. The GAM model was my first approach, and without these features I was getting only slightly worse results.
+
+I chose this model for a few reasons:
+
+We have very few variables that are already high-level features. Feature engineering is basically impossible, it's just a matter of finding the right relationship.
+
+Boosting is based on trees, which, in my opinion, are not able to find "real" relationships. Because real world relationships are rather continuous in nature --- and decision trees only approximate it. Of course, they are great and you can approximate almost anything (e.g., very high-level interactions), but the world does not work in that way.
+
+GAM has built-in regularization; it selects parameters by performing internal crossvalidation. This makes it very convenient, and I could freely add interactions and features created from the XGB and LASSO model.
+
+Author
+Piotr Szulc
+
+seascape
+
+arrow_drop_up
+22
+Share
+more_horiz
+Citation
+
+Piotr Szulc. 1st place solution. https://www.kaggle.com/competitions/playground-series-s3e10/writeups/piotr-szulc-1st-place-solution. 2023. Kaggle
+
+comment
+12 Comments
+1 appreciation comment
+Hotness
+paddykb
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Beautiful Piotr. Thank you for sharing your approach. GBMs are such a heavy Kaggle default that it is instructive to see other methods do well. Smoothness & continuity FTW :)
+
+reply
+Reply
+mateuszgrzyb.pl
+
+Posted 4 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Jestem pod wrażeniem. Dzięki za udostępnienie kodu. Gratulacje!
+
+reply
+Reply
+Piotr Szulc
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Dzięki i pozdrawiam!
+
+reply
+Reply
+Tariq Mahmood
+
+Posted 4 years ago
+
+arrow_drop_up
+-3
+more_vert
+
+Hi Dear @seascape The approach you have taken is very interesting and provides insight into thethought process in selecting the appropriate model for this problem. The use of GAM with additional features created by XGB and LASSO, and the explanation of why these features were not crucial, shows your very careful consideration of the problem and their approach to solving it.
+
+And your reason that why you chose GAM over boosting is also insightful, as it highlights the limitations of tree-based models and the importance of continuous relationships in real-world data. The use of built-in regularization in GAM also makes it a convenient choice for this problem.
+
+No doubt , your sharing provides valuable insights into the process of selecting and combining models for solving a real-world problem, and your success in achieving 1st place is a testament to the effectiveness of your approach.👍
+
+reply
+Reply
+Morozov Oleg
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+mino
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thank you for sharing this! @seascape I am still learning about the GAM model, and I have a question about this part where you mention that you "add interactions and features created from the XGB and LASSO model." I believe this line of code is the exact part: mutate(Class = predict(gam_fit, pulsar_test, type = "response"). Could you please explain how the "interactions and features" are being added to GAM? Thank you!
+
+reply
+Reply
+Piotr Szulc
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@isaaccha That's the definition of my model:
+
+formula_gam <- as.formula(Class ~ s(Mean) + s(SD) + s(EK) + s(Skewness) + s(Mean_curve) + s(SD_curve) + s(EK_curve) + s(Skewness_curve) + ti(SD, EK) + ti(Skewness, EK) + ti(Skewness, Mean_curve) + ti(Mean_curve, SD_curve) + ti(SD_curve, Skewness_curve) + s(prob_xgb) + s(prob_glm))
+
+(from https://www.kaggle.com/code/seascape/how-to-detect-pulsars-with-gam-1st-place). The terms ti() represent interactions and can be interpreted in a similar way to a linear regression model. The features prob_xgb and prob_glm are predictions from XGB and Lasso and are not related to GAMs, that is these features can be used in any model, not just GAM.
+
+reply
+Reply
+mino
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I see -- thank you for the kind explanation! Helps a lot. 🙏
+
+reply
+Reply
+Siddharth Kumar
+
+Posted 4 years ago
+
+· 156th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing your solution and the reasoning behind your choice of model. Congratulations on achieving 1st place in the competition!
+
+reply
+Reply
+Iqbal Syah Akbar
+
+Posted 4 years ago
+
+· 477th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+This is the first time I hear GAM, I am very interested to see how it will be used on other datasets in Kaggle. I hope I can try using GAM in Python, tho I am not sure whether GAM in Python has the same quality as the one in R (and maybe I need to learn R if I want to use it in the future).
+
+I also agree with you on feature engineering. I think the features provided have already described Integrated Profile and DM-SNR curve as best as they can here.
+
+reply
+Reply
+Lucy
+
+Posted 4 years ago
+
+· 81st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congradulations! Thanks for the insights and your notebook!
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (1)
+Ericka42
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing your solution

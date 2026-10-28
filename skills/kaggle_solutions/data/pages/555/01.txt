@@ -1,0 +1,1010 @@
+url: https://www.kaggle.com/c/tlvmc-parkinsons-freezing-gait-prediction/discussion/416026
+fetched: 2026-10-27
+chars: 26820
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution: transformer and acceleration data — Parkinson's Freezing of Gait Prediction
+1st place solution: transformer and acceleration data
+
+Parkinson's Freezing of Gait Prediction
+
+Solution Writeup · 1st place · Jun 9, 2023
+
+Greetings to the Kaggle Community. In this message I want to tell you about my solution.
+
+Thanks to Kaggle for providing free GPU and TPU resources to everyone. On my graphics card (1050 Ti) I would not have achieved those results. Thanks to Google for the excellent tensorflow library. All of my work was done in Kaggle Notebooks and relies on TensorFlow capabilities.
+
+The key decisions that, in my opinion, led to a good result:
+
+Use a combination of transformer encoder and two BidirectionalLSTM layers.
+Use patches like VisualTransformer.
+Reduce the resolution of targets.
+
+How does it work?
+
+Suppose we have a tdcsfog sensor data series with AccV, AccML, AccAP columns and len of 5000.
+
+First, apply mean-std normalization to AccV, AccML, AccAP columns.
+
+def sample_normalize(sample):
+    mean = tf.math.reduce_mean(sample)
+    std = tf.math.reduce_std(sample)
+    sample = tf.math.divide_no_nan(sample-mean, std)
+
+    return sample.numpy()
+
+
+Then the series is zero-padded so that the final length is divisible by block_size = 15552 (or 12096 for defog). Now the series shape is (15552, 3).
+
+And create patches with the patch_size = 18 (or 14 for defog):
+
+series # Example shape (15552, 3)
+series = tf.reshape(series, shape=(CFG['block_size'] // CFG['patch_size'], CFG['patch_size'], 3)) # Example shape (864, 18, 3)
+series = tf.reshape(series, shape=(CFG['block_size'] // CFG['patch_size'], CFG['patch_size']*3))  # Example shape (864, 54)
+
+
+Now the series shape is (864, 54). It's a model input.
+
+What to do with the StartHesitation, Turn, Walking data? Same, but apply tf.reduce_max at the end.
+
+series_targets # Example shape (15552,  3)
+series_targets = tf.reshape(series_targets, shape=(CFG['block_size'] // CFG['patch_size'], CFG['patch_size'], 3)) # Example shape (864, 18, 3)
+series_targets = tf.transpose(series_targets, perm=[0, 2, 1]) # Example shape (864, 3, 18)
+series_targets = tf.reduce_max(series_targets, axis=-1) # Example shape (864, 3)
+
+
+Now the series shape is (864, 3). It's a model output.
+
+At the end, simply return the true resolution with tf.tile
+
+predictions = model.predict(...) # Example shape (1, 864, 3)
+predictions = tf.expand_dims(predictions, axis=-1) # Example shape (1, 864, 3, 1)
+predictions = tf.transpose(predictions, perm=[0, 1, 3, 2]) # Example shape (1, 864, 1, 3)
+predictions = tf.tile(predictions, multiples=[1, 1, CFG['patch_size'], 1]) # Example shape (1, 864, 18, 3)
+predictions = tf.reshape(predictions, shape=(predictions.shape[0], predictions.shape[1]*predictions.shape[2], 3)) # Example shape (1, 15552, 3)
+
+Details
+
+Daily data, events.csv, subjects.csv, tasks.csv have never been used.
+
+Tdcsfog data is not used to train defog models.
+
+Defog data is not used to train tdcsfog models.
+
+Optimizer
+
+tf.keras.optimizers.Adam(learning_rate=Schedule(LEARNING_RATE, WARMUP_STEPS), beta_1=0.9, beta_2=0.98, epsilon=1e-9)
+
+
+Loss function
+
+'''
+loss_function args exp
+
+real is a tensor with the shape (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], 5) where the last axis means:
+0 - StartHesitation
+1 - Turn
+2 - Walking
+3 - Valid
+4 - Mask
+
+output is a tensor with the shape (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], 3) where the last axis means:
+0 - StartHesitation predicted
+1 - Turn predicted
+2 - Walking predicted
+
+'''
+
+ce = tf.keras.losses.BinaryCrossentropy(reduction='none')
+
+def loss_function(real, output, name='loss_function'):
+    loss = ce(tf.expand_dims(real[:, :, 0:3], axis=-1), tf.expand_dims(output, axis=-1)) # Example shape (32, 864, 3)
+
+    mask = tf.math.multiply(real[:, :, 3], real[:, :, 4]) # Example shape (32, 864)
+    mask = tf.cast(mask, dtype=loss.dtype)
+    mask = tf.expand_dims(mask, axis=-1) # Example shape (32, 864, 1)
+    mask = tf.tile(mask, multiples=[1, 1, 3]) # Example shape (32, 864, 3)
+    loss *= mask # Example shape (32, 864, 3)
+
+    return tf.reduce_sum(loss) / tf.reduce_sum(mask)
+
+
+Model
+
+CFG = {'TPU': 0,
+       'block_size': 15552,
+       'block_stride': 15552//16,
+       'patch_size': 18,
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 5,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+'''
+The transformer encoder layer
+For more details, see https://arxiv.org/pdf/1706.03762.pdf [Attention Is All You Need]
+
+'''
+
+class EncoderLayer(tf.keras.layers.Layer):
+    def __init__(self):
+        super().__init__()
+
+        self.mha = tf.keras.layers.MultiHeadAttention(num_heads=CFG['fog_model_num_heads'], key_dim=CFG['fog_model_dim'], dropout=CFG['fog_model_mha_dropout'])
+
+        self.add = tf.keras.layers.Add()
+
+        self.layernorm = tf.keras.layers.LayerNormalization()
+
+        self.seq = tf.keras.Sequential([tf.keras.layers.Dense(CFG['fog_model_dim'], activation='relu'),
+                                        tf.keras.layers.Dropout(CFG['fog_model_encoder_dropout']),
+                                        tf.keras.layers.Dense(CFG['fog_model_dim']),
+                                        tf.keras.layers.Dropout(CFG['fog_model_encoder_dropout']),
+                                       ])
+
+    def call(self, x):
+        attn_output = self.mha(query=x, key=x, value=x)
+        x = self.add([x, attn_output])
+        x = self.layernorm(x)
+        x = self.add([x, self.seq(x)])
+        x = self.layernorm(x)
+
+        return x
+
+'''
+FOGEncoder is a combination of transformer encoder (D=320, H=6, L=5) and two BidirectionalLSTM layers
+
+'''
+
+class FOGEncoder(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+
+        self.first_linear = tf.keras.layers.Dense(CFG['fog_model_dim'])
+
+        self.add = tf.keras.layers.Add()
+
+        self.first_dropout = tf.keras.layers.Dropout(CFG['fog_model_first_dropout'])
+
+        self.enc_layers = [EncoderLayer() for _ in range(CFG['fog_model_num_encoder_layers'])]
+
+        self.lstm_layers = [tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(CFG['fog_model_dim'], return_sequences=True)) for _ in range(CFG['fog_model_num_lstm_layers'])]
+
+        self.sequence_len = CFG['block_size'] // CFG['patch_size']
+        self.pos_encoding = tf.Variable(initial_value=tf.random.normal(shape=(1, self.sequence_len, CFG['fog_model_dim']), stddev=0.02), trainable=True)
+
+    def call(self, x, training=None): # (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], CFG['patch_size']*3), Example shape (4, 864, 54)
+        x = x / 25.0 # Normalization attempt in the segment [-1, 1]
+        x = self.first_linear(x) # (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], CFG['fog_model_dim']), Example shape (4, 864, 320)
+
+        if training: # augmentation by randomly roll of the position encoding tensor
+            random_pos_encoding = tf.roll(tf.tile(self.pos_encoding, multiples=[GPU_BATCH_SIZE, 1, 1]),
+                                          shift=tf.random.uniform(shape=(GPU_BATCH_SIZE,), minval=-self.sequence_len, maxval=0, dtype=tf.int32),
+                                          axis=GPU_BATCH_SIZE * [1],
+                                          )
+            x = self.add([x, random_pos_encoding])
+
+        else: # without augmentation
+            x = self.add([x, tf.tile(self.pos_encoding, multiples=[GPU_BATCH_SIZE, 1, 1])])
+
+        x = self.first_dropout(x)
+
+        for i in range(CFG['fog_model_num_encoder_layers']): x = self.enc_layers[i](x) # (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], CFG['fog_model_dim']), Example shape (4, 864, 320)
+        for i in range(CFG['fog_model_num_lstm_layers']): x = self.lstm_layers[i](x) # (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], CFG['fog_model_dim']*2), Example shape (4, 864, 640)
+
+        return x
+
+class FOGModel(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+
+        self.encoder = FOGEncoder()
+        self.last_linear = tf.keras.layers.Dense(3)
+
+    def call(self, x): # (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], CFG['patch_size']*3), Example shape (4, 864, 54)
+        x = self.encoder(x) # (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], CFG['fog_model_dim']*2), Example shape (4, 864, 640)
+        x = self.last_linear(x) # (GPU_BATCH_SIZE, CFG['block_size'] // CFG['patch_size'], 3), Example shape (4, 864, 3)
+        x = tf.nn.sigmoid(x) # Sigmoid activation
+
+        return x
+
+Submission (Private Score 0.514, Public Score 0.527) consists of 8 models:
+Model 1 (tdcsfog model)
+CFG = {'TPU': 1, 
+       'block_size': 15552, 
+       'block_stride': 15552//16,
+       'patch_size': 18, 
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 5,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+LEARNING_RATE = 0.01/38
+STEPS_PER_EPOCH = 64
+WARMUP_STEPS = 64
+BATCH_SIZE=32
+
+
+Validation subjects ['07285e', '220a17', '54ee6e', '312788', '24a59d', '4bb5d0', '48fd62', '79011a', '7688c1']
+
+Train 15 minutes on TPU. Validation scores: StartHesitation AP - 0.462 Turn AP - 0.896 Walking AP - 0.470 mAP - 0.609
+
+Model 2 (tdcsfog model)
+CFG = {'TPU': 0, 
+       'block_size': 15552, 
+       'block_stride': 15552//16,
+       'patch_size': 18, 
+
+       'fog_model_dim': 256,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 3,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+LEARNING_RATE = 0.01/24
+STEPS_PER_EPOCH = 64
+WARMUP_STEPS = 64
+BATCH_SIZE = 16
+
+
+Validation subjects ['07285e', '220a17', '54ee6e', '312788', '24a59d', '4bb5d0', '48fd62', '79011a', '7688c1']
+
+Train 40 minutes on GPU. Validation scores: StartHesitation AP - 0.481 Turn AP - 0.886 Walking AP - 0.437 mAP - 0.601
+
+Model 3 (tdcsfog model)
+CFG = {'TPU': 1,
+       'block_size': 15552, 
+       'block_stride': 15552//16,
+       'patch_size': 18, 
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 5,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+LEARNING_RATE = 0.01/48
+STEPS_PER_EPOCH = 64
+WARMUP_STEPS = 64
+BATCH_SIZE = 32
+
+
+Validation subjects ['e39bc5', '516a67', 'af82b2', '4dc2f8', '743f4e', 'fa8764', 'a03db7', '51574c', '2d57c2']
+
+Train 11 minutes on TPU. Validation scores: StartHesitation AP - 0.601 Turn AP - 0.857 Walking AP - 0.289 mAP - 0.582
+
+Model 4 (tdcsfog model)
+CFG = {'TPU': 1,
+       'block_size': 15552, 
+       'block_stride': 15552//16,
+       'patch_size': 18, 
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 5,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+LEARNING_RATE = 0.01/38
+STEPS_PER_EPOCH = 64
+WARMUP_STEPS = 64
+BATCH_SIZE = 32
+
+
+Validation subjects ['5c0b8a', 'a03db7', '7fcee9', '2c98f7', '2a39f8', '4f13b4', 'af82b2', 'f686f0', '93f49f', '194d1d', '02bc69', '082f01']
+
+Train 13 minutes on TPU. Validation scores: StartHesitation AP - 0.367 Turn AP - 0.879 Walking AP - 0.194 mAP - 0.480
+
+Model 5 (defog model)
+CFG = {'TPU': 1,
+       'block_size': 12096, 
+       'block_stride': 12096//16,
+       'patch_size': 14, 
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 5,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+LEARNING_RATE = 0.01/62
+STEPS_PER_EPOCH = 256
+WARMUP_STEPS = 256
+BATCH_SIZE = 32
+
+
+Validation subjects ['00f674', '8d43d9', '107712', '7b2e84', '575c60', '7f8949', '2874c5', '72e2c7']
+
+Train data: defog data, notype data Validation data: defog data, notype data
+
+Train 45 minutes on TPU. Validation scores: StartHesitation AP - [not used] Turn AP - 0.625 Walking AP - 0.238 mAP - 0.432 Event AP - 0.800
+
+Model 6 (defog model)
+CFG = {'TPU': 1,
+       'block_size': 12096, 
+       'block_stride': 12096//16,
+       'patch_size': 14, 
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 5,
+       'fog_model_num_encoder_layers': 5,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+
+Train data: defog data (about 85%) Validation data: defog data (about 15%), notype data (100%)
+
+Model 7 (defog model)
+CFG = {'TPU': 1,
+       'block_size': 12096, 
+       'block_stride': 12096//16,
+       'patch_size': 14, 
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 4,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+LEARNING_RATE = 0.01/24
+STEPS_PER_EPOCH = 32
+WARMUP_STEPS = 64
+BATCH_SIZE = 128
+
+
+Train data: defog data (100%) Validation data: notype data (100%)
+
+Train 18 minutes on TPU. Validation scores: StartHesitation AP - [not used] Turn AP - [not used] Walking AP - [not used] mAP - [not used] Event AP - 0.764
+
+Model 8 (defog model)
+CFG = {'TPU': 1,
+       'block_size': 12096, 
+       'block_stride': 12096//16,
+       'patch_size': 14, 
+
+       'fog_model_dim': 320,
+       'fog_model_num_heads': 6,
+       'fog_model_num_encoder_layers': 5,
+       'fog_model_num_lstm_layers': 2,
+       'fog_model_first_dropout': 0.1,
+       'fog_model_encoder_dropout': 0.1,
+       'fog_model_mha_dropout': 0.0,
+      }
+
+LEARNING_RATE = 0.01/46
+STEPS_PER_EPOCH = 256
+WARMUP_STEPS = 256
+BATCH_SIZE = 32
+
+
+Validation subjects ['12f8d1', '8c1f5e', '387ea0', 'c56629', '7da72f', '413532', 'd89567', 'ab3b2e', 'c83ff6', '056372']
+
+Train data: defog data, notype data Validation data: defog data, notype data
+
+Train 28 minutes on TPU. Validation scores: StartHesitation AP - [not used] Turn AP - 0.758 Walking AP - 0.221 mAP - 0.489 Event AP - 0.744
+
+Final models
+
+Tdcsfog: 0.25 * Model 1 + 0.25 * Model 2 + 0.25 * Model 3 + 0.25 * Model 4
+
+Defog: 0.25 * Model 5 + 0.25 * Model 6 + 0.25 * Model 7 + 0.25 * Model 8
+
+Author
+Urazalinov Baurzhan
+
+baurzhanurazalinov
+
+arrow_drop_up
+117
+Share
+more_horiz
+Citation
+
+Urazalinov Baurzhan. 1st place solution: transformer and acceleration data. https://www.kaggle.com/competitions/tlvmc-parkinsons-freezing-gait-prediction/writeups/baurzhan-urazalinov-1st-place-solution-transformer. 2023. Kaggle
+
+comment
+32 Comments
+3 appreciation comments
+Hotness
+Ifeanyichukwu Nwobodo
+
+Posted 3 years ago
+
+arrow_drop_up
+10
+more_vert
+
+Congratulations 🎉🎉🎉🎉 The fact that I don't understand a single comment here shows that I have a long way to go. Thanks for sharing.
+
+reply
+Reply
+AmorfEvo
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+I hope you will receive the prize money for 1st place. If Kaggle cannot deliver it to you because of the sanctions, then I would write to the Michael J. Fox Foundation if I were you, so that it would be possible for you somehow…
+
+reply
+Reply
+AmorfEvo
+
+Posted 3 years ago
+
+arrow_drop_up
+9
+more_vert
+
+He fought with a 1050 Ti and some Kaggle free resources and achieved 1st place as a 1 person team and this is his 1st place and gold medal. It should be rewarded, not withheld regardless of the global situation.
+
+reply
+Reply
+slime
+
+Posted 3 years ago
+
+· 77th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you for sharing your solution, time-series dimensionality reduction is the thing I haven't thought of, I have a question for you, -
+
+How do you perform inference for your models? Suppose you've got the predictions for N tokens in the token sequence, which ones do you take? (e.g. all of them and then average predictions for overlapping tokens from different windows, or do you take only central token from each window?)
+
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks. Yes, simple window roll ([0:15552], [972:16524], [1944:17496], … ) and average predictions for overlapping tokens from different windows.
+
+reply
+Reply
+Ignacio Oguiza
+
+Posted 3 years ago
+
+· 36th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @baurzhanurazalinov, for winning this competition! And thank you for sharing your great solution. The use of patches and the consolidation of targets are great ideas. I have a few questions:
+
+Have you tried a transformer-only solution (without the LSTM part)?
+I'd never seen a random rolling position encoding built this way. Is this your own idea? Have you compared it to a regular position encoding?
+You have a parameter block_stride that indicates you create multiple samples from each subject (with overlap). But the batch size and samples per epoch are low. How many epochs did you use?
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks!
+
+Yes. Without LSTM layers, the model does not work well. I think the main contribution of the transformer encoder is to classify events (StartHesitation, Turn or Walking?), and LSTM part provides continuous communication between neighboring tokens.
+Yes, it was my idea. I am not sure that adding positional encoding improves validation scores, but I have noticed that positional encoding does not harm the model, so I decided not to remove it. I suppose that requires additional tests.
+Yes. I got about 2000 samples for tdscfog dataset and about 25000 samples for defog dataset. Model weights do not exceed 72MB and work quickly. Average number of epochs for a well-trained model is 35 epochs.
+reply
+Reply
+Ignacio Oguiza
+
+Posted 3 years ago
+
+· 36th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for your quick reply, @baurzhanurazalinov!
+
+LSTM layers, the model does not work well. I think the main contribution of the transformer encoder is to classify events (StartHesitation, Turn or Walking?), and LSTM part provides continuous communication between neighboring tokens.
+
+This is a great finding. I wonder if the LSTM part provides the inductive bias that is missing in the Transformer. I'll start using this combination.
+
+Yes, it was my idea.
+
+Excellent! I'd like to also test this approach.
+
+reply
+Reply
+Roy Segalz
+
+Posted 3 years ago
+
+· 120th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Amazing work! Very elegant and interesting!
+
+reply
+Reply
+Shujun
+
+Posted 3 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+How do you pick validation subjects? And also how do you use event model for the test set?
+
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+I count the number of StartHesitation, Turn, Walking events in each subject with scipy.ndimage.label function. Then randomly select subset of subjects (about 15% subjects). If subset contains 20 - 30% StartHesitation events and 20 - 30% Walking events, I choose it.
+Event model is only used for training on defog + notype data (4-target model, in case of notype examples the first three targets are masked). During submission, the fourth target is ignored. Also, event AP is a good metric.
+series['Event'] = series[['StartHesitation', 'Turn', 'Walking']].aggregate('max', axis=1)
+series['Event_prediction'] = series[['StartHesitation_prediction', 'Turn_prediction', 'Walking_prediction']].aggregate('max', axis=1)
+
+reply
+Reply
+此般浅薄
+
+Posted 3 years ago
+
+· 29th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing validation trick👍
+
+reply
+Reply
+HideBu
+
+Posted 3 years ago
+
+· 67th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@baurzhanurazalinov Congratulations!! I have questions about your comment 1 and 2.
+
+Did you choose subset (contains 20-30% StartHesitation and Walking events) for both train and valid data? And, didn't you cross validation?
+In your case, you use Event in addition to StartHesitation, Turn, and Walking. Are you saying that the addition of the Event flag helped to improve the accuracy of the deep learning model?
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks.
+
+Valid data only (valid data = selected subset; train data = all data - selected subset) Cross validation is not used because of the low correlation between validation score and LB. I used three rules to select the trained model: Model was trained for a long time. Model at the end of long training gives good validation scores Model gives good public LB score
+If you do not use Event flag, it is not possible to include notype data in the training process. I thought that pseudo-labeling notype data would lower my validation scores, so I didn't use pseudo-labeling.
+reply
+Reply
+hyd
+
+Posted 3 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great solution. I also use LSTM + transformer, and my sequence length is 5120. But I didn't use patches like you which seems very helpful to avoid overfitting.👍👍👍
+
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks. Patch size is the most important parameter of this model. Increasing or decreasing significantly degrades mAP. It can also be noticed that 18 * (100Hz / 128Hz) = 14.0625, where 18 - optimal tdcsfog patch size, 14 - optimal defog patch size, but the tdcsfog and defog models are independent.
+
+reply
+Reply
+Yijie Xu
+
+Posted 3 years ago
+
+· 685th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! @baurzhanurazalinov A question, why did you go with the resolution reduction approach, was it to save memory or is there some intrinsic benefit?
+
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks!
+
+No, it's not saving memory. Model works better with reduced resolution than with true resolution. I think deep learning models do badly on targets with complex structure (for example, 128Hz like in this competition), so they should be reduced. In addition, it allows you to use raw input data instead of using feature engineering.
+reply
+Reply
+Yijie Xu
+
+Posted 3 years ago
+
+· 685th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+By your second point, do you mean that the high resolution is too noisy to render the data effective? Essentially, you are denoising the data by reducing resolution? Not sure how feature engineering relates to the resolution here
+
+reply
+Reply
+Eugeniy Osetrov
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@baurzhanurazalinov Great job! Congratulations! 👋
+
+reply
+Reply
+Bachar Acherif
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations for work sharing👍
+
+reply
+Reply
+Vladimir Simões da Luz Junior
+
+Posted 3 years ago
+
+· 619th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, @baurzhanurazalinov! And thanks for sharing your knowledge with the community!
+
+Impressive to see that you achieved such results using only AccV, AccML and AccAP data series…
+
+Curious to understand why you used block_size = 15552 (or 12096 for defog), and if you tried other values?
+
+Keep up with the great work💪🔥
+
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks!
+
+The model has two important parameters: patch size and sequence length. optimal tdscfog patch size = 18 optimal defog patch size = 14 optimal sequence length = 864 864 * 18 = 15552 and 864 * 14 = 12096 Using other parameters values lowers the validation scores.
+reply
+Reply
+Vladimir Simões da Luz Junior
+
+Posted 3 years ago
+
+· 619th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Really interesting…
+
+It seem's that using patches like VisualTransformers and BidirectionalLSTM layers enabled the model to capture both global and local information efficiently.
+
+Congratulations and thanks once again🙏
+
+reply
+Reply
+cbrt343
+
+Posted 3 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+ARYAN PERSHAD
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! It's inspiring to see people come up with such innovative solutions.
+
+reply
+Reply
+Eishkaran Singh
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations
+
+reply
+Reply
+Lingduo Wang
+
+Posted 3 years ago
+
+· 533rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great job! Thank you for sharing! May I ask where I can see your complete code? If I could further learn, I will appreciate a lot!
+
+reply
+Reply
+olivepicker
+
+Posted 3 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, I'm gonna implement your solution and I hope to understand your insights. Thanks for sharing.
+
+reply
+Reply
+JM
+
+Posted 3 years ago
+
+· 40th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing job well done!
+
+reply
+Reply
+hip_174999
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+🐮🍺🐮🍺🐮🍺🐮🍺🐮🍺🐮🍺🐮🍺🐮🍺🐮🍺🐮🍺
+
+reply
+Reply
+Alberto Annoni
+
+Posted 3 years ago
+
+· 202nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing, and congrats! Padding each time-series to 15552 samples is very memory consuming. Have you processed and trained one time-series at a time (e.g. using model.train_on_batch) or other techinques or am I wrong in something? :-)
+
+reply
+Reply
+Urazalinov Baurzhan
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks!
+
+All train data were loaded into RAM. No problems with memory. You can run my notebook if you want to make sure: https://www.kaggle.com/code/baurzhanurazalinov/parkinson-s-freezing-tdcsfog-training-code
+
+reply
+Reply
+Alberto Annoni
+
+Posted 3 years ago
+
+· 202nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you I just realized there were the complete notebooks available!
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (3)
+Ruiruiw
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing the solution!
+
+Mark Gustetic
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for sharing!
+
+Pooja Chauhan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing

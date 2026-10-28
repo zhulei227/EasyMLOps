@@ -1,0 +1,642 @@
+url: https://www.kaggle.com/c/playground-series-s4e11/discussion/549160
+fetched: 2026-10-27
+chars: 14842
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Exploring Mental Health Data
+1st place solution
+
+Exploring Mental Health Data
+
+Solution Writeup · 1st place · Dec 1, 2024
+
+Well, this is a nice and totally unexpected surprise! Congratulations to everyone who survived the shake-up, and thanks to @optimistix and @tilii7 for their support and encouragement last month, which kept me motivated to win the competition of this month.
+
+I kept my promise, @optimistix. Funny enough, my winning solution came from an early experiment I ran during the second week of the competition, which, honestly, I didn’t think had a chance of winning. Over the month, I trained many different models (69 in total) with various data pipelines and configurations, and tried many different methods to ensemble them. However, as it turned out, fewer models and a simpler ensembling approach worked better this time around. I ended up using 24 models (still a lot, though!).
+
+The reason I doubted this solution would work was because the CV score was much higher than I expected (0.94173), and the public LB score was lower than many of my other submissions (0.94284). My other selected submission, which I spent a lot more time on, had a CV score of 0.94150 and a public LB score of 0.94285. Despite this, I couldn’t find any errors in my code, so I decided to trust the CV score and use this solution as one of my submissions.
+
+My approach this month was similar to last month. I didn't do any feature engineering and did not drop any features, despite the temptation to remove the Name column. For the modeling part, I trained XGBoost and three variations of LightGBM on four different data pipelines, with the original dataset being included in two of the pipelines. I also used the OOF files from my public notebook. Additionally, I trained two AutoGluon models, one with and one without the original dataset. These two models had the highest CV scores and were probably the two most important models in my ensemble. The scores for each of my models, and my AutoGluon ensemble can be seen in the figure below.
+
+After training all the models and collecting their OOF files, I let AutoGluon handle the ensembling, ensuring to define the CV strategy myself to avoid leakage. It worked really well last month, so I decided to try it again, and it didn’t disappoint! I also experimented with ensembling the OOF files with hill climbing, Ridge, Logistic Regression, and a combination of Ridge and Logistic Regression, but the CV scores for these methods didn’t even come close to what I achieved with AutoGluon.
+
+Author
+Mahdi Ravaghi
+
+ravaghi
+
+arrow_drop_up
+106
+Share
+more_horiz
+Citation
+
+Mahdi Ravaghi. 1st place solution. https://www.kaggle.com/competitions/playground-series-s4e11/writeups/mahdi-ravaghi-1st-place-solution. 2024. Kaggle
+
+54
+36
+19
+16
+1
+comment
+76 Comments
+8 appreciation comments
+Hotness
+Electro Knight
+
+Posted 2 years ago
+
+· 866th in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+But wouldn't not cleaning the data mean machine has learnt false things? Like for example if the form is distributed in a specific locality where depression is high. There are 2 people having same name let us take Rohan. both Rohan have depression. But the data of 1st Rohan is used in training and second is used in testing. The machine will learn that the Rohan is cause of depression but in reality that it is the very specific locality that causes it. Like the poverty in area is the actual factor rather than name.
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+What you're saying makes sense and is a valid concern, but keep in mind that we are working with a synthetic dataset. With real data, I would address the issues you're mentioning, but based on what I've learned about synthetic datasets since I began competing in TPS, it's usually best to leave the inconsistencies in the data as is.
+
+reply
+Reply
+Electro Knight
+
+Posted 2 years ago
+
+· 866th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I see thanks.
+
+reply
+Reply
+Optimistix
+
+Posted 2 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats once again! While I'm not surprised that your winning submission was achieved early on (so were my highest private scores, which I didn't choose), it's great that you chose wisely. You always turn in solid work and get great scores and are high on the LB, so it was only a matter of time before you won, and here we are. Celebrate this!
+
+reply
+Reply
+hugosilva664
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Hello! Congratulations on your solution and results. I'd like to ask a question about it. After reading your notebook and also some introductory tutorials on AutoGluon, something intrigued me. Both mention the importance of not allowing data contamination, that is, not allowing the trained model to have "interacted" with the predictions of the validation data in any way before using it for validation. Consider the following sequence:
+
+When doing k-fold cross validation, a model is trained on set $A^C$ and evaluated on set $A$. Assume example $x_1$ belongs to $A$.
+OOF predictions are generated for elements. Assume a fixed element $x_2$ from $A^C$
+At some point, in another fold, $x_2$ was used for validation, the model generating its predictions was trained on $x_1$
+When ensembling, the per-model OOF predictions are used as features
+k-fold cross validation is run again when training the ensemble weights (e.g. your ridge or logistic regression)
+Assume, on this second run, that the example $x_1$ now belongs to a set $B$ and $x_2$ now belongs to set $B^C$ in one of the folds
+When using $B$ for validation, the model was trained on $B^C$
+$x_2$ is on $B^C$. However, its OOF features---which the training model can see---are from a model that was trained on $x_1$, as stated previously Doesn't this introduce subtle data contamination? Maybe there is something I am missing.
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @hugosilva664!
+
+If I were to create the ensemble folds and stratifications differently from those of the single models, I would introduce some leakage, which would lead to high CV scores and a low private LB score (i.e., the model would perform worse on unseen data). However, the strategy that I'm using is safe to use as long as the same seed and stratification strategy are applied to all models, as well as the ensemble models.
+
+Hope this answers your question.
+
+reply
+Reply
+hugosilva664
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you very much for your reply. I am still confused though. In my description above, if $A=B$, as would be the case in same seed and strategy, the items would still be true (i.e. $x_2$ in the ensemble training would have features resulting from having previously been trained on $x_1$), so the subtle contamination would still happen. Is it the case that this subtle contamination simply does not interfere with results much?
+
+reply
+Reply
+Nick Erickson
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Hello @hugosilva664! Yes you are correct. The process of multilayer stacking leads to subtle data contamination. This is inescapable when using multi-layer stacking, and is why we use a dynamic stacking logic in AutoGluon that detects the severity of the contamination and disables stacking if it would lead to sufficient performance loss, which was one of the major features added in AutoGluon 1.0.
+
+The impact of the contamination varies by dataset, ranging from harmless to catastrophic.
+
+reply
+Reply
+hugosilva664
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Understood. Thank you very much for your reply.
+
+reply
+Reply
+Will
+
+Posted 2 years ago
+
+· 34th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Many thanks for sharing this and congratulations! Did you save out of fold predictions on your Autogluons models?
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks!
+
+Only the weighted ensemble OOF, the single model OOFs generated by AutoGluon tend to overfit, so I usually don't include them in my ensemble. There is a discussion post about this here if you are interested to know why.
+
+reply
+Reply
+Mart Preusse
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Great that you finished 1st! I am so happy for you. Using AutoGluon as stacker is an intersting idea and you worked hard on the details like defining the cv for AutoGluon and comparing the ensembling results of AutoGluon and Hillclimbing. Well earned victory! Good luck further on.
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you!
+
+I was initially suspicious of my CV score with AutoGluon as an ensembler, but I'm glad I chose it as one of my final submissions.
+
+reply
+Reply
+Tilii
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+@ravaghi Kudos to you! Love when good things happen to model competitors.
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much! It means a lot to me.
+
+reply
+Reply
+Bhargav Borah
+
+Posted 2 years ago
+
+· 51st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on another consistent top 10 finish and winning the competition!
+
+Could you recommend the minimum time limit one should set for AutoGluon models to achieve competitive results?
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you @introverstein!
+
+Could you recommend the minimum time limit one should set for AutoGluon models to achieve competitive results?
+
+
+It highly depends on the dataset and how you configure AutoGluon. Most of the time, I run AutoGluon on Kaggle notebooks and I set the time limit to as high as I can get away with.
+
+reply
+Reply
+1
+Hardy Xu
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!! It's interesting how AutoGluon performed so well here, both as a 1st level model and as an ensembler. I've never used it myself, but it seems it's been contributing to a lot of top solutions to these comps recently, so I guess I'd better start using it too!
+
+reply
+Reply
+Den_Kuznetz
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! That's a great result!
+
+reply
+Reply
+JuseTiz
+
+Posted 2 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very impressive solution! Thank you for sharing.
+
+A question: how do you save the out-of-fold (OOF) results from Autogluon? Did you use the .predict_proba_oof method in Autogluon?
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you!
+
+Yes, I have an example here.
+
+reply
+Reply
+Shedrack Eneojo Okute
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation ,Mahdi. What another great opportunity to learn from you again
+
+reply
+Reply
+Yannick Maehlmann
+
+Posted 2 years ago
+
+· 1789th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great solution, I wondered if the 1st place finish would include the name column in the dataset, as I dropped it instantly, but interestingly it does make for better results.
+
+reply
+Reply
+Mohamed Drabo
+
+Posted 2 years ago
+
+· 436th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I want to know how to select my submissions for my public score. I used to think that I should select the submission with the highest score, but then I realized that some of my submissions have a better public score than my selected submission.
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Trust your CV. Works most of the time for me.
+
+reply
+Reply
+Beata Faron
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations ! Great solution!
+
+reply
+Reply
+SP09_
+
+Posted 2 years ago
+
+· 1516th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! The explanation of the solution was excellent.
+
+Could you please explain in simple terms what is the use of oof files ? @ravaghi
+
+Thanks.
+
+reply
+Reply
+Tilii
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+I'll let @ravaghi answer your question since that is who you asked.
+
+For the future: any time you have a question, I suggest you start typing keywords into the search field at the top of the "Discussion" section. Typing oof into that field will give you the same results as the link below:
+
+https://www.kaggle.com/competitions/playground-series-s4e11/discussion?sort=undefined&search=oof
+
+Those are all the threads in this competition with a word oof, and somewhere in there might be an answer to your question.
+
+reply
+Reply
+Mahdi Ravaghi
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The same question is asked and briefly answered in this very thread as well.
+
+reply
+Reply
+Przemyslaw Kwiecinski
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Excellent solution.
+
+reply
+Reply
+Chanhee0129
+
+Posted 2 years ago
+
+· 2464th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That's good
+
+reply
+Reply
+Riyad Mehdi
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, very interesting
+
+reply
+Reply
+Mayko Rodrigues Ribeiro da Costa
+
+Posted 2 years ago
+
+· 2176th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the result and exceptional mastery of the tools.
+
+reply
+Reply
+Oleksandr Vyshnevskyi
+
+Posted 2 years ago
+
+· 2476th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great solution
+
+reply
+Reply
+swaminathan07
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great work done
+
+reply
+Reply
+Dragos
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great solution, great notebook!
+
+reply
+Reply
+Ayo-Ajakaiye Adedamola
+
+Posted 2 years ago
+
+· 2489th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation, Honestly I have to put more work into my modelling, I got bored waiting for my system to load the dataset which got me demotivated, now I know I have to be more efforts to win thanks.
+
+reply
+Reply
+A-SP
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, bravo!
+
+reply
+Reply
+Mohammad Arshad Ahmad
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the well-deserved win! It's impressive how you trusted an early experiment and focused on a simpler ensemble approach, proving that persistence and intuition matter. Your detailed breakdown, especially the use of AutoGluon, is both insightful and inspiring. Looking forward to seeing more of your work @ravaghi
+
+reply
+Reply
+1

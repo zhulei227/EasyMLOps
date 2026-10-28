@@ -1,0 +1,963 @@
+url: https://www.kaggle.com/c/playground-series-s5e4/discussion/575784
+fetched: 2026-10-27
+chars: 32620
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - RAPIDS cuML Stack - 3 Levels! — Predict Podcast Listening Time
+1st Place - RAPIDS cuML Stack - 3 Levels!
+
+Predict Podcast Listening Time
+
+Solution Writeup · 1st place · May 2, 2025
+
+Thank you Kaggle for a great playground competition. This month's playground competition has a great dataset with lots of interesting patterns within! (and it felt more like real data and less like synthetic data). And there are lots of strong competitors which made this competition fun and exciting!
+
+The target Listening_Time_minutes is approximately equal to the linear relationship 0.72 x Episode_Length_minutes as described in my 3 discussion posts here, here, here. The other 9 features modulate this linear relationship. Based on this insight, I stacked the following approaches:
+
+My favorite solution for a Kaggle competition is a single model, my second favorite solution is hill climbing ensemble. Neither of these solutions could win 1st place in Kaggle's April playground competition because the data has too many interactions and too many deep patterns. For Kaggle's April playground competition, we need a large diverse deep RAPIDS cuML stack of 3 levels!
+
+Hill Climbing (linear level 2 model) versus Stacking (non-linear level 2 model)
+
+Hill climbing (or ridge) ensemble generally works well. However in this competition, the dataset was so complicated that a deep stack was the best solution. The most important feature is Episode_Length_minutes. It contains 90%+ of the signal. But it is missing for 11.6% of the data! This means there are two scenarios;
+
+Predict target Listening_Time_minutes with Episode_Length_minutes
+Predict Listening_Time_minutes without Episode_Length_minutes
+
+Hill climbing (and ridge) cannot do this (because it uses a linear level 2 model). Imagine that we make one model that does great predicting target with ELM and we build a second model that does great predicting target without ELM. Hill climbing will just take a weighted average of all predictions.
+
+But a stack (non-linear level 2 model) will use predictions from one model when predicting with ELM and use the predictions from another model when predicting without ELM. In other words, instead of taking all predictions from all models, it will take the best predictions from each model (for different situations)!
+
+RAPIDS cuML Stack - 3 Levels of Models!
+
+The secret to building a strong stack is diverse models. (And every model trains with the same 5 KFolds and we must remove all leaks from target encoding, pseudo labeling, etc). Diversity comes from different feature engineering and different models (and/or model hyperparameters).
+
+For each new model I built, I engineered different sets of features using the speed of RAPIDS cuDF. Each model has different customized features that benefit the new model best. And I trained lots of diverse models using the speed of RAPIDS cuML! All models below use the speed of GPU!
+
+Diversity x5
+
+To add diversity to our stack we can take each of the 12 model depicted above and train it in at least 5 different ways described below. Additionally, we can change feature engineering and/or hyperparameters and train more ways. My final stack uses 75 models. So I approximately created each of the above 12 models in 6 different ways!
+
+Every day during the month of April, I spent a few hours and built new diverse models. Using 3xA100 GPU and the speed of RAPIDS cuDF and cuML I would build about a dozen new models (with new complex feature engineering) each day and keep the few models which improved my stack!
+
+(1) Different Sets of Feature Engineering
+
+The typical way to predict Listening_Time_minutes is to train a model using KFold and all columns of train.csv. Additionally we can create more columns with feature engineering. We can build multiple GBDT models each using different engineered features. This provides diversity to our stack. Also we can change GBDT hyperparameters. For example, some times we use max_depth=10 and sometimes we use max_depth=0, max_leaves=1024. These find different interactions and create diverse models. Furthermore, sometimes we can use max_depth=20 to get more interaction and sometimes max_depth=5 for less interaction. Below are 4 other ways to train models in April's playground competition.
+
+(2) Remove Episode_Length_minutes from All Rows!
+
+Based on my discussion here, the feature/column Episode_Length_minutes is important. We can remove Episode_Length_minutes from all rows and train a model to predict Listening_Time_minutes from all other columns. These models will be strong predicting target when Episode_Length_minutes is missing. And the stack will use these models when appropriate.
+
+(3) Predict Ratio of Target divided by Episode_Length_minutes
+
+Based on my discussion here, for each model, we can create a new target with train['new_target'] = train.Listening_Time_minutes / train.Episode_Length_minutes. We can train models to predict this new target. We can then multiply this prediction by Episode_Length_minutes or an imputed value of Episode_Length_minutes from below.
+
+(4) Predict Episode_Length_minutes (use Train.csv and Test.csv)
+
+Based on my discussion here, the feature Episode_Length_minutes is so important, we can train models to predict Episode_Length_minutes. Futhermore, we can use both train.csv and test.csv data to train and predict Episode_Length_minutes. Because both train.csv and test.csv have all the columns necessary.
+
+Afterwards, we can use these ELM predictions in at least 3 ways. (1) We can impute missing values with these ELM preds then train a model. (2) We can replace every row's ELM (both missing and non-missing) with these ELM preds, then train a model. (3) We can multiply these ELM preds by the Ratio preds (from above) to predict the target Listening_Time_minutes. All 3 of these ideas will make new diverse models!
+
+(5) Pseudo Label (use Train.csv and Test.csv)
+
+Based on my discussion here, we see that many columns are important. We can use more information from more columns by using the columns from test.csv. We can add test.csv data with pseudo labels to the training of all our models.
+
+Stacking Models CV Scores
+
+Below are the CV scores for level 1, level 2, and level 3 models (without pseudo labeling). The LB scores are basically the same as the CV scores:
+
+Level 1 Model	Notes	CV Score
+RAPIDS cuML Lasso	uses 6000 features!	13.2
+RAPIDS cuML SVR	uses 6000 features!	13.2
+RAPIDS cuML KNN Regressor	k=51, weight by distance	12.8
+RAPIDS cuML Random Forest	max_depth = 32	12.1
+NN - MLP	Built by ChatGPT	12.0
+NN - TabPFN	20x "SUBSAMPLE_SAMPLES": 10_000	13.2
+GBDT - XGBoost	4x models with 4x feature sets	11.8
+GBDT - LGBM	diverse from XGBoost	11.8
+GBDT - Boost over RAPIDS Lasso	predict Lasso residuals	11.9
+GBDT - Boost over RAPIDS SVR	predict SVR residuals	11.9
+GBDT - Boost over NN MLP	predict MLP residuals	11.9
+AutoML AutoGluon	public notebook here	12.4
+---	---	---
+Level 2 Model	Notes	CV Score
+GBDT XGBoost	uses 73 level 1 models	11.56
+NN - MLP	uses 73 level 1 models	11.56
+---	---	---
+Level 3 Model	Notes	CV Score
+Weighted Average	50% / 50%	11.54
+
+. CREDITS: Thank you @pirhosseinlou for XGBoost single model here and @greysky for LGBM single model here which I used as two of my XGBoost "4x models with 4x feature sets" (and then made a dozen variations of). And thank you @itasps for your AutoML AutoGluon model here. I incorporated all 3 of these public models into my final stack (by re-running with my stack's KFolds and then making a dozen variations of each)!
+
+Final Submission - CV 11.54, Public LB 11.51, Private 11.44, First Place!
+
+My final RAPIDS cuML stack has CV 11.54, Public LB 11.50, Private 11.44, First Place!
+
+Post Comp Analysis
+
+Now that the comp ended, I compare Hill Climb to Stack with my 73x L1 models:
+
+Hill Climbing - CV 11.64 - Public LB 11.57 - Private LB 11.503
+Stack - CV 11.54 - Public 11.51 - Private 11.448
+Author
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+234
+Share
+more_horiz
+Citation
+
+Chris Deotte. 1st Place - RAPIDS cuML Stack - 3 Levels!. https://www.kaggle.com/competitions/playground-series-s5e4/writeups/chris-deotte-1st-place-rapids-cuml-stack-3-levels. 2025. Kaggle
+
+22
+27
+34
+12
+comment
+122 Comments
+12 appreciation comments
+Hotness
+Vladimir Demidov
+
+Posted a year ago
+
+· 34th in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+What kind of conversation with ChatGPT should be to build such a good NN? Is it crafted anything surprising, a breakthrough? Anyway, that approach deserves a guide to be published.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+14
+more_vert
+
+Thanks! 😀 ChatGPT suggested the MLP architecture and ChatGPT wrote the vectorized code to normalize numerical features. The architecture isn't fancy, we could have made it ourselves. But it saved time with trial and error. I described my features and some properties of the data and it produced the architecture below. The NN is trained 10 epochs with reduce on plateau learning schedule. Batch size 512 with start LR=1e-3 Adam optimizer.
+
+The easiest way to make strong NN features is just take all the features from our strongest GBDT. Then we One Hot Encode all the categoricals and normalize (subtract mean divide std) all the numericals. Then finally impute missing to zero. (We could alternatively make embeddings but the following is the easiest way to get another quick NN for stack). I also built other NNs from scratch with new feature engineering from scratch, but below is the simplest conversion from GBDT to NN:
+
+Preprocess to convert GBDT Features to NN Features
+print("Normalizing...", end='')
+norm_cols = [c for c in X_train.columns if c not in CATS ]
+means = X_train[norm_cols].mean()
+stds = X_train[norm_cols].std()
+stds = stds.replace(0, 1)
+X_train[norm_cols] = (X_train[norm_cols] - means) / stds
+X_valid[norm_cols] = (X_valid[norm_cols] - means) / stds
+X_test[norm_cols] = (X_test[norm_cols] - means) / stds
+print("done")
+
+print('Before:',X_train.shape, X_valid.shape, X_test.shape)
+combined = pd.concat([X_train,X_valid,X_test],axis=0)
+combined = pd.get_dummies(combined, columns=CATS )
+X_train = combined.iloc[:len(X_train)]
+X_valid = combined.iloc[len(X_train):len(X_train)+len(X_valid)]
+X_test = combined.iloc[len(X_train)+len(X_valid):]
+print('After:',X_train.shape, X_valid.shape, X_test.shape)
+del combined
+
+print("Impute missing")
+X_train = X_train.fillna(0.0)   
+X_valid = X_valid.fillna(0.0)   
+X_test = X_test.fillna(0.0)   
+
+NN Architecture
+from tensorflow.keras.layers import BatchNormalization, Dropout
+from tensorflow.keras.layers import Activation
+
+def build_model(size=len(FEATURES)):
+    x_in = Input(shape=(size,))
+    x = Dense(512)(x_in)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = Dropout(0.3)(x)
+
+    x = Dense(256)(x)
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = Dropout(0.3)(x)
+
+    x = Dense(128, activation='relu')(x)
+    x = Dense(1, activation='linear')(x)
+
+    model = Model(inputs=x_in, outputs=x)
+    return model
+
+reply
+Reply
+2
+Roman@Ahmed
+
+Posted a year ago
+
+· 1696th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Your detailed explanations and clear thought process are truly enlightening. Thank you for sharing your knowledge
+
+reply
+Reply
+5 more replies
+arrow_drop_down
+Hamed Abedi
+
+Posted a year ago
+
+· 425th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations on your first place again! It’s impressive that you shared such valuable insights throughout the competition and still managed to win by such a large margin! You are a true legend! I saw your interviews on Youtube videos, and I should admit that you are a great teacher as well!
+
+Two questions by the way:
+
+How do you determine that spending time, training weaker models (e.g., those with a 13.2 CV score in your case) would add more value to your final ensemble compared to focusing on a few stronger models? My intuition tells me to build several high-performing models first and then ensemble them; In general, how do you identify which weaker models will bring useful diversity?
+
+How do you see the future with the progress of LLMs? you mentioned that your ChatGPT-based approach could easily hit a 12.0 CV score (Unfortunately same as my best score! 😀), something that wasn’t possible a few years ago. In your view, will these models soon be able to benefit from their multi-modality and explore different methods and outperform human data scientists? And what uniquely human power, do you think computers will never replicate?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Thank you. Great questions. (1) When building an ensemble it is all about diversity and nothing about performance. I have models with CV score 26 RMSE which boost my stack CV score and LB score! (These are models that use all columns except Episode Length Minutes).
+
+For me building diverse models is the fun part. Each day I say "how can i solve this problem in a completely new way unlike anything i have done before?". In general if it is completely new approach it will boost stack CV score and LB score everytime! And if it doesn't then no big deal because it was fun to try something unconventional.
+
+(2) This is a very good question. I worked 1-4 hours every day for 1 month. Each day I built new novel models and each day 1 or 2 models boosted my stack CV score and LB score. I believe that soon LLM will be able to do everything I did over 1 month in just a few hours with enough compute (like 1000 GPU). It's crazy to imagine.
+
+reply
+Reply
+1
+Hamed Abedi
+
+Posted a year ago
+
+· 425th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That's very insightful, I will test new methods in my ensemble next time! Also, I hope that the future LLM still needs our mentorship ! 😀
+
+reply
+Reply
+Venkatesh
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+good to explain
+
+reply
+Reply
+Pascal Terpstra
+
+Posted a year ago
+
+· 17th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Very impressive solution, and thank you for your detailed explanations -- this makes Kaggle such a fun place!
+
+Do you think scores in previous playground competitions (specifically regression settings) could have improved significantly if more models were included? If not, why is that? Is it because this dataset contains too many deep patterns? And how do you realize that the data contains many deep patterns and could be significantly improved with ensembling (just trial and error)?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+This is a great question. I don't have an exact answer. In this comp it was just an intuition. Many things provided hints:
+
+My first single model with lots of feature engineering was beat by public notebook AutoML AutoGluon. My model had CV/LB 12.5 and AutoML had CV/LB 12.4. This was weird because AutoML has never beat my single models before. (AutoML doesn't feature engineer nor target encode, so it was very surprising to see such good performance here).
+
+Next I noticed that GBDT performed better and better with very deep trees. The best single model public notebook used max_depth=19. That is weird. I have never seen that before.
+
+In the first week, other Kagglers were beating me on LB. I was working hard feature engineering and building a strong single model, so I was surprised that I wasn't higher on LB in the first week. I tried to guess what these other Kagglers were doing. Based on their previous solutions to previous comps, I assumed that were stacking or ensembling.
+
+Then when doing EDA, I saw there were so many "if else cases". Like when Episode Length Minutes is not missing it is most important to predict target. When it is missing other columns are most important. And there is so much interaction like this podcast on this day at this time with this sentiment has different target. So much "this with this with this with this".
+
+All these clues indicated that one model was not going to be enough to extract all the signal here. We need an assortment of diverse models. Then we need an L2 stacking model to put it all together. (However in retrospect 2nd place did build a single model which is amazing!)
+
+And the icing on the cake was went I built my first stack. At one point when i was 3rd or 4th on LB in the first week, I took all of my previous experiments and just trained an XGB on their OOF and Test PRED. (It is good practice to save all OOF and Test PRED to disk for every experiment). To my surprise, the CV score and LB score was great and I jumped into first place LB. From that point on, I continued with stack and diversity approach.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+UPDATE: Now that the comp ended, I compare Hill Climb to Stack with my 73x L1 models:
+
+Hill Climbing - CV 11.64 - Public LB 11.57 - Private LB 11.50
+Stack - CV 11.54 - Public 11.51 - Private 11.44
+reply
+Reply
+Bilal Awais
+
+Posted a year ago
+
+arrow_drop_up
+3
+more_vert
+
+Thanks for initiating this insightful discussion! I've noticed that feature interactions and categorical encoding play a big role in improving model performance in this competition. Using techniques like target encoding or frequency encoding on the key categorical features gave my model a nice boost. Has anyone tried combining these with stacking or ensembling? I'd love to hear your thoughts and results!
+
+reply
+Reply
+Shahzad Hassan
+
+Posted a year ago
+
+arrow_drop_up
+3
+more_vert
+
+would be thankful if we can get the detail solution notebook please
+
+reply
+Reply
+2
+rshukla4
+
+Posted a year ago
+
+· 1832nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hello Chris, Thank you so much for sharing this approach. I haven’t participated in a competition for a while, but it’s really amazing to see how intricate and thoughtful your method was. Heading into the summer, I look forward to learning more from you and others. I’m happy to be back on Kaggle after a long long break. See you in the Predict Calories Expenditure!
+
+reply
+Reply
+Glitch
+
+Posted a year ago
+
+· 67th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks for sharing amazing insight again highly intutive
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you Glitch! Congrats on your top 100 finish as rank 67th!
+
+reply
+Reply
+Miku Tsuchiya
+
+Posted a year ago
+
+· 672nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@cdeotte Congratulations on coming in first place. Even now that the competition deadline has passed, I am still studying, referring to the solutions of the top competitors. I have one question. What is the RMSE (loss function) for predicting Episode_Length_minutes? In my testing, the value was quite large, about 30, with almost no feature engineering, so I don't know whether the training is going well or if there is a mistake in the code. If you don't mind, could you please tell me?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I forget. But the way to tell if your model is learning or not is to compare your model to predicting just the mean. So, use the mean of Episode_Length_minutes as a prediction for all rows and compute the RMSE from that. That is the baseline. Then see if your model does better than that. If it does better than that, then your model is learning.
+
+reply
+Reply
+Miku Tsuchiya
+
+Posted a year ago
+
+· 672nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@cdeotte Thank you for your answer! When the average value of Episode_Length_minutes was used as the predicted value for all rows, the RMSE was "32.964394", while the RMSE of the model I created was "31.63631". In other words, it's a slight improvement, but it doesn't seem to be much different from when the average value was used. It doesn't seem to be a program error, so just finding this out was a great learning experience. I'd like to continue studying.
+
+reply
+Reply
+David Abert
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Hello Chris, thanks for sharing your winning solution. I got a basic question that I am sure you already answered tons of times: How do you evaluate a new set of feature? I mean, over which model do you evaluate them? Do you create a basic model and train on that? Do you perform CV on that model to evaluate it? Do you also tune its hyperparameters?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi. I build each model individually. So for linear regression I build one set of features (mainly OHE and products of OHE). For GBDT i build another set of features (lots of group by aggregation stuff), etc etc
+
+Then i add a few dozen at a time and evaluate CV score. If CV improves I keep the dozen, otherwise i discard them.
+
+reply
+Reply
+David Abert
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for your response. When you create features, do you craft them manually or you automatize it with an script? Feel free to not reveal it if its a secret🙂‍↕️
+
+reply
+Reply
+Shahzad Hassan
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+As new in the field, can we get the entire notebook repository for learning please.
+
+reply
+Reply
+2
+wajason11
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for your good work!! It's great!
+
+reply
+Reply
+Hossein Behjat
+
+Posted a year ago
+
+· 534th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you @cdeotte for your helpful discussions during competition days and congratulations for achieving first place of this competition. During competition days I tried to train models according to an approach similar to your approach in this discussion (definitely in a very simple and beginner like way :)), but because of lack of deep understanding knowledge in machine learning I couldn't leverage my score very high. But I think it could be a good starting point for me. You can have a look to my notebook here: https://www.kaggle.com/code/hosseinbehjat/pss5e4-missing-values
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi. Nice work. Your model looks good. LB 12.27 is a good score.
+
+reply
+Reply
+delai50
+
+Posted a year ago
+
+· 36th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for the win! We are lucky to have you (and other awesome kagglers) participating on these playground competitions.
+
+From what I understand you used all your single models for the 2nd stage stacking models, do you think that performing a selection (e.g., forward selection) would improve the performance of the stacking?
+
+I am also wondering whether you tried re-stacking (i.e., include the original features along with the OOFs when creating the stage 2 models).
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! Congrats on your 36th place finish.
+
+From what I understand you used all your single models for the 2nd stage stacking models, do you think that performing a selection (e.g., forward selection) would improve the performance of the stacking?
+
+Forward selection helps. I did use forward selection. Each day I made about a dozen models and tried adding each one by one to the stack. I only kept the ones that helped which was about 1-3 each day.
+
+I am also wondering whether you tried re-stacking (i.e., include the original features along with the OOFs when creating the stage 2 models).
+
+Yes. I did this and it helps. Because it allows the L2 model to pick the best models for different situations.
+
+reply
+Reply
+1
+Mohsen Shahbazi
+
+Posted a year ago
+
+· 260th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+sir, as I remember on last playground, one of the issue was lacking of data, so you decide to pay more attention on creating model than feature engineering. you built 6 different model and using KFold to trained them. I think!!. I wonder why you didn't make sth like that on there. I mean stacking models using diversity models. I mean 3 level model. I would be really happy if you guid me sir. also, where should we know it's time to use sth like that. high level model.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This month's playground has lots of train data 750_000 rows, so we can (and need to) engineer lots of features and/or make lots of models for a complex stack/ensemble/single model.
+
+(When train.csv is few rows then we need to keep things more simple).
+
+reply
+Reply
+HYCKaggler
+
+Posted a year ago
+
+· 2205th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you @cdeotte for sharing your solution. If you don't mind, could you please answer some questions I had regarding the feature engineering (I am quite new to Data Science so apologies if some of the questions have obvious answers):
+
+how did you decide which feature engineering techniques to use?
+do you keep all features you generate regardless of the strength of correlation with target variable?
+would you mind providing a summary of the feature engineering techniques you used to create 6000 features?
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi. My 4 different GBDT each use between 500-1500 features each. The features are similar to public notebooks. Lots of combinations of columns and target encoding different statistics like mean, min, max, median, std, etc.
+
+My linear lasso and linear SVR use 6000 features. The 6000 features are all the categorical one-hot-encoded. Then non-linear terms are created by making products OHE_A x OHE_B x Episode Length Minutes for every pair of OHE. And products OHE_A x Episode Length Minutes for every OHE.
+
+reply
+Reply
+paperxd
+
+Posted a year ago
+
+· 340th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wait so if you multiply the one hot encoded by Episode Length minutes doesn’t that just give you a column with 0s and values exactly the same as Episode Length minutes because OHE columns are either 0 or 1?
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Jordi Rosell
+
+Posted a year ago
+
+· 457th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Awesome work.
+
+One question about pseudo labeling. As I understand, the procedure is as follows:
+
+Fit a model with the train data and predict on test data.
+Then combine rows of the augmented test data with the train data to build the pseudo labeled train data.
+Fit a model with the new train data and predict the test data.
+
+Are you applying this procedure or similar one for each fold? Or only doing it for the test competition data?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks @jordirosell Here is more info than you want :-)
+
+Simple Answer
+
+Your steps are correct and we do this for each fold. (1) Fit fold 1 of model with train and predict test (2) Then combine rows of augmented test with fold 1 train data (3) Fit fold 1 with new train and predict test.
+
+We then repeat steps 1,2,3 for each of the 5 KFolds. This is the way that everyone usually does pseudo if just making a single model or blending in an ensemble. If we want to use the OOF and Test PREDs in a stack then it gets more complicated as described below.
+
+Long Answer
+
+The above guarantees that we are leak free. However we can improve the above steps to make it more generalizable to LB. Let's think about validation data and test data. When you use the above steps the model validation inference benefits from data that is nothing like valid. Then the OOF CV score is inflated and stack will use it too much. Because when we infer the test data we do not have this benefit (because the pseudo data is the test data).
+
+So we can do better. (1) Fit fold 1 of model with train and predict fold 1's valid data (2) Then combine rows of augmented valid with fold 1 train (3) Fit fold 1 with new train and predict valid.
+
+So we train 4 models. Two models use your above steps. And two models use these new steps. Then we use the OOF from my steps in our stack training. And we use test preds from your steps in our stack inference.
+
+Longer Answer
+
+And we can do one more thing to make it even better lol. When we do step (2) we don't train a single fold model, we actually train 5 and blend them. If we train step 2 with all the pseudo data then model may just memorize that. So we train (2a) with 80% of pseudo, then (2b) with different 80%, (2c) with different 80%, (2d) (2e). We do this both for our valid pseudo (my steps) and test pseudo (your steps).
+
+Short cut
+
+Once again, if we just want a single model or something to blend with, then your steps should work fine and is the common way to do it. If we want it to work in stack, then it gets more complicated.
+
+Another trick to get it to work in a stack is to train one model like usual without pseudo. Then train another model with pseudo using your simple steps. Then train stack with OOF of normal model, but use your Test PREDS when the stack makes inference on test.
+
+reply
+Reply
+Jordi Rosell
+
+Posted a year ago
+
+· 457th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for your answer. I'm glad I've asked.
+
+reply
+Reply
+DanteTheAbstract
+
+Posted a year ago
+
+· 224th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Excellent work as always @cdeotte! You've mentioned in previous write ups that you experiment with hundreds of models and here you even have some with thousands of features. How do keep track of your work? Do you use something like 'mlflow' or 'weights&biases'?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+All my records are pencil and paper. I keep notebooks listing my experiments. And every new experiment I do in a new jupyter notebook titled MODEL-N.ipynb where MODEL is model type and N increases from 1, 2, 3, etc. So I can go back and review any experiment. I save all OOF and Test PRED to disk for every experiment. (And of course I store lots of information in my head).
+
+reply
+Reply
+1
+Thomas Meißner
+
+Posted a year ago
+
+· 1351st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Did you train all of this in Kaggle notebooks?
+
+reply
+Reply
+Sanjeev Krishna S
+
+Posted a year ago
+
+· 1558th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think the RAPIDS library cannot be downloaded in kaggle(i am not sure) but it works in google colab and you have to change the environment to a gpu based one.
+
+reply
+Reply
+Thomas Meißner
+
+Posted a year ago
+
+· 1351st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Rapids is preinstalled in Kaggle envs
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Did you train all of this in Kaggle notebooks?
+
+No, for this competition I trained everything locally using 3xA100 GPU each with 80GB VRAM. And the system has 512GB CPU RAM
+
+reply
+Reply
+1
+KennyT
+
+Posted a year ago
+
+· 365th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats for the victory. Learn so much from your solution.
+
+reply
+Reply
+Sreya
+
+Posted a year ago
+
+· 1104th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you so much. This is a great learning.
+
+reply
+Reply
+Sangam Paudel
+
+Posted a year ago
+
+· 94th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks you for sharing your solution.We've learned a lot from your solution and you've always been a motivation for us
+
+reply
+Reply
+sun9sun9
+
+Posted a year ago
+
+· 171st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing your solution. I’ve learned a lot.
+
+reply
+Reply
+paperxd
+
+Posted a year ago
+
+· 340th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This idea of predicting Episode_Length_minutes as a proxy for Listening_Time_minutes is very smart
+
+reply
+Reply
+Muhammad Khibban I'tishom
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on coming in first place! I have two questions about how you trained TabPFN:
+
+Why did you choose 20 as the number of subsamples? Is there a recommended way to determine the appropriate number of subsamples?
+
+As far as I know, TabPFN was optimized for datasets with ≤1000 rows. Why did you choose the 10.000 rows in each subsample instead of 1000?
+
+reply
+Reply

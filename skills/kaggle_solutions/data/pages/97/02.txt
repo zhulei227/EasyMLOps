@@ -1,0 +1,90 @@
+url: https://github.com/mattwescott/bird-recognition
+fetched: 2026-10-27
+chars: 4529
+
+GitHub - mattwescott/bird-recognition: 2nd Place Model for Kaggle Competition · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ mattwescott bird-recognition Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ bird-recognition Public Notifications You must be signed in to change notification settings Fork 12  ( 12 ) Star 11  ( 11 ) You must be signed in to star a repository About 2nd Place Model for Kaggle Competition Resources Readme Activity Stars 11 stars Watchers 4 watching Forks 12 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 1 Commit 1 Commit Folders and files Name Name Last commit message Last commit date FoldBuilder.py FoldBuilder.py     README.md README.md     SETTINGS.json SETTINGS.json     classifier.py classifier.py     config.py config.py     create_submission.py create_submission.py     data.py data.py     mfccs.py mfccs.py     requirements.txt requirements.txt     sanity_check.py sanity_check.py     submission_utils.py submission_utils.py     training_utils.py training_utils.py     transform.py transform.py     wav_utils.py wav_utils.py     View all files Repository files navigation README More items ## Bird Species Classification 
+
+ Second place in Kaggle contest 
+ Les Bricoleurs: Dima Kamalov , Matt Wescott 
+
+ ####Hardware / OS 
+
+ M3.2XLarge instance on Amazon EC2
+
+ 8 virtual cpu 
+ 26 gb ram 
+ Intel Xeon E5-2670 
+
+ Ubuntu 12.04, 64 bit, Server Edition 
+
+ ####Dependencies 
+
+ numpy/scipy 
+ pandas 
+ scikit-learn 
+
+ ####Installation Instructions (from fresh EC2 instance) 
+
+ sudo apt-get update 
+ sudo apt-get install git 
+ sudo apt-get install python-pip python-dev build-essential libblas-dev liblapack-dev gfortran 
+ sudo pip install virtualenv 
+ git clone git@github.com:mattwescott/bird-recognition.git 
+ cd bird-recognition 
+ Get the data 
+ Edit paths in SETTINGS.json to point to the data 
+ virtualenv venv 
+ source venv/bin/activate 
+ pip install -r requirements.txt 
+
+ ####Generate Kaggle submission 
+
+ python create_submission.py (~4 hours runtime) 
+
+ ####Predict on new test set 
+
+ Not implemented 
+
+ About 2nd Place Model for Kaggle Competition Resources Readme Activity Stars 11 stars Watchers 4 watching Forks 12 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

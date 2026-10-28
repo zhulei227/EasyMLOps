@@ -1,0 +1,46 @@
+url: https://www.kaggle.com/c/quickdraw-doodle-recognition/discussion/73738
+fetched: 2026-10-27
+chars: 564
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Google AI · Featured Prediction Competition · 8 years ago
+Late Submission
+more_horiz
+Quick, Draw! Doodle Recognition Challenge
+
+How accurately can you identify a doodle?
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

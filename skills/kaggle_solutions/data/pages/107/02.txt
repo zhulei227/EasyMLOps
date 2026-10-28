@@ -1,0 +1,72 @@
+url: https://github.com/freedomljc/Loan_Default_Prediction
+fetched: 2026-10-27
+chars: 4958
+
+GitHub - freedomljc/Loan_Default_Prediction: This is the Python Code for the submission to Kaggle&#39;s Loan Default Prediction by the ID &quot;HelloWorld&quot; · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ freedomljc Loan_Default_Prediction Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ Loan_Default_Prediction Public Notifications You must be signed in to change notification settings Fork 49  ( 49 ) Star 62  ( 62 ) You must be signed in to star a repository About This is the Python Code for the submission to Kaggle's Loan Default Prediction by the ID "HelloWorld" Resources Readme BSD-3-Clause license Activity Stars 62 stars Watchers 5 watching Forks 49 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 16 Commits 16 Commits Folders and files Name Name Last commit message Last commit date LICENSE LICENSE     README.md README.md     features.py features.py     predict.py predict.py     View all files Repository files navigation README BSD-3-Clause license More items Loan_Default_Prediction 
+ This is the Python Code for the submission to Kaggle's Loan Default Prediction by the ID "HelloWorld" 
+ My best score on the private dataset is 0.44465, a little better than my current private LB score 0.44582, ranking 2 of 677. Using this script, you can yield similiar results with my best entry(score: 0.44465). 
+ Data preprocessing: 
+ The training data is sorted by the time, and the test data is randomly orded. So in the validation 
+process, I first shuffle the training data randomly.
+Owing to lack of the feature description, It is hard to use the tradition method to predict LGD. In 
+my implemention, the operator +,-.*,/ between two features, and the operator (a-b) * c among three 
+features were used, these features were selected by computing the pearson corrlation with the loss.
+
+ Model description: 
+ GBM classifier(traindata_1) -&gt; guassian process regression
+GBM calssifier(traindata_2) -&gt; svr, GBM regression
+Finally, the prediction results from guassian process regression, svr, GBM regression are blended 
+linearly.
+Otherwise, owing to the long tail distribution of loss, the log(loss) was used.
+
+ Requirements: 
+ sklearn package, about 96G ram(gaussian process process spend too much memory).
+
+ Instruction: 
+ Download the data from http://www.kaggle.com/c/loan-default-prediction/data to the working directory
+'loan_default_prediction'.
+Run the script predict.py
+
+ About This is the Python Code for the submission to Kaggle's Loan Default Prediction by the ID "HelloWorld" Resources Readme BSD-3-Clause license Activity Stars 62 stars Watchers 5 watching Forks 49 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

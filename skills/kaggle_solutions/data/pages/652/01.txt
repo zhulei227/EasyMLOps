@@ -1,0 +1,439 @@
+url: https://www.kaggle.com/c/image-matching-challenge-2025/discussion/583058
+fetched: 2026-10-27
+chars: 13322
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Image Matching Challenge 2025
+1st Place Solution
+
+Image Matching Challenge 2025
+
+Solution Writeup · 1st place · Jun 15, 2025
+
+Thank you to the organizers and Kaggle team for this exciting competition. Congratulations to all the participants. Although I first participated in IMC in 2022, I'm glad that this time I achieved my best results ever.
+
+This year, I focused on utilizing recent 3D geometric foundation models such as MASt3R and VGGT. I was surprised at their potential. I respect the authors who developed such great models.
+
+1. Overview
+
+I developed a simple MASt3R-based pipeline.
+
+As far as I've tried, image matching using MASt3R's local feature head appears to achieve significantly better results than other detector-based methods such as ALIKED+LG on IMC25.
+
+Pre-clustering using coarse MASt3R matching on the top-k neighbor images (not shown in the figure).
+Image pair extraction with the combination of multiple shortlists derived from image retrieval.
+Utilizing MASt3R (https://github.com/naver/mast3r) as a matcher. In addition to MASt3R semi-dense matches, keypoints extracted by other keypoint detectors are also matched using MASt3R.
+Generating reconstructions using a general COLMAP pipeline (based on https://www.kaggle.com/code/eduardtrulls/imc25-submission)
+2. Solution
+
+I observed that MASt3R-based matching achieves higher precision (i.e., fewer mismatches) than other methods, so it can match images in messy scenes where detector-based methods typically fail. I think the following points are probably useful for robust matching:
+
+3D geometric features (From DUSt3R)
+MASt3R is trained not only with the MegaDepth dataset but also with several object-centric datasets
+
+By simply using the MASt3R model as a semi-dense detector-free matcher and integrating it into a general COLMAP pipeline, I achieved a score of 42-45 on the PublicLB. Furthermore, I found that increasing the number of image pairs led to a higher score, reaching approximately 50. Therefore, I thought that how image pairs could be increased within limited computational time might be an important consideration.
+
+2.1. Clustering
+
+I developed a pre-clustering approach based on MASt3R matches, but this approach was not adopted in the final version. It turned out that, since image matching primarily uses MASt3R, there wasn't a significant difference whether I used pre-clustering or multiple reconstructions from COLMAP.
+
+The pre-clustering (which was not used) approach is outlined below:
+
+Initialize the cluster label for each image to -1
+Extract N images from the scene using farthest point sampling, and assign each of them a unique cluster label (0, 1, …, N-1).
+For each of the N seed images (from step 2), run 1-vs-all matching with MASt3R against other unclustered images. If an image is matched, assign the seed image's cluster label to the matched image. Otherwise, assign a new cluster label to it.
+Use the newly matched images as the next queries, and repeat 1-vs-k matching iteratively until all images are assigned a cluster label
+Treat small clusters as "outliers"
+2.2. Shortlist
+
+Since the MASt3R matcher is computationally more intensive than detector-based methods, a shortlist of image pairs for matching is still important.
+
+I generated candidate pairs for matching within a scene by taking the union of neighbors from multiple image retrieval results. I used the following four global features for image retrieval.
+
+MASt3R-ASMK (From MASt3R-SfM https://arxiv.org/abs/2409.19152)
+MASt3R-SPoC (From MASt3R-SfM https://arxiv.org/abs/2409.19152)
+DINOv2
+ISC (https://arxiv.org/abs/2112.04323)
+
+Although MASt3R-ASMK could extract pairs with sufficient coverage, adding the other models slightly improved the score.
+
+Features	Parameters
+MASt3R-ASMK	n=10, k=25 (See MASt3R-SfM paper)
+MASt3R-SPoC	topk=10
+DINOv2	topk=10
+ISC	topk=10
+
+Note that using only MASt3R-ASMK with heavier settings (e.g., MASt3R-ASMK(n=10, k=60)) can also achieve a high score, but the proposed method is faster while achieving a similar score.
+
+2.3. Pairwise matching
+
+First, matches for an image pair are computed by MASt3R. This implementation is based on fast_reciprocal_NNs() from the code in the official repository. I used default parameters of subsample=8 and pixel_tol=5.
+
+In addition to the semi-dense matches, keypoints extracted by other keypoint detectors are also fed to the MASt3R matcher (Inspired by MP-SfM https://arxiv.org/abs/2504.20040). These additional keypoints might regionally overlap with points subsampled by MASt3R, but this approach improved the score compared to using only MASt3R matches.
+
+I used ALIKED and SuperPoint as the additional keypoint detectors. While I also tried SIFT, GIMSuperPoint, and DaD, I ultimately adopted the combination of ALIKED and SuperPoint because this combination yielded the best LB score.
+
+The detailed configurations are as follows:
+
+Model	Parameters
+MASt3R	size=512, threshold=1.001
+ALIKED detector	size=1280, max_keypoints=4096
+SuperPoint detector	size=1600, max_keypoints=4096, threshold=0.0005
+2.4. Engineering tips
+
+In addition, I applied the following techniques to make the pipeline faster:
+
+Build the curope (RoPE2D) module with CUDA.
+Replace attention implementations used in mast3r/dust3r/croco with torch.nn.functional.scaled_dot_product_attention. (to enable flash attention)
+Fix use_amp args in the MASt3R inference function to be used correctly.
+Use the T4 x 2 environment in Kaggle, and run the submission pipeline in parallel over scene subsets, split by dataset in submission.csv.
+
+According to Speedy MASt3R (https://arxiv.org/abs/2503.10017), TensorRT can further accelerate the MASt3R model. However, I wasn't able to convert the model.
+
+2.5. Local/Public/Private Score
+	amy_gardens	fbk_vineyard	ETs	stairs	Public	Private
+Best submission	40.65	72.09	59.46	15.89	52.64	56.00
+w/ Pre-clustering	37.02	47.25	59.46	20.35	50.22	50.93
+The scores of amy_gardens and fbk_vineyard seemed to be unstable.
+stairs was difficult (As a side note, VGGT achieved the highest score of 25.07 in my local experiments)
+3. What did not work
+GLOMAP: I tried GLOMAP instead of COLMAP with the pre-clustering approach, but it didn't improve the score.
+Coarse-to-Fine matching: Probably, there was a bug in my implementation.
+Using monocular depth estimation: I tried to filter mismatched pairs using depth information.
+VGGT: The tracking head of VGGT with pre-extracted keypoints worked well on local tests, but it resulted in a TimeoutError in submission.
+Code
+Notebook
+Github
+Author
+ns64
+
+ns6464
+
+arrow_drop_up
+66
+Share
+more_horiz
+Citation
+
+ns64. 1st Place Solution. https://www.kaggle.com/competitions/image-matching-challenge-2025/writeups/ns64-1st-place-solution. 2025. Kaggle
+
+21
+comment
+14 Comments
+2 appreciation comments
+Hotness
+emoji_people
+Kohei
+
+Posted a year ago
+
+· 7th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations on winning 1st place! I'm very impressed with your approach. Am I correct in understanding that you didn't perform any processing to correct image rotation? In my solution, my PrivateLB dropped from 45.58 to 38.67 when I didn't apply rotation correction using image matching. If you truly didn't perform any rotation correction, I'm just amazed by MASt3R's high matching capability.
+
+reply
+Reply
+ns64
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you! congrats on 7th place!
+
+Am I correct in understanding that you didn't perform any processing to correct image rotation?
+
+Yes, you're correct. I didn't use any rotation as preprocessing. I thought rotation wasn't particularly important for the IMC25 dataset after my first submission using MASt3R achieved a good score.
+
+reply
+Reply
+1
+tmyok
+
+Posted a year ago
+
+· 10th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Impressive! Truly worthy of the winning solution. Do you have any plans to share the code?
+
+reply
+Reply
+ns64
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thank you! Yes, I plan to share the code later.
+
+reply
+Reply
+10
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations！I'm very appreciate for the impressive solution, learnt a lot! 👍
+
+reply
+Reply
+old-ufo
+
+Competition Host
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for amazing writeup!
+
+While I also tried SIFT, GIMSuperPoint, and DaD, I ultimately adopted the combination of ALIKED and SuperPoint because this combination yielded the best LB score.
+
+Would you mind please to share those results with other detectors?
+
+reply
+Reply
+ns64
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thank you for reading!
+
+Here are some other results. Unfortunately, there are not ideal ablation studies due to the daily submission limit.
+
+Sparse Detectors	w/ Pre-clustering	Shortlist	Verification	Public	Private
+ALIKED(4k)+DaD(4k)	No	ASMK(k=30) SPoC(k=10) DINOv2(k=10) ISC(k=10)	RANSAC(COLMAP)	52.41	55.31
+ALIKED(4k)+SIFT(4k)	Yes	ASMK(k=30) SPoC(k=10) DINOv2(k=10) ISC(k=10)	MAGSAC(OpenCV)	50.66	52.10
+SIFT(4k)	Yes	ASMK(k=30) SPoC(k=10) DINOv2(k=10) ISC(k=10)	MAGSAC(OpenCV)	50.50	51.82
+ALIKED(2k)+SIFT(2k)+SP(2k)+DaD(2k)	Yes	ASMK(k=30) SPoC(k=10) DINOv2(k=10) ISC(k=10)	MAGSAC(OpenCV)	50.33	50.00
+GIMSP(4k)+ALIKED(4k)	No	ASMK(k=60)	MAGSAC(OpenCV)	49.25	53.83
+reply
+Reply
+2
+YumeNeko
+
+Posted a year ago
+
+· 12th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on 1st place! I was truly impressed by your simple yet innovative solution leveraging MASt3r.
+
+In relation to this question, if you happen to know: what was the score without adding keypoints from ALIKED and SuperPoint? In other words, how much did incorporating keypoints from ALIKED and SuperPoint actually contribute to the final score?
+
+Also, I’m really looking forward to the release of your source code. I’m especially interested in how you implemented passing keypoints detected by other detectors into MASt3r.
+
+reply
+Reply
+ns64
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you! Actually, the contribution of the additional keypoints was relatively small, leading to a score increase of only approximately 0.5 to 1.0 points.
+
+I’m especially interested in how you implemented passing keypoints detected by other detectors into MASt3r.
+
+I used MP-SfM implementations below. https://github.com/cvg/mpsfm/blob/main/mpsfm/extraction/pairwise/models/mast3r.py#L112
+
+reply
+Reply
+1
+Abubakar Idrees
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning 1st place! I'm very impressed with your approach.This is a very Great way to sort libraries and use them
+
+reply
+Reply
+102203654_Aditya_Pratap_Singh
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+great work done
+
+reply
+Reply
+Daniel
+
+Posted a year ago
+
+· 816th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thanks for the write-up.
+
+Would this pipeline also work using only ALIKED/SuperPoint keypoints + the MASt3R Matcher (ie not using the dense MASt3R matches)?
+
+reply
+Reply
+ns64
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! Using only ALIKED/SuperPoint keypoints with the MASt3R Matcher performed worse than also using the dense MASt3R matches. Here are the results (Please note that these results are for the ALIKED+DaD combination):
+
+MASt3R matches	Sparse keypoints	Public	Private
+Dense+Sparse	ALIKED+DaD	52.41	55.31
+Sparse	ALIKED+DaD	48.59	53.79
+reply
+Reply
+M.Hamza Shafqat
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on winning 1st place and thanks for sharing your solution. I learned a lot from this especially how you used MASt3R's for image matching and added keypoints from ALIKED and SuperPoint to improve results. Your engineering tips were also very helpful. i'm new to 3D matching, so it was great to see how you handled performance and scoring. Just wondering, How did you decide which keypoint detectors to combime? Did some combinations not work well? Thanks again and great job!
+
+reply
+Reply
+ns64
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! I selected the keypoint detectors based roughly on PublicLB score. You can see several combination results here: https://www.kaggle.com/competitions/image-matching-challenge-2025/discussion/583058#3217968
+
+reply
+Reply
+1
+1
+M.Hamza Shafqat
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you so much for the quick reply and for sharing the detailed results link!
+
+The table you posted comparing different keypoint detector combinations is really helpful. It’s interesting to see how ALIKED + SuperPoint gave the best balance of accuracy and speed.
+
+I’ll explore the combinations further — really appreciate the transparency in sharing all this!
+
+reply
+Reply
+1
+Appreciation (2)
+Aniket Potabatti
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Impressive! Thanks for sharing.
+
+Ziang Lu
+
+Posted a year ago
+
+· 67th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thanks for the write-up.

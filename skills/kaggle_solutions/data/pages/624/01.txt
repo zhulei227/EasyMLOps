@@ -1,0 +1,642 @@
+url: https://www.kaggle.com/c/playground-series-s4e9/discussion/537052
+fetched: 2026-10-27
+chars: 14426
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+# 1 solution - stacked NN — Regression of Used Car Prices
+# 1 solution - stacked NN
+
+Regression of Used Car Prices
+
+Solution Writeup · 1st place · Oct 9, 2024
+
+Did I really made it to the top? I am still surprised and excited.
+
+Way to the solution: I spent the first two weeks with reading the discussions, playing around with catboost and publishing an ensemble. The plan was to collect diverse models and ensemble them with Ridge, with the same pipeline I used in this notebook. The final ensemble, which I chose as my first final submission, would have landed me on the second place and differed from the notebook in the following points:
+
+I used 20 cv folds
+I included original data in some of the models (even two times in LGBM)
+I did compute a SVR with a rbf kernel as suggested by broccoli beef in this discussion post instead of the linear SVR.
+I included all categorical features additionally as target encoded to catboost, but I used the median, not the mean for target encoding. I did this leakfree, meaning that I recomputed the targetencoded columns in each fold. Moreover, I used Catboost as classifier, not as regressor. Catboost predicted the outlier prices (see function bin_price). The hyperparameters were found by optuna. The oof predictions were not used in the ensemble. They were used as an additional feature in a LGBM (or the NN for my second final submission).
+def bin_price(data):
+    df = data.copy()
+    # Calculate Q1 (25th percentile) and Q3 (75th percentile)
+    Q1 = np.percentile(df['price'], 25)
+    Q3 = np.percentile(df['price'], 75)
+    IQR = Q3 - Q1
+
+    # Define the lower and upper bounds for outliers
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    # Identify outliers
+    outliers = df[(df['price'] > upper_bound)]
+    df['price_bin'] = (df['price'] < upper_bound).astype(int)
+
+    return df
+
+cat_params2 = {
+    'early_stopping_rounds':25,
+    'use_best_model': True,
+    "verbose": False ,
+    'cat_features': cat_cols,
+    'min_data_in_leaf': 16, 
+    'learning_rate': 0.03355311405703999, 
+    'random_strength': 11.663619399375248, 
+    'l2_leaf_reg': 17.703146378123996, 
+    'max_depth': 10, 
+    'subsample': 0.9479174100256215, 
+     'border_count': 130, 
+    'bagging_temperature': 24.032067560148384
+}
+
+I included the catboost oof predictions as an additional feature for LGBM
+I used a second LGBM (LGBM5), where I label encoded all categorical data (rare categories summarized in a category "rare" as done with the NN in the notebook) and raised max_bin.
+lgb_params = {
+    'verbose' : -1,
+    'early_stopping_rounds':25,
+    'loss_function':"RMSE",
+    'n_estimators': 2000, 
+    'max_bin': 30000,
+}
+
+I included fastai computations from Autogluon (with a nested cv over 20 folds to be 100% leakfree)
+ predictor = TabularPredictor(label='price',
+                             eval_metric='rmse',
+                             problem_type="regression").fit(X_train,
+                                                       pseudo_data = data_original, 
+                                                       num_bag_folds = 10,
+                                                       num_bag_sets = 2,
+                                                       time_limit=1800,
+                                                       included_model_types = ['FASTAI'], 
+                                                       keep_only_best = True,
+                                                       presets="best_quality",
+                                                      )
+
+
+I ended up with a crossvalidation score of 72300 and the following models (_st means that the catboost oofs are included):  The crossvalidation scores of the individual models were: 
+
+First place solution: I needed a second final submission and I decided spontanously on the last day to submit a forked notebook from Vladimir Demidov. I noticed that his NN is robust to changes, so I added four numerical features: the SVR oof predictions, the LGBM5 oof predictions, the CatboostClassifier oof predictions and XGB predictions (derived from publicy available hyperparameters, unfortunatly I forgot the source). The NN ensemble had a crossvalidation score of 72468, but in the end was better than the Ridge ensemble.
+
+My thanks obviously go to @yekenot , @siukeitin , @noodl35 (LGBM hyperparameters), who directly provided parts of the code I used. I also provited strongly from the discussions, especially the AutoML solution threads and the posts from @tilii7 and @roberthatch where I got the idea for outlier classification and @cdeotte who made the entrance to NNs simple for me. I am also very grateful to all who are participating lively in the discussions so that learning is a fulfilling experience.
+
+What did not work: I experimented with a lot of models, but most of them did not help me to get a better cross-validation score. Especially XGB did not work for me and although it is accidently included in my final submission I do not think that it was a crucial part of the ensemble. Feature engineering was at least partly working, but all the amazing features introduced by Chris Deotte in this post did not work for me.
+
+The corresponding crossvalidation - leaderboard scores in a scatterplot: 
+
+Edit: I included the CatBoostClassifier, LGBM1_st and LGBM5_st in my notebook. This notebook has a private score of 62957.83525 and would have reached a place within the top three.
+
+Edit 2: Autogluon, when using TabularPredictor.fit(), is not using the original data. To use the original data, one has to call TabularPredictor.fit_pseudolabel(). So my Fastai - AutoGluon predictions were not using the original data. For a nice reference of how to use AutoGluon with original data and with a predefined stratification see this great notebook of Mahdi Ravaghi for the next playground competition.
+
+Author
+Mart Preusse
+
+martinapreusse
+
+arrow_drop_up
+95
+Share
+more_horiz
+Citation
+
+Mart Preusse. # 1 solution - stacked NN. https://www.kaggle.com/competitions/playground-series-s4e9/writeups/mart-preusse-1-solution-stacked-nn. 2024. Kaggle
+
+18
+24
+2
+comment
+83 Comments
+4 appreciation comments
+Hotness
+Chris Deotte
+
+Posted 2 years ago
+
+· 81st in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+Congratulations. Great write up. Good explanations and pictures.
+
+Your solution is great. You approached the competition perfectly making a diverse set of models and carefully producing OOF and exploring ensemble methods. Your use of median with target encoding and building a stack over classification predictions was creative and effective.
+
+I enjoyed all your contributions during the competition. Great job!
+
+reply
+Reply
+3
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thank you Chris for your feedback, this means a lot for me!
+
+reply
+Reply
+shash
+
+Posted 2 years ago
+
+· 193rd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Wow great insights, any particular reason you were able to infer as to why xgb did not work in this case?
+
+reply
+Reply
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I have no idea.
+
+reply
+Reply
+Vladimir Demidov
+
+Posted 2 years ago
+
+· 229th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Congrats and thanks for your work. I've waited for someone who can improve a DeepTables performance. Now we know how it's good with oof predictions as a feature added.
+
+reply
+Reply
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I am really grateful that you shared your notebook, as it seems that deep tables is easy to work with and robust. I will definitely explore the possibilities in more details. This is also not the only great notebook you published, I read two more in the last week which are very interesting.
+
+reply
+Reply
+2
+Riana Azad
+
+Posted 2 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Such a great insights!
+
+reply
+Reply
+Optimistix
+
+Posted 2 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+A big congrats to you! Really glad to see you at no. 1 after all your contributions in the playground series this year. Neat solution(s), too!
+
+reply
+Reply
+1
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks, I am really happy, even more because I did not see this coming. I learned a lot this year and I love the community here. Nice pic, by the way. Matches your name.
+
+reply
+Reply
+Optimistix
+
+Posted 2 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Danke schön!
+
+reply
+Reply
+1
+Yarza Wynn
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+congrats and thanks for taking the time to write up your thought process!
+
+reply
+Reply
+nathfavour
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+impressed!
+
+reply
+Reply
+Rajawat Devendra Singh
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for ranking first!
+
+reply
+Reply
+Harshit Sharma
+
+Posted 2 years ago
+
+· 848th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @martinapreusse on an incredible achievement and thanks for sharing your detailed journey and insights—truly inspiring!
+
+reply
+Reply
+1
+Eunji Goo
+
+Posted 2 years ago
+
+· 1044th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you so, so much for sharing! It's a wonderful explanation and notebook!👍
+
+reply
+Reply
+1
+Guilherme P Oliveira
+
+Posted 2 years ago
+
+· 1191st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the first place!!
+
+And thank you very much for sharing your insights. It’s always great to see the approaches that resulted in a high ranking.
+
+reply
+Reply
+1
+Harsh Gupta
+
+Posted 2 years ago
+
+· 1558th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congratulation for your SWAG victory i wish you to do best in playground season 4 ep 10 also.
+
+reply
+Reply
+1
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I will probably take a playground break and only participate in the discussion. I am eager to work with real data.
+
+reply
+Reply
+Tilii
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for your well-deserved 1st place!
+
+I see in your solution many things I kind of knew were working, but didn't pursue them hard enough. So big thumbs up for your perseverance. For example, I knew that 20-fold worked better than 10-fold (and repeated 10x3 fold probably yet better), but that was at a point where I would have to repeat many of my early models. I also knew that FASTAI models from AutoGluon were contributing good diversity, but didn't think to make an AG run just with those models.
+
+NN stackers were just a shade worse than hill climbing in my hands, and I will write about it separately. But NNs are definitely more reliable at ensembling this dataset than boosted trees, so again props to you for making the right choice.
+
+reply
+Reply
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks Tilii. I made the choice of twenty folds very early and decided to not use a repeated cross validation, but to average over several different model random seeds. The advantage was that I just had to use the same folds everywhere, but could use as many random seed bags as I wanted for each model. When I had to decide over my second final submission I looked at the price boxplots of my test predictions. I noticed that the NNs had smaller outlier prices, so I picked the stacked NN as second final submission. Congrats to your place as well. It is astonishing that you always end with that many models. I usually reach a minimal /maximal cv score with only a handfull models and can improve the ensembling score only by improving the single models.
+
+reply
+Reply
+Tilii
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It is astonishing that you always end with that many models.
+
+That's definitely the power of machine over brain, as I normally have strong computational resources but not always the best ideas. You in this competition and @optimistix in the other proved that good ideas still can beat heavy resources, at least in a month-long competition.
+
+reply
+Reply
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, you are probably right when it comes to resources, but the ideas in my case originated from the discussion and heavily involved your comments. 😅
+
+reply
+Reply
+Mahdi Ravaghi
+
+Posted 2 years ago
+
+· 126th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Finally, a 1st place and a well deserved one. Congratulations!
+
+reply
+Reply
+1
+Mart Preusse
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks, I am looking forward to the day when it is your turn to celebrate. I learn so much from your notebooks.
+
+reply
+Reply
+Jyotirmoy Das
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats Brother
+
+reply
+Reply
+Tanaa85
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+My congratulations!
+
+reply
+Reply
+Taimour Nazar
+
+Posted 2 years ago
+
+· 302nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Good, congratulations!
+
+reply
+Reply
+Matheus Bonjour Laviola da Silva
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congrats for ranking 1st
+
+reply
+Reply
+Ibrahim Denis Fofanah
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations for ranking 1st
+
+reply
+Reply
+Shepherd Mahadzva
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for ranking first!
+
+reply
+Reply
+BHANUPRAKASH
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations ! For ranking 1st position..
+
+reply
+Reply
+emoji_people
+Zeel
+
+Posted 2 years ago
+
+· 1213th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+amazing work!
+
+reply
+Reply
+GgggGunGun
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+good job for catboost😃
+
+reply
+Reply
+Van Patangan
+
+Posted 2 years ago
+
+· 1735th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I learned so much from this write up, incredibly helpful.
+
+reply
+Reply
+1
+Satyam Kumar
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+looks interesting
+
+reply
+Reply

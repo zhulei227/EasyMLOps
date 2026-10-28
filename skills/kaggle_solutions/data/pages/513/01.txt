@@ -1,0 +1,660 @@
+url: https://www.kaggle.com/c/rsna-2022-cervical-spine-fracture-detection/discussion/362607
+fetched: 2026-10-27
+chars: 12897
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — RSNA 2022 Cervical Spine Fracture Detection
+1st Place Solution
+
+RSNA 2022 Cervical Spine Fracture Detection
+
+Solution Writeup · 1st place · Oct 29, 2022
+
+Thanks to the organizers and congrats to all the winners and those who worked hard to develop new pipelines and stuck with it until the end of the competition.
+
+This is a very interesting competition, because we can think of many different ways to approach this dataset. Therefore the most important thing for this competition is to develop a reasonable pipeline, followed by optimization of the model.
+
+Code
+
+https://www.kaggle.com/competitions/rsna-2022-cervical-spine-fracture-detection/discussion/362787
+
+Summary
+
+I designed a 2-stage pipeline to deal with this problem.
+
+stage1: 3D semantic segmentation -> stage2: 2.5D w/ LSTM classification.
+
+In addition, there are 2 different types of classification models in stage2.
+
+3D Semantic Segmentation
+
+For 3D semantic segmentation, we only have 87 samples w/ 3d mask in the dataset, but it's sufficient to train 3D semantic segmentation models with good performance.
+
+I use 128x128x128 input, to train resnet18d or efficientnet v2s + unet model, for segmenting C[1-7] vertebraes (7ch output).
+
+After the training was completed, I predicted 3d masks for each vertebrae for all 2k samples in the training set.
+
+Here is an example of predicted masks of C[1-7] vertebrae. Center slice of x, y, z dimension view, from left to right.​
+
+Prepare Data for Classification
+
+Next step is to prepare data for classification.
+
+First using the predicted 3D mask for each vertebrae, we can crop out 7 vertebraes from a single original 3d image (there might be multiple vertebraes shown in a single crop, but It's fine). At this moment, we cropped 2k * 7 = 14k samples and for each sample there is only one single binary label.
+
+Then for each vertebrae sample, I extracted 15 slices evenly by z-dimension, and for each slice, I further extracted +-2 adjacent slices to form an image with 5 channels. E.g if a 3D vertebrae sample have a shape of (128, 128, 30), I extracted 0th, 2nd, 4th, 6th….26th, 28th slices, then for example for the 2nd one, I use 0th~4th slices to form a 5-channel image.
+
+In addition, I added the predicted mask of corresponding vertebrae as the 6th channel to each image, as a way to exclude the effect of having multiple vertebraes in a single sample.
+
+Here is an example of one slice of a single vertebrae, and its predicted mask (with augmentations). We can see that the left half of the vertebrae in the image do not belong to the vertebrae specified by this crop.​
+
+2.5D + LSTM Classification
+
+We now have 14k 3D training samples of vertebrae. Theoretically the easiest way to deal with this data is to train 3D CNN on it. But unfortunately this method does not work. Training a 3D CNN on this data did not give me satisfactory results.
+
+So I backed off and chose the 2.5D approach. Here 2.5D means that each 2D slice in a vertebrae sample has the information of several adjacent slices, so it is written 2.5D. But the model is a normal 2D CNN with 5-channels input.
+
+The structure of this model is that, I first input 15 slices from a single sample into a 2D CNN, extracted out features of each slice, and then follow it with an LSTM model. So that the whole model can learn the features of the whole vertebrae. I call it type1 model ↓
+
+​
+
+This model structure above, while being able to train a single vertebrae for fracture, does not able to train the patient as a whole for the presence of a fracture. So I designed another model.
+
+The second classification model is basically the same as the one above, except that it treats a patient as one training sample (the model above treats a vertebrae as one training sample). This model is fed with 7x15 2D images at the same time, so that it has the ability to learn patient_overall labels. I call it type2 model ↓
+
+​
+
+However, the disadvantage of this model is that it takes up too much GPU memory and therefore can only use small backbones (Imagine a model with batch_size = 1 that has to be trained on 105 images at one time, it is insane).
+
+Final Submission
+
+3D Seg
+
+5fold resnet 18d unet (128x128x128)
+5fold effv2 s (128x128x128)
+
+2.5D Cls
+
+Type1 5fold effv2s (512x512)
+
+Type1 5fold convnext tiny (384x384)
+
+Type2 5fold convnext nano (512x512)
+
+Type2 2fold convnext pico (512x512)
+
+Type2 2fold convnext tiny (384x384)
+
+Type2 2fold nfnet l0 (384x384)
+
+The submission time is 7.5 hours.
+
+Thanks to timm library for having so good implementation of those models. I always using it.
+
+Acknowledge
+
+In this competition, more than half of my models are trained on Z8G4 Workstation with dual A6000 GPU from Z by HP. I would say I couldn't have achieved this without this workstation, thanks a lot!
+
+Author
+Qishen Ha
+
+haqishen
+
+arrow_drop_up
+222
+Share
+more_horiz
+Citation
+
+Qishen Ha. 1st Place Solution. https://www.kaggle.com/competitions/rsna-2022-cervical-spine-fracture-detection/writeups/qishen-ha-1st-place-solution. 2022. Kaggle
+
+comment
+87 Comments
+3 appreciation comments
+Hotness
+README
+
+Posted 4 years ago
+
+· 526th in this Competition
+
+arrow_drop_up
+14
+more_vert
+
+Hi, @haqishen , These are two architectures of 1st solution stage2 model that i plot:
+
+stage2 type1 
+
+stage2 type2 
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Good work!
+
+reply
+Reply
+README
+
+Posted 4 years ago
+
+· 526th in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Hi, @haqishen , This is the architecture of 1st solution stage1 model that i plot: 
+
+reply
+Reply
+Victor Salvia
+
+Posted 4 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations and thanks for sharing your code, very well deserved !
+
+Did you try using a transformer rather than LSTM? You think LSTM in this kind of tasks still outperform transformers?
+I was really surprised by your end2end training of these models, we tried that as well but succeeded only by first training the encoder… We will certainly have to learn how to train them end2end. How long does it take to train one of these models?
+How important would you say mixup is in this kind of problem? Did you try without it?
+Which performance had a single model? How was the improvement just by doing the 20 or so ensembles in classification?
+The transformation in which you do a permutation of slices within the vertebrae and of vertebrates in the type2 model helped your training? Does this mean LSTM has no idea what is up and down (as transformers do with positional encoding)?
+
+Again, thanks for your time and congratulations 👍
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thx. Good questions!
+
+I didn't try transformers here. The sequence is not too long…
+Final model takes 12h~24h and little experiments takes 6~12h.
+To avoid overfitting, mixup is one of the choses.
+Ensemble make CV score around ~0.02 better.
+Also kind of avoiding overfit, nothing special behind it.
+reply
+Reply
+patriot
+
+Posted 4 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+congratulations! I will replicate your solution and prepare for the next. Which idea boosted LB from 0.35 to ~0.2?
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thx. The 0.35 submission is just kind of POC of my ideas. Nothing change in pipeline afterward.
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Yiheng Wang
+
+Posted 4 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Thanks @haqishen for sharing and congrats to your solo Champion! Your stage 2 models are brilliant! Could I ask how much gain it is for type 2 model compared with using 7 type 1 models and then calculate patient_overall?
+
+BTW, I also could not build a good 3d model.
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Type2 make the CV of patient_overall 0.02 better, so for whole CV 0.01 or so.
+
+reply
+Reply
+yu4u
+
+Posted 4 years ago
+
+· 32nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+BTW, I also could not build a good 3d model.
+
+same to me 😭
+
+reply
+Reply
+RihanPiggy
+
+Posted 4 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+BTW, we also started from 3D model using monai. But it didnt work. Then we shift to 2 stage solution
+
+reply
+Reply
+Jesse
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! Awesome solution.
+
+I told my teammate @yeeseng back in mid August that you would be #1. It's the only thing I predicted well for this competition. 😅
+
+For the type1 model, if those are only contributing to individual c level score, how are the patient scores calculated? And how much was gain do you estimate ensembling type1+type2 vs type2 alone?
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+haha thx, I've just published my inference code with some small models and you can take a look at it. I think the type1+type2 ensemble should have made the score 0.01~0.02 better.
+
+reply
+Reply
+Jesse
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great thank you!
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I'm very interested if anyone has got good performence with 3D classification, if yes please leave a comment here!
+
+reply
+Reply
+Marius
+
+Posted 4 years ago
+
+· 579th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Would be very interested too. My 3D models were overfitting like crazy on the validation set.
+
+reply
+Reply
+shigengtian
+
+Posted 4 years ago
+
+· 50th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congratulations!
+
+reply
+Reply
+olivepicker
+
+Posted 4 years ago
+
+· 37th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing solution. congratulations !
+
+reply
+Reply
+README
+
+Posted 4 years ago
+
+· 526th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation! very nice solution😋
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wonderful approach @haqishen, your stage 2 model approach is the highlight of the overall post. Keep up the great work and hearty congratulations for the solo gold!
+
+reply
+Reply
+Harshit Sheoran
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning, Amazing Solution!
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats to your solo gold! I knew it when I first saw the LB, well deserved!
+
+reply
+Reply
+liron
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congratulations!
+
+reply
+Reply
+Konika Rani
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @haqishen. Nice work👍
+
+reply
+Reply
+LuckyLuke1
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Big Congrats!
+
+reply
+Reply
+Torkia Salem
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congratulations !! can you send to me the test train plz ! salemtorkia5@gmail.com
+
+reply
+Reply
+Toyan Ünal
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! I have recently changed my field and started spending more time on Kaggle. I will replicate the code to study for the upcoming competitions.
+
+reply
+Reply
+Shrijayan
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Awesome solution.
+
+reply
+Reply
+Quadeer Shaikh
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing this and congratulations !
+
+reply
+Reply
+Adrien Heinzlé
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! And thanks for sharing the code and the architecture.
+
+reply
+Reply
+RogerTaylor
+
+Posted 4 years ago
+
+· 309th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your achievement of first place. I learnt alot and though not the same solution given my lack of resources I'm glad you achieved your results based on the direction of travel to my own solution (kfold, segmentation, Classification) Well done!
+
+reply
+Reply
+Dariusz Trzeciak
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congratulations!
+
+reply
+Reply
+Dogaska
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+dropstone34
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!!
+
+reply
+Reply
+MarHenKa
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing. In the Final Submission you have listed two 3D seg models and 6 2.5D classifiers. How did you aggregate their results?
+
+reply
+Reply
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+check my inference code!
+
+reply
+Reply

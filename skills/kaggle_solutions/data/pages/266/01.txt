@@ -1,0 +1,82 @@
+url: https://www.kaggle.com/shadowwarrior/1st-place-solution/notebook
+fetched: 2026-10-27
+chars: 832
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Harlan Seymour · 9y ago · 16,143 views
+arrow_drop_up
+145
+Copy & Edit
+165
+file_download
+Download
+more_vert
+1st Place Solution
+Notebook
+Input
+Output
+Logs
+Comments (23)
+history
+Version 7 of 7
+Runtime
+play_arrow
+
+27s · GPU P100
+
+Tags
+NLP
+Feature Engineering
+Gradient Boosting
+Neural Networks
+Text
+Language
+
+Python
+
+Competition Notebook
+
+DonorsChoose.org Application Screening
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+1 file
+output
+Output
+0 files
+list_alt
+Logs
+27.5 second run - successful
+comment
+Comments
+23 comments

@@ -1,0 +1,697 @@
+url: https://www.kaggle.com/c/asl-signs/discussion/406684
+fetched: 2026-10-27
+chars: 20363
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution - 1DCNN combined with Transformer — Google - Isolated Sign Language Recognition
+1st place solution - 1DCNN combined with Transformer
+
+Google - Isolated Sign Language Recognition
+
+Solution Writeup · 1st place · May 5, 2023
+
+First of all, I would like to express my gratitude to the Google for hosting this amazing competition. I have always been a big fan of the services, frameworks, and platforms provided by Google.(Colab, GCP, TensorFlow.. all of them are amazing). Without access to these offerings from Google, I wouldn't have been able to win this competition. I would also like to thank all the other participants who shared their ideas. In particular, I gained valuable insights from the ideas shared by @hengck23.
+
+TL;DR
+
+My solution involved a combination of a 1D CNN and a Transformer, trained from scratch using all training data(competition data only), and used 4x seed ensemble for submission. and I initially started with PyTorch + GPU but later switched to TensorFlow + Colab TPU(tpuv2-8) to ensure compatibility with TensorFlow Lite.
+
+1D CNN vs. Transformer?
+
+My hypothesis was that in modeling sequential data, if there is a strong inter-frame correlation, 1D CNNs would be more efficient than Transformers.
+
+As in my experiment, the pure 1D CNN easily outperformed the Transformer and as a result, I was able to achieve a public LB score of 0.80 using only the 1D CNN at the end.
+
+However, there still were roles for the Transformer, which could be used on top of the 1D CNN(we can view 1d cnn as some kind of trainable tokenizer).
+
+Model
+def get_model(max_len=64, dropout_step=0, dim=192):
+    inp = tf.keras.Input((max_len,CHANNELS))
+    x = tf.keras.layers.Masking(mask_value=PAD,input_shape=(max_len,CHANNELS))(inp)
+    ksize = 17
+    x = tf.keras.layers.Dense(dim, use_bias=False,name='stem_conv')(x)
+    x = tf.keras.layers.BatchNormalization(momentum=0.95,name='stem_bn')(x)
+
+    x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+    x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+    x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+    x = TransformerBlock(dim,expand=2)(x)
+
+    x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+    x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+    x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+    x = TransformerBlock(dim,expand=2)(x)
+
+    if dim == 384: #for the 4x sized model
+        x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+        x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+        x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+        x = TransformerBlock(dim,expand=2)(x)
+
+        x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+        x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+        x = Conv1DBlock(dim,ksize,drop_rate=0.2)(x)
+        x = TransformerBlock(dim,expand=2)(x)
+
+    x = tf.keras.layers.Dense(dim*2,activation=None,name='top_conv')(x)
+    x = tf.keras.layers.GlobalAveragePooling1D()(x)
+    x = LateDropout(0.8, start_step=dropout_step)(x)
+    x = tf.keras.layers.Dense(NUM_CLASSES,name='classifier')(x)
+    return tf.keras.Model(inp, x)
+
+
+Combining CNN and Transformer is a prevalent idea in recent state-of-the-art models(coatnet, conformer, Maxvit, nextvit…). I started with an 192d 8-layer 1D CNN, then switched to a 192d (3+1)x2 conv-transformer structure, which yielded a +0.01 CV and LB improvement.
+
+The 1D CNN model employed depthwise convolution and causal padding. The Transformer used BatchNorm + Swish instead of the typical LayerNorm + GELU, due to slightly(negligible) lighter inference with the same accuracy. single model has around 1.85M parameters.
+
+Masking
+
+Handling variable-length input correctly was very crucial for ensuring train-test consistency and efficient inference , as we do not necessarily have to pad the short videos. During training, I used a max_len=384 with padding and truncation, while for inference, I only applied truncation. This approach provided sufficient inference speed and allowed the use of reasonably large models. To accurately apply masking to the 1D CNN, I used causal padding to maintain the mask index. In TensorFlow, masking can be easily implemented using tf.keras.layers.Masking at the beginning of the model. Plus, It is essential to ensure that masking is accurately applied to operations like batch normalization and global average pooling which can be affected by masking.
+
+Regularization
+Drop Path(stochastic depth, p=0.2)
+high rate of Dropout (p=0.8)
+AWP(Adversarial Weight Perturbation, with lambda = 0.2)
+
+As we need to train the model from scratch, regularization technics played a significant role. I used drop_path(0.2, applied after each block), dropout(0.8, applied after GAP) and AWP(Adversarial Weight Perturbation, lambda=0.2) AWP and the dropout applied after epoch 15. All these methods were very crucial for preventing overfitting when training with long epochs(>300). All three methods had a significant impact on both CV and leaderboard scores, and removing any one of them led to noticeable performance drops.
+
+Preprocessing
+class Preprocess(tf.keras.layers.Layer):
+    def __init__(self, max_len=MAX_LEN, point_landmarks=POINT_LANDMARKS, **kwargs):
+        super().__init__(**kwargs)
+        self.max_len = max_len
+        self.point_landmarks = point_landmarks
+
+    def call(self, inputs):
+        if tf.rank(inputs) == 3:
+            x = inputs[None,...]
+        else:
+            x = inputs
+
+        mean = tf_nan_mean(tf.gather(x, [17], axis=2), axis=[1,2], keepdims=True)
+        mean = tf.where(tf.math.is_nan(mean), tf.constant(0.5,x.dtype), mean)
+        x = tf.gather(x, self.point_landmarks, axis=2) #N,T,P,C
+        std = tf_nan_std(x, center=mean, axis=[1,2], keepdims=True)
+
+        x = (x - mean)/std
+
+        if self.max_len is not None:
+            x = x[:,:self.max_len]
+        length = tf.shape(x)[1]
+        x = x[...,:2]
+
+        dx = tf.cond(tf.shape(x)[1]>1,lambda:tf.pad(x[:,1:] - x[:,:-1], [[0,0],[0,1],[0,0],[0,0]]),lambda:tf.zeros_like(x))
+
+        dx2 = tf.cond(tf.shape(x)[1]>2,lambda:tf.pad(x[:,2:] - x[:,:-2], [[0,0],[0,2],[0,0],[0,0]]),lambda:tf.zeros_like(x))
+
+        x = tf.concat([
+            tf.reshape(x, (-1,length,2*len(self.point_landmarks))),
+            tf.reshape(dx, (-1,length,2*len(self.point_landmarks))),
+            tf.reshape(dx2, (-1,length,2*len(self.point_landmarks))),
+        ], axis = -1)
+
+        x = tf.where(tf.math.is_nan(x),tf.constant(0.,x.dtype),x)
+
+        return x
+
+
+I used left-right hand, eye, nose, and lips landmarks. For normalization, I used the 17th landmark located in the nose as a reference point, since it is usually located close to the center ([0.5, 0.5]). I used motion feature of lag1 x[:1] - x[1:], and lag2 x[:2] - x[2:](lag > 2 did not help much).
+
+Augmentation
+temporal augmentation
+Random resample (0.5x ~ 1.5x to original length)
+Random masking
+Spatial augmentation
+hflip
+Random Affine(Scale, shift, rotate, shear)
+Random Cutout
+Training
+
+Epoch = 400
+Lr = 5e-4 * num_replicas = 4e-3
+Schedule = CosineDecay with no warmup
+Optimizer = RAdam with Lookahead(better than AdamW with optimal parameters)
+Loss = CCE with label smoothing=0.1 or just plain CCE
+
+final single model result CV(participant split 5fold): 0.80 public LB: 0.80 private LB: 0.88
+
+Training takes around 4 hours with colab TPUv2-8.
+
+Single model CV was around 0.80 with participant split(5fold) at the end. I ensemble 4 different seed(with some minor differences in training configurations) for the final model and got LB 0.81. By the way, I could see slightly worse score when I submitted 4x size(384d, 16layers) single model with the same settings. I think it can achieve same or better score with better configurations.
+
+Tried but not worked
+GCNs
+More Complex augmentations: augmentation based on angle and the distance between the landmarks, grid distortion on temporal, spatial axis, etc.
+CutMix, MixUp: Not worked. Main problem was how to define new label with two different length of inputs. I could not find the correct way to implement it.
+Knowledge Distillation: I tried to use single 4x sized model and distill it with 4x seed 4x sized model, but I could not manage it to work due to lack of time.
+
+I'm always amazed by the fact that we did try each other’s methods, but we came up with different result. I also gave the 2D-CNN(similar to @kolyaforrat 's brilliant solution) and pure transformer approaches a try, but due to their initial weak performance and my confidence in my own hypothesis, I didn't dig any deeper. Seeing other teams succeed with the ideas I had trouble with, through their skill and hard work, has been truly inspiring. I've learned a lot through this competition, and I'm grateful for the experience. Thank you all!!! :)
+
+Edit: I made my code public, check https://www.kaggle.com/competitions/asl-signs/discussion/406978
+
+Author
+hoyso48
+
+hoyso48
+
+arrow_drop_up
+191
+Share
+more_horiz
+Citation
+
+hoyso48. 1st place solution - 1DCNN combined with Transformer. https://www.kaggle.com/competitions/asl-signs/writeups/hoyeol-sohn-1st-place-solution-1dcnn-combined-with. 2023. Kaggle
+
+comment
+48 Comments
+Hotness
+Aisuluu Ulan kyzy
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+you ate it solo, my congrats
+
+reply
+Reply
+Muhammad Usman
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+wow thats great…
+
+reply
+Reply
+Jaydev
+
+Posted 3 years ago
+
+· 938th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congratulations
+
+reply
+Reply
+Gleb Papchikhin
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations with solo win! I was glad to see your solution. Thanks!
+
+reply
+Reply
+Bilzard
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulation for the 1st prize. This writeup is really impressive.
+
+Now, I am trying to reproduce your pipeline in my environment, but mask tensor fails to propagate when saving to tflite although original model can produce valid output.
+
+How did you convert your tf.keras.Model into TFLite model?
+
+Error message
+
+in user code:
+
+    File "/ml-tf/working/kaggle-ISLR/train/model_v41.py", line 43, in call  *
+        mask = tf.cast(mask, tf.bool)
+
+    ValueError: None values not supported.
+
+
+c.f. My failed code is below:
+
+            class TestSubmitModel(tf.Module):
+                def __init__(self):
+                    super().__init__()
+
+                    # Load the feature generation and main models
+                    self.preprocess_layer = preprocess_layer
+                    self.model = model
+
+                @tf.function(
+                    input_signature=[
+                        tf.TensorSpec(shape=[None, 543, 3], dtype=tf.float32, name="inputs")
+                    ]
+                )
+                def __call__(self, x):
+                    # Preprocess Data
+                    x, non_empty_frame_idxs = self.preprocess_layer(x)
+                    # Return a dictionary with the output tensor
+                    x = tf.expand_dims(x, axis=0)
+                    non_empty_frame_idxs = tf.expand_dims(non_empty_frame_idxs, axis=0)
+                    dummy_labels = tf.zeros((x.shape[0]), dtype=tf.int32)
+                    dummy_z_preds = tf.zeros(
+                        (
+                            x.shape[0],
+                            cfg.input_size,
+                            len(cfg.left_hand_idxs) + len(cfg.right_hand_idxs),
+                            1,
+                        ),
+                        dtype=tf.float32,
+                    )
+                    outputs = model(
+                        {
+                            "frames": x,
+                            "non_empty_frame_idxs": non_empty_frame_idxs,
+                            "labels": dummy_labels,
+                            "z_preds": dummy_z_preds,
+                        }
+                    )
+                    outputs = tf.squeeze(outputs, axis=0)
+                    return {"outputs": outputs}
+
+            # Define TF Lite Model
+            submit_model = TestSubmitModel()
+            # Sanity Check
+            seq_idx = 25
+            raw_data = load_relevant_data_subset(train.iloc[seq_idx]["file_path"])
+            print(f"demo_raw_data shape: {raw_data.shape}, dtype: {raw_data.dtype}")
+            demo_output = submit_model(raw_data)["outputs"]
+            print(f"demo_output shape: {demo_output.shape}, dtype: {demo_output.dtype}")
+            demo_prediction = demo_output.numpy().argmax()
+            print(
+                f'demo_prediction: {demo_prediction}, correct: {train.iloc[seq_idx]["sign_ord"]}'
+            )
+
+            tf.saved_model.save(submit_model, "submit_model")
+            converter = tf.lite.TFLiteConverter.from_saved_model("submit_model")  # <- failed at this line
+            tflite_model = converter.convert()
+
+reply
+Reply
+hoyso48
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I released my inference notebook. check it if you want! :)
+
+reply
+Reply
+huyidao
+
+Posted 3 years ago
+
+· 600th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+amazing solution. congrats and thanks for sharing.
+
+reply
+Reply
+Muchamad Arif Hana Sasono
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing. can the code be implemented on EEG signals for classification?
+
+reply
+Reply
+hoyso48
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I believe yes, with some modifications.
+
+reply
+Reply
+Kshitiz Kumar
+
+Posted 3 years ago
+
+· 581st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Many congratulations. Thank you for sharing!
+
+reply
+Reply
+The Devastator
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Really cool solution (Cool approach in general, there weren't a lot of conv + transformer architectures to this point!).
+
+Quick question, Is the masking PAD for ignoring gradients computed for shorter sequences in the batch? [I assume the causal masking is inside the transformer block itself, am I correct?]
+
+Congrats, and thank you again for sharing! Amazing work. I am a bit shocked by how simple it is..
+
+reply
+Reply
+hoyso48
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+21
+more_vert
+
+Masking of PAD is literally for the masking of PAD tokens in the sequence. for example, if the data have the length of 256, 128 PAD tokens are added to match the fixed length of 384 during the training. But we don't want to add the PAD tokens during the inference, as it will significantly increase the inference time. Maybe someone can suggest to use PAD=0 and no masking during training + no padding during inference, this method drops accuracy significantly due to the train-test time inconsistency. So the only choice for us is to mask the PAD part of the inputs during training so that they do not contribute to the calculation of the gradients.
+
+TransformerBlock is originally designed to support variable length inputs, as they use 'attention_mask' when training with PAD tokens, and making it invisible during training. So yes, Transformer block also supports Masking in my implementation, which is trivial.
+
+But the 'masking by causal padding' in the Conv1DBlock I mentioned is bit more trickier to understand. Conv1DLayer does not internally supports masking, as when they used with kernel size > 1, the PAD token will be calculated together in the kernel with neighboring frames. So if we use typical padding='same' argument, the PAD tokens will intrude into the original input sequence's time frames, and makes it much harder to implement masking. On the other hand, the causal padding prevents kernels to see the future frames, and it always preserves the time frame information if strides=1, thus we do not need to additionally handle the position of the mask which is originally generated by the initial tf.keras.layers.Masking layer. 
+
+reply
+Reply
+Heroseo
+
+Posted 3 years ago
+
+· 1062nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on 1st place solo cash gold finish :)
+
+reply
+Reply
+Artem Toporov
+
+Posted 3 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Good job!
+
+reply
+Reply
+hoyso48
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congratulations for you too! thanks a lot! :)
+
+reply
+Reply
+Kolya Forrat
+
+Posted 3 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations with solo win! Great solution Do you plan to post your submission preparing code with model's weights? I'm really curious about trying 1d CNN + 2d CNN approach
+
+Also have you tried to compare ensemble with and without softmax?
+
+reply
+Reply
+hoyso48
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Im cleaning up my code right now… but right now im not sure which part of my code to be available on the public since it contains bunch of things included in my other projects.
+
+about the softmax, yes I compared it on public LB and without softmax was better so I used it, but it turned out that with softmax was better on private LB and their difference was negligible(around +-0.0004).
+
+thank you and it was an honor for me to compete with you and your team!:)
+
+reply
+Reply
+Drishti B.📚📝
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I love how you explained your thought process through your code and explanation. Somehow I understand them, I just need to understand the concepts you mentioned. That was lovely and I look forward to seeing more.
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I think your approach is very inspiring! Especially the way you see the 1D CNN modules as a "trainable tokenizer". That broaden my perspective. By the way, can I ask you some questions about the input layer you implemented?
+
+What's the reason behind setting the input layer "CHANNEL" size as "6x118"? not 3x118(xyz per landmarks)
+And, why you set the max_len as 64? Is it because althoguh there were various lengths of data, max_len 64 can cover majority of your input data?
+If 2. is true, did you also thought about the information loss of long sequence data?
+
+I will be very pleased if you answer my questions :)
+
+reply
+Reply
+Mariam Akter
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing this crucial information .
+
+reply
+Reply
+Tim Liu
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+English is not my mother tongue. Could you explain what 4x seed is?🥺 Is that mean CFG.seed = 42 or 43 or 44 or 45?
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+In hoyso48's notebook(shared code), " you should run this notebook four time (for each seed=42,43,44,45) to get all 4 seed weights of the model. " So I think you got the point.
+
+reply
+Reply
+Ardian Bramantyo
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Kudos to you!
+
+reply
+Reply
+Davide Boeker
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing your solution. Your notes and explanations are very helpful.
+
+reply
+Reply
+Skinny Lich
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+this is great solution!
+
+reply
+Reply
+Vladimir Simões da Luz Junior
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Greetings, @hoyso48 !
+
+Amazing solution, congratulations!
+
+Have you already looked at the latest Google ASL competition? Eager to see how will you solve this task… Keep up with the great work💪🔥
+
+reply
+Reply
+Rasha Salim
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thank you so much for sharing :)
+
+reply
+Reply
+Suraj
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Kudos @hoyso48 !
+
+reply
+Reply
+apranav_19
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thats a great solution
+
+reply
+Reply
+june
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!!! Thanks for sharing your solutions.
+
+reply
+Reply
+Arslan3x5
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+👍👏🎉 Congrats on winning the competition with your innovative approach! It's great to see how you combined a 1D CNN and a Transformer to achieve such impressive results. Your explanation of the model architecture and the techniques you used for handling variable-length inputs and regularization are also very insightful. Thanks for sharing your experience!
+
+reply
+Reply

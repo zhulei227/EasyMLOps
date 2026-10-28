@@ -1,0 +1,65 @@
+url: https://www.kaggle.com/c/iwildcam2022-fgvc9/discussion/328965
+fetched: 2026-10-27
+chars: 2709
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — iWildCam 2022 - FGVC9
+1st Place Solution
+
+iWildCam 2022 - FGVC9
+
+Solution Writeup · 1st place
+
+Our method is based on filtering detection results of megadetector. No model training or tracking algorithm is involved. We just return the max number of objects among all images in sequence as our final predict. By observation, if we set 0.95 as confidence threshold, we found that we will undercount animals in images with high-density objects and overcount animals in images with low-density objects. So we divided all images in to low-object -density images and high-object-density images and then use different filtering methods to solve them separately. The threshold is 8 predictions in a image
+
+high-object-density images To count more animals, we set the confidence threshold as 0.0. To remove the duplications we applied NMS method and set IoU=0.2. We also make little modifications to suppress smaller boxes. I cannot upload images but the filtering result is pretty good by observation. With the help of our NMS method, the public score can increase to 0.253
+
+low-object-density images If we don't take confidence score into consideration, We assume that area with many bounding box overlap has higher tp probability than area without overlapping bounding boxes if set the confidence threshold as 0. After few times of fine-tuning, we found that 0.98(confidence threshold) for boxes without overlaps and 0.8 for boxes with overlap can get best public score. Public score can raise up to 0.249 now. We also applied second round of filtering for images with 1 or 2 object left after first round of filtering. The confidence threshold is 0.98 and now we get our best result 0.247
+
+Summary We don't try any training methods because ground truth is not provided and if we use the detector's result as training data, the error propagation will happen and new model cannot outperform megadetector if we don't manually filter out FP prediction of megadetector. We attend this competition 1 week before deadline so we don't have enough time to focus on tracking algorithm. If time permits, we will continue the study and focus on tracking objects in image sequence.
+
+Tagged
+Animals
+Author
+Yang Zhang
+
+zy984764389
+
+arrow_drop_up
+4
+Share
+more_horiz
+Citation
+
+Yang Zhang. 1st Place Solution. https://www.kaggle.com/competitions/iwildcam2022-fgvc9/writeups/yang-and-yuan-1st-place-solution. 2022. Kaggle
+
+comment
+0 Comments
+Hotness

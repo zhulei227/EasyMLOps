@@ -1,0 +1,615 @@
+url: https://www.kaggle.com/c/playground-series-s3e1/discussion/377137
+fetched: 2026-10-27
+chars: 11179
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+That was a surprise! Here is the 1st place solution.... — Regression with a Tabular California Housing Dataset
+That was a surprise! Here is the 1st place solution....
+
+Regression with a Tabular California Housing Dataset
+
+Solution Writeup · 1st place · Jan 12, 2023
+
+First - thanks for the fun competition, great public solutions and contributions! 👍
+
+This will be a short summary but still as some maybe are interested in what FE/models etc. included to the solution.
+
+Didn't had much time for this competition while doing other as well but joined the competitions for trying some new frameworks versions in this specific dataset.
+
+I finally picked the AutoGluon framework and its tabular predictor for the task. "AutoGluon-Tabular: Robust and Accurate AutoML for Structured Data" - https://arxiv.org/abs/2003.06505
+
+For the FE part I used a public notebook https://www.kaggle.com/code/dmitryuarov/ps-s3e1-coordinates-key-to-victory , credit to author!
+
+The AG trained solution is an weighted ensemble of many 8 fold trained common architectures as xgb,lgbm,catb,RF,NN etc and it also used bootstrap aggregation and stacking(3 levels for this one).
+
+The final local CV score was 0.5006.
+
+That's it! 🙂
+
+Author
+Kirderf
+
+kirderf
+
+arrow_drop_up
+69
+Share
+more_horiz
+Citation
+
+Kirderf. That was a surprise! Here is the 1st place solution..... https://www.kaggle.com/competitions/playground-series-s3e1/writeups/kirderf-that-was-a-surprise-here-is-the-1st-place-. 2023. Kaggle
+
+6
+comment
+40 Comments
+1 appreciation comment
+Hotness
+Nick Erickson
+
+Posted 4 years ago
+
+arrow_drop_up
+11
+more_vert
+
+This is awesome! I'm the lead developer of AutoGluon, and it is very rewarding to see it being used to achieve 1st place in a Kaggle competition when combined with smart feature engineering tricks! There is a lot more that can be done with AutoML, and our team intends to keep pushing the boundaries so that it no longer comes as such a surprise that an AutoML system is able to assist Kaggle Grandmasters ;) . If anyone ends up trying AutoGluon and has suggestions on how it can be improved, please let me know!
+
+reply
+Reply
+Cyril Bourgeois
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hello, for beginning, THANKS for your work!!! Autogluon is a wonderful hyperstructure! I learned how to use Autogluon 3 months along, it's very difficult to discover strong actuallized exemples. Do you have adresses for learn with simplicity actual strong exemples with latest tabular implementations? 🌈⛲🌈 Can you be more active on Kaggle for show at community optimized and advanced example of Autogluon utilization? ^^🏄‍♂️🏄‍♀️
+
+reply
+Reply
+Nick Erickson
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+@cyrilbourgeois Thank you for your enthusiasm :)
+
+We are working on creating a set of examples for highly performant usage of AutoGluon. Currently, I would recommend following my twitter (https://twitter.com/innixma) to be updated with the latest examples. We are also planning on creating a public Discord soon for the community to share their code examples, which will be announced on twitter, hopefully in a couple weeks.
+
+Regarding my own participation in Kaggle, I lack bandwidth to do this personally, but you can check my Kaggle notebooks for some examples of AutoGluon usage.
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@innixma Thanks, for the comment and for the work with the framework 👍 No surprise for me on the model and its high final ranking as I picked it as one of the best local CV score but more surprised by the 1st place, that was a positive suprise regardless the model choise :)
+
+About suggestions, sure I can drop an email about some small suggestions/findings noted along the way while testing the different modules.
+
+reply
+Reply
+Nick Erickson
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the detailed suggestions in your email, it is much appreciated!
+
+reply
+Reply
+The Devastator
+
+Posted 4 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations on a successful and impressive 1st place finish! It is really amazing that an AutoML system came up 1st on a competition.. I don't remember it ever happening before..
+
+The Devastator.
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! The manual FE before the training was important as well for the final score, so native end-to-end automl didn't get the 1st place :) But as "model/training + FE part 2 + pp" choice automl got the best score here.
+
+reply
+Reply
+inversion
+
+Kaggle Staff
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Have you tried the new way to link to your write-up from the leaderboard?
+
+https://www.kaggle.com/discussions/product-feedback/373153
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@inversion I didn't think of it, never been in top 5 before ;) as this is the playground series I didn't thought that was mandatory here though. But the information in the post has all needed information, links to the complete notebook for the FE part and autogluon is an automl framework so no need for more description I believe, all is printed in the post to reproduce the solution. Hope it's OK. 👍
+
+reply
+Reply
+inversion
+
+Kaggle Staff
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+It's not at all necessary or required, but if you go to your Team page and put the link of your post there, it will put an icon next to your name on the LB, which will make it easier for people to find and upvote. 😃
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@inversion too easy to understand haha 🙃 Saw the template and had an image of an arxiv paper! The link to this writeup is now added to the team site! 👍🙂
+
+reply
+Reply
+inversion
+
+Kaggle Staff
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@kirderf Thanks!!
+
+reply
+Reply
+MichaelP
+
+Posted 4 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! AutoML was a sensible choice in the time constraints. I didn't have time to implement an NN fully, and although I could see stacking was helping with local cv, I only had time to get to 1 level of stacking. An AutoML framework would likely have sped things up. Congratulations again.
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, yes it does help and can give a direction, I tried many frameworks and models. As the dataset was small it gave a good window for testing many different approaches, and I followed the local CV. A good dataset and FE is the also the final key, here I followed and tested the work in the public community as the time was limited. I believe with further hyp.tuning and final ensembles even better score could be done.
+
+reply
+Reply
+MichaelP
+
+Posted 4 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Yes I am sure you are right that there would have been more scope for incremental optimisation with more time. But it is also fun to have a short competition where people don't have to make a long time commitment and in the time available some very effective work was done.
+
+reply
+Reply
+Eric Vos
+
+Posted 4 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations, i was not expecting an AML framework at the first place.
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! I tried many frameworks and models, automl and not, but followed the local CV and this was the best here. But a good dataset and FE is the key as well, only automl/model doesn't get the 1st place, both are needed.
+
+reply
+Reply
+Jose Cáliz
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the first place!. Can you share what CV strategy did you use and if you augmented dataset with original California Housing Dataset?
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+You have all the info in the links I provided in the post :) E.g. AG use its ParallelLocalFoldFittingStrategy and Repeated k-fold Bagging.
+
+reply
+Reply
+Yassir Acharki
+
+Posted 4 years ago
+
+· 316th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing this solution @kirderf
+
+reply
+Reply
+Mario Batista
+
+Posted 4 years ago
+
+· 646th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing your work and results.
+
+reply
+Reply
+faissal boutaounte
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Zakir Khan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Amazing results! ✨
+
+reply
+Reply
+ksqrt
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+awsome !!!!!!!!
+
+reply
+Reply
+Gimnir
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Balaji Kartheek
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!!
+
+reply
+Reply
+Scorpio42
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Very interesting and congratulations!
+
+reply
+Reply
+suanow
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, very interesting results!
+
+reply
+Reply
+Cyril Bourgeois
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thannnnkksss !!!!!
+
+reply
+Reply
+Rôger Andrade
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, way to go!
+
+reply
+Reply
+Muhammad Waseem
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation, Nice Notebook and great result
+
+reply
+Reply
+Mohit Kumar
+
+Posted 4 years ago
+
+· 523rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great Notebook!! Lots to learn from this notebook.. btw Congratulation!!🎉🎉
+
+reply
+Reply
+Dmitry Uarov
+
+Posted 4 years ago
+
+· 54th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thank you! When I saw you in the first place, I thought that you had invented something cosmic for coordinates, but everything turned out to be simpler! 😄
+
+reply
+Reply
+Adam Wurdits
+
+Posted 4 years ago
+
+· 392nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thank you for the write-up!
+
+reply
+Reply
+Tyl3rDurd3n
+
+Posted 4 years ago
+
+· 172nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Did you use the data from the original california housing dataset?
+
+reply
+Reply
+Vladislav Viryasov
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Great work and solution! =)
+
+reply
+Reply
+Alexander Shumilin
+
+Posted 4 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Great result! :)
+
+reply
+Reply
+Kirderf
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! :)
+
+reply
+Reply
+THIRAPHAT boaty
+
+Posted 4 years ago
+
+· 355th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation on the top first place :)👍🎉🎉
+
+reply
+Reply

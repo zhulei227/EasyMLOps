@@ -1,0 +1,45 @@
+url: https://www.kaggle.com/c/santander-value-prediction-challenge/discussion/63907
+fetched: 2026-10-27
+chars: 523
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Banco Santander · Featured Prediction Competition · 8 years ago
+Late Submission
+more_horiz
+Santander Value Prediction Challenge
+
+Predict the value of transactions for potential customers.
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Failed to load the discussion topic

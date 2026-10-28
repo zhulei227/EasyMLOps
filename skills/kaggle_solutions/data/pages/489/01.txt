@@ -1,0 +1,186 @@
+url: https://www.kaggle.com/c/birdclef-2022/discussion/327047
+fetched: 2026-10-27
+chars: 4806
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution models (it’s not all BirdNet) — BirdCLEF 2022
+1st place solution models (it’s not all BirdNet)
+
+BirdCLEF 2022
+
+Solution Writeup · 1st place · Jun 5, 2022
+
+First of all, thanks to Kaggle Team, @stefankahl and all participants
+
+As you may know, in our final blend we have used BirdNet along with other models provided by me, @ivanpan, @realsleim and @selimsef
+
+In this post I will cover my models and approach
+
+Model Architecture
+
+I was using SED architecture, proposed and used by @tattaka - post
+
+As a backbones I have used:
+
+tf_efficientnet_b3_ns
+eca_nfnet_l0
+
+I have changed the first stride from (2,2) to (1,1) in order to have larger (in terms of length and number of frequencies ) output of CNN encoder ( I have taken this trick from @ilu000 SETI)
+
+Model Training
+
+I have trained model on 15 sec chunks and with secondary labels
+
+I have used following augmentations:
+
+GaussianNoise
+PinkNoise
+OR Mixup on waveforms
+BackgroundNoise. For training - this dataset. For finetuning - esc50 + nocall from soundscapes of 2021 BirdClef Comp
+
+Proposed by @selimsef I have used weights (computed by primary_label) for Dataloader and Loss in order to cope with unbalanced dataset (especially for scored_birds)
+
+As for Loss I have used simple BCE on clipwise logits
+
+I was tracking 3 best checkpoints by LB metric and Validation loss and then averaged 3 model weights (kind of naive SWA)
+
+Training stages
+
+For training I have used 2 stage training:
+
+Pretrain on 2021 and 2022 comp data
+Finetune on data from pretrain BUT filtered by the next rule - Take samples which contain scored_bird in primary_label OR secondary_labels
+
+Inference
+
+Having SED model I have tried 2 options for inference:
+
+Proposed by @tattaka - using AND rule for long and short clipwise predictions. short prediction - 5 sec, long - 15 sec
+Feed model 15 sec chunk BUT apply head only on centered 5 sec reduced CNN image and use max(framewise, dim=time)
+
+Overall second option worked better for me
+
+Choosing threshold. Here I have tried also 2 options:
+
+Use ordinary threshold. Optimal values varied for me from 0.2 - 0.3
+Use quantile threshold, originally proposed by @philippsinger post. Optimal value for quantile_tresh was 0.25
+tresh = np.quantile(
+                        test_model_probs[:, scored_bird_ids].flatten(),
+                        1 - quantile_tresh,
+                    )
+
+
+For solo model (5 folds) second worked better and for ensembles first worked better
+
+Validation
+
+I have used 5 CV Stratified training (also maupar sample was splitted on 5 samples in order to have consistent OOF score) Compute LB metric using next prediction scheme: For each validation sample - slice it on pieces -> predict each piece -> max(sample_predictions, dim=pieces) And then compute metric using all_labels=[primary_label] + secondary_labels Also I have computed this metric only on samples which contain scored_bird in all_labels and taking into account only scored_birds And finally optimize threshold with step 0.1
+
+Results
+
+tf_efficientnet_b3_ns: Val = 0.87894692; Public = 0.82; Private = 0.78
+eca_nfnet_l0: Val = 0.88640918; Public = 0.82; Private = 0.78
+
+Inference Kernel - https://www.kaggle.com/code/ivanpan/fork-of-fork-of-cls-exp-1-870246-021187-967146/notebook?scriptVersionId=96433080 GitHub Repo - https://github.com/Selimonder/birdclef-2022
+
+Authors
+realsleim
+
+realsleim
+
+Ivan Panshin
+
+ivanpan
+
+Selim Seferbekov
+
+selimsef
+
+Volodymyr
+
+vladimirsydor
+
+arrow_drop_up
+63
+Share
+more_horiz
+Citation
+
+realsleim, Ivan Panshin, Selim Seferbekov, Volodymyr. 1st place solution models (it’s not all BirdNet). https://www.kaggle.com/competitions/birdclef-2022/writeups/kdl-1st-place-solution-models-it-s-not-all-birdnet. 2022. Kaggle
+
+comment
+4 Comments
+Hotness
+Takashi Tamura
+
+Posted 4 years ago
+
+· 393rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on 1st place! Thanks for sharing your solution. Amazing work!
+
+reply
+Reply
+Lainey
+
+Posted 4 years ago
+
+· 210th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot, the solution description and code repo!
+
+reply
+Reply
+Hao
+
+Posted 4 years ago
+
+· 78th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations for the 1st place, @vladimirsydor. Regarding your 2 stages training, in your 2nd finetune stage training, di d you train all layers of your model, or freeze backbone to avoid overfitting?
+
+Finetune on data from pretrain BUT filtered by the next rule - Take samples which contain scored_bird in primary_label OR secondary_labels
+
+reply
+Reply
+
+This comment has been deleted.

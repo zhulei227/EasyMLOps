@@ -1,0 +1,466 @@
+url: https://www.kaggle.com/c/amex-default-prediction/discussion/348111
+fetched: 2026-10-27
+chars: 6538
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st solution(update github code) — American Express - Default Prediction
+1st solution(update github code)
+
+American Express - Default Prediction
+
+Solution Writeup · 1st place · Sep 4, 2022
+
+First time be a solo winner, I must say there is luck in winning the competition.
+
+My best result is a heavy ensemble with LGB and NN.
+
+Data 
+
+Model
+
+for NN model, all data fillna(0) and using nn.utils.rnn.pack_padded_sequence to pad.
+
+I have to look for my early stage model, sorry for small font size in figure.
+
+update: I release a clean code at https://github.com/jxzly/Kaggle-American-Express-Default-Prediction-1st-solution. note: You may not be able to reproduce the best result due to random fluctuations.
+
+Author
+Correlation
+
+daishu
+
+arrow_drop_up
+303
+Share
+more_horiz
+Citation
+
+Correlation. 1st solution(update github code). https://www.kaggle.com/competitions/amex-default-prediction/writeups/lucky-shake-1st-solution-update-github-code. 2022. Kaggle
+
+10
+comment
+112 Comments
+1 appreciation comment
+Hotness
+Marília Prata
+
+Posted 4 years ago
+
+· 4725th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+A huge congratulation Daishu!
+
+1st time solo winner is an achievement to be remembered. Mostly in this AMEX competition. Though I can't even understand any solutions since I'm a beginner. Thank you for sharing yours.
+
+reply
+Reply
+delai50
+
+Posted 4 years ago
+
+· 228th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks for sharing and congratulations for your first solo winner! Some questions from my side:
+
+How user-based and month-based rank features are calculated? Simply applying scipy.stats.rankdata to raw data per user and per month before making the aggregations?
+
+diff: Is it last value - nth value or nth value - nth-1 value?
+
+LGB series oof: Let's call the number of customers in train set N_1 and the number of features N_2. The feature matrix you used to calculate LGB series oof has size (N_1, N_2*13), correct?
+
+What are GreedyBins? Could you point some resource to take a look at it?
+
+How was your iteration process for trying new features? I mean, how did you decided which features to try/add to your already selected features each time?
+
+Answers from anybody are welcome :)
+
+reply
+Reply
+Correlation
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+df.groupby('cid')[num_features].rank(pct=True), df.groupby('year-month')[num_features].rank(pct=True)
+
+nth value - nth-1 value
+
+the training set is train_data.merge(train_y,how='left',on='cid')
+
+GreedyBins is a operation in LGB.
+https://blog.katastros.com/a?ID=01800-4e3a4f7c-6981-40af-b4dd-3224074d705a
+
+when cv and lb boosting, the feature were selected.
+
+reply
+Reply
+
+This comment has been deleted.
+
+Astraz93
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the win!
+
+reply
+Reply
+SgangX
+
+Posted 4 years ago
+
+· 717th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! l look forward to your github code!👍
+
+reply
+Reply
+Making TARS
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulation! That luck met its owner well :) @daishu
+
+reply
+Reply
+Raimondo Melis
+
+Posted 4 years ago
+
+· 1317th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the seemingly simple solution. Can you briefly explain why you applied some transformations in the last 3 and 6 rows?
+
+reply
+Reply
+Muhammad Anas Mahmood
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing this amazing way to summarize the solution
+
+reply
+Reply
+guansuo
+
+Posted 4 years ago
+
+· 459th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win! Thank you for sharing！
+
+reply
+Reply
+peterclerk
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Well done!!
+
+reply
+Reply
+Mezue
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Well done!!
+
+reply
+Reply
+Stefan Burger
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!
+
+reply
+Reply
+Ed Kent-Hazledine
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, well done! 💪
+
+reply
+Reply
+Gizachew Alemu
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the win!
+
+reply
+Reply
+Ranjeet shrivastav
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the solo win🎉
+
+reply
+Reply
+SgangX
+
+Posted 4 years ago
+
+· 717th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing amazing way and l look forward to your github code!👍
+
+reply
+Reply
+Lamsaoub
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing amazing way to summarize solution
+
+reply
+Reply
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win! 🎉Thank U for sharing！
+
+reply
+Reply
+Athar Sayed
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing amazing way to summarize solution
+
+reply
+Reply
+Ivan Kireev
+
+Posted 4 years ago
+
+· 3185th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Really lucky shake ) My congratulation and thanks for sharing!
+
+reply
+Reply
+Nuriel Reuven
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing! And congratulations for the win
+
+reply
+Reply
+Matthew Setiadi
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulation @daishu and Thank you for sharing your interesting solution.
+
+reply
+Reply
+Ahmed Gomaa
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win! 🎉
+
+reply
+Reply
+Felipe
+
+Posted 4 years ago
+
+· 848th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very interesting @daishu. Enjoy your first solo. Im also beginning in competitions and is very instructive to see your workflow. By the way, feature selection didnt improve my public also. Anyway… a tough competition in my opinion. Congrats!!!
+
+reply
+Reply
+shahilpravind
+
+Posted 4 years ago
+
+· 3390th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win! 🎉
+
+reply
+Reply
+Robert Hatch
+
+Posted 4 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing!
+
+My first competition, I'm not sure what's normal: are you planning to share any Notebook(s) of the above work?
+
+reply
+Reply
+Correlation
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+I run all on my local machine. Maybe I will share code at github.
+
+reply
+Reply
+Santiago Mota
+
+Posted 4 years ago
+
+· 92nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Please, do it
+
+reply
+Reply
+
+This comment has been deleted.

@@ -1,0 +1,72 @@
+url: https://github.com/selimsef/dsb2018_topcoders
+fetched: 2026-10-27
+chars: 4504
+
+GitHub - selimsef/dsb2018_topcoders: DSB2018 [ods.ai] topcoders · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ selimsef dsb2018_topcoders Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ dsb2018_topcoders Public Notifications You must be signed in to change notification settings Fork 137  ( 137 ) Star 420  ( 420 ) You must be signed in to star a repository About DSB2018 [ods.ai] topcoders Resources Readme MIT license Activity Stars 420 stars Watchers 7 watching Forks 137 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 34 Commits 34 Commits Folders and files Name Name Last commit message Last commit date albu/ src albu/ src     data data     data_test data_test     predictions predictions     selim selim     victor victor     .gitignore .gitignore     LICENSE.txt LICENSE.txt     README.md README.md     predict_oof_trees.sh predict_oof_trees.sh     predict_test.sh predict_test.sh     setup_env.sh setup_env.sh     train_all.sh train_all.sh     tune_all.sh tune_all.sh     View all files Repository files navigation README MIT license More items DSB2018 [ods.ai] topcoders 1st place solution 
+ Model weights/annotated data 
+ You can download the whole package (7.5G) that contains training data, nn models weights, GBT models. 
+ See also solution description on Kaggle 
+ You need to setup your environment first. Please install latest nvidia drivers, cuda 9 and cudnn 7.
+After that run setup_env.sh script 
+ How to run predict 
+ unzip test data into data_test folder and 
+ ./predict_test.sh 
+ Submission files will be in predictions folder (submission_0.csv, submission_1.csv).
+Individual model predictions will be also in predictions folder. 
+ How to run training 
+ Before training please remove models from: 
+
+ albu/weights 
+ selim/nn_models 
+ victor/nn_models 
+ victor/lgbm_models 
+
+ after it run: 
+ ./train_all.sh
+./tune_all.sh
+./predict_oof_trees.sh 
+ We use two stage training because we want to tune models on the stage1 data released 11.04.
+Every script goes into every folder and runs scripts to train models. 
+ About DSB2018 [ods.ai] topcoders Resources Readme MIT license Activity Stars 420 stars Watchers 7 watching Forks 137 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

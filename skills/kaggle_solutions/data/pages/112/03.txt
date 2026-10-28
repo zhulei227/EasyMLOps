@@ -1,0 +1,130 @@
+url: https://github.com/nagadomi/kaggle-lshtc
+fetched: 2026-10-27
+chars: 6002
+
+GitHub - nagadomi/kaggle-lshtc: Code for Large Scale Hierarchical Text Classification competition. Final place: 3rd · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ nagadomi kaggle-lshtc Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-lshtc Public Notifications You must be signed in to change notification settings Fork 23  ( 23 ) Star 37  ( 37 ) You must be signed in to star a repository About Code for Large Scale Hierarchical Text Classification competition. Final place: 3rd Topics kaggle Resources Readme MIT license Activity Stars 37 stars Watchers 4 watching Forks 23 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 22 Commits 22 Commits Folders and files Name Name Last commit message Last commit date figure figure     .gitignore .gitignore     LICENSE LICENSE     Makefile Makefile     README.md README.md     SETTINGS.h SETTINGS.h     binary_classifier.hpp binary_classifier.hpp     classifier_storage.hpp classifier_storage.hpp     evaluation.hpp evaluation.hpp     inverted_index.hpp inverted_index.hpp     knn.cpp knn.cpp     ncc.cpp ncc.cpp     ncc_cache.hpp ncc_cache.hpp     nearest_centroid_classifier.hpp nearest_centroid_classifier.hpp     predict.cpp predict.cpp     prefetch.cpp prefetch.cpp     reader.hpp reader.hpp     tfidf_transformer.hpp tfidf_transformer.hpp     tick.hpp tick.hpp     train.cpp train.cpp     util.hpp util.hpp     validation.cpp validation.cpp     vt_classifier.cpp vt_classifier.cpp     vt_knn.cpp vt_knn.cpp     vt_ncc.cpp vt_ncc.cpp     View all files Repository files navigation README MIT license More items Code for Large Scale Hierarchical Text Classification competition. 
+ http://www.kaggle.com/c/lshtc 
+ Summary 
+ a centroid-based flat classifier. 
+ Prediction 
+
+ Selecting k-class from near the query with nearest centroid classifier. 
+ Judging with binary classifier whether the query can be accepted to class. 
+
+ (predict.cpp) 
+
+ Selecting k-candidate classes that centroid of class close to the query. 
+
+ Selecting classes that binary classifier of class returns p &gt; 0.5. (Implementation of the binary classifier is logistic regression) 
+
+ Training 
+ For each data points.. 
+
+ Selecting k-class from near the data point with nearest centroid classifier. 
+ Adding the data point as training data to dataset for each classes. 
+
+ (prefetch.cpp) 
+ For each classes.. 
+
+ Learning the binary classifier using own dataset. 
+
+ (train.cpp) 
+
+ What are the feature 
+ using variant TF-IDF. 
+ tf = log(number_of_term_occurs_in_document + 1)
+idf = log(total_number_of_documents / (number_of_documents_containing_term + 1)) + 5
+tfidf = tf * idf
+
+ and feature vector is normalized by L2 norm.
+(code: tfidf_transformer.hpp) 
+ What are the metric for Centroid Classifier 
+ using cosine similarity. 
+ Requirements 
+
+ Ubuntu 13.10 
+ g++ 4.8.1 
+ make 
+ 32GB RAM 
+
+ How to Generate the Solution 
+ please edit SETTINGS.h first. 
+ make
+./prefetch
+./train
+./predict
+
+ NOTE: ./prefetch is very slow. probably processing time exceeds 15 hours. 
+ MISC programs 
+ Running the Validation Test 
+ ./vt_prefech
+./vt_train
+./validation
+
+ Simple k-NN baseline 
+ running the validation test. 
+ ./vt_knn
+
+ generating the sumission.txt. 
+ ./knn
+
+ Simple Nearest Centroid Classifier 
+ running the validation test. 
+ ./vt_ncc
+
+ generating the sumission.txt. 
+ ./ncc
+
+ Figure 
+
+ Model LBMaF Training Time Prediction Time 
+
+ k-NN 0.23088 n/a 10 minutes 
+
+ NCC 0.28931 80 seconds 2 hours 
+
+ NCC+BC 0.33025 15 hours 2 hours 
+
+ About Code for Large Scale Hierarchical Text Classification competition. Final place: 3rd Topics kaggle Resources Readme MIT license Activity Stars 37 stars Watchers 4 watching Forks 23 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

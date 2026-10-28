@@ -1,0 +1,1002 @@
+url: https://www.kaggle.com/c/rsna-breast-cancer-detection/discussion/392449
+fetched: 2026-10-27
+chars: 33276
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — RSNA Screening Mammography Breast Cancer Detection
+1st place solution
+
+RSNA Screening Mammography Breast Cancer Detection
+
+Solution Writeup · 1st place · Jun 3, 2023
+
+Update 10/04/2023
+
+Ablation study: despite of a large improvement on a particular fold (below), soft positive label trick does not show a clearly improvement in performance over the standard label smoothing technique. The use of external datasets improve F1-score about 0.02 on local OOF validation and Private Leaderboard (with extractly same training pipeline + hyper-params).
+
+External data	Loss	OOF F1	LB	PL
+x	label smoothing=0.1	0.4921	0.60	0.53
+x	soft positive label=0.8	0.4853	0.60	0.53
+✓	label smoothing = 0.1	0.5161	0.58	0.56
+✓	soft positive label = 0.9	0.5182	0.61	0.55
+
+First of all, I would like to thank Kaggle and competition's host for such an amazing challenge, a lofty goal with high data quality. Thank you to all paticipants/kagglers with many active and helpful discussions/codes. My solution was just built up from every pieces of kindly shares from you. I learned a lot and I'm very appreciated for that. I'm also very happy and suprised with the 1st place. This is my first gold medal and I'm writing my first writeup. It was such a great journey for me. For the solution, I use a very simple pipeline which can be described in just few lines:
+
+Use some external datasets: VinDr-Mammo, MiniDDSM, CMMD, CDD-CESM, BMCD.
+4 x Convnextv1-small 2048x1024, validated on 4-folds splits of competition data.
+Soft positive label
+
+Now I want to share some experiments and my thought about those. Many of theme could be found in another discussions by excellent kagglers. Many of theme seem obvious. Hope this helps some new comer getting started in the future. Kindly note that it's just my own opinion/thoughts with very limited experiments and knownledge. I'm appreciated for your discussions and feel free to correct me if something was wrong.
+
+1. ROI crop
+
+ROI cropping was performed since it effectively help keeping more texture/detail given a fixed resolution. I use YOLOX-nano 416x416 for ROI detector. The advantage of DL detector vs rule-based methods is the obtained bbox is smaller, aspect ratio is more stable and focus to the breast region.
+
+Train a YOLOX on @remekkinas 's dataset (472 bbox-annotated images)
+Inference on all available training data with low conf_thres and high iou_thres. Only 3 miss-detected images (all contain noise) and over 100 images with 2 boxes (almost overlapped). I manually select and label 99 of those images. Therefore, I have 571 annotated images in total.
+Retrain YOLOX on new images: 521 for train, 50 for val. Note that these 50 val images include all 47 val images of original @remekkinas 's dataset. The new dataset version contain original resolution images (same as original dicoms), preprocessed with simple min-max normalization. Tried various model/image sizes and finally choose YOLOX-nano 416x416 as final model due to the consistent result and small overhead.
+model size	image size	interpolation	AP_new_val	AP_remek_val
+nano (selection)	416	LINEAR	96.26	94.21
+nano	416	AREA	94.09	91.60
+nano	640	LINEAR	95.85	88.40
+nano	768	LINEAR	96.22	82.09
+nano	1024	LINEAR	94.92	89.40
+tiny	416	LINEAR	94.23	90.20
+tiny	640	LINEAR	94.95	89.84
+tiny	768	AREA	96.21	68.03
+tiny	1024	AREA	93.69	73.70
+s	416	LINEAR	95.03	0.86
+s	640	LINEAR	96.10	70.80
+s	768	LINEAR	96.79	78.70
+
+AP@0.5 is 1.0 in all experiments. We see a large gap between AP@0.5-0.95 between two validation sets. Some reasons for that:
+
+New version add more 3/50 typical hard cases.
+Inconsistent processing pipeline: val images in Remek's val was resized 2 times (original --> 1024 --> 416)
+Training images is annotated according to personal bias (no standard way/consentration to annotate the breast boxes correctly). So higher AP may not indicate a better model.
+The validation size is also not large enough to judge
+No hyper parameters tuning
+
+Did these things led to the large gap, particularly with stronger model and larger image size ? All these efforts are just to ensure an "as good as posible" ROI detection model. I think @remekkinas 's dataset is enough to train good YOLOX models and they could perform equally well in hidden test set.
+
+Simpler Otsu thresholding + findCountours() slightly modified from this notebook is used to find breast bbox as a fall back in case of YOLOX's miss-detection. Or, if both miss the breast box, just use the whole image without any cropping.
+
+2. The inference pipeline
+
+Operations on large array take time, so I try to transfer the computation task to GPU as much as posible. 
+
+3. Early experiments
+
+My final solution use external datasets, but I stitch up with using only competition data for almost of the time (until "7 days to go"). Hence most of my experiments are done on competition data only: 5-folds splits with StratifiedGroupKFold based on patient_id. Training hyperparams used for the final solution are almost inherited from these early experiments.
+
+3.1. About the metric
+
+The competition pF1 score is not stable and hard to track for me. Therefore, I mainly track my experiments based on multiple metrics: { PR_AUC, ROC_AUC, best_PF1 (binarized), best_threshold } instead of just one.
+
+PR_AUC: correlated with but more stable than best_PF1. It focuses on positive cases, and is strongly affected by prior data distribution (% of positive).
+ROC_AUC: less affected by prior data distribution. Much more stable, but seem to be over optimistic which led to just a small gap between a good model and a bad model.
+To get a high binaried pf1, model should not predict too many positives which usually led to large FP --> dramatically reduce best_PF1. A good scored pf1 model tends to prioritize Precision over Recall. I personaly don't like this behaviour, especially for real life application.
+3.2. Augmentations
+
+I stitch with this augmentation pipeline for all experiments, no tuning at all:
+
+A.Compose([
+    # crop, tweak from A.RandomSizedCrop()
+    custom_augs.CustomRandomSizedCropNoResize(scale=(0.5, 1.0), ratio=(0.5, 0.8), p=0.4),
+    # flip
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    # downscale
+    A.OneOf([
+        A.Downscale(scale_min=0.75, scale_max=0.95, interpolation=dict(upscale=cv2.INTER_LINEAR, downscale=cv2.INTER_AREA), p=0.1),
+        A.Downscale(scale_min=0.75, scale_max=0.95, interpolation=dict(upscale=cv2.INTER_LANCZOS4, downscale=cv2.INTER_AREA), p=0.1),
+        A.Downscale(scale_min=0.75, scale_max=0.95, interpolation=dict(upscale=cv2.INTER_LINEAR, downscale=cv2.INTER_LINEAR), p=0.8),
+    ], p=0.125),
+    # contrast
+    A.OneOf([
+        A.RandomToneCurve(scale=0.3, p=0.5),
+        A.RandomBrightnessContrast(brightness_limit=(-0.1, 0.2), contrast_limit=(-0.4, 0.5), brightness_by_max=True, always_apply=False, p=0.5)
+    ], p=0.5),
+    # geometric
+    A.OneOf(
+        [
+            A.ShiftScaleRotate(shift_limit=None, scale_limit=[-0.15, 0.15], rotate_limit=[-30, 30], interpolation=cv2.INTER_LINEAR,
+                               border_mode=cv2.BORDER_CONSTANT, value=0, mask_value=None, shift_limit_x=[-0.1, 0.1],
+                               shift_limit_y=[-0.2, 0.2], rotate_method='largest_box', p=0.6),
+            A.ElasticTransform(alpha=1, sigma=20, alpha_affine=10, interpolation=cv2.INTER_LINEAR, border_mode=cv2.BORDER_CONSTANT,
+                               value=0, mask_value=None, approximate=False, same_dxdy=False, p=0.2),
+            A.GridDistortion(num_steps=5, distort_limit=0.3, interpolation=cv2.INTER_LINEAR, border_mode=cv2.BORDER_CONSTANT,
+                             value=0, mask_value=None, normalized=True, p=0.2),
+        ], p=0.5),
+    # random erase
+    A.CoarseDropout(max_holes=6, max_height=0.15, max_width=0.25, min_holes=1, min_height=0.05, min_width=0.1,
+                    fill_value=0, mask_fill_value=None, p=0.25),
+    ], p=0.9)
+
+
+For the random crop choice: real breast size/ratio vary largly between images --> popular pipeline of longest resize + padding introduces multi-scales problem. Of course, it would introduce higher risks of wrong positive label.
+
+Example batch 
+
+3.3. Up/down sampling
+
+I upsample pos cases in each epoch for all of my experiments.
+
+Ensuring at least 1 pos in a batch/iteration is pretty important to stablize training. I found training difficult while set 0.5 pos per batch.
+Upsampling ratio can largly affect CV score and prediction distribution. It also vary between backbones and other hyperparams choices. However, I prefer smallest pos/neg ratio as posible (since it's near to the real data distribution) but ensure at least 1 pos/batch.
+Large pos/neg ratio helps training faster in early epochs. I tried linearly increase/decrease the pos/neg ratio between epochs to face with some problems of prediction distribution/threshold (especially EffB4). But in the end, i got no improvement in CV.
+3.4. Model/backbone
+
+I tried Eff-B2, Eff-B4, Effv2-s and Convnextv1-small
+
+Each model has its own characteristic and training phenomenon.
+All models could perform equally well in local CV. Except that Convnextv1-small give higher CV score.
+EfficientNet (no model EMA) tends to overfit quickly after fews epochs with high pos/neg ratio: longer training reduce AUC largely and may slightly increase best_pf1 --> model tends to predict less positives. Small pos/neg ratio helps training more stable but reduce CV. Linearly increase pos/neg ratio between epochs (by a sampler) did not help much.
+Convnext-small (with/without EMA) shows both stable training and better CV.
+3.5. drop_rate, drop_path_rate
+
+Playing with drop_rate and drop_path_rate:
+
+We can use large dropout rate of >= 0.5 to regularize training and reduce overfiting.
+With very large drop_rate = 0.9 or drop_path_rate = 0.5, I still can get a "not bad as expected" model in CV score. The following results is for Eff-B4, pos/neg = 1/3 on fold 0:
+drop_rate	drop_path_rate	auc	best_pf1	best_thres	epoch
+0.9	0.2	91.90	47.73	0.78	4
+0.7	0.2	90.36	52.27	0.55	3
+0.5	0.2	90.02	50.00	0.72	4
+0.3	0.2	91.23	48.24	0.82	4
+0.5	0.5	90.45	46.33	0.95	4
+
+However, I set drop_rate = 0.5 and drop_path_rate = 0.2 for most of my experiments, including the final ones.
+
+3.6. Global pooling
+
+I stitch with max pooling for almost my experiments as my inductive bias:
+
+Max pooling is suitable and seem to be effective for anomalies detection or "needle in the haystack" tasks in literature. In this case, cancer may appear in a very small region and the rest are all normal.
+max() provides stronger learning signal, but less stable than mean() in term of gradient.
+My guess: gem > max > mean when enough data provided.
+3.7. Soft positive label/ Positive label smoothing
+
+Convnextv1-small look good in CV scores with stable AUC, PR_AUC, best PF1 across epochs. But there're differences in behaviour between Effv2-s and Convnextv1-small especially in best threshold for image/breast level.  The two lower green ones belong to Effv2-s and the other belong to Convnextv1-small
+
+Some discussions suggest smaller best threshold (<0.55) may indicate a better model. For single-image, Convnext show a very high threshold of > 0.92, which could indicate the problem of over-confident. Stronger models with larger number of parameters is easier to be over-confident or overfitted, especialy in this highly imballanced dataset scenario. About the above figure, label_smoothing = 0.1 was used but seem like it was not enough. So, just add harder label smoothing to regularize training. Or use positive weight < 1.0 to reduce the priority of positive samples.
+
+loss	num_logits	target {neg, pos}	pr_auc	roc_auc	best_pf1	best_thres	epoch
+(baseline) bce_smooth 0.1	2	{ [0.95, 0.05], [0.05, 0.95] }	0.4755	0.9278	0.497	0.66	14
+bce_smooth 0.4	2	{ [0.8, 0.2], [0.2, 0.8] }	0.4749	0.9248	0.5	0.6	25
+bce_pos_smooth 0.4	2	{ [1.0, 0.0], [0.2, 0.8] }	0.5191	0.9153	0.5488	0.53	13.5
+(best) bce_pos_smooth 0.2	1	{ 0.0, 0.8 }	0.5401	0.9281	0.5714	0.49	20
+bce_pos_smooth 0.3	1	{ 0.0, 0.7 }	0.522	0.933	0.517	0.5	17
+bce_smooth 0.1 + pos_weight 0.4	1	{ 0.05, 0.95 }	0.4946	0.9146	0.5393	0.39	19
+
+Note:
+
+Table above is fold 0 CV results
+num_logits = 2 means using sigmoid (BCEWithLogitsLoss) for training and softmax for inference. Refer here.
+
+Soft positive labeling look reasonable: we have per-breast label and not per-image label. For some images belong to same patient, cancer signal may not appears clearly in some images, or even all images (MG is not enough to judge for cancer/non-cancer) --> the positive label should not be the maximum bound value of 1.0, but less confident.
+
+Soft postive label trick improve CV and helps threshold looks much better. 
+
+As some discussions, very sharp prediction distribution may indicate worse result/generalization. 
+
+4. Final experiments
+4.1. External datasets
+
+A week left to the competition deadline, I was thinking about training final experiments for the final submission and should not make any mistakes or missing something. I read some discussions again and relized I was missing a big part: external data. In particular, external data contains a large number of positive cases which are valuable. These external datasets summary:
+
+Dataset	num_patients*	num_samples*	num_pos_samples*
+VinDr-Mammo	5000	20000	226 (1.13 %)
+MiniDDSM	1952	7808	1480 (18.95 %)
+CMMD	1775	5202	2632 (50.6%)
+CDD-CESM	326	1003	331 (33 %)
+BMCD	82	328	22 (6.71 %)
+All	9135	34341	4691 (13.66 %)
+
+* The number may not indicate original dataset characteristics, but processed data I used for this competition.
+
+Some details:
+
+VinDr-Mammo: contains BIRADS scores for each image of 0-5. I treated BIRADS 5 as cancer (1) and all other as normal (0). With only Digital Mammograms and BIRADS categories, one can't confirm 100% if a case is cancer or not . BIRADS 4 indicate 30% chance of cancer, then I was treated it as normal. My decision only happen in just a few seconds as i could remember. Reading other posts, i'm feeling my decision is not as good, except that it helps reduce sensitivity and can "improve" the pF1 (I don't want to see it that way). Maybe I make a huge mistake here. Better solution is to use soft/uncertain label or pseudo labeling for these ambigous (BIRADS-4) cases instead. Some images has LUTDescriptor. The image look over-exposured when apply VOILUT (voi + windowing), so I just apply windowing on this dataset, equivalent to pydicom's apply_voi_lut(prefer_lut = False)
+
+MiniDDSM: I used all 7808 samples. Found that the status label of {Cancer, Benign, Normal} is per patient_id, not per laterality. So I treat a patient-laterality as cancer if and only if status == 'Cancer' and at least 1 supicious region annotation (segmentation map) for that laterality is available. End up in 1480 positives and the remaining 6318 negatives. I use 16-bits png part for the less information loss. No windowing parameters as presented. Since there're watermarks noise with very high pixel intensity in ROI crop, percentile min-max scaled was performed instead of min-max scaled for normalization.
+
+CMMD: Total of 5202 breast images belong to 1872 patient id. Note that some patient ids start with 'D2' are almost malignant and usually had label for one laterality only. For those cases, I treated the other laterality (no laterality-level label specified in csv file, but still have image) as normal (EDA from the competition data show that cancer only appears in one laterality). Original dicom images are in 8-bits depth with windowing parameters available.
+
+CDD-CESM: consisting Contrast-enhanced spectral mammography (CESM) images. This dataset contain label of {Normal, Malignant, Benign}. I treated Malignant as cancer, Normal or Benign as normal and only use the low-energy images as it is comparable to digital mammograms (MG), or at least they look pretty similar for me. Low-energy images is in 8-bits jpeg, no windowing information.
+
+BMCD: contains 100 patients (50 normal + 50 suspicious cases) with 82 biopsy-confirmed cases of {'NORMAL', 'BENIGN', 'DCIS', 'MALIGNANT'} and mammogram images of them at the time of screening and avg 2.2 year before. I treat 'DCIS' or 'MALIGNANT' patient's last screening images as cancer and all the remaining as normal. Original dicom images is in 16-bits depth and windowing parameters are available.
+
+4.2. Validation strategy
+
+I found inconsistence in CV between 5-folds splits of competition data, probably because the number of positive is not sufficient. Although, hidden test should has distribution/property closer to the competition data, so I change validation strategy to 4-splits as:
+
+Do 4-folds splitting on competition data
+Use 1 fold for validation, the rest 3 folds + all external data for training. Then, for each split, training data contain about 5560/75400 positive cases (~7.38 %).
+4.3. Training
+
+I managed to get 4 x Convnextv1-small corresponding to the above 4 splits. Some unexpected results were founded during training, so the training stages was changed and in short consist of:
+
+Train 2 models on fold 0 and fold 1 with soft_pos_label = 0.8
+Train 2 models on fold 2 and fold 3 with soft_pos_label = 0.9
+Finetune 2 models obtained from stage 1 on fold 0 and fold 1 with soft_pos_label = 0.9
+
+In details, I start training on first two folds: fold 0 and fold 1 with the following config:
+
+Model: timm's convnext_small.fb_in22k_ft_in1k_384
+Input size: 2048x1024
+Loss: vanila BCE (no class weight)
+Sampler: upsampling pos samples per epoch to pos/neg = 1/7, ensure each batch contains at least 1 pos sample.
+Batchsize: 8
+Automatic Mixed Precision (AMP): enable
+Model EMA: enable
+Global pooling: max
+Soft positive label = 0.8
+Optimizer: SGD with momemtum=0.9
+Scheduler: Cosine lr decay(epoch = 24, lr = 1e-3, min_lr = 1e-5) + linear warmup(warmup_lr = 1e-5, warmup_epoch = 4)
+Drop_rate = 0.5, drop_path_rate = 0.2
+
+Once training finished, results are not as my expectation on fold 0:
+
+CV results are not good
+Threshold is much smaller. I expected it to be in the range [0.35, 0.5], but it's just around 0.25+-0.02
+Training is not converged yet. I guess that CV can be improved with more additional training epochs.
+
+So I start train fold 2 and fold 3 with few changes: longer training with larger learning rate and reduce soft positive label.
+
+Scheduler: Cosine lr decay(epoch = 30, lr = 3e-3, min_lr = 5e-5) + linear warmup(warmup_lr = 3e-5, warmup_epoch = 4)
+Soft positive label: 0.9
+
+Results on fold 2 and fold 3 seem to be better. So I decided to finetune fold 0 and fold 1 with the same value of soft_positive_label = 0.9 from the previous last checkpoints.
+
+4.4. Checkpoints selection
+For each fold, I manually select 3-7 best checkpoints by looking at multiple metrics.
+Grid search over all posible combinations of each fold's checkpoints (3x5x7x5 = 525 combinations for my case), compute Out-Of-Fold (OOF) results for each combination.
+Select the best combination with highest binarized pF1. The best combination has local OOF pf1 = 0.5187, while the worst with 0.4951.
+
+Final results:
+
+name	soft_positive_label	pr_auc	roc_auc	best_pf1	best_thres	epoch
+fold 0	0.8	0.3983	0.9142	0.4716	0.25	24
+(selected) fold 0 + fine-tune	0.9	0.4363	0.9119	0.4785	0.35	11 (24 + 11)
+fold 1	0.8	0.5151	0.9202	0.5291	0.34	18
+(selected) fold 1 + fine-tune	0.9	0.5381	0.9149	0.5381	0.34	8 (24 + 8)
+(selected) fold 2	0.9	0.4946	0.9234	0.5185	0.34	26
+(selected) fold 3	0.9	0.5088	0.9401	0.5455	0.31	19
+
+Some thoughts:
+
+Fold 0 result looks weird? Maybe I need more time inspecting it.
+With much more data especially positive ones, guesses for the best hyperparams became obsolete. Maybe I could forget the soft positive label trick and get better result?
+
+OOF validation was done to determine the best threshold value of 0.34
+
+                        auc      @th     f1      |  prec    recall  |   sens    spec 
+single image     [0]    0.87296 0.40000 0.41907 |   0.48365 0.37047 |   0.37047 0.99145
+grouby mean()    [0]    0.92043 0.34000 0.51820 |   0.60989 0.45122 |   0.45122 0.99391
+grouby max()     [0]    0.91939 0.61000 0.50913 |   0.57545 0.45732 |   0.45732 0.99289
+--------------
+
+single image     [1]    0.84866 0.40000 0.33649 |   0.38241 0.30120 |   0.30120 0.98881
+grouby mean()    [1]    0.89225 0.34000 0.39587 |   0.47027 0.34252 |   0.34252 0.99139
+grouby max()     [1]    0.88917 0.61000 0.39424 |   0.44554 0.35433 |   0.35433 0.99016
+--------------
+
+single image     [2]    0.89611 0.40000 0.53331 |   0.62912 0.46356 |   0.46356 0.99453
+grouby mean()    [2]    0.94288 0.34000 0.64699 |   0.75419 0.56722 |   0.56723 0.99632
+grouby max()     [2]    0.94329 0.61000 0.63182 |   0.71428 0.56722 |   0.56723 0.99548
+--------------
+
+
+The results was generated by @hengck23 ’s script
+
+4.5. Submission
+
+My training progress was done in the last day of the competition. 5 final submissions include:
+
+1 submission of models in earlier epochs while waiting training to be done. The main purpose is to ensure the pipeline is correct and no exception occurs, which give me 0.56 LB.
+4 submission of same final (best) model with different threshold: 0.31, 0.34 (best oof), 0.37, 0.40 . I guessed the LB's best threshold > CV's best threshold, but I'm totally wrong (I did not probe the LB). But it was fortunate that threshold=0.31 is the one on the peak :D
+
+Those submissions bring me from LB 600th to LB 22nd in one day. The PL 0.55 submission was successfully finished when ~30 mins left to the deadline.
+
+Threshold	OOF	LB	PL
+0.27 (late sub)	0.4877	0.60	0.53
+0.28 (late sub)	0.4917	0.60	0.54
+0.29 (late sub)	0.4973	0.60	0.54
+0.30 (late sub)	0.5027	0.60	0.55
+(selection) 0.31	0.5049	0.61	0.55
+(selection) 0.34	0.5187	0.58	0.53
+0.37	0.5000	0.55	0.52
+0.40	0.4896	0.54	0.50
+5. Code
+Submission notebook: https://www.kaggle.com/dangnh0611/1st-place-submission-code
+Training code: https://github.com/dangnh0611/kaggle_rsna_breast_cancer
+
+I just got luck with simple pipeline and simple decision. Many teams had much better models but did not select it in final, as I could see. Thanks for your attention.
+
+Author
+Đăng Nguyễn Hồng
+
+dangnh0611
+
+arrow_drop_up
+179
+Share
+more_horiz
+Citation
+
+Đăng Nguyễn Hồng. 1st place solution. https://www.kaggle.com/competitions/rsna-breast-cancer-detection/writeups/mr-robot-1st-place-solution. 2023. Kaggle
+
+9
+comment
+39 Comments
+Hotness
+sandy1112
+
+Posted 4 years ago
+
+· 148th in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+Thanks a lot for sharing such a detailed write up. Congratulations on your Gold… looking at the way you broke down the problem, its a well deserved gold. In my experiments also found that Maxpooling worked the best, while average pooling tended to wash away the required signals
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for your kind words !
+
+reply
+Reply
+Reyihi
+
+Posted 4 years ago
+
+· 458th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Could you share more training parameters of ROI detection model? I can't get the same AP@0.5-0.95 as you mentioned above. I only train on @remekkinas's dataset. thank you!
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, insufficient number of val samples and personal labeling bias can make the AP@0.5-0.95 unstable. For YOLOX, I use this hyperparams config
+
+reply
+Reply
+Jhye O'Meley
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Really great work.
+
+reply
+Reply
+Pablo Larrosa
+
+Posted 4 years ago
+
+· 1026th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi, you mentioned that you used image size 2048x1024 with Convnextv1-small model, but when you processed the images yolox produce as output image of 416?.
+
+Thank in advance!
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi, i get the bounding box output from YOLOX, then the coordinates will be used to crop the original resolution image, as described here
+
+reply
+Reply
+Abdallah Ragab223
+
+Posted 4 years ago
+
+· 1172nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+great work, and thanks to share the solution
+
+reply
+Reply
+Antti Isosalo
+
+Posted 4 years ago
+
+· 1311th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Absolutely great work! And a overwhelming amount of experiments you have done starting from pre-processing and all the way to the inference. Also you seem to have picked up many things during this short time that took me couple of years to get a grasp over while doing PhD on this very topic. In my opinion publishing these results and answering those remaining questions that you have listed would get you far for a PhD, unless of course you already have one. 😃
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks for you kind words and suggestions 😄
+
+unless of course you already have one
+
+I did not even have a Master's degree 😂
+
+reply
+Reply
+Mr.G
+
+Posted 4 years ago
+
+· 100th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your kind message! I'm looking forward to your training code! I have learned a lot from reading your sharing.
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you! I guess that the training code should be available in next 2 days.
+
+reply
+Reply
+Darragh
+
+Posted 4 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Really great work. I like the augmentations, especially the different downscales.
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you!
+
+reply
+Reply
+继续战斗继续前进
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Interesting!!!
+
+reply
+Reply
+HANF Wang
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Sorry to bother you. I want to reproduce this project, but I can't install nvidia-dali-nightly-cuda. Is this package necessary
+
+reply
+Reply
+Pedro Martínez Barrón
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work:), congrats. I just read the solution and review a little bit your code, I would like to know what is the image type input for the windowing process? (I know it must be an array but like, an array from the original dicom image…?) Thx!
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, it's raw pixel array from the original dicom image, e.g pydicom.dcmread(dcm_path).pixel_array
+
+reply
+Reply
+Pedro Martínez Barrón
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Ohh I see, thank u very much. Considering working with the raw dicom images as arrays I just wonder how did you manage memory and computation resources?:c hahaha
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+ah sorry, just a small note that during inference, windowing is applied to the ROI-cropped patch only, which then resized to smaller fixed size, e.g 2048x1024. But, this only saves a little computation 👀
+
+reply
+Reply
+Lidiia Kachmarska
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Helpful information, thank you for sharing.
+
+reply
+Reply
+Bharys J
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi, thanks for the detailed writeup. I learnt many new things going through your codebase. I have a question. Winning model is an ensemble of four ConvNext models, did using an ensemble model show significantly better performance than a single model? Thanks
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+In my quick test without threshold tunning, single model on single fold could archive LB 0.59 and PB 0.54
+
+reply
+Reply
+Bharys J
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks. If I get this correctly, based on the pb scores single model trained on single fold performs just as well as the ensemble right? I'm just curious as to why four convnext models were used
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Because that's all I had at that time :D. Winning submission was created and submitted in the last day of this competition and I have no other stronger models (e.g with different architectures or training strategies) at that time --> no more complex ensemble should be tried. 4 is always better stabilization/generalization/score than 1 in almost every cases. In this particular case, 0.02 LB and 0.01 PB difference is not a negligible improvement.
+
+reply
+Reply
+Bharys J
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much for explaining it.
+
+reply
+Reply
+CJLUer
+
+Posted 3 years ago
+
+· 539th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+num_logits = 2 means using sigmoid (BCEWithLogitsLoss) for training and softmax .Can you explain why this strategy is used? Is there any basis for it? Usually the same activation function is used for training and inference.Thanks in advance.
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, It's just a baseline when I'm start with this competition. I experienced slightly better results with BCE instead of CCE for binary classification tasks in the past. Another reason is to easily integrating custom auxiliary losses (usually BCEs too) and balancing these loss weights, e.g all losses have same scales. Also, 2 logits --> double the number of params in the linear head
+
+reply
+Reply
+CJLUer
+
+Posted 3 years ago
+
+· 539th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for your reply. My question is why sigmoid is used in the training phase and softmax is used in the inference phase. This usage is very uncommon. Does it help the results?
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Fernando Cossio
+
+Posted 4 years ago
+
+· 689th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats for the win! Thanks for the detailed write up, I have learned a lot.
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you. Hope it helps
+
+reply
+Reply
+Ifeanyichukwu Nwobodo
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+You're a living genius. Bravo
+
+reply
+Reply
+Theo Viel
+
+Posted 4 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratz on the win ! And thanks for the really nice write-up :)
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, I also learned a lot from you 💯
+
+reply
+Reply
+Chi-Han Tsai
+
+Posted 4 years ago
+
+· 23rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Gem was not work for me. I think Gem is very tricky.In the same competition , some people say it works, but others say it doesn't work
+
+reply
+Reply
+Fernando Cossio
+
+Posted 4 years ago
+
+· 689th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+What is GEM?
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+What is GEM?
+
+Generalized Mean Pooling
+
+reply
+Reply
+Pablo Rios
+
+Posted 4 years ago
+
+· 517th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Many thanks for the elaborate write-up and for sharing your reasonings throughout it!
+
+As you comment in https://github.com/dangnh0611/kaggle_rsna_breast_cancer/blob/dev/notebooks/roi_yolov5.ipynb can you share the annotation dataset and the yolov5 training notebook?
+
+Looking forward to study training code in the dev branch even before you publish the refactored one, if possible.
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I'm sorry, but the notebook you mentioned should be move to notebooks/3rd/ directory instead since i just download @remekkinas 's notebook. Giving credit to his awesome discussions (here and here), yolov5 training notebook, yolov5 inference notebook and annotated dataset.
+
+reply
+Reply
+Pablo Rios
+
+Posted 4 years ago
+
+· 517th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you.
+
+Training code of the Convnextv1-small classification models is available at dev/src/pytorch-image-models/projects/rsna, correct? Thanks again.
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Yes. And I have updated the code. Thanks for your attention 😄
+
+reply
+Reply
+kingjohnson
+
+Posted 4 years ago
+
+· 952nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for your kind share! Do you train single-view models or dual-view models to achieve such an impressive performance?
+
+reply
+Reply
+Đăng Nguyễn Hồng
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, I just tried single-view models. Multi-views model is potential so I'll give it a try later 😊
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+This comment has been deleted.

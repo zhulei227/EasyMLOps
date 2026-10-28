@@ -1,0 +1,557 @@
+url: https://www.kaggle.com/c/playground-series-s5e5/discussion/582611
+fetched: 2026-10-27
+chars: 15668
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - GPU Hill Climbing! — Predict Calorie Expenditure
+1st Place - GPU Hill Climbing!
+
+Predict Calorie Expenditure
+
+Solution Writeup · 1st place · Jun 2, 2025
+
+Thanks Kaggle for another fun playground competition. This month was different than past months because the features were all numeric without NANs.
+
+GPU Hill Climbing
+
+My final solution is the result of feeding hundreds of GBDT, NN, and NVIDIA cuDF cuML models into my GPU Hill Climbing starter notebook here. Over the month of May 2025, I used the speed of GPU and NVIDIA cuDF cuML to build as many diverse models as possible.
+
+Hill climbing is great because it automatically selects models for us. From the hundreds of candidate models, hill climbing selected the following 7 models:
+
+Weight	Model	Notes	CV score
+1/12	XGBoost	cuML target encoded features1	0.06084
+1/12	XGBoost	cuML target encoded features2	0.06061
+1/12	XGBoost	cuML target encoded features3	0.06053
+1/4	XGBoost	product features	0.05951
+1/6	CatBoost	binned features and groupby features	0.05937
+1/6	NN over LinearRegression	NN is here	0.05999
+1/6	XGB over NN	NN is here	0.05989
+Final Ensemble CV and LB Scores
+
+The final hill climbing ensemble has
+
+RMSLE CV = 0.05880
+Public LB = 0.05677
+Private LB = 0.05841
+XGBoost with cuML Target Encoder (CV=0.06XX)
+
+In my final ensemble 25% of the weight is XGBoost with NVIDIA cuML TargetEncoder features. This demonstrates that diversity is more important than single model CV score. My XGBoost with TE features each have a poor CV score of 0.06XX but they improved the final ensemble CV 0.05890 => 0.05880 and Private LB 0.05847 => 0.05841
+
+XGBoost with Product Features (CV = 0.05951)
+
+For each feature, i created a log1p version, i.e. df[f'log1p_{c}'] = log1p( df[c] ). Then i created all products, divisions, sums, and differences between all pairs of features.
+
+CatBoost with Binned Features and GroupBy Features (CV=0.05937)
+
+CatBoost loves categorical features, so I converted each numerical feature into 9 equal width binned values. I also created log1p versions of all features and converted those into 9 binned values. Afterward I created combinations of all pairs of columns. The resultant new columns had 81 unique values and were also categorical. We then use cat_features = CATS.
+
+For groupby features, I would pick a group of people like Sex and Age using the bins, then I would compute each person's z-score about their height. And then their z-score about their weight, i.e. for a male in their 40's how does their weight compare with other males in their 40's.
+
+I created 26 of these features. I would make groups from 1 to 3 features then compute z-score of another feature. Another example is [ ["Sex","Weight_bin","Body_Temp"], ["Heart_Rate"] ],. This means i make groups from Sex, Weight, Body_Temp and compute z-score for Heart_Rate.
+
+NN over Linear Regression (CV=0.05999)
+
+I trained my public notebook NN on the residuals from a NVIDIA cuML LinearRegression model. This improved CV 0.0608 => 0.0599. The linear regression model does a great job capturing the linear relationships in the data. And then it helps the NN learn these relationships better.
+
+train LinearRegression with 5 Kfold seed 42. Make OOF predictions and test PRED predictions.
+make a new target with new_target = old_target - LinearRegression_OOF
+train NN with train data and new target (with 5 Kfold seed 42)
+infer NN on test, then final_pred = NN_PRED + LinearRegression_PRED.
+XGB over NN (CV=0.05989)
+
+I trained my XGB with Product Features on the residuals from my public NN notebook. This did not improve the XGB CV score but it made a new diverse model that improved my hill climbing ensemble CV score. We implement this using similar bullet points as above in "NN over Linear Regression" section.
+
+Icing on the Cake - Retrain Using 100% Train
+
+I use the following trick in all my Kaggle competitions. My OOF are 5-Kfold and we use hill climbing to find the model weights from these OOF. Then we retrain all the models using 100% train data and use fixed number of iterations equal to 25% ( which equals to 1/(K-1) ) more than average number of iterations from 5-Kfold early stopping. Then we take a weighted average of these 100% test preds using the weights found from hill climbing based on 5-Kfold OOF. This gives a nice boost in every Kaggle competition! (I also train K of these using a different seed each time and average the predictions).
+
+Author
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+155
+Share
+more_horiz
+Citation
+
+Chris Deotte. 1st Place - GPU Hill Climbing!. https://www.kaggle.com/competitions/playground-series-s5e5/writeups/chris-deotte-1st-place-gpu-hill-climbing. 2025. Kaggle
+
+30
+15
+16
+3
+comment
+63 Comments
+10 appreciation comments
+Hotness
+Marília Prata
+
+Posted a year ago
+
+arrow_drop_up
+5
+more_vert
+
+We're already waiting you (e.g. topics/Notebooks/ solutions) on the New Fertilizer Playground. Thank you Deotte!
+
+reply
+Reply
+Oscar Aguilar
+
+Posted a year ago
+
+· 171st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations on another win with a strong approach! I have a quick question: Are those results based on 5-fold or 10-fold cross-validation? In my experiments, I found that I achieved slightly better results with a 10-fold cross-validation strategy over a 5-fold strategy. During the last week of the competition, I retrained the CatBoost model, which has been my best single model, using a 15-fold cross-validation strategy. This improved my Public LB score from 0.05730 to 0.05708, which was the best solution based on the 10-fold cross-validation strategy. These results were obtained using raw data without any feature engineering.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+Hi @oscarm524 Thanks! I use a trick in all my Kaggle competitions. My OOF and hill climbing use 5-Kfold to find the model weights. Then I retrain all the models using 100% train data and use fixed number of iterations equal to 25% ( which equals to 1/(K-1) ) more than average number of iterations from 5-Kfold early stopping. Then I take a weighted average of these 100% test preds using the weights found from hill climbing based on 5-Kfold OOF. This gives a nice boost in every Kaggle competition!
+
+reply
+Reply
+Oscar Aguilar
+
+Posted a year ago
+
+· 171st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Interesting. Thanks for sharing, @cdeotte. I do remember now that you mentioned in a YouTube video with Abhishek that you always retrain your models on the entire dataset.
+
+reply
+Reply
+6 more replies
+arrow_drop_down
++1
+Johannes Heller
+
+Posted a year ago
+
+· 72nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats on another well-deserved win 🤩 Two things I find especially interesting in your description:
+
+Binning and combining binned features into new categories. → Do you think that works particularly well for synthetically generated data (somehow matching the generation mechanism), or also with real-life data?
+Using linear models as input for neural networks. → Are you using the residuals from the linear model simply as an additional feature for the NN beside original and other generated features?
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi @stopwhispering . Converting numerical features into categorical features with binning helps in real life too. Because often the numerical feature can behave somewhat categorical to begin with. Take Age for example. In real life there are big differences between babies, infants, toddlers, children, college age, adults, elderly etc. So binning Age into 0's, 10's, 20's, 30's, 40's, 50's often groups people into categories where they share a lot of properties with others in those categories. That being said, i think all categorical tricks work better with Kaggle playground synthetic data. (Note we can tune the number of bins as a hyperparameter. I tried many and 9 worked best).
+
+When i say "NN over LinearRegression", I'm talking about using the residuals:
+
+train LinearRegression with 5 Kfold seed 42. Make OOF predictions and test PRED predictions.
+make a new target with new_target = old_target - LinearRegression_OOF
+train NN with train data and new target (with 5 Kfold seed 42)
+infer NN on test, then final_pred = NN_PRED + LinearRegression_PRED.
+
+Also, in addition to training NN with residuals as described above. We can optionally/additionally add LinearRegression_OOF as a new feature column too. Because sometimes the residual is related to the magnitude of the LinearRegression_OOF. I forget if i added this column or not.
+
+reply
+Reply
+paperxd
+
+Posted a year ago
+
+· 17th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+is it a good idea to use like xgboost and another xgboost predicting residuals or is it generally not a good idea for GBDTs
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Daniel Bekker
+
+Posted a year ago
+
+· 1384th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you for sharing @cdeotte ! What heuristic do you recommend (if any) for selecting the max number of models you may add to the ensemble when hill climbing or is this just something you test empirically on a case-by-case basis?
+
+reply
+Reply
+Harsh Gupta
+
+Posted a year ago
+
+· 1150th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+This detailed discussion will be very helpful for future competition for me, and also Thank you so much for this information.
+
+reply
+Reply
+Pratham Jain
+
+Posted a year ago
+
+· 1265th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Insane work! Love how you combined GPU brute force with clever ensemble strategy. That NN over residuals trick + product features + CatBoost bins is gold. Also, really cool to see "bad" CV models still shine in the ensemble. Respect for pushing cuML to its limits Congrats.
+
+reply
+Reply
+Frederic Nicholson
+
+Posted a year ago
+
+· 13th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+thanks for sharing your strategy and congratulations to another first place. Just for my info, what was your best private score? my best models private score beat your winning score, just wanted to see if you are in the boat.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+My best private score is this hill climbing ensemble (0.05841). Congrats on achieving 12th place and congrats on building models better than private LB 0.05841 !!
+
+reply
+Reply
+spedr
+
+Posted a year ago
+
+· 390th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Nice work. This was my first Kaggle competition and the insights are greatly appreciated. I ended up going with a single model solution, so it's interesting to see the winning solution was built out from a hill-climbing strategy from hundreds of candidates.
+
+reply
+Reply
+YUNZHEN (ZION) WU
+
+Posted a year ago
+
+· 625th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Impressive work! The hill climbing strategy elegantly leverages model diversity, especially by embracing imperfect models with unique signals. The extensive feature engineering, residual learning approach (NN over Linear, XGB over NN), and full-data retraining strategy are all very effective. Great inspiration for balancing model accuracy with ensemble synergy!
+
+reply
+Reply
+Pirhosseinlou
+
+Posted a year ago
+
+· 436th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations. Your work is always amazing. It seems that in this competition, all the leaders in the leaderboard fell into the trap of the task designer and forgot the principles due to the uneven distribution of data in the public test and private test sections, and their results were overfit (including myself) except for you who had the necessary experience to win the competition.
+
+reply
+Reply
+khosoop
+
+Posted a year ago
+
+· 1471st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing the breakdown — super insightful and congrats on 1st place! 🎉 I’m currently testing out your approach myself, especially the GPU hill climbing setup and the diverse feature engineering techniques. Would you be willing to share the full code or notebook you used? It would be incredibly helpful to understand the implementation details and test everything end-to-end. 🙏
+
+reply
+Reply
+Gio
+
+Posted a year ago
+
+· 787th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I've been learning too much from you, Chris! Hope you can find time to keep participating
+
+reply
+Reply
+paperxd
+
+Posted a year ago
+
+· 17th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+When doing hill climbing does it matter if the OOFs come from different number of folds or different random_state?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I think it will still work well with different number of folds and fold seed. However, i think it works best with same number of folds and same fold seed. So I always use the same.
+
+If we use different folds, then it may just select the new model because the different folds added new diversity but in reality the new model doesn't add diversity. Because remember there are no folds when we infer test data. All models infer all test data. So if different folds is the only reason the new model is good, this reason will not exist when we infer test data.
+
+reply
+Reply
+Muhamad Awais
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+It looks great, Congrats Chirs. Can you guide me on the proper way to approach this competition and get started on it? It would be of great help to me to learn from grandmaster.
+
+reply
+Reply
+Beyza Kucuk
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the impressive solution. Your systematic approach, especially the combination of residual learning, stacking, and GPU hill climbing, stands out as a masterclass in practical machine learning. Thank you for openly sharing these valuable insights — it's incredibly helpful for those of us looking to improve our understanding and workflow.
+
+reply
+Reply
+Evgeniy Borovoy
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratilations!
+
+reply
+Reply
+Urvish Ahir
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrates !! @cdeotte
+
+reply
+Reply
+PavelGorbachev1
+
+Posted a year ago
+
+· 3549th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Interesting idea!Congratulations
+
+reply
+Reply
+Henry D
+
+Posted a year ago
+
+· 687th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much for sharing, I've learned a lot from your explanations. I noticed that you have over 100 entries per competition. How did you structure your workflow to manage that effectively?
+
+reply
+Reply
+Khushi Yadav
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your detailed explanation.✨
+
+reply
+Reply
+Nikolay Pasevich
+
+Posted a year ago
+
+· 832nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Super! Thank you that you share your steps. Briliant work!!!
+
+reply
+Reply
+Fazliddin Karimov
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your detailed explanation :)
+
+reply
+Reply
+Yasir Hussein Shakir
+
+Posted a year ago
+
+· 2450th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations sir. Your work is impressive
+
+reply
+Reply
+Marpini Pavan Srikar
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!…Thanks for sharing your solution.
+
+reply
+Reply
+Rookie
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+simple and amazing solution!
+
+reply
+Reply

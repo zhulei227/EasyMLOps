@@ -1,0 +1,484 @@
+url: https://www.kaggle.com/c/learning-agency-lab-automated-essay-scoring-2/discussion/516791
+fetched: 2026-10-27
+chars: 15666
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution - Trust CV (and LB a bit) — Learning Agency Lab - Automated Essay Scoring 2.0
+1st Place Solution - Trust CV (and LB a bit)
+
+Learning Agency Lab - Automated Essay Scoring 2.0
+
+Solution Writeup · 1st place · Jul 4, 2024
+
+Thanks a lot for the great competition to Kaggle and the hosts! It was good fun even though I was sweating until the end.
+
+Congrats to @syhens and @dsohonosom who were leading most of the time! Until the very end I wondered if you overfit the public LB with such high scores - but apparently you just had some very good solutions!
+
+Thanks to @cdeotte for carrying this competition from the start and sharing so many resources. Thanks @cpmpml for sharing a faster QWK calculation.
+
+TLDR:
+Data analysis + experiments to find "new" data scoring patterns and get CV-LB-correlation.
+Train Deberta ensemble reflecting these scores.
+Two rounds of pseudo labelling to get "old" data with "new" scores.
+Transform float predictions via thresholding to ints.
+Ensemble without overfitting.
+Getting CV-LB-correlation
+
+The dataset contained essays written by 8-12th graders from ~12 years ago. The competition used text-dependent essays, but most of the data was taken from the persuade corpus which included additional independent writing tasks. There are ~13k Persuade essays ("old") and 4.5k unseen ("new") essays in the competition data.
+
+When comparing new and old data it was obvious there was quite a divide: two prompts were only present in "old" and the score distributions of same prompts were very different. All texts seem to have been written at the same time (12-13 years ago), as even the "newer" texts didn't mention any recent events, politicians or billionaires when writing about exploring Venus/Mars and self-driving cars.
+
+Some texts in persuade were written by students from different grades which could explain the score differences (maybe they were just worse?!). To test this (and other slight changes in scoring thresholds) I trained models on old or new data only and evaluated them on the other. I used ensembles of Debertas to rank the texts and calculated a "cheating" score that used the exact label distribution of the test data to turn the rankings into predictions. It helped close the gap but quite a sizeable difference remained. This made me believe there were actual differences in the criteria that the raters used.
+
+Since the new data was clearly using slightly different scoring criteria, I set up my training as a pre-train -> fine-tune, two-staged process. Pre-train on the old data (+ maybe aux data) and fine-tune on the new. This gave a boost of at least 0.015 on public LB and made CV-LB-correlation much better. Within each stage I used stratified 5-fold split using prompt_id+score as labels.
+
+Train Deberta
+
+With the two-staged approach training Deberta was fairly straightforward: find a decent baseline using Deberta base, find a set of working hyperparams for Deberta large and then generate a diverse set of models that can be used for creating ensembles. All models used regression and I evaluated the initial models mostly for MSE since I wanted to use them only for pseudo labelling (PL).
+
+Best params:
+
+Param	Value
+Base model	Deberta large, base
+Loss	MSE, BinaryCrossEntropy (scale targets to [0, 1])
+Pooling	CLS, Gem
+Context length	1024
+Batch size	8
+LR torso	1e-5, 5e-6 (pre-train / fine-tune)
+LR head	2e-5, 1e-5
+Epochs	2
+Warmup	15% of pre-train
+Decay	cosine
+Grad clip	10
+Weight decay	0.01
+Dropout	0
+Added tokens	"\n", " " (as @cdeotte shared)
+Init	normal_(mean=0.0, std=0.02), bias=0
+
+To create an ensemble with a bit of variety I mostly changed pooling, loss, context length and rarely LR. iirc shorter context length only ever made it into an ensemble if the weight was negative… But Deberta base was sometimes selected.
+
+The fine-tuning dataset only contained ~4.5k samples. Spread over five prompts with six possible scores meant that data was quite scarce. Model performance varried a lot for different seeds, especially when using thresholding to get int predictions. To counteract this I 3-seed-averaged everything. This made a big difference in predictability. Training three times as many models was very expensive but I found that only redoing the fine-tuning phase with a different seed made hardly any difference in performance and saved a lot of time. Still the model folder is around 2TB.
+
+Pseudo labelling
+
+Since the criteria for scoring seemed to differ, I used an ensemble fine-tuned on the new data to get better scores for the old data. I did two rounds: the first used mean(score, ensemble_pred) and the second used the prediction exclusively (after retraining an ensemble on the first round data). I always used the exact float prediction, no rounding.
+
+This is where it got a bit messy, the first round improved CV quite a bit but LB only slightly. The second round, however, improved CV even more, making a huge jump, but LB went down. The CV seemed not to correlated very well - I feared there was a leak that I missed (I didn't change the fine-tuning stage, only used the original labels) and didn't use the second round much. However one of the "bad" models scored 0.839 on private, single model, single seed (it was also the one with best CV). Maybe I could have trusted CV even more here but it seemed too risky.
+
+Thresholding (float -> int)
+
+Many people found that rounding at custom values (1.67 instead of 1.5) could improve results a lot. From my testing it seemed to do a couple of things at once:
+
+(over-) fit the targets
+correct errors caused by impalanced score labels
+Optimize quadratic weighted cohen's kappa (QWK).
+
+1 is obvious and 2 is caused by regression loss and imbalanced data - errors of true_label==2 are always biased towards the majority class 3 instead of 1, causing the latter to be underrepresented. The last point, 3, is important because Cohen's Kappa can often be increased by moving predictions around (often towards minority classes) even if it decreases accuracy / MSE, see example. Typical thresholds for 1/2 were 1.7 and for 5/6 even 4.9 (there were very few 6s and some prompts had none!)
+
+Data at the tails was very sparse and rounding thresholds could vary a lot between model seeds. I always used three seeds to calculate thresholds, without this it was too much gambling.
+
+All my submissions are full-fits (train model on all data), which meant they always behaved somewhat differently from the OOFs even when using the same seed. Averaging probably helped because of this too.
+
+To find the thresholds, I used minimize from scikit.optimize with "Powell", evaluating on 1 - qwk. Results seemed more reliable and much faster than guessing methods like Optuna. The found thresholds vary a bit based on the starting point of optimization, I average 15 different starting points.
+
+Ensemble
+
+From trained models I created ensembles via simple averaging, Nelder-Mead and a Hill-climbing method (first seen from @cdeotte iirc). With PL, thresholding and fitted ensemble weights with just 4.5k samples, there was a huge chance of overfitting. Especially when fitting thresholds and weights independently even small ensembles fit the data way too well. I counteracted this by pre-calculating each model's thresholds individually (3-seeds) and using the ensemble weights for the thresholds too.
+
+On top of this many subs were simple averages, squeezing out another 0.001 didn't seem as important as preventing overfitting.
+
+Submissions and luck
+
+Almost all models I submitted were 3-seed-average at inference too. My largest chosen ensemble therefore was 7 models with 3 seeds each (21 Deberta large).
+
+My three submissions were:
+
+Models	Pseudo labelling	Weights
+4 large, 1 base	no PL	fitted, non-negative
+7 large	1st round	fitted, negative
+4 large	1st + 2nd round	simple average
+
+Only the last one (which came in at 0.841) was chosen by best CV, the others were selected for diversity (no model overlap, not using PL …). They did much worse: 0.838 and 0.837 on private.
+
+Some of the best CV models:
+
+Models	Pseudo labeling	Weights	CV	Public LB	Private LB
+Best ensemble, 4x large	3x1st, 1x2nd	average	0.832	0.824	0.841
+Only 1st round PL models from best, 3x large	1st	average	0.831	0.823	0.840
+Only 2nd round PL model, 1x large	2nd	-	0.830	0.820	0.836
+Best single model	2nd	-	0.833	0.814	0.839
+
+The second round of PL gave a couple of models like the last one, very good CV (like an ensemble) but LB went down. I feared a leak but they did fine on Private LB, so maybe just bad luck on Public ¯_(ツ)_/¯
+
+What worked
+Worked (rough order of importance)
+Trust CV when you're rank 619
+Pretrain -> finetune on new data (+0.015)
+Pseudo-label old data (+0.004-0.007)
+3-seed-average everything (mostly reduced variance, lucky seeds could still work well)
+Spend a lot of time analysing score dists and sensitivity (esp. for thresholding)
+Limit overfitting in ensembling (simple average, don't post-fit thresholds…)
+Deberta large (base was ok on public but CV and private was 98% large)
+Neutral / unsure
+Additional data (Persuade, Ellipse) - non-text-dependent essays seemed to make little difference
+Differential LR - tiny difference
+Did not work
+GBDT, weak as a model by itself for me, 2nd stage seemed not to add anything over ensemble + thresholding (didn't spend that much time though).
+Adding prompt to input
+Backtranslation
+Classification with Deberta
+Attention pooling
+Rushing efficiency solution in the last 48 hours -> even half layer xsmall ONNX was too slow here, and it was the only thing I could produce quickly
+Author
+flg
+
+ferdinandlimburg
+
+arrow_drop_up
+86
+Share
+more_horiz
+Citation
+
+flg. 1st Place Solution - Trust CV (and LB a bit). https://www.kaggle.com/competitions/learning-agency-lab-automated-essay-scoring-2/writeups/flg-1st-place-solution-trust-cv-and-lb-a-bit. 2024. Kaggle
+
+5
+11
+comment
+22 Comments
+Hotness
+hiro
+
+Posted 2 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Congratulations on win and becoming a Competition Grandmaster!
+
+I was considering trying the average of three seeds, but since there wasn't a significant difference between CV and public scores, I decided not to. However, there was a large fluctuation in scores due to seeds in the private leaderboard, so I should have adopted it.
+
+Your idea of pseudo-labeling is excellent. I realized that I had the preconception that pseudo-labeling was only applied to data without labels. I will use this as a reference in the future.
+
+reply
+Reply
+yao
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations on win the game!! Excellent analysis for getting CV-LB correlation, this bothers me from time to time 😅. Also, congratulations for becoming Kaggle Competition Grandmaster!! 🎉🎉
+
+reply
+Reply
+rosyyyyyyy
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+你也很棒！！求代码 仅学习用
+
+reply
+Reply
+Optimo
+
+Posted 2 years ago
+
+· 509th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! It seems that the pseudo-labeling from 'old' to 'new' gave you the win! Very smart approach!
+
+I would not call that 'trusting CV' though. Any chance you could share your final pseudo labels for 'old' data ? What was your final CV score? How did you compute it? Train on 'old' data with pseudo labels and validate on 'new' data only ?
+
+Also what was your public score for the 0.841 private solution ?
+
+Sorry lots of questions, congratulations again!
+
+reply
+Reply
+flg
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! I feel like the most important was getting as much as possible out of the "new" data, PL probably helped, but rank 2 and rank 3 seemed to have done just fine without it.
+
+Train was: first: relabeled "old" data (persuade) and then fine-tune with unchanged "new" data. 5fold CV on "new" data (fine-tune) only. My best model had 0.841 private and 0.824 public, I was lucky that it was pretty much highest on CV, public and private at the same time. Other models had more variation. I will add more info tomorrow with CV and PL.
+
+I would not call that 'trusting CV' though.
+
+I think I added that mostly because I kept repeating "Trust CV" to myself 😀 In the end I used LB as just another data point. I tried not to fit anything directly to it as it seemed very easy to overfit here..
+
+reply
+Reply
+flg
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Added some more info on CV and here is the final round of pseudo labeling. I uploaded it for all of Persuade although it's probably weaker on the independent data (which was not part of the comp).
+
+reply
+Reply
+opamusora (Ivan Viakhirev)
+
+Posted 2 years ago
+
+· 1372nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!!! This win is well deserved, the follow up is excellent, was very interesting to read through, you took so many steps to avoid overfitting and it definetely paid off, congrats!
+
+reply
+Reply
+Ryenhails
+
+Posted 2 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Big congratulations! It is truly impressive to see the strong correlation in the CV and the unwavering confidence in it.
+
+reply
+Reply
+Rishit Jakharia
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+That is some insightful work! Congratulations!!
+
+reply
+Reply
+Archanaa
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great Job!!! Keep Going
+
+reply
+Reply
+
+This comment has been deleted.
+
+nitheeshgovind
+
+Posted 2 years ago
+
+· 1177th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+MrSimple
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+2
+C R Suthikshn Kumar
+
+Posted 2 years ago
+
+· 1033rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on achieving the first place in this competition. Thank you for sharing details of your solution. Just out of curiosity, can you share the time you spent while working on this competition and your background in ML.
+
+reply
+Reply
+Gcdelgado
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on your work! Amazing stuff! Very very insightfu! 😀
+
+reply
+Reply
+tascj
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Now I am certain that pseudo-labeling is very helpful. I also tried averaging gt score and pseudo labels, and it did show a slight CV improvement.
+
+reply
+Reply
+Mohamed Eltayeb
+
+Posted 2 years ago
+
+· 188th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+"Thresholding (over-) fits the targets" The submission that saved us from going > 1000th is the one we used np.round with it 🙃
+
+reply
+Reply
+Dennosity
+
+Posted 2 years ago
+
+· 1552nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Do you plan on releasing the training/inference notebook/code?
+
+reply
+Reply
+Sn1887
+
+Posted 2 years ago
+
+· 291st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on becoming Kaggle Grand Master!
+
+reply
+Reply
+Piotr Gabrys
+
+Posted 2 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the solo win and becoming the Grand Master! The pseudo-lableling on the old data was a great idea! This is amazing (and confusing) to me how different our approaches were…
+
+reply
+Reply
+MTP
+
+Posted 2 years ago
+
+· 1581st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations
+
+reply
+Reply
+manaphy24
+
+Posted 2 years ago
+
+· 192nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply

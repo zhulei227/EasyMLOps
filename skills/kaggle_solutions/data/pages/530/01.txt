@@ -1,0 +1,250 @@
+url: https://www.kaggle.com/c/playground-series-s3e3/discussion/380920
+fetched: 2026-10-27
+chars: 4286
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place. That was unexpected... — Binary Classification with a Tabular Employee Attrition Dataset
+1st place. That was unexpected...
+
+Binary Classification with a Tabular Employee Attrition Dataset
+
+Solution Writeup · 1st place · Jan 24, 2023
+
+I hadn't even selected any submissions because I wasn't expecting to do well as I watched my public LB score slip. 😄
+
+Many thanks to Khawaja Abaid, whose notebook Starting Strong - XGBoost + LightGBM + CatBoost was the basis of my own. Please go upvote Khawaja's notebook if you haven't already. My only big change was to add some feature engineering before training the same models. I had discussed it previously in Adding Risk Factors, but here's the final FE code from the winning version:
+
+df['MonthlyIncome/Age'] = df['MonthlyIncome'] / df['Age']
+
+df["Age_risk"] = (df["Age"] < 34).astype(int)
+df["HourlyRate_risk"] = (df["HourlyRate"] < 60).astype(int)
+df["Distance_risk"] = (df["DistanceFromHome"] >= 20).astype(int)
+df["YearsAtCo_risk"] = (df["YearsAtCompany"] < 4).astype(int)
+
+df['NumCompaniesWorked'] = df['NumCompaniesWorked'].replace(0, 1)
+df['AverageTenure'] = df["TotalWorkingYears"] / df["NumCompaniesWorked"]
+# df['YearsAboveAvgTenure'] = df['YearsAtCompany'] - df['AverageTenure']
+
+df['JobHopper'] = ((df["NumCompaniesWorked"] > 2) & (df["AverageTenure"] < 2.0)).astype(int)
+
+df["AttritionRisk"] = df["Age_risk"] + df["HourlyRate_risk"] + df["Distance_risk"] + df["YearsAtCo_risk"] + df['JobHopper']
+
+Author
+Bill Cruise
+
+bcruise
+
+arrow_drop_up
+36
+Share
+more_horiz
+Citation
+
+Bill Cruise. 1st place. That was unexpected.... https://www.kaggle.com/competitions/playground-series-s3e3/writeups/bill-cruise-1st-place-that-was-unexpected. 2023. Kaggle
+
+comment
+14 Comments
+Hotness
+Khawaja Abaid
+
+Posted 4 years ago
+
+· 50th in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+HAHAHAHA OMG NO WAYYYYY!! Many many congratulations, @bcruise, you totally deserve it. ❤️ And it's all you for coming up with these genius FE ideas, my notebook does nothing but combines three simple models. 😅 ngl, I can't stop laughing 😂😂😂 and i'm feeling so honored to be mentioned in a competition winner's post!
+
+reply
+Reply
+Mohit Kumar
+
+Posted 4 years ago
+
+· 215th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congrats @bcruise. Your methods used are simply great. Well deserved win!💪
+
+reply
+Reply
+Matt OP
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Haha, I felt the same way as I watched my public LB score slip. Sometimes it's pretty difficult to ignore the public LB. Congratulations on 1st place @bcruise and nice work on the feature engineering!
+
+reply
+Reply
+Chris Deotte
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations Bill. Well done!
+
+reply
+Reply
+Pavel Smirnov
+
+Posted 4 years ago
+
+· 394th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+genius in simplicity 👍
+
+reply
+Reply
+KirkDCO
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @bcruise !! It seems that simplicity is key in the Playground these days.
+
+reply
+Reply
+Bill Cruise
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you. It does look like simpler models (and a little bit of luck) give an advantage in this series so far. I think that's a good thing when the competition only lasts a week.
+
+reply
+Reply
+Jenifar
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Really, wonderful….
+
+reply
+Reply
+Ilia Gradina
+
+Posted 4 years ago
+
+· 537th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations)
+
+reply
+Reply
+Ram Aravilli
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations Bill. Well done!!!
+
+reply
+Reply
+Paul Bailey
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Very well done!
+
+reply
+Reply
+Priyanka Palshetkar
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Wow! Many congratulations Bill :D
+
+reply
+Reply
+saeusa
+
+Posted 4 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great feature engineering!
+
+reply
+Reply
+
+This comment has been deleted.

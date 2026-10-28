@@ -1,0 +1,90 @@
+url: https://www.kaggle.com/andresionek/is-there-any-job-out-there-kaggle-vs-glassdoor
+fetched: 2026-10-27
+chars: 979
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Andre Sionek · 7y ago · 15,615 views
+arrow_drop_up
+190
+Copy & Edit
+284
+file_download
+Download
+more_vert
+Is there any job out there? Kaggle vs Glassdoor
+Notebook
+Input
+Output
+Logs
+Comments (42)
+history
+Version 78 of 78
+Runtime
+play_arrow
+
+1m 16s
+
+Input
+Competitions
+
+2019 Kaggle Machine Learning & Data Science Survey
+
+Datasets
+
+Data Jobs Listings - Glassdoor
+
+Tags
+Employment
+Data Visualization
+Survey Analysis
+Jobs and Career
+Language
+
+Python
+
+Competition Notebook
+
+2019 Kaggle Machine Learning & Data Science Survey
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+2 files
+output
+Output
+0 files
+list_alt
+Logs
+76.0 second run - successful
+comment
+Comments
+42 comments

@@ -1,0 +1,169 @@
+url: https://github.com/melisgl/higgsml
+fetched: 2026-10-27
+chars: 8865
+
+GitHub - melisgl/higgsml: The winning solution to the The Higgs Boson Machine Learning Challenge. · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ This repository was archived by the owner on May 7, 2020. It is now read-only.
+
+ melisgl higgsml Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ higgsml Public archive Notifications You must be signed in to change notification settings Fork 44  ( 44 ) Star 128  ( 128 ) You must be signed in to star a repository About The winning solution to the The Higgs Boson Machine Learning Challenge. Resources Readme MIT license Activity Stars 128 stars Watchers 1 watching Forks 44 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 10 Commits 10 Commits Folders and files Name Name Last commit message Last commit date build build     data data     doc doc     model model     src src     submission submission     test test     xgboost-scripts xgboost-scripts     .gitignore .gitignore     LICENSE LICENSE     Makefile Makefile     README.md README.md     SETTINGS SETTINGS     configure configure     higgsml-build higgsml-build     higgsml-run higgsml-run     higgsml-train higgsml-train     rumcajsz.asd rumcajsz.asd     View all files Repository files navigation README MIT license More items This is the winning solution to the The Higgs Boson Machine Learning
+Challenge on Kaggle by Gábor Melis . 
+ Instructions for the batteries included distribution 
+ For the contest one has to submit a zip file with all the libraries
+and reproduce the submitted results exactly. The instructions in this
+section relate to that. 
+ The winning submission was a bag of 70 dropout neural networks and
+took one day to train on a GTX Titan GPU in double precision mode.
+Prediction took about an hour. 
+ My tests indicate that 8-16 neural networks are very close in
+performance to 70, so this was probably an overkill. 
+ Prerequisites 
+ Summary of what's needed: 
+
+ NVIDIA CUDA Toolkit (tested with 5.5.22, build 331.67) 
+ a CUDA card, preferably a Titan (in double precision mode) or better 
+ to rebuild the executable, SBCL (a Common Lisp compiler) 
+ 24GiB RAM 
+ about 4GiB of disk space 
+
+ Let's see why these things are needed. The CUDA card and the NVIDIA
+CUDA Toolkit are prerequisites, because training of the dropout
+network was performed on a CUDA card relying on the CURANDOM random
+number generator, and also because the results of deterministic
+operations on the GPU and the CPU can and do differ within the
+constraints of the IEEE standard. 
+ A Titan or better is recommended because it is many times faster than
+GTX 480 or similar alternatives in double precision mode. I haven't
+tested with single precision float, it's likely to work just as well. 
+ SBCL is only necessary to rebuild the executable. SBCL 1.1.14 was used
+in the submission, but any recent version should work. 
+ I'm not sure about the actual minimum memory required, it may work
+with 8GiB, but it was tested with 24GiB and that's the heap size with
+which the executable was built. 
+ Reproducing the results 
+ The zip file contains an executable built on a recent Debian Linux
+x86-64 Testing installation. This is executable is the file 'rumcajsz'
+in the top-level directory. 
+ If this executable works, there is no need to build anything, training
+and prediction can be done right away: 
+ ./higgsml-train &lt;path/to/training.csv&gt; &lt;save-dir-for-trained-model&gt;
+ ./higgsml-run &lt;path/to/test.csv&gt; &lt;save-dir-for-trained-model&gt; \
+ &lt;path/to/submission.csv&gt;
+
+ Note that higgsml-train logs its doings to stdout and also to 
+ &lt;save-dir-for-trained-model&gt;/rumcajsz.log
+
+ If higgsml-train fails with a library or ELF format related error,
+then the executable may not be compatible with slc5 and it needs to be
+rebuilt with: 
+ ./higgsml-build
+
+ After rebuilding the executable, the above higgsml-{train,run}
+commands should work. 
+ On the public and private leaderboards the submission achieved 3.78457
+and 3.80581, respectively. Cross-validation on the training set
+indicated 3.82-3.85 depending on how much smoothing was applied to the
+ams-vs-cutoff curve. For the raw curve see doc/cv-ams-vs-cutoff.png. 
+ Instructions for the source distribution 
+
+ Install either SBCL or AllegroCL . SBCL is free and is
+available on all Linux distributions. 
+
+ Set some options: 
+ $ ./configure --help
+ Usage: ./configure
+ [--lisp [ acl | sbcl]]
+ [--sbcl-bin &lt;sbcl-binary&gt;]
+ [--sbcl-options &lt;sbcl-options&gt;]
+ [--acl-bin &lt;acl-binary&gt;]
+ [--acl-options &lt;acl-options&gt;]
+ [--data-dir &lt;directory&gt;]
+ [--model-dir &lt;directory&gt;]
+ [--submission-dir &lt;directory&gt;]
+
+ --lisp
+ defaults to 'sbcl'.
+ --sbcl-bin
+ Path to the sbcl executable. Defaults to 'sbcl'.
+ --sbcl-options
+ Defaults to '--dynamic-space-size 24000 --noinform
+ --lose-on-corruption --end-runtime-options
+ --non-interactive --no-userinit --no-sysinit
+ --disable-debugger'.
+ --acl-bin
+ Path to the AllegroCL executable. Defaults to 'alisp'.
+ --acl-options
+ Defaults to ''.
+ --data-dir
+ Where the uncompressed csv files reside, defaults to 'data/'.
+ --model-dir
+ Where the model files are saved, defaults to 'model/'.
+ --submission-dir
+ Where submission files are saved, defaults to 'submission/'.
+
+ The directories can be absolute filenames or relative to the
+configuration script. 
+ Installing dependencies to a project local quicklisp dir 
+ The following command will set up a new quicklisp directory right
+below the top-level directory and fetch all dependencies with the exact
+versions with which this program was tested: 
+ make quicklisp
+
+ Installing dependencies to a global quicklisp dir 
+ Well, you are on your own, but you may want to use the following
+command to fetch the dependencies not in quicklisp: 
+ (cd ~/quicklisp/local-projects &amp;&amp;
+ &lt;path-to-here&gt;/build/install-local-projects.sh)
+
+ If you are having trouble, not that the rest of the libraries were
+from the 2015-01-13 quicklisp distribution. See
+build/install-dependencies.lisp about how to get historical
+distributions. 
+ Running and Developing 
+ Place training.csv and test.csv into the data directory (by default
+./data/). 
+ Train the model and create the leaderboard predictions files by
+evaluating the commented out form at the bottom of src/bpn.lisp. 
+ Also see the description of the command line scripts
+higgsml-{build,train,run} above. 
+ About The winning solution to the The Higgs Boson Machine Learning Challenge. Resources Readme MIT license Activity Stars 128 stars Watchers 1 watching Forks 44 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/icecube-neutrinos-in-deep-ice/discussion/402882
+fetched: 2026-10-27
+chars: 841
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+IceCube Neutrino Observatory · Research Code Competition · 4 years ago
+Late Submission
+more_horiz
+IceCube - Neutrinos in Deep Ice
+
+Reconstruct the direction of neutrinos from the Universe to the South Pole
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/mercari-price-suggestion-challenge/discussion/50272
+fetched: 2026-10-27
+chars: 814
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Mercari · Featured Code Competition · 9 years ago
+Late Submission
+more_horiz
+Mercari Price Suggestion Challenge
+
+Can you automatically suggest product prices to online sellers?
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

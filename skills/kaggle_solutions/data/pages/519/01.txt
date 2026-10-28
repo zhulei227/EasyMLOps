@@ -1,0 +1,804 @@
+url: https://www.kaggle.com/c/feedback-prize-english-language-learning/discussion/369457
+fetched: 2026-10-27
+chars: 16264
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Feedback Prize - English Language Learning
+1st Place Solution
+
+Feedback Prize - English Language Learning
+
+Solution Writeup · 1st place · Dec 8, 2022
+
+Thanks a lot to the hosts and Kaggle for hosting this interesting competition, we had great fun working on this one. Also congratulations to all other competitors for the great solutions and results. Special thanks to my teammates @evgeniimaslov2 and @poteman for such a perfect teamwork.
+
+Summary:
+
+Our solution is based on training lots of different models with different pooling techniques and max lengths and finally ensembling. We also used 3 models to extract embeddings and add them to ensemble.
+
+Cross validation
+
+Throughout this competition we had near perfect correlation between ensemble CV and LB. Whenever we saw some improvement on CV, we saw it reflected in a similar manner on the LB with very small random range. For splitting the folds, we just used MultilabelStratifiedKFold startegy.
+
+Modeling:
+
+Our final solution is a combination of different modeling approaches.
+
+Train/PL data + Different Pooling techniques + model + max_len(768/1462 for deberta models, 512 for others) + freezing top n layers + re_init/no re_init top layer + differential LR + AWP.
+
+Poolings Used:
+MeanPooling
+ConcatPooling
+WeightedLayerPooling
+GemPooling
+LSTMPooling
+Models Used:
+microsoft-deberta-v3-base
+deberta-v3-large
+deberta-v2-xlarge
+roberta-large
+distilbert-base-uncased
+
+Model Used for Embeddings and SVR
+
+"facebook/bart-large"
+"flax-sentence-embeddings/all_datasets_v3_roberta-large"
+"facebook/bart-large-mnli"
+
+Public Models:
+
+Weight Tuning:
+
+We used optuna to tune the model weights, since we used different folds for training, we used final oofs to tune the weights. Also weights are tuned target wise.
+We only add a model to our ensemble if it improves both our Ensemble CV/LB.
+The best CV we get using this approach was 0.44073 (We didn't select this sub fearing overfitting but this has best private score.) Our Second Best CV was 0.44096 (It has good CV/LB correlation).
+
+Model	CV	Public LB	Private LB
+deberta-v3-base with PL (Roh)	0.4464	0.437219	0.437982
+deberta-v3-large (Yev)	0.4460	0.436758	0.434625
+deberta-v3-large (pub)	0.4548	0.439502	0.437965
+nischay (pub)	4588	0.442645	0.439982
+deberta-v2-xlarge (pub)	0.4675	0.442497	0.443604
+roberta-large (Roh)	0.4596	0.443616	0.444081
+deberta-v3-large (pub)	0.4552	0.440045	0.437234
+deberta-v3-large (Roh)	0.4556	0.444469	0.440331
+distilbert-base-uncased (Roh)	0.4794	0.458219	0.459658
+deberta-v3-large (yev)	0.4440	0.435268	0.434334
+deberta-v3-base with AVG(trainPl + train) (Roh)	0.4482	0.43856	0.441147
+roberta-large with AVG(trainPl + train) finetune train (Roh)	0.4649	0.449538	0.447643
+deberta-v3-large (yev)	0.4538	0.441582	0.439262
+deberta-v3-large (yev)	0.4617	0.448342	0.442106
+deberta-v3-large (yev)	0.4447	0.436268	0.435978
+fb_bart_large_svr (Roh)	0.4635	0.455645	0.453132
+ad_v3_roberta_large_svr (Roh)	0.5113	0.501901	0.500084
+fb_bart_large_mnli_svr (Roh)	0.4708	0.456652	0.459615
+Final Ensemble CV	0.44096	0.433821	0.433356
+We also noticed that generating Soft/Pseudo labels on train data leads to huge overfitting, CV around 0.437.
+Pseudo labels:
+FB1 data
+Train data
+Mean of Train Pl / Actual Labels [This gives nice boost in both CV/LB]
+What Worked:
+Different Pooling techniques
+Different max_len
+freezing top n layers
+re_init top n layers.
+Training with Differential learning rate
+Pseudo labels
+What didn't worked
+Augmentations
+Post processing
+Important Citations:
+
+https://www.kaggle.com/code/cdeotte/rapids-svr-cv-0-450-lb-0-44x https://www.kaggle.com/code/nischaydnk/fb3-pytorch-lightning-training-baseline https://www.kaggle.com/code/yasufuminakama/fb3-deberta-v3-base-baseline-train https://www.kaggle.com/code/kojimar/fb3-deberta-family-inference-9-28-updated https://github.com/ybabakhin/kaggle-feedback-effectiveness-1st-place-solution
+
+Extra Links:
+
+Link to our best submission https://www.kaggle.com/code/rohitsingh9990/merged-submission-01/notebook?scriptVersionId=111953356
+
+Thanks and Acknowledgements:
+
+Special thanks to @cdeotte, @yasufuminakama, @nischay, @nischaydnk, @e0xextazy and @kojimar for sharing their notebooks/datasets/ideas publicly.
+
+Team Members
+
+@rohitsingh9990 @evgeniimaslov2 @poteman
+
+Training code can be accessed from https://github.com/rohitsingh02/kaggle-feedback-english-language-learning-1st-place-solution
+
+Authors
+Dracarys
+
+rohitsingh9990
+
+poteman
+
+poteman
+
+Yevhenii Maslov
+
+evgeniimaslov2
+
+arrow_drop_up
+129
+Share
+more_horiz
+Citation
+
+Dracarys, poteman, Yevhenii Maslov. 1st Place Solution. https://www.kaggle.com/competitions/feedback-prize-english-language-learning/writeups/autox-rohit-yevhenii-1st-place-solution. 2022. Kaggle
+
+comment
+59 Comments
+5 appreciation comments
+Hotness
+CPMP
+
+Posted 4 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congrats on the the win!
+
+Can you expand a bit what you mean by "Mean of Train Pl / Actual Labels" ? Thanks.
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+We generated soft labels / pseudo labels for train data using our earlier best ensemble. Then i took average of newly generated train labels and actual train labels. That's what Mean of Train Pl / Actual Labels means.
+
+reply
+Reply
+CPMP
+
+Posted 4 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks. I never did that, will try it.
+
+reply
+Reply
+Apa
+
+Posted 4 years ago
+
+· 55th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I still don't quite understand, can you explain with a simple example? thank you so much
+
+reply
+Reply
+Ioannis M
+
+Posted 4 years ago
+
+· 31st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+congrats @rohitsingh9990 and team, well deserved victory 👍
+
+reply
+Reply
+Dylan Liu
+
+Posted 4 years ago
+
+· 665th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! I'm curious that you said "used different folds for training", dose that mean the numbers of folds are also different? If so, do models trained with more folds have better cv? It seems unfair for models with fewer folds.
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+In ensemble we used 18 models in total, out of which 15 were trained using 5 folds and remaining 3 models which we used for Embedding extraction and SVR are trained using 25 folds.
+
+We used more folds only train Embedding model and their CV was already weak comparable to others. But you are right ensembling using different folds will lead to leakage and we need to be very careful while doing that. We can't blindly rely on CV score, we need some validation from Lb score as well.
+
+reply
+Reply
+Psi
+
+Posted 4 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats amazing job!
+
+I also had near perfect CB/LB correlation and my best CV was also best LB (unselected for same reasons as you).
+
+reply
+Reply
+pineapple
+
+Posted 4 years ago
+
+· 869th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats on your first place and thank you for the great explanation! Also, how did you get your CV and LB to line up so well? Really impressive stuff
+
+reply
+Reply
+Muhammad Hilmi Asyrofi
+
+Posted 4 years ago
+
+· 170th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats for your team victory @poteman @rohitsingh9990 @evgeniimaslov2 Congrats Rohit and Yevhenii for becoming the Kaggle Master! well deserved!
+
+I wanna ask, what's your strategy to use AWP?
+
+how do you choose the start epoch for AWP?
+how do you choose the learning rate for the AWP? must it be lower then the model learning rate?
+
+From my experiment, the model becomes harder to converge after applying AWP.
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@mhilmiasyrofi Thanks, the idea to use AWP came from past NLP competitions, most of our models we trained for 4 epochs and start epoch of AWP was 2, and the learning rate we used is 2e-5 for all layers except head for which it was 5e-4.
+
+reply
+Reply
+Muhammad Hilmi Asyrofi
+
+Posted 4 years ago
+
+· 170th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing! @rohitsingh9990 can't wait to see your training notebook so that I can deep dive the things behind! Keep the good work up 😀
+
+reply
+Reply
+Nischay Dhankhar
+
+Posted 4 years ago
+
+· 195th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you for the mention. Congratulations @rohitsingh9990 and team on the first place victory 💥💥💥
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations @evgeniimaslov2 for becoming Competitions Master.
+
+reply
+Reply
+Yevhenii Maslov
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you) I also want to congratulate you on becoming the competitions Master)
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Amazing result @rohitsingh9990 and team! Hearty congratulations and thanks for the detailed approach note! All the best and regards!
+
+reply
+Reply
+Santhoshkumar
+
+Posted 4 years ago
+
+· 968th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations 👏, way2go, thanks for sharing👍🤗
+
+reply
+Reply
+Vaidehi Savaliya
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and good job…
+
+reply
+Reply
+Jackson You
+
+Posted 4 years ago
+
+· 1015th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats @rohitsingh9990 . Could you explain or find the reason that consistently keeps a good CV/LB correlation? That's attractive stuff.
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+First we trained a base model and tested its Lb score, after that every model we train we check its ensemble CV/LB, if it improve both, we add that model to our ensemble else we move to next experiment.
+
+reply
+Reply
+Jackson You
+
+Posted 4 years ago
+
+· 1015th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+So the first base model maybe important than others. I thought it would be best to choose a model with a CV score close to the LB score as the first model.
+
+reply
+Reply
+Mark Baushenko
+
+Posted 4 years ago
+
+· 46th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your victory, it's very nice to see that you used my model in your final submission!
+
+reply
+Reply
+william.wu
+
+Posted 4 years ago
+
+· 86th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @rohitsingh9990! For using the MultilabelStratifiedKFold, did you create dummies for y before feeding in the Fold.split? As the following shows:
+
+df = train.copy()
+y = pd.get_dummies(data=df[CFG.target_cols], columns=CFG.target_cols)
+for n, (train_index, val_index) in enumerate(Fold.split(X=train, y=y)):
+        train.loc[val_index, 'fold'] = int(n)
+
+
+My CV and LB weren't correlated. I think it's mainly due to the splitting.
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+No, it was too late to do this change as most of the models were already trained and we didn't wanted to retrain them.
+
+reply
+Reply
+8 more replies
+arrow_drop_down
+AK
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Nicely done and congrats @rohitsingh9990 for becomng competition Master <3
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks and congratulations to you and @rashmibanthia for becoming competition Master as well.
+
+reply
+Reply
+Rashmi B
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you, Congratulations @rohitsingh9990, well done and well deserved 🎉🎉
+Thank you for sharing your solution.
+
+reply
+Reply
+Jaideep
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@rohitsingh9990 &team many congrats ,shows the real hardwork from you solution and same reflected in leaderboard also Keep going .. Hope i join kaggle back soon
+
+reply
+Reply
+Zhaoji Xu
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Such a great solution. Will try my best to learn from this.
+
+reply
+Reply
+fafinozzi
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Well done and thanks for sharing all the material!
+
+reply
+Reply
+ZHENYI SHEN
+
+Posted 4 years ago
+
+· 1049th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!
+
+I find you mentioned using generated Soft/Pseudo labels on train data and found there is huge overfitting. I also tried that and got the same CV, 0.437, as you did.
+
+Do you know why the overfitting occurs? I am very confused on this point. As we predict the values on different folds, there should be no leakage.
+
+reply
+Reply
+Mohsen Mahmoud
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Keep going
+
+reply
+Reply
+JimmyLiao
+
+Posted 4 years ago
+
+· 47th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Looking forward to reading your code.
+
+reply
+Reply
+Feng Qilong
+
+Posted 4 years ago
+
+· 595th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Can you explain a bit on the rationale of using the "Mean of Train Pl / Actual Labels" method? Thx :)
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+What we tried first is generating soft labels (pl) for train data, training on this was hugely overfitted as we were getting CV around 0.437, then i thought i should try average of train pl and train data in an effort to reduce overfitting and this experiment worked, as it gave some boost in both ensemble CV/LB.
+
+reply
+Reply
+Feng Qilong
+
+Posted 4 years ago
+
+· 595th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the info! I was suspicious that training with pl is overfitting as I was getting really good cv but not improving lb, but I could not find any form of leakage so I decided to stick with it…Glad that you found some rly cool ways to address this problem. Congrats again!
+
+reply
+Reply
+IOC META
+
+Posted 4 years ago
+
+· 733rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+can i ask you how to use freezing top n layers
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Here is a code snippet. if 'deberta-v3-base' in cfg.architecture.model_name or 'mdeberta-v3-base' in cfg.architecture.model_name: self.model.embeddings.requires_grad_(False) self.model.encoder.layer[:9].requires_grad_(False) Full training code will be released soon.
+
+reply
+Reply
+william.wu
+
+Posted 4 years ago
+
+· 86th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We used optuna to tune the model weights, since we used different folds for training, we used final oofs to tune the weights. Also weights are tuned target wise
+
+since we used different folds for training, do you mean you were training on different splits? Will that cause data leakage? Actually, I raised this question in this discussion. They convinced me that it would cause data leakage. Could you explain why it won't cause data leakage?
+
+My previous understanding was, for every single sample, it's predicted by models trained on data without it, so it wouldn't cause data leakage.
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Since we used 2-3 public models and embedding models [they were surely trained on different splits]. We were aware that this might cause leakage thats why we only added those models to ensemble that gave boost in both ensemble CV/LB.
+
+reply
+Reply
+william.wu
+
+Posted 4 years ago
+
+· 86th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Got it, so it might cause leakage, and you prevent this by checking the CV & LB score
+
+reply
+Reply
+Dracarys
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+yes, and since we had 3 final subs to choose. we took this risk with one sub.
+
+reply
+Reply
+Julien Mouchnino
+
+Posted 3 years ago
+
+· 2383rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+What is FB1 data?
+
+reply
+Reply

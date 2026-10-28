@@ -1,0 +1,5 @@
+url: http://blog.kaggle.com/2015/08/21/avito-winners-interview-2nd-place-changsheng-gu-aka-gzs_iceberg/
+fetched: 2026-10-27
+chars: 64
+
+FETCH_FAILED: <urlopen error [WinError 10061] 由于目标计算机积极拒绝，无法连接。>

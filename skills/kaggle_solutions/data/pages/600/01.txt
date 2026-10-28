@@ -1,0 +1,719 @@
+url: https://www.kaggle.com/c/hms-harmful-brain-activity-classification/discussion/492560
+fetched: 2026-10-27
+chars: 20771
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution, team Sony — HMS - Harmful Brain Activity Classification
+1st place solution, team Sony
+
+HMS - Harmful Brain Activity Classification
+
+Solution Writeup · 1st place · Apr 23, 2024
+
+I would like to thank the organizers and the community of the competition! I'm grateful to the members who joined the team.
+
+Code ( updated on 4/23/2024)
+train : https://www.kaggle.com/code/sugupoko/1st-place-all-train-code/notebook
+inferenece: https://www.kaggle.com/code/sugupoko/1st-place-hms-inference-code
+Summary
+
+Our prediction pipeline is this. Each approaches are will added in the comments!
+
+yamash's part : Link
+suguuuuu's part: Link
+kfuji's part : Link
+Muku's part : Link
+
+Team Validation Strategy
+
+The verification method was the same for the entire team.
+
+Validation using Chris's method
+link : https://www.kaggle.com/code/cdeotte/wavenet-starter-lb-0-52
+Normalize by summing labels with eeg_id, crop the middle 10,000 frames of EEG.
+Folding strategy : Group K-fold with a 5-fold split.
+vote >=10
+Authors
+suguuuuu
+
+sugupoko
+
+kfuji
+
+kazumafujii
+
+Jow
+
+jooott
+
+Muku
+
+ryosukesaito
+
+yamash
+
+yamash73
+
+arrow_drop_up
+114
+Share
+more_horiz
+Citation
+
+suguuuuu, kfuji, Jow, Muku, yamash. 1st place solution, team Sony. https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification/writeups/team-sony-1st-place-solution-team-sony. 2024. Kaggle
+
+26
+comment
+25 Comments
+Hotness
+yamash
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+24
+more_vert
+
+Thank you Kaggle & hosts for organizing an interesting competition. Thanks also to my teammates who took part with me. It was fun to participate in close discussions.
+
+yamash’s part
+Model
+
+I lined up the raw EEG signal as it was and created a single 2D image, which was then processed with a 2D CNN model. In more detail, 18 signals of bipolar montage were cropped at three different intervals (2000, 5000 and 10000 samples), resized and concatenated into a single image. I trained several models based on this method. Depending on the model, I changed the range of the bandpass filter to create a 2D image.
+
+This is a very simple method, but the CV was around 0.24.
+
+Following 5 models are used for final sub:
+
+4 x convnext atto models with different seed and bandpass filter (CV: 0.2452, 0.2385, 0.2457, 0.2351)
+1 x inception next tiny (CV: 0.2309)
+
+Ensemble
+
+I used non-negative linear regression for ensemble. Each target variable was estimated by non-negative linear regression from the values of the same target variable predicted by each model.
+
+At first, our ensemble method is the average of all models, or a single weight was given to each model. We decided on using non-negative linear regression when we realized that the correlation between CV and public lb was maintained even when more overfit to training data.
+
+Replacing softmax with entmax
+
+The output of softmax is not zero for every target variable, but many training data labels have some zero probability classes. To deal with this difference, I tried to replace softmax with sparsemax[1] and entmax[2]. These functions can output sparser results compared to softmax. Finally, we decided to use entmax with a small alpha parameter (~1.03) for all our single models, which improved both public and private LB score around 0.004. In practice, small alpha didn’t output sparse results, but only of making the values a little more crisp.
+
+I found this almost the end of this competition, so I couldn’t have enough experiments of using entmax and sparsemax in the training stage.
+
+[1] https://arxiv.org/abs/1602.02068 [2] https://arxiv.org/abs/1905.05702
+
+reply
+Reply
+1
+1
+Darragh
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I really like the entmax idea 💡 thanks for sharing. For such a small change it has a relatively big effect. Are you aware if it gave similar lift in CV and LB?
+
+reply
+Reply
+yamash
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for the comment. As for CV, there were some improvements and some not, depending on each single model. And there was no overall improvement in CV. CV was calculated with labels averaged over the same eeg_id, so it is possible that the effect of entmax was less pronounced than with the labels in the actual test data. On the other hand, for public LB, scores improved consistently regardless of the single model combination.
+
+reply
+Reply
+Simon Beck
+
+Posted 3 years ago
+
+· 713th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+how can u use different activation softmax and entmax in train and test?
+
+reply
+Reply
+Muku
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+22
+more_vert
+Muku's part
+
+First of all, I would like to thank Harvard Medical School and Kaggle team for organizing a great competition, the participants for sharing useful ideas, and my teammates for fighting alongside me.
+
+
+
+
+Overview
+
+
+
+
+1. Model
+Based on the 16-channel anterior-posterior montages generated from raw EEG, two types of image representations are generated and input to timm model.
+
+First：Temporal feature maps by 1D temporal convolution
+This idea was inspired by EEGNet paper and G2Net Gravitational Wave Detection | Top 1 solution.
+I expected to obtain filters for the rhythmic temporal features specific to each symptom, by learning.
+The kernel size was set to the same value as the sampling rate (200).
+Stack the generated temporal feature maps by montage channels or feature maps to obtain input images for timm mddel.
+Stacking each montage channels has better accuracy, and parallel use of both methods improves accuracy.
+Optional: Temporal feature maps are directly input to the GRU layer, which improves accuracy, so added as a variation of Ensemble.
+
+Second：Time-Frequency Transform (superlets / STFT)
+In the early stages of the study, I used STFT, but it did not appear to be a good representation because of the loss of resolution in the time or frequency.
+Then, I use superlets as a better representation method. (CWT was being investigated by suguuuuu and kfuji, so I used this as a variation).
+Use the following repositories published under the MIT License https://github.com/irhum/superlets
+settings：
+min_freq, max_freq = 0.5, 20.0
+base_cycle, min_order, max_order = 1, 1, 16
+Adjusted for better resolution in the time direction
+The superlet is more compatible with frequency/time expressivity compared to STFT, and the representation is more predictable for labels even for humans.
+Examples：   
+
+timm model
+Try various timm backbones and add them to Ensemble. Diverse ensemble was effective because the KL divergence is sensitive to errors for extreme predictions.
+Overall, smaller models performed well.
+Best backbone：swinv2_tiny_window16 (CV: 0.2229)
+The following also showed good accuracy and contributed to Ensemble
+swinv2_tiny_window8
+caformer_s18
+gcvit_xtiny, xxtiny
+convnextv2_atto
+maxvit_pico
+inception_next_tiny
+poolformerv2_s12
+nextvit_small
+
+
+
+
+2. Training
+2-stage training (Stage1：> 1 vote, Stage2：> 9 votes)
+Labels of vote: 1 appeared to be unreliable, so excluded from training. (I had thought about applying pseudo labeling, but I didn't have enough time)
+Learning rate：[Stage1：1e-3, Stage2：1e-4]
+Loss function：KLDivLoss（with aux loss for each model output）
+scheduler：CosineAnnealingLR
+Optimizer：Adan
+Data sampling：Each unique eeg_id & label（Multiple samples may be generated from the same eeg_id）
+Label smoothing：Add offset of 0.02 to each vote before normalization.
+By adding this before normalization, a stronger regularization is applied to labels with low vote counts, which are considered to have a relatively low confidence.
+Augmentation：
+±5 sec random time-shift
+Random bandpass filter (Only for waves)
+XYMasking（Only for specs）
+butter bandpass filter (Only for waves)：Set highcut to 30~40Hz
+When high-frequency noise exists, "Others" votes tended to increase, so these noises are determined to be important for predicition.
+reply
+Reply
+1
+Darragh
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Very clever idea on the label smoothing.. applying before normalisation to smooth low count labels more
+
+reply
+Reply
+1
+emoji_people
+MBOOK
+
+Posted 3 years ago
+
+· 57th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats for 1st place!
+
+I have one question about 2D images created by superlet.
+
+It seems you made scalograms by setting the time-axis as about 800. But when resizing it to (256,256), the images are totally different from the original one, which would lead to the loss of information in time direction.
+
+Did you make any treatment against that problem?
+
+P.S. If possible, I'd like to know the image's shape you made when creating scalogram (before resizing).
+
+reply
+Reply
+Muku
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Dear MBOOK,
+
+Thank you for your comment! And sorry for the late reply.
+
+P.S. If possible, I'd like to know the image's shape you made when creating scalogram (before resizing).
+
+The shape of scalogram before resize is (32, 10000), for each montage channel.
+
+I set the frequency axis resolution to 32, which is enough for my needs. The reason is that higher resolution increases generation time of scalogram significantly. (It is also intended to prevent time-out during inference)
+The freqs input to the function is as follows freqs = jnp.linspace(0.5, 20.0, 32)
+
+Then, to save storage consumption, I resize it once to (32, 1000) and save it in .npy format. Next, during the training phase, scalogram 2d image is generated by the following steps:
+
+Crop the center of each montage channnel image in the range of 256/512/768px. (i.e., shape=(32, 256or512or768))
+The reason for not using max 1000px is to use 5sec time-shift augmentation.
+Resize the image of each montage channnel to (16, 256) (when using 16ch montage; when using 4ch average: (64, 256))
+You are correct that resize will result in lack of information. However, comparing the images before and after resize, I judge this effect is not that significant. (I may have the impression that information is "aggregated")
+before resize (32, 768) 
+after resize (32, 256) 
+Also, some timm backbones, such as swinv2, which has good accuracy this time, have a limitation of 256px (or 224px) resolution. Therefore, I used resize because it was worth accepting the trade-off for lack of information to use these models.
+There are no special tricks here, only application of resize by bilinear.
+Stack each montages channel in the frequency direction to obtain single (256, 256) image. In the case of 16 montages, (16x16=256, 256)
+
+If you have any questions, please feel free to ask again. :)
+
+reply
+Reply
+2
+emoji_people
+MBOOK
+
+Posted 3 years ago
+
+· 57th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for very clear and logical representations! I learned a loft of things from you.
+
+Thanks again, and happy kaggling!
+
+reply
+Reply
+1
+suguuuuu
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+16
+more_vert
+suguuuu part
+Overview
+I first created Model1.
+Model2 combines the Yamash preprocessing (I only use 50sec). Please refer to the Yamash solution.
+model 1 (4models seed ensemble, one model cv: 0.2399)
+
+model 2 (4models seed ensemble, one model cv: 0.23810)
+
+Preprocessing ( How to create a stacked scalogram image )
+Extract features from rawEEG
+x.clip(-1024.1024)/32
+Crop EEG: crop the middle 50sec(10,000 frames) of EEG.
+Crop 50 seconds (10,000 frames) performed better than 25 seconds or 10 seconds.
+label : Normalize by summing labels with eeg_id
+Continueous Wavelet Transform(CWT)
+code : https://www.kaggle.com/competitions/g2net-gravitational-wave-detection/discussion/275356#1529639
+Settings: wavelet_width=7, fs=200, lower_freq=0.5, upper_freq=40, n_scales=40, border_crop=1, stride=16.
+Adjust the parameters to approximate a 512x512 size when stacked.
+Configured for 0.5-40Hz, which outperformed the 0.5-20Hz setting.
+input EEG:18 x 10000, output scalogram:18x40x625
+Stack CWT images vertically.
+Resize to 512 x 512
+Training
+2stage training (5epoch => 15epoch)
+Augmentation
+XYMasking, Mixup
+optimizer : Adan
+scheduler : CosineAnnealingLR
+Model
+The MaxViT_base is the best for the scalogram image.
+Do not work for me
+STFT, Kaggle spec, CQT.
+Train with plotted image.
+Various montage
+Why did I use CWT?
+I tried various experiments with STFT, but couldn't achieve good performance.
+So, I chatted to ChatGPT and was able to get the following information:
+To capture the local characteristics of signals with high non-stationarity, it's essential to choose an analysis method that can adapt to the varying nature of the signal. Considering the strengths and weaknesses of Wavelet Transform, Superlet Transform, and Short-Time Fourier Transform (STFT), let's determine the best option.
+
+### Short-Time Fourier Transform (STFT)
+- **Strengths:**
+  - Relatively easy to implement and widely used.
+  - Offers an intuitive presentation of time-frequency information.
+- **Weaknesses:**
+  - Fixed window size creates a trade-off between time and frequency resolution.
+  - Limited ability to capture local features of highly non-stationary signals.
+
+### Wavelet Transform
+- **Strengths:**
+  - Capable of multi-resolution analysis, capturing signal characteristics at different scales.
+  - Excellently captures local features of non-stationary or complex signals.
+  - Suitable for detecting short-duration events, analyzing abrupt changes, and non-linear characteristics within signals.
+- **Weaknesses:**
+  - Requires the selection of an appropriate wavelet function, which can demand specialized knowledge.
+  - Implementation and interpretation can become complex.
+
+### Superlet Transform
+- **Strengths:**
+  - Provides high time-frequency resolution, capturing fine details of the signal.
+  - High capability to distinguish overlapped or short-duration signal components.
+  - Particularly effective for analyzing signals with high non-stationarity, such as complex brain wave patterns.
+- **Weaknesses:**
+  - Relatively new, with potentially limited resources or examples of implementation available.
+  - May incur high computational costs.
+
+### Best Transform for Analyzing High Non-stationary Signals
+To capture the local characteristics of highly non-stationary signals, **Wavelet Transform** or **Superlet Transform** are particularly suitable. These methods provide high flexibility and adaptability to temporal and frequency changes in the signal, making them effective for analyzing complex, varying signals. Wavelet Transform, with its versatility and local feature extraction capability, is broadly adopted. The Superlet Transform may be chosen for even higher time-frequency resolution needs or when analyzing extremely complex signals.
+
+reply
+Reply
+1
+2
+kfuji
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+12
+more_vert
+
+First and foremost, I would like to express my gratitude to the competition host who organized this interesting competition, as well as the Kaggle team. Additionally, I am thankful for my teammates who worked together with me until the end.
+
+kfuji's part
+Preprocessing:
+Using all raw EEG data excluding EKG, taking differences between specific pairs to create 18 types of signals.
+For each of the 18 types of signals, the continuous wavelet transform (CWT) was applied following the suguuuu's method. To increase the variation in input data, I used Paul as the mother wavelet instead of Morlet. I used the implementation of https://github.com/tomrunia/PyTorchWavelets/blob/master/wavelets_pytorch/wavelets.py and https://www.kaggle.com/code/anjum48/continuous-wavelet-transform-cwt-in-pytorch#PyTorch-implementation.
+The scalograms obtained through the CWT will be stacked vertically to form a single 2D image and resized to 512x512 as the final step. 
+Model:
+maxvit_base_tf_512.in21k_ft_in1k
+Training:
+During training, one eeg_sub_id was randomly selected from eeg_id for each epoch. The input data consisted of 10,000 frames (50 seconds) starting from the corresponding eeg_label_offset_seconds. Furthermore, the labels assigned to the eeg_sub_id were utilized for training.
+Lr: 1e-3
+Scheduelr: CosineAnnealingLR
+Optimizer: Adan
+Augmentation: XYMasking, mixup
+2stage training
+Stage1: 5 epochs (all data)
+Stage2: 15 epochs (10 votes or more)
+Variation:
+The following three models, trained with variations in input frame length and Paul's parameters, were merged into the final team submission.
+2000frame(10sec), Paul(m=4), CV:0.2475
+5000 frame(25sec), Paul(m=4), CV:0.2309
+5000frame(25sec), Paul(m=16), CV:0.2311
+What didn't work well:
+Using DOG (Derivative of Gaussian) instead of Paul.
+Longer input frames (performed well individually but did not contribute to the ensemble).
+reply
+Reply
+1
+ANTONY ALEXIA
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+This comment's detailed methodical approach really impresses me. It's clear that cleaning the EEG data and improving the model architecture took a lot of work on the part of Fuji and the team. A thorough understanding of the issue domain is demonstrated by the choice to use wavelet transforms using Paul as the mother wavelet as well as the meticulous selection of training settings and augmentation strategies.
+
+reply
+Reply
+2
+gezi
+
+Posted 3 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Congratulations ! Well I used to think Cris's method was not the best for eval as per eeg id we might have many labels, only same label parts could be seen as aug, but from your wok seems I am wrong…, I will try to change this strategy to see the diff, thanks for sharing, entmax is also cool!
+
+reply
+Reply
+2
+CPMP
+
+Posted 3 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Awesome way of reporting, lots of interesting content. Well done for the win!
+
+reply
+Reply
+2
+C R Suthikshn Kumar
+
+Posted 3 years ago
+
+· 355th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on first prize in this competition. Thanks for sharing the details of your solution.
+
+reply
+Reply
+2
+smalltrain
+
+Posted 3 years ago
+
+· 193rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! 🎉 Thanks for sharing your excellent work. In this competition, I didn't make full use of the raw EEG data, but I learned a lot from your detailed analysis.
+
+reply
+Reply
+2
+ModeEric
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Really makes me wonder how much of raw EEG data is actually noise vs relevant information. It seems like depending on the data format, it can be interpreted as either
+
+reply
+Reply
+1
+Aaditya Porwal
+
+Posted 3 years ago
+
+· 198th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats !!! for securing 1st position
+
+reply
+Reply
+1
+Enes Koşar
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+excellent work!
+
+reply
+Reply
+1
+Niclo
+
+Posted 3 years ago
+
+· 145th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+fantastic work. congrats to your team :)
+
+reply
+Reply
+1
+zephyrus1
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning competition. ⭐
+
+reply
+Reply
+1
+Ganesh Talwar
+
+Posted 3 years ago
+
+· 1254th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congratulations
+
+reply
+Reply
+1
+SungyoonKim_KoK
+
+Posted 3 years ago
+
+· 895th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on taking first place. 🎉
+
+reply
+Reply
+2
+makio323
+
+Posted 3 years ago
+
+· 261st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Along with the models, I am stunned to find that the basic CV strategy can still lead the 1st place even many top solutions use the high-number voting data for validation along with training. It is encouraging to stick to the basic CV, which still works for training with the selected data and may hedge a potential shake-up.
+
+reply
+Reply
+yamash
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Sorry, we didn't explain it well enough, but we were also using validation data with vote >= 10.
+
+reply
+Reply
+makio323
+
+Posted 3 years ago
+
+· 261st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the clarification. It is yet good to know it!
+
+reply
+Reply
+1
+gezi
+
+Posted 3 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I have a question， when counting for votes》10 it is per eeg subid or per eeg id？
+
+reply
+Reply
+yamash
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+One data from each eeg_id with more than 10 votes was used for CV calculations. We treated the number of votes of the first eeg_sub_id as for that eeg_id.
+
+reply
+Reply
+
+This comment has been deleted.

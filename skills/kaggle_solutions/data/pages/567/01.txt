@@ -1,0 +1,784 @@
+url: https://www.kaggle.com/c/google-research-identify-contrails-reduce-global-warming/discussion/430618
+fetched: 2026-10-27
+chars: 19116
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Google Research - Identify Contrails to Reduce Global Warming
+1st place solution
+
+Google Research - Identify Contrails to Reduce Global Warming
+
+Solution Writeup · 1st place · Aug 20, 2023
+
+I thank the organizer and Kaggle for hosting this interesting competition. I also thank many Kagglers who wrote solutions in past competitions, without which I could not compete for segmentation tasks.
+
+Overview
+U-Net with MaxViT encoder
+Input is the standard ash color image
+Target y is soft; the average of individual masks
+BCE (binary cross entropy) loss
+U-Net trained for symmetrized label, y_sym, which is the label shifted by 0.5 pixels
+Shift-scale-rotate augmentation
+Additional tiny convolution trained to map y_sym to y
+Rotation augmentation
+
+Augmentation is extremely important in this competition to suppress overfit and train longer. With rotation augmentation I could train 40-50 epochs, compared to 10-20 epochs without augmentation. The test-time augmentation (TTA) is also very effective, adding ~0.006 to the score for free.
+
+This is basic but does not work as usual in this competition because the label is shifted 0.5 pixels to the right and bottom with respect to the contrails. Random rotation augmentation would shift the label to random directions and make the model impossible to learn the right-bottom aligned ground-truth labels.
+
+Discover the 0.5-pixel shift
+
+I was very confused when the score dropped with flip and rot90 (multiples of 90° rotation) augmentations. In physics, what symmetry the system has is the first thing to consider, and although westerly winds or Coriolis force could make the physics asymmetric under flip or rotation, I could not believe that those affect the contrail detection. I visualized a prediction with a model trained without augmentation and applied it to a 180°-rotated input image to see why the augmentation did not work.
+
+The blue-green-red stripe pattern from top to bottom shows false negative, true positive, and false positive, which means that the rotated label is shifted up compared to the predicted label; that is, the original labels are shifted down compared to the contrails. I also observed the same pattern for left and right.
+
+If the labels are shifted 0.5 pixels to top left (right panel in the figure above), then the rotated label is consistent with the original label in terms of the contrail-label offset.
+
+I first shift the label by 0.5 pixels and create y_sym
+y_sym has size 512×512 and is sampled from y on a shifted regular grid with bilinear interpolation
+U-Net is trained with y_sym
+Additional tiny convolution of 5x5 with stride 2 is trained to learn the mapping from y_sym to right-bottom aligned y, using 5% of the data when the augmentations are not applied randomly (note that y cannot be augmented).
+At inference time, y_sym is averaged for 8 patterns of rot90 and flip TTAs. The conv5x5 is applied after the y_sym.
+
+The augmentation is,
+
+import albumentations as A
+
+A.Compose([
+    A.RandomRotate90(p=1),
+    A.HorizontalFlip(p=0.5),
+    A.ShiftScaleRotate(rotate_limit=30, scale_limit=0.2)
+])
+
+
+I refer to my public notebook for the details:
+
+https://www.kaggle.com/junkoda/base-unet-model-for-the-1st-place
+
+Models
+
+The final prediction is the weighted mean of two models with a threshold ~0.45. I tuned the threshold and the weights using the validation set. Both models are U-Net using maxvit_tiny_tf_512.in1k as the encoder, but one uses single time t=4, and the other use four times t = 1 - 4. The input image size is 1024×1024 for both models.
+
+Single-time model
+Upscale the input image to 1024×1024
+Drop the final decoder layer of upscale and output 512×512
+4-panel model
+
+In order to use the time information, I tried 3D ResNet and ConvLSTM, but I was not able to make them work at all. The only thing I could do was to pack four 512×512 image at t=1,2,3,4 into one 1024×1024 image and hope that self attention in MaxViT look at different times.
+
+In the U-Net, I only pass the quarter of the features (H/2, W/2) to the decoder, which corresponds to the t=4 quarter. The rest is the same as the single-time model. Concatenating images in the spacial direction appear in Kaggle once in a while. I remember CPMP's solution for the G2Net blackhole merger competition, in which he stacked 3 detector data horizontally rather than stacking them as 3 channels.
+
+Training details:
+
+Train 5 out of k=10 folds, using the out-of-fold to monitor the validation loss
+0.5 epochs of linear warmup to learning rate 8e-4, followed by cosine annealing
+batch size 4 × gradient accumulation 2
+AdamW with weight_decay = 0.01
+35 or 40 epochs of training
+Scores
+                    CV     Public  Private
+       input size
+
+Single time   512  0.697   0.707   0.712
+Single time  1024  0.703   0.719   0.716
+4-panel      1024  0.704   0.719   0.722
+Ensemble           0.706   0.725   0.724
+
+
+All scores are for 5-fold × 8 TTA mean.
+
+Things I was not able to do
+I did not use pseudo labeling. I tried pseudo labeling at an early stage. It boosted the single model score a lot, but the benefit was unimpressive after 5-fold mean.
+I was not able to train large models. I tried MaxViT small and base, and many other models, but the improvement was unclear. I increased the input image size instead. This failure must be due to my insufficient experience.
+I used only positive data (dropping data with no positive labels) for model evaluation because it takes 1/2 time to train. However, I was not able to use it in the real prediction; it performs very bad for negative samples, and my classifier was not good enough to exclude such false negatives.
+Removing small masks is a basic technique in segmentation competition, but here, removing even 1-pixel clusters (connected components) was not a good idea. I tried to remove false positive clusters based on some cluster statistics (size, density, max density, etc), but U-Net was cleverer than my post processing.
+Codes
+Training: https://github.com/junkoda/kaggle_contrails_solution
+Inference notebook: https://www.kaggle.com/code/junkoda/contrails-submit
+
+Update 2023-08-20: Add links to the codes and minor english corrections.
+
+Author
+🐢 Jun Koda
+
+junkoda
+
+arrow_drop_up
+164
+Share
+more_horiz
+Citation
+
+🐢 Jun Koda. 1st place solution. https://www.kaggle.com/competitions/google-research-identify-contrails-reduce-global-warming/writeups/jun-koda-1st-place-solution. 2023. Kaggle
+
+comment
+47 Comments
+Hotness
+Theo Viel
+
+Posted 3 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Congratz on the win !
+
+Very elegant solution, and impressive detective work.
+
+reply
+Reply
+DennisSakva
+
+Posted 3 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Would it make sense to shift an image by 0.5 pixel instead of the mask? This way you don't need to shift masks during the inference.
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think so, and that seems easier. Is that what TASCJ did, because he did not write about shifting back 0.5 pixel in method 2? Somehow I didn't think about that during the competition.
+
+reply
+Reply
+hengck23
+
+Posted 3 years ago
+
+· 96th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+" 4-panel model … hope that self attention in MaxViT look at different times." this actually might work. good idea!
+
+some smart design of positional encoding (e.g. t,x,y) or/and attention may make it work better.
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! 512 x 4 panel was better than 512 single time. I wonder if was competitive compared to other teams 2.5D and 3D model.
+
+reply
+Reply
+Giovanni Cavallin
+
+Posted 3 years ago
+
+· 124th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats for the winning! Thank you for the explanation, definitely simple solutions works best most of the times!
+
+reply
+Reply
+Bartley
+
+Posted 3 years ago
+
+· 58th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats on the solo win @junkoda, and interesting write-up.
+
+Can you explain how you shift a mask by 1/2 a pixel?
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks! I apply torch.nn.functional.grid_sample function to y. It returns interpolated values on the given grid. I hope it will be clear when I finish with my public notebook.
+
+reply
+Reply
+JeremyLoscheider
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+I was just talking with an intern about the need to get into the messiness of the data. It seems that your approach is successful because of how much you dove into the problem and asked about the structure of the data.
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! Sounds like a very nice intern program. Understanding the data is important, but it is also difficult for deeplearning problems; often we only see how annotators are inconsistent. In this problem, it probably worked because I also had a hypothesis and visualize the data with a specific purpose.
+
+reply
+Reply
+Dimas Maulana Ichsan
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratz on the win! I also just found out that the y_sym of your solution is so helpful! Thank you for sharing!
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You are welcome!
+
+reply
+Reply
+slime
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Nice shifted mask visualization, congratz with the result!
+
+reply
+Reply
+Optimo
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Many congratulations on the solo win and thank you for the great write up!
+
+Could you please clarify this part:
+
+Additional tiny convolution of 5x5 with stride 2 is trained to learn the mapping from y_sym to right-bottom aligned y. This is done when the augmentation is not applied for the 5% of the data (note that y cannot be augmented).
+
+Where do you put this convolution ? head of the Unet ? When do you train it? What are the 5% of the data you are referring to? Why not just training with centered masks (y_sym) and then apply the invert shift on the predictions ?
+
+At inference time, y_sym is averaged for 8 patterns of rot90 and flip TTAs. The conv5x5 is applied to the averaged y_sym.
+
+Just to be sure I understood : basically you perform classical 8 times TTA, average the predictions and then shift the results using your trained conv5x5 ?
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks for the question, and I must agree that many reader have the same question. That's why I am going to write the notebook, and I hope it become clear with the code. I'll read my text again tomorrow and think how I can revise, too.
+
+where do you put the convolution? Yes it is a head,
+y_sym_pred = unet(x)
+y_pred = conv5x5(y_sym_pred)
+return y_sym_pred, y_pred
+
+
+but both y_sym_pred and y_pred are returned and both are compared to their labels. Maybe something strange or wrong is going on here for deeplearning experts.
+
+when do you train?
+
+I always train y_sym_pred with y_sym, but I cannot train y_pred if augmentation is applied.
+
+loss = bce_loss(y_sym_pred, y_sym)
+
+what is 5%?
+
+I apply augmentation with probability 0.95, and do not with 0.05. 5% is the probability that the augmentation is not applied. When augmention is not applied, I train both,
+
+loss = bce_loss(y_sym_pred, y_sym) + bce_loss(y_pred, y)
+
+(I am not accurate about the batch, I hope that is a technical detail)
+
+Why not just training with centered masks (y_sym) and then apply the invert shift on the predictions ?
+
+Yes, you can do that with 512x512 y_sym, but I was also working with 256x256 y_sym, and I used a similar method.
+
+Just to be sure I understood Yes that's right. conv5x5 is outside the standard TTA.
+reply
+Reply
+DennisSakva
+
+Posted 3 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Super cool explanation. "I first shift the label by 0.5 pixel and create y_sym" "Additional tiny convolution of 5x5 with stride 2 is trained to learn the mapping from y_sym to right-bottom aligned y."
+
+Why learning a separate convolution to shift the mask back and not just shift it 1 pixel at 512x512 and downscale to 256x256, which is equivalent to 0.5 px shift)?
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Yes! I tried that too and both works equally well. I started from 256x256 y_sym and I used 3x3 at that time, and I continue to do that way.
+
+reply
+Reply
+Sambit Barik
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@junkoda kudos for winning the competition and writing such a nice writeup!
+
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 585th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the great writeup. OOC, how did you find out about the 0.5 pixel trick? By plotting the data maybe?
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks! I don't remember exactly now, but I think I came up with an hypothesis first that the reason for augmentation not working is the shifted labels. Thought about 1 pixel shift and then discover the 0.5 pixel with the visualization presented above. I thought there must be a special reason that rot90 and flip augmentation do not work.
+
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 585th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the details!
+
+reply
+Reply
+Raki
+
+Posted 3 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I rationalized it away by imaging that the model gains insights about geographical location from the direction of contrails and that information being lost when applying those augmentations. I will try to always check what happens in visualizations like you did.
+
+reply
+Reply
+Twit ter1
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great job! :)
+
+reply
+Reply
+Tariq Mahmood
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations 🎉 Dear @junkoda for this position.
+
+reply
+Reply
+Vyshakh Krishnan T
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats and a great work done.
+
+reply
+Reply
+Shailja Kant Tiwari
+
+Posted 3 years ago
+
+· 344th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @junkoda and thanks for sharing your approach.
+
+reply
+Reply
+Muhammad Usman
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @junkoda
+
+Very helpful solution.
+
+reply
+Reply
+SAM NY
+
+Posted 3 years ago
+
+· 790th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+awesome … congratulations !
+
+reply
+Reply
+NA
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+This is wonderful. Thank you so much for sharing!
+
+reply
+Reply
+kongweihao
+
+Posted 3 years ago
+
+· 332nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+May I ask what machine you are using for the experiment? These experiments seem to require very good machines
+
+reply
+Reply
+kongweihao
+
+Posted 3 years ago
+
+· 332nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much if you can recover
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Yes, I use multiple A100 GPUs in the last week to train the final models with 1024-size image. Until then, I use my local machine with one RTX3090 GPU and 1TB M2 nvme SSD (3500 MB/s bandwidth). SSD is also important to load large data quickly for many times (many epochs)
+
+reply
+Reply
+kongweihao
+
+Posted 3 years ago
+
+· 332nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thank you for your answer, which has greatly inspired me
+
+reply
+Reply
+Darshan Patel
+
+Posted 3 years ago
+
+· 65th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Nicely done! I will definitely make use of your technique to shift masked labels as part of the model building framework. Thanks for sharing!
+
+reply
+Reply
+delai50
+
+Posted 3 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for the solo win! I would like to ask a few questions:
+
+You created 10 folds using train folder, train only 5 of them and validate those on given validation set, right?
+Why you passed only the quarter of the features to the decoder?
+Why you dropped the final decoder layer of upscale to output 512x512 in the case of single frame model?
+
+Thanks for sharing
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes. I thought 10% validation set is sufficiently large and additional 10% from 80% to 90% in the train might help compared to 5 fold. I didn't see a difference between 5 fold and 10 fold at least with small models though.
+
+The quarter is the upper-left quarter for t=4. That is what the U-Net decoder should get from skip connection to output segmentation mask at t=4.
+
+I assumed the upscale to 1024 is unnecessary and 512 is sufficient but I don't know. I didn't tried.
+
+reply
+Reply
+Patchef
+
+Posted 3 years ago
+
+· 63rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Did you use different learning rates for encoder and decoder? It improved my score a lot
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I tried 10 times smaller learning rate for encoder and it improves the first 10 epochs nicely but underperformed at the end of 40 epochs. I also tried completely freezing the encoder, but that was not good at all. Training the encoder is necessary.
+
+There must be some learning rate for encoder better than the single learning rate, but I could not find it and spend time on other issues.
+
+reply
+Reply
+Suraj
+
+Posted 3 years ago
+
+· 679th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing the write up @junkoda ! Kudos on winning the competition.🎉
+
+reply
+Reply
+Bananafin
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hello, congratulations on achieving the first-place result.
+
+I have reviewed your GitHub code and noticed that in "unet1024/data.py," on line 87, the code "x=f['x'][3,:]" means that it is selecting data from the fourth time step, and on line 109, you are resizing the image to 1024x1024 with "x=self.resize(x)." This approach differs from what you mentioned in the discussion, where you described combining time steps 1-4 to create a 1024x1024 image ("The only thing I could do was to pack four 512×512 images at t=1,2,3,4 into one 1024×1024 image").
+
+Could you please clarify this inconsistency and explain how these two approaches might impact the final results differently?
+
+reply
+Reply
+🐢 Jun Koda
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, Thanks for checking it out. unet1024 is the single time 1024x1024 model. The 4-panel model is in vit4 directory.
+
+reply
+Reply

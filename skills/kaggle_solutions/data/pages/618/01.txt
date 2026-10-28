@@ -1,0 +1,215 @@
+url: https://www.kaggle.com/c/uspto-explainable-ai/discussion/522233
+fetched: 2026-10-27
+chars: 4017
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — USPTO - Explainable AI for Patent Professionals
+1st place solution
+
+USPTO - Explainable AI for Patent Professionals
+
+Solution Writeup · 1st place
+
+Thanks to the hosts for this interesting competition. Congratulations to the winning teams. Thanks also to @tomyanabe for competing with me.
+
+summary
+Simulated Annealing
+Only AND, OR
+Omission of AND using -
+query
+
+The format of the query is as follows: (ti:word1-ti:word2-detd:word3-…-cpc:wordN) OR …
+
+The query is composed only of AND, OR
+By connecting words with -, the AND token can be omitted
+cpc cannot be omitted with -, so cpc is placed last
+Use all words for cpc, title, abstract
+Delete words with high frequency (100,000 or more) for claim, description
+candidate generation
+
+Define a sequence of words connected by AND as a subquery. Generate candidates for subqueries to be used in the query through the following steps:
+
+Generate a set of words to be used in subqueries
+All words possessed by a single target
+Common set of words possessed by two targets
+Sort words by the number of elements
+Add words until the patent set consists only of targets, and make it a subquery
+The patent set is obtained by taking the common set of each word
+If there are non-targets after combining all the words, that subquery is not a candidate
+tips for improvement
+Reduce computational complexity by adding words in ascending order of elements
+The complexity of calculating the common set of two sets s, t is min(len(s), len(t))
+Speed up the calculation of the common set using cupy
+2-3 times faster compared to using set(a) & set(b)
+cp.intersect1d(array1, array2)
+On the final day, speeding up with this allowed using all cpc, title, abstract, and the rank improved from 3rd to 1st
+Reduce memory usage by placing only patents appearing in test.csv (2500*50) and the words those patents possess in memory
+Simulated Annealing
+Combine subqueries with OR
+Neighborhood
+50% chance to add one unused subquery
+50% chance to remove one used subquery
+Score function
+The number of targets included in the search results of the query
+Consider only the number of targets as candidates are subqueries with zero non-targets
+Duplicate removal
+Reduce the number of candidates by removing duplicates, as subqueries with the same target set do not need multiple candidates
+code
+
+https://www.kaggle.com/code/tanakar/sa-cpc-title-abst-clm-desc-10-5-allpub-cupy-sub
+
+Authors
+T0m
+
+tomyanabe
+
+tk
+
+tanakar
+
+arrow_drop_up
+39
+Share
+more_horiz
+Citation
+
+T0m, tk. 1st place solution. https://www.kaggle.com/competitions/uspto-explainable-ai/writeups/tk-t0m-1st-place-solution. 2024. Kaggle
+
+comment
+10 Comments
+3 appreciation comments
+Hotness
+Labmus Qooraf
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+It helped me a lot
+
+reply
+Reply
+Ateeq Ur Rehman
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Amazing Work, will definitely want you to be my mentor.
+
+reply
+Reply
+Suzuki Shunta
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+NICE, I study English and Data Science
+
+reply
+Reply
+Qiao Shang
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+masterpiece.
+
+reply
+Reply
+Abdullah Ali Abdullah
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+good job broo
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 2 years ago
+
+· 256th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning the top place in this competition. Thanks for sharing the details of your solution. Looking forward to reviewing your code.
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (3)
+Iris W
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing!
+
+ginger
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+thank you for sharing
+
+Aadit Shukla
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+thank you for sharing @tanakar

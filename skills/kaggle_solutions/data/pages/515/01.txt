@@ -1,0 +1,364 @@
+url: https://www.kaggle.com/c/AI4Code/discussion/360501
+fetched: 2026-10-27
+chars: 6958
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Google AI4Code – Understand Code in Python Notebooks
+1st Place Solution
+
+Google AI4Code – Understand Code in Python Notebooks
+
+Solution Writeup · 1st place · Dec 12, 2023
+
+Overview
+
+I used single list-wise deberta-v3-large trained on all competition data. Input text is cells separated with [SEP] and [CLS] tokens.
+
+Code
+
+training code: https://github.com/hydantess/2022-Google-AI4Code-1st-Place-Solution
+inference notebook: https://www.kaggle.com/code/hydantess/ai4code0729?scriptVersionId=103060429
+
+What Worked
+
+MLM
+preprocessing
+Reasoning and context: It makes text shorter, so we can handle longer text.
+use deberta rather than codebert
++lstm head
+bigger cell_cnt and seq_length
+Reasoning and context: metric function cares more about long text.
++postprocessing: predict code and markdown both, then sort code by ground truth.
+Reasoning and context: more reasonable than only predict markdown, and concat with code cells.
+
+What Didn’t Work
+
+translation: facebook/mbart-large-50-many-to-one-mmt
+Reasoning and context: most notebooks are in english. Or I did something wrong.
++code rank to dense layers
+Reasoning and context: I should try to concat text with rank information. Model will learn better.
+extract embedding, then train a transformer model
+Reasoning and context: I should pre-train the extracting model first.
+xlm-robert-large or mdeberta-v3-base
+Reasoning and context: much worse than deberta-v3-large. so can not ensemble directly.
+
+Important Citations
+
+https://www.kaggle.com/code/ilyaryabov/fastttext-sorting-with-cosine-distance-algo by ilyaryabov
+https://www.kaggle.com/competitions/AI4Code/discussion/327626#1804178 by Nguyentuananh
+
+Additional Context
+
+loss is MAE.
+MLM on training data for 15 epochs, max_length is 1024. It takes 3 days.
+training for 10 epochs, max_length is 2048. It takes 7 days. I think set max_length to 5120 will greatly improve model performance but I have not enough A100~
+inference: max_length is 5120. It takes 6 hours.
+I used 1 * A100(80GB) for the last two weeks and 1 * 3090(24GB) at the early stage.
+Future work:
+concat text with rank information: flag + rank_1 + cell_1 + flag+ rank_2 + cell_2 + … + flag+ rank_n + cell_n
+multi languages
+extra training data
+Adversarial Weight Perturbations (AWP), but too time-consuming
+
+Thanks and Acknowledgements:
+
+Thanks to competition organizers for hosting such an amazing NLP competition. And thanks to the great notebooks and discussions, I learned a lot.
+
+Team Members:
+
+@hydantess .
+Author
+hyd
+
+hydantess
+
+arrow_drop_up
+62
+Share
+more_horiz
+Citation
+
+hyd. 1st Place Solution. https://www.kaggle.com/competitions/AI4Code/writeups/hyd-1st-place-solution. 2022. Kaggle
+
+comment
+28 Comments
+Hotness
+Dmytro Poplavskiy
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations on winning the challenge!
+
+An impressive result, especially for the single model without ensembling.
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks. Your poly-encoder like approach is also very impressive. I tried translating and using xlm-roberta model but failed!
+
+reply
+Reply
+Jose A. R. Fonollosa
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations to @hydantess and all the prize winners! You are the geniuses!!!
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You are the genius too! I am very happy competing with you~
+
+reply
+Reply
+Vadim Irtlach
+
+Posted 4 years ago
+
+· 96th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Your solution, especially the max length of the input, blew up my mind 😄… I hope, you won't have an OOM error at the end 🙏
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I tested it before. So it's fine.
+
+reply
+Reply
+Gregor Lied
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your solo gold and your current 1st place position. Good luck to you for the final reruns. First of all, thank you for your solution write-up. I got two follow-up questions: (1) Did you check the model results with and without text preprocessing? Did this step help you a lot? (2) Considering that you used deberta-v3-large and the number of days it took you for training: Were you able to perform hyperparameter tuning? Were you working on a sub-sampled dataset to speed up your experiments?
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+1) It makes text shorter, so we can handle long text. Otherwise 5120 is not enough. 2) Yes. I only sample 30000 notebooks for fast experiment at the early stage.
+
+reply
+Reply
+Leon
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on entering top10! How do you deal with multiple languages, with deberta models?
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I didn't deal with multi languages situation, so just list it in feature work. I think Dmytro Poplavskiy's poly-encoder like approach may help.
+
+reply
+Reply
+7 more replies
+arrow_drop_down
+ShinSiang
+
+Posted 4 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Are you using percentile ranks or just the absolute ranks as target?
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+percentile ranks.
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+Teemo
+
+Posted 4 years ago
+
+· 477th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Can you explain your listwise method more detailly? Or just throw me a document or website?
+
+reply
+Reply
+Fiem Fager
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Now you are the top of the leaderboard. Great.
+
+reply
+Reply
+kyle
+
+Posted 4 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! and thank for sharing your solution. I have one question here. What's the output of the model? I am confused because from your code the output dimension is 1, and the previous context indicates the target is more than one dimensions. Or is it list-wise or point-wise model?
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+List-wise.
+
+reply
+Reply
+Andrey Bazhan
+
+Posted 4 years ago
+
+· 425th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! Can you explain in more detail 1) what is your input representation of a notebook (x)? 2) what is model output (num_classes=1)? 3) how this output converts to total ordering? 4) What is your input to deberta during MLM? Is it all cells concatenated (after preproc)?
+
+reply
+Reply

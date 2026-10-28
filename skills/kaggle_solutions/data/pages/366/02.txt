@@ -1,0 +1,86 @@
+url: https://www.kaggle.com/niyamatalmass/1-introduction-to-the-solution-of-dsg-eie
+fetched: 2026-10-27
+chars: 960
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Niyamat Ullah · 7y ago · 1,762 views
+arrow_drop_up
+14
+Copy & Edit
+76
+file_download
+Download
+more_vert
+1. Introduction to the solution of DSG: EIE
+Notebook
+Input
+Output
+Logs
+Comments (0)
+history
+Version 12 of 12
+Runtime
+play_arrow
+
+6s
+
+Input
+Competitions
+
+DS4G - Environmental Insights Explorer
+
+Language
+
+Python
+
+Table of Contents
+Introduction to the solution of DSG: Environmental Insights Explorer
+Notebook Overview
+Methodology
+Conclusion
+Competition Notebook
+
+DS4G - Environmental Insights Explorer
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+1 file
+output
+Output
+0 files
+list_alt
+Logs
+6.3 second run - successful
+comment
+Comments
+0 comments

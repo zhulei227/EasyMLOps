@@ -1,0 +1,384 @@
+url: https://www.kaggle.com/c/kore-2022-beta/discussion/317737
+fetched: 2026-10-27
+chars: 10194
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Kore 2022 - Beta
+1st Place Solution
+
+Kore 2022 - Beta
+
+Solution Writeup · 1st place · Apr 9, 2022
+
+Ahoy, there!
+
+My solution is a simple rules-based agent which sequentially performs some basic operations:
+
+shipyard defence - We can find out where and when our shipyard will be attacked, and we have time to form a defense. Knowing how many ships are currently in the shipyard and how many my ships will arrive in the near future, I can say exactly what minimum number of additional ships I need to get for a successful defense. If the shipyard has enough spawning capacity and time, then I just create the necessary number of ships in the shipyard. But if that's not enough, then I will send ships from the nearest shipyards to help.
+
+shipyard attack - The same thing, I know the exact number of ships that need to be sent to capture a shipyard. Unfortunately it doesn't always work.
+
+direct attack - I launch a pirate fleet to intercept an enemy fleet, just as simple as that. And of course I choose a route that will not overlap with the routes of enemy fleets.
+
+adjacent attack- It's looks like this: . I sacrifice my fleet, but at the same time I create double or even triple damage to the opponent.
+
+expansion - I create new shipyards if I have an surplus of kore, and my current spawning capacity is much less than I can mine.
+
+mining - I look at the huge number of possible routes that are available to me, and choose the one that will give me the largest number of kores per turn. At the same time, I check that a route does not intersect with routes of opponent's fleets. This was very important in 4p games, but I'm not sure how much it's necessary in 2p games.
+
+spawn - I spawn as much as possible until my fleet outnumbers the opponent's fleet by several times.
+
+I can share the code, but I'm not sure if it would be appropriate. Will it harm the upcoming competition? What do you think?
+
+I hope you enjoyed this little competition as much as I did. See you in the next one!
+
+Edit: you can find my code here
+
+Author
+aDg4b
+
+egrehbbt
+
+arrow_drop_up
+58
+Share
+more_horiz
+Citation
+
+aDg4b. 1st Place Solution. https://www.kaggle.com/competitions/kore-2022-beta/writeups/adg4b-1st-place-solution. 2022. Kaggle
+
+comment
+24 Comments
+1 appreciation comment
+Hotness
+robga
+
+Posted 5 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+Good of you to share your approach. I took a similar approach, but did less of it, and did it less well :-)
+
+I only had a few evenings to work on it, so I started with the kaggle provided baseline simp_agent which scores about 1210 - see https://github.com/Kaggle/kaggle-environments/blob/master/kaggle_environments/envs/kore_fleets/kore_fleets.py#L149
+
+Once I understood the rules and had games to watch … I fixed some small bugs and made default fleet size 22 so it won dumb collisions, made it return end game cargo, made it search more complex patterns, made it send ships between SYs (1400). etc All that and in 4th just 2 points away from 3rd place and kaggle swag (sad face).
+
+Edit: adg4b was good enough to share 1st place code. My 4th place bot seems to lose 47.5% to 52.5% against it.
+
+reply
+Reply
+Bharath Devanaboina
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning the beta competition!
+
+reply
+Reply
+MarkHaoxiang
+
+Posted 5 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congrats on winning the competition!
+
+My approach was basically the same thing, just worse. Some points to consider:
+
+I tried to prioritise attacking enemy shipyards over expansion. With mining about equal and kore quickly reaching surplus about 200 turns in, the real resource are the number of ships, and its really hard to defend with 50 fewer ships on a 20x20 map.
+Instead of separating pirates and mining, I used one large heuristic function to evaluate all possible paths.
+Most important 3 lines in my agent:
+    boards : List[Board] = [board]
+    for i in range(40):
+        boards.append(boards[-1].next())
+
+
+I think the current game engine is built on Python? Not sure. It would probably be a priority for most competitive teams, both rule based and ML to try and make their own fast Board class and engine, either with Cython or C++. In fact, I can already see a lot of successful algorithms relying on future lookaheads. (MCTS anyone?). And a custom viewer would also be important. Will be attempting both in the upcoming weeks, would be nice to make it an open sourced community effort.
+
+reply
+Reply
+Zhu Liang
+
+Posted 5 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Personally I would hate to see a reality where MCTS wins the game over other approaches. It would just be a competition of who can write the fastest code to simulate the game.
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+SirBananaKitten
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations on winning the beta competition!
+
+Even though my approach was very similar, your implementation was much better. Especially the early game seems to be optimized way better in your agent.
+
+Here are some points that I did differently:
+
+My mining routes actively tried to collide with weaker enemy ships.
+I mined Kore only if I could use it for ship production in the next 30 turns.
+As soon as I had 1.2x more ships than the opponent, I started an attack
+
+Now I am very excited about the real competition and look forward to discovering many creative and new strategies. Hopefully Reinforcement Learning will prove to be more important there as well.
+
+reply
+Reply
+Bovard Doerschuk-Tiberi
+
+Kaggle Staff
+
+Posted 5 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Congrats @egrehbbt ! The main Kore competition will launch early next week and run for multiple months. I don't think sharing your code will harm the upcoming competition other than create a lot of copies of your agent in the leaderboard! I suspect the medal-worthy bots will be significantly higher in rank.
+
+reply
+Reply
+aDg4b
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks, I have added a link to the code
+
+reply
+Reply
+robga
+
+Posted 5 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, I have added a link to the code
+
+Some of the top agents on the "real" competition challenge sure look to be performing like your agent @egrehbbt ! It certainly makes for a solid "baseline" to reach in coming days/weeks.
+
+reply
+Reply
+Zhu Liang
+
+Posted 5 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Super cool! I also used rule-based agents in the beginning and got to top 3 at one point.
+
+Then I pivoted to try out ML approach and spent about a week just to get a basic DQN baseline working (other commitments IRL as well).
+
+I am really excited to see if I can somehow merge these two and create an agent driven by both ML (on a high level) and rules (on an execution level). I guess I will try that in the official competition.
+
+reply
+Reply
+masaishi
+
+Posted 5 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+The code is so beautiful and would be a good reference for writing agent code for me. I didn't take defense into account at all, so I will use this reflection next time. Thank you so much for sharing!
+
+reply
+Reply
+Vladi Krajnak
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you very much for sharing your code, it does help newcommers get up to speed a lot
+
+reply
+Reply
+
+This comment has been deleted.
+
+Gia Lâm Phan
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+The code is so beautiful and would be a good reference for writing agent code for me.
+
+reply
+Reply
+Samuel
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @egrehbbt ! I'm studying your code to get an insight into which if-then rules helped your bot dominate in the beta competition. I see that you have a few similar classes PlanPath, PlanRoute, BoardPath, BoardRoute. I'm not quite sure what the differences are. Could you briefly explain their differences?
+
+reply
+Reply
+aDg4b
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, these classes can be confusing. Not sure that it was reasonable to create them.
+
+In general. PlanPath and PlanRoute are just instructions that can be applied to any fleet. BoardPath and BoardRoute are exact routes, we can find out the exact position of the fleet at any given time.
+
+Something like that:
+
+PlanPath(North, 3) - a simple instruction: 3 steps to the north
+PlanRoute([PlanPath(North, 3), PlanPath(East, 2)]) - a complex instruction: 3 steps to the north and then 2 steps to the east
+BoardPath(field[0, 0], PlanPath(North, 3)) - a simple route: start at Point (0, 0) and move 3 steps north until you reach Point (0, 3)
+BoardRoute(field[0, 0], PlanRoute([PlanPath(North, 3), PlanPath(East, 2)])) - a complex route: Point (0, 0) -> Point (0, 3) -> Point (2, 3)
+reply
+Reply
+Ahmed
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+It was a good approach to follow up with, guys! I just want to ask one question. Did you deal with the environment as a deterministic environment or a probabilistic environment?
+
+reply
+Reply
+aDg4b
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The whole game is deterministic, there is no randomness or hidden information. So I was dealing with a deterministic environment.
+
+reply
+Reply
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+It's great that you are posting your code. I think it will be helpful for people who are trying to learn how to code.
+
+reply
+Reply
+
+This comment has been deleted.
+
+Bovard Doerschuk-Tiberi
+
+Kaggle Staff
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@endboss we'll have a leaderboard convergence period for the main competition, and I'm currently working on a something to disable old submissions!
+
+reply
+Reply
+Appreciation (1)
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing this!

@@ -1,0 +1,295 @@
+url: https://www.kaggle.com/c/planttraits2024/discussion/510393
+fetched: 2026-10-27
+chars: 10734
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution - PlantHydra 🐍 — PlantTraits2024 - FGVC11
+1st Place Solution - PlantHydra 🐍
+
+PlantTraits2024 - FGVC11
+
+Solution Writeup · 1st place · Jun 8, 2024
+
+PlantTraits2024 Solution Overview
+
+Hello everyone!
+
+Firstly, I'd like to extend my gratitude to the organizers and all participants for making this contest a fantastic experience. I'm thrilled to share that my solution secured 1st place in the PlantTraits2024 competition! Below, I outline my approach and key methods used. The full code and implementation details are available on my GitHub repository. Feel free to reach out with any questions or for further discussion.
+
+Overview of My Solution:
+
+Image Credits: DALL-E
+
+My solution involved a combination of multiple methods coming together, which I'll summarize here. The primary components are:
+
+1. The Three-Head Solution ("PlantHydra")
+
+Initially, I used only one head to directly regress the traits, but this approach was insufficient for accurately identifying plant traits. There is a clear correlation between plant traits and species, and even species from similar environments share common traits. For example, species from regions with higher rainfall typically have greener and larger leaf areas. In the PlantTraits contest, we estimate mean trait values for a species, making it crucial to correctly identify the species or a cluster of species with similar traits.
+
+With this in mind, I divided the training observations into 17,396 species based on unique plant traits, as explained in this notebook by Rich Olson. I then adopted a three-head approach:
+
+Regression Head: Estimates the normalized traits directly.
+Classification Head: Classifies the observation into one of the 17,396 species, and the corresponding species traits are chosen as the predicted traits.
+Soft Classification Head: Addresses long-tail classification issues and inter-species correlation by calculating the final trait values through a weighted sum of species traits, with weights derived from the classification head's softmax scores.
+
+Finally, these three heads were blended to obtain the final traits. The blending weights were made trainable to optimally weigh predictions from each head.
+
+2. DINOv2 VIT-b and VIT-l Backbone
+
+I experimented with ViT-b and ViT-l backbones for feature extraction due to their powerful performance in such tasks. A model pre-trained on the flora of southwestern Europe (based on Pl@ntNet collaborative images [1]) provided a significant boost in detecting plant traits.
+
+3. Structured Self-Attention for Metadata
+
+The metadata about climate, soil, etc., played a crucial role in estimating traits like nitrogen content and seed dry mass, as these factors directly affect plant growth. After several failed attempts with various consolidation approaches, such as PCA, I implemented a Structured Self-Attention module to identify correlations between traits and metadata, as well as within the metadata itself.
+
+4. Objective Functions
+
+This is the interesting part, as multiple objective functions were at play, and the weights for each were fine-tuned manually. Here is a breakdown by heads:
+
+Regression Head: R2 loss was used on normalized traits along with cosine similarity. It was essential not only to estimate individual traits accurately but also to maintain the correlation between all traits. Traits can be considered as a vector of dimension 6, and higher cosine similarity acted as a regularization to ensure the correct prediction of all traits.
+Classification Head: Focal loss was used to handle the long-tail classification task.
+Soft Classification Head: There was no dedicated loss for this head, as it was generated from the classification head itself.
+Blending Heads: A final R2 loss was used on unnormalized trait values, thereby allowing gradients to flow to all the heads.
+5. Fine Tuning with Dedicated Schedulers
+
+Fine-tuning the heads and backbone offered significant potential, as maintaining a delicate balance between underfitting and overfitting the model was crucial. Schedulers and optimizers played a key role in training the layers. Instead of using a single optimizer for both heads and the backbone, different learning rate schedules were employed.  In summary, the heads with no prior knowledge were given higher learning rates and were warmed up earlier. In contrast, the backbone layers had scaled-down learning rates to prevent overwriting useful information.
+
+6. Mixture of Experts
+
+Finally, various model flavors were trained, some excelling in regressing traits directly and others in classifying species. The soft classification head outperformed individual models, striking a balance between hard classification and regression. The winning submission combined different heads from various models, weighted manually.
+
+Things That Didn't Work Out
+Cut-Mix Augmentations: Intended to improve generalization, but results were unsatisfactory.
+SD Variation in Target Traits: Although traits SD data was available, it was not useful for predicting mean traits of species in this competition. However, this data might be valuable for generalizing models on actual traits in future.
+Conclusion
+
+In summary, the blend of regression, classification, and soft classification heads, combined with advanced feature extraction and fine-tuning strategies, led to the winning solution. Feel free to reach out for any questions, and the full code is available on GitHub.
+
+References:
+
+[1] @misc{goeau_2024_10848263, author = {Goëau, Hervé and Lombardo, Jean-Chirstophe and Affouard, Antoine and Espitalier, Vincent and Bonnet, Pierre and Joly, Alexis}, title = {{PlantCLEF 2024 pretrained models on the flora of the south western Europe based on a subset of Pl@ntNet collaborative images and a ViT base patch 14 dinoV2}}, month = mar, year = 2024, publisher = {Zenodo}, doi = {10.5281/zenodo.10848263}, url = {https://doi.org/10.5281/zenodo.10848263} } https://zenodo.org/records/10848263
+
+Author
+Daft Vader
+
+syeddanish
+
+arrow_drop_up
+29
+Share
+more_horiz
+Citation
+
+Daft Vader. 1st Place Solution - PlantHydra 🐍. https://www.kaggle.com/competitions/planttraits2024/writeups/daft-vader-1st-place-solution-planthydra. 2024. Kaggle
+
+16
+comment
+12 Comments
+Hotness
+Jack Lee
+
+Posted 2 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you for sharing this insightful solution! The soft classification strategy seems very reasonable, and I regret that we didn't explore this method 😔. Choosing a pre-trained model more relevant to the data also appears to be a very good practice. I'm curious, in the final mixture stage, we found that using stacking worked better than manual weighting (ensemble models yielded the best results, and ridge regression was also a good choice). I wonder if this approach was not applicable in your case?
+
+reply
+Reply
+1
+Daft Vader
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Stacking seems more reasonable for blending the branches. However, I didn't enough time to use that approach, it would probably yield the most optimal solution.
+
+reply
+Reply
+Jack Lee
+
+Posted 2 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for your response! Congratulations on securing first place!
+
+reply
+Reply
+1
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+I'm a beginner in this field. I'm currently exploring the StructuredSelfAttention module and have a question about its implementation. Given that the input x_ is of shape (batch_size, input_dim), Q, K, V are of shape (batch_size, output_dim) and the resulting attention_scores and attention_weights will have a shape of (batch_size, batch_size). This setup calculates attention weights between different samples in the batch rather than within a single sample, which is not typical for self-attention mechanisms. Maybe my understanding is wrong. I'm eager to learn and appreciate your insights on this matter.
+
+reply
+Reply
+Daft Vader
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Your observation is correct, and it highlights a key point about how self-attention mechanisms typically work. In the StructuredSelfAttention module, the way the attention scores and weights are being calculated is indeed not typical for self-attention mechanisms. Thanks for catching this oversight.
+
+reply
+Reply
+Behzad Ansarinejad
+
+Posted 2 years ago
+
+· 152nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on the first place and thanks a lot for sharing your code and explaining it in detail! This was my first kaggle competition and definitely learnt a lot from your approach!! 🙂
+
+reply
+Reply
+1
+Nathan Mandi
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Your method of multiple heads including a blended head seems really cool to me. I'm curious, how did you determine the weightings for the different heads?
+
+Also, did you pretrain your image encoders on Pl@ntNet images yourself? I'd love it you could point me to that code in the repo if it's available
+
+reply
+Reply
+1
+Daft Vader
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for your kind words. For blending, the weights for each head were made learnable starting from ones, gradient descent optimized the weights based on the objective function. The encoder was pre-trained by the author of the cited work. I believe they do have config files for pre-training the network on their page.
+
+reply
+Reply
+1
+Nathan Mandi
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Hi there, congrats on the win! It looks like you really earned it :). And I love the plant hydra logo! I just wanted to say thanks a ton for the detailed post here, my team is reading it and your code and learning a lot
+
+reply
+Reply
+1
+Daft Vader
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for your kind words. The plant hydra logo was generated by chat gpt 😅
+
+reply
+Reply
+emoji_people
+Giacomo Ignesti
+
+Posted 2 years ago
+
+· 167th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Just a curiosity you remove around 2000 species, since you choose a 0.98 quartile and remove al negative traits (thanks for the GiTHUB btw) that is quite a lot, the performance where lower with these traits? And if yes how much lower? Thanks
+
+reply
+Reply
+Ivan Kadilenko
+
+Posted 2 years ago
+
+· 153rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Заходи в переводчик
+
+reply
+Reply
+
+This comment has been deleted.

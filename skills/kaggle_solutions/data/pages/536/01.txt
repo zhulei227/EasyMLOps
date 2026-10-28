@@ -1,0 +1,298 @@
+url: https://www.kaggle.com/c/playground-series-s3e7/discussion/390976
+fetched: 2026-10-27
+chars: 7814
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Binary Classification with a Tabular Reservation Cancellation Dataset
+1st place solution
+
+Binary Classification with a Tabular Reservation Cancellation Dataset
+
+Solution Writeup · 1st place · Feb 28, 2023
+
+Feature Engineering Although all of the data was numeric, a look at the data description revealed that the features type_of_meal_plan, room_type_reserved, and market_segment_type were actually categorical in nature. I handled these variables in 3 different ways:
+
+Leaving them as is
+One-hot encoding them
+Marking them as categorical features (used for LGBM)
+
+I played around with creating additional features, but I didn't find anything that improved my CV significantly.
+
+Data Leakage Within the train and test set, there were 1531 pairs of records that were duplicates if you dropped booking status.
+
+562 of those pairs were in the train set, and upon closer inspection, each of those pairs had opposite booking statuses.
+253 of those pairs were in the test set.
+The remaining 716 pairs included 1 record in the train set and 1 record in the test set.
+
+Out of curiosity, I tried modifying a submission by setting the predictions for those 716 records in the test set to the opposite of their corresponding record in the train set, and got a boost of +.014 to my leaderboard score. I naively hoped to keep this secret to myself, but it was quickly discovered by the rest of the community 😅 However, I do have to thank @siukeitin for their suggestion to predict .5 for the 253 pairs of duplicates in the test set. This boosted my score by +.003, and I don't believe this trick was as well-known.
+
+Additionally, I removed from the train set the 562 duplicate pairs, plus the 716 records that had a duplicate in the test set, as I found that doing so improved my score on a holdout set I constructed to test this. I think this only resulted in a minor increase in my private score though. However, I do think that perhaps removing the train duplicate pairs helped make my CV more reliable.
+
+Data Cleaning
+
+When running adversarial validation between the train and original datasets, I plotted for the original dataset the predicted probability of belonging to the train set and got a bimodal distribution like this: 
+
+This led me to experiment with removing the chunk of the original dataset that looked the least like the train set. I ended up using models that both included the entire original dataset and models that removed ~17% of the original dataset that looked the least like the train set.
+
+I also played around with things like fixing dates, but didn't see significant improvement in CV score from doing so.
+
+Modeling My CV setup was a stratified 3-fold with 3 repeats. For creating submissions, predictions from each fold were averaged. When tuning hyperparameters, one thing I noticed was that increased tree expressiveness seemed to improve performance to a much greater degree than what I had been used to. This meant using XGBoost with the 'exact' algorithm instead of 'hist' and max_depths around 12-13, and using LGBM with larger max_leaves and max_bin values.
+
+My winning submission was an average of the following 4 XGB submissions and 2 LGBM submissions:
+
+XGB
+XGB with categorical variables one-hot-encoded
+XGB with reduced original dataset
+XGB with categorical variables one-hot-encoded and reduced original dataset
+LGBM with reduced original dataset
+LGBM with categorical features and reduced original dataset
+Author
+Hardy Xu
+
+hardyxu52
+
+arrow_drop_up
+57
+Share
+more_horiz
+Citation
+
+Hardy Xu. 1st place solution. https://www.kaggle.com/competitions/playground-series-s3e7/writeups/hardy-xu-1st-place-solution. 2023. Kaggle
+
+comment
+15 Comments
+1 appreciation comment
+Hotness
+icfoer
+
+Posted 4 years ago
+
+· 85th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! I knew that you would be the first.
+
+About the leak : in fact, I only found it because you came in first place. I couldn't believe that someone had found the "golden bullet". I heard that on kaggle, in competition with AUC, there is a trick for this - people submit (1-predict) so as not to be at the top of the leaderboard.
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you!
+
+I heard that on kaggle, in competition with AUC, there is a trick for this - people submit (1-predict) so as not to be at the top of the leaderboard.
+
+Haha, that's actually pretty clever.
+
+reply
+Reply
+Joshmi Joshua Mable
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congartulations…
+
+reply
+Reply
+Jose Cáliz
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congartulations on achieving first place
+
+ I do have to thank @siukeitin for their suggestion to predict .5 for the 253 pairs of duplicates in the test set. This boosted my score by +.003, and I don't believe this trick was as well-known.
+
+
+Yes I did the same on my submissions, a value of .5 is standard but the best value can be obtained by calculating the median because AUC is about ranking.
+
+reply
+Reply
+Hardy Xu
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, congratulations on your second place! Actually I tried predicting other values, including mean and median, and found they decreased my score compared to predicting .5. Also, I'm not convinced that predicting the median is theoretically correct. If we assume the booking status percentage is around 38% like it was in the train set, then I would think you would want to predict higher than the median, since the booking rate for the pairs of duplicates is 50%.
+
+reply
+Reply
+Jose Cáliz
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think you are correct, the right value is the percentile (1 - 0.38) because is where the optimal threshold should be to perfectly divide both sets, I got confused while writing it 😅
+
+reply
+Reply
+Yue Sun
+
+Posted 4 years ago
+
+· 88th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I did not notice that there exists a data leakage to use. Good findings!
+
+reply
+Reply
+Manas Tripathi
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Is there a notebook to look at ?
+
+reply
+Reply
+Pardeep Singh
+
+Posted 4 years ago
+
+· 67th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning this competition @hardyxu52 and thanks for sharing your solution writeup 🙌🙏
+
+reply
+Reply
+Pasquale
+
+Posted 4 years ago
+
+· 39th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, I've also used the strategy suggested by @siukeitin (great tip btw) for the duplicates in the test set and that improved my score 😏
+
+reply
+Reply
+Matt OP
+
+Posted 4 years ago
+
+· 37th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Well deserved win @hardyxu52, nice solution writeup as well. Predicting 0.5 for the 253 pairs of duplicates in the test data was a clever strategy!
+
+reply
+Reply
+Shiva Kant Mishra
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@hardyxu52 ,Thanks for the sharing your winning solution
+
+reply
+Reply
+gemammi
+
+Posted 4 years ago
+
+· 167th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Nice explanation there and congratulations!, especially to point out the categorical features and how to handle them, I did notice about it earlier but all the discussion didnt mention it, so i got carried away to leave them as is
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (1)
+Mohammad Tanvirul
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for your winning solution

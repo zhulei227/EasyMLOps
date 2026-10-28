@@ -1,0 +1,529 @@
+url: https://www.kaggle.com/c/santa-2024/discussion/560560
+fetched: 2026-10-27
+chars: 9996
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Santa 2024 - The Perplexity Permutation Puzzle
+1st place solution
+
+Santa 2024 - The Perplexity Permutation Puzzle
+
+Solution Writeup · 1st place · Feb 1, 2025
+
+Thank you to the organizers for hosting the annual Santa competition. I really enjoy the Santa format without restrictions on program execution time, and I’m truly honored to have achieved such great results this time.
+
+Here is our repo and the explanation of our solution (en/ja). https://github.com/Lgeu/santa2024
+
+Authors
+c-number
+
+cnumber
+
+nagiss
+
+nagiss
+
+kibuna
+
+kibuna
+
+arrow_drop_up
+85
+Share
+more_horiz
+Citation
+
+c-number, nagiss, kibuna. 1st place solution. https://www.kaggle.com/competitions/santa-2024/writeups/hamiltonians-1st-place-solution. 2025. Kaggle
+
+4
+4
+10
+comment
+49 Comments
+6 appreciation comments
+Hotness
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+This puzzle was definitely a brain teaser! I'm curious, what was the most common mistake people made? And congrats to everyone who solved it!
+
+reply
+Reply
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congrats to all the winners and everyone who participated! Sounds like it was a challenging and fun puzzle. Looking forward to next year's Perplexity Permutation!
+
+reply
+Reply
+emoji_people
+Veniamin Nelin
+
+Posted 2 years ago
+
+· 23rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+You found the best solution quite a while ago. Did you stop searching for improvements, and if so, at what point?
+
+reply
+Reply
+nagiss
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+To be honest, I never had confidence that we wouldn’t be overtaken. But seeing the same scores lining up at the top of the LB, and after seeing this post on X, I turned off the GPU and got ready to take down @cnumber .
+
+reply
+Reply
+c-number
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+I wasn't very confident either, so I left my GPU running. It ended up taking a toll on my electricity bill, but it warmed up the room and made the harsh winter cold a bit more bearable.
+
+It seems that I've been losing to @nagiss for now, but I'm planning to give it my all for the next 10 days in hopes of eventually winning.
+
+reply
+Reply
+2
+ayushokaay
+
+Posted 2 years ago
+
+· 1481st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+looks like lot of efforts @nagiss @cnumber
+
+reply
+Reply
+Fırat Kıyak
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. What did you do to stabilize online learning of the neural network? Didn't it tend to overfit, or go crazy? Didn't it made the search process much more unstable? Is your algorithm able to find the optimal solution w/o the neural network?
+
+reply
+Reply
+emoji_people
+Ali
+
+Posted 2 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing, I learn a lot from your work each year on Santa competitions 🫡
+
+reply
+Reply
+nagiss
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you Ali, and congratulations on your 3rd place finish and becoming Competitions Master!
+
+reply
+Reply
+emoji_people
+Pizzaboi
+
+Posted 2 years ago
+
+· 23rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi! I also tried to distill gemma for this smal domain we have, but really failed and lost in details. Could you please give more insight on build such a NN? I really would like to now EVERYTHING about it, as far spent month with no success
+
+reply
+Reply
+nagiss
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+NN is not a replacement for Gemma, but it was introduced to exclude word sequences that clearly worsen the score before letting Gemma score them.
+
+While Gemma is a transformer, I chose a ConvNet inspired by SE-ResNet for two reasons: (1) I'm not very experienced with training transformers, and (2) in this competition, how nearby words are arranged seemed to be more important than their global relationships. The model architecture can be found here. (Pretraining wasn’t actually necessary, and online learning during exploration turned out to be sufficient.)
+
+reply
+Reply
+WOOSUNG YOON
+
+Posted 2 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I believe the key point to solving sample5 is block rotation. 😄
+
+A common pattern observed in top solutions is a rotation mechanism that inserts blocks to their near neighbors. In other words, these solutions explore the space through small transformations without significantly altering the current state.
+
+If you think about it, the difficulty in exploration may make solutions scoring 28.52 and 31.5 seem far apart. However, I believe they are actually different local minima within the same basin.
+
+reply
+Reply
+YaGana Sheriff-Hussaini
+
+Posted 2 years ago
+
+· 145th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @ayushparwal and team. Thanks so much for sharing.
+
+reply
+Reply
+ayushokaay
+
+Posted 2 years ago
+
+· 1481st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+hey bro @sheriytm you tagged wrong.
+
+reply
+Reply
+ayushokaay
+
+Posted 2 years ago
+
+· 1481st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Interesting solution @nagiss much to learn.
+
+reply
+Reply
+emoji_people
+CPMP
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+NN based pruning is interesting, did not think of it.
+
+reply
+Reply
+1
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+cool logic
+
+reply
+Reply
+mohamed mustafa shaban
+
+Posted 2 years ago
+
+· 391st in this Competition
+
+arrow_drop_up
+-3
+more_vert
+
+Congrats to all the winners and everyone who participated! Sounds like it was a challenging and fun puzzle. Looking forward to next year's Perplexity Permutation!
+
+reply
+Reply
+proximus08
+
+Posted 2 years ago
+
+arrow_drop_up
+-1
+more_vert
+
+This was my first online competition and it was a great experience for me every team or individual were were making there best solution I learned a lot like many distance algorithms and so on.
+
+reply
+Reply
+
+Posted 2 years ago
+
+arrow_drop_up
+-2
+more_vert
+
+nice problem
+
+reply
+Reply
+Santiago Mota
+
+Posted 2 years ago
+
+· 227th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+Nice job and inspiring prunnig idea. Congrats
+
+reply
+Reply
+Dawood M D
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congrats , you have done a awesome job
+
+reply
+Reply
+mohamed mustafa shaban
+
+Posted 2 years ago
+
+· 391st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to all the winners
+
+reply
+Reply
+umitliguler
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to all the winners and thank you for sharing solutions
+
+reply
+Reply
+สุเทพ บุญเต็งชาญ
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Good to see you
+
+reply
+Reply
+Medhansh_Jain2306
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Very Infomative
+
+reply
+Reply
+Reginald Won
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+thanks for your share, it's nice and good!
+
+reply
+Reply
+Dhanunjai Reddy
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+nicely done
+
+reply
+Reply
+MuhammadHabibna
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Terimakasih banyak bro
+
+reply
+Reply
+vialactea
+
+Posted 2 years ago
+
+· 35th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on the 1st place and thanks for sharing. I'm curious about how well your model worked.
+
+I tried various methods to prune the solutions before running the gemma score (e.g., smaller gemma model, word scores at a given position + best path til the end based on average word scores, …) with some degree of success. However, none was nearly as effective as a simple NN model. I started with a tiny convolution model (21k parameters) and ended up sticking with it because larger models didn't seem to perform any better and I was able to train it on Kaggle's CPU (allowing me to save the GPU quota). Initially I was using pruning stochastically (to assign a probability of picking a solution), but in light to how well it performed, I switched to using it deterministically (with a parameter that indicated which percentage of steps used the model to prune versus running the gemma scorer directly).
+
+For 1k batches the average ranking error was anywhere from 70 to 90 (out of 1024 positions). Moreover, the top 10% solutions were 60% to 85% correct (i.e., they were also within the top 10% of real scores) and they included the top 10 real solutions. These numbers are for the cases in which the train and test samples were generated from different experiments. If I mixed them, the performance would be much better because of some level of leakage between the train and test samples.
+
+Larger models (including attention models with rotary positional embeddings) didn't perform better, but I wonder if it was because I trained them with a small sample and for few epochs (training on CPU takes a while). I wonder how much better a larger and more sophisticated model would do. How well did you model perform?
+
+reply
+Reply
+nagiss
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Regarding the error values, they depend on how the data for training and inference is sampled, so I don’t think it makes much sense to discuss them in detail. We trained the model as part of the exploration process, and during that process, we printed the Spearman’s correlation. However, the value varied significantly depending on whether it was right after a kick or not.
+
+Also, I’m not sure about the impact of model size. I initially chose a model size so that training would not significantly affect the exploration speed, and I did not adjust it afterward.
+
+reply
+Reply
+nicxxxx
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+hey this is v good, keep it up
+
+reply
+Reply
+ruanbingyan
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+nice problem
+
+reply
+Reply

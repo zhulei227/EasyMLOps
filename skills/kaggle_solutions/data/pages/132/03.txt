@@ -1,0 +1,75 @@
+url: https://github.com/jlnh/SeizurePrediction
+fetched: 2026-10-27
+chars: 4650
+
+GitHub - jlnh/SeizurePrediction · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ jlnh SeizurePrediction Repository navigation Code Issues 1  ( 1 ) Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ SeizurePrediction Public Notifications You must be signed in to change notification settings Fork 5  ( 5 ) Star 15  ( 15 ) You must be signed in to star a repository About No description, website, or topics provided. Resources Readme MIT license Activity Stars 15 stars Watchers 4 watching Forks 5 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 8 Commits 8 Commits Folders and files Name Name Last commit message Last commit date common common     seizure seizure     LICENSE LICENSE     README.md README.md     SETTINGS.json SETTINGS.json     SeizurePredictionDocument.pdf SeizurePredictionDocument.pdf     SeizurePredictionGraphicOutput.pdf SeizurePredictionGraphicOutput.pdf     cross_validation.py cross_validation.py     predict.py predict.py     predict_all.py predict_all.py     seizure_detection.py seizure_detection.py     train.py train.py     View all files Repository files navigation README MIT license More items American Epilepsy Society Seizure Prediction Challenge 
+ Description 
+ The code was written for the American Epilepsy Society Seizure Prediction Challenge . The software is written in Python. The standard numpy, scipy, scikit-learn and matplotlib packages are used extensively. 
+ Dependency 
+
+ Python 2.7 
+ scikit learn-0.14.1 
+ numpy-1.8.1 
+ pandas-0.14.0 
+ scipy 
+ hickle (plus h5py and hdf5, see https://github.com/telegraphic/hickle for installation details) 
+
+ Hardware and Runtime 
+ The computations were done in a desktop with intel i7 quad core CPU and 12GB RAM. The total computational time is about 2 hours when the classifier is set to use all the CPU threads. 
+ How to Generate the Solution 
+
+ Modify SETTINGS.json file and put the data in the data dir. Sample SETTINGS.json is given here 
+
+ {
+ "competition-data-dir": "seizure-data",
+ "data-cache-dir": "data-cache",
+ "submission-dir": "submissions",
+ "figure-dir": "figure"
+}
+
+ Run predict.py 
+ Check the submission file in submissions directory and the analytical graphic PDF file in figure directory 
+
+ About No description, website, or topics provided. Resources Readme MIT license Activity Stars 15 stars Watchers 4 watching Forks 5 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

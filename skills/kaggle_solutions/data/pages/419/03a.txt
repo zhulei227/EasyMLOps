@@ -1,0 +1,110 @@
+url: https://www.kaggle.com/meaninglesslives/rfcx-minimal
+fetched: 2026-10-27
+chars: 1146
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+-- · 5y ago · 4,971 views
+arrow_drop_up
+112
+Copy & Edit
+90
+file_download
+Download
+more_vert
+RFCX Minimal
+
+Copied from private notebook (+49,-13)
+
+Notebook
+Input
+Output
+Logs
+Comments (13)
+history
+Version 3 of 3
+Runtime
+play_arrow
+
+4h 40m 21s · GPU P100
+
+Input
+Competitions
+
+Rainforest Connection Species Audio Detection
+
+Datasets
+
+Birds Checkpoints 1
+
+birdsong resampled train audio 00 (a ~ b)
+
+birdsong resampled train audio 02 (g~m)
+
+birdsong resampled train audio 03 (n ~ r)
+
+trending_flat
+
+See All
+
+Tags
+Audio
+PyTorch
+Multilabel Classification
+Language
+
+Python
+
+Competition Notebook
+
+Rainforest Connection Species Audio Detection
+
+Private Score
+
+0.97161
+
+Best Score
+
+0.97170 V2
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+8 files
+output
+Output
+37 files
+list_alt
+Logs
+16820.8 second run - successful
+comment
+Comments
+13 comments

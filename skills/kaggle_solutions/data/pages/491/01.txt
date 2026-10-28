@@ -1,0 +1,138 @@
+url: https://www.kaggle.com/c/sorghum-id-fgvc-9/discussion/329049
+fetched: 2026-10-27
+chars: 2865
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Sorghum -100 Cultivar Identification - FGVC 9
+1st Place Solution
+
+Sorghum -100 Cultivar Identification - FGVC 9
+
+Solution Writeup · 1st place
+
+Thanks to Kaggle and the hosting team for an interesting competition.
+
+summary
+
+My method is very similar to that of the third place(sorghum-id-fgvc-9/discussion/328593).
+
+The main differences are as follows:
+
+I used convnext base network as backbone.
+I trained 5-folds models and ensembled them.
+I combined this contest data with fgvc8data to generate a new dataset with 223 categories instead of 100.
+results
+step	method	Public Score	Private Score
+1	convb+100categories	0.953	0.952
+2	convb+223categories	0.955	0.954
+3	ensemble(step1+step2)	0.959	0.957
+4	step3+pseudo label	0.963	0.962
+5	step4+5folds	0.965	0.965
+Authors
+wangzhe
+
+lonelygeese
+
+XuShower
+
+xu18251989808
+
+arrow_drop_up
+6
+Share
+more_horiz
+Citation
+
+wangzhe, XuShower. 1st Place Solution. https://www.kaggle.com/competitions/sorghum-id-fgvc-9/writeups/deepblueai-1st-place-solution. 2022. Kaggle
+
+comment
+4 Comments
+1 appreciation comment
+Hotness
+cygn
+
+Posted 4 years ago
+
+· 81st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Did you also use histogram equalization, instance normalisation, arcface and the other tricks of that 3rd place solution?
+
+reply
+Reply
+wangzhe
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I didn’t use instance normalisation and AWP train.Data enhancement strategies are also slightly different.
+
+reply
+Reply
+Abby Stylianou
+
+Competition Host
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+This is great! I'm finding that one of the most common elements across lots of different contests (I ran two this year) is the ensembling. I suppose that's not surprising, but it's interesting to me the extent to which the ensembles are the single most common element I see across many high performing approaches.
+
+I'm also interested in the fact that you combined data with last year's dataset! There was likely some overlap between the sorghum lines in the two contests, which means that some of your 223 categories were overlapping. Given that, I'm not shocked that that gave only a small improvement -- I wonder if you left out step 2 and 3 how things would have worked.
+
+Great job! (And my apologies for my delay in posting a follow up -- my whole extended family has come down with covid in the last few weeks and I've been basically entirely out of commission.)
+
+reply
+Reply
+Appreciation (1)
+I110143105
+
+Posted 4 years ago
+
+· 133rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+great, thanks for sharing :)

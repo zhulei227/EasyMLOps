@@ -1,0 +1,539 @@
+url: https://www.kaggle.com/c/arc-prize-2025/writeups/nvarc
+fetched: 2026-10-27
+chars: 16768
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+NVARC solution — ARC Prize 2025
+NVARC solution
+
+Synthetic Data Generation with LLMs and code generation + The ARChitects + TRM
+
+ARC Prize 2025
+
+Solution Writeup · 1st place · Dec 6, 2025
+
+The main components of our solution:
+
+Multi-stage synthetic data generation pipeline
+Improved version of the ARChitects solution
+Improved version of the Tiny Recursive Model
+
+Our overall workflow can be summarized by this picture. We will review each part in the rest of this writeup.
+
+Synthetic Puzzles
+
+We build a Synthetic Data Generation (SDG) pipeline with 4 main stages:
+
+Collect puzzle descriptions and generate puzzle summaries
+Mix two summaries and generate new more complex summaries
+Generate python code for the input grid logic
+Generate python code for the output grid logic
+
+The majority of generated data is made with gpt-oss-120b model using the NeMo-Skills framework. This framework provides many tools for LLM development, including large-scale SDG pipelines on Slurm cluster. You can find more information how to use this framework for SDG here. Running this model on a single node with 8xH100 GPUs gives us 15k tokens/s generation throughput.
+
+Puzzle summaries
+
+We collect the puzzle descriptions from two main sources. First, we found H-ARC, which was surprisingly underestimated in the ARC community. This dataset contains solution attempts from over 1700 humans on ARC problems, but more importantly it includes the natural-language solution descriptions. Second, we took 160 human written descriptions from BARC. After filtering and combining these descriptions we had descriptions for 716 training puzzles from ARC-AGI-2.
+
+Mix summaries
+
+We prompted LLM to join two puzzle summaries and produce a new more complex puzzle by combining elements from both. In total, we generated 266593 new puzzle summaries.
+
+Input grid programs
+
+Instead of generating a full puzzle program with input/output logic, we decided to split this into two stages. First - generate a Python program for the input grid logic, second - generate a program of the output grid logic, i.e. transformation rules. To generate reliable and good input grid logic we prompt the LLM to produce additional unit test for the input grid. In total, we generated and filtered 126901 input grid programs in Python code.
+
+Output grid programs
+
+We prompt LLM with puzzle description and corresponding input grid program to generate the relevant output grid program. Here we apply a different validation strategy. Instead of validating Python code with unit tests, we prompt the LLM multiple times for each input grid logic and filter out solutions which are not consistent. After filtering we had 103253 puzzles, where each puzzle has 1 input grid program and multiple output grid programs, but all of these output programs produce consistent output grids.
+
+The ARChitects
+
+For this approach we try to use as many puzzles as possible. In addition to our synthetic data we also used a few real puzzles datasets. Our final dataset includes 3.2M augmented samples, where each sample has up to 7 input/output pairs.
+
+Source	Unique puzzles	Augmented samples \ per puzzle	Total samples	Share
+MINI-ARC	147	256	37632	1.2
+ConceptARC	160	256	40960	1.3
+RE-ARC	400	256	102392	3.2
+ARC-AGI-2	609	256	155904	4.8
+NVARC training	47337	24	1132633	34.8
+NVARC full	55886	32	1785960	54.9
+	104539		3255481	
+
+ARC-AGI-2 training subset excludes RE-ARC puzzles. NVARC training subset based only on training puzzles from ARC-AGI-2. NVARC full subset uses both training and evaluation puzzles from ARC-AGI-2.
+
+The ARChitects approach has a simple representation of puzzles as a list of input/output grids. But we made it even simpler and used a dialog style template from Qwen3 model. For example, formatted message represents 1 pair of input/output grids looks like this:
+
+<|im_start|>user\n123\n456<|im_end|>
+<|im_start|>assistant\n78\n90<|im_end|>
+
+
+This simpler representation requires only 16 tokens: 10 - for digits, 1 - new line, “user” - start of input grid, “assistant” - start of output grid, 2 special tokens (<|im_start|>, <|im_end|>) and 1 for padding <|endoftext|>. We used the NeMo RL framework for the post-training stage. We run supervised fine-tuning with Megatron backend which allows us to efficiently utilize memory and computation resources of multiple nodes with H100 GPUs. For example, to do a full fine-tuning of the 4B model we used 4 nodes of 8xH100 for 27 hours.
+
+We used LoRA test-time fine-tuning for each puzzle independently with r = 256 and alpha = 32. We removed gradient checkpointing and we removed 4-bit quantization too. Test-time fine-tuning was run with bfloat16 precision. We also used Flash Attention 2 with Unsloth Framework. You can find all hyperparameters in our source code.
+
+The main optimization we made in the ARChitects approach is for the decoding stage. We implemented the batch version of the Depth First Search (DFS) algorithm. However, there is one downside effect of batch implementation. It became nondeterministic. This phenomenon is well explained in a blog from Thinking Machines Lab. We used an open-sourced solution from Thinking Machines Lab and managed to make inference batch invariant. However, despite the better precisions, and better local validations scores, this version runs much longer in the Kaggle environment. About 17% slower, and we didn’t use it in the final submission.
+
+The ARChitects approach uses additional augmentations to rescore the candidates from DFS stage. We made a small change here. We used only 8 augmentations per candidate solution, but we used exactly the same augmentations for each candidate solution. This makes the scores of different solutions more comparable. After the competition deadline we tested the different re-scoring strategies and found the better method to select the right candidate. We calculate how many times the candidate solution was found during the DFS stage and adjust this with the geometric mean ensemble
+of log-probabilities from different augmentations.
+
+During the competition we fine-tuned models on different portions of synthetic data. In the figure you can see the effect from adding more data on the loss function during the pretraining stage. The local validation loss measured on an augmented version of 120 evaluation puzzles, and we saw a good correlation with public leaderboard. Our best model scored 27.64% during the competition.
+
+Tiny Recursive Model
+
+During the last 10 days or so of the competition we explored the use of the Tiny Recursive Models (TRM) by Alexia Jolicoeur-Martineau.
+
+The day before last we managed to get a working submission that ensembles TRM with the Qwen3 2B model. We lacked time to tune the ensemble and the TRM model itself, but we were glad to be able to test the idea still. We used a few late submissions to finish testing the ensemble and report on these as well. We only used models pretrained during the competition in these late submissions.
+
+Using the code, the ARC Prize organization got a score of 6.9 percents by adapting it to run on 4 nodes of 8 H100 GPUs. Using that amount of compute resources is impossible in Kaggle. To make it worse, we could only use 2 hours or so for TRM given we had to use the rest for the ARChitects approach. Therefore, we had to use a different method. We first pretrained the TRM model, then fine-tuned the TRM model using test data during submission.
+
+Using a batch size of 3072 instead of 768, and learning rate of 3e-4 instead of 1e-4 we could train TRM to the same accuracy as the original code in 24 hours on 8xH100. Using this in a submission yields a score of 2.08% only.
+
+We then tuned various parameters to get the best score while using at most 2 hours of running time on Kaggle. We ended up with these parameters: 4 H cycles instead of the default 3, and 10 halt max steps instead of 16. We used 2000 epochs and only 200 warmup steps. This makes TRM run in about 2 hours on Kaggle.
+
+In order to assess the strength of the TRM model we trained it twice. We trained it with the 4k puzzles and used that for submission. And we also trained it with the competition evaluation dataset removed. We then scored the latter on the evaluation data. We then looked at how many training steps were used for the checkpoint with best pass@2. We finally selected the checkpoint trained on all 4k samples with the closest number of training steps. Best pass@2 on evaluation with a model not trained on evaluation was 9.44%. When submitted the matching checkpoint trained with evaluation scored 7.5%. This is much better than the 2.08% we had before.
+
+After the competition deadline we submitted our best TRM using 4k epochs instead of 2k. It yield a score of 10.0%, in less than 4 hours.
+
+In order to use TRM with the ARChitects approach we modified TRM so that it generates 10 attempts instead of 2 per puzzle. These attempts were then added to the attempts generated by The ARChitects procedure. They were then scored by the Qwen3 model like the other attempts.
+
+This worked fine but with mixed results. Most of the puzzles solved by TRM were solved by Qwen3, hence TRM added nothing there. However, about 2 or 3 puzzles solved by TRM were not solved by Qwen3. Unfortunately, these were not always picked by Qwen3 scoring.
+
+With two late submissions we found that we could improve the 21.53 score obtained with Qwen3 2B to 22.50 with a TRM ensemble. We also saw that when using a Qwen3 4B submission that uses 10 hours only, with a score 27.22, adding TRM yields the same 27.22 score.
+
+While we think that there is some potential for improvement here, ensembling the Qwen3 4B model and TRM model would require more investigations and experiments than we could perform.
+
+Conclusion
+
+We presented how we improved The ARChitects and TRM models to get the best score on the public leaderboard of ARC Prize 2025 competition. With limited resources during the evaluation stage we needed a good way to compress learned knowledge and skills. Scaling the pretraining stage with good synthetic puzzles was the right direction to succeed in this Kaggle competition. But we also believe that this synthetic data with python programs and reasoning traces could be used for other research directions.
+
+Authors
+ivan
+
+sorokin
+
+CPMP
+
+cpmpml
+
+arrow_drop_up
+124
+Share
+more_horiz
+Project Links
+NVARC Source Code
+
+https://github.com/1ytic/NVARC
+
+link
+
+github.com
+
+Scripts, configs and instructions how to reproduce NVARC results
+
+arc2-trm-v31
+
+a year ago · 57 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+TRM approach
+
+arc2_qwen3_unsloth_flash_lora_batch4_queue
+
+a year ago · 168 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+ARChitects approach
+
+nvarc-viewer
+
+a year ago · 41 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Visualization of synthetic puzzles
+
+NVARC Artifacts Puzzles
+
+a year ago · Usability 3.5
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+NVARC Synthetic Puzzles
+
+a year ago · Usability 1.9
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+NVARC Augmented Puzzles
+
+a year ago · Usability 1.3
+
+table_chart
+
+Kaggle Dataset
+
+Public
+
+Private resource
+
+table_chart
+
+Kaggle Dataset
+
+Citation
+
+ivan, CPMP. NVARC solution. https://www.kaggle.com/competitions/arc-prize-2025/writeups/nvarc. 2025. Kaggle
+
+comment
+17 Comments
+1 appreciation comment
+Hotness
+Cody_Null
+
+Posted a year ago
+
+· 313th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Some of the most impressive work I have seen in a long time, can’t wait to review this more
+
+reply
+Reply
+4
+Giba
+
+Posted a year ago
+
+· 225th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations @sorokin and @cpmpml ! This is a incredible win!
+
+Great writeup, and not only a big gap to 2nd place, but real artificial intelligence applied to an extremely challenging task.
+
+reply
+Reply
+3
+Eduardo Rocha de Andrade
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Insane results, the LB gap is really impressive!! 🔥
+Congratulations and thanks for the write up!
+
+reply
+Reply
+1
+1
+jojobagel
+
+Posted a year ago
+
+· 250th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for open-sourcing the training data and even the scripts generating them! They will be extremely valuable for future research on ARC AGI.
+
+reply
+Reply
+2
+emoji_people
+Texxi
+
+Posted a year ago
+
+· 1349th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+No problem. Maybe next year I'll show you my Artifical Super Intelligence which can solve all publicly available 51'454'560 training tasks in milliseconds…
+
+reply
+Reply
+Komal Mishra
+
+Posted a year ago
+
+arrow_drop_up
+-2
+more_vert
+
+Instead of generating a full puzzle program with input/output logic, we decided to split this into two stages. First - generate a Python program for the input grid logic, second - generate a program of the output grid logic, i.e. transformation rules. To generate reliable and good input grid logic we prompt the LLM to produce additional unit test for the input grid. In total, we generated and filtered 126901 input grid programs in Python code.
+
+reply
+Reply
+1
+Navneet
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Generate a Python program for the input grid logic?
+
+reply
+Reply
+vialactea
+
+Posted 10 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing and congratulations for the 1st place and innovative solution. Well done!!!
+
+I'd like to ask you a couple of questions:
+
+Why did you pick bfloat16 instead of 4bits quantization? Better model accuracy?
+How did you figure out which package versions to use with unsloth and how to patch flash attention?
+reply
+Reply
+ivan
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks!
+
+Accuracy and speed. If I’m not mistaken the quantization slows down the inference.
+I used the latest available package of Unlsoth at that moment. I spent about 3 days to figure out how it works and how to make it batch invariant. The patch with flash attention is not critical, you can ignore it. I just keep it to align the training and inference.
+reply
+Reply
+Navneet
+
+Posted 10 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the ARChitects and TRM models!
+
+reply
+Reply
+Tiberiu Musat
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Amazing work! How many tokens did it take you to generate one task?
+
+reply
+Reply
+CPMP
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+about one per cell in the grid plus one per row.
+
+reply
+Reply
+Tiberiu Musat
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+How about the synthetic tasks? How many gpt-oss tokens did you consume to generate those 50k synthetic tasks? Were you able to generate all that synthetic data using a single 8xH100 node?
+
+reply
+Reply
+ivan
+
+Topic Author
+
+Posted 10 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We provide all generated texts here https://www.kaggle.com/datasets/sorokin/nvarc-artifacts-puzzles You can estimate tokens from it.
+
+reply
+Reply
+Abhishek Awasthi
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+thats impressive
+
+reply
+Reply
+sayoulala
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Excellent and well-structured solution! Really appreciate you open-sourcing this. I learned a tremendous amount from it.
+
+reply
+Reply
+2
+xz
+
+Posted a year ago
+
+· 602nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the achievement! I am a little bit surprised TRM wasn't a major contributing factor to your team's crazy climb during the last few days.
+
+reply
+Reply
+CPMP
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I am a little bit surprised TRM wasn't a major contributing factor to your team's crazy climb
+
+Why? Arc prize team got less than 7% with TRM using 3x8 H100 for a day. We were pleased to see 10% in 2 hours or so with 4 L4.
+
+Model ensembling is not about having lots of great models.
+
+Ensembling is about having one great model (here Qwen 4B) and other models that can add a bit to it (TRM).
+
+reply
+Reply
+xz
+
+Posted a year ago
+
+· 602nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I was under the wrong impression that the one would try to add the TRM style recurrent loops on top of their "main model". But upon further reading, it seems that having a pretrained natural language backbone is crucial to your approach?
+
+reply
+Reply
+CPMP
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Recurring over the main model is expensive. We used all the 12 hours we got, and we could not run anything lower.
+
+reply
+Reply
+Appreciation (1)
+Irakoze Ntawigenga Kelly
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for the write up!

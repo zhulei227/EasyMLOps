@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation/discussion/107824
+fetched: 2026-10-27
+chars: 843
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Society for Imaging Informatics in Medicine (SIIM) · Featured Prediction Competition · 7 years ago
+Late Submission
+more_horiz
+SIIM-ACR Pneumothorax Segmentation
+
+Identify Pneumothorax disease in chest x-rays
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

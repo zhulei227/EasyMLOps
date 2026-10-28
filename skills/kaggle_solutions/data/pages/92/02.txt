@@ -1,0 +1,76 @@
+url: https://github.com/ma2rten/kaggle-evergreen
+fetched: 2026-10-27
+chars: 5620
+
+GitHub - ma2rten/kaggle-evergreen: My solution for Kaggle&#39;s Stubleupon Evergreen Contest · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ ma2rten kaggle-evergreen Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-evergreen Public Notifications You must be signed in to change notification settings Fork 9  ( 9 ) Star 8  ( 8 ) You must be signed in to star a repository About My solution for Kaggle's Stubleupon Evergreen Contest Resources Readme MIT license Activity Stars 8 stars Watchers 2 watching Forks 9 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 12 Commits 12 Commits Folders and files Name Name Last commit message Last commit date src src     .gitignore .gitignore     LICENSE LICENSE     README.md README.md     requirements.txt requirements.txt     submission.csv submission.csv     View all files Repository files navigation README MIT license More items This is a slightly modified version of my 2nd place entry to the Kaggle Stumbleupon Evergreen competition. 
+ Overview 
+ This model only uses textual features from the provided features. First I extract text from the html. I also extract
+boilerplate using boilerpipe (additionally to the one provided). 
+ Instead of training one classifier on each tag (h1, title, boilerplate, ...), I found it to work better empirically
+to use linear combinations of tags (e.g. 5 * h1 + title * ...). I did not manage to find a way to estimate the
+tag weights in way which prevents overfitting on this noisy dataset, therefore I went for a brute force approach:
+just calculate lots of combination and throw them all in an ensemble. For this end, I implemented a simple parser,
+which parses the name of the dataset (e.g. 10 * title + body). 
+ I used the same brute force approach to preprocessing, applying stemming, tf-idf, lsi (svd), lda to every dataset. This
+way I ended up with 260 models. 
+ The only classifier used is logistic regression. Other classifiers (e.g. Random Forest), did not seem to improve the final result. Also no parameter search is preformed.
+After all, the best parameters per classifier are not necessarily the ones that improve the ensemble. 
+ I included 3 ways of producing the final ensemble: simple average, weighted average using least squares and using least
+squares to select what models are averaged (this works best). 
+ All results are cached, so e.g. when you add another classifier it should not take more then a few minutes. 
+ Changes compared to my actual submission 
+ I removed some 'secret source', which has to not been published yet. This code would give you a private leaderboard score of 0.88752 (or 6th place). 
+ Getting it running 
+ Install requirements 
+ pip install -r requirements.txt 
+ Place the competition data into data/ and unzip raw_content.zip into data/raw_content/ 
+ Extract text from html and create word count matrices. 
+ python src/parse_html.py &amp;&amp; python src/count_words.py 
+ This should not take more than 30 minutes. Now train the actual models: 
+ python src/train_models.py 
+ This takes about 120 minutes. Now you can get the final score with: 
+ python src/ensemble.py 
+ That's it. 
+ About My solution for Kaggle's Stubleupon Evergreen Contest Resources Readme MIT license Activity Stars 8 stars Watchers 2 watching Forks 9 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

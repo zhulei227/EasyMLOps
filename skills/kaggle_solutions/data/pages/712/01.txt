@@ -1,0 +1,533 @@
+url: https://www.kaggle.com/c/neurogolf-2026/writeups/1st-place-kaggle-agent
+fetched: 2026-10-27
+chars: 9176
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - Kaggle Agent - Introduction — The 2026 NeuroGolf Championship
+1st Place - Kaggle Agent - Introduction
+
+The 2026 NeuroGolf Championship
+
+Solution Writeup · 1st place · Jul 16, 2026
+
+1st PLACE SOLUTION
+
+Thank you everyone for a great competition. We will publish our full solution in the upcoming days!
+
+UPDATE:
+
+We published our pipeline overview here.
+We published techniques for prompting here
+And more solution information will come soon! Stay tuned!
+TEAM KAGGLE AGENT
+
+It was a pleasure working with @titericz @jiweiliu @maxjeblick @arc144 and ChatGPT, Codex and Claude Code!
+
+DASHBOARD
+
+We used our dashboard to track our progress and share our onnx with each other. Visit the dashboard here to see how we progressed and what score we achieved for each task!
+
+SAMPLE AGENT
+
+An agent's success depended on all the information it had access to and the agent's prompt/instructions.
+
+ARCHITECTURAL REWRITES
+
+From the history of each task's score, we observe that architectural rewrites averaged +0.5 boost per task whereas optimzing existing graphs averaged only +0.05 per task. Therefore agents were always encouraged to explore and find better architectures. This avoided being stuck in score plateaus.
+
+STAY TUNED
+
+We will publish our full solution in the upcoming days!
+
+Authors
+Jiwei Liu
+
+jiweiliu
+
+Max Jeblick
+
+maxjeblick
+
+Eduardo Rocha de Andrade
+
+arc144
+
+Chris Deotte
+
+cdeotte
+
+Giba
+
+titericz
+
+arrow_drop_up
+116
+Share
+more_horiz
+Citation
+
+Jiwei Liu, Max Jeblick, Eduardo Rocha de Andrade, Chris Deotte, Giba. 1st Place - Kaggle Agent - Introduction. https://www.kaggle.com/competitions/neurogolf-2026/writeups/1st-place-kaggle-agent. 2026. Kaggle
+
+5
+25
+16
+comment
+30 Comments
+1 appreciation comment
+Hotness
+Shair Khan
+
+Posted 2 months ago
+
+arrow_drop_up
+-1
+more_vert
+
+This isn't just a 1st place solution; it's a blueprint for the future of AI optimization. 🏆💯
+
+Huge congratulations @cdeotte @titericz @jiweiliu @maxjeblick @arc144 !
+
+The +0.5 architectural rewrite rule is going to be quoted in AI/ML papers for years. Sandbagging 200 points on the leaderboard while systematically executing graph rewrites across tasks is pure brilliance!
+
+Thank you for pushing the absolute limits of Kaggle! The dashboard looks legendary. 🚀👏
+
+
+reply
+Reply
+Chan Kha Vu
+
+Posted 3 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Congrats on 1st place! When you jumped to 8257, I and my amazing teammates were trying last-minute effort to jump you 😁 But then you revealed your true score of 8314… it was shocking that you hid 200 points at some point during the last days!
+
+reply
+Reply
+1
+parthenos
+
+Posted 3 months ago
+
+· 601st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+congrats on the win🙌
+
+btw the dashboard looks like utopian stock market heatmap😅
+
+reply
+Reply
+1
+1
+Geremie Yeo
+
+Posted 3 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@cdeotte do you mind sharing how your task380 m0p20 solution looks like? (I am assuming its a 0-memory einsum)
+
+We have been stuck at m0p60 for a long time and even after the competition I tried prompting harder and it still refuses to improve…
+
+reply
+Reply
+Geremie Yeo
+
+Posted 3 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+wow just as I said this I prompted ChatGPT to try harder and got a m0p30 lol
+
+reply
+Reply
+Evolvion
+
+Posted 3 months ago
+
+arrow_drop_up
+4
+more_vert
+
+Congratulation to first place! It clear that most teams used similar pipeline to get result. The most important part of information how you have been able to reach such high number is what LLM model you have used and what prompt and data you have sent to Agents. Are you going to publish full ONNXs as well as part of some public repo? I am still very curious what I have missed and which optimization techniques left undiscovered. Again congratulations and looking forward to your full writeup.
+
+reply
+Reply
+emoji_people
+Sinan Calisir
+
+Posted 3 months ago
+
+· 16th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+What a beautiful dashboard. Huge congrats, and looking forward to hearing more about the details! 🎉
+
+reply
+Reply
+3
+emoji_people
+mudesteven
+
+Posted 3 months ago
+
+· 7th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Amazing work. We prompted our agents to prioritise stuctural rewrites as well but it didn't end up producing as much as expected. Curious to see the details.
+
+reply
+Reply
+1
+Ahmad abdullah
+
+Posted 3 months ago
+
+arrow_drop_up
+2
+more_vert
+
+I need an expert advice to learn computer vision
+
+reply
+Reply
+zhou zhou
+
+Posted 2 months ago
+
+arrow_drop_up
+1
+more_vert
+
+I also need.And I found it's dificult to know what is important for cv.
+
+reply
+Reply
+Mohit
+
+Posted 3 months ago
+
+arrow_drop_up
+2
+more_vert
+
+Welll done !!!!
+
+reply
+Reply
+Wasiq Ali
+
+Posted 3 months ago
+
+arrow_drop_up
+2
+more_vert
+
+First thanks for sharing the first place solution writeup it's really appreciatable and thanks for sharing the interesting information with is it's really appreciatable and congratulations 🥳👏
+
+reply
+Reply
+Mieszko Baszczak
+
+Posted 3 months ago
+
+· 27th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+What cost exactly did you get on 199? We got it with cost 176, which seems to be tad better than yours, is it right?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 3 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on 31st and great job getting cost 176. Our best cost on task199 was 189.
+
+reply
+Reply
+Mieszko Baszczak
+
+Posted 3 months ago
+
+· 27th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on 1st place, That one task seemed quite algebraic to us, like many, and it worked quite expectedly in a single einsum but with 85 inputs, so it definetely wasn't an elegant one xd
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Geremie Yeo
+
+Posted 3 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for posting the writeup! I am curious how do the human solutions look like?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 3 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Thanks. Congratulations to you and your team. There are many public human solutions on the internet. For example, here is a famous one https://arc-visualizations.github.io/ This is a collection of the work from 1700 humans describing solutions.
+
+reply
+Reply
+3
+Eduardo Rocha de Andrade
+
+Posted 3 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Huge congrats @yeoyunsianggeremie to you and your team!
+
+reply
+Reply
+Opeyemi Kayode
+
+Posted 3 months ago
+
+arrow_drop_up
+1
+more_vert
+
+well done, congratulations on getting first place
+
+reply
+Reply
+Navneet
+
+Posted 3 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Bravo Guys!
+
+reply
+Reply
+Georgy Mamarin
+
+Posted 3 months ago
+
+· 363rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats — and thank you for putting numbers on the rewrite-vs-polish question; +0.5 vs +0.05 per task is the number people will be quoting from this competition. One way to see how lopsided that is: score is linear in ln(cost), so +0.5 points erases ~39% of a task's whole bill while +0.05 trims ~5% — one architectural rewrite is worth ten polish passes. I read that as the metric's whole message: a rewrite changes which tensors exist at all; polishing only shrinks the ones you kept.
+
+reply
+Reply
+Mohit
+
+Posted 3 months ago
+
+arrow_drop_up
+1
+more_vert
+
+That's good
+
+reply
+Reply
+Ugur Tasdan
+
+Posted 3 months ago
+
+· 429th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I would sell some of my kidneys to learn from you personally :D Waiting for the whole solution as my claude was insisting on not grinding or grinding very inefficiently.
+
+reply
+Reply
+NotWhatYouThink
+
+Posted 3 months ago
+
+· 211th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Many congratulations, impressive work and a beautiful dashboard. Looking forward to some sheer brilliance and elegance in the winning solutions.
+
+reply
+Reply
+Subin An
+
+Posted 3 months ago
+
+· 203rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+super congrats!! amazing result
+
+reply
+Reply
+Heliosli
+
+Posted 3 months ago
+
+· 140th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing win.
+
+reply
+Reply
+1
+Pavlo Ivanin
+
+Posted 3 months ago
+
+· 616th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on a well-deserved victory!
+It seems that the days of handwork are completely a thing of the past)
+
+reply
+Reply
+emoji_people
+Lixin73
+
+Posted 3 months ago
+
+· 45th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks to the first-place team, impressive work! So beatiful！🌹
+
+reply
+Reply
+
+This comment has been deleted.
+
+Mieszko Baszczak
+
+Posted 3 months ago
+
+· 27th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+I think that if you don't mind time limits you can have around 9000 points. From math point of view every task can be solved with only one einsum and parameters
+
+reply
+Reply
+Appreciation (1)
+Guru Prasaath S
+
+Posted 3 months ago
+
+arrow_drop_up
+0
+more_vert
+
+congratulations!!!

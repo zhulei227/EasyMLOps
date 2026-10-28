@@ -1,0 +1,414 @@
+url: https://www.kaggle.com/c/commonlit-evaluate-student-summaries/discussion/447293
+fetched: 2026-10-27
+chars: 12874
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st: A brief review of the competition experience (Detail solution is on the way) — CommonLit - Evaluate Student Summaries
+1st: A brief review of the competition experience (Detail solution is on the way)
+
+CommonLit - Evaluate Student Summaries
+
+Solution Writeup · 1st place · Oct 15, 2023
+
+Some Feelings
+
+I would like to thank the organizers for bringing us the wonderful competition, and thank you for the atmosphere of sharing and discussion. This competition is a practical project required by the natural language processing course. My teammates and I learned in this competition than in the school class. Of course, thanks to the lucky shake, luck is also an important factor.
+
+What we did in the comp
+
+Our final submission only used a 4fold microsoft/deberta v3 large. Because each team member's academic pressure and time reasons, we did not plan to study various tricks or training skills from the beginning, but started with the quality and diversity of data.
+
+WHY data? Because we found that the training data provided, only contains four topics, but from our own experience to think, training a student writing ability requires a lot of different topics, so the real test scenario, the model for the understanding of different topics is the most important (subsequent other players through prob test set also proved this), and we found that the LLM game, many people use LLM data increase and obtained the exciting fect, so we focus on improving the diversity of topic.(We continue to focus on other competitions and competitors' experience and progress in using LLM, but we do not see anyone openly revealing whether using LLM is "USEFUL", even if they have tried to use the generated data.)
+
+We sincerely hope that our ideas can provide some feasible ideas for the use of LLM in the FUTURE competitions, and can bring reference value to other participants
+
+The key points of our solution:
+
+Meta pseudo label (3 rounds), the most critical and time-consuming part, is the key to associating unannotated data with annotated data, from a paper by Google.(https://arxiv.org/pdf/2003.10580.pdf)
+
+Carefully designed prompt to guide LLM to spit out the topic and topic text in his stomach (we can actually use the commonlit website, but we didn't realize that at the moment.)
+
+Another prompt used to generate ten summary of different quality for each additional topic.
+
+Change the data preprocessing in the open source training code to introduce prompt text into the model, but most other good teams have this key point, which commonly mentioned in discussion.
+
+Two stage traning: stage1 - Use pseudo labeled data only for 2epoch and valid on train. stage2 - Use train data only for 2-3 epochs. In this way, we need not to pay too much attention to the data distribution of pseudo-labels, which mentioned by @philippsinger in his insightful solution of Feedback-ELL.
+
+Sort index according to the length of the input text, and reduce the infer time. The whole model of inference is estimated to be 7 hours, but if you do not do so, the inference time will exceed the limit of 9 hours.
+
+Traning and inference pipelinecode shared by @tsunotsuno ,the perfect process steps save us a lot of time to build pipeline.
+
+Other words
+
+We only used the open source code and did not make any improvement on the model. In these days, we have read the plans of other teams, which impressed us, especially the "Head Mask" mentioned by @ivanaerlic and his deep understanding and insight into the game itself and the nature of the model structure, which made us admire and hope that one day we can make such excellent model optimization like you.
+
+I believe combine the head mask and llm meta pseudo procedure, the private score might improved to .43+ ONLY BY ONE MODEL.
+
+Thanks again to all the participants for your selfless sharing. I hope our working can contribute to the community!! :)
+
+Prompt used for LLM generate prompts:
+
+Prompt used for LLM generate summaries:
+
+Related source:
+
+inference code: https://www.kaggle.com/itsmeanszao/debertav3-lgbm-no-autocorrect llm generated data: https://docs.google.com/spreadsheets/d/1gKT1jYOVVtcMsIMiqgrxXGxdLSBQPkIM/edit?usp=sharing&ouid=117192899697376325370&rtpof=true&sd=true
+
+Authors
+it'smeanszao
+
+itsmeanszao
+
+Free Soul01
+
+freesoul01
+
+Jingcheng Deng
+
+anastasiajia
+
+Faye
+
+cynthiawu0
+
+arrow_drop_up
+58
+Share
+more_horiz
+Citation
+
+it'smeanszao, Free Soul01, HengweiDAI, Faye. 1st: A brief review of the competition experience (Detail solution is on the way). https://www.kaggle.com/competitions/commonlit-evaluate-student-summaries/writeups/lucky-shake-1st-a-brief-review-of-the-competition-. 2023. Kaggle
+
+3
+comment
+18 Comments
+Hotness
+narsil (jobs-in-data.com)
+
+Posted 3 years ago
+
+· 1201st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for the detailed overview of your solution, and for sharing a very creative approach to fix the major challenge in this competition - very few prompts in the training dataset.
+
+One question that comes to my mind is whether competition rules about sharing external data, also apply to the additional data that you created on your own:
+
+C. External Data. You may use data other than the Competition Data (“External Data”) to develop and test your Submissions. However, you will ensure the External Data is publicly available and equally accessible to use by all participants of the Competition for purposes of the competition at no cost to the other participants. The ability to use External Data under this Section 7.C (External Data) does not limit your other obligations under these Competition Rules, including but not limited to Section 11 (Winners Obligations).
+
+From my perspective, if you created the data using your creativity and LLM, they are your competitive advantage, and it is natural not to share it. Then the competition rules should be updated to avoid any ambiguity.
+
+reply
+Reply
+it'smeanszao
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you for your approval and Cannot agree more, as a student, kaggle Is the fairest and most justice platform I have ever seen.
+
+Because we have no advantage but the ability to think and write the code, Whether the enterprise-level pre-training model, Or the business data of the enterprise, Even a computing GPU is a luxury. (As for Chinese mainland, Legal use of colab is impossible).
+
+But kaggle by limiting the external data and model license, and tool library license, And providing free computing resources to ensure that all participants focus on using their minds and intelligence rather than things outside themselves to solve problems.
+
+Fairness is always relative, however, at least the serious imbalance of computing resources and high cost, lead to different participants to experiment and training time cost is completely different, in the same game time limit, for lack of training resources is extremely unfair, especially the NLP the high demand of training resources, on the premise of "free", basic it is difficult to be competitive. (But for a little, i can rent a RTX4090 one day for $10, which is acceptable for most contestants.）
+
+Therefore, I believe that kaggle officials have been looking for a relatively fairest rule boundary. Before the popularization of bert, the cost of computing resources is not very high and will not seriously affect the fairness. Now that LLM is becoming popular, how to define a limited extent for using LLM to ensure the fairness of most people is a thorny issue, however, the world is always dynamically balanced, and the ripples will eventually converge. I believe that with the gradual maturity of LLM applications, this problem will be solved naturally.
+
+reply
+Reply
+narsil (jobs-in-data.com)
+
+Posted 3 years ago
+
+· 1201st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Very important questions indeed.
+
+reply
+Reply
+Oleksiy Kononenko
+
+Posted 3 years ago
+
+· 665th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+@narsil the paragraph you mentioned seems to discuss external data. However, in my opinion, data generated by a contestant are not really external, but kind of internal. They're an intrinsic part of a solution just like model weights.
+
+reply
+Reply
+narsil (jobs-in-data.com)
+
+Posted 3 years ago
+
+· 1201st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+That is my interpretation as well.
+
+reply
+Reply
+Peng Sun
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I do agree with your interpretation. My feeling used to be that participants need to make public each and every dataset used in training that is not part of the provided training dataset. It seems that I have a bit "over-interpreted" the rule. I also generated some data by LLM. But I made it a public dataset in kaggle to avoid any potential violation of the competition rules. Now I think you are right. The self-generated data should not be regarded as "external data", rather should be viewed as part of the solution.
+
+reply
+Reply
+emoji_people
+Kinosuke
+
+Posted 3 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your excellent results! Thank you for publishing your solution. I believe this solution will bring about a significant change in the way competitions will be fought in the future.
+
+One point I'd like to ask, which LLM did you use to increase your data?
+
+reply
+Reply
+it'smeanszao
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We cannot use the same llm to ensure sufficient topic diversity, so we tried as many open source LLM as well as chatgpt, and screened the topics in terms of expanding the knowledge domain.
+
+reply
+Reply
+emoji_people
+Kinosuke
+
+Posted 3 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for your answer!
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 3 years ago
+
+· 197th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+Congratulations. Thanks for sharing the details of your solution.
+
+reply
+Reply
+Jingbo
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi,
+
+This is an interesting approach to generating the pseudo label based on LLM. I am wondering, when you use prompts to generate ten summaries of different quality for each additional topic, do you need to give a score for each artificial summary?
+
+If not, how you can use these generated summaries to train your supervised machine-learning model?
+
+Jingbo
+
+reply
+Reply
+Jingbo
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Or you basically give a descending score for each answer, e.g., answer 1, answer 2, ,,,, and answer 10.
+
+reply
+Reply
+Farzan Ansari
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+**Congratulations **to your team for winning the first prize. I am pursuing this competition as a university project. I am doing a bachelor's degree in artificial intelligence, and the course is NLP. I took this up as a course project, and I would love your insights on how to learn and present a worthwhile project. I have a few questions. You said that the CommonLit website can be used for generating more data. It would be extremely insightful if you could guide me through the process.
+
+Any other techniques would be helpful too. Thank you.
+
+reply
+Reply
+JOOOHN0128
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations. Thanks for sharing the details of your solution.
+
+reply
+Reply
+derection
+
+Posted 3 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the detailed overview of your solution,Congratulations on your win!
+
+reply
+Reply
+Athar Sayed
+
+Posted 3 years ago
+
+· 362nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @itsmeanszao amazing write up , its cool to see how data augmentation with LLM can be used for boosting the score , I have one doubt how did you labelled the data for generated summaries and text that were generated using LLM , or did you used unlabelled data ?
+
+reply
+Reply
+Urenna Okeke
+
+Posted 3 years ago
+
+· 1430th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your win and thank you for the detailed solution!
+
+reply
+Reply
+Jon Whiting
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to the team and thanks for publishing the code, that was really interesting to see.
+
+reply
+Reply
+Peng Sun
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to the team! The LLM part is very insightful
+
+reply
+Reply
+XinYiLea
+
+Posted 3 years ago
+
+· 201st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations to your team for winning first place. The sharing about LLM has greatly benefited me.
+
+reply
+Reply
+
+This comment has been deleted.

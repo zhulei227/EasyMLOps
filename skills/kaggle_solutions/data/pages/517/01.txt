@@ -1,0 +1,414 @@
+url: https://www.kaggle.com/c/open-problems-multimodal/discussion/366961
+fetched: 2026-10-27
+chars: 13152
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution Summary — Open Problems - Multimodal Single-Cell Integration
+1st Place Solution Summary
+
+Open Problems - Multimodal Single-Cell Integration
+
+Solution Writeup · 1st place · Nov 26, 2022
+
+First of all, thank you to the organizers and kaggle management and to everyone who participated with me. Since I needed to gain experience in analyzing single cell data, this competition was an excellent experience for me.
+
+I would like to introduce the overview of my solution.
+
+Multiome
+Model Overview
+
+Input Preprocessing
+
+Target Preprocessing
+
+tSVD-based imputation method:
+
+Perform dimensionality reduction on the data with tSVD
+And then, Transform the data back to the original space
+Copy the value of the 0 part of the original data from the transformed values.
+Model
+
+Output Postprocessing and Loss
+
+In the inference phase, the model outputs the average of the five predicted target data.
+
+CITEseq
+Model Overview
+
+Input Preprocessing
+
+In selecting important genes in CITEseq, the correlation coefficient is calculated for each batch and select only genes with high correlation in many batches. Genes were selected from those related to the target proteins and pathway. I use Reactome as pathway database.
+
+Target Preprocessing
+
+Model
+
+Output Postprocessing and Loss
+
+In the inference phase, the model outputs the average of the five predicted target data.
+
+Local evaluation
+
+I used two evaluation schemes.
+
+Evaluation with cross validation:
+5-fold cross validation grouped by donor and day
+Evaluation for hyperparameter optimization with Optuna:
+Training data set is divided into training and validation data sets. ( Training data set: 80%, validation data set: 20%. )
+Ensemble
+
+I used the weighted average of predictions of the following models.
+
+Models trained with changing the seed
+Models fine-tuned on only some batches
+Batch combination pattern examples: males only, female only, Day 4, 7 only, etc.
+Use a model trained on the full training data set as a pre-training model
+Code
+
+https://github.com/shu65/open-problems-multimodal
+
+Update
+
+2022/11/20 add the repository url of my solution 2022/11/26 fix some figures
+
+Author
+Shuji Suzuki
+
+shujisuzuki65
+
+arrow_drop_up
+104
+Share
+more_horiz
+Citation
+
+Shuji Suzuki. 1st Place Solution Summary. https://www.kaggle.com/competitions/open-problems-multimodal/writeups/shuji-suzuki-1st-place-solution-summary. 2022. Kaggle
+
+comment
+21 Comments
+Hotness
+Liilili
+
+Posted 4 years ago
+
+· 57th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Big old 🙏🙏🙏 May i ask some questions emmm The part of multi's model is fantastic, why not apply to Cite problems, by residual target this way, it is not work in the cite problems?
+
+reply
+Reply
+andreylalaley
+
+Posted 4 years ago
+
+· 127th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for thq 1st place and thank you for sharing your solution! As I see, you ve added metadata to both models. What increase (cv/ lb) did you get from adding metadata to models?
+
+reply
+Reply
+vialactea
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for the 1st position and great solution!!
+
+I tried combining multiple forms of inputs/targets (initial inputs, SVD and binarized) and weight averaging their losses, but dropped it because the added complexity wasn't helping. I missed the ingenuity of your preprocessing chain and the averaging of the outputs for prediction (I took only the prediction of the original targets, and used the other outputs solely to regularize training).
+
+I have seen big PB jumps to gold medal positions - @cpmpml comes to mind, but I don't recall ever seeing such an impressive finish in a winner. What a great job! I'm curious about how surprised you where with taking the top position after ending the competition in a position far from the gold medals in the LB.
+
+reply
+Reply
+CPMP
+
+Posted 4 years ago
+
+arrow_drop_up
+3
+more_vert
+
+You jumped quite a bit too.
+
+reply
+Reply
+Shuji Suzuki
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you!
+
+I couldn't believe it at first either and showed the screenshot of LB to my colleagues at work to make sure I was in first place and not wrong.
+
+reply
+Reply
+Artem Fedorov
+
+Posted 4 years ago
+
+· 88th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for this detailed post. I see you made a lot of work preprocessing the data. But how did you come to this sort of preprocessing? Where does the idea to divide all the inputs by non-zero medians come from?
+
+reply
+Reply
+Shuji Suzuki
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+I noticed that the library-size normalization + log1p data is not being returned well after dimensionality compression with tSVD. The correlation coefficient between the original data and the converted and reverted data is only about 0.70.
+
+For this reason, I tried to find a better preprocessing method and found it.
+
+reply
+Reply
+Mikhael Manurung
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Dividing by non-zero medians is something I've never seen in single-cell literature, but hey, it WORKS! How do you get to this approach? Could you elaborate on your thought process? Thanks and congratulations!
+
+reply
+Reply
+Daniel Burkhardt
+
+Competition Host
+
+Posted 4 years ago
+
+· 1145th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@shujisuzuki65 am I right in understanding you looked at many different pre-processing approaches and optimized for one that had high correlation after low-rank-approximation with tSVD? This led to selecting normalizing by median non-zero values?
+
+reply
+Reply
+BarryZhou
+
+Posted 4 years ago
+
+· 29th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thanks for posting your great solution Shuji Suzuki!
+
+reply
+Reply
+Syed Siddique Mridul
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+One of the best posts I have seen
+
+reply
+Reply
+Alex
+
+Posted 4 years ago
+
+· 492nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hello Shuji. I tried to run your code with the minor modification that I only use 996 data points for both the train and test set to speed up the calculations. I get this output/error when training the cite model and don't know what to do. The error persists even when changing batch-size to 1000, for some reason it always looks for 8 batches and can't find 6 of them: git_hexsha Failed to get git load input values completed loading input values. elapsed time: 4.2 load targets values completed loading targets values. elapsed time: 0.2 load input values completed loading input values. elapsed time: 1.2 use test_inputs_values. total size: 1992 train sample size: 996 dump params kfold type group None skip pre_post_process fit model input shape X:(664, 217) Y:(664, 128) dataset size 664
+
+KeyError Traceback (most recent call last)
+
+/content/drive/MyDrive/bio/suzuki/open-problems-multimodal-main/script/train_model.py in 570 571 if name == "main": --> 572 main()
+
+6 frames
+
+/content/drive/MyDrive/bio/suzuki/open-problems-multimodal-main/script/train_model.py in main() 475 476 cv = CrossVaridation() --> 477 result_df, k_fold_models, k_fold_pre_post_processes = cv.compute_score( 478 x=train_inputs, 479 y=train_target,
+
+/content/drive/MyDrive/bio/suzuki/open-problems-multimodal-main/script/train_model.py in compute_score(self, x, y, metadata, x_test, metadata_test, params, build_model, build_pre_post_process, dump, dump_dir, n_splits, n_bagging, bagging_ratio, use_batch_group) 145 model = build_model(params=params["model"]) 146 print(f"model input shape X:{preprocessed_x_train.shape} Y:{preprocessed_y_train.shape}") --> 147 model.fit( 148 x=x_train_bagging, 149 y=y_train_bagging,
+
+/content/drive/MyDrive/bio/suzuki/open-problems-multimodal-main/ss_opm/model/encoder_decoder/encoder_decoder.py in fit(self, x, preprocessed_x, y, preprocessed_y, metadata, pre_post_process) 221 self.model.to(device=self.params["device"]) 222 --> 223 dummy_batch = next(iter(data_loader)) 224 dummy_batch = self._batch_to_device(dummy_batch) 225 self._train_step_forward(dummy_batch, 1.0)
+
+/usr/local/lib/python3.8/dist-packages/torch/utils/data/dataloader.py in next(self) 626 # TODO(https://github.com/pytorch/pytorch/issues/76750) 627 self._reset() # type: ignore[call-arg] --> 628 data = self._next_data() 629 self._num_yielded += 1 630 if self._dataset_kind == _DatasetKind.Iterable and \
+
+/usr/local/lib/python3.8/dist-packages/torch/utils/data/dataloader.py in _next_data(self) 1331 else: 1332 del self._task_info[idx] -> 1333 return self._process_data(data) 1334 1335 def _try_put_index(self):
+
+/usr/local/lib/python3.8/dist-packages/torch/utils/data/dataloader.py in _process_data(self, data) 1357 self._try_put_index() 1358 if isinstance(data, ExceptionWrapper): -> 1359 data.reraise() 1360 return data 1361
+
+/usr/local/lib/python3.8/dist-packages/torch/_utils.py in reraise(self) 541 # instantiate since we don't know how to 542 raise RuntimeError(msg) from None --> 543 raise exception 544 545
+
+KeyError: Caught KeyError in DataLoader worker process 0. Original Traceback (most recent call last): File "/usr/local/lib/python3.8/dist-packages/torch/utils/data/_utils/worker.py", line 302, in _worker_loop data = fetcher.fetch(index) File "/usr/local/lib/python3.8/dist-packages/torch/utils/data/_utils/fetch.py", line 58, in fetch data = [self.dataset[idx] for idx in possibly_batched_index] File "/usr/local/lib/python3.8/dist-packages/torch/utils/data/_utils/fetch.py", line 58, in data = [self.dataset[idx] for idx in possibly_batched_index] File "/content/drive/MyDrive/bio/suzuki/open-problems-multimodal-main/ss_opm/model/torch_dataset/citeseq_dataset.py", line 79, in getitem info = torch.as_tensor(self.metadata.iloc[index, :][self.metadata_keys].values.astype(float), dtype=torch.float32) File "/usr/local/lib/python3.8/dist-packages/pandas/core/series.py", line 1007, in getitem return self._get_with(key) File "/usr/local/lib/python3.8/dist-packages/pandas/core/series.py", line 1047, in _get_with return self.loc[key] File "/usr/local/lib/python3.8/dist-packages/pandas/core/indexing.py", line 1073, in getitem return self._getitem_axis(maybe_callable, axis=axis) File "/usr/local/lib/python3.8/dist-packages/pandas/core/indexing.py", line 1301, in _getitem_axis return self._getitem_iterable(key, axis=axis) File "/usr/local/lib/python3.8/dist-packages/pandas/core/indexing.py", line 1239, in _getitem_iterable keyarr, indexer = self._get_listlike_indexer(key, axis) File "/usr/local/lib/python3.8/dist-packages/pandas/core/indexing.py", line 1432, in _get_listlike_indexer keyarr, indexer = ax._get_indexer_strict(key, axis_name) File "/usr/local/lib/python3.8/dist-packages/pandas/core/indexes/base.py", line 6070, in _get_indexer_strict self._raise_if_missing(keyarr, indexer, axis_name) File "/usr/local/lib/python3.8/dist-packages/pandas/core/indexes/base.py", line 6133, in _raise_if_missing raise KeyError(f"{not_found} not in index") KeyError: "['batch_sv2', 'batch_sv3', 'batch_sv4', 'batch_sv5', 'batch_sv6', 'batch_sv7'] not in index"
+
+reply
+Reply
+Oscar Aguilar
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats @shujisuzuki65. Thanks for sharing all your approach details. Well done👍
+
+reply
+Reply
+zhez017
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations to get the 1st palce, and thanks for sharing.
+
+reply
+Reply
+Kexin Wang
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Big Congrat! And thanks a lot for sharing your idear
+
+reply
+Reply
+Chris Deotte
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @shujisuzuki65 ! Amazing work, great job!
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot for the detailed approach note @shujisuzuki65! Hearty congratulations and best regards!
+
+I wish to know of the approaches that did not work for you too. I eagerly await the adjutant code too.
+
+reply
+Reply
+Arthur Mulikhov
+
+Posted 4 years ago
+
+· 85th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! I see the combination of MSE/MAE in "compressed" space and correlation loss in original space as a approach to model regularization Did you select weights of these two losses ? If so, how ? Why you used MAE in citeseq part, but not MSE as in multiome part ?
+
+reply
+Reply
+Shuji Suzuki
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The MAE/MSE weights were set at 1.0 at the beginning of training and the weights were gradually reduced as training progressed.
+
+The detail of weight schedule is here: https://github.com/shu65/open-problems-multimodal/blob/3d57dd3837b17079fed5678043e681749ba32324/ss_opm/model/encoder_decoder/cite_encoder_decoder_module.py#L81
+
+I tried MAE as in multiome part. But, the score of the model with MAE is lower than that with MSE.
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.

@@ -1,0 +1,673 @@
+url: https://www.kaggle.com/c/child-mind-institute-problematic-internet-use/discussion/552638
+fetched: 2026-10-27
+chars: 13720
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+First Place Write-Up: Or How I Won the Lottery — Child Mind Institute — Problematic Internet Use
+First Place Write-Up: Or How I Won the Lottery
+
+Child Mind Institute — Problematic Internet Use
+
+Solution Writeup · 1st place · Jan 2, 2025
+
+First and foremost, I would like to thank the organizers and Kaggle for making this competition possible. Tackling real-world noisy data was both a challenging and rewarding experience.
+
+To be perfectly honest, luck played a major role in my success. I was especially lucky actually selecting the best possible notebook. Nevertheless, I’d like to present what I did. (Link to the notebook)
+
+Interestingly, I dropped out of the competition two months ago only to re-enter recently. My focus during this return was on improving the robustness of the solution.
+
+Final Model Overview
+
+The final solution was a voted ensemble consisting of: • LGBMRegressor • Two XGBoost Regressors • CatBoostRegressor • ExtraTreesRegressor
+
+Target, Cross-Validation, and Sample Weights
+
+• Target Variable: Instead of using the provided sii labels, I used the 'PCIAT-PCIAT_Total' score and converted the predictions to sii labels. • Distribution and Weighting: The target’s distribution, especially the excess zeros, led to two approaches: exploring sample weights and alternative objectives for regression like Tweedie. Equidistant bins were used to define the sample weights. Weighting did not improve the optimized scores directly but it brought the unoptimized scores closer to the optimized scores. • Cross-Validation: A 10-fold stratified KFold was used, stratified by the bins. Seeds were frequently changed to ensure stability. Submissions with different seeds were used to get further feedback from the public Leaderboard on the variance. The LB-score itself was mostly ignored to minimize overfitting to the leaderboard.
+
+Data Cleaning, Feature Engineering, and Imputation
+
+Data Cleaning:
+
+Implausible values, such as body fat percentages over 60% or negative bone mineral content, were removed and replaced with NaN.
+
+Feature Engineering:
+
+Various descriptive actigraph features were created, with separate masks for day and night.
+Dimensionality reduction of the actigraph data using PCA retained 15 components.
+Additional features included normalized values based on age group means and other features that seemed sensible like the difference between the daily energy expenditure and the basal metabolic rate.
+Quantile binning was applied to a good chunk of the features to deal with the noise. Which worked surprisingly well.
+
+Imputation:
+
+Lasso was used for feature imputation, due to the moderately high dimensionality and noise.
+Features were imputed using Lasso. For each target column, a model was trained using features with fewer than 40% missing values, and missing values in these features were imputed based on the trained model. If no valid features (i.e., features with less than 40% missing values) were found for imputation, or if the number of valid samples was too small, the solution defaulted to mean imputation.
+Parameter Tuning and Feature Selection
+
+Early in the competition, it became apparent that typical parameter tuning with regular cross-validation setups resulted in unstable outcomes. To address this: • Repeated Stratified KFold was employed during parameter tuning. With 10 to 20 repeats. Which was computationally more expensive but yielded more robust results. • Feature selection was done manually based on feature importance, reducing the dataset to 39 features
+
+Author
+Lennart Haupts
+
+lennarthaupts
+
+arrow_drop_up
+94
+Share
+more_horiz
+Citation
+
+Lennart Haupts. First Place Write-Up: Or How I Won the Lottery. https://www.kaggle.com/competitions/child-mind-institute-problematic-internet-use/writeups/lennart-haupts-first-place-write-up-or-how-i-won-t. 2024. Kaggle
+
+21
+28
+comment
+48 Comments
+6 appreciation comments
+Hotness
+Vladimir Demidov
+
+Posted 2 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Simple but solid classical approach. Congrats! You overcome all bottlenecks by your methodology. This is inspiring.
+
+reply
+Reply
+1
+5
+Abhisek Das
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congrats @yekenot… can u share ur approach.. u got 19th and I would love to know ur approach
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much for your kind feedback. Very much appreciated.☺️
+
+reply
+Reply
+aldparis
+
+Posted 2 years ago
+
+· 165th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @lennarthaupts !
+
+reply
+Reply
+1
+1
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Much appreciated!☺️
+
+reply
+Reply
+Miles
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+One strange phenomenon to be explained. I find the engineered features, like PU_norm, CU_norm etc., have lower Spearman's correlation score than the original features with the target, why using those normalized features while dropping the original features lead to better performance?
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hey, thank you for engaging with my solution. That's an insightful observation. PU and CU were strongly correlated with age, which also had a strong relationship with the outcome. By normalizing PU and CU based on the mean of the age groups, the age effect in these features was reduced. 😀
+
+reply
+Reply
+Miles
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much for the explanation! The intuition totally makes sense. The confusion just comes from the lower correlation score of the normalized with respect to the target. So, during feature engineering, even if the normalized/derived features show lower correlation score with the target than original features, as long as we believe that the derived features are more meaningful, we should use those ones. Is this right?
+
+reply
+Reply
+Syed Rabeet
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+That's great, congrats
+
+reply
+Reply
+Bikram Chatterjee
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+very inspiring!
+
+reply
+Reply
+Harsh Darji
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Really nice feature engineering and congratulations!
+
+reply
+Reply
+Mohan Nellore
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+well done, great work
+
+reply
+Reply
+Dang An
+
+Posted 2 years ago
+
+· 1509th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I rlly admire u. As a person w/ deep ML knowledge, can u give me (a newbie) some advice on ML?
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much, and apologies for my late response! 😊 I honestly wouldn’t consider myself as someone with particularly deep ML knowledge, but I really appreciate your kind words.
+
+If I could share four pieces of advice, they’d be:
+
+Do projects you enjoy. It’s the best way to stay motivated and ensure you keep learning.
+Focus on the fundamentals. Understanding the 'why' and 'how' behind the basics is crucial, and it’s easy to get distracted by the shiny appeal of fancy methods.
+Be critical of your validation approach. Only a solid validation strategy leads to trustworthy and usable results.
+Engage with others to exchange ideas.
+
+Best of luck on your ML journey.
+
+reply
+Reply
+2
+Dang An
+
+Posted 2 years ago
+
+· 1509th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks U for ur advice <3
+
+reply
+Reply
+Mai Phong
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow, great work!
+
+reply
+Reply
+CodeCavalier
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for bringing this to my attention!
+
+reply
+Reply
+Juliet Kreisel
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow, great work!
+
+reply
+Reply
+Eya Jlassi
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Simple but solid classical approach. This is inspiring.
+
+reply
+Reply
+Alexander Kapturov
+
+Posted 2 years ago
+
+· 1610th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, Lennart @lennarthaupts !
+
+reply
+Reply
+Zhixing Zhang
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great job, congra
+
+reply
+Reply
+Azadeh Razmi
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+exellent👍
+
+reply
+Reply
+Yinuo Huang
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Really nice feature engineering and congratulations!
+
+reply
+Reply
+Nadav Cherry
+
+Posted 2 years ago
+
+· 296th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations！Solid work
+
+reply
+Reply
+Eunki_H
+
+Posted 2 years ago
+
+· 783rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Your solid work truly inspires me and highlights the attitude needed for success in Machine Learning. Thank you for sharing your insights!
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot!
+
+reply
+Reply
+Abhisek Das
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @lennarthaupts 🎉🎉.. Your solution help me think beyond the box, especially the usage of ExtraTreesRegressor in the end… though I would like to know more about the details of dimensionality reduction using PCA and how did u come up with quantile binning and this method 'Features with fewer than 40% missing values were imputed with a Lasso model'.. I am just impressed with your methods, got to learn a lot and I am working my way upto Grandmaster…
+
+PS: would be really helpful if you can share your notebook
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much! I’ve shared the notebook link above, but here it is again:
+
+Notebook Link
+
+I used quantile binning because the data was noisy. While binning loses some information by grouping values into intervals, it also reduces overfitting, the impact of outliers and measurement errors. I only imputed features with fewer than 40% missing values using Lasso to ensure there were enough samples for a robust model. The 40% threshold is a bit conservative, but it worked for reliability.
+
+reply
+Reply
+taroiwai
+
+Posted 2 years ago
+
+· 214th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! And thank you for sharing the excellent strategies.
+
+Retaining unnecessary features can compromise the model's robustness. However, I hesitated to remove features because eliminating those with low feature importance did not necessarily lead to improvements in CV (Stratified 5 Folds *5). As a result, I ended up using about 70 features. Did you select 39 features by applying some criteria to determine their necessity based solely on feature importance values and your CV results? Looking at your notebook, it appears that the "exclude" list of unnecessary features was selected manually.
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for your kind words!
+
+Yes, I approached this manually and iteratively without really hard criteria. I focused on features that showed low importance across three models, removing one to three at a time and observing the impact on CV. Features were excluded if the CV score improved or only dropped marginally (typically in the third decimal). It was essentially a manual, eyeballed version of recursive feature elimination.
+
+reply
+Reply
+muteman
+
+Posted 2 years ago
+
+· 260th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations！Solid work
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you.
+
+reply
+Reply
+ArthurT800
+
+Posted 2 years ago
+
+· 126th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. Really efficient strategy.
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Many thanks!
+
+reply
+Reply
+Mahmoud Elshahed
+
+Posted 2 years ago
+
+· 1207th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, Very Efficient ⭐
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much☺️
+
+reply
+Reply
+vandl
+
+Posted 2 years ago
+
+· 180th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Very different approach compared to "best" public notebooks, who didn't drop any features at all. The robustness and stability of the model seems to have been an important aspect of the competition that many of us missed. When adding new features, what is it that made you decide "I should combine X and Y feature in Z way"? Is it only feature importance or something else?
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the kind comment.
+
+When constructing new features, I usually focused on finding a domain reason; what the new feature might capture. Some features were also created to reduce dimensionality. For instance, I calculated mean, min, and max for FGC_zones and then dropped the original columns.
+
+reply
+Reply
+Deepak Saldanha
+
+Posted 2 years ago
+
+· 3293rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Many congratulations and well thought out feature engineering approaches given the unreliable nature of this data.
+
+reply
+Reply
+Lennart Haupts
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I appreciate your kind words.
+
+reply
+Reply

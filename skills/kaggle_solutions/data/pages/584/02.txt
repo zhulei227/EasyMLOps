@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/open-problems-single-cell-perturbations/discussion/458738
+fetched: 2026-10-27
+chars: 868
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Open Problems in Single-Cell Analysis · Featured Prediction Competition · 3 years ago
+Late Submission
+more_horiz
+Open Problems – Single-Cell Perturbations
+
+Predict how small molecules change gene expression in different cell types
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

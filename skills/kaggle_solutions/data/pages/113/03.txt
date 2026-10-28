@@ -1,0 +1,54 @@
+url: https://github.com/jfkingiii/walmart
+fetched: 2026-10-27
+chars: 5012
+
+GitHub - jfkingiii/walmart: Kaggle Walmart Recruiting Challenge · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ jfkingiii walmart Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ walmart Public Notifications You must be signed in to change notification settings Fork 5  ( 5 ) Star 3  ( 3 ) You must be signed in to star a repository About Kaggle Walmart Recruiting Challenge Resources Readme Activity Stars 3 stars Watchers 3 watching Forks 5 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 3 Commits 3 Commits Folders and files Name Name Last commit message Last commit date README.md README.md     benchmark_2299.R benchmark_2299.R     benchmark_2304.R benchmark_2304.R     benchmark_2311.R benchmark_2311.R     benchmark_2317.R benchmark_2317.R     benchmark_2322.R benchmark_2322.R     benchmark_2324.R benchmark_2324.R     benchmark_2337.R benchmark_2337.R     benchmark_2343.R benchmark_2343.R     benchmark_2352.R benchmark_2352.R     benchmark_2372.R benchmark_2372.R     benchmark_2374.R benchmark_2374.R     benchmark_2377.R benchmark_2377.R     benchmark_2409.R benchmark_2409.R     benchmark_2412.R benchmark_2412.R     benchmark_2415.R benchmark_2415.R     benchmark_2421.R benchmark_2421.R     benchmark_2436.R benchmark_2436.R     benchmark_2441.R benchmark_2441.R     benchmark_2467.R benchmark_2467.R     benchmark_2468.R benchmark_2468.R     benchmark_2471.R benchmark_2471.R     benchmark_2480.R benchmark_2480.R     benchmark_2484.R benchmark_2484.R     benchmark_2497.R benchmark_2497.R     benchmark_2513.R benchmark_2513.R     benchmark_2587.R benchmark_2587.R     benchmark_2597.R benchmark_2597.R     benchmark_2615.R benchmark_2615.R     benchmark_2685.R benchmark_2685.R     benchmark_2814.R benchmark_2814.R     benchmark_2842.R benchmark_2842.R     benchmark_3094.R benchmark_3094.R     benchmark_3115.R benchmark_3115.R     benchmark_3971.R benchmark_3971.R     benchmark_4106.R benchmark_4106.R     departments.R departments.R     safety.R safety.R     test.rds test.rds     thanksgiving.gnumeric thanksgiving.gnumeric     train.rds train.rds     walmart.py walmart.py     View all files Repository files navigation README More items Kaggle Walmart Recruiting Challenge
+Third Place 
+ The best submission is produced by benchmark_2299.R, which scores
+2299.60492 public and 2394.70198 private 
+ The file safety.R contains the safety submission - no judgment calls or test set snooping involved,
+just week alignment, week blending, and store and department trend.
+It scores 2360.39811 public 2432.86274 private. 
+ About Kaggle Walmart Recruiting Challenge Resources Readme Activity Stars 3 stars Watchers 3 watching Forks 5 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

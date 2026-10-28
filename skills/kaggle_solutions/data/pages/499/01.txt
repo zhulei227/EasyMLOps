@@ -1,0 +1,529 @@
+url: https://www.kaggle.com/c/uw-madison-gi-tract-image-segmentation/discussion/337197
+fetched: 2026-10-27
+chars: 10382
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+UW Madison · Research Code Competition · 4 years ago
+Late Submission
+more_horiz
+UW-Madison GI Tract Image Segmentation
+
+Track healthy organs in medical scans to improve cancer treatment
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Carno Zhao · 1st in this Competition · Posted 4 years ago
+arrow_drop_up
+127
+more_vert
+1st place solution
+1st place solution
+
+TL; DR
+
+We used three groups of models in our solution, named CLS group (gray boxes), SEG group (blue boxes) and 3D group (yellow boxes). CLS group is used to classify whether the prediction of a slice should be empty or not. SEG group and 3D group are used to do segmentation for slices that should be predicted.
+
+notebook
+
+Our submission notebook is for referencing only. Model weights will not be released.
+
+github
+
+Here is my github repo for this solution.
+
+1. CLS group
+1.1 Data
+
+Models were trained with the whole dataset, instead of folds.
+
+Some models were trained without wrong annotated cases (mentioned in discussion).
+
+1.2 Model
+
+4 unets, with efficientnet b4, b5, b6, b7 backbones.
+
+1.3 Training
+
+Public mmsegmentation pipeline.
+
+1.4 Usage
+
+We computed prediction result of each slice of test data, using 0.6 threshold to binarize sigmoid probabilities. If the number of positive pixels if larger than 12, the slice is defined as "positive slice" (#pixels check arrow). Otherwise, the slice is defined as negative, which will skip further computation, and generate zero masks only.
+
+2. SEG group
+2.1 Data
+
+Efficientnet-Unet models were trained with annotated slices (green arrow) in the whole dataset, which means, slices that have no annotation will not used in this step.
+
+ConvNeXt-UPernet models were trained with all slices in the whole dataset, except 5 slices following the end point (orange arrow) of large-bowel and small-bowel. We believe these slices' annotation will introduce ambiguous supervision.
+
+Some models were trained without wrong annotated cases (mentioned in discussion).
+
+2.2 Model
+
+5 unets, with b4, two b5, b6 and b7 backbones.
+
+2 upernet, with convnext-base and convnext-small backbones.
+
+2.3 Training
+
+Public mmsegmentation pipeline.
+
+2.4 Usage
+
+We computed logits prediction result of each positive slice of test data.
+
+3. 3D group
+3.1 Data
+
+Public MONAI pipeline data preprocessing
+
+3.2 Model
+
+3 SegResNets, with init_filters = 12, 20, 32, PRELU activation and batch norm.
+
+3.3 Training
+
+Public MONAI pipeline training.
+
+3.4 Usage
+
+We computed logits prediction result of each volume of test data. The 3D logits and 2.5D logits were merged using 0.4/0.6 weights, then binarized using threshold 0.4.
+
+4. Hyperparameters
+
+All hyperparameters will be listed in config files. The dataset of all config files will be released soon.
+
+In short, for CLS group and SEG group, we used dice-ce, ce, dice loss for different models. We used elastic transform, grid distortion and optical distortion, with default flip, rotation in data augmentations.
+
+For 3D groups, we used default trained pipeline as public MONAI dataset in first stage training. And we used cosine annealing, 1e-4->1e-6 learning rate, 20 epochs in second stage training.
+
+5. Acknowledgement
+
+Many thanks to my teammates.
+
+And also thanks to other competitors that inovated us by their previous solutions: [1], [2], [3], from which our classification-segmentation two-stage pipeline and training tricks comes.
+
+And @yiheng, without his excellent 3D monai training pipeline, we can't get such a high score.
+
+Please sign in to reply to this topic.
+
+comment
+63 Comments
+1 appreciation comment
+Hotness
+Liam Nguyen
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+We really appreciate other Kagglers who were willing to share their works and findings. Without them we could not achieve this.
+
+Yiheng Wang
+
+Posted 4 years ago
+
+· 86th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats @carnozhao ! Well deserved winning! I'm very glad to see MONAI makes some help in your top solution : )
+
+Carno Zhao
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+In our submission, even ensembling our 2.5D models (~0.885) with your public 0.872 fold-0 3DUnet, we can get a +0.003 boost to 0.888. This is really amazing!
+
+moth
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for the win @carnozhao! I see that OpenMMLab is one of the best frameworks nowadays for object detection and image segmentation. However, it has a steep learning curve, do you know any good resources/courses/links to get familiar with the framework?
+
+Carno Zhao
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+My experience is that the more you use it, the more familiar you will get to it.
+
+Hetvi Bhora
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! The explanation was really helpful!
+
+Veronika Chernova
+
+Posted 4 years ago
+
+· 145th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing! I misunderstood one moment.. Can you explain in more detail what data you used for training ConvNeXt-UPernet models? I can't understand what this phrase means: 'were trained with all slices in the whole dataset, except 5 slices following the end point (organ arrow) of large-bowel and small-bowel'
+
+Carno Zhao
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+You can see the left column of the Figure, where I draw a sample z-axis. From top to bottom is the direction of human's head to foot, and the green part is where annotation exists. After the end of the annotation, is the 5-layer orange part, named "ambiguous". We did not include this orange part in ConvNext-upernet training.
+
+Souvik Biswas
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+the image representation was quite helpful
+
+Himanshu Dongre
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @carnozhao. Great explaination.
+
+Hemanth S
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for the first place @carnozhao . The idea to use a classifier is really amazing. Just a question here, did you use the classifier first on the images and then applied segmentation models only on positive images or did you use it after the segmentation to eliminate possible false positives?
+
+Carno Zhao
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Both method you mentioned does the same thing. The only difference is that the first one can save more time since we do not have to segment "negative slices". And this is also what we used in submission.
+
+Janga Vidhya Sagar
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @carnozhao
+
+buddybudy
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Woot Woot. That's awesome
+
+tahsin1221
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Nice. Very helpful explanation it was.
+
+shajiayu
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+About the wrong annotated cases. Models were trained without the wrong annotated cases. Infer the images with wrong annotated use the models, we get Pseudo-Labelling. In SEG group, models were trained with the Pseudo-Labelling datas and other datas.
+
+豆柴金鯱
+
+Posted 4 years ago
+
+· 109th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Did you guys embed pseudo-labeling into the pipeline or do it offline?
+
+shajiayu
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Not online. Trained with the Pseudo-Labelling datas and other correct datas
+
+Zoe Wang
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+This explanation is helpful.
+
+Syem Aziz
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratzzzz!!!!
+
+FelipeKitamura, MD, PhD
+
+Posted 4 years ago
+
+· 35th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations to the top1 team! Very neat solution. Would you mind to explain how the selection of the best model is done when training on the whole training set? Is there a validation set? Or is the best model selected based on metric/loss in the training set? How many epochs did you train the 3D models and the 2.5D models?
+
+Carno Zhao
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We used one of models from last three epochs, based on performance on public LB or just selected one of them empirically. Our models (2.5d) were trained with 60 epochs or 20k iterations (differs between models). 3D models were always selected from last epoch.
+
+FelipeKitamura, MD, PhD
+
+Posted 4 years ago
+
+· 35th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, @carnozhao !
+
+Hemanth S
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@carnozhao Can you please give some context on how choosing the last epoch model is better than choosing the best model?
+
+Rafi Hassan Chowdhury
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Niceeeeeeeeee
+
+ElliotXie
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation! And thanks so much for sharing!
+
+David
+
+Posted 4 years ago
+
+· 142nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! This sharing was really helpful!
+
+Yassine Alouini
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing all these details. The diagram is great as well, well done to you!
+
+xu jack
+
+Posted 4 years ago
+
+· 1267th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I'm training the classification model, but I always get nan for stomach.
+
+xu jack
+
+Posted 4 years ago
+
+· 1267th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation!!
+when I study and re-try your solution from the github, I met some errors. is it updated in the github?
+
+xu jack
+
+Posted 4 years ago
+
+· 1267th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+the input channel of classification model is 1?
+@carnozhao could you please give some details? I'm trying to reproduce the experiment.
+
+Advay Patil
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great explanation!
+
+Bella Pisani
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing! I really appreciate the diagram in particular.
+
+Sochanntrea Ou(KIT)
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+The explanation was really useful!!! Thank you!!!

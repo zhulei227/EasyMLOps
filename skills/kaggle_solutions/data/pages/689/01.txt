@@ -1,0 +1,519 @@
+url: https://www.kaggle.com/c/playground-series-s6e1/writeups/1st-place-ive-ran-out-of-catchy-phrases-v
+fetched: 2026-10-27
+chars: 12238
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place - (I've ran out of catchy phrases :V) — Predicting Student Test Scores
+1st place - (I've ran out of catchy phrases :V)
+
+Predicting Student Test Scores
+
+Solution Writeup · 1st place · Feb 1, 2026
+
+First of all, I would like to thank Kaggle for a very nice dataset this month. The CV/LB correlation was even better than S5E8/S5E11 and there was a decent amount of signal. I would also like to thank all the people who shared their code and insights, including but not limited to: @cdeotte, @yekenot, @omidbaghchehsaraei, @siukeitin, @masayakawamata, @mikhailnaumov.
+
+Now my solution:
+
+FE
+
+I have 2 main feature sets that I used for my models:
+
+Feature set 1 (this did best with NNs):
+
+Cyclical features from @yekenot's notebooks
+The formula from here
+A categorical copy of each numerical base feature
+Digit features
+Certain combinations of features + TE (mean/std/skew)
+Certain combinations of digits + TE (mean/std/skew)
+
+Feature set 2 (this did best with GBDTs):
+
+The same formula as feature set 1
+Ordinal mapping of categorical features from @cdeotte's notebook
+A categorical copy of each base feature (including categoricals as they are mapped to numerical)
+Digit features
+Models
+
+I focused on making stronger models rather than a lot of different models this time. This resulted in my best single model placing 7th! Their CV/LB scores (without post-processing) are as follows:
+
+Model type	CV	Public LB	Private LB
+RealMLP	8.58742	8.54280	8.58005
+XGBoost	8.59480	8.55235	8.59251
+TabM	8.59651	8.55740	8.59279
+CatBoost	8.60027	8.56047	8.59537
+DeepTables	8.60147	8.55467	8.59020
+LightGBM-dart	8.60870	8.56743	8.60437
+LightGBM	8.60910	8.56951	8.60670
+Keras MLP	8.61511	8.57016	8.60957
+
+There are some other weaker models like Resnet, FTTransformer, xLearn FFM, etc. but those are not listed here (partially because I'm kinda lazy :V).
+
+Ensembling
+
+My final ensemble has a total of 190 models ensembled with Ridge: CV 8.56634, LB 8.53096, PB 8.57273 (with post-process). Other ensemblers like HC, Autogluon, CatBoost, etc. gave worse scores.
+
+Post-processing
+
+Somewhere in the middle of the comp, I tried using Isotonic Regression to post-process the oofs passed to Ridge as well as after and it gave a decent improvement. Turns out, my final ensemble without the post-process is only slightly worse on LB and a lot better on PB: CV 8.56959, LB 8.53099, PB 8.57152. I tested it on my best single model as well and both LB and PB are worse as well.
+
+Hyperparameter tuning
+
+I also want to note that adding a lot of models with different hyperparameters worked really well. My boost from around 8.5335 down to 8.5309 was due to hyperparameter tuning all my best models (RealMLP, TabM, GBDTs) and saving all the oofs from all the trials. I would recommend using WandB sweeps as you get very handy visualizations and can parallelize the tuning on multiple machines (at least I think so, I've never tried it :V).
+
+Conclusion
+
+I've said it many times and I'll say it again, ensembling lots of diverse models and some FE is all you need. Best of luck for the next comp (which I will probably not be participating in) and happy Kaggling!
+
+Author
+Mahog
+
+mahoganybuttstrings
+
+arrow_drop_up
+49
+Share
+more_horiz
+Project Links
+PG S6E1 - Ridge ensemble - [CV 8.56634 LB 8.57273]
+
+9 months ago · 58 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+PG S6E1 - RealMLP - [CV 8.58748 LB 8.58006]
+
+9 months ago · 34 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Citation
+
+Mahog. 1st place - (I've ran out of catchy phrases :V). https://www.kaggle.com/competitions/playground-series-s6e1/writeups/1st-place-ive-ran-out-of-catchy-phrases-v. 2026. Kaggle
+
+12
+comment
+22 Comments
+1 appreciation comment
+Hotness
+Mirko
+
+Posted 9 months ago
+
+· 5th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi Mahog,
+
+I wanted to share that adding your RealMLP_TD_Regressor (without pseudo-labeling) to my ensemble provided a massive boost to my scores!
+
+My solution was a Ridge stack built exclusively on my own generated OOFs—I did not use any public predictions or OOFs from other notebooks. To give context on the ensemble's power, my best individual model was an XGB with pseudo-labeling that achieved a CV of 8.609246.
+
+The stack relied on a diverse set of relatively 'weak' learners (single seeds, 5-fold CV, no hyper-parameter tuning). I focused heavily on Feature Engineering, using a mix of Autoencoders, PCA, and Genetic Programming features. My scores improved significantly:
+
+CV: 8.58053 → CV: 8.57613
+
+Public LB: 8.53788 → 8.53309
+
+Private LB: 8.57875 → 8.57353
+
+It’s impressive how robust this architecture is, especially since the OOF, Public, and Private improvements were perfectly coherent. Thanks for sharing your insights and the implementation!
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 9 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Your models must be really diverse. My ensemble only improved 0.02 from my best single model yet your ensemble improved a whole 0.04 from your best single model! Could you make your oofs public? I want to see how much they improve my ensemble
+
+reply
+Reply
+1
+Mirko
+
+Posted 9 months ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This was my first time sharing a dataset, so I hope everything is organized correctly!
+
+I also want to take a moment to thank @cdeotte, @tilii7, @siukeitin, @mikhailnaumov, @masayakawamata and obviously @mahog. Their insights and public work were instrumental in helping me build this pipeline.
+
+I've uploaded the OOFs and Test predictions here: datase. I included both .npy and .csv formats for convenience. Hope they help with the ensemble!
+
+My best CV ensemble used BayesianRidge, but since it was my first time, I preferred the stability of a standard Ridge for my final submission.
+
+Adding your RealMLP_TD_Regressor with pseudo-labeling I got: Overall OOF RMSE: 8.57545 and Private score: 8.57269
+
+reply
+Reply
+1
+6 more replies
+arrow_drop_down
+Yu Liwei
+
+Posted 9 months ago
+
+· 353rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks you very much. I learned a lot from your FE and MLP model. And I test it without pseudo, found it still work well. I wonder how to chose the pseudo, use less features with the same model or use the different model with lower score? Which better?
+And [https://github.com/dholzmueller/pytabkit/blob/main/pytabkit/models/alg_interfaces/nn_interfaces.py] is hard to understand, would you mind to share the code about opt the Hyperparams?
+Thanks again.
+
+reply
+Reply
+David Holzmüller
+
+Posted 9 months ago
+
+· 523rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi, the code simply samples hyperparameter configurations using this part of the code: https://github.com/dholzmueller/pytabkit/blob/c126ea51187c5080b91f28d352481dbd3b2194b0/pytabkit/models/alg_interfaces/nn_interfaces.py#L699
+For example, it could sample 30 random hyperparameter configurations by calling this 30 times with different seeds, and then tests them (e.g. using cross-validation). (You could take the best one but Mahog took multiple of these models into the ensemble.)
+
+reply
+Reply
+Yu Liwei
+
+Posted 9 months ago
+
+· 353rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you very much, you're the author of pytabkit. Great to meet you here.
+
+reply
+Reply
+JecKaggle
+
+Posted 9 months ago
+
+· 888th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Mahog,
+
+Thank you for sharing this, a really interesting read and a great learning material for newbies like myself!
+
+In your experience, did cyclical features help for things like study hours? I was really confused seeing notebooks using this, as I'd initially expect it to just add noise, as surely study hours wouldn't have a real cyclical element to it? Is it just a similar thing to log1p scaling, where you're just treating it as a non-linear scaling to adjust the distribution slightly?
+
+Thank you again for the detailed breakdown and congratulations on another 1st place!
+
+reply
+Reply
+nevergetcomplacent
+
+Posted 9 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice! I like the competition theme
+
+reply
+Reply
+Tilii
+
+Posted 9 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on a stellar job of getting in front and fending off all the comers! Thanks for the notebooks and OOF files - it makes for an interesting analysis.
+
+reply
+Reply
+1
+Tilii
+
+Posted 9 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+With a simple Keras MLP and your OOFs I get CV: 8.572227, public LB: 8.53132 and private LB: 8.57165. Nothing fancy, just 4 hidden layers (128-64-32-16 neurons). As scary as that sounds, you still had room to whip us by a larger margin. I also get private LB: 8.57086 when combining your OOFs with mine.
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 9 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+As I wrote above, my ensemble gets 8.57152 on private LB without post-processing, so yes, there was still a lot of room left. Also, the weird thing about this comp is that I never felt my score stagnate. Even at the end, I was still getting 0.0005-0.001 improvements on CV/LB
+
+reply
+Reply
+Tilii
+
+Posted 9 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Same here. I had a model that was running past the deadline, and its addition alone to the ensemble improved the CV/LB scores by 0.0006. Pretty sure I would never catch you, but I am certain that with more time and submissions I'd have a better score by 0.002-0.003 than what I have now.
+
+reply
+Reply
+Vijay Kumar
+
+Posted 9 months ago
+
+· 2270th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congrats @mahoganybuttstrings and thanks for sharing insights
+
+reply
+Reply
+Mirko
+
+Posted 9 months ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the 1st place finish, Mahog!
+Thanks for sharing your insights with the community.
+
+reply
+Reply
+JinZhao
+
+Posted 9 months ago
+
+· 645th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning first place! Did you use a linear regression model? Or did you use a linear regression model to generate out-of-fold predictions (OOF) and test set predictions, and then add these predictions as features to train other models?
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 9 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I tried adding linear regression features but they were not very effective. I'm supposing any signal from linear regression was already captured by the formula I mentioned
+
+reply
+Reply
+Jimmy Smith1009
+
+Posted 9 months ago
+
+· 1151st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats！thx for sharing.
+
+reply
+Reply
+Traiko Dinev
+
+Posted 9 months ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats @mahoganybuttstrings ! How did you tune the RealMLP parameters? It's one of the models I have up on quite early on.
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 9 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on 6th place as well! I did random search for around 30 trials with the recommended search space (tabarena-new), you can find it in here
+
+reply
+Reply
+kobby_
+
+Posted 9 months ago
+
+· 9th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats man. Steady win.
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 9 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Congrats on your 9th place as well!
+
+reply
+Reply
+David Holzmüller
+
+Posted 9 months ago
+
+· 523rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, I'm delighted to see the results of your model comparison 😃
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 9 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! I think this is the second comp (for me) RealMLP completely outperformed all the other models, the other one was NFL Big Data Bowl 2026
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (1)
+ELMIR
+
+Posted 9 months ago
+
+· 692nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks you for no asnwer!

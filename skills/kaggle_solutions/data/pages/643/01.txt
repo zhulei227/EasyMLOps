@@ -1,0 +1,246 @@
+url: https://www.kaggle.com/c/fide-google-efficiency-chess-ai-challenge/discussion/571023
+fetched: 2026-10-27
+chars: 14169
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+My solution: Cfish, nnue, data (1st) — FIDE & Google Efficient Chess AI Challenge
+My solution: Cfish, nnue, data (1st)
+
+FIDE & Google Efficient Chess AI Challenge
+
+Solution Writeup · 1st place · Apr 1, 2025
+
+Source code: https://github.com/linrock/minifish
+
+Background
+
+Special thanks to teams: Approvers, “Fix the bugs?” for their top performances, and inspiring my interest in joining.
+
+At first, I didn’t expect nnue could be that much better than hand-crafted evaluations (HCE) under the 64kb binary size constraints. It wasn’t until I saw team Approvers way up on the leaderboard in December when I realized nnue had high potential.
+
+Most of my time went into nnue research, as I saw this competition as a fun way to improve at ML. My engine code ended up being more basic and less sophisticated than others in the top 3. Much of the strength was hidden in the network weights.
+
+Base engine
+
+I started with Cfish because I assumed binary size would be easier to minimize in a C codebase instead of C++. Modern stockfish is optimized for strong nnue (~70mb compressed weights) evaluations at long time controls. Many improvements in recent years are not relevant to the much-weaker evaluations limited by the 64kb size constraint, and would perform worse.
+
+Early on, I focused on first removing unnecessary code (tablebases, etc.) to reduce the binary size, then looked through stockfish git commit history to decide on patches to try porting over. The original nnue architecture introduced in 2020 is too complex to fit in the size constraints, so I removed the code entirely and made initial progress on search patches with HCE before later looking into how to get a simple nnue working from scratch.
+
+Quantifying progress
+
+From working on stockfish, I already had a running fishtest dev server. I modified this to work with Cfish, primarily for SPRT. Elo measurements are crucial to measuring progress on engine strength.
+
+For testing basic functionality, such as getting nnue working at all, a combination of ./cfish bench and local elo measurements with fastchess at fixed nodes were good for quick checks.
+
+I used scripts to build .tar.gz submissions and keep an eye on compression sizes with the various tools available (gzip, zopfli, bz2, xz, 7z). Compression sizes helped decide what direction to go with nnue, as there were tradeoffs to make between size and strength.
+
+Visualizing weights
+
+I found it important to look at images of the weights to figure out a plan. The networks I used were standard 768 chess inputs (64 squares x 6 piece types x 2 colors), dual-perspective, with horizontal king mirroring, and a single hidden layer.
+
+Feature transformer weights are associated with a particular type of piece being present on a square. Here’s an example of what “our pawn” weights look like:
+
+The y-axis represents squares, from A1 = 0, A2 = 1, … H8 = 63. The first and last rows are zero because pawns cannot exist on the 1st and last ranks. While it’s possible to entirely remove 32 pawn inputs (16 for our pawn, 16 for their pawn), I found that simply zeroing unused weights improved compressibility without an increase in code complexity.
+
+The x-axis represents indices of neurons in the feature transformer. Here, there are 64 neurons. Bytes are ordered from left-to-right, top-to-bottom. Sequential data with high correlation compresses more, so transposing these weights reduces binary size by improving compressibility.
+
+If we plot all the feature transformer weights grouped by piece type and perspective (ours, theirs), more concepts become apparent.
+
+Each row from top-to-bottom shows weights for a piece type in the order of: pawn, knight, bishop, rook, queen, king
+
+The left column is “our piece”, and the right column is “their piece”
+
+Each vertical line is a feature vector encoding some abstract evaluation concept across piece types.
+
+The bottom left is “our king”, where the horizontal stripes of zero represent horizontal king mirroring. Networks can be created such that when our king moves between the vertical center (between D and E files), the weights from our perspective are mirrored to keep the king on one half of the board.
+
+This effectively reduces the # of king inputs by 32, which further improves compressibility since we can zero more unused weights. It also increases the strength of the network by improving the correlation of features relative to our king.
+
+Training nnue
+
+I used bullet to create networks with simple architectures. The most important aspect of the network strength was in data selection and processing. I modified Primer to improve data filtering and used it to filter source data that I had previously created for training Stockfish networks.
+
+With good data, a simple network can be much stronger (+100 elo) than HCE even without implementing the easily-updatable (UE) part of nnue.
+
+The best source of raw training data is Leela Chess Zero (lc0) reinforcement learning training runs. In particular, the smaller ResNet T77 and T79 networks led to the best nnue data, while data generated from larger networks performed worse. I started with data I had converted into binpack format for nnue training a few years ago.
+
+First, training on weaker data from scratch, then training with the strongest data later leads to stronger networks than directly training on the strongest data from scratch.
+
+I used a 2-stage training process from scratch:
+
+Stage 1 - 100 superbatches (10 billion positions)
+data originally generated with Stockfish
+trained purely on position score from low-node search (5k nodes)
+Stage 2 - 120 superbatches (12 billion positions)
+data originally generated from lc0
+trained on a combination of position score (converted from average value: Q) and game outcome (WDL)
+
+Each training stage used the AdamW optimizer with an LR schedule linearly decaying to zero. The stage 2 training was resumed from a checkpoint at the end of stage 1.
+
+Due to variance in the strength of networks even when all parameters are the same, re-running the training from scratch multiple times would lead to stronger networks.
+
+The full training config can be found at: here
+
+Data filtering
+
+The nnue-pytorch trainer creates the strongest nnue networks. Part of its strength is in data skipping methods implemented in the dataloader. This enables using highly-compressed binpack data while trading off training speed for overall network elo.
+
+If we look at a histogram of training data from a Leela binpack bucked by # of pieces in each position, we see an uneven distribution:
+
+The large number spike at 32 is due to training games all starting from the starting position. Out of the opening, there are many more positions with even # of pieces, due to recaptures being common after a piece capture at this phase.
+
+Since the # of positions are in the 10s of billions, preprocessing the entire dataset would be very compute intensive. By instead targeting a uniform distribution of pieces in training batches using stochastic skipping, we flatten the uneven distribution at training-time. This was previously found to improve the strength of stockfish networks, and turned out to be strong here as well.
+
+Since both the nnue-pytorch dataloader and primer are implemented in C++, it was easy to port dataloader code to primer by copy/pasting.
+
+I prepared data from multiple iterations through the dataset with a few filtering methods applied for each pass. These resulting datasets could be stacked together to simulate multiple stochastic traversals through the dataset when used with the sequential dataloader:
+
+These were some of the filtering methods applied:
+
+Flattening the piece count distribution
+Stochastic skipping where game outcome (WDL) is likely to match the position score
+Skipping all data from the first 28 plies of a training game
+Keeping positions where a piece sacrifice is the best move (skip SEE >= 0)
+Compressing nnue
+
+A histogram of 16-bit feature transformer weights shows that the majority are within 8-bit range with the particular choice of quantization constants QA = 101 and QB = 160.
+
+Since the majority of 16-bit feature transformer weights can fit in 8 bits, variable-length compression such as LEB128 is worth considering for reducing the network size as a lossless compression method. However, I found its compression still wasn’t high enough.
+
+The choice of quantization constants in the feature transformer (QA) and output layer (QB) has an effect on the range of integer values in the network weights. The less quantization, the more information, which improves strength while requiring more space.
+
+When grouped by piece type, it turns out queen weights have the highest range, while some piece types have weights that fit in 8 bits without modification. This means it's possible to fit 16-bit weights in 8 bits, which both avoids the loss of strength from directly quantizing to 8 bits, and maximizes compression by storing weights as 8-bit numbers.
+
+Within each group of piece weights, as long as there are 256 or fewer unique values, 16-bit weights can be represented in 8 bits without quantization. If the number of unique weights is not much more, say 300 unique weights for “our queen”, similar low-frequency weights can be grouped together into fewer unique values, then stored as any unused 8-bit numbers.
+
+These mappings of unused 8-bit numbers to 16-bit weights can then be stored in C++ arrays to reverse the mappings when the weights are loaded. This way, 16-bit feature transformers can be compressed to 8-bit without elo regression.
+
+By default, the quantization constants are QA = 255 and QB = 64. I ended up at QA = 101 and QB = 160 as that was the largest QA I could fit in the size constraints. Right after the competition ended, I realized I overlooked a few ideas that would’ve reduced the binary size by another 1kb+, but that’s how it goes.
+
+7zip led to the best compression ratios. While .7z submissions could not be directly uploaded, I saw that 7z was available within the docker container image used for the competition environment, so I compressed the engine binary with 7z, and decompressed it at runtime in main.py while using zopfli for the outer .tar.gz compression.
+
+Final stages
+
+It wasn’t until 1.5 weeks before the deadline when I finally had a nnue submission that compressed to less than 64kb. I used the remaining time to measure the competition runtime environment and try to optimize for it. Since leaderboard scores are noisy, I mostly looked at match-up win rates vs. Approvers and “Fix the bugs?” to quantify the effects of changes.
+
+From measuring the effects on error losses with different hash sizes, I noticed the 5mb RAM limit was a gradient, where error losses increase with higher RAM usage. Since increasing hash size improves elo, I took several measurements to decide what hash size to use for the final submissions.
+
+Time losses happen even if insta-moving when time is low due to the simple delay being random. I ended up doing nothing to minimize time losses, as I couldn’t effectively measure the elo impact of countermeasures.
+
+Time increment was announced early on, but there were no follow-ups a week before the deadline, so I assumed it would not happen. I optimized for sudden death time controls with SPSA, at slightly longer time controls (20s instead of 10s) to account for time delay and pondering time usage.
+
+For the final submissions, I was wary of going too close to the RAM limit in case the environment was changed again. I assumed it would not change, and took a risky approach of using an 896kb hash size to maximize elo from RAM usage. I figured the 3-4% error loss rate was borderline, and it held up at first. Unfortunately a week after the deadline, a change to the environment was made that increased everyones’ error losses, especially for those close to the RAM limit. However, due to high variance, luck favored me in the end.
+
+Pondering time management and simple delay are both non-standard in engine testing frameworks, so I tested a few ideas in production to try optimizing them. For my final 2 submissions, I scaled up Time.optimumTime by +1/3x and +2/5x in timeman.c, up from the default of +1/4x, which had remained unchanged for many years.
+
+Summary
+
+Overall, I found nnue research to be a fun way to learn more about ML. Research tends to look towards larger models, so it was nice to work on tiny models that were very fast to train. As it turns out, neural networks compressible to ~20kb are both significantly faster and stronger than all human knowledge on evaluating chess positions built up over decades!
+
+Author
+linrock
+
+linrock
+
+arrow_drop_up
+22
+Share
+more_horiz
+Citation
+
+linrock. My solution: Cfish, nnue, data (1st). https://www.kaggle.com/competitions/fide-google-efficiency-chess-ai-challenge/writeups/linrock-my-solution-cfish-nnue-data-1st. 2025. Kaggle
+
+1
+comment
+5 Comments
+Hotness
+DanGanKaggle
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Wow, great article! Have you used board symmetries (horizontal flips, rotations, etc.) in your data pipeline or model design? It could reduce model complexity by enforcing equivariance rather than learning it from scratch.
+
+reply
+Reply
+Anaz Jaleel
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing your solution, congratulations!
+
+reply
+Reply
+dugggi
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+This write up is magnificent. Winning the comp as a tool to "learn more about ML" is mind-boggling. 🤯
+
+reply
+Reply
+Ari Kanevsky
+
+Posted 2 years ago
+
+· 368th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Incredible work, congratulations.
+
+reply
+Reply
+Olabode James
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing your solution approach, @linrock. What's more important is that your approach is simple. This is remarkable work. Keep this going, and I wish you more success in future competitions.
+
+reply
+Reply
+2

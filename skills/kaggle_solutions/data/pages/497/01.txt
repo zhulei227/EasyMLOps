@@ -1,0 +1,353 @@
+url: https://www.kaggle.com/c/tabular-playground-series-jun-2022/discussion/334331
+fetched: 2026-10-27
+chars: 10489
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+#1 Solution - Denoising Autoencoder — Tabular Playground Series - Jun 2022
+#1 Solution - Denoising Autoencoder
+
+Tabular Playground Series - Jun 2022
+
+Solution Writeup · 1st place · Jul 1, 2022
+
+As most people noticed during this competition, the significant challenge was estimating the conditional distribution of F4 where two or more values were missing in the given row. To solve this, I used a denoising autoencoder, which estimates the distribution of missing values given a mask of where the values are missing. I mean-imputed F1 and F3, and completely ignored F2.
+
+A pytorch implementation of my notebook can be found here (it scored poorly because I messed up the submission dataframe 😅).
+
+Below, I have included a drawing of this architecture.
+
+Random Mask I initially impute the data with zeros, and create a source null matrix that contains the locations of the original data nulls. Then I create a binomial random mask (where each row has at least one value) that I multiply by the original data to randomly set values to zero. The model takes the masked data and an input mask - the input mask is the combination of the source null and random mask vectors.
+
+Feature-wise embeddings The model embeds both the features and the mask and adds them together. This is so it can learn a representation of where the nulls are set to zero, and therefore where to focus to impute. This method performs much better than simply applying dropout to the masked data. For these embeddings, I linearly projected each feature in the input and mask vectors into an embedding dimension (16 in the final submission), added them together, and then flattened them. I also tried dot-product attention between the mask and linear embeddings (as per this paper), but this performed worse than simply adding them together.
+
+MLP Architecture The feature/mask embeddings are then sent through an MLP. I used layer normalization with skip connections, with 7 dense layers using the mish activation function. The performance increased with larger layer sizes, but I only tried up to a size of 2048, since computation time became a problem and I was having to decrease my batch size dramatically.
+
+Output Computation I send the MLP output through a final dense layer to match the dimensions with the input shape. Then, the final output is conditional on whether the value was masked. If the value was masked, we use the final dense layer output, otherwise we just use the model input. This causes the gradients for non-masked inputs to equal zero with the MSE loss, so the network only updates parameters for their contribution to the imputation of the mask. Like the mask embeddings, this helps the network focus on the values that should be imputed.
+
+Masked MSE Loss This step is very similar to the output computation, and is just another way of conditionally setting the loss function to zero. Here, I used an MSE loss that sets the value to zero according to a mask. This mask is the true data null values - thus we never calculate a loss on values that were originally in the training data, but we can still learn from those rows without creating bias by using a naive imputation method during training. A similar method is used here (equivalent to setting the loss to zero at the data nulls). This step could have been included as part of the modified output computation, but I only wanted to include this step during training - otherwise the implementations would have to pass a vector of zeros during the prediction step (which felt a bit clunky).
+
+Conditional Ensemble I ran the DAE 3 times in pytorch and tensorflow - tensorflow runs performed significantly better, but the average of all performed the best. This model scored 0.83351 on the private LB. To improve this slightly, I ensembled single-attribute prediction runs only when the row-wise null count for F4 was 1. This conditional ensemble gave the private LB score of 0.83343.
+
+Author
+Sebastian van Gerwen
+
+sebastianvangerwen
+
+arrow_drop_up
+75
+Share
+more_horiz
+Citation
+
+Sebastian van Gerwen. #1 Solution - Denoising Autoencoder. https://www.kaggle.com/competitions/tabular-playground-series-jun-2022/writeups/sebastian-van-gerwen-1-solution-denoising-autoenco. 2022. Kaggle
+
+comment
+20 Comments
+3 appreciation comments
+Hotness
+Victor Severo
+
+Posted 4 years ago
+
+· 352nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+First of all, congratulations! I'm still reading your notebook to understand better how your solution works but it seems really impressive.
+
+May I ask you: did you try any other ML models before this approach? Also, did you already knew that you could use DAE for this use case? I never thought that DAEs could be used to any other problem besides, well, denoising stuff 😅 What I understand is you're treating NaNs as noise which now kind of makes sense but still, really smart solution.
+
+Congratulations again!
+
+reply
+Reply
+Sebastian van Gerwen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks Victor!
+
+The DAE was the model I tried first - I was deliberately looking to not have to iterate over the features so an autoencoder seemed quite natural. But I don't claim to be the only person to have thought of this! @masatomurakawamm uses a masked autoencoder-like model here, and @ehekatlact suggests an autoencoder and GAN in this thread.
+
+I think it was more important to persevere with the idea of using an autoencoder using a couple of the tricks I mentioned to have the network focus on imputing the NaN mask. Versions of autoencoders I tried that didn't have some embedding/attention mechanism for the dropout mask performed quite poorly.
+
+reply
+Reply
+Towhidul.Tonmoy
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for the insights! Bookmarked! And congratulations! @sebastianvangerwen
+
+reply
+Reply
+Shanks114
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+good explaination
+
+reply
+Reply
+The Devastator
+
+Posted 4 years ago
+
+· 79th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Incredible!
+
+I have a question regarding the training regime of your denoising autoencoder. When you are masking values in the input data, are you using the same mask for all data points in a single batch? I.e. are you sharing the same random mask across all data points in a batch?
+
+reply
+Reply
+Sebastian van Gerwen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks!
+
+No, the mask is separately randomly generated for each batch, and is random binomial across the batch (so each row has a different mask).
+
+reply
+Reply
+ArturRa
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Awesome! I've just sorted out your brilliant solution. I wonder one question. Did you try set more values to zero in random mask than "at least one value"? Maybe adding this in some proportion.
+
+reply
+Reply
+Sebastian van Gerwen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, my post might have been misleading. The random mask is binomial distributed with a binomial probability of 5%. I experimented with a couple of binomial probabilities and 5% performed best.
+
+The "at least one value" requirement was an additional step, just so no rows have zero masked values during training. Since losses are only non-zero at masked values, a training item without nulls would not update the parameters at all. So I just apply the "at least one value" mask to save computation time.
+
+In practice, the function that I used to mask wasn't quite binomial because it was the OR intersection of the binomial mask and the "at least one value" mask - if you have a look in my notebook the function is listed there as random_mask().
+
+reply
+Reply
+Akshay Kumar Kushwaha
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congo sir, You really made it
+
+reply
+Reply
+What
+
+Posted 4 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I thought there was a much more elegant solution than just iterating over all the NaNs using many neural models. Here it is. Beautiful solution, congratulations on a well-deserved victory!
+
+reply
+Reply
+Niek van der Zwaag
+
+Posted 4 years ago
+
+· 64th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Wonderful stuff, congrats on 1st 🙌
+
+reply
+Reply
+Saeedeh Kamjoo
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the excellent tutorial. 👍 I have a problem. How to use custom filters instead of Tensorflow filters? Can you put the TensorFlow version here?🙏
+
+reply
+Reply
+Perfect Is Shit
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing, just some basic questions. I think you use this DAE to generate new features if I'm not wrong. Here's questions: (1) how do you use these features, I mean you use the weights themselves or combine them with the original features together? (2)If former it seems you have to concat the target, so the row of weights is the same as the original targets? and what is the model used for training on them? (3)If latter, still why the row numbers are the same? or how to concat with the original features? Thanks.
+
+reply
+Reply
+Sebastian van Gerwen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I actually don't use the DAE to generate features. The DAE is the model itself.
+
+In training, I simulate missing values with dropout (the random mask section of the model). Then, for prediction, we pass the vector of actual null values as the mask, so the DAE imputes the nulls. I hope this helps!
+
+reply
+Reply
+Moiz Bohra
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Good Explanation
+
+reply
+Reply
+Praveer Towakel
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Well done!
+
+reply
+Reply
+graham broughton
+
+Posted 4 years ago
+
+· 132nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+awe man, I knew I should have tried DAE. Someone said they had poor results with one so I didnt try it. wait… maybe that was you! lol
+
+reply
+Reply
+Appreciation (3)
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing!!!
+
+Arimi Shimada
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing.
+
+Dwarakesh Padala
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Interesting! Thank you for sharing.

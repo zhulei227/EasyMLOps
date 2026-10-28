@@ -1,0 +1,1012 @@
+url: https://www.kaggle.com/c/playground-series-s4e8/discussion/531823
+fetched: 2026-10-27
+chars: 29910
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution: 72 OOFs, a whole lotta Autogluon, and 31 scores of 0.98512 or above (on the private LB) — Binary Prediction of Poisonous Mushrooms
+1st Place Solution: 72 OOFs, a whole lotta Autogluon, and 31 scores of 0.98512 or above (on the private LB)
+
+Binary Prediction of Poisonous Mushrooms
+
+Solution Writeup · 1st place · Sep 4, 2024
+
+Apologies for such a long post - to paraphrase the famous words of Blaise Pascal, I didn't have the time to make it shorter.
+
+Well, that was a very satisfying competition indeed! The core of my success was the same as described (along with some back story) in my post from last month (4th place solution, PSS4E8) - large ensembles, and a whole lotta hustling in the absence of serious resources outside Kaggle.
+
+While this month wasn't as frustrating as last month, with "only" 3 million samples instead of last month's 11, we did have about twice as many variables. But everything was more manageable in terms of space and storage, though I did face some familiar frustrations in terms of GPU quota and 12 hour run limits on Kaggle.
+
+The TLDR is similar:
+
+Gathered a veritable zoo of models, ensembled them, kept an eye on CV & model diversity, & kept ensembling while score increased
+Kept running out of GPU and execution time (at 12 hours) on Kaggle
+Experimented a lot more with Autogluon
+Kept experimenting with everything: new models, hyperparameters, ensembling approaches, etc. Ended up with nearly 80 OOF arrays, used 72 in the end
+Ended up with 31 scores of 0.98512 or above (0.98511 being the second highest on the private LB), the first of which was achieved on August 17th, with two weeks remaining in the competition.
+
+Before I go on, let me acknowledge the generosity of those who shared their insights, findings and code, including but not limited to
+
+@ambrosm, @siukeitin, @nischaydnk, @gauravduttakiit, @rzatemizel, @ravaghi, @oscarm524, @ravi20076, @tilii7, @roberthatch, @omidbaghchehsaraei, @trupologhelper, @arunklenin, @carlmcbrideellis
+
+It was great to have @ambrosm back this month, as another of his wonderful EDA notebooks helped many of us get up and running - it (and some blending) helped me get to a score of 0.98516 on day 1 (private: 0.98498). A few things were clear right on day 1, including that Autogluon was doing very well on this dataset, and I noticed in @gauravduttakiit's notebook with LazyPredict results that Random Forests and Extra Trees were quite competitive this time around, and made a mental note about including them in my ensembles. As soon as I saw @siukeitin's brilliant post about an exact solution to the original dataset, I added the probability of being poisonous as a new feature, reasoning that it could be a proxy for the "signal" from the original still present in the current dataset. It helped boost the score of some models, just as including the original did - and even when they didn't boost the score, they added to the diversity of the ensemble. @carlmcbrideellis was the catalyst for that work by @siukeitin, as he provided a dataset with a million mushrooms, based on the original dataset. He also initiated a competition for perfectly predicting the labels on his dataset in the least time - playing around with that helped me figure out that one can speed up LGBM by setting "num_threads" = number of CPU cores.
+
+I spent a fair amount of time on Autogluon (AG) this month, as there were so many notebooks using it to achieve great scores on the public LB. @gauravduttakiit also showed the importance of using GPUs and long runs with AG, when just using a GPU made the score jump from 0.98482 to 0.98524, without changing the rest of the code. Meanwhile I had to ensemble a few dozen models to get anywhere near that. I immediately launched a long GPU run of AG, which led to the single-most frustrating moment of the competition, as Kaggle killed the notebook after 12 hours, right in the middle of producing the output files 😡
+
+From the beginning, I explored ensembling using various methods, including Hill Climbing, which was more feasible this month than last, when it was a nonstarter beyond 10-15 models. This month I used it till the very end, though it took over 2 hours once I went beyond 60 models or so. One of my breakthrough scores (0.98530 without any blending) came via a combination of Ridge and GBDTs for ensembling. However, Ridge generally gave the best combination of speed and LB score, so most of my submissions used that. It helped me get to the first score where I started to feel confident, as an ensemble of about 50 models achieved 0.98525 without any "blind blending". Unbeknownst to me, this also achieved a score of 0.98512 on the private LB (with 2 weeks to go), which might have sufficed to win. So in some sense, I was running up the (teeny) margin after this, though of course I had no way of knowing this.
+
+Highs and lows of experiments with Autogluon (AG) With about 10 days remaining, I decide to invest more time in experimenting with AG, which seemed likely to help push my scores further. After perusing several notebooks, I noticed that XGBoost and CatBoost were the weakest models within AG, which was interesting, especially since XGBoost was the best performing outside of AG/AutoML. I reasoned that excluding them might improve AG's score by giving more time to the better performing models - it didn't improve, but it didn't worsen either, and one could achieve the same score in about half the time. I then noticed that the top ensemble was almost always of GBM and XT alone, so I dropped everything else, and the score was only about 0.0001 less. Finally, I decided to run individual models alone via AG, and ensemble them myself, to see whether this would allow each model more time, and thereby lead to an improved ensemble score, and it did, though again only by about 0.0001. Finally, I decided to throw my OOFs into AG - but that's a story for later (about two paragraphs later).
+
+Three ways to 0.98535, en route to 0.98537 After the "debacle" of June, when I held the no. 1 spot for the second half of the month while overfitting to oblivion, I remained focused on building a robust ensemble. But I wasn't above some "blind-blending" when I had submissions remaining for the day with too little time to get new results to add to the ensemble, and indeed that was part of how I first got to number 1 this month. I did try to use two other solutions (Gaurav & @nischaydnk's) built differently from mine but with about the same score of 0.98525, and ended up with 0.98532. A few days later, two such blends of mine with @arunklenin's 0.98527 got to me to 0.98534 and into the lead. Finally I used the "insert confident disagreements" approach to overwrite my prediction with those of another model/ensemble, if the latter produced a sufficiently high probability (say > 0.99), which produced my first LB score of 0.98535, albeit on rather shaky grounds (the private LB for this turned out to be mere 0.98506).
+
+So far, my CV scores had generally been < 0.98510 (with ensembles), and < 0.9850 with solo models (range: 0.97844 - 0.98494). I started using AG OOFs along with the solo models, and this finally helped me get to a CV of 0.985087, and LB of 0.98533 (private: 0.98513) with 66 OOFs. At this point, I was starting to feel good, since this was easily the best score I'd obtained without any blending with others submissions. Meanwhile, AG with CPU was giving me about 0.98524.
+
+Finally, I decided to throw in some OOFs into AG - I was wary of too many OOFs exhausting the run time on Kaggle, so I used Hill Climbing to decide which OOFs to use, and added the 8 which were chosen by hill climbing on top of the highest scoring AG OOF. Throwing this mix into AG, I launched the run and frantically kept monitoring the intermediate results, until the run concluded with an AG leaderboard score of 0.985124. Excited, I submitted with anticipation, and bingo! the LB score was 0.98532 (private: 0.98516). With ensembles of 0.98533 and 0.98532, I was feeling better and better, though I was quite aware that any number of brilliant Kagglers could overtake me at any time (some probably hidden by the army of blenders lurking nearby as well).
+
+At long last, I decided to throw caution to the winds, and threw all 72 OOFs into AG, and to my delight, even a CPU run produced 0.98535 on the LB (private: 0.98512), an 0.98535 that I was much more confident about than the first one. In the meantime, I'd seen many people stuck on 0.98533 and 0.98534 for days, so it did seem that 0.98535 was potentially close to a winning score.
+
+I had no GPU quota left, so I searched outside Kaggle, in vain. Saturn Cloud offered 15 hours per month, but you couldn't run anything for that long at a go without assistance from their team. Lightning.ai offered 22 hours per month, but no more than 4 hours of GPU at a time. Nevertheless, I tried to repeat the AG run with 72 OOFs there, and quickly realized that they lacked several packages I took for granted on Kaggle, as they were set up for Deep Learning. So no LGBM (initially a shock!), and so on. I noticed that they had an option to use 32 CPUs, so I decided to go for a 3 hour run with that, reasoning that it might just be better than 12 hours with 4 CPUs on Kaggle. I was afraid that the results might be underwhelming, but to my great relief, it produced another 0.98535 (private: 0.98513).
+
+By this time, there were lots of people right behind me - I was more concerned about known strong performers like @tilii7 at 0.98533 and @oscarm524 at 0.98532, since I knew they were doing solid work and not just blending away into the ether. I indulged in a not so blind blend of my 0.98535s, which led to a public LB score of 0.98537 (private: 0.98513) - I knew it wasn't necessarily going to score any higher on the private LB, but at least it might give pause to some of the pursuers 😀
+
+I also did some trial and error ensembling of my two solid 0.98535s, but didn't choose any of them among the final two, as they scored 0.98535 or lower. Interestingly, my best private LB scores came from here - a 50-50 blend produced a private score of 0.98517, my highest; several others produced 0.98514. A 90-10 blend of my highest 0.98535 with the 0.98533 from a Ridge ensemble of 66 models produced a public score of 0.98533, but private of 0.98516 (second highest).
+
+Moral of the story - trust your CV score, and keep building while keeping CV and LB in good agreement. Avoid blind blending as much as possible, tempting though it may be.
+
+I had some great plans for the last few days, but a combination of a family emergency & running out of steam meant most of it remained unrealized. I couldn't follow @tilii7's advice of learning xLearn, didn't run models like TabNet which I'd run last time, and didn't do a sufficiently deep dive into optimizing any one model, like pushing XGBoost beyond 0.9850 (CV), or rescuing CatBoost from the CV < 0.9848 range, etc.
+
+All along, my public LB scores were about 0.0002 more than my CV scores with Ridge, and 0.0001 than my CV scores with Hill Climbing. So I was expecting the private LB scores to be about the same as my CV scores, and that proved to be the case. Early in the month, many had expressed confidence that there wouldn't be a major shakeup, as we had millions of samples, whereas some, like @oscarm524, expected a shakeup, since people would deal with the noisy data in various ways that may not generalize to the private data. In the end, the blenders proved that one can indeed overfit even datasets with millions of samples, as there was quite a shakeup. On the other hand, people like @neupane9sujal, @bwandowando, @co000l, @ravaghi, @roberthatch and others made impressive jumps of 50-200 positions on the LB! Congratulations to them and everyone who finished in the Top 10 or 25. Personally, after dropping from 1 to 113 two months ago, this month feels like having grown a bit as a Kaggler.
+
+All this month, I kept meaning to turn away from Kaggle & spend more time on the course on LLMs that I'm (supposed to be) also doing, but I was pretty much obsessed. Last month, I came 4th but got a tshirt thanks to @tilii7 having already finished in the Top 3 before. I'd said then that one day, I'll earn the t-shirt that someone else gets - it's immensely gratifying to have that come true already.
+
+Now that I've managed to get a t-shirt and the no. 1 spot, I shall step back and participate more judiciously, as I really need to put in time on the LLM course (any pointers to interesting datasets for an LLM project? Thanks in advance!). I'll keep submitting from time to time, but shall keep intense participation for the last week of the month, if then. All the best to everyone! It's been an amazing six months chasing the leaderboard in the playground series! Many thanks to everyone who helped along the way. I want to start spending more time on the rest of Kaggle (and elsewhere) now, but shall continue to participate in the Playground Series, which has been one of the best things about a difficult year for me - many thanks to Kaggle, and to all of you who make this such a fun and engaging experience.
+
+Happy Kaggling!
+
+Author
+Optimistix
+
+optimistix
+
+arrow_drop_up
+64
+Share
+more_horiz
+Citation
+
+Optimistix. 1st Place Solution: 72 OOFs, a whole lotta Autogluon, and 31 scores of 0.98512 or above (on the private LB). https://www.kaggle.com/competitions/playground-series-s4e8/writeups/optimistix-1st-place-solution-72-oofs-a-whole-lott. 2024. Kaggle
+
+13
+23
+comment
+54 Comments
+1 appreciation comment
+Hotness
+Harshit Sharma
+
+Posted 2 years ago
+
+· 441st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Congratulations @optimistix on an incredible win and detailed breakdown—your persistence and ensembling mastery truly paid off! 🎉
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you so much!
+
+reply
+Reply
+Jesus Jhonny
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on Your Amazing Kaggle Win!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the support!
+
+reply
+Reply
+gregory gorbov
+
+Posted 2 years ago
+
+· 517th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Could u please explain what is blind blending ?
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Sorry if you thought it's an established term - you could also say e.g. ad-hoc blending, it's my way of referring to the case when people just combine predictions without any insight into how they were produced, e.g. taking the output of many public notebooks, and simply using their mode as your submission. This often works well on the public LB (or appears to, because you can see the public LB score), but usually fails to generalize to the private LB.
+
+reply
+Reply
+gregory gorbov
+
+Posted 2 years ago
+
+· 517th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thx very much for clearity. I want to know what is the other way to get weights, could you name a several if it is not a big discussion. As i understand it is better to use local CV score as weights for ensamble cuz it gives more generalizable score
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+It's a huge topic, and this is the best resource that I know of:
+
+https://web.archive.org/web/20160304031055/http://mlwave.com/kaggle-ensembling-guide/
+
+reply
+Reply
+SCRIPTCHEF
+
+Posted 2 years ago
+
+· 287th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Well done, this was definitely an inspiring story and impressive that you pulled through to first despite life getting in the way. Proves a slow steady systematic approach is better than ad hoc blending. Keep it up!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you!
+
+reply
+Reply
+Oscar Aguilar
+
+Posted 2 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@optimistix, congratulations on winning first place! These days, winning a competition (even a tabular competition) is not easy and takes a lot of hard work and consistent dedication. Your approach write-up really shows all the work you put into this competition. By the way, thanks for the mention.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks so much, and you're most welcome - I always enjoy reading your clean code and write ups. One of the things I forgot to mention in my write up - I also tried your approach of ensembling by model type, and then ensembling the ensembles, but it didn't improve the overall score (but it was fun to see nice big numbers against each model class/category).
+
+reply
+Reply
+Saim Nasir
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks alot brother, this is something that everyone needs to acknowledge!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you!
+
+reply
+Reply
+BHANUPRAKASH
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for acing the top 1 position..!!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much!
+
+reply
+Reply
+KBRASK
+
+Posted 2 years ago
+
+· 2050th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You're most welcome!
+
+reply
+Reply
+Mahdieh Mortazavi
+
+Posted 2 years ago
+
+· 172nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for generously sharing your knowledge with us.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You're most welcome! I've just done what's expected - and I've personally benefited from many others sharing their knowledge, so it's the least I can do.
+
+reply
+Reply
+2
+Sahada Jam's
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Ok. Finally wy TH. ยับเยิน Go To Dubai. 😆😆😆
+
+reply
+Reply
+Sahada Jam's
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Okay Go.😄😄😄😄
+
+reply
+Reply
+Catadanna
+
+Posted 2 years ago
+
+· 521st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Kaggle killed the notebook after 12 hours, right in the middle of producing the output files
+
+I know that so well, and as you say : 😡
+
+reply
+Reply
+Swandip Singha
+
+Posted 2 years ago
+
+· 59th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congratulation bro for being top 1
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, and congrats for your top 2.5% finish!
+
+reply
+Reply
+Kunritty He
+
+Posted 2 years ago
+
+· 684th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Really informational notebook! As a beginner, I was just wondering how much time do you dedicate to feature engineering-finding what changes and additions work and which don't?
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much! I generally don't spend too much time on feature engineering, as the noisy nature of the synthetic data used in the playground series often renders it useless. But it depends on the data in a specific competition. I also regularly read and participate in discussions, and sometimes that leads to useful features being added to my arsenal.
+
+reply
+Reply
+Tanishk Patil
+
+Posted 2 years ago
+
+· 740th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation! Learned something new today.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! Glad you found it useful.
+
+reply
+Reply
+Anupam Kumar Paul
+
+Posted 2 years ago
+
+· 1298th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+First off, congrats on winning!!! This was my second competition and i will say my ranking has improved and i now know quite few more things. What is OOF though? And could you give some pointers on where to learn all these different models used by everyone? Also as a newbie, how to process the notebooks faster or like defeat the 12 hour limit on kaggle?? Thanks for your time!!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! OOF stands for "out-of-fold" to see what that means and how such predictions are used for ensembling, you could check out this link.
+
+To learn about various models, you can use your preferred combination of textbooks, videos, online materials and Kaggle notebooks and discussions. In terms of processing faster, a few simple things could be optimizing your own Python code, using libraries that support faster computation (e.g. Polars, cuDF, etc.), tweaking hyperparameters of models, etc. Note that defeating the 12 hour limit may not always be possible, or may involve a tradeoff - e.g. you can specify how long Autogluon should run, and can get useful results in as little as 15-30 minutes, but the longer you let it run, the better the results shall usually be.
+
+reply
+Reply
+Sujal Neupane
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@optimistix Congratulations on 1st position and that is nicely detailed write-up. I got some new ideas that I'll definately try out. And again congrats!!!!!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, and congrats again on your no. 2 finish, and awesome jump of nearly 200 on the LB!
+
+reply
+Reply
+MrSimple
+
+Posted 2 years ago
+
+· 118th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing work! Congrats!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much for the kind words, @mrsimple07!
+
+reply
+Reply
+EUISANG LEE
+
+Posted 2 years ago
+
+· 939th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+First of all, really congratulations!!! This is my first time participating in this competition, and although I am not ranked high, I was able to think about many things while participating. And while reading your article, I felt inspired and passionate.
+
+Lastly, congratulations again.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much! Glad it was useful to you.
+
+reply
+Reply
+Pushpit Kamboj
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+can you share the competition notebook for reference
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+There's no single notebook - the work is scattered across dozens of notebooks. However, you could refer to the excellent notebooks by @ambrosm, @ravaghi & @rzatemizel to see how to use multiple models along with generating and saving OOF matrices, and then using them for ensembling. I did the same, but for a large number of models. You can also refer to @siukeitin's notebook for an exact solution for the original dataset.
+
+reply
+Reply
+Pushpit Kamboj
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the help
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You're most welcome!
+
+reply
+Reply
+Robert Hatch
+
+Posted 2 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This was an awesome read - well deserved and congrats!
+
+reply
+Reply
+Robert Hatch
+
+Posted 2 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This was the second competition where the original dataset had no noise, so it was all injected by the GAN. LGB was amazing in the other one too. And never tried XT last time, but in this one I think it was really really amazing for learning a form of "which half of this half-poisonous half-edible is more than half?" The nature of the noise probably playes will with the same algorithmic features that make XT good at outlier detection(?)
+
+Just speculation but it makes sense to me.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much! Great point about LGB being amazing when the original dataset was noise-free (I think the flooding dataset was somewhat fact-free as well). Interesting speculation about XT - I should look into them in more detail.
+
+reply
+Reply
+Robert Hatch
+
+Posted 2 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+"fact-free" ROFL well said!
+
+reply
+Reply
+Jack Lee
+
+Posted 2 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning first place, and thank you for sharing your detailed insights! Your use of GPUs and incorporating OOF into AutoGluon has been truly enlightening for me.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much, and congrats on your 8th place finish!
+
+reply
+Reply
+Paulo Gaspar
+
+Posted 2 years ago
+
+· 1305th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on such achieving! Thanks for such an inspiring and detailed explanation.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much for your kind words, @pauloagaspar!
+
+reply
+Reply
+1
+Tilii
+
+Posted 2 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@optimistix Well done, and thank you for summarizing everything. Good to see that your determination and a systematic approach paid off. It seems to me that you refined the whole approach to competitions over the past 4-5 months, and in my book that is worth more than any LB placement. Still, I am happy that you also got a top spot, and convincingly so - at least by Kaggle standards.
+
+Separately, I got about 4 more mentions in your writing than I deserved, so thank you for that.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! The learning is definitely what matters in the long run, but in the short term I'm not above extracting a little extra satisfaction from tiny differences in the fifth decimal place, and ending up high on the LB. And every time you were mentioned was absolutely deserved 😀
+
+reply
+Reply
+Michael Tinglof
+
+Posted 2 years ago
+
+· 1485th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for such a detailed explanation!
+
+This is my first time hearing of Autogluon. I will need to give it a shot for the next competition!
+
+Again, congrats on the 1st place. Hopefully you'll revel in this for a few months before coming back to the competitions.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! I suspect I'll hang around, but in low-key mode.
+
+reply
+Reply
+JuseTiz
+
+Posted 2 years ago
+
+· 107th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on securing first place! I found your detailed solution incredibly insightful and learned a lot from it.
+
+I have a question regarding model diversity. You emphasized its importance in your approach, and I’m curious—did you incorporate different feature engineering techniques in the out-of-fold predictions to enhance the performance of the final ensemble?
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Glad it was useful to you. I'm not sure what you mean by incorporating different feature engineering techniques in the out-of-fold predictions - do you mean, e.g. running the same model with different feature subsets? Or actually engineering different features for different models?
+
+reply
+Reply
+JuseTiz
+
+Posted 2 years ago
+
+· 107th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your response. I apologize if my previous question was unclear. To clarify:
+
+For example, when you run LightGBM (or any other models), do you use different feature combinations, such as combination A and combination B, each with varying hyperparameters, to generate multiple OOF and test data predictions? Or, are all the results for your final ensemble based on the same feature combination, meaning that all models use exactly the same set of features?
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for clarifying. I don't usually drop the original features, but yes, newly derived features will be included with some models but not others. Most of the variety comes from playing around with the hyperparameters, including or excluding the original dataset, varying the number of folds, etc.
+
+reply
+Reply
+Mahdi Ravaghi
+
+Posted 2 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for a very comprehensive write-up! I was waiting anxiously for this. You have worked very hard and smart on this competition and earned yourself a well deserved 1st place. Big congratulations to you.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much! Was delayed partly due to the GP, and partly the aforementioned emergency. I hope it's not too late to find many readers. And congrats once again on becoming a Master!
+
+reply
+Reply
+Mahdi Ravaghi
+
+Posted 2 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! I assume there are many like myself who want to know how you won and learn from your solution. More readers will surely come.
+
+reply
+Reply

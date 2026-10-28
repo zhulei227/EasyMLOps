@@ -1,0 +1,346 @@
+url: https://www.kaggle.com/c/playground-series-s6e6/writeups/1st-place-mission-300-accomplished
+fetched: 2026-10-27
+chars: 11585
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - "Mission 300+" Accomplished! — Predicting Stellar Class
+1st Place - "Mission 300+" Accomplished!
+
+I set myself the goal of an upwards jump on the private LB, ideally of 300+ ranks
+
+Predicting Stellar Class
+
+Solution Writeup · 1st place · Jul 2, 2026
+
+This competition began well enough, but about two weeks in, the blind blenders started climbing the public LB with a vengeance, and any steady improvement in ranks based on CV-LB agreement became nearly impossible. At this point, I set myself the challenge of resisting the temptation to blend with a high scoring public nb just to see my name high up the list, and instead hold steady with the right approach even if I kept sliding down the public LB, potentially setting myself up for a big climb up the private LB. It was amazing to eventually manage the jump from 344 to 1 - a second consecutive #1 finish is especially gratifying. Before I go on, I'd like to thank those who generously shared their code and/or insights, including (but not limited to) :
+
+@cdeotte, @omidbaghchehsaraei, @yekenot, @masayakawamata, @fachri00
+
+Now for the details:
+
+It was easy to get quickly started - with another 3-class, Balanced Accuracy challenge just 2 months after a similar task in April, there was a lot of readymade code to quickly adapt and reuse. Coupled with the generous gift of several great notebooks and a fast Logistic Regression stacker by @cdeotte, I quickly had a decent ensemble of 30+ models humming, with a reasonable agreement between CV and LB. But soon the public LB became inundated with a deluge of blind blending notebooks - the seemingly distant barrier of 0.97200 on the public LB was swiftly overcome, and scores kept inching northwards. Around the midway mark, I reached CV = 0.970506, LB = 0.97171 with 49 models. This proved to be hard to improve upon, and I began to see that the ceiling with a proper CV framework was within LB = 0.97200, and perhaps CV 0.97080, making it extremely unlikely that the top LB scores were achieved with anything but blind blending and LB probing. There were a subset of users and notebooks with particularly amusing statements and claims, declaring premature victory, accusing others of jealousy, claiming "advanced" classification, etc. Once such notebooks are available, it's tempting to blend your own models with them and achieve a score that keeps your name high up the public LB. Of course, that usually results in a crash on the private LB, as I learned pretty early on. So the question then becomes whether you want to do it anyway, but choose your final two submissions based on CV-LB agreement - tricky in case you forget to choose the right final submissions, but can be pulled off.
+
+I decided to set myself a different goal this time - of resisting the temptation, staying calm as I inevitably fell down the public LB, and hopefully reap the eventual benefits of a robust approach to climb up the private LB. I was visualizing a jump of > 300 ranks, but of course it wasn't entirely in my hands - if my best public LB happened to be in the top 300, then so be it. As I fell to 340+ on the final day, I was fairly confident of achieving the goal, since I only had to place in the top 40 or so (the higher the better, of course). Jumping all the way to #1 was of course the icing on the cake!
+
+A few technical notes:
+
+Model Diversity : As usual, I tried many diverse models and approaches, including XGB, LGBM, CatBoost, RealMLP, TabM, ET, HGB, RF, YDF, FT-Transformer, TabNet, and many more. I took advantage of AutoML libraries like Autogluon, Light AutoML, FLAML and PyTabKit. My best scoring solo was a CatBoost based on @cdeotte's CAT-v3, with additional feature engineering and HP tweaking. Claude Code made it easier than ever to keep adding new, diverse models.
+
+Feature Engineering : Once again, I created several notebooks with "Heavy FE" of the kind seen in excellent notebooks by @cdeotte, @masayakawamata, @mahoganybuttstrings and others in past playground episodes, with 200-400 features; and also reused excellent features from others.
+
+Ensemblers : I tried many, including Logistic Regression (LR) with Logits, XGB, LGB, CatBoost, Simple MLP, RealMLP, FLAML & Autogluon. LR with Logits & MLP were the best overall.
+
+Final Push The midway mark of CV = 0.970506, LB = 0.97171 wasn't hard to beat, but CV = 0.97060, LB= 0.97180 sort of became the wall. No matter how many new models I added, those two numbers could not be beat. New models would come and displace old ones in importance, but the overall score remained within the above limits. As ensemble size grew towards 100 and beyond, performance actually deteriorated. So I returned to earlier points a few times, and resumed adding models from there, rather than keep growing ensemble size to 150 and beyond. An interesting pattern which emerged was that MLP often achieved better CV, but lower LB compared to LR-Logits. In the end, I had two LR-Logits ensembles which scored 0.97179 on the LB, with CV 0.970510 (49 models) and 0.97573 (78 models), respectively. The best MLP ensemble had a higher CV at 0.970598, but LB of "only" 0.97172 (89 models). And then there was my best LB submission of 0.97188, which was achieved via voting over 3 submissions - I decided that it was just a lucky combination which benefited from getting a few extra cases of the rarest class right, and was unlikely to translate to a better score on the private LB. In the end, I chose the LR-Logits submission/ensemble with the higher CV among the two that had the highest LB score, and the MLP one with the highest CV. It was the MLP submission that won me the competition - a classic case of the Kaggle wisdom of "Trust your CV" paying off yet again.
+
+I'd like to end with a big congratulations to @xx1263, @nybbler, @cindyxue1122, @milanfx & all others who finished strong and/or learned new things. All the best for July, and Happy Kaggling!
+
+Author
+Optimistix
+
+optimistix
+
+arrow_drop_up
+32
+Share
+more_horiz
+Citation
+
+Optimistix. 1st Place - "Mission 300+" Accomplished!. https://www.kaggle.com/competitions/playground-series-s6e6/writeups/1st-place-mission-300-accomplished. 2026. Kaggle
+
+9
+comment
+15 Comments
+Hotness
+EUGENEYEUNG
+
+Posted 4 months ago
+
+· 417th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @optimistix !
+This is a great inspiration to pursue the superiority of my own models rather than just chasing scores on public leaderboards.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much, and glad to hear that - all the best!
+
+reply
+Reply
+Navneet
+
+Posted 4 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Bravo for 1st Place @optimistix
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot!
+
+reply
+Reply
+Georgy Mamarin
+
+Posted 4 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the second #1, and on keeping your finals on CV even while the public board had you at 344th. That 344-to-1 is the cleanest case I know for why public rank is not the thing to chase, so I added it to my S6E6 notebook's postscript. Really good write-up.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the kind words.
+
+reply
+Reply
+Shivam
+
+Posted 4 months ago
+
+· 1752nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @optimistix !
+That's really amazing, I still need a lot to learn.
+This month I will experiment more.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, and all the best!
+
+reply
+Reply
+vedant pol
+
+Posted 4 months ago
+
+· 215th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @optimistix — a 344→1 jump and back-to-back #1s is seriously impressive. 🙌
+
+Your write-up hit home: I landed 240th doing exactly what you resisted — chasing the high public blends and LB-probing instead of trusting CV, then crashing on the private LB. Lesson learned the hard way. Thanks for sharing the approach — genuinely learned a lot. Well deserved! 🚀
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! We all learn the lessons of overfitting early on (though some refuse to learn). All the best!
+
+reply
+Reply
+Vijay Takbhate
+
+Posted 4 months ago
+
+· 733rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, @optimistix, on securing 1st place! 🎉
+
+I have a genuine question for you and @nybbler.
+
+I also competed in this competition, but I was only able to train my 7 best models. You, however, trained a large number of models for ensembling.
+
+My question is: How do you find the best hyperparameters for each new model?
+
+For every new model I try, I typically use Optuna or random search to find the best-performing hyperparameters. I'm curious about your workflow. Do you tune every model individually, reuse parameter sets from previous experiments, or follow a different strategy?
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! A new model doesn't necessarily mean one with new HP - it could be new due to new FE. Also, while one can always choose HP via HPO, one can also reuse old HP, borrow from public notebooks, tweak a few HP to generate several models, and so on. The bigger your ensemble, the less important it becomes to optimize HP.
+
+reply
+Reply
+1
+nybbler
+
+Posted 4 months ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@vijay20213 I am too new/green to be be qualified to answer this really, but my instinct (fwiw) is that hyperparameter tuning was not particularly central at least to the approach that I took. The key (for me) was breadth, which was a challenge because the inherent dimensionality of the feature space was very low (<2 in my estimation).
+
+reply
+Reply
+Vijay Takbhate
+
+Posted 4 months ago
+
+· 733rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, @optimistix, for clearing my doubt about reusing or borrowing HP from public notebooks; tweaking it a bit will help me reduce time for HP searches. Plus, @nybbler said, 'Well said, feature engineering was the challenging part for this competition.'
+
+reply
+Reply
+nybbler
+
+Posted 4 months ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @optimistix ! There was a discussion post somewhere about whether the public LB was just overfit and I predicted a large shakeup, and I actually meant to make a prediction that you would be in the top 10. Making #1 twice in a row is impressive!
+
+I will post my solution write-up soon - unfortunately (well fortunately) I’m on holiday right now, and my server seems to be down so I can’t access all my files. I will see what I can reconstitute soon!
+
+It’s nice to see good approaches winning through.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much, and congrats to you as well, for another great finish. I think most of us with some experience of the TPS were expecting a massive shakeup. Enjoy your holidays!
+
+reply
+Reply
+Matt Baker7
+
+Posted 3 months ago
+
+· 2386th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Good job on first place
+
+reply
+Reply

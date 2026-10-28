@@ -1,0 +1,503 @@
+url: https://www.kaggle.com/c/ariel-data-challenge-2024/discussion/544317
+fetched: 2026-10-27
+chars: 14622
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — NeurIPS - Ariel Data Challenge 2024
+1st Place Solution
+
+NeurIPS - Ariel Data Challenge 2024
+
+Solution Writeup · 1st place · Nov 4, 2024
+
+link to notebook
+
+Introduction
+
+We ( @daiwakun and @cnumber) would like to thank the organizers for hosting this fascinating competition, especially @gordonyip and @lorenzomugnai, who worked tirelessly so that competitors could focus on the more "interesting" parts.
+
+Also, a huge applause to @jeroencottaar for maintaining first place for almost the entire duration of the competition. Although we managed to grab victory at the end of the race, we are confident that we would have lost had the competition period been one day shorter or one day longer.
+
+Many ideas in our solution were found during a deep examination of the ExoSim2 and TauREx3 code used for data generation, including gain drift fitting and foreground processing. Although we didn't (or couldn't) find any leaks, we have to admit that our solution somewhat "hacks" the simulator. Nevertheless, we hope the hosts can make use of some aspects of our solution, and hopefully, it would be useful for the actual data.
+
+For those who are curious about our significant score improvement during the last two days of the competition, we have decided to present what was going on in our team in another post
+
+Solution
+Signal Preprocessing
+
+Only the AIRS-CH0 channel was used because our solution heavily relies on the correlation between adjacent wavelengths, and also because we were unsure how to effectively utilize the FGS1 channel data due to issues with its distorted and fluctuating point spread function.
+
+The public notebook (we wanted to put a link, but we couldn't find the notebook we used) was used with the following changes:
+
+Disabling Hot Pixel Processing: This led to a significant jump on the leaderboard. We assume that the hot pixel processing leads to unwanted information loss of the pixels in the middle of the sensor, making it almost impossible to correct the noise introduced by the time-dependent PSF distortion (see image below). Perhaps it is the sigma clip algorithm that is doing the wrong thing and that there exist algorithms that can handle hot pixels properly, but we weren't able to find them.
+
+Foreground Processing: Some teams have noticed that multiplying the final spectrum by a coefficient around 1.006~1.008 gives a huge boost. This is because a foreground is added to the signal during the ExoSim2 simulation [link to GitHub]. The correct way to handle this is to estimate the wavelength-dependent foreground signal and to subtract it from the signal in the central region. In our solution, we decided to estimate the foreground signal with the regions [0:8] and [24:32], and subtracted it from the central region [8:24]. The effect of considering the foreground properly can be seen in this discussion post.
+
+Initial Dip Estimation for Each Wavelength
+Identifying the Transit Interval
+
+For identifying the time location of the transit, the wavelength-averaged signal was used. After estimating the approximate time position using a rule-based algorithm, the exact time was identified with a fitting algorithm.
+
+Gain Drift
+
+Gain drift refers to the variation in the detector's gain over time and across different wavelengths. These drifts can introduce systematic errors in the observed signal and must be corrected to accurately estimate the transit dip.
+
+ExoSim2 models the gain drift as:
+
+(
+1
++
+𝑓
+(
+𝑡
+)
+⋅
+𝑔
+(
+𝜆
+)
+)
+
+where 
+𝑓
+(
+𝑡
+)
+ and 
+𝑔
+(
+𝜆
+)
+ are polynomial functions.
+
+It is notable that the final function form is different from a two-variable polynomial 
+ℎ
+(
+𝑡
+,
+𝜆
+)
+, because while the wavelength and time components can be separated in the former, they cannot in the latter.
+
+By using this functional form directly in the fitting described below, we were able to achieve high performance in the dip estimation.
+
+Dip Estimation with Gain Drift Fitting
+
+The function used for fitting is as follows:
+
+𝑦
+pred
+=
+𝐼
+(
+𝜆
+)
+×
+Box
+(
+𝜆
+)
+×
+(
+1
++
+𝑓
+(
+𝑡
+)
+⋅
+𝑔
+(
+𝜆
+)
+)
+
+where 
+𝐼
+(
+𝜆
+)
+ is the spectrum of the star, and 
+Box
+(
+𝜆
+)
+ describes the dip; it is 1 outside the transit and 
+1
+−
+𝑑
+𝜆
+ inside the transit.
+
+The number of fitting parameters are as follows:
+
+𝑓
+(
+𝑡
+)
+: 5 parameters
+𝑔
+(
+𝜆
+)
+: 5 parameters
+
+It is worth mentioning that the optimal 
+𝐼
+(
+𝜆
+)
+ and the optimal dip used in 
+Box
+(
+𝜆
+)
+, which minimize the mean squared error, can be found analytically if the other parameters are fixed, and they don't need to be considered by the fitting algorithm.
+
+To stabilize the fitting process, a two-stage fitting was used. In the first stage, 
+𝐼
+(
+𝜆
+)
+ was directly estimated from the raw signal with temporal averaging and fixed during the fitting. In the second stage, 
+𝐼
+(
+𝜆
+)
+ was not fixed and was set optimally for each step during the fitting, while for the fitting parameters, the result from the first stage was used as the initial parameter. The error for each data point used in the fitting was estimated from the variation of the signal at each wavelength.
+
+Dip Error Estimation with Bootstrapping
+
+The errors in the dip estimation at each wavelength differ due to the varying signal-to-noise ratios associated with each wavelength. Bootstrapping was used to overcome this problem and to estimate the dip error of each wavelength.
+
+Further details are available in our code.
+
+Dip Estimation Considering Wavelength Correlations
+
+Three models were used: Gaussian Process Regression, AutoEncoder, and Non-negative Matrix Factorization (NMF). They were ensembled with the ratio 6:2:2.
+
+Gaussian Process Regression
+
+Nothing fancy, unlike the second-place solution.
+
+A simple kernel composed of RBF and Matern kernels was employed, and the errors calculated by bootstrapping were passed to sklearn.gaussian_process.GaussianProcessRegressor so that the model can consider the uncertainty of each data point.
+
+AutoEncoder
+
+We applied an autoencoder to capture relationships in the data.
+
+Unlike PCA, which captures linear relationships, autoencoders can model more complex and nonlinear patterns.
+
+Also, we expected that by training the model with MSE loss, the autoencoder model could take noise into account and recover the "optimal" spectrum.
+
+Important points were to normalize the data for each exoplanet and to take the moving median of the dip spectrum to smooth the input dip spectrum.
+
+The model we used is as below, with 4 nodes in the hidden layer:
+
+input_data = Input(shape=(input_dim,))
+encoded = Dense(encoding_dim, activation='relu')(input_data)
+decoded = Dense(input_dim, activation='linear')(encoded)
+
+autoencoder = Model(input_data, decoded)
+
+NMF
+
+Very similar to the autoencoder, but we added it to enhance the diversity.
+
+Unlike with the autoencoder, the number of ranks was set to 5 for NMF.
+
+Spectral Components Identified by NMF
+
+The plot below shows the identified spectral components by NMF for the training data.
+
+It can be seen that the main contributing gases of each component are:
+
+Component 1: CO₂
+Component 2: CH₄
+Component 3: H₂O
+
+This signifies NMF's ability to consider the correlation of the spectrum unsupervised.
+
+Sigma
+
+We took the weighted average of the following components:
+
+Constant value (planet and wavelength independent)
+Standard deviation of the smoothed predicted dip spectrum (planet dependent, wavelength independent)
+Uncertainty predicted by Gaussian Process Regression (planet and wavelength dependent)
+
+The constant value played an important role in cases where the dip spectrum was almost constant but had some bias.
+
+The Contribution of Each Component
+
+Since our solution incorporates a variety of ideas, we examined the contributions for those that seem important with late submissions.
+
+Method	Public	Private	Public Loss	Private Loss
+Final Submission	0.7330321	0.7420624	0.0000000	0.0000000
+Only Gaussian Process Regression	0.7221480	0.7343485	-0.0108841	-0.0077139
+Only AutoEncoder	0.7078056	0.7181137	-0.0252265	-0.0239487
+Only NMF	0.7017943	0.7122631	-0.0312378	-0.0297993
+With Hot Pixel Processing	0.7021653	0.7224989	-0.0308668	-0.0195635
+Without Foreground Processing
+with *1.008 to prediction	0.7225193	0.7298121	-0.0105128	-0.0122503
+What Didn't Work
+Absorption Spectra of Known Gases
+
+We tried to use TauREx3 to fit the dip spectrum.
+
+Although it worked really well on the training data, the leaderboard score was horrible, presumably because of the shift in the composition of the atmosphere.
+
+We did try to identify the gases in the test data, but without any success.
+
+Denoising the Input Data with Machine Learning
+
+It is quite hard to assume that taking the sum of the [8:24] channels is optimal.
+
+In some cases, the optimal range could be [9:23] or [10:22], or even taking a weighted sum could be optimal.
+
+To resolve this problem, we tried several machine learning methods but didn't manage to beat [8:24], probably due to the temporal spatial fluctuation of the signal.
+
+What We Wanted to Do If We Had More Time
+Utilize the FGS1 channel.
+Final Comments
+
+Deep analysis of the simulation code led to critical ideas needed for our victory. The function for the gain drift or the foreground processing method couldn't have been found without observing the ExoSim2 code. Though we had believed that this is the destiny of competitions that use simulation-generated data, we were very surprised that some of the top teams were able to achieve high scores without using them, so again, a big applause to them.
+
+Authors
+c-number
+
+cnumber
+
+daiwakun
+
+daiwakun
+
+arrow_drop_up
+51
+Share
+more_horiz
+Citation
+
+c-number, daiwakun. 1st Place Solution. https://www.kaggle.com/competitions/ariel-data-challenge-2024/writeups/c-number-daiwakun-1st-place-solution. 2024. Kaggle
+
+15
+4
+comment
+9 Comments
+Hotness
+Jeroen Cottaar
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Congratulations on your win! It seems I didn't approach the competition enough as 'reproduce the synthetic data generation'. Nonetheless you also seem to have done a better job of breaking down the spectra than my simple PCA, which I expect could also benefit the final mission.
+
+I'll also have to try a submission with the hot pixel processing disabled. This would be a bit disappointing if it matters much, since there were very few hot pixels in the training set (and so I never gave it much consideration).
+
+reply
+Reply
+greySnow
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I'm eager to see if your score jump to over 0.76 without the hot pixels, this would be amazing
+
+reply
+Reply
+Jeroen Cottaar
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I tested this and did not see an improvement by disabling the hot pixel filter. @cnumber , @daiwakun , do you apply any method to deal with invalid data? If not that might explain the difference. It's rather critical to deal with invalids, because jitter is only compensated when all rows are summed (as Jun Koda explains above). In fact you might gain more from some inpainting since it would also deal with dead pixels.
+
+reply
+Reply
+c-number
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+For the dead pixels, and originally hot pixels, we didn't do anything special. Just a simple np.nanmean over the x-axis to get the signal for every wavelength. We also agree that the PSF distortion over time and the xy-axis jitter (as @junkoda pointed out) were the reasons why the hot pixel process hurt our score so much.
+
+We saw that your code interpolates nan pixels with adjacent pixels, and are assuming that maybe this is the reason why you didn't gain from deleting the hot pixel process.
+
+reply
+Reply
+greySnow
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Why would interpolating dead affect the hot pixels? They are s separated iirc
+
+reply
+Reply
+1
+3 more replies
+arrow_drop_down
+🐢 Jun Koda
+
+Posted 2 years ago
+
+· 47th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I felt the dark current correction is too small (and speculated if the time 0.45 or 0.1 factor is really correct), so it makes scenes that keeping hot pixel is harmless and disadvantage in noise cancelling can be worse (but I didn't try).
+
+The PSF (point spread function) noise is highly correlated among spatial channels and the error is much less for the sum over 32 channels; not just 1/sqrt(N) reduction but noise is cancelling each other. I guessed this is subpixel pointing error - the star moves a little randomly during timestep so each spacial channel get a little different light but total is the same; or maybe the light get distorted for other reasons among pixels but within 32 channels. And the error cancellation become imperfect when pixel is removed, so not removing can be a benefit.
+
+Do you only disable the hot pixels from dark current and keep the dead pixel mask? I think the Auto Encoder is great for learning the correlated error and compensate for the masked signal.
+
+Congratulations for the 1st place!!!
+
+reply
+Reply
+c-number
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks!
+
+Do you only disable the hot pixels from dark current and keep the dead pixel mask? Yes. We believe that the process of the dead pixel mask is reasonable, and it was only the hot pixel mask that was doing the wrong things.
+
+reply
+Reply
+greySnow
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+The link to the notebook the not work
+
+reply
+Reply
+c-number
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Sorry, forgot to make it public. Hope it works now!
+
+reply
+Reply
+greySnow
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you. Congratz on winning; outstanding work.
+
+reply
+Reply
+2
+greySnow
+
+Posted 2 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I see 'private datasource' attached to your notebook, are they needed for it to run? If so, please public them too…
+
+reply
+Reply
+c-number
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It's for installing astropy (and taurex_cuda), so you won't need it if you pip install it like this. https://www.kaggle.com/discussions/product-feedback/532336
+
+It was after attaching the datasource that I realised Kaggle had introduced this nice feature :(
+
+reply
+Reply
+1
+
+This comment has been deleted.

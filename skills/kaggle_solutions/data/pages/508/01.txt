@@ -1,0 +1,370 @@
+url: https://www.kaggle.com/c/hubmap-organ-segmentation/discussion/356201
+fetched: 2026-10-27
+chars: 12277
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — HuBMAP + HPA - Hacking the Human Body
+1st place solution
+
+HuBMAP + HPA - Hacking the Human Body
+
+Solution Writeup · 1st place · Oct 2, 2022
+
+First of all, I’d like to express my gratitude to kaggle and the competition hosts for holding such an amazing competition. I’d like to thank MMSegmentation developers too. MMSegmentation is really nice and useful tool. Also great thanks to @ayuraj who incorporated a hook of Weight & Biases into MMSegmentation, which helped a lot to manage training history.
+
+In the contest, I learned a lot from @hengck23. Thank you so much for sharing knowledge with us:)
+
+Overview
+
+I used the following methods. ・ End-to-end MMSegmentation(with customization) ・ Ensemble of SegFormers ・ Used group normalization and trained with batch_size=1 in Colab ・ Hand-labeling of lung from scratch ・ External dataset and pseudo labeling.
+
+DataSet
+
+Used dataset: ・ HPA images [351 images] ・ HPA images stained with H&E or PAS [351 images x 4 stain patterns] ・ external spleen [39 images + 39 images x 4 stain patterns] *from a single image ・ external lung [73 images] *from a single image
+
+(Lung)When I noticed that unstable results were from lung prediction, I imagined hand labeling is better than predicting lung by low threshold, which might lead to unstable and unconfident results. So I researched how lung alveolus/alveoli look alike and hand-labeled lung images from scratch. Since there is no information on how to annotate alveolus/alveoli anywhere, I made about 7 annotation sets where potential alveolus was gradually annotated and probed which one is the best. Then I created an external dataset with pseudo labels and with the best threshold. After training with it, the best threshold for lung increased to 0.60, which gave the best result ever. I guess good modeling is better than hand labeling since there are those who got 0.11/0.22 in public/private. (Spleen)Used pseudo label for an external dataset (Prostate/ Largeintestine)Used pseudo label for the HPA dataset. I had a feeling that my models underfit HPA dataset because these dataset didn’t put weight on HPA datasets in terms of colors. The torchstain was used for the stain tool.
+
+Models
+
+Ensemble of the following models: ・ 1x SegFormer mit-b3, image_size: 1024x1024 ・ 2x SegFormer mit-b4, image_size: 960x960 ・ 1x SegFormer mit-b5, image_size: 928x928 ・ 2x SegFormer mit-b5, image_size: 960x960 Different pretrained models, seed and additional stain dataset were used in some models. The reason all models are SegFormer is I chose models only from MMSegmentation and it worked well. *Best single model was mit-b4(private: 0.82821).
+
+Traning
+
+I used google colaboratory. Since GPU resources are limited, I trained segformer with batch_size=1 with group normalization. In my experiment, it was better than batch_size=4 with batch normalization in both CV and LB. I chose 2 class rather than 6 class segmentation because it showed better results consistently, especially in lung. In 6 classes, the area of the lung tends to shrink and even if the area was equivalent to 2 classes, LB lung score was worse.
+
+settings: ・ norm: group normalization(num_groups=32) for decoder ・ num_classes:2 ・ loss_decode: CE:LovaszLoss=1:3 ・ steps: 45000 ・ optimization: AdamW with lr=0.00006
+
+augmentations: ・ Dataset image size: 2000x2000 ・ Downscale for prostate ・ Crop/ Flip/ RandomRotate90/ HueSaturationValue/ RandomGamma/ RandomBrightness ・ (mmseg)Resize to (480~1600, 480~1600) * such as (480, 1600), (1024,1024), (1500,480) ・ (mmseg)RandomCrop(crop_size=model input size)
+
+Inference
+
+・ Whole image and ignored pixel_size ・ TTA: horizontal flip and different scales (approximately x0.8, x1.0, x1.2) . ・ Thresholds for each organ were kidney: 0.3 | large intestine: 0.2 | lung: 0.6 | prostate: 0.3 | spleen: 0.5
+
+Results
+
+all private: 0.83562 public: 0.82716 kidney private: 0.16940 public: 0.12175 large intestine private: 0.09005 public: 0.05730 lung private: 0.21586 public: 0.10963 prostate private: 0.17784 public: 0.14772 spleen private: 0.18246 public: 0.17515
+
+About license
+
+Pretrained SegFormer and its encoder “mit” are unavailable for commercial use. It seems that other winners also use this model. However, I got an answer from the host, which permits the use of SegFormer in this competiion. The reasons are:
+
+Since competition hosts are non-profit, the commercial restriction isn’t applied.
+The model was Apache 2.0 license at the competition launch and the license was changed during the competition.
+Author
+opusen
+
+opusen
+
+arrow_drop_up
+48
+Share
+more_horiz
+Citation
+
+opusen. 1st place solution. https://www.kaggle.com/competitions/hubmap-organ-segmentation/writeups/i-need-segformer-1st-place-solution. 2022. Kaggle
+
+comment
+15 Comments
+Hotness
+ananzeng
+
+Posted 4 years ago
+
+· 178th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+hi can you share your mmsegmentation config file only ? i want to know how to modify input image size. i use swin,convnext,twins,segformer in mmsegmentation but i finally get 0.72 in private. i find that when i use input image size large than defult setting(like 640, 768), the performance will bad
+
+reply
+Reply
+opusen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Did you downscale prostate images? The image size for prostate is said to be 160x160.
+
+I used train_pipeline like below.
+
+crop_size = (960, 960) train_pipeline = [ dict(type='LoadImageFromFile'), dict(type='LoadAnnotations'), dict(type='CustomAug'), # Customized for each organs dict(type='Resize', img_scale=[(480,480),(1600, 1600)], keep_ratio=False, ratio_range=None), dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.5), dict(type='RandomFlip', direction='horizontal', prob=0), dict(type='SaveOverlay', save_root_dir='/content', save_num=500, no_overlay=True), # Customized for visualization dict(type='Convert2Class1'), # Customized for converting 6 class masks to 2 class one. dict(type='Normalize', **img_norm_cfg), dict(type='Pad', size=crop_size, pad_val=0, seg_pad_val=255), dict(type='DefaultFormatBundle'), dict(type='Collect', keys=['img', 'gt_semantic_seg']), ]
+
+Prostate were processed with Albumentations in CustomAug: A.Downscale(scale_min=0.08, scale_max=0.4, interpolation=cv2.INTER_LINEAR, p=0.9) I used 2000x2000 images. So, downscale to from 160x160 to 800x800 and upscale to 2000x2000 in this case.
+
+reply
+Reply
+ynhuhu
+
+Posted 4 years ago
+
+· 139th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, @opusen. My evaluation mDice is low for 2-class. Loss and Acc is normal. For multi-class it work well. What is your evaluation metric? I don't know whether my custom Convert2Class is correct? Is there anything else to be aware of? @PIPELINES.register_module() class MaskTo2Class:
+
+def __call__(self, results):
+    for key in results.get('seg_fields', []):
+        gt_seg = (results[key]!=0).astype(np.uint8)
+        results[key] = gt_seg
+    return results
+
+
+Is there anything else to be aware of?
+
+reply
+Reply
+opusen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi, how degree is it low? Although I used mDice, I haven't compared the metrics of 2 class with multi class because I customized mDice calculation for 2 class, from "calculation from total area" to "average of each image". I recommend you to submit the model.
+
+By the way, did you take "class 255" into account? Class 255 means 'ignore' and would be converted to "class 1" in your code depending on pipeline position. For example, RandomRotate and Pad would create class 255. Here is an example.
+
+@PIPELINES.register_module()
+class MaskTo2Class:
+    def __call__(self, data):
+        mask = data['gt_semantic_seg']
+
+        mask_ignore = (mask == 255)
+        mask = np.where((mask >= 1) & (mask < 255), 1, 0)
+        mask[mask_ignore] = 255
+
+        data['gt_semantic_seg'] = mask
+
+        return data
+
+
+Anyway, creating custom pipeline for visualization would be helpful for future works:)
+
+reply
+Reply
+ynhuhu
+
+Posted 4 years ago
+
+· 139th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Yes. I didn't take 255 class into account. The evaluation mDice with MMSeg is about 16. Loss is normal. I don't know how to custom mDice in MMSeg? Could you share your method?
+
+reply
+Reply
+opusen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Loss and Acc is normal. The evaluation mDice with MMSeg is about 16
+
+is mDice 0.16? Do you mean Acc is decode.acc_seg?
+
+Yes. I didn't take 255 class into account.
+
+I feel like test accuracy is also low. Did you check it?
+
+Could you share your method?
+
+Actually I don't recommend to use it. I couldn't modify the code to work also in multi-class and the code was written in messy way. Also, CV wasn't useful in this competition:)
+
+reply
+Reply
+CarlosRunner
+
+Posted 4 years ago
+
+· 433rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations for your first place! I wasn't familiar with the technique of group normalization. Could you share how did you use it, specially in the context of mmsegmentation?
+
+reply
+Reply
+opusen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks:)
+
+norm_cfg = dict(type='GN', num_groups=32, requires_grad=True) model = dict( type='EncoderDecoder', backbone=dict( type='MixVisionTransformer', … decode_head=dict( type='SegformerHead', …
+
+SegFormer is composed of 'MixVisionTransformer' and 'SegformerHead'.
+
+For MixVisionTransformer, Layer Normalization was used as default. https://github.com/open-mmlab/mmsegmentation/blob/master/mmseg/models/backbones/mit.py#L329-L330
+
+For SegformerHead, default settings is SyncBN. https://github.com/open-mmlab/mmsegmentation/blob/master/configs/_base_/models/segformer_mit-b0.py#L2 So you can change SyncBN to 'GN'.
+
+Supported normalizations would be https://github.com/open-mmlab/mmcv/blob/master/mmcv/cnn/bricks/norm.py#L11-L21
+
+reply
+Reply
+Forte Lean
+
+Posted 4 years ago
+
+· 331st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+hi, can you share your competition-dataset-only scores?
+
+reply
+Reply
+opusen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The boost of external spleen was 0.00594 and lung was 0.00622. In simple calculation, 0.83562(final score) - (0.00594+0.00622)=0.82346
+
+It was a good opportunity to check my submission history :)
+
+reply
+Reply
+Forte Lean
+
+Posted 4 years ago
+
+· 331st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks for your reply. : )
+
+reply
+Reply
+ynhuhu
+
+Posted 4 years ago
+
+· 139th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great methods, thanks for your sharing. I have two questions. For MMSegmentation the activation function is to use argmax. How to set thresholds for each organ? Can you share your test config?
+
+reply
+Reply
+opusen
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+How to set thresholds for each organ?
+
+You need to customize encorder_decoder.py I created a notebook. https://www.kaggle.com/code/opusen/customize-mmseg
+
+Then you can use sigmoid raw outputs of each class for thresholds or ensemble. I ensembled 'cell class' sigmoid of several models.
+
+Can you share your test config?
+
+Not much different from the others.
+
+dataset_type = 'xxx' data_root = 'xxx' img_norm_cfg = dict( mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True) crop_size = (960, 960) train_pipeline = [] val_pipeline = [] test_pipeline = [ dict(type='LoadImageFromFile'), dict( type='MultiScaleFlipAug', img_scale=crop_size, img_ratios=[0.8, 1.0, 1.2], #[0.8125, 1.0, 1.1875] for 1024x1024. flip=True, transforms=[ dict(type='Resize', keep_ratio=True), dict(type='RandomFlip'), dict(type='Normalize', **img_norm_cfg), dict(type='ImageToTensor', keys=['img']), dict(type='Collect', keys=['img']), ]) ]
+
+reply
+Reply
+ynhuhu
+
+Posted 4 years ago
+
+· 139th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for your response.
+
+reply
+Reply
+
+This comment has been deleted.

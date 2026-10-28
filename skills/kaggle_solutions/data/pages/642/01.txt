@@ -1,0 +1,1052 @@
+url: https://www.kaggle.com/c/equity-post-HCT-survival-predictions/discussion/566550
+fetched: 2026-10-27
+chars: 32015
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution-2 Targets and Ensemble — CIBMTR - Equity in post-HCT Survival Predictions
+1st Place Solution-2 Targets and Ensemble
+
+CIBMTR - Equity in post-HCT Survival Predictions
+
+Solution Writeup · 1st place · Mar 12, 2025
+
+First, congratulations to the teams that finally "survived" in this competition, and thank you to the participants who shared their experiences and provided help in the forum.
+
+I also trained classifier and regressor models independently and then combined them together with a magic function, just like 2nd and 4th place solution. The main idea is that when a patient has a high probability of efs == 0, we should give them a high score. Otherwise, we should give them a relatively lower score and pay more attention to the rank of efs_time. So the regressor just needs to focus on the ranking task where efs == 1.
+
+Here is the simplified code.
+
+1. Feature Engineering
+Original features
+One-hot encoding for all categorical features(but still keep the original category features)
+Copy continuous features as categorical features
+2. CV Strategy
+The CV is very unstable with different splits Strategy. To make the results comparable, I used 10-fold splits with same seeds for all classifier and regressor model training.
+y_combine = data['efs'].astype('str')+'|'+data['X']['race_group'].astype('str')
+skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=888)
+skf.split(X,y_combine)
+
+without use early stoping to reduce the risk of overfitting, especially when I use a large number of folds.
+3. Classifier
+Target: P(efs=0)
+Models Used
+XGBoost, LightGBM, CatBoost
+NN, TabM
+GNN
+NN/TabNet/GNN with pairwise-rank-loss
+tricks
+Gnn method. I use KNN to find nearest 25 nodes and create edges(use Euclidean Distance),then use graphsage to fit the targets.
+when use rank loss, the predition would shift over different fold because rank loss is not sensitive to shift, which may cause lower CV when calculate metric in the entire set. So you need to fix these shifts to keep same mean/mid prediction value over models trained in differece fold.
+GNN also have this problem even if I used logloss，I still don't know why.
+auc metrics
+model	auc
+lightgbm	0.7603
+catboost	0.7617
+xgboost	0.7606
+nn	0.75902
+tabm	0.7596
+gnn	0.7591
+ranknn	0.7598
+ranktabm	0.7597
+rankgnn	0.7586
+interesting finding
+The best max depth for LGB and XGB is 2 (for CatBoost, it's 6, and I still don't know why). This is nearly unheard of in my experience. It means there is little valuable feature interaction information, and the task is easy to fit. Maybe that's why NN like models also work well in this tabular data.
+4. Regressor
+Target
+
+Grouped and normalized rank by efs
+
+efs_time_norm[efs == 1] = efs_time[efs == 1].rank() / sum(efs == 1)  
+efs_time_norm[efs == 0] = efs_time[efs == 0].rank() / sum(efs == 0)  
+
+Models used
+
+XGBoost lightgbm catboost( NN like model didn't work well for me, if any one succeed in NN like model, please let me know.)
+
+Tricks
+Add efs as a feature when training and focus on the performance at samples where efs==1. Set efs=1 when making inference on LB data.
+apply sample weight on efs==1 and efs==0 with 0.6:0.4
+Here's why this trick is used. Initially, I trained the regressor only on samples where efs==1. When using this model to make inference on samples where efs==0, it still showed an obvious correlation between prediction and ground truth. This is strange because efs_time for efs==0 is meaningless due to various reasons could cause data censoring. I guess it's because of the SurvalGAN algorithm. By the way, it turns out that there are similar patterns between samples where efs==0 and efs==1. So, by adding samples where efs==0, the regressor's performance on efs==1 improved significantly!
+Raw Concordance Index on efs==1
+model	c-index
+xgboost	0.770229
+lightgbm	0.767615
+catboost	0.769340
+5.Merge Function
+def model_merge(Y_HAT_REG,Y_HAT_CLS,a=2.96,b=1.77,c=0.52):
+    '''
+    Y_HAT_REG and Y_HAT_CLS need be scaled to 0~1
+    a,b,c need to be tuned with optuna 
+    '''
+    y_fun = (Y_HAT_REG>0)*c*(np.abs(Y_HAT_REG))**(b)
+    x_fun =(Y_HAT_CLS>0)*(np.abs(Y_HAT_CLS))**(a)
+    res = (1-y_fun)*x_fun+y_fun
+    res = pd.Series(res).rank()/len(res)
+    return res
+
+
+This is what the merge function looks like(without rank transform), where x is the probablity of efs==0 and y is predicted efs_time(scaled to 0~1) 
+
+6 Ensembling Method
+
+Create combinations between classifiers and regressors, then find the best (a, b, c) for the merge function by with 5-folds and then get the merged predictions.
+
+Here is Stratified Concordance Index of combinations. Ignoring the rank transform in merge function, pretty sure there is no leakage
+
+cls	reg	CV Stratified c-index
+xgboost	xgboost	0.6938821198444668
+xgboost	catboost	0.693390761259049
+xgboost	lightgbm	0.6920553689042972
+catboost	xgboost	0.6946771227057665
+catboost	catboost	0.6942415329389815
+catboost	lightgbm	0.6928675187239672
+lightgbm	xgboost	0.6935306031275579
+lightgbm	catboost	0.693123814234674
+lightgbm	lightgbm	0.6917244174625249
+tabm	xgboost	0.6943607674628444
+tabm	catboost	0.6936616324722884
+tabm	lightgbm	0.6922428015362854
+nn	xgboost	0.6939542378441973
+nn	catboost	0.6932931191267933
+nn	lightgbm	0.6920700218390199
+gnn	xgboost	0.6940062476514388
+gnn	catboost	0.6932012736212297
+gnn	lightgbm	0.6921340326054011
+ranktabm	xgboost	0.693141398733159
+ranktabm	catboost	0.6927626179572159
+ranktabm	lightgbm	0.6912730733179469
+ranknn	xgboost	0.6944776101013886
+ranknn	catboost	0.6936542865352446
+ranknn	lightgbm	0.6924528052605144
+rankgnn	xgboost	0.6934854451860402
+rankgnn	catboost	0.692783734834767
+rankgnn	lightgbm	0.6916329456191074
+
+Ensemble the merged predictions using a weighted average with Optuna and 5-folds.
+
+Since there are 9 classifiers × 3 regressors = 27 combinations, there is a risk of overfitting. Therefore, I set the Optuna search range for weights to be between 0.1 and 1, rather than 0 and 1. I think this is a form of regularization.
+
+The final CV Stratified c-index is round 0.6965
+
+Adding noise to some race groups significantly improved cross-validation performance, but it didn't work on either the public or private LB.
+
+Author
+minerppdy
+
+minerppdy
+
+arrow_drop_up
+186
+Share
+more_horiz
+Citation
+
+minerppdy. 1st Place Solution-2 Targets and Ensemble. https://www.kaggle.com/competitions/equity-post-HCT-survival-predictions/writeups/minerppdy-1st-place-solution-2-targets-and-ensembl. 2025. Kaggle
+
+37
+35
+18
+comment
+50 Comments
+3 appreciation comments
+Hotness
+hyd
+
+Posted 2 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Great workl! We have similiar auc score, but your regression models are much better than mine, my final cv is around 0.693~
+
+reply
+Reply
+emoji_people
+klog
+
+Posted 2 years ago
+
+· 909th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations! 🎉 You were leading at the top from start to finish, and it was truly amazing!
+
+reply
+Reply
+Zhong
+
+Posted 2 years ago
+
+· 2082nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! Very nice approach
+
+reply
+Reply
+Fatima
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Yes, i think the same, it is reale good
+
+reply
+Reply
+Gunes Evitan
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on strong finish! I think you added a decent amount of diversity by ensembling combination of classifiers and regressors. I've never thought doing such thing because I was focused on finalizing the classifier part first. This made me go into tunnel vision and I used only the same classifier blend with my regressors. I think you might push your score a little bit more by adding 3 more combinations of classifier blend x lightgbm, classifier blend x xgboost and classifier blend x catboost.
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+i also tried blend cls and reg first, then apply the merge function, hard to say which is better
+
+reply
+Reply
+emoji_people
+Robert Hatch
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+I had some strong hints that optimizing all together at once could be best. Or maybe better to say that I knew blend first couldn't search the entire optimization space. It was clear it was further from optimal then normal for effectively optimizing against this formula.
+
+Got clear evidence of that by stumbling upon an unusually amazing CV score that my normal ensembling method couldn't come close to finding.
+
+However, I didn't trust my individual model's CV and using a new ensembling method quite enough since I was still trying to hedge against a fear of overfitting CV.
+
+With the hundreds of base models I used, it could've been interesting to try the greedy ensemble selection I used to pare down the number, but then restart ensembling on the selected models with your Optuna method or something similar.
+
+reply
+Reply
+Sergey Bryansky
+
+Posted 2 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Same approach to solve tasks independently then combined it, rank is all u need for ranking task. Cool find with addition of efs as feature, very very smart! I also experimented with some sort of stacking and target recreation using similar approach with probabilities of efs, but always it was overfitted! Congratz!
+
+reply
+Reply
+emoji_people
+Robert Hatch
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+Something interesting and surprising I found was a (probably inferior) variant of efs as feature: because I tried the trick late and was lazy, I was predicting the smaller train set with hyperparameters tuned for a larger train set. Because of that and/or other unclear reasons, adding rest of train data with sample weight 0 was a big help to my model. I'm unsure the overall impact, which hyperparameters are affected by the data, or exactly why/how it helped. But it did. On both LGB and Catboost.
+
+reply
+Reply
+Andrey Chankin
+
+Posted 2 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@minerppdy in one of the old posts you mentioned feature engineering, did you keep them in your final sub? And, do you mind sharing your background? - Your acc is fresh and you were top1 since the very beginning, just curious
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I have posted the simplified code and the feature engineering is almost the same as in my final submission. I registered on Kaggle years ago, but recently when I returned to Kaggle, I couldn't verify my account with Persona, so I had to delete the account and register again…
+
+reply
+Reply
+emoji_people
+Robert Hatch
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Huge congrats! (1st during almost the whole competition too, was it?) Can you give more insight into how you tuned/trained the a,b,c constants of the merge function? Did you just find what maximized CV score? Were they part of the Optuna search? Or…?
+
+(I was really worried about overfitting if I just took the constants that maximized CV with my VERY similar function and postprocessing 'tricks'. So even on my winning gamble sub I went a little under the CV optimal constants)
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@roberthatch 1. I used 5-fold validation to get the reliable CV score 2. use optuna to find the best (a,b,c) to maximize C-index of train_set, then get oof result and LB result with best (a,b,c), do this by 5 loops, then calucate the oof C-index 3. how ever this cant prevent overfitting if the form of merge function is not appropriate, just make sure you CV is reliable
+
+reply
+Reply
+emoji_people
+Robert Hatch
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+Thanks, that's about how I would've done it if not trying to be more careful. My formulation was a little different and I was worried the constants wouldn't translate to LB and would drastically increase any partial over fitting I already had. In part because my LB score was always a bit lower than expected from the first day I tried the two completely separate model trick. (I think my simple LGB two models I had a two targets blend with 0.682 to 0.693 CV and around 0.688 LB to low 689 LB. With the trick my CV jumped to 0.685 to 686, but LB 0.687 to 0.689. It got much better with Cat boost and with more models, but there was still a concern whether LB score was noise or some partial inability to generalize. Impressive how perfectly your tuning methodology worked!
+
+reply
+Reply
+emoji_people
+Robert Hatch
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+My 5th place winning submission with postprocessing was only (low) 0.693 on public LB!
+
+reply
+Reply
+1
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I also tried NN with pair-wise-loss to combine all the classifiers and regressors, but it didn't work, the CV score is bad
+
+reply
+Reply
+Focus
+
+Posted 2 years ago
+
+· 862nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I am very thankful if @minerppdy answer this. In initBTree method there are following statements.
+
+last_full_row = int(np.log2(len(values) + 1) - 1) len_ragged_row = len(values) - (2 ** (last_full_row + 1) - 1)
+
+Where does these come from ? Why log2?
+
+reply
+Reply
+Akshat Singhal
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @minerpddy congratulations achieving the first place. Can you please explain your choice for the magic function. How have you chosen this exact form and not any other? Especially this line here res = (1-y_fun)*x_fun+y_fun
+
+reply
+Reply
+
+This comment has been deleted.
+
+LearNerZhou99
+
+Posted 2 years ago
+
+· 59th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+yeap, thats really amazing and magic
+
+reply
+Reply
+Benjamin Richards
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice work, very interesting. I'd love to learn more about merge functions for blending classifier and regressors. I've seen many blending techniques for models of the same type, but here you are blending models of different types. Just wondering where you first learnt about the merge function? Or if you know of any others? Thanks in advance
+
+reply
+Reply
+Igor Kostenko
+
+Posted 2 years ago
+
+· 2223rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks. I've learned a lot from your solution. Two targets, model combining, amazing
+
+reply
+Reply
+NEElen
+
+Posted 2 years ago
+
+· 1372nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Excellent result. Thank you for sharing your knowledge.
+
+reply
+Reply
+RIYADH HAITHAM
+
+Posted 2 years ago
+
+· 2917th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+great work did you use hurdle modeling here
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+No, but I think the idea is similar.
+
+reply
+Reply
+RIYADH HAITHAM
+
+Posted 2 years ago
+
+· 2917th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thank you if you donot mind i have one question i read all your notebook i understanded most of it just one thing which is the magic function how you reached it i tried using just simple way like Y_hat_reg * a + Y_hat_clas * b the results was worse did you find it by chance or is it related with the dataset it self and is it really necessary to pass efs why not just passing all the data without efs column or you want to make conditional training for your regressor
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+The merge function is based on the understanding of C-index metric.
+
+The main idea is that when a patient has a high probability of efs == 0, we should give them a high score. Otherwise, we should give them a relatively lower score and pay more attention to the rank of efs_time. So the regressor just needs to focus on the ranking task where efs == 1.
+
+Since the regressor only needs to focus on the ranking task for samples where efs == 1, you can train it using just the efs == 1 samples. Additionally, you can train the model using both efs == 1 and efs == 0 samples to achieve better performance. However, in this case, it is necessary to add efs as an extra feature to prevent the model from getting confused by mixing the two types of samples together.
+reply
+Reply
+Arjun Singh
+
+Posted 2 years ago
+
+· 1948th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+First thing, Congrats! Its my lack of knowledge that I never thought of such approach. Well, it's obvious since I'm still learning but reading your solution gave somewhat insight on how I should've framed the problem. Thanks for sharing the solutions.
+
+reply
+Reply
+DeStee
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Very good aproach
+
+reply
+Reply
+Samay Ashar
+
+Posted 2 years ago
+
+· 3110th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats @minerppdy, solid approach. 👏 Classifier + Regressor as two separate models is something I never thought of.
+
+I think the depth 6 of CatBoost might be because of the way it handles categorical features via target encoding unlike LGB/XGB which use one-hot encoding. It can lead to deeper trees for understanding the feature interaction.
+
+reply
+Reply
+Luana Belo
+
+Posted 2 years ago
+
+· 2944th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Really cool to see your thought process behind the solution, super helpful for juniors like me to understand how to approach these challenges :)
+
+reply
+Reply
+Bhargav Chirumamilla
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Very nice approach
+
+reply
+Reply
+Samith Chimminiyan
+
+Posted 2 years ago
+
+· 653rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats !!! Very nice approach. Good for Learning.
+
+reply
+Reply
+Palbha
+
+Posted 2 years ago
+
+· 2808th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Omar .. I am trying to understand the code & I saw you trained model with pca & tsne features & then use the best params to find the optimal parameters again with an optuna study & train the model with best params the training data without pca & tsne .. I mean why not directly find optimal parameters on train data without tsne & pca ?
+
+reply
+Reply
+Rajwa Abisena
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Interesting approach
+
+reply
+Reply
+Ishraq Tanvir
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Yes u are right
+
+reply
+Reply
+Palbha
+
+Posted 2 years ago
+
+· 2808th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations !! Thanks for sharing the approach. Would be more helpful if you could share the code so we could understand better in detail
+
+reply
+Reply
+
+Posted 2 years ago
+
+arrow_drop_up
+-6
+more_vert
+Función para optimizar el uso de memoria
+
+def optimize_dtypes(df): df_copy = df.copy() for col in df_copy.columns: if df_copy[col].dtype == 'object': df_copy[col] = df_copy[col].astype('category') elif df_copy[col].dtype == 'float64': df_copy[col] = df_copy[col].astype('float32') elif df_copy[col].dtype == 'int64': df_copy[col] = df_copy[col].astype('int32') return df_copy
+
+Función para reemplazar nulos con valores por defecto
+
+def replace_nulls_with_default(df, float_default=-1.0, object_default="Missing"): df_copy = df.copy() for col in df_copy.select_dtypes(include=['float', 'int']).columns: df_copy.loc[:, col] = df_copy[col].replace("", float_default).fillna(float_default)
+
+for col in df_copy.select_dtypes(include=['object', 'category']).columns:
+    if df_copy[col].dtype.name == 'category':
+        if object_default not in df_copy[col].cat.categories:
+            df_copy[col] = df_copy[col].cat.add_categories(object_default)
+    df_copy.loc[:, col] = df_copy[col].replace("", object_default).fillna(object_default)
+
+return df_copy
+
+Función para calcular la probabilidad de supervivencia
+
+def transform_survival_probability(df, time_col='efs_time', event_col='efs'): kmf = KaplanMeierFitter() kmf.fit(df[time_col], event_observed=df[event_col]) survival_probabilities = kmf.survival_function_at_times(df[time_col]).values.flatten() return survival_probabilities
+
+Función para calcular el índice C estratificado (corregida)
+
+def stratified_c_index(y_true, y_pred, groups): unique_groups = np.unique(groups) c_indices = []
+
+for group in unique_groups:
+    mask = groups == group
+    y_true_group = y_true[mask]
+    y_pred_group = y_pred[mask]
+
+    if len(y_true_group) < 2:
+        continue
+
+    pairs = np.array(list(combinations(range(len(y_true_group)), 2)))
+    y_true_pairs = y_true_group[pairs]
+    y_pred_pairs = y_pred_group[pairs]
+
+    true_diff = y_true_pairs[:, 0] - y_true_pairs[:, 1]
+    pred_diff = y_pred_pairs[:, 0] - y_pred_pairs[:, 1]
+
+    permissible = true_diff != 0
+    concordant = (true_diff * pred_diff) > 0
+
+    c_index = np.sum(concordant & permissible) / np.sum(permissible)
+    c_indices.append(c_index)
+
+return np.mean(c_indices) - np.std(c_indices)
+
+
+def custom_scorer(estimator, X, y): y_pred = estimator.predict(X) return stratified_c_index(y.values, y_pred, race_groups.values[X.index])
+
+Optimizar el uso de memoria
+
+df_tr = optimize_dtypes(df_tr) df_ts = optimize_dtypes(df_ts)
+
+Reemplazar nulos con valores por defecto
+
+df_tr = replace_nulls_with_default(df_tr) df_ts = replace_nulls_with_default(df_ts)
+
+Calcular y añadir la columna objetivo
+
+df_tr["target"] = np.sqrt(transform_survival_probability(df_tr, time_col='efs_time', event_col='efs'))
+
+Eliminar columnas irrelevantes
+
+drop_cols = ["ID", 'efs', 'efs_time'] df_tr = df_tr.drop(columns=[col for col in drop_cols if col in df_tr.columns]) df_ts = df_ts.drop(columns=[col for col in drop_cols if col in df_ts.columns])
+
+Preparar los datos para el modelo
+
+X = df_tr.drop(columns=['target'], axis=1) y = df_tr['target'] race_groups = df_tr['race_group']
+
+Identificar columnas categóricas
+
+cat_features = list(X.select_dtypes(include=['object', 'category']).columns)
+
+Convertir columnas categóricas a tipo string
+
+for col in cat_features: X[col] = X[col].astype(str) df_ts[col] = df_ts[col].astype(str)
+
+Aplicar PCA
+
+pca = PCA(n_components=10) X_pca = pca.fit_transform(X.select_dtypes(include=['float32', 'int32']))
+
+Aplicar t-SNE
+
+tsne = TSNE(n_components=2, random_state=42) X_tsne = tsne.fit_transform(X.select_dtypes(include=['float32', 'int32']))
+
+Añadir las nuevas características al DataFrame original
+
+X_new = pd.concat([X, pd.DataFrame(X_pca, columns=[f'PCA_{i}' for i in range(10)], index=X.index), pd.DataFrame(X_tsne, columns=['TSNE_1', 'TSNE_2'], index=X.index)], axis=1)
+
+Actualizar la lista de características categóricas
+
+cat_features = list(X_new.select_dtypes(include=['object', 'category']).columns)
+
+Configurar validación cruzada con KFold
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+Función objetivo para la búsqueda amplia (más agresiva)
+
+def objective_wide(trial): params = { 'iterations': trial.suggest_int('iterations', 100, 10000), 'learning_rate': trial.suggest_float('learning_rate', 1e-5, 1.0, log=True), 'depth': trial.suggest_int('depth', 2, 16), 'l2_leaf_reg': trial.suggest_float('l2_leaf_reg', 1e-10, 100.0, log=True), 'border_count': trial.suggest_categorical('border_count', [32, 64, 128, 255, 512]), 'bagging_temperature': trial.suggest_float('bagging_temperature', 0, 2), 'random_strength': trial.suggest_float('random_strength', 1e-10, 100.0, log=True), 'loss_function': 'RMSE', 'eval_metric': 'RMSE', 'random_seed': 42, 'task_type': 'GPU', 'devices': '0,1', 'verbose': False, 'cat_features': cat_features, 'used_ram_limit': '10gb', 'allow_writing_files': False }
+
+model = CatBoostRegressor(**params)
+
+try:
+    score = cross_val_score(model, X_new, y, cv=kf, scoring=custom_scorer, error_score="raise").mean()
+    print(f"Trial completed with score: {score}")
+    return score
+except Exception as e:
+    print(f"Exception encountered: {e}")
+    return float('-inf')
+
+Crear el estudio de Optuna y optimizar (búsqueda amplia)
+
+study_wide = optuna.create_study(direction='maximize')
+
+Usar parallel_backend aquí
+
+with parallel_backend('loky', n_jobs=-1): study_wide.optimize(objective_wide, n_trials=1000, timeout=14400) # 4 horas de tiempo límite
+
+Mejores parámetros y puntuación de la búsqueda amplia
+
+best_params_wide = study_wide.best_params print('Mejores parámetros (búsqueda amplia):', best_params_wide) print('Mejor puntuación (búsqueda amplia):', study_wide.best_value)
+
+Guardar los mejores parámetros de la búsqueda amplia
+
+np.save('best_params_wide.npy', best_params_wide)
+
+Mejores parámetros y puntuación de la búsqueda amplia
+
+best_params_wide = study_wide.best_params print('Mejores parámetros (búsqueda amplia):', best_params_wide) print('Mejor puntuación (búsqueda amplia):', study_wide.best_value)
+
+Definir el espacio de búsqueda fina (más agresiva)
+
+def objective_fine(trial): params = { 'iterations': trial.suggest_int('iterations', max(100, int(best_params_wide['iterations']0.5)), min(15000, int(best_params_wide['iterations']1.5))), 'learning_rate': trial.suggest_float('learning_rate', max(1e-6, best_params_wide['learning_rate']0.5), min(1.0, best_params_wide['learning_rate']1.5), log=True), 'depth': trial.suggest_int('depth', max(1, best_params_wide['depth']-3), min(20, best_params_wide['depth']+3)), 'l2_leaf_reg': trial.suggest_float('l2_leaf_reg', max(1e-11, best_params_wide['l2_leaf_reg']0.5), min(200.0, best_params_wide['l2_leaf_reg']1.5), log=True), 'border_count': trial.suggest_categorical('border_count', [32, 64, 128, 255, 512]), 'bagging_temperature': trial.suggest_float('bagging_temperature', max(0, best_params_wide['bagging_temperature']0.5), min(3, best_params_wide['bagging_temperature']1.5)), 'random_strength': trial.suggest_float('random_strength', max(1e-11, best_params_wide['random_strength']0.5), min(200.0, best_params_wide['random_strength']1.5), log=True), 'loss_function': 'RMSE', 'eval_metric': 'RMSE', 'random_seed': 42, 'task_type': 'GPU', 'devices': '0,1', 'verbose': False, 'cat_features': cat_features, 'used_ram_limit': '10gb', 'allow_writing_files': False }
+
+model = CatBoostRegressor(**params)
+
+try:
+    score = cross_val_score(model, X_new, y, cv=kf, scoring=custom_scorer, error_score="raise").mean()
+    print(f"Fine-tuning trial completed with score: {score}")
+    return score
+except Exception as e:
+    print(f"Exception encountered in fine-tuning: {e}")
+    return float('-inf')
+
+Crear el estudio de Optuna y optimizar (búsqueda fina)
+
+study_fine = optuna.create_study(direction='maximize')
+
+Usar parallel_backend aquí
+
+with parallel_backend('loky', n_jobs=-1): study_fine.optimize(objective_fine, n_trials=400, timeout=10400) # 3 hora de tiempo límite
+
+Mejores parámetros y puntuación de la búsqueda fina
+
+best_params_fine = study_fine.best_params print('Mejores parámetros (búsqueda fina):', best_params_fine) print('Mejor puntuación (búsqueda fina):', study_fine.best_value)
+
+Comparar resultados
+
+print('Mejora en la puntuación:', study_fine.best_value - study_wide.best_value)
+
+Comparar resultados y seleccionar los mejores parámetros
+
+if study_fine.best_value > study_wide.best_value: print("La búsqueda fina mejoró los resultados.") best_params = best_params_fine else: print("La búsqueda amplia dio mejores resultados.") best_params = best_params_wide
+
+Guardar los mejores parámetros finales
+
+np.save('best_params.npy', best_params)
+
+print('Mejores parámetros finales:', best_params) print('Mejor puntuación final:', max(study_fine.best_value, study_wide.best_value))
+
+Intentar cargar los mejores parámetros, si el archivo existe
+
+if os.path.exists('best_params.npy'): best_params = np.load('best_params.npy', allow_pickle=True).item() else: print("Advertencia: No se encontró el archivo 'best_params.npy'. Usando los parámetros en memoria.")
+
+Initialize variables for predictions and scores
+
+final_predictions = np.zeros(len(X)) fold_scores = []
+
+for fold, (train_idx, val_idx) in enumerate(kf.split(X, race_groups)): print(f"Fold {fold + 1}") X_train, X_val = X.iloc[train_idx], X.iloc[val_idx] y_train, y_val = y.iloc[train_idx], y.iloc[val_idx] race_val = race_groups.iloc[val_idx]
+
+# Set up CatBoost model with best parameters
+model = CatBoostRegressor(
+    **best_params,
+    random_seed=42,
+    task_type='GPU',
+    devices='0,1',  # Usa GPUs en serie
+    verbose=False,
+    cat_features=cat_features,
+    gpu_ram_part=0.8,
+    allow_writing_files=False
+)
+
+# Train the model
+model.fit(
+    X_train, y_train,
+    eval_set=(X_val, y_val),
+    early_stopping_rounds=50,
+    verbose=False
+)
+
+# Predict and compute metric
+y_val_pred = model.predict(X_val)
+fold_score = stratified_c_index(y_val.values, y_val_pred, race_val.values)
+fold_scores.append(fold_score)
+print(f"Stratified C-Index for Fold {fold + 1}: {fold_score}")
+
+final_predictions[val_idx] = y_val_pred
+
+Overall Stratified Concordance Index
+
+overall_score = stratified_c_index(y.values, final_predictions, race_groups.values) print(f"Overall Stratified C-Index: {overall_score}")
+
+Calculate standard C-index
+
+c_index = concordance_index(y, final_predictions) print(f"Standard C-Index: {c_index}")
+
+Plot the scores per fold
+
+plt.figure(figsize=(10, 6)) plt.plot(range(1, len(fold_scores) + 1), fold_scores, marker='o', linestyle='-', color='b') plt.title('Stratified C-Index by Fold') plt.xlabel('Fold') plt.ylabel('Stratified C-Index') plt.xticks(range(1, len(fold_scores) + 1)) plt.grid() plt.show()
+
+Plot predicted vs actual values
+
+plt.figure(figsize=(10, 6)) plt.scatter(y, final_predictions, alpha=0.5) plt.plot([y.min(), y.max()], [y.min(), y.max()], 'r--', lw=2) plt.xlabel('Actual Values') plt.ylabel('Predicted Values') plt.title('Predicted vs Actual Values') plt.tight_layout() plt.show()
+
+reply
+Reply
+2
+Palbha
+
+Posted 2 years ago
+
+· 2808th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+https://www.kaggle.com/code/palbha/cibmtr-replicate-1st-prize-solution - I have created this notebook as per what you shared - patiently waiting for it to run now :) .. Thanks a lot for sharing !!
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@omararielvallejos i saw your posted code, what's 0.74 mean? and how it comes?
+
+reply
+Reply
+Carlos Musungu
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Wow, great work!
+
+reply
+Reply
+Andreas Bisiadis
+
+Posted 2 years ago
+
+· 84th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Add efs as a feature when training and focus on the performance at samples where efs==1. Set efs=1 when making inference on LB data.
+
+@minerppdy Do you use the actual efs target (retaining both 0 and 1 values) as feature for training and set efs=1 for all rows during inference?
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@andreasbis yes, the purpose is to improve the performance on efs=1 using the potencial information of efs=0, and meanwhile make sure the model wouldn't confused by mixing different samples together. without this feature, the result is really bad
+
+reply
+Reply
+emoji_people
+Robert Hatch
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Huh, and from code you shared you had efs==0 as it's own separate uniform 0-1 ranking? Interesting. If that even mattered I wonder why it works. I suspect there are competing nuances to the impact of your exact implementation, but I don't think I have fully grasped it at a theoretical level yet.
+
+reply
+Reply
+minerppdy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@roberthatch I have tried several kinds of transform,but didn't find impressive difference, for example:
+
+efs_time_norm[efs == 1] = efs_time[efs == 1].rank() / sum(efs == 1)  
+efs_time_norm[efs == 0] = efs_time[efs == 0].rank() / sum(efs == 0)  +1
+
+efs_time_norm = efs_time.rank() / len(efs)
+
+reply
+Reply

@@ -1,0 +1,295 @@
+url: https://www.kaggle.com/c/playground-series-s5e1/discussion/560629
+fetched: 2026-10-27
+chars: 6766
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Forecasting Sticker Sales
+1st place solution
+
+Forecasting Sticker Sales
+
+Solution Writeup · 1st place · Feb 1, 2025
+
+Big thanks to @kdmitrie for his many insightful contributions! My solution is largely based on his starter model, which you can check out here.
+
+I also took some inspiration for handling holidays from this solution to a previous competition.
+
+You can find my first-place solution here. There may be some subtleties to it that I don't fully understand myself, so if you spot anything interesting, I’d love to hear your thoughts!
+
+Author
+George Koussa
+
+georgekoussa
+
+arrow_drop_up
+26
+Share
+more_horiz
+Citation
+
+George Koussa. 1st place solution. https://www.kaggle.com/competitions/playground-series-s5e1/writeups/george-koussa-1st-place-solution. 2025. Kaggle
+
+10
+comment
+15 Comments
+1 appreciation comment
+Hotness
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Great execution! Every element is on point.
+
+reply
+Reply
+Konstantin Dmitriev
+
+Posted 2 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+My congratulations for winning the first place! I'm very happy that my work was useful!
+
+reply
+Reply
+ayushokaay
+
+Posted 2 years ago
+
+· 387th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+you have been first throughout the competition @kdmitrie congrats.
+
+reply
+Reply
+Less
+
+Posted 2 years ago
+
+· 158th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations winning 1st place. What a great job！
+
+reply
+Reply
+Chris Deotte
+
+Posted 2 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Amazing job George. Congratulations winning 1st place solo!
+
+reply
+Reply
+ayushokaay
+
+Posted 2 years ago
+
+· 387th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+looks like a lot of effort for this @georgekoussa I have seen your notebook impressive work!!
+
+reply
+Reply
+Piyush007Panchariya
+
+Posted 2 years ago
+
+· 570th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, Great Work
+
+reply
+Reply
+Mohamed Drabo
+
+Posted 2 years ago
+
+· 380th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hello thanks to share your code, I've learned lot of things. Please could check my code for me : https://www.kaggle.com/code/mohameddrabo/forecasting-sticker-sales-cat-lagmb/notebook
+
+reply
+Reply
+yunsuxiaozi
+
+Posted 2 years ago
+
+· 295th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I have carefully read your notebook and have the following questions:
+
+1.Should time series have offline CV? What I mean is to keep the last 3 years of the training set as the validation set, although the final mape is also calculated, I don't think this is the true CV.
+
+2.I see that you are decomposing each variable and building a separate model. If the order of these decompositions is changed, will the result be different? How to choose the order of decomposition?
+
+3.If the products of each store in a dataset are different, for example, store A has products a and c, and store B has products b and c, how can this solution be extended?
+
+4.Improvement suggestion: The number of holiday days for festivals may vary, and weighting can be considered for festivals, such as a 2-day festival being 1 and 1.5 for a 3-day festival.
+
+reply
+Reply
+George Koussa
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+1 You're right, validating results only using the data that was used to build the model is not ideal. Proper CV is definitely best practice, though I never got around to adding it to my notebook. If I were to add CV, I would use a 5-fold scheme where the model is trained on the first 2, 3, 4, 5, and 6 years and evaluated on the 3rd, 4th, 5th, 6th, and 7th year, respectively.
+
+2 Actually, @kdmitrie revealed in his discussion post here that it is better to evaluate the factors simultaneously rather than sequentially. Doing so would also mean you wouldn't have to worry about ordering!
+
+That said, I do believe that the order matters more for some factors than others. For example, using relative sales to calculate store factor and product factor helps normalize variations caused by other factors. Since external influences affect all products/stores similarly, shifting the order of these two factors likely wouldn’t change the results much. On the other hand, it is not as easy to isolate the holiday & New Year's factors, particularly from variations in sales over time like the trend factor I mention in my solution. That's why I chose to evaluate those two factors last, after accounting for the effects of the other factors.
+
+3 If each store carries a different subset of products (e.g., store A has products {a, c} while store B has {b, c}), it becomes more difficult to isolate the product effect from the store effect. Some stores might sell unique products, while others may overlap, creating dependencies between the two factors. To account for this, I would calculate the product factor separately for each store. This way, the model captures how each product behaves within a specific store rather than assuming a uniform effect across all stores.
+
+4 That's an interesting suggestion. I'm not too familiar with the Python holiday package, but in the case that it doesn't treat the separate days of a festival as holidays themselves, that could improve performance. I know from a few other discussions that the holiday library misses some holidays that do influence sales. @cabaxiom, for instance, points out here that certain Kenyan holidays were absent from the package.
+
+My current treatment of holidays was quite basic, and there’s certainly room for improvement. A more refined approach would involve identifying and removing holidays that do not significantly impact sales while also adding missing holidays that do.
+
+reply
+Reply
+yunsuxiaozi
+
+Posted 2 years ago
+
+· 295th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks for your reply and congratulations.
+
+reply
+Reply
+Ashish Khare
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+What are these wav features? Can you throw some light on it? 🙏
+
+reply
+Reply
+Joshua Immanuel
+
+Posted 2 years ago
+
+· 1104th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, Great Work
+
+reply
+Reply
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+i Need help in 1 competition , can anyone help me in this , i'm new on kaggle
+
+reply
+Reply
+ayushokaay
+
+Posted 2 years ago
+
+· 387th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+sure I will help you.
+
+reply
+Reply
+Appreciation (1)
+Minhaz07
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great Work

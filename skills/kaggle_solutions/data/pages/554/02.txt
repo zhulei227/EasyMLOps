@@ -1,0 +1,47 @@
+url: https://www.kaggle.com/c/playground-series-s3e15/discussion/413826
+fetched: 2026-10-27
+chars: 542
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Kaggle · Playground Prediction Competition · 3 years ago
+Late Submission
+more_horiz
+Feature Imputation with a Heat Flux Dataset
+
+Playground Series - Season 3, Episode 15
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Failed to load the discussion topic
+
+Failed to load the discussion topic

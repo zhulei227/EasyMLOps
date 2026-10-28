@@ -1,0 +1,52 @@
+url: https://github.com/theusual/kaggle-yelp-business-rating-prediction
+fetched: 2026-10-27
+chars: 5574
+
+GitHub - theusual/kaggle-yelp-business-rating-prediction: Code for Kaggle Contest &quot;RecSys2013: Yelp Business Rating Prediction&quot; -- Predicting Business Ratings on Yelp.com Using Machine Learning. My final submission scored an RMSE of 1.2307 which earned a rank of #7 out of ~250 teams. This a collection of code that is meant to be run from python console, it is not a stand-alone program · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ theusual kaggle-yelp-business-rating-prediction Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-yelp-business-rating-prediction Public Notifications You must be signed in to change notification settings Fork 13  ( 13 ) Star 20  ( 20 ) You must be signed in to star a repository About Code for Kaggle Contest "RecSys2013: Yelp Business Rating Prediction" -- Predicting Business Ratings on Yelp.com Using Machine Learning. My final submission scored an RMSE of 1.2307 which earned a rank of #7 out of ~250 teams. This a collection of code that is meant to be run from python console, it is not a stand-alone program Resources Readme Activity Stars 20 stars Watchers 4 watching Forks 13 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 10 Commits 10 Commits Folders and files Name Name Last commit message Last commit date Data Data     .gitignore .gitignore     AFINN-111.txt AFINN-111.txt     README.md README.md     calc_categories.py calc_categories.py     calc_name_avgs.py calc_name_avgs.py     calc_sent_scores.py calc_sent_scores.py     features.py features.py     main.py main.py     munge.py munge.py     test_multiprocessing.py test_multiprocessing.py     train.py train.py     utils.py utils.py     visualizations.py visualizations.py     View all files Repository files navigation README More items kaggle-yelp-business-rating-prediction 
+ Code for Kaggle Contest "RecSys2013: Yelp Business Rating Prediction" -- Predicting Business Ratings on Yelp.com Using Machine Learning
+. 
+ This was my third Kaggle contest and my final submission achieved an RMSE of 1.23107 which placed #7 out of ~250 teams. I used the python code in this repository to load and munge the data and for modeling and cross-validation on certain subsets of the data that performed well with machine learning models. The subsets were output to CSV's then joined together in Excel where factorization models were added for the remaining subsets not ran through ML, thus creating a comprehensive submission for the contest. 
+ This code was mostly written stream of conscience during the weeks I worked on the contest, so it is messy and jumbled. Also, it was intended to be run in the Ipython console in sections during exploration of the data, so it will not run as a stand-alone program. Think of it more as a collection of useful code snippets for data analysis! 
+ About Code for Kaggle Contest "RecSys2013: Yelp Business Rating Prediction" -- Predicting Business Ratings on Yelp.com Using Machine Learning. My final submission scored an RMSE of 1.2307 which earned a rank of #7 out of ~250 teams. This a collection of code that is meant to be run from python console, it is not a stand-alone program Resources Readme Activity Stars 20 stars Watchers 4 watching Forks 13 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

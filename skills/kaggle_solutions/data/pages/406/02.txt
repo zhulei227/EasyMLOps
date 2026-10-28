@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/conways-reverse-game-of-life-2020/discussion/200539
+fetched: 2026-10-27
+chars: 797
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Kaggle · Playground Code Competition · 6 years ago
+Late Submission
+more_horiz
+Conway's Reverse Game of Life 2020
+
+Reverse the arrow of time in the Game of Life
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

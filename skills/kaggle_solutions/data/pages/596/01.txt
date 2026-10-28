@@ -1,0 +1,647 @@
+url: https://www.kaggle.com/c/blood-vessel-segmentation/discussion/475522
+fetched: 2026-10-27
+chars: 16740
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution (code updated) — SenNet + HOA - Hacking the Human Vasculature in 3D
+1st Place Solution (code updated)
+
+SenNet + HOA - Hacking the Human Vasculature in 3D
+
+Solution Writeup · 1st place · Feb 14, 2024
+
+First of all, we would like to thank Kaggle and the organizers for hosting such a great competition. And also thanks to @hengck23 for the amazing posts, @junkoda for the metric implementation and all other participants for sharing their experiments.
+
+Overview
+
+Our final submission is an ensemble of two 2.5d convnext tiny unet with 3 channels, and the only differences between these two models are augmentation and number of epochs. Actually the best scored submission is not the selected ensemble but one single model of the ensemble which is 0.835 on private lb.
+
+Data Preparation
+
+We used all training data including kidney_1_voi.
+
+Multiview slice (x, y, z)
+Normalization: No normalization, just image = image / 65535.0
+Whole slice instead of tiles and all slices resized or cropped to 1536x1536.
+Augmentations:
+A.Compose([
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.Transpose(p=0.5),
+    A.Affine(scale={"x":(0.7, 1.3), "y":(0.7, 1.3)}, translate_percent={"x":(0, 0.1), "y":(0, 0.1)}, rotate=(-30, 30), shear=(-20, 20), p=0.5),
+    A.RandomBrightnessContrast(brightness_limit=0.4, contrast_limit=0.4, p=0.5),
+    A.OneOf([
+        A.Blur(blur_limit=3, p=0.2),
+        A.MedianBlur(blur_limit=3, p=0.2),
+    ], p=1.0),
+    A.OneOf([
+        A.ElasticTransform(alpha=1, sigma=50, alpha_affine=10, border_mode=1, p=0.5),
+        A.GridDistortion(num_steps=5, distort_limit=0.1, border_mode=1, p=0.5)
+    ], p=0.4),
+    A.OneOf([
+        A.Resize(1536, 1536, cv2.INTER_LINEAR, p=1),
+        A.Compose([
+            RandomResize(1536, 1536, scale_limit_x=0.5, scale_limit_y=0.5, p=1),
+            A.PadIfNeeded(1536, 1536, position="random", border_mode=cv2.BORDER_REPLICATE, p=1.0),
+            A.RandomCrop(1536, 1536, p=1.0)
+        ], p=1.0),
+    ], p=1.0),
+    A.GaussNoise(var_limit=0.05, p=0.2),
+])
+
+Random 3D rotation to get slices that is not necessarily parallel to axes. The best scored submission used random 3d rotation for augmentation and trained for more epochs. 
+Modeling & Training
+We used unet from SMP with convnext tiny backbone, replaced BatchNorm and ReLU to GroupNorm and GELU and added an extra convolution stem. The input size for all models is 3x1536x1536.
+self.extra_stem = nn.Sequential(
+    nn.Conv2d(in_channels, out_channels, 3, 2, 1),
+    LayerNorm2d(out_channels),
+)
+
+For loss function, we used 1.0 focal loss, 1.0 dice loss, 0.01 boundary loss and 1.0 custom loss. The custom loss is inspired by @hengck23's post and @junkoda's metric implementation.
+class CustomLoss(nn.Module):
+    def __init__(self):
+        super().__init__()
+        power = 2**np.arange(0, 8).reshape(1, 1, 2, 2, 2).astype(np.float32)
+        area = create_table_neighbour_code_to_surface_area((1, 1, 1)).astype(np.float32)
+        self.power = nn.Parameter(torch.from_numpy(power), requires_grad=False)
+        self.kernel = nn.Parameter(torch.ones(1, 1, 2, 2, 2), requires_grad=False)
+        self.area = nn.Parameter(torch.from_numpy(area), requires_grad=False)
+
+    def forward(self, preds, targets):
+        """
+        preds: tensor of shape [bs, 1, d, h, w]
+        targets: tensor of shape [bs, 1, d, h, w]
+        """
+        bsz = preds.shape[0]
+
+        # voxel logits to cube logits
+        foreground_probs = F.conv3d(F.logsigmoid(preds), self.kernel).exp().flatten(1)
+        background_probs = F.conv3d(F.logsigmoid(-preds), self.kernel).exp().flatten(1)
+        surface_probs = 1 - foreground_probs - background_probs
+
+        # ground truth
+        with torch.no_grad():
+            cubes_byte = F.conv3d(targets, self.power).to(torch.int32)
+            gt_area = self.area[cubes_byte.reshape(-1)].reshape(bsz, -1)
+            gt_foreground = (cubes_byte == 255).to(torch.float32).reshape(bsz, -1)
+            gt_background = (cubes_byte == 0).to(torch.float32).reshape(bsz, -1)
+            gt_surface = (gt_area > 0).to(torch.float32).reshape(bsz, -1)
+
+        # dice
+        foreground_dice = 2 * (foreground_probs*gt_foreground).sum(-1) / (foreground_probs.sum(-1)+gt_foreground.sum(-1)).clamp(1e-6)
+        background_dice = 2 * (background_probs*gt_background).sum(-1) / (background_probs.sum(-1)+gt_background.sum(-1)).clamp(1e-6)
+        surface_dice = 2 * (surface_probs*gt_area).sum(-1) / ((surface_probs+gt_surface)*gt_area).sum(-1).clamp(1e-6)
+        dice = (foreground_dice + background_dice + surface_dice) / 3
+        return 1 - dice.mean()
+
+For optimization, we used AdamW and CosineAnnealingLR from 1e-4 to 0 with warmup. All models were trained for 20 epochs with a batch size of 8 and 4 gradient accumulation steps, except for the model with 3d slice rotation augmentation which was trained for 30 epochs.
+Inference
+Inference on 3 axes with 8xTTA.
+We tried different resize methods for inference. For the best scored submission, all slices are simply resized to 3072x3072; for the selected submission, we used a dynamic scale factor that (h*scale)*(w*scale)=3200*3200.
+The threshold used for submission is 0.4, and the optimal threshold based on cv and lb is about 0.4~0.5.
+torch.compile() gave about 2x acceleration so that we were able to inference with high resolution and TTAs.
+What didn't work
+3d models.
+External data and pseudo labels.
+Transformers.
+Stacking more slices (>3) for 2.5d model.
+Results
+	Model	Slice Rotation	Inference size	Public Score	Private Score
+1	convnext_tiny		3072	0.889	0.682
+2	convnext_tiny	✓	3072	0.888	0.830
+3	convnext_tiny	✓	3072	0.867	0.835
+4	ensemble(1+2)	-	3200	0.898	0.744(selected)
+5	ensemble(1+2)	-	3200(dynamic)	0.895	0.774(selected)
+Links
+training code
+inference code
+final submission ensemble 0.774106
+3d rotate single model 0.835346
+Authors
+Lum0s517
+
+lum0s517
+
+Clevert
+
+clevert
+
+arrow_drop_up
+100
+Share
+more_horiz
+Citation
+
+Lum0s517, Clevert. 1st Place Solution (code updated). https://www.kaggle.com/competitions/blood-vessel-segmentation/writeups/clevert-1st-place-solution-code-updated. 2024. Kaggle
+
+1
+comment
+30 Comments
+Hotness
+hengck23
+
+Posted 3 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+thanks for the writeup. good work!
+
+As a reference, my implementation:
+
+convnext tiny
+random 3d slice
+boundary + interior bce loss weighing
+optimal local cv threshold and public: 0.4~0.5.
+
+comparing your results and mine, espically your very high private score, i think the cruical points are:
+
+training data including kidney_1_voi
+"No normalization, just image = image / 65535.0" + "replaced BatchNorm and ReLU to GroupNorm" (this is local contrast, i.e. you are doing feature noramlisation instead of image intensity noramlisation)
+strong augmantation
+direct lb metric loss
+reply
+Reply
+Kavya_17
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+nice work
+
+reply
+Reply
+Viktor Cikojevic
+
+Posted 3 years ago
+
+· 137th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+congratulations on keeping the first place both on private and public leaderboards!!
+
+Can you tell me how do you introduce the extra_stem layer?
+
+reply
+Reply
+Tanishq dublish
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations, Thank you for sharing the solution. It would be good for new learners if you provide complete notebook solution.
+
+reply
+Reply
+Huma Perveen
+
+Posted 3 years ago
+
+· 297th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations, Thank you for sharing the solution. It would be good for new learners if you provide complete notebook solution.
+
+reply
+Reply
+JEANMPIA
+
+Posted 3 years ago
+
+· 46th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Very nice writeup and solution ! The attention to detail is very impressive ! Thank you for sharing.
+
+May I ask a few question:
+
+What's the reasoning behind the simple / 65535.0 norm ?
+Same question for Groupnorm and GeLU
+Is the aug scheme found throught iterative refinement or coming from another pipeline ?
+
+Thanks in advance for the answers.
+
+PS: The loss function is very impressive. I read @hengck23 discussion on it but didn't have the grit to actually implement it. Congrats for actually making it work.
+
+reply
+Reply
+hengck23
+
+Posted 3 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+" didn't have the grit to actually implement it."
+
+Me too!
+
+reply
+Reply
+Clevert
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks!
+
+We tried other normalization methods, but they did't work well for us.
+The GroupNorm is for gradient accumulation and the GELU is just an empirical choice.
+The augmentation scheme is found throught iterative refinement.
+reply
+Reply
+slime
+
+Posted 3 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Cool! I see that 3d-rotation augmentation makes a big difference in the final score.
+
+What is the impact of the combination of the loss functions? What score could be achieved with the same setup & simple BCE or focal loss?
+
+reply
+Reply
+Clevert
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We started with focal + dice loss, so no results for simple BCE or focal loss. And we discovered boundary loss in early experiments which brought minimal improvement(<1%) for cv and public lb. A combination of focal + dice + boundary loss with a single channel 2d model gave a score of 0.732/0.835 for private/public lb. As for the custom loss, it didn't bring any improvement for public/private score, but the 2.5d models with custom loss seem more stable for both public/private score.
+
+reply
+Reply
+tzebin
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Are you planning to publish this? I would love to read the detailed methodology and ablation studies:)
+
+reply
+Reply
+Metin Topyildiz
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congraculations! and thank you for sharing the code
+
+reply
+Reply
+jewe1ry
+
+Posted 3 years ago
+
+· 42nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! impressive work about norm.
+
+reply
+Reply
+David Cano Rosillo
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+MarcoPG
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!!!
+
+reply
+Reply
+malakkafaq
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+cogrates dear!!
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, Thank you for sharing the solution .
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 3 years ago
+
+· 624th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on getting the first prize. Thanks for sharing the details of your solution.
+
+reply
+Reply
+Optimo
+
+Posted 3 years ago
+
+· 129th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+Could you share how you handled CV vs LB scores? You don't talk about CV at all in your write up, does it mean that you only implemented new ideas and relied on LB? If not could you share the split and cv you had and did it correlate well with LB scores ?
+
+reply
+Reply
+Clevert
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! For experimenting, we used kidney_3_dense for validation and other data for training. And we used IOU for local validation. For submission, we used all the data for training. The correlation between local cv and lb is not good. And because of the lack of data, our strategy was to improve lb score while ensuring the local cv improve or remain the same. Since we used all the data for training, we selected the last three checkpoints of one experiment for submissions, the lb score for different checkpoints varies a lot even with similar cv (the selection was based on lb). We also tried swa and ema, but didn't work well. Here's some results for reference. The models for cv and lb were trained with same setting only that the model for submission was trained with all data.
+
+	model	epochs	channels	custom loss	3d rotation	IOU	public score	private score
+1	convnext tiny	20	1			0.8116	0.835	0.732
+1	convnext tiny	20	3			0.8066	0.852	0.534
+2	convnext tiny	20	3	✓		0.8150	0.889	0.682
+3	convnext tiny	30	3	✓	✓	0.8153	0.867	0.835
+4	convnext small	30	3	✓	✓	0.8045	0.848	0.741
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 734th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Well done and congratulations on staying on the top position both on public and private.
+
+reply
+Reply
+Clevert
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks!
+
+reply
+Reply
+ForcewithMe
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Random 3D rotation and the loss are creative and insightful. Congratulations @clevert , this solution well deserves top1 👍.
+
+I would like to know how large the improvement brought by 1) Random 3D rotation, 2) the loss, 3) and the large inference size. May you provide more ablation study on these three key points?
+
+reply
+Reply
+chemdatafarmer
+
+Posted 3 years ago
+
+· 211th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I would love to see this as well
+
+reply
+Reply
+Clevert
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you!
+
+Random 3d rotation brought little improvement for both cv and public score. but for private score, the improvement is huge (0.682->0.835).
+The custom loss gave us ~2% boost for local cv, no improvement for public or private lb. But we noticed that the custom loss brought more stability and consistency for public and private scores.
+Large inference size is critical for the final score. >10% boost from 1536 to 3072 for both public and private scores.
+reply
+Reply
+ForcewithMe
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+0.682->0.835 is a super huge improvements. Thank you for introducing this! 👍
+
+reply
+Reply
+hengck23
+
+Posted 3 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+few question:
+
+first, why do you think ensemble(1+2) performs worse in private? did you do post submission using better threshold adjustment? )maybe best threshold for ensmble is on 0.4?
+
+difference of 0.835 and 0.744/0.774 is large. what is the cause? hence even at 0.835 private, results are still not stable (becuase of ground truth)?
+
+second, is there results for model using single channel (instead of 3 channel)? in this case you are not using marching cube loss.
+
+third, are you using convnext v1 or v2 (this include global response norm, grn)?
+
+"We used all training data including kidney_1_voi." , this also means that sparsity is not important in annotation as ground truth? hence the fine vessel are not detectable afterall?
+
+reply
+Reply
+Clevert
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+1) We haven't done any post submission yet. Here's some existing results of different thresholds for ensemble. We will do more probes later. I think one potiential reason for the large difference might be the inconsistent spacing of the channel dimension for 2.5d models, while the inconsistency of other dimensions is alleviated by random scaling augmentation(3d resize might help?). And the 3d rotation might alleviate this problem by resampling? I realized this problem near the end the competition but didn't have time to dig into it. 2) Yes. We used single channel models in early experiments. Checking the submission history, the best single channel model scored 0.732/0.835 for private/public. But the single channel models are quite unstable and unreproducible, the scores ranging from 0.6 to 0.73 for private, 0.83~0.87 for public. For 2.5d models with custom loss, the private scores are about 0.67~0.69 for private and 0.86~0.88 for public. 3) We were using convnext v1 without grn.
+
+	infer size	threshold	public score	private score
+1	3072	0.40	0.897615	0.751151
+2	3072	0.35	0.895733	0.767362
+reply
+Reply
+Chikuwabu
+
+Posted 3 years ago
+
+· 101st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing! I express my deep respect that you won first place in both Public and Private.
+
+My question is, what data set configuration did you use to calculate the CV? (train and valid)
+
+reply
+Reply
+Clevert
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+For experimenting, we used kidney_3_dense for validation and other data for training. For submission, we used all the data for training.
+
+reply
+Reply
+Appreciation (0)
+
+This comment has been deleted.

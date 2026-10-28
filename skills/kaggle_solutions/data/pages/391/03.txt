@@ -1,0 +1,115 @@
+url: https://github.com/pfnet-research/kaggle-alaska2-3rd-place-solution
+fetched: 2026-10-27
+chars: 6746
+
+GitHub - pfnet-research/kaggle-alaska2-3rd-place-solution: 3rd place solution for ALASKA2 Image Steganalysis on Kaggle · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ pfnet-research kaggle-alaska2-3rd-place-solution Repository navigation Code Issues 1  ( 1 ) Pull requests Actions Projects Security and quality Insights More items 
+
+ kaggle-alaska2-3rd-place-solution Public Notifications You must be signed in to change notification settings Fork 2  ( 2 ) Star 13  ( 13 ) You must be signed in to star a repository About 3rd place solution for ALASKA2 Image Steganalysis on Kaggle Topics deep-learning kaggle kaggle-alaska2 kaggle-competition steganalysis Resources Readme MIT license Activity Custom properties Stars 13 stars Watchers 13 watching Forks 2 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 3 Commits 3 Commits Folders and files Name Name Last commit message Last commit date alaska2 alaska2     env env     scripts scripts     somen somen     .gitignore .gitignore     LICENSE LICENSE     README.md README.md     pyproject.toml pyproject.toml     reproduce_final_submission.sh reproduce_final_submission.sh     View all files Repository files navigation README MIT license More items 3rd place solution of ALASKA2 Image Steganalysis 
+ Code for 3rd place solution of ALASKA2 Image Steganalysis on Kaggle. 
+ A description of the method can be found in the following paper and this post in the kaggle discussion. 
+
+ An Ensemble Model using CNNs on Different Domains for ALASKA2 Image Steganalysis 
+Kaizaburo Chubachi 
+
+ Run Instructions 
+ Environments 
+ Run it on the docker image shown in env/Dockerfile . 
+ (Optional) We mounted tmpfs in /tmp/ram because we used there to pass images read from the zip file to jpegio during training. 
+ Data Preparation 
+ # download data 
+mkdir -p data/input/
+ cd data/input/
+kaggle competitions download alaska2-image-steganalysis
+unzip alaska2-image-steganalysis.zip
+ cd ../../
+
+ # clone codes for some architectures 
+git clone https://github.com/facebookresearch/pycls
+git clone https://github.com/iduta/pyconv
+
+ # extract metadata such as qualities of JPEG files. 
+python scripts/make_assets/make_quality_df.py
+python scripts/make_assets/make_payload_stats.py 
+ Reproduce the final submission 
+ Run reproduce_final_submission.sh . We primarily used four NVIDIA Tesla V100 16GB to perform the training, so the script is written to use four GPUs. 
+ Train 3-channel color image models 
+ Make a configuration file like scripts/rgb_naive/rgb-4class-eb5-cutmix-p100.yaml . Put the file as scripts/rgb_naive/${CONFIG_NAME}.yaml . Then run following commands. 
+ python scripts/rgb_naive/train.py \
+ --config scripts/rgb_naive/ ${CONFIG_NAME} .yaml \
+ --task download_model
+python -m torch.distributed.launch --nproc_per_node=4 \
+ scripts/rgb_naive/train.py \
+ --resume \
+ --config scripts/rgb_naive/ ${CONFIG_NAME} .yaml \
+ --task train 
+ Train a DCT coefficient model 
+ Make a configuration file like scripts/dct_d8/dct-d8-stride-1-2-l16-q-cos.yaml . Put the file as scripts/dct_d8/${CONFIG_NAME}.yaml . Then run following commands. 
+ python scripts/dct_d8/train.py \
+ --config scripts/dct_d8/ ${CONFIG_NAME} .yaml \
+ --task download_model
+python -m torch.distributed.launch --nproc_per_node=4 \
+ scripts/dct_d8/train.py \
+ --resume \
+ --config scripts/dct_d8/ ${CONFIG_NAME} .yaml \
+ --task train 
+ Train a MLP 
+ Before training, dump feature maps of trained CNNs. 
+ python -m torch.distributed.launch --nproc_per_node=4 \
+ scripts/rgb_naive/train.py \
+ --config scripts/rgb_naive/ ${CONFIG_NAME} .yaml \
+ --task predict_feature 
+ Make a configuration file like scripts/cnn_feature_concat/dct-d8-stride-1-2-l16-q-cos.yaml , and put the file as scripts/dct_d8/${CONFIG_NAME}.yaml . Then run following commands. 
+ python scripts/cnn_feature_concat/train.py \
+ --config scripts/cnn_feature_concat/ ${CONFIG_NAME} .yaml \
+ --task train 
+ Citation 
+ @inproceedings{chubachi2020alaska,
+ author={Kaizaburo Chubachi},
+ booktitle={2020 IEEE International Workshop on Information Forensics and Security (WIFS)}, 
+ title={An Ensemble Model using CNNs on Different Domains for ALASKA2 Image Steganalysis}, 
+ year={2020},
+ pages={1-6},
+ doi={10.1109/WIFS49906.2020.9360892}
+}
+
+ About 3rd place solution for ALASKA2 Image Steganalysis on Kaggle Topics deep-learning kaggle kaggle-alaska2 kaggle-competition steganalysis Resources Readme MIT license Activity Custom properties Stars 13 stars Watchers 13 watching Forks 2 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

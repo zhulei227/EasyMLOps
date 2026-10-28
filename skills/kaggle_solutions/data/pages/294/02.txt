@@ -1,0 +1,74 @@
+url: https://github.com/yafeunteun/kaggle-dont-call-me-turkey
+fetched: 2026-10-27
+chars: 4784
+
+GitHub - yfe404/kaggle-1st-place-dont-call-me-turkey: Finding the turkey sound signature from pre-extracted audio features. · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ yfe404 kaggle-1st-place-dont-call-me-turkey Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ kaggle-1st-place-dont-call-me-turkey Public Notifications You must be signed in to change notification settings Fork 2  ( 2 ) Star 4  ( 4 ) You must be signed in to star a repository About Finding the turkey sound signature from pre-extracted audio features. www.kaggle.com/c/dont-call-me-turkey/leaderboard Resources Readme Activity Stars 4 stars Watchers 0 watching Forks 2 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 9 Commits 9 Commits Folders and files Name Name Last commit message Last commit date All Steps - Final Submission.ipynb All Steps - Final Submission.ipynb     front_image.png front_image.png     generated_features.pickle generated_features.pickle     readme.org readme.org     submission.csv submission.csv     View all files Repository files navigation README More items Kaggle Competition - Don’t call me Turkey 
+
+ Useful links 
+ General ML techniques 
+
+ https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74 
+ https://scikit-learn.org/stable/auto_examples/model_selection/plot_randomized_search.html 
+ https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.LeaveOneOut.html 
+
+ Text Mining and NLP techniques 
+
+ https://www.kdnuggets.com/2018/03/text-data-preprocessing-walkthrough-python.html 
+ https://www.datacamp.com/community/tutorials/web-scraping-python-nlp 
+ http://www.tulane.edu/~howard/NLP/webpages.html 
+ https://stevenloria.com/tf-idf/ 
+
+ Keras specifics 
+
+ https://machinelearningmastery.com/use-keras-deep-learning-models-scikit-learn-python/ 
+ https://stackoverflow.com/questions/41032551/how-to-compute-receiving-operating-characteristic-roc-and-auc-in-keras 
+
+ Audio data related 
+
+ https://askubuntu.com/questions/249828/command-to-see-media-file-info-in-terminal 
+ https://github.com/tensorflow/models/blob/master/research/audioset/vggish_inference_demo.py 
+ https://github.com/alibugra/audio-data-augmentation/blob/master/AudioAugmentation.py 
+
+ About Finding the turkey sound signature from pre-extracted audio features. www.kaggle.com/c/dont-call-me-turkey/leaderboard Resources Readme Activity Stars 4 stars Watchers 0 watching Forks 2 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

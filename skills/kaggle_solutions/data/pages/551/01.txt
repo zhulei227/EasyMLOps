@@ -1,0 +1,685 @@
+url: https://www.kaggle.com/c/amp-parkinsons-disease-progression-prediction/discussion/411505
+fetched: 2026-10-27
+chars: 20260
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — AMP®-Parkinson's Disease Progression Prediction
+1st Place Solution
+
+AMP®-Parkinson's Disease Progression Prediction
+
+Solution Writeup · 1st place · May 22, 2023
+
+First of all we would like to thank Kaggle and AMP PD for hosting this competition and providing a great dataset to dig into and rich enough to get lost in it for several months. It is always an extra motivation to work on problems that can bring value to the medical field or contribute to scientific research. Additional words of gratitude of course go to @kyakovlev for the amazing work he has done, I think we formed a great team for this competition and the results reflect that.
+
+We publish the full code of the winning notebook here
+
+Quick summary
+
+Our final solution is a simple average of two models: LGB and NN. Both models were trained on the same features (+ scaling/binarization for NN):
+
+Visit month
+Forecast horizon
+Target prediction month
+Indicator whether blood was taken during the visit
+Supplementary dataset indicator
+Indicators whether a patient visit occurred on 6th, 18th and 48th month
+Count of number of previous “non-annual” visits (6th or 18th)
+Index of the target (we pivot the dataset to have a single target column)
+
+The winning solution fully ignores the results of the blood tests. We’ve tried hard to find any signal in this crucial piece of the data, but unfortunately we came to the conclusion that none of our approaches or models can benefit from blood test features significant enough to distinguish it from random variations. The final models were trained only on the union of clinical and supplementary datasets.
+
+LGB
+
+For the entire duration of the competition LGB was our model to beat and only a NN trained with the competition metric as the loss function was able to achieve competitive performance on CV. At first, we tried running a regression LGB model with different hyperparameters and custom objective functions, but nothing was better than l1 regression, which does not optimize the desired metric SMAPE+1. We also noticed that on CV the performance of every model is always better when the regression outputs are rounded to integers. Then we switched to an alternative approach.
+
+Our LGB model is a classification model with 87 target classes (0 to maximum target value) and logloss objective. To produce the forecast we applied the following post-processing: given the predicted distribution of target classes, pick a value that minimizes SMAPE+1. Taking into account the observation that the optimal predictions are always integers, the task boils down to a trivial search among 87 possible values. Such an approach would have worked well for the original SMAPE metric also, because the approach treats cases with multiple local minimums naturally.
+
+We ran an optimization routine to tune LGB hyperparameters to minimize SMAPE+1 on CV using the described post-processing.
+
+NN
+
+The neural network has a simple multi-layer feed-forward architecture with a regression target, using the competition metric SMAPE+1 as the loss function. We fixed the number of epochs and scheduler, and then tuned the learning rate and hidden layer size. The only trick there was to add a leaky relu activation as the last layer to prevent NN from getting stuck at negative predictions. Of course there are alternative ways to solve this issue.
+
+Cross-Validation
+
+We’ve tried multiple cross-validation schemes due to the small training sample size, all of them were stratified by patient id. Once a sufficient number of folds is used, they all are quite well correlated to each other. Better than to the public leaderboard :) The final scheme we relied on was leave-one-(patient)-out or, in other words, a group k-fold cross validation with a fold for each patient. We used it because it doesn’t depend on random numbers. The cross-validation correlated well enough with the private leaderboard, and the submit we chose turned out to be our best private LB submission.
+
+What worked
+
+The most impactful feature was the indication of whether a patient visit happened on the 6th month or not. It correlates strongly with the UPDRS targets (especially 2 and 3) and with frequency of medications being taken. As we can observe only the data correlation, it is impossible to judge what is the core reason for that. During the competition our hypothesis was that the patients that had more severe symptoms during the first examination (UPDRS scores parts 2 and 3) were more likely to get invited for a visit after 6 months and more likely to get medications prescribed. But for model training it was important that the patients that made a visit on the 6th month, have higher UPDRS scores on average. The same is true for an 18th month visit as well, but these 2 features are correlated. I personally wonder if presence / absence of these variables in the models are the reason for the private LB cliff effect around 20th place.
+
+Another curious effect related to it is observed for the forecasts made at visit_month = 0. If you look at the model forecasts for 0, 12 and 24 months ahead, they are consistently lower than the forecasts 6 months ahead. It is very logical from the math point of view - if a patient will show up on the 6th month, they will have higher UPDRS scores on average, and if not - the forecast will be ignored. But such model behaviour is unreasonable from a clinical point of view of course.
+
+It was also important to pay attention to the differences between training and test datasets as e.g. nicely summarized here. That, for instance, explains well why adding a feature indicating the visit on the 30th month could improve the CV, but ruin LB.
+
+What didn’t work
+
+Blood test data. We’ve tried many approaches to add proteins and/or peptides data to our models, but none of them improved CV. We narrowed it down to a bag of logistic regressions that forecasted the visit on the 6th month based on the blood test result on the 0th month. We applied soft up/down scaling of model-based predictions for patients that were more/less likely to visit on the 6th month based on the logistic regression probabilities. It worked on public LB after tuning a couple of “magic” coefficients directly on public LB itself. That gave us a boost all the way up to the second place on public LB, but it was clearly an overfit. We chose a “mild” version of that approach as our second final submission. It scored worse on private LB than the other submission, but, interestingly enough, not by as much as one could have expected (60.0 vs 60.3).
+
+Thanks to everyone who participated in the competition, those who kept many interesting discussions going on the forum and those who suggested improvements! And congrats to all the winners!
+
+Authors
+Konstantin Yakovlev
+
+kyakovlev
+
+dott
+
+dott1718
+
+arrow_drop_up
+99
+Share
+more_horiz
+Citation
+
+Konstantin Yakovlev, dott. 1st Place Solution. https://www.kaggle.com/competitions/amp-parkinsons-disease-progression-prediction/writeups/connecting-dotts-1st-place-solution. 2023. Kaggle
+
+4
+comment
+38 Comments
+1 appreciation comment
+Hotness
+Konstantin Yakovlev
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+13
+more_vert
+
+It was a huge huge pleasure to team up with @dott1718 (Dmitry) in this competition. I felt as a total junior DS - Dmitry's ideas, approach and dedication were astonishing - I've learned so much and so grateful for all the time we spent together.
+
+This competition was super unique for me with many new puzzles to solve.
+
+Thank you again and congrats to all the winners and participants - It was remarkable ride.
+
+reply
+Reply
+Konstantin Yakovlev
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+16
+more_vert
+
+A SMAPE1P thing:
+
+MAPE / SMAPE / SMAPE1P are very tricky metrics for GBT models:
+
+Need custom loss or target transform with l1 loss (l1 is never optimal choice for gbt)
+Multimodal
+Zero inflation
+….
+
+Here is the "hack" that is boosting the SMAPE1P score (and works also on real data - confirmed few weeks ago):
+
+Step 1: Multiclass Classification
+
+params = {
+        'boosting_type': 'gbdt',
+        'objective': 'multiclass',
+...
+}
+
+
+Step 2: Train model (could be xgboost catboost lgbm)
+
+estimator.train(...)
+
+
+Step 3: Predict probabilities:
+
+probas = estimator.predict(...)
+
+
+Step 4: Make direct SMAPE1P optimization from probabilities
+
+def single_smape1p(preds, tgt):
+    x = np.tile(np.arange(preds.shape[1]), (preds.shape[0], 1))
+    x = np.abs(x - tgt) / (2 + x + tgt)
+    return (x * preds).sum(axis=1)
+
+def opt_smape1p(preds):
+    x = np.hstack([single_smape1p(preds, i).reshape(-1,1) for i in range(preds.shape[1])])
+    return x.argmin(axis=1)
+
+final_predictions = opt_smape1p(probas)
+
+
+If you are sure that "SMAPE" variation is the metric that reflects your business value - do the "hack" (at least try).
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Amazing hack! Great discovery and thanks for sharing!
+
+reply
+Reply
+16 more replies
+arrow_drop_down
+Vitaly Kudelya
+
+Posted 3 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Why is leave-one-(patient)-out cross-validation also called "stratified cross validation with a fold for each patient" in the post? I thought that for stratification we need our folds to be stratified for target, for example )
+
+reply
+Reply
+
+This comment has been deleted.
+
+dott
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+You are right, thank you for pointing that out! It is indeed group k-fold and not stratified k-fold, I've corrected the text to prevent potential confusion.
+
+reply
+Reply
+oka_haru
+
+Posted 3 years ago
+
+· 115th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations!!! Thanks for sharing your solution!!
+
+reply
+Reply
+Jindo
+
+Posted 3 years ago
+
+· 115th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations🎉 I really learned a lot from your source code and explanations. Thank you very much.
+
+reply
+Reply
+Samvel Kocharyan
+
+Posted 3 years ago
+
+· 262nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations Dmitry and Konstantin! What a brilliant skill to focus on one smaller part of data (visits) and have enough wisdom and experience to ignore the others (CSF). I would say it is one of my main outcomes from this competition.
+
+I hope that organizers will not be dissatisfied since that all the data they provided were not used in a winning solutions and the hypothesis about predictive power of proteins and peptides is not confirmed yet. Anyway this competition makes all of us a bit closer to the understanding of the Parkinson's desease.
+
+Congratulations to everyone who won in leaderbord and congratulations to all those who have beaten themselves in this competition. It was an addictive trip and interesting experience.
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations @dott1718 and @kyakovlev Fantastic job!
+
+The winning solution fully ignores the results of the blood tests. We’ve tried hard to find any signal in this crucial piece of the data, but unfortunately we came to the conclusion that none of our approaches or models can benefit from blood test features significant enough to distinguish it from random variations. The final models were trained only on the union of clinical and supplementary datasets.
+
+I just had a thought. Now that the competition ended and the signal was fully explained by AmbrosM here, it might be the case that there is signal in the protein peptide information. Perhaps the problem is that once our models detect the 3 groups of patients using visit_month then protein peptide does not provide more information. However if the host could hide the 3 groups of patients (i.e. remove the signal from visit month), I wonder whether the protein peptide information can help locate the 3 groups?
+
+In other words, i do not think that this competition demonstrated that the protein peptide does not contain signal (by the fact that top teams did not use it.). I think this competition demonstrated that the signal from visit_month contains whatever signal may exist in the protein peptide information. Do you think this might be the case? If so, we should let the host and biology community know this.
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Now i just read that you did try using blood without visit month. So perhaps you demonstrated that it does not have predictive power.
+
+Blood test data. We’ve tried many approaches to add proteins and/or peptides data to our models, but none of them improved CV. We narrowed it down to a bag of logistic regressions that forecasted the visit on the 6th month based on the blood test result on the 0th month. We applied soft up/down scaling of model-based predictions for patients that were more/less likely to visit on the 6th month based on the logistic regression probabilities.
+
+reply
+Reply
+dott
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, it is exactly why we tried to narrow it down to a single homogenous group, but without much success. At some point I managed to get a CV improvement with some proteins data of a 0.01 magnitude which was much smaller than expected random effect on LB of around 0.1. So a different competition setup with more data might have been successful in identifying proteins/peptides.
+
+The way I managed to "force" proteins into the LGB model was to select the top 5-10 ones with the highest absolute correlation with the targets and scale down their gain with feature_contri parameter dramatically.
+
+reply
+Reply
+Gaurav Srivastava
+
+Posted 3 years ago
+
+· 378th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Heartiest Congratulations @dott1718. And thanks for sharing. Keep up the good work 😊
+
+reply
+Reply
+Vincent Schuler
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @dott1718 and @kyakovlev ! Best team name and best solution 💪
+
+I tried multiclass classification as well but couldn't make it work better than a simple regression model. Thanks for sharing your method, it's instructive !
+
+reply
+Reply
+dott
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you Vincent! I was cheering for you to get to the gold zone on private LB, hopefully you are not too upset about the result.
+
+reply
+Reply
+Vincent Schuler
+
+Posted 3 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks 😄 Nothing too frustrating, hopefully I'll get it another time !
+
+reply
+Reply
+dott
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I am sure you will!
+
+reply
+Reply
+Aaron C Bastian
+
+Posted 3 years ago
+
+· 1775th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+It is unfortunate that no signal was found in the protein data, as that was the entire point of the challenge. Parkinson's remains a clinical diagnosis it seems.
+
+reply
+Reply
+Ion05
+
+Posted 3 years ago
+
+· 115th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thanks for sharing your solution with us. It has been very helpful for me. Thank you!!
+
+reply
+Reply
+windupbirdjdt
+
+Posted 3 years ago
+
+· 1323rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+very interesting discussion and work, thank you for taking the time to update on this, its interesting that the blood test data was not directly an input
+
+reply
+Reply
+Jayanth Sai Marreddi
+
+Posted 3 years ago
+
+· 528th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thanks for sharing your solution gives a lot insights to me to see how does top people in leaderboard approach a project.
+
+reply
+Reply
+Viji
+
+Posted 3 years ago
+
+· 910th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thanks for sharing your approach to a simple but effective solution.
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing your solution. I never achieved good results from GBT. (I think CV was 57 compared with my MLP's 55). And i did not achieve any significant boosts from SMAPE optimization (besides rounding). I also did not find a better loss for my MLP than MeanAbsoluteError loss.
+
+Now after reading your solution, i may go back and revisit these ideas and see if i can boost my MLP by ensembling it with GBT and adding some SMAPE optimization.
+
+My two top models were MLP (4th place) and SVR (9th place) but the CV did not boost when i ensembled the two.
+
+reply
+Reply
+Konstantin Yakovlev
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Same with our ensembles - NN with lgbm showed just a tiiiny boost on CV.
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I like your trick of training multi-class then optimizing output to SMAPE. That's clever.
+
+Our LGB model is a classification model with 87 target classes (0 to maximum target value) and logloss objective. To produce the forecast we applied the following post-processing: given the predicted distribution of target classes, pick a value that minimizes SMAPE+1. Taking into account the observation that the optimal predictions are always integers, the task boils down to a trivial search among 87 possible values. Such an approach would have worked well for the original SMAPE metric also, because the approach treats cases with multiple local minimums naturally.
+
+reply
+Reply
+Jai Chauhan
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! sir
+
+reply
+Reply
+Rida Mahmood
+
+Posted 3 years ago
+
+· 833rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Many congratulations @dott1718. Also I highly appreciate you for sharing your winning solution. Stay blessed!
+
+reply
+Reply
+sameelie
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Thanks for sharing your approach to a simple but effective solution.
+
+reply
+Reply
+Konstantin Yakovlev
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+https://www.kaggle.com/code/kyakovlev/amp-blood-randomness/
+
+Small example for "fake" correlations in proteins / peptides
+
+reply
+Reply
+MichaelDarling
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @dott1718, congratulations! Would you be able to send along the testing data provided by the competition? I have a student working with this data for his capstone project and would love to get this data. We contacted the competition organizers but haven't heard back.
+
+reply
+Reply
+Aleksey SCHUKIN
+
+Posted 3 years ago
+
+· 262nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thanks for sharing your approach.
+
+reply
+Reply
+Tomonori Sasaki
+
+Posted 3 years ago
+
+· 621st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thank you for publishing and sharing. The discussion around the metrics in this competition was difficult and confusing to me. I will learn from the published notes.
+
+reply
+Reply
+Backyard
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Good job,thank you very much. Because I can learn from it .
+
+reply
+Reply
+Jeong Taewoo
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I thought XGBoost almost always had good performance, but I guess it wasn't necessarily. Your writing and notebook helped me improve my skills a lot. Thank you!!
+
+reply
+Reply
+Josef Švenda
+
+Posted 3 years ago
+
+· 769th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+As I understood the discussion: XGB would be a comparable method if it would have custom objective function aligned with SMAPE metric. Right @cdeotte, @dott1718, @kyakovlev ? Anyway excellent learning opportunity! Thanks guys!
+
+reply
+Reply
+GridSearchGK
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations !! Well done 🔥
+
+reply
+Reply
+3SE3_212011556_Aronad Brilliantio Evan Maheswara
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thanks for sharing your approach.
+
+reply
+Reply

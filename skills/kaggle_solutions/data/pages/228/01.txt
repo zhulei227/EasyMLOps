@@ -1,0 +1,87 @@
+url: https://www.kaggle.com/outrunner/use-keras-to-count-sea-lions/notebook
+fetched: 2026-10-27
+chars: 917
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+outrunner · 9y ago · 21,449 views
+arrow_drop_up
+206
+Copy & Edit
+292
+file_download
+Download
+more_vert
+Use keras to count Sea Lions
+Notebook
+Input
+Output
+Logs
+Comments (10)
+history
+Version 23 of 23
+Runtime
+play_arrow
+
+2m 30s
+
+Input
+Competitions
+
+NOAA Fisheries Steller Sea Lion Population Count
+
+Tags
+Advanced
+CNN
+Language
+
+Python
+
+Table of Contents
+Use keras to count Sea Lions
+Experience
+Competition Notebook
+
+NOAA Fisheries Steller Sea Lion Population Count
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+1 file
+output
+Output
+0 files
+list_alt
+Logs
+150.1 second run - failure
+comment
+Comments
+10 comments

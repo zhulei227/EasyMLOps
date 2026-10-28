@@ -1,0 +1,461 @@
+url: https://www.kaggle.com/c/llm-detect-ai-generated-text/discussion/473295
+fetched: 2026-10-27
+chars: 13223
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Comprehensive 1st Place Write-Up — LLM - Detect AI Generated Text
+Comprehensive 1st Place Write-Up
+
+LLM - Detect AI Generated Text
+
+Solution Writeup · 1st place · Feb 4, 2024
+
+Our team is still a bit stunned that we got 1st place (🤯). Raja posted earlier with a short summary, but here is a more detailed look at our solution and what we think made a difference.
+
+tldr
+
+The hosts did not reveal much information about what the generated essays would be like, so we aimed to create a diverse set of generated essays in hopes that it would (1) make a model that generalizes and (2) have data similar to the private leaderboard. The modeling approach was less important, as we had multiple single models in the 0.970+ range due to the quality of the dataset.
+
+Overview
+Datamix
+Models
+Ensemble
+Datamix
+
+Our datamix was created in an incremental way focusing on size, diversity and complexity to facilitate good generalization capabilities and strong resistance against adversarial examples. For each datamix iteration, we attempted to plug blindspots of the previous generation models while maintaining robustness.
+
+To maximally leverage in-domain human texts, we used the entire Persuade corpus comprising all 15 prompts. We also included diverse human texts from sources such as OpenAI GPT2 output dataset, ELLIPSE corpus, NarrativeQA, wikipedia, NLTK Brown corpus and IMDB movie reviews.
+
+Sources for our generated essays can be grouped under four categories:
+Proprietary LLMs (gpt-3.5, gpt-4, claude, cohere, gemini, palm)
+Open source LLMs (llama, falcon, mistral, mixtral)
+Existing LLM generated text datasets
+Synthetic dataset made by T5
+DAIGT V2 subset
+OUTFOX
+Ghostbuster data
+gpt-2-output-dataset
+Fine-tuned open-source LLMs (mistral, llama, falcon, deci-lm, t5, pythia, BLOOM, GPT2). For LLM fine-tuning, we leveraged the PERSUADE corpus in different ways:
+Instruction tuning: Instructions were composed of different metadata e.g. prompt name, holistic essay score, ELL status and grade level. Responses were the corresponding student essays.
+One topic held out: LLMs fine-tuned on PERSUADE essays with one prompt held out. When generating, only the held out prompt essays were generated. This was done to encourage new writing styles.
+Span wise generation: Generate one span (discourse) at a time conditioned on the remaining essay.
+
+For fine-tuning LLMs we used autotrain and custom code based on the transformers library.
+
+We used a wide variety of generation configs and prompting strategies to promote diversity & complexity to the data. Generated essays leveraged a combination of the following:
+
+Contrastive search
+Use of Guidance scale, typical_p, suppress_tokens
+High temperature & large values of top-k
+Prompting to fill-in-the-blank: randomly mask words in an essay and asking LLM to reconstruct the original essay (similar to MLM)
+Prompting without source texts
+Prompting with source texts
+Prompting to rewrite existing essays
+
+Finally, we incorporated augmented essays to make our models aware of typical attacks on LLM content detection systems and obfuscations present in the provided training data. We mainly used a combination of the following augmentations on a random subset of essays:
+
+Spelling correction
+Deletion/insertion/swapping of characters
+Replacement with synonym
+Introduce obfuscations
+Back translation
+Random capitalization
+Swap sentence
+
+As a minor detail, we created a heavily pre-processed version (removed special characters, normalized whitespace, and changed to all lowercase) of our datamix. Our hypothesis was a model trained on this version would learn deeper patterns and thus make a significant contribution in ensembling. Furthermore, the heavy pre-processing would reduce the risk of random character attacks in the hidden test set.
+
+Our best performing models were trained on 160k samples (without pre-processing), out of which 40k were human written.
+
+Models
+
+We adopted the following modelling strategies:
+
+LLM (Q)LoRA fine-tuning: Mistral 7b
+Deberta-v3
+Classification
+Custom Tokenizer + MLM + Pseudo label
+Ranking
+Ghostbuster (llama 7b, tiny llama 1.1B)
+Ahmet’s Unsupervised Approach
+
+We hypothesize that our modelling strategies themselves had a lesser impact on the overall performance as compared to the datamix. Each of our individual models would have been in the gold medal range.
+
+LLM (Q)LoRA fine-tuning: Mistral 7b
+
+We fine-tuned the mistralai/Mistral-7B-v0.1 backbone using (Q)LoRA with config provided below on our carefully curated datamix.
+
+peft_config = LoraConfig(
+        r=64,
+        lora_alpha=16,
+        lora_dropout=0.1,
+        bias="none",
+        task_type=TaskType.SEQ_CLS,
+        inference_mode=False,
+        target_modules=[“q_proj”, “k_proj”, “v_proj”, “o_proj”]
+    )
+
+
+We also used autotrain-advanced to train some LLMs for text generation.
+
+Deberta
+Classification: deberta-v3-large
+
+This uses the AutoModelForSequenceClassification in transformers BCE loss with continuous labels (e.g. essays generated with instruction-tuned LLMs assigned less than 1 score)
+
+Custom Tokenizer + MLM + Pseudo label: deberta-v3-small
+(Inspiration)
+Derive a custom tokenizer based on train + test essays
+Train a small model using Masked Language Modeling (MLM) on the train + test essays
+Enrich training datamix with pseudo labeled test essays
+Train for one epoch, followed by Inference on test essays
+Intuition: these steps would provide a unique advantage to the resulting model due to a specialized understanding of the hidden test set.
+Ranking: deberta-v3-large
+
+Pairwise loss with margin
+
+Ghostbuster
+
+(original repo here) This approach uses the token probs from two small-ish LLMs (originally davinci and ada from OpenAI) as well as the token probs for unigram and trigram models. The sequence probs go through vector operations when mixing them across models (e.g. divide llm1 probs with llm2 probs, subtract unigram from trigram) and then into a scalar operation (take the max prob of the sequence) Instead of using models via the OpenAI API, we used Llama 7b and Tiny Llama 1.1B (the models must have the same tokenizer) The unigram and trigram models were trained using the Ghostbuster repo's code on the nltk Brown corpus using the Llama tokenizer. The first 25 tokens in the sequence are ignored, as the models would not have much context to generate meaningful representations.
+
+We saw a small boost when fine-tuning the tiny llama model on texts from the PERSUADE corpus Instead of doing the structured search across all operations, we did 10 operations of each of the four model sequence probs (llama 7b, tiny llama, unigram, trigram) as well as the same 10 operations on the ratio of the following models: llama 7b/tiny llama, llama 7b/unigram, llama 7b/trigram, tiny llama/unigram, tiny llama/trigram, unigram/trigram. The ten operations were: min, max, mean, median, 10% quantile, 25% quantile, 75% quantile, 90% quantile, L2 norm, and variance All together this is 100 features Instead of doing logistic regression, we used an ensemble of an SVM classifier and a Random Forest Classifier. We did not do much tuning to hyperparameters. Rapids was used to train significantly faster than sklearn
+
+Ahmet’s Unsupervised Approach
+
+We implemented a variation of this approach by modifying the logic for weak labelling and final score computation. We used confident predictions from our mistral model for weak labelling For a given essay, we first picked neighboring human & generated essays based on a dynamic threshold. Thereafter, we used mean aggregation (instead of min aggregation in the original work) of similarity scores over selected essays.
+
+Ensemble
+
+We used the rankings, rather than the raw prediction values when combining the predictions. The minimum scoring text gets a rank of 1, and the maximum scoring text gets a rank of n, where n is the number of essays in the test set. These ranks are averaged between models and the averaged rank becomes the final value in the “generated” column. Minor weighting was done based on public LB and intuition. We applied the most weight to mistral-7b models.
+
+Our highest scoring selected submission is available here
+
+Our code is available here
+
+Huge shoutout to Raja (@conjuring92) and Udbhav (@ubamba98) for their great contributions!! 👏👏👏
+
+Authors
+Nicholas Broad
+
+nbroad
+
+Udbhav Bamba
+
+ubamba98
+
+Raja Biswas
+
+conjuring92
+
+arrow_drop_up
+100
+Share
+more_horiz
+Citation
+
+Nicholas Broad, Udbhav Bamba, Raja Biswas. Comprehensive 1st Place Write-Up. https://www.kaggle.com/competitions/llm-detect-ai-generated-text/writeups/comprehensive-1st-place-write-up. 2024. Kaggle
+
+24
+1
+comment
+15 Comments
+Hotness
+focus
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Nice work! Just wondering what is the intuition of using ranking loss rather than cross-entropy loss? Do you see any performance improvement?
+
+reply
+Reply
+Nicholas Broad
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It was just an experiment to try out different approaches to see what does better on LB. Kept it for diversity
+
+reply
+Reply
+focus
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for your response, so in your experiments the ranking loss is actually perform better than cross-entropy loss right?
+
+reply
+Reply
+jack
+
+Posted 3 years ago
+
+· 3028th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Are you saying that you used LLMs to generate more essays for your team in addition to using the publicly available LLM essays from DAIGT V2 subset, etc.? If so, were the essays you generated made public?
+
+reply
+Reply
+emoji_people
+Valentin Werner
+
+Posted 3 years ago
+
+· 357th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The consens was that datasets that you generate yourself using open source LLMs do not have to be made public as far as I know. Yes, they definetly generated additional data.
+
+reply
+Reply
+jack
+
+Posted 3 years ago
+
+· 3028th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Gotcha. I never found an answer from the official organizers regarding this but it seems like people just took the risk anyways. I guess if they don't answer, then they don't mind. Or maybe I missed their clarification.
+
+Also, it sounds like they may have privately generated essays from not just open source llms, "Proprietary LLMs (gpt-3.5, gpt-4, claude, cohere, gemini, palm)". Not sure though.
+
+reply
+Reply
+Nicholas Broad
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes we generated more data
+
+reply
+Reply
+Nicholas Broad
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@jackawade Datamix here: https://www.kaggle.com/datasets/conjuring92/ai-mix-v26
+
+reply
+Reply
+Kaggler
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+Did you train the models with Kaggle or outside services like Amazon Sagemaker or Google Cloud?
+
+reply
+Reply
+Nicholas Broad
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Outside.
+
+reply
+Reply
+Kaggler
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Can you tell me the service you used for training and which nvidia gpus did you use for whole training? And the estimated time.
+
+Thanks @nbroad
+
+reply
+Reply
+7 more replies
+arrow_drop_down
+Hyunsoo Lee 1010
+
+Posted 3 years ago
+
+· 322nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi @nbroad can you explain why you used 4 moduels when training models with LoRA? I think you wanted to train head section (q,k,v,o).
+
+reply
+Reply
+emoji_people
+Valentin Werner
+
+Posted 3 years ago
+
+· 357th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@nbroad seeing this is absolutely inspirational. How much effort did you put into this competition? It seems that you had multiple operations going on and I wonder if most insights came within the last months or whether most of these ideas were started early on.
+
+I know that Ahmets approach was published pretty late.
+
+reply
+Reply
+Nicholas Broad
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Each person spent roughly 50-150 hours
+
+reply
+Reply
+emoji_people
+Valentin Werner
+
+Posted 3 years ago
+
+· 357th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+incredible efficiency. Good job!
+
+reply
+Reply
+Xinze Feng
+
+Posted 2 years ago
+
+· 2865th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing and Nice work. Truly impressed by your solution :)
+
+reply
+Reply
+emoji_people
+Geremie Yeo
+
+Posted 3 years ago
+
+· 130th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @nbroad well done! Excellent writeup, shows years of dedication on Kaggle will eventually pay off!
+
+Do you mind sharing a list of experiments that failed on the LB ? I’m sure every team has its fair share of these
+
+reply
+Reply
+
+This comment has been deleted.
+
+Arigion
+
+Posted 3 years ago
+
+· 3326th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Ha! Found you! I was wondering for years who is writing these fortune cookie messages.
+
+reply
+Reply

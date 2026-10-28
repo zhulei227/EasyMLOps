@@ -1,0 +1,88 @@
+url: https://github.com/KazukiOnodera/Home-Credit-Default-Risk
+fetched: 2026-10-27
+chars: 4609
+
+GitHub - KazukiOnodera/Home-Credit-Default-Risk: 2nd Place Solution 💰🥈 · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ KazukiOnodera Home-Credit-Default-Risk Repository navigation Code Issues 1  ( 1 ) Pull requests Actions Projects Security and quality Insights More items 
+
+ Home-Credit-Default-Risk Public Notifications You must be signed in to change notification settings Fork 86  ( 86 ) Star 229  ( 229 ) You must be signed in to star a repository About 2nd Place Solution 💰🥈 www.kaggle.com/c/home-credit-default-risk/ Resources Readme Activity Stars 229 stars Watchers 20 watching Forks 86 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 1,059 Commits 1,059 Commits Folders and files Name Name Last commit message Last commit date LB LB     imp imp     jn jn     other other     py py     py_bureau py_bureau     py_gp py_gp     py_prev py_prev     sample sample     .gitignore .gitignore     HomeCredit_columns_description.xls HomeCredit_columns_description.xls     README.md README.md     SAMPLE CSV.ipynb SAMPLE CSV.ipynb     best_CV.txt best_CV.txt     imp.txt imp.txt     imp_check.py imp_check.py     init.txt init.txt     submission.xlsx submission.xlsx     View all files Repository files navigation README More items Home-Credit-Default-Risk 
+ LeaderBoard: https://www.kaggle.com/c/home-credit-default-risk/leaderboard 
+ Discussion: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722 
+ I was in charge of feature engineering in this team.
+
+ Following are the features I made 
+ Features 
+ 1. Current Application 
+
+ Simple calculation(delta, ratio, etc...) 
+
+ 2. Previous Application 
+
+ Aggregated features(all, 1year, 2years, 3years) 
+ last and first application 
+
+ 3. POS CASH balance 
+
+ Aggregated features(all, 1year, 2years, 3years) 
+
+ 4. Installments Payments 
+
+ Aggregated features(all, 1year, 2years, 3years) 
+
+ 5. Credit Card Balance 
+
+ Aggregated features(all, 1year, 2years, 3years) 
+
+ 6. Bureau 
+
+ Aggregated features(all, 1year, 2years, 3years) 
+ last and first application 
+
+ 7. Bureau Balance 
+
+ Aggregated features(all, 1year, 2years, 3years) 
+
+ 8. Other 
+
+ Aggregated features using above data(all, 1year, 2years, 3years) 
+
+ About 2nd Place Solution 💰🥈 www.kaggle.com/c/home-credit-default-risk/ Resources Readme Activity Stars 229 stars Watchers 20 watching Forks 86 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

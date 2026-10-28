@@ -1,0 +1,707 @@
+url: https://www.kaggle.com/c/nbme-score-clinical-patient-notes/discussion/323095
+fetched: 2026-10-27
+chars: 17141
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st solution — NBME - Score Clinical Patient Notes
+1st solution
+
+NBME - Score Clinical Patient Notes
+
+Solution Writeup · 1st place · May 22, 2022
+
+First of all, thanks to competition organizers for hosting this competitions and great teammate(@ryuichigt). And thanks to the great notebooks and discussions, I learned a lot and was able to make it my final solution.
+
+Solution Summary
+
+The following six models are blended to maximize cv. Each models use MLM, pseudo labeling, AWP, augmentation, and trained 5 out of 10 GroupStratifiedKFolds and all data, built our CV from the resultant 50% train data OOF. Final submit uses some weights of those six (fold 0, 1, 2, 3, 4, all) due to time limitations. Notebook
+
+exp-num	Hugging Fase Model	cv	PubLB
+(5/10folds+all)	PriLB
+(5/10folds+all)	final submit
+used weights
+107	deberta-v3-large	0.8925	0.8931	0.8929	4/10folds+all
+092	deberta-v2-xlarge	0.8914	0.8930	0.8911	3/10folds+all
+106	deberta-large	0.8913	0.8922	0.8925	2/10folds+all
+102	deberta-v2-xlarge	0.8925	0.8928	0.8940	3/10folds+all
+101	deberta-large	0.8907	0.8918	0.8934	4/10folds
+104	deberta-v2-large	0.8921	0.8925	0.8920	2/10folds+all
+
+Things that worked.
+
+AWP
+
+Feedback Prize 1st Place Great Notebook is very helpful.
+trying several parameters, the following improved the cv
+adv_lr: 1.0, adv_eps: 0.01
+cv increase about 0.002
+my code
+
+MLM
+
+Pre-training is performed on 'patient_notes.csv' except for the data in 'train.csv'.
+cv increase about 0.002
+
+pseudo labeling
+
+Ratio, pseudo labeling data: 90%, train data: 10%
+soft label
+In my experiments, soft labels improved cv score better than hard labels.
+We attempted to limit the data used for pseudo labeling, such as those with more than 0.95 predictive value for any one letter, but sampling randomly from the entire data set improved the cv.
+
+augmentation
+
+Remove one sentence from the text.
+Probability of augmentation, p=0.2
+cvscore is almost unchanged. However, it seemed to be effective for this task and data, so we adopted it.
+Pseudo-label data did not try augmentation.
+
+Auxiliary Target Learning
+
+Add the beginning and end of the target, respectively. and learn with 3chanel.
+channel_0: Normal target
+channel_1: start: 1, else: 0
+channel_2: end: 1, else: 0
+The cv improvement is slight, but can be used for ensembles(blend) with pseudo labels. (I think taking the average of two pseudo labels would improve the accuracy of the pseudo label.)
+Checking the PrivateLB scores, it appears that this attempt was effective.
+Not worked
+shuffle augmentation
+augmentation shuffles sentences, makes cv worse.
+label smoothing loss
+clip_grad_norm
+I tried the following two things, but the cv got worse. Maybe we need to adjust some more parameters.
+torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1000)
+torch.nn.utils.clip_grad_norm_(self.model.parameters(), 10)
+postprocessing
+Remove leading and trailing spaces.
+this excellent notebook Be aware of white space [DeBERTa+RoBERTa]very helpful.
+cv split
+
+Up until midway through the competition, we were using 5fold GroupKFolds. The change from 10folds to GroupStratifiedKFolds has been a huge improvement for our team.
+
+Notebook
+
+submit: https://www.kaggle.com/currypurin/nbme-final-submit-currypurin MLM: https://www.kaggle.com/code/currypurin/nbme-mlm/
+
+Edit
+
+Edit: cv score added
+
+Authors
+Ryuichi
+
+ryuichigt
+
+currypurin
+
+currypurin
+
+arrow_drop_up
+128
+Share
+more_horiz
+Citation
+
+Ryuichi, currypurin. 1st solution. https://www.kaggle.com/competitions/nbme-score-clinical-patient-notes/writeups/ryuichi-currypurin-1st-solution. 2022. Kaggle
+
+comment
+28 Comments
+1 appreciation comment
+Hotness
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+23
+more_vert
+
+My AWP code. I use pl.LightningModule. I tried several patterns, but this method gave me the good cv score.
+
+class Learner(pl.LightningModule):
+    def __init__(self, model, num_train_steps, num_warmup_steps,
+                 valid_df, wandb):
+        super().__init__()
+        self.model = model
+        self.criterion = nn.BCEWithLogitsLoss(reduction="none")
+        self.num_train_steps = num_train_steps
+        self.num_warmup_steps = num_warmup_steps
+        self.best_f1_score  = 0
+        self.steps = 0
+        self.automatic_optimization = False
+
+    def training_step(self, batch, batch_idx):
+        opt = self.optimizers(use_pl_optimizer=True)
+
+        d_ = batch
+        label = d_['label']
+        out = self.model(d_['tokens'], d_['attention_mask'], d_["token_type_ids"])
+        loss = self.criterion(out.view(-1, 1), label.view(-1, 1))
+        loss = torch.masked_select(loss, label.view(-1, 1) != -1).mean()
+
+        opt.zero_grad()
+        self.manual_backward(loss)
+        opt.step()
+
+        if self.best_f1_score > 0.83:
+            adv_loss = self.awp.attack_backward(d_['tokens'], d_['attention_mask'], d_["token_type_ids"],
+                                                d_['label'], self.current_epoch)
+            self.manual_backward(adv_loss)
+            opt.step()
+            self.awp._restore()
+
+        self.log('Loss/train', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        sch = self.lr_schedulers()
+        sch.step()
+        self.steps += 1
+        lr = float(sch.get_last_lr()[0])
+        self.log('lr', lr, on_step=True, on_epoch=True, prog_bar=False, logger=True)
+
+
+class AWP:
+    def __init__(
+        self,
+        model,
+        optimizer,
+        adv_param="weight",
+        adv_lr=1.0,
+        adv_eps= 0.01,
+        start_epoch=0,
+        adv_step=1,
+    ):
+        self.model = model
+        self.optimizer = optimizer
+        self.adv_param = adv_param
+        self.adv_lr = adv_lr
+        self.adv_eps = adv_eps
+        self.start_epoch = start_epoch
+        self.adv_step = adv_step
+        self.backup = {}
+        self.backup_eps = {}
+        self.criterion = nn.BCEWithLogitsLoss(reduction="none")
+
+    def attack_backward(self, tokens, attention_mask, token_type_ids, label, epoch):
+        if (self.adv_lr == 0) or (epoch < self.start_epoch):
+            return None
+
+        self._save()
+        for _ in range(self.adv_step):
+            self._attack_step()
+            with torch.cuda.amp.autocast():
+
+                out = self.model(tokens, attention_mask=attention_mask, token_type_ids=token_type_ids).view(-1, 1)
+                adv_loss = self.criterion(out, label.view(-1, 1))
+                adv_loss = torch.masked_select(adv_loss, label.view(-1, 1) != -1).mean()
+
+            self.optimizer.zero_grad()
+        return adv_loss
+
+    def _attack_step(self):
+        e = 1e-6
+        for name, param in self.model.named_parameters():
+            if param.requires_grad and param.grad is not None and self.adv_param in name:
+                norm1 = torch.norm(param.grad)
+                norm2 = torch.norm(param.data.detach())
+                if norm1 != 0 and not torch.isnan(norm1):
+                    r_at = self.adv_lr * param.grad / (norm1 + e) * (norm2 + e)
+                    param.data.add_(r_at)
+                    param.data = torch.min(
+                        torch.max(param.data, self.backup_eps[name][0]), self.backup_eps[name][1]
+                    )
+                # param.data.clamp_(*self.backup_eps[name])
+
+    def _save(self):
+        for name, param in self.model.named_parameters():
+            if param.requires_grad and param.grad is not None and self.adv_param in name:
+                if name not in self.backup:
+                    self.backup[name] = param.data.clone()
+                    grad_eps = self.adv_eps * param.abs().detach()
+                    self.backup_eps[name] = (
+                        self.backup[name] - grad_eps,
+                        self.backup[name] + grad_eps,
+                    )
+
+    def _restore(self):
+        for name, param in self.model.named_parameters():
+            if name in self.backup:
+                param.data = self.backup[name]
+        self.backup = {}
+        self.backup_eps = {}
+
+reply
+Reply
+vialactea
+
+Posted 4 years ago
+
+· 37th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+I feel I'm missing something in your AWP implementation. You reference @wht1996's solution, which I understood as follows:
+
+Compute regular gradients.
+Use regular gradients to perform an adversarial attack on the original model and compute adversarial gradients.
+Use the adversarial gradients to update the original model
+
+Whereas I understand your code as follows:
+
+Compute regular gradients and use them to update the model.
+loss = self.criterion(out.view(-1, 1), label.view(-1, 1))
+loss = torch.masked_select(loss, label.view(-1, 1) != -1).mean()
+
+opt.zero_grad()
+self.manual_backward(loss)
+opt.step()   # update original model
+
+Use regular gradients to perform an adversarial attack on the updated model and compute adversarial gradients.
+adv_loss = self.awp.attack_backward(
+    d_['tokens'], d_['attention_mask'], d_["token_type_ids"],
+    _['label'], self.current_epoch)
+self.manual_backward(adv_loss)
+
+Use the adversarial gradients to update the updated model
+opt.step()
+
+Restore the model weights of the updated model
+self.awp._restore()
+
+
+It seems that the last step cancels AWP. I'm probably missing something, but I haven't figure out what.
+
+reply
+Reply
+KhanhVD
+
+Posted 4 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Nice solutions. Thanks for sharing @currypurin :D
+
+reply
+Reply
+🐢 Jun Koda
+
+Posted 4 years ago
+
+· 48th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations for the 1st, amazing boost in the last few days, and for becoming a Grandmaster!!! Using 10 fold is a good idea, which I didn't even imagine, having a little large training set with better statistics of random annotator selection.
+
+Can I ask what batch_size did you use? I know 4 was popular in Feedback prize. I used 6, and didn't feel benefit of AWP with small batch size. Or, adv_eps 0.01 is amazingly large, so maybe that's the reason for success.
+
+🎉🎉🎉🎉🎉
+
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks!! Ggood parameter might depend on the batch size. The batch size I used is as follows.
+
+deberta-v3-large, deberta-large: 8
+deberta-v2-large: 4 or 5
+reply
+Reply
+Romuska Palo Ur Laputa
+
+Posted 4 years ago
+
+· 133rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for your great notebook!! I'll study with this!! Congratulation for your gold medal and being Grandmaster!
+
+reply
+Reply
+OhNoMyNameIsTaken
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats, and thanks for sharing the solution!
+
+reply
+Reply
+Jaideep
+
+Posted 4 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@currypurin could you throw light on how u trained using the MLM. what really contributed more to the score . Many congrats for the 1st place sol.
+
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes MLM's contribution is very significant. I posted the link in the Notebook section above. I also tried freezing the parameters, but did not adopt it because the loss did not go down.
+
+reply
+Reply
+dlbsabu
+
+Posted 4 years ago
+
+· 182nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thanks for sharing ! The page appears to have been deleted ?
+
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+sorry, public it.
+
+reply
+Reply
+SchenbergZ
+
+Posted 4 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Big Congrats and I want to verify some details when you move from Pseudo Training (PT) to Auxiliary Target Learning (ATL) and Auxiliary Target and Pseudo (ATaP):
+
+you load weights from PT to ATL instead of initial weights from huggingface right? But I am wondering if this will overfit?
+When moving from ATL to ATaP, can you explain the process a bit?
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, I load my own trained weights in all but the MLM. I don't see any difference between it and the MLM weights.
+
+When moving from ATL to ATaP, can you explain the process a bit?
+
+There is no special process. I created the pseudo label as 3 channels and train it as target.
+
+reply
+Reply
+Trushant Kalyanpur
+
+Posted 4 years ago
+
+· 28th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the late LB climb and 1st place finish! Amazing achievement becoming a competition GM!! How did you come up with the weights per model during the ensemble? Was that using optuna ? Our ensemble cv didnt correlare well to lb.
+
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you! Yes I used optuna. My cv also did not correlate well with Public LB. Therefore, our team chose two final submissions, one with a high cv and one with a high PublicLB. Finally, the best Private LB was the one with the high cv.
+
+reply
+Reply
+CPMP
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on the win!
+
+I see you used three heads as well :D
+
+I could not make AWP work for me. I will check if it works with your parameters, thanks for sharing.
+
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I have learned a lot from your solution, thank you!
+
+reply
+Reply
+vialactea
+
+Posted 4 years ago
+
+· 37th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and thanks for sharing!
+
+Did I understand correctly that you trained all 10 folds, but only used a subset in the submission ensemble?
+What was your strategy to select the folds for the final ensemble (random, best scores, …)?
+Did you use the fold "all data" throughout the pipeline or only at the end?
+How did you select the schedule for "all data" (same as that of regular folds, which was fixed; some average of the lrs that worked for the regular folds, …)?
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you!
+
+Did I understand correctly that you trained all 10 folds, but only used a subset in the submission ensemble?
+
+I trained fold 0~4 and all data, fold 5~9 not trained. This is because inference time is "9 hours run-time" and there is no time to submit everything.
+
+What was your strategy to select the folds for the final ensemble
+
+It's random and I tried to ensure that all fold are selected the same number of times as possible.
+
+Did you use the fold "all data" throughout the pipeline or only at the end?
+
+"all data" is used throughout the pipeline.
+
+How did you select the schedule for "all data" (same as that of regular folds, which was fixed; some average of the lrs that worked for the regular folds, …)?
+
+Same. This time I am not using early stopping, so both regular folds and all data are trained for 5 epochs based on the number of data in train.
+
+reply
+Reply
+💥Alien💥
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+@currypurin Wow! congratulations on winning and thanks for sharing your solution. Amazing work
+
+reply
+Reply
+Zacchaeus
+
+Posted 4 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on winning🎉🎉🎉
+
+Up until midway through the competition, we were using 5fold GroupKFolds. The change from 10folds to GroupStratifiedKFolds has been a huge improvement for our team.
+
+May I ask in what way you benefit from changing 10-fold GroupKFolds to GroupStratifiedKFolds? Does the CV/LB correlation improve significantly or anything else I didn't notice? Thank you!
+
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! CV/LB correlation may not be improving. cv score improved about 0.001~0.002 and LB score improved 0.002~0.003. I am not sure if this is due to the change from 5fold to 10fold or from GroupKFold to GroupStratifiedKfold.
+
+reply
+Reply
+xiaoguzai123
+
+Posted 4 years ago
+
+· 131st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hello,bro,can you show your entire code?
+
+reply
+Reply
+llleeex
+
+Posted 4 years ago
+
+· 42nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Wow， Congratulations for the gold🎉 and thanks for sharing. Did I understand correctly that you train fold 0 ~ 4 and built cv on fold 5 ~ 9 ?
+
+reply
+Reply
+currypurin
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you!! I trained fold 0~4 and build cv on fold 0~4. I didn't train fold 5~9. Because it takes time to train and there is not enough time to submit. ref: https://www.kaggle.com/competitions/nbme-score-clinical-patient-notes/discussion/323095#1777962
+
+reply
+Reply
+Nanga Parbat
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+wow~great job!
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (1)
+mylinh97
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+congrats and thanks for sharing!

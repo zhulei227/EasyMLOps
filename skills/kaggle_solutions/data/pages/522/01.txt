@@ -1,0 +1,679 @@
+url: https://www.kaggle.com/c/dfl-bundesliga-data-shootout/discussion/359932
+fetched: 2026-10-27
+chars: 17329
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Team Hydrogen: 1st place solution — DFL - Bundesliga Data Shootout
+Team Hydrogen: 1st place solution
+
+DFL - Bundesliga Data Shootout
+
+Solution Writeup · 1st place · Jan 4, 2023
+
+Thanks a lot to Kaggle and the hosts for this very, very interesting competition. A 2-stage competition is always a thrilling experience, but then seeing your models generalizing so well to completely unseen data is really exciting.
+
+Our solution is based on a single-stage model combining 2.5D and 3D data to properly extract temporal information from the video data. This solution ranks first in both public and private leaderboards. Next, we want to give a high-level overview of this solution.
+
+Validation setup
+
+In this competition, we used a fixed train/validation split to tune our models: the validation videos used for this included 4ffd5986_0, 407c5a9e_1, 9a97dae4_1, and ecf251d4_0. Our best local score was 0.857, and we observed strong correlation between local validation and public leaderboard (LB). For our final submission, we retrained our best models on the full data that was available to us, this is a general procedure we always try to take in the end.
+
+Model setup
+
+As mentioned, we solely rely on a single-stage model architecture. The input for our models was a 1024x1024 grayscale image, with the channels stacked in the time dimension over three neighboring frames. We chose to use grayscale images rather than full color due to the improved generalization and runtime capabilities it offered - and it also seems to generalize extremely well to the unseen private data.
+
+The single-stage architecture combined 2.5D and 3D techniques. The backbone of the model was either efficientnetv2_b0 or efficientnetv2_b1, as we found that larger backbones tended to overfit quickly on the small dataset. 3D convolution layers were only used in the last block and final convolution before pooling, which allowed us to stay in 2.5D for most of the backbone and achieve fast inference times with caching.
+
+In a bit more detail, if our current frame is t=15, we first stack three neighboring frames {14,15,16} as the channels of the input, and separately pass five different time steps (2 in each direction), each again stacked with three channels. If our time step would be 3, this would mean we pass {8,9,10},{11,12,13},{14,15,16},{17,18,19},{20,21,22} through the backbone, and the final 3D layer aggregates these 5 individual time steps with additional pooling.
+
+We also experimented with different stacks over the time domain and found that 15 frames (combined over 2.5D and 3D) worked best for our final submission.
+
+We applied the usual set of augmentations and used Mixup as well. The loss function was binary cross-entropy with three target columns. One area where we had room for experimentation and improvement was in how to set the hard or soft labels for training. In the end, our best solution used hard labels in a small window around the actual event.
+
+Most of our time during this competition was spent training on only the labeled regions of the competition data. Pre-training on some Soccernet labels improved the score by around 0.02, but we had no success with pseudo label pre-training on unlabeled regions and clips.
+
+Inference
+
+Increasing the inference resolution by 128 also slightly improved our cross-validation (CV) and LB scores. We spent a significant amount of time optimizing the inference kernel to run as efficiently as possible, utilizing both CPU cores with threading. We predicted only every second frame for a single model, and our final solution blended the results of two models, alternating between them frame by frame. We then applied post-processing to reduce the number of false positives.
+
+A single model had a runtime of 2.5 hours in the kernel, and processing a single video took 25 minutes. Our final solution with two models had a runtime of around 5 hours. There was potential for using even more models, but we opted to keep things as simple as possible.
+
+Big shoutout to my teammates @ybabakhin and @ilu000!
+
+Authors
+Yauhen Babakhin
+
+ybabakhin
+
+Psi
+
+philippsinger
+
+Pascal Pfeiffer
+
+ilu000
+
+arrow_drop_up
+139
+Share
+more_horiz
+Citation
+
+Yauhen Babakhin, Psi, Pascal Pfeiffer. Team Hydrogen: 1st place solution. https://www.kaggle.com/competitions/dfl-bundesliga-data-shootout/writeups/team-hydrogen-scores-team-hydrogen-1st-place-solut. 2022. Kaggle
+
+comment
+61 Comments
+6 appreciation comments
+Hotness
+Camaro
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+Big congrats @philippsinger, @ybabakhin and @ilu000!
+
+I couldn’t imagine +0.80 can be achieved by such a simple pipeline. Actually my solution is also single stage one and has many common parts with yours, but when I see you break 0.85, I thought it would be a more complicated pipeline. Of course there would be many tricks to reach the score, really looking for the detailed writeup!
+
+Thanks for sharing!
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+We also experimented quite a bit with TSM/GSM & GRU etc., but in the end a more simple setup was more effective. The main benefit was that training time was much faster, so we could experiment more, specifically given that we started quite late into this competition and had to play catchup. I think there is a lot of overfit potential in this competition - insample scores of 0.99 are very quick to reach, and some easy gains can be made by playing with label and regularization setups, regardless of your whole architecture and approach.
+
+reply
+Reply
+AngadY
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+can you share notebook to test?
+
+reply
+Reply
+Pascal Pfeiffer
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Thanks a lot @philippsinger @ybabakhin for the great team-up!
+
+Thanks to the hosts for this very interesting and intense competition with many approaches to try. I can imagine a broad range of diverse solutions in the gold zone. Looking forward to other write-ups and to the final rescoring.
+
+reply
+Reply
+Guillermo García Cobo
+
+Posted 4 years ago
+
+· 34th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+First of all, congrats on the great and "simple" solution @philippsinger @ybabakhin @ilu000! Although you plan to share more details of your solution in December, I couldn't wait to ask you a few questions about your approach. Feel free to answer any of the questions or refer me to the December's write-up for some of them.
+
+I am still trying to understand why our multiple approaches (preprocessing aside) did not work. A few questions related to this:
+
+You mention that you experimented with different stacks over time. Your final size is t=5, which is relatively small. Did larger stack sizes perform considerably worse? We thought that more context was needed, so the smallest size that we tested was t=20 frames (12.5 FPS).
+You used BCE with 3 target columns. Did you do anything to account for class imbalance, such as weighted loss? Most of our models tended to converge to constantly predicting plays (or background), even with the weighted loss.
+You say: "we predict only each second frame for a single model". Did you train the model with 12.5 FPS or just output predictions for every 2 frames of the input window? From the beginning, we processed videos at 12.5 FPS, considering that it was enough both for the model and for the final score (the metric allows for 4 frames of margin for each tolerance). Nonetheless, two days before the competition ended, we checked that performance of the best public model was degraded more than expected (-0.03) when reducing the inference FPS to 12.5.
+
+In terms of the inference, I am very curious about:
+
+Did you try any sliding window approach? Since you are providing temporal context, frames on the edges do not receive equal context. If everything should have gone as it should for us, we had our code ready for this and expected a nice boost.
+You mention that you managed to speed up the data loading for inference. Did you manage to efficiently load the frames directly from the videos? If so, how? For us, this was equal to storing them in disk and loading the frames with torch Dataloader. We did manage to optimize the storage in disk.
+I am curious about how to do the blending of both models, but I guess this would be included in December's write-up.
+
+Thanks a lot for your time in advance!
+
+PS: looking forward to meeting you in Barcelona for the Kaggle Days' final in a few weeks! You have been a great source of inspiration since I started my Kaggle and AI journey.
+
+reply
+Reply
+Leo Black
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Why do you say "Your final size is t=5, which is relatively small. Did larger stack sizes perform considerably worse? We thought that more context was needed, so the smaller size that we tested was t=20 frames (12.5 FPS)." ?
+
+The author: "We also experimented with different stacks over the time domain
+and ended up with 15 frames (combined over 2.5 & 3D) for our final submissions"
+
+So, t = 15 frames ? ( One input for the network is an "image" with 15 channels, and each channel is a grayscale image got by cv2.BGR2GRAYSCALE ?)
+
+reply
+Reply
+Guillermo García Cobo
+
+Posted 4 years ago
+
+· 34th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for your question @deepervision, the author said in another comment:
+
+So actually it is t=5 (3d) and c=3 (2.5d) making it overall 15.
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Added a few more details to the solution! If there are any more questions, please shoot (but don't score!).
+
+We are obviously very happy with our result and really impressed by the great generalization capabilities of our solution and the gap on the leaderboard.
+
+reply
+Reply
+Camaro
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the update! I was really about to ask a question about how you feed sequence of images both for channel dim and temporal dim, but now I'm satisfied🤗 Don't ask why I'm still caring about 3d cnn modeling…
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I wonder why :)
+
+reply
+Reply
+
+This comment has been deleted.
+
+Joga
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much for sharing and congratulations to the 1st place! I am rather new to DL and computer vision and have some basic questions:
+
+Did you use the pre-trained weights for ImageNet for the efficientnetv2 architecture? Which layers did you freeze in, which did you leave open?
+Did you pass the 5 different time steps (each 3 grayscale images) through the same efficientnetv2-block, i.e. same weights? I am also wondering whether you used PyTorch or if this can be set up with TF/Keras as well. :)
+What usual augmentations did you apply to the input?
+
+Any short answer is greatly appreciated. Thank you! :)
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+Yes ImageNet pretrained, and no freezing.
+All through the same backbone
+Pytorch all the time
+Mixup, apart from that nothing specific, random flip, bit of resizing
+reply
+Reply
+happymentee
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Do you use any Trainer built on pytorch, such as pytorch lightning?
+
+reply
+Reply
+Joga
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Awesome -- thanks so much! :)
+
+reply
+Reply
+Vladislav Ostankovich
+
+Posted 4 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Can't believe this solution worked so good) Impressive! Will be waiting for the complete solution.
+
+reply
+Reply
+Darragh
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Impressive, great work Team Hydrogen 🚀🚀
+
+reply
+Reply
+Leon
+
+Posted 4 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your 1st place! I am confused by the channel and time domain you described. Does it mean (batch,t=15,c=3,h,w) -> (batch*t,c,h,w) -> 2.5d+3d -> (batch,t,classes=3)?
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+So actually it is t=5 (3d) and c=3 (2.5d) making it overall 15.
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+ledifof
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+This tutorial was really useful and beneficial for beginners. I will like to learn more on machine learning, and I am very excited about it.
+
+reply
+Reply
+Fnoa
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Always a pleasure to read your solutions
+
+reply
+Reply
+VIGNESHWAR REDDY M
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Impressive, great work Team Hydrogen 🚀🚀
+
+reply
+Reply
+Shravan Jindal
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Real nice way, simple and effective. Congratulations :)
+
+reply
+Reply
+sabarita venkat
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi can you please tell about what is the post processing that is used to reduce the false positives. Also, I would like know about the class wise precision or accuracy on the public leader board test data
+
+reply
+Reply
+Sain
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I am new to this type of problems, thanks for sharing this will help a lot! And also Congrats for securing 1st place!
+
+reply
+Reply
+ivanovas
+
+Posted 4 years ago
+
+· 498th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your 1st place solution!
+
+I was reading through the solution and I was thinking about how I would tackle this problem the first thing that popped into my mind is to use a proposal model (eg. BMN) and then a recognizer. Did you try something similar? Do you think it can work better but take more time for inference? I am not very experienced in working with videos, but this seems logical to me.
+
+Thank you in advance.
+
+reply
+Reply
+ZEROUAL SLIMANE
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! and thank you for sharing.
+
+reply
+Reply
+Sinu Sheoran
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+This tutorial was really useful and beneficial for beginners.
+
+reply
+Reply
+Pranay Joshi
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congratulations team Hydrogen
+
+reply
+Reply
+Mushtaq Ahmad
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+it was really helpful.
+
+reply
+Reply
+Max Wei
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work!
+
+reply
+Reply
+Rahul Pandey
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+That really amazing to see your work @philippsinger @ybabakhin and @ilu000!. I like to try it with some other real video classification. If possible, can your notebook as per your agreement.
+
+reply
+Reply
+Y-Haneji
+
+Posted 4 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@philippsinger Ccngratulations! How did you convert RGB pretrained weight to grayscale one? You used 3channels input but it was 3 stacked grayscale images not RGB channels.
+
+reply
+Reply
+AndrewTao
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Can you say a bit about how much you gain from going 3 to 15 frames? Did you pose this as 3 image channels + 5 time dimension so that you could use imagenet pretrained models? I mean as opposed to using 15 image channels as input.
+
+reply
+Reply
+Leo Black
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Do you mean that one input with 15 channels is got by 5 images (with BGR 3 channels) ?
+
+reply
+Reply
+Theo Viel
+
+Posted 4 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratz on the great performance @philippsinger @ybabakhin @ilu000 !
+
+How do you handle the 2D -> 3D transition ?
+
+This is how I am considering doing it :
+
+Replace the Conv2Ds to Conv3Ds (and BNs in a similar fashion) using the same in_channels, out_channels, k (, …)
+Reshape nb_ft x C x H x W to nb_ft x 1 x C x H x W before entering the first 3D conv
+First 3d conv therefore has 1 channel.
+
+However this results in a quite big model, do you reduce the number of channels somewhere or are you doing it a different way ? Thanks !
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+There are quite a few different ways of doing it and what works for a specific problem is experimental. In general you can reshape from 2D to 3D and back quite easily, so if you start with bs x frames x channels x H x W you can reshape to bs*frames x channels x H x W for the 2D part and then reshape back to 5 dimensions for the 3D part.
+
+reply
+Reply
+Theo Viel
+
+Posted 4 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I see, that makes more sense, thanks !
+
+reply
+Reply
+Fnoa
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I guess this way you can use pre-trained 2D encoders right? Do you know of any useful documentation for this?
+
+Thanks in advance!
+
+reply
+Reply
+Shanni786
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Big congrats @philippsinger, @ybabakhin and @ilu000!
+
+reply
+Reply
+Felix nediv
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Impressive, great work Team Hydrogen 🚀🚀
+
+reply
+Reply

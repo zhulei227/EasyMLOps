@@ -1,0 +1,904 @@
+url: https://www.kaggle.com/c/playground-series-s5e10/writeups/1st-place-i-think-it-was-genetic-programming
+fetched: 2026-10-27
+chars: 20417
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place - I think it was genetic programming — Predicting Road Accident Risk
+1st place - I think it was genetic programming
+
+Many models that didn't help and a few that did
+
+Predicting Road Accident Risk
+
+Solution Writeup · 1st place · Nov 1, 2025
+
+Congratulation to all the winners and many thanks to those contributing quality discussions and code: @cdeotte, @siukeitin, @optimistix, @mikhailnaumov, @mahoganybuttstrings You know who you are even if I forgot to mention you here.
+
+I want to credit in particular @masayakawamata and his excellent TabM notebook. It helped my ensemble, but mostly because I learned to use a new group of neural networks that I suspect will be useful in the future.
+
+It was a close competition on public LB, and remained so on private LB. Other than the top 4 spots "tied" at 0.05563, the next ~200 competitors were all at 0.05564. We've had it close before, but this seems extreme even by Kaggle standards.
+
+In my academic calendar I have a somewhat open three-week stretch in October, so this is my only chance to compete meaningfully outside of summer and winter breaks. So I did, and my computers could attest to that. It seemed to me from the beginning that not much progress would be made in this competition after the first week or so. Boy, did I underestimate it! Forget about "not much progress", how about no progress at all? I have had the same LB score for the past 3 weeks, even though it was internally improving by miniscule amounts when I sorted about a dozen submissions that scored 0.05537. As scores from other Kagglers remained the same for the most part, it was clear that this stagnation was not happening only to me.
+
+I tried many things, and it would take me a long time to summarize. Instead, I will mention what I think made the most difference, even though I am not sure there was a difference given that 3 Kagglers are tied with me, and another 200 are behind by only 0.00001.
+
+I meant to make a helpful chart but the result above seems overly complex. Hopefully it will do the trick. The first row is various data types that were used. Mix refers to original data that had both categorical and numerical features. Sometimes they were all converted to Categorical or to Numerical. After about 10 days I added latent space representations by Autoencoder and some features derived by Genetic programming.
+
+Purely numerical representation didn’t work, or I should say it didn't work by Kaggle standards. For example, I got a 0.058 CV score and a 0.05802 private score from Lasso, which is objectively excellent for a method that takes about 2 minutes for a 10x10 repeated K-fold run. Not only that, but Lasso feature coefficients were extremely informative in this competition.
+
+When you translate what’s in that image into numbers (while ignoring coefficients with absolute values < 0.05), you get this:
+
+accident_risk = 
+0.3046 * curvature +
+0.0706 * lighting_2 +
+-0.1203 * lighting_0 +
+-0.1181 * lighting_1 +
+-0.0928 * weather_0 +
+-0.1232 * speed_limit_0 +
+-0.1232 * speed_limit_2 +
+-0.1218 * speed_limit_1 +
+0.0646 * speed_limit_4 +
+0.0629 * speed_limit_3 +
+0.0789 * num_reported_accidents_4 +
+0.0704 * num_reported_accidents_5
+
+
+Compare that to the original equation used to create the target, and we have a strong Lasso model that clearly explains feature contributions.
+
+base_risk = (
+    0.3 * data["curvature"] + 
+    0.2 * (data["lighting"] == "night").astype(int) + 
+    0.1 * (data["weather"] != "clear").astype(int) + 
+    0.2 * (data["speed_limit"] >= 60).astype(int) + 
+    0.1 * (np.array(data["num_reported_accidents"]) > 2).astype(int)
+)
+
+
+But enough of that. As you can see from the flowchart above, I tried many different neural networks. Got introduced to PyTorch Tabular and even learned rudimentary PyTorch programming. None of those "worked" by Kaggle standards. That’s where the TabM notebook was so valuable, because it gave another model that could work with my Keras FM and TF embedding networks. I added XGB residual boosting by @cdeotte too late to my ensemble, and by that time neither my CV nor LB scores were budging regardless of promising individual models. In the end I fine-tuned TabM parameters and got three models that had better scores than the original, and those parameters can be found in this notebook. One of the three parameter sets is used, and the other two are commented out. You may want to try all three and see if that helps your ensembles. XGBoost and CatBoost were fairly standard for me in this competition, didn’t use LightGBM except for a couple of runs at the start.
+
+I do ensembling with multiple methods because it is generally easy, and one never knows what will work. That said, my preference is with NNs and Lasso for regression, followed by hill climbing for getting a quick result. That’s because all these methods generally require no tunning. You will see from the flowchart that I also used XGB and CatB for ensembling, but those are long Optuna runs where finding the optimal parameters takes 4-10 hours. After about 2 weeks I was ensembling exclusively with NNs as it worked better than anything else and was reasonably fast (1-2 hours for 40-50 models).
+
+I did several AugoGluon runs that produced many promising models, but none of them were helping the ensemble.
+
+Since I didn’t talk about it up in the data section, I should say here that neither autoencoders (AE) not genetic programming (GP) produced features that worked well on their own. Again, take this as a relative assessment, because they worked better than Lasso, but were generally not competitive. Adding them to individual models didn’t help much either.
+
+Here is what I think made a little difference: adding 11 GP-derived features at the ensembling stage. I have a notebook here showing how the GP features were derived. As they are added to the original data, you can simply copy those files and try them in your pipelines. These features are difficult to rationalize by looking at the formula:
+
+train['GP_11'] = np.sqrt(np.abs(np.sin(np.sin(np.sin(np.sin(np.sin(np.sin(0.254397*train['speed']*np.sqrt(np.abs(train['lighting']*train['speed']*np.exp(train['curvature'])*np.sqrt(np.abs(train['lighting']**3*np.sin(train['speed']**2*train['accidents']*np.cos(train['weather']))/train['weather']))))))))))))
+
+
+Notice, however, that even here only the relevant features were selected for calculation. Just for fun, I did a couple of GP runs that disallowed all the fancy algebra and trigonometric manipulations, and only [+, -, *, /] operations were allowed. Check out what two of those runs produced independently.
+
+0.308*[curvature] + 0.180*[speed_limit_3] + 0.180*[speed_limit_4] + 0.128*[num_reported_accidents_4] + 0.180*[lighting_2] + 0.107*[weather_1] + 0.118*[weather_2] - 0.0004
+
+0.309*[curvature] + 0.186*[speed_limit_3] + 0.186*[speed_limit_4] + 0.0929*[num_reported_accidents_4] + 0.186*[lighting_2] + 0.099*[weather_1] + 0.0929*[weather_2] + 0.011
+
+
+One would think that these would be great extra features because they recapitulate the original target equation almost perfectly, but that’s not the case. As they are so similar to good models and individually have ~0.059 RMSE to the target, it seems that they are not really needed at the ensembling stage. Basically, they don’t bring diversity. Other GP features in that notebook were generally more useful in my ensembles. Specifically, adding 11 GP features on top of individual models resulted in a 0.00001 ensemble improvement.
+
+The last improvement came from using CatBoost as a secondary ensembler. CatB has the ability to use a strong “baseline” model as a seed before ensembling, which is essentially the same as boosting residuals except that adding and subtracting from the target is done automatically for us. So I would first run a Keras ensemble without 11 GP features, then run CatB with the same group of models + 11 GP features and use the Keras ensemble model as a baseline. This improved both pubic and private LB scores by ~0.00002. That and GP features is what I suspect made the difference in the end.
+
+The final step was taking several first-level ensemble models and making a second-level ensemble by hill climbing. Although, one could argue that they were already second level ensembles because I run them first through Keras and then CatB. That final hill climbing ensemble (using 4 previous ensemble models) finished with the best score and was my winning solution, even though it looks the same over 5 decimals as the best individual ensemble. In fact, all my top 12 solutions look the same over 5 decimals, so I am happy that among them I picked 2nd and 5th best solutions.
+
+Tagged
+Neural Networks
+Ensembling
+Optimization
+Author
+Tilii
+
+tilii7
+
+arrow_drop_up
+216
+Share
+more_horiz
+Project Links
+S5E10 | TabM tuned further
+
+a year ago · 26 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+S5E10 Genetic Programming Features
+
+a year ago · 31 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Citation
+
+Tilii. 1st place - I think it was genetic programming. https://www.kaggle.com/competitions/playground-series-s5e10/writeups/1st-place-i-think-it-was-genetic-programming. 2025. Kaggle
+
+8
+27
+comment
+84 Comments
+5 appreciation comments
+Hotness
+Chris Deotte
+
+Posted a year ago
+
+· 5th in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+Congratulations, awesome job @tilii7 winning 1st place! You have a great diverse set of models, I particularly like Genetic Programming, AutoEncoder, and Keras FM. I will need to try these in future competitions. I was impressed with how fast you jumped to top of public LB. I could not match your LB score. Well done!
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+They say that necessity is the mother of invention, and I would say it certainly applied here. As my GP-derived features were not working on their own or when added to primary models, at some point I decided to add them as ensemble models. That did it.
+
+Autoencoder features didn't really work, but they made some pretty pictures. Below is a t-SNE plot of the whole train dataset based on five AE latent features. I think those clusters correspond to unique curvature values, as there are roughly 100 of them.
+
+reply
+Reply
+7
+Mahog
+
+Posted a year ago
+
+· 10th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congrats!
+
+Got introduced to PyTorch Tabular and even learned rudimentary PyTorch programming
+
+You'll soon be introduced to a few more libraries, I promise you that :D
+
+In the end I fine-tuned TabM parameters and got three models that had better scores than the original
+
+I would have tuned the parameters as well but lacked the time and resources to do that
+
+reply
+Reply
+1
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+You made the most impressive upward jump, that has to count for something!
+
+reply
+Reply
+2
+Bhaskar S
+
+Posted a year ago
+
+· 372nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Woah!, that's a lot of models.🤯
+Congrats🎉
+May I know what hardware did you use for this?
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Let's just say that I have plenty of computer power available. If I get stuck it is usually the lack of time or ideas, not the resources.
+
+reply
+Reply
+1
+Mahog
+
+Posted a year ago
+
+· 10th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I'm curious, what GPU(s) do you have?
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I don't want to get into details, so let's just say that locally I have access at any given time to at least 3-4 GPUs. That said, I also do research and other things that require GPUs.
+
+reply
+Reply
+2
+1
+Stephanie O
+
+Posted a year ago
+
+arrow_drop_up
+3
+more_vert
+
+Big Congratulations @tilii7 🎈 🎉
+Honestly after reading your write-up I realized I have alot to learn
+
+reply
+Reply
+Alexander
+
+Posted a year ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations! Your solutions gave me a bunch of new ideas I had no clue about which I can use in future competitions.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations to you on a strong start and a strong finish.
+
+reply
+Reply
+TalkiestClaw454
+
+Posted a year ago
+
+· 106th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations @tilii7 for winning 1st place!! You know this solution opened a whole new methods for me that i never even knew. Thank you very much for the solution.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That's good to hear! I learned a couple new approaches as well.
+
+reply
+Reply
+1
+Optimistix
+
+Posted a year ago
+
+· 12th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations - it's great to see you at #1!
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! I knew you would come up strong in the end.
+
+reply
+Reply
+Optimistix
+
+Posted a year ago
+
+· 12th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks! Mostly laid low this month - having enjoyed the August episode, I was highly motivated in September, but was badly disappointed by yet another episode with random targets, and ended up skipping the competition entirely for the first time in over 1.5 years. Came back this month, but participated sparingly, esp. after you pointed out that growing the ensemble wasn't doing much for the score. I spent most of the last 10 days at around 20 OOFs, and couldn't be bothered to add more. Finally added a few in the end, before Computer troubles and Halloween upended my final day - still, not bad for what I put in this time.
+
+reply
+Reply
+yeshwant
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+@tilii7
+How did you get this analogy, A lot to learn from you and others
+
+reply
+Reply
+MJ.LIU.T
+
+Posted a year ago
+
+· 479th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your first-place win!🎊 Your notebook is truly excellent. I also tried to manually improve the original equation, but as a beginner, I was only making intuitive tweaks and adjustments—efforts that yielded very little improvement. Your approach, along with many of the comments, has given me tremendous inspiration. Thank you!💐
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! You did really well in your first competition.
+
+reply
+Reply
+2
+SIVA S
+
+Posted a year ago
+
+· 1076th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Your solution was interesting and gave me a bunch of new ideas which I can use in future Learning and works.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Good to hear that. Many have shared their insights on Kaggle that helped me, and I still learn something new in each competition. If only I could remember everything in the long run!
+
+reply
+Reply
+1
+2
+aldparis
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Hi @tilii7 ! Really great to see you winning a Kaggle competition against such brilliant competitors ! You truly deserve this. Congratulations !
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for the kind words! You have been at the winning side in few of the close competitions as well.
+
+reply
+Reply
+1
+Pirhosseinlou
+
+Posted a year ago
+
+· 15th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Your solution was interesting and complex.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Many thanks! Props to you as well for a strong LB placement.
+
+reply
+Reply
+WOOSUNG YOON
+
+Posted a year ago
+
+· 300th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on first place! 🎉
+The solution is impressive, but I feel your write-up writing are even more amazing.
+
+It feels like you're naturally conversing with the other kaggler,
+while at the same time including all the technically necessary standard elements.
+
+I'd love to learn this kind of writing. it's truly remarkable.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Much appreciated! It's nothing more than a lot of practice, as my students ask many questions.
+
+reply
+Reply
+emoji_people
+Muhammad Awais
+
+Posted a year ago
+
+· 116th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats🎉 good work.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, good job by you as well.
+
+reply
+Reply
+Abhishek Awasthi
+
+Posted a year ago
+
+· 3988th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+how bro , i see the leaderboard teach me something
+
+reply
+Reply
+1
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+What I wrote in this thread is meant to teach something.
+
+reply
+Reply
+3
+ENE_MENE_PONKE_PO.
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation's Sir.
+
+reply
+Reply
+Crafty Code
+
+Posted a year ago
+
+· 3206th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Bro tili your an awesome humble guy bro love you.
+
+reply
+Reply
+1
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Many thanks for your kind words.
+
+reply
+Reply
+Shinye宁叶
+
+Posted a year ago
+
+· 3045th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+棒！！！很详细的报告，有所启发。
+
+reply
+Reply
+CHIRAG_C33
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! You really deserve 1st place 🎊 thank you
+
+reply
+Reply
+Aaditya Khanal
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+What an incredible detailed writeup! The genetic programming approach is fascinating. Well deserved 1st place!
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! You may want to try GP yourself by using this package.
+
+reply
+Reply
+Sanjay Savara
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Intresting
+
+reply
+Reply
+Kishan
+
+Posted a year ago
+
+· 641st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+TabM and TabR, thats something new I learned today. Congratulations @tilii7 and thank you for this detail writeup !
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! It was my first exposure to TabM as well.
+
+reply
+Reply
+Punyak
+
+Posted a year ago
+
+· 491st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very insightful thank you sir! and congratulations!
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Cheers and best of luck to you!
+
+reply
+Reply
+Yusuf ILGAZ
+
+Posted a year ago
+
+· 1095th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! As a newbie to data science, I learn a lot from experienced people like you. Thanks for the solution.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! Good luck in future competitions.
+
+reply
+Reply
+Ladipo Samson
+
+Posted a year ago
+
+· 1712th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congratulations on your 1st place finish you truly deserve it! 👏
+
+We really can’t overlook or underplay the contributions and discussions from the people like @cdeotte, @siukeitin, @optimistix and their inputs clearly played a big role in shaping great ideas throughout the competition.
+
+I also experimented with TabM, but it didn’t quite work out for me. I found booster ensembles using CatBoost, XGBoost, and LightGBM to be more optimal in my setup.
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you kindly! Good luck to you in future competitions.
+
+reply
+Reply
+1
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats , Greatt to see u on #1
+
+reply
+Reply
+Tilii
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you, and great job with your final LB showing!
+
+reply
+Reply

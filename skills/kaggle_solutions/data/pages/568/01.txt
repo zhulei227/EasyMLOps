@@ -1,0 +1,567 @@
+url: https://www.kaggle.com/c/icr-identify-age-related-conditions/discussion/430843
+fetched: 2026-10-27
+chars: 11350
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+How on Earth did I win this competetion? — ICR - Identifying Age-Related Conditions
+How on Earth did I win this competetion?
+
+ICR - Identifying Age-Related Conditions
+
+Solution Writeup · 1st place · Aug 19, 2023
+
+Hello there! This was really unexpected. I hoped to be in top 10%, but never dreamed of something more. Thanks to everyone who participated in the competetion and especially to those who discussed various ideas and shared their code! And big thanks to SAMUEL, who introduced reweighting the probabilities in this notebook: https://www.kaggle.com/code/muelsamu/simple-tabpfn-approach-for-score-of-15-in-1-min
+
+My solution was purely based on some sophisticated DNN: https://www.kaggle.com/room722/icr-adv-model UPDATE: Training notebook attached.
+
+What did not work for me:
+
+Gradient boosting was obviously overfitting, although I spent just little time on it and didn't make much fine-tuning.
+The "greeks" were useless. I think, because we have no greeks for the test data.
+FE led to overfitting.
+
+What did work:
+
+DNN based on Variable Selection Network. [1]
+No "casual" normalization of data like MinMaxScaler or StandartScaler, but instead a linear projection with 8 neurons for each feature.
+Huge values of dropout: 0.75->0.5->0.25 for 3 main layers.
+Reweighting the probabilities in the end worked really good.
+10 folds cv, repeat for each fold 10-30 times, select 2 best models for each fold based on cv (yes, cv somehow worked in this competition!).The training was so unstable, that the cv-scores could vary from 0.25 to 0.05 for single fold, partially due to large dropout values, partially due to little amount of train data. That's why I picked 2 best models for each fold.
+The cv was some kind of Multi-label. At first I trained some baseline DNN, gathered all validation data and labeled it as follows: (y_true = 1 and y_pred < 0.2) or (y_true = 0 and y_pred > 0.8) -> label 1, otherwise label 0. So, this label was somthing like "hardness to predict". And the other label was, of course, the target itself.
+
+It will be honest to say, that I was lucky to win, but for me personally that means also that DNN wins, and probably not just by luck. And as a big fan of DNNs this makes me proud and happy))
+
+[1] The idea of this network was taken from here https://arxiv.org/abs/1912.09363
+
+Author
+room722
+
+room722
+
+arrow_drop_up
+318
+Share
+more_horiz
+Project Files
+table_chart
+adv_model_training.ipynb
+get_app
+Download All
+Citation
+
+room722. How on Earth did I win this competetion?. https://www.kaggle.com/competitions/icr-identify-age-related-conditions/writeups/room722-how-on-earth-did-i-win-this-competetion. 2023. Kaggle
+
+3
+comment
+162 Comments
+9 appreciation comments
+Hotness
+CPMP
+
+Posted 3 years ago
+
+· 901st in this Competition
+
+arrow_drop_up
+16
+more_vert
+
+Well done! I am so happy the winner did not win by sheer luck. That you used a deep learning model of your own is a great sign.
+
+reply
+Reply
+Chris Deotte
+
+Posted 3 years ago
+
+· 806th in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+Congratulations. Great work! I also like DNN and I am happy to see DNN win. What did this submission score on public LB?
+
+reply
+Reply
+room722
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thank you very much! It scored 0.14.
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 3 years ago
+
+· 854th in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Hearty congratulations for the victory and solo gold medal too @room722 The solo gold will be a huge boost to you for your next steps as you embark on your Kaggle competitions GM journey.
+
+reply
+Reply
+Chirag Desai
+
+Posted 3 years ago
+
+· 2662nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I agree with @ravi20076 .. I have heard from few kaggle grandmasters that wining solo was difficult for them and took long time. . Congrats and best wishes for future.👍
+
+reply
+Reply
+Onkar Kota
+
+Posted 3 years ago
+
+arrow_drop_up
+5
+more_vert
+
+Congrats!!!🎉 @room722! Your achievement is truly inspiring. I am eager to join similar competitions myself.
+
+reply
+Reply
+@kaggleqrdl
+
+Posted 3 years ago
+
+· 633rd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+@room722
+
+Curious, why can't you make it opensource? afaict, it's just a variation of this code here https://github.com/keras-team/keras-io/blob/master/examples/structured_data/classification_with_grn_and_vsn.py which is apache license.
+
+fwiw, your code can't be encumbered to win the prize.
+
+grant to the Competition Sponsor the license to the winning Submission stated in the Competition Specific Rules above, and represent that you have the unrestricted right to grant that license;
+
+You don't lose the right to open source your code.
+
+reply
+Reply
+room722
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you, now I understand this better)
+
+reply
+Reply
+TheStrugglingEngineer
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! It takes a great deal of hubris on bad losers part to claim that winning in this competition is a matter of luck. Humility will do everyone a great deal of good.
+
+reply
+Reply
+@kaggleqrdl
+
+Posted 3 years ago
+
+· 633rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Luck plays a huge factor in these comps .. being lucky not to be competing against skillfull and talented folks like @room722
+
+I had expected superior models by newcomers, but nothing quite this superior. Well deserved 1st place win.
+
+reply
+Reply
+Tilii
+
+Posted 3 years ago
+
+· 2555th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations on your top spot. This actually sounds like a very original model, and your score stands out for sure. Looking forward to hearing all the details.
+
+reply
+Reply
+Tomás Luna
+
+Posted 3 years ago
+
+· 1399th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations for the great job @room722 ! About the missings imputation, I saw that you used the median, do you think it could be useful to use other method like knn?
+
+reply
+Reply
+room722
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! Maybe, but I didn't experimented with this.
+
+reply
+Reply
+Michal Bogacz
+
+Posted 3 years ago
+
+· 930th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+A wonderful and informative solution!
+
+This makes me reflect that I looped in FE and gradient boosting, being convinced that too little effect is a matter of too little effort in both topics. Theoretically, I knew that if the approach did not give the intended results, it had to be changed, but I was still trying to prove to myself that I was right with FE and gradient boosting, because that was the result of previous experiences (only on other data with larger numbers).
+
+Lesson learned, thanks so much and congratulations on your win!
+
+reply
+Reply
+Jake
+
+Posted 3 years ago
+
+· 419th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Interesting, I used a CNN and it was my only model in which the public and private lb were the same!
+
+reply
+Reply
+Stephen Bailey
+
+Posted 3 years ago
+
+· 516th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats!
+
+It sounds like you came up with a very good solution.
+
+reply
+Reply
+Biliarto Sastro Cemerson
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! Thanks for sharing, and Great job!
+
+reply
+Reply
+srthk03
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!!!! Thanks for sharing your insights, it will be really helpful :)
+
+reply
+Reply
+Pardeep Singh
+
+Posted 3 years ago
+
+· 3307th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats @room722 for winning this competition. Thanks for the writeup and sharing your training code!
+
+reply
+Reply
+CPMP
+
+Posted 3 years ago
+
+· 901st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+How much did you step 6 improve your model. If I get it right, you override original targets by the model's out of fold prediction if the prediction is confident enough. I had something like that in mind but it seems it felt in a crack. I used this successfully in the past and I have seen recent competition winners share something similar too.
+
+reply
+Reply
+room722
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+No, it's just my wrong naming, I mean "tgt2") I didn't override the original target, the tgt2 was used only for better splits during cross-validation. Step 6 improved the score by 0.02.
+
+reply
+Reply
+kapedalex
+
+Posted 3 years ago
+
+· 2984th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! However, I still have a question. Why didn't you utilize normalization or standardization on the data? You only used WeightedEns.
+
+reply
+Reply
+room722
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! In my experiments standardization of the data deteriorated the cv-score, though I don't fully understand why.
+
+reply
+Reply
+Anier Velasco Sotomayor
+
+Posted 3 years ago
+
+· 374th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I'm surprised that the DNN didn't overfit considering the size of the training data was small. Congrats!
+
+reply
+Reply
+Tilii
+
+Posted 3 years ago
+
+· 2555th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wonderful job! I learned a great deal from your solution, and would venture to say that I am not the only one. It is amazing that you had a public notebook all the time, with a good score public LB score (0.14) and it completely flew under the radar.
+
+reply
+Reply
+room722
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I made it public just yesterday)
+
+reply
+Reply
+KC
+
+Posted 3 years ago
+
+· 1036th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the win! Well deserved!
+
+reply
+Reply
+Lil Gaussy
+
+Posted 3 years ago
+
+· 3391st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Woo DNN gang! That's awesome, big dropout values makes a lot of sense in this competition when using a DNN. Congratulations, and thanks for introducing us to that paper - really stoked this kind of solution won 🎉
+
+reply
+Reply
+Serigne
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats for the win This is a very elegant and neat solution and definitely not sheer Luck IMHO.
+
+It is a bit funny to see people thinking Time series should behave like I.I.D and stationary data . These deviations are not uncommon , particularly in fields like Finance. That's why modelling for these data is still very challenging and overfitting them is very easy
+
+reply
+Reply
+Samuel Cortinhas
+
+Posted 3 years ago
+
+· 1621st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! Must be a very nice surprise haha
+
+reply
+Reply
+Glosolin
+
+Posted 3 years ago
+
+· 2251st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! and thank you for sharing the notebook
+
+reply
+Reply
+LewsTherin
+
+Posted 3 years ago
+
+· 541st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congrats! Its refreshing and unexpected to see a NN win a tabular data competition
+
+reply
+Reply
+MikhailU
+
+Posted 3 years ago
+
+· 4298th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!🫡 Can't wait to see training notebook 😀
+
+reply
+Reply

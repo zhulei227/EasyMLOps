@@ -1,0 +1,722 @@
+url: https://www.kaggle.com/c/waveform-inversion/discussion/587388
+fetched: 2026-10-27
+chars: 18133
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Yale/UNC-CH - Geophysical Waveform Inversion
+1st Place Solution
+
+Yale/UNC-CH - Geophysical Waveform Inversion
+
+Solution Writeup · 1st place · Jul 1, 2025
+
+First and foremost, a sincere thank you to the competition organizers for this challenge, and congratulations to all my fellow competitors on their impressive work.
+
+Crazy how nobody moved a single place up or down in top 28.
+
+Goals List: ✔️Single digit submissions solo gold ✔️Solo win a competition #1
+
+Anyways, here's what I have done:
+
+Preprocessing
+
+This is not a segmentation task. The velocity model pixels don't line up spatially with the seismic data. An early experiment tested it. I had a baseline that resized the input from the original (5, 1000, 70) to (5, 350, 70) and got a CV of 46.9. , I reshape the input to (1, 350, 350), basically forcing the channels into a spatial layout. CV jumped to 32.5
+
+This is how the non-resized 1x1000x350 input looks like:
+
+Architecture
+
+Unet didn’t make sense to me, my input was 350x350, the pixel values of the velocity model did not spatially align with the input, so it did not make much sense to me to go back to previous layers to get intermediate layer’s embeddings like a Unet does
+
+Anyways, it turns out, vision transformers don’t necessarily need a Unet to do their bidding 🙂
+
+Vision transformers are secretly segmentation-like regression models:
+
+This image size was a nice square so it was easy to work with and scale. I started using this without a decoder with the best vision transformer I found, EVA02-small model. The performance was really cool, even at this stage it got me a close to 30 score on CV with just 40 epochs of training.
+
+To scale up the model, I experimented with base and large variants which were scoring better, but what was scoring even more was repeating the architecture as an encoder+decoder setup:
+
+Training this scored CV 28, repeating this (encoder+decoder) with base or large variant of the model did not give improvement and were overfitting
+
+Training EVA, it was still 20-30% slower than training the original ViT, I found a better backbone after experimenting to find out what was making EVA score much better than ViT, Depth? Channels? Number of attention heads? MLP layer scaling? Gated activations? Turns out, RoPE (Rotary Positional Embeddings) was contributing to the majority of the bottleneck, then I chose better pretrained weights and I got vit_small_patch14_reg4_dinov2.lvd142m as my ideal choice of backbone. On the same training, ViT+RoPE got me under 26 MAE.
+
+Here is the final architecture:
+
+Code: https://www.kaggle.com/code/harshitsheoran/yale-fwi-vit-architecture?scriptVersionId=248201360
+
+My loss function is MAE loss, I apply sigmoid on my logits and scale them in range of (1500, 4500)
+
+Training
+
+Pretty much every training run used the same recipe:
+
+LR: 1e-4 with cosine annealing down to ~1e-5
+Optimizer: AdamW
+Loss: MAE
+HFlip and TTA
+EMA
+
+I used 440k out of 470k for training, 30k for validation, the core of my training at MAE of 26 with 50 epochs is that I am severely underfitting, increasing image size and restarting training can lead to much better scores, for a total of 300 epochs:
+
+This model was done training on May 28 (more than a month before the deadline), the last month was done exploring the next part of the solution.
+
+Generating Data
+
+Data Augmentation is a key part of my solution, before an almost perfect replication of the forward modeling function was available, I used forward-modeling + denoiser model setup where denoiser model was the architecture above designed to predict the noise still left in the forward-modeled data
+
+After failing experiments with generating new velocity models with heuristics or diffusion, I went ahead with using FiveCrop and 5xRandomAffine augmentations {RandomAffine(p=1.0, degrees=15, translate=(0.2, 0), shear=(-15, 15), padding_mode='reflection', resample='nearest')} on existing velocity models to generate more velocity models, this gave me 10x more data of 4.7 million seismic samples, I use this data for pretraining on every step, the training graph looks like this:
+
+Later in the competition, a perfect method for forward modeling was publicly available, at the time, the original notebook was running at a speed of about 10 images per minute which was unusable, using pytorch compile and a 5090, I sped it up to >5000 images per minute per gpu which is a lot more bearable for the next time consuming step.
+
+I call it “Iterative Pseudo” where after every epoch, I predict on my validation and competition’s test set, about ~95k samples in total, this prediction is a pseudo prediction (for the test set) as we do not know how good or bad it is, I take the predicted velocity models and forward-model them to generate what should be the input for them and use this input in training the next epoch. This step is repeated for every epoch, this does add extra time to each epoch but the payout in terms of score is so worth it.
+
+As pretraining epochs are 10x larger, all epochs weighted, this was trained for a total of 570 epochs.
+
+Another observation was made that most of the new score that the model is improving for a while, has been coming from mainly 4 out of 10 methods. So, model was further trained with removing the data that doesn’t come from [‘CurveFault_B’, ‘CurveVel_B’, ‘Style_A’, ‘Style_B’], this removes more than half of the data, speeds up training, frees up the model’s parameters to focus more on this part.
+
+Then for inference, I would replace the predictions that were from these 4 methods with the predictions from the model below, which yielded a score of 7.5 on CV, 7.0/7.0 on Public/Private LB
+
+Training this with larger image size at the end, with 896x896 and ensembling that Top4 model to the existing Top4 model yields my best submission at 7.28 CV, 6.9/6.9 on Public/Private LB
+
+The whole process from start to finish takes about 15 days on 4x 5090.
+
+My solution does not feature much for ensembling, and can be cleanly trained for longer to generate a hopeful sub 5 leaderboard.
+
+That didn’t work / Didn’t get to try
+
+MAE/MIM self-supervised pretraining Standard Augmentations Unet decoder, UperNet, Mask2Former, ViT-Adapter, Fusion heads, more complicated heads than a linear layer
+
+Due to being short on time, I did not go back and recreate the pretraining data with perfect simulation, that could still improve the score more.
+
+Idea that I didn’t get to try: Prediction from the model forward modeled to generate simulated seismic input - original seismic input to compute gradient, the original seismic input, this gradient and the predicted velocity model as input to a new model that will refine the prediction according to the gradient
+
+Thank you for reading!
+
+Author
+Harshit Sheoran
+
+harshitsheoran
+
+arrow_drop_up
+194
+Share
+more_horiz
+Citation
+
+Harshit Sheoran. 1st Place Solution. https://www.kaggle.com/competitions/waveform-inversion/writeups/harshit-sheoran-1st-place-solution. 2025. Kaggle
+
+31
+27
+10
+2
+comment
+44 Comments
+8 appreciation comments
+Hotness
+greySnow
+
+Posted a year ago
+
+· 4th in this Competition
+
+arrow_drop_up
+20
+more_vert
+
+Someone once said that all top solution are realy simple. This time, it's not! Really amazing job. So many interesting ideas. Now I really want to do with you a competition sometime 🤣
+
+reply
+Reply
+Harshit Sheoran
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you, I would be looking forward to it 😊
+
+reply
+Reply
+2
+2
+Jeroen Cottaar
+
+Posted a year ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Congratulations! I'll be sharing my solution around the weekend, but in short I used classical full waveform inversion, using @brendanartley's solution as a starting point. Key point to get this working was to have strong priors.
+
+Essentially I think your solution is not so very different; in your case the priors are basically learned by the network. Both our solutions require significant compute per test sample (unlike some of the other solutions that are expensive to train but cheap to infer), and I think our compute costs are surprisingly similar.
+
+More details later this week!
+
+reply
+Reply
+tinkei
+
+Posted a year ago
+
+· 471st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Looking forward to your writeup. I started out by caching Bartley's ensemble models output, and ran scalar wave FWI to refine only CurveFault_B. (In my CV, FWI mostly helps with _B family but not _A. I don't have enough compute so I focused on the most difficult family.) It ended up performing worse. So I added a loss term to not let the physical inversion deviate too much from the ensemble output (L1 loss between the two velocity maps in Deepwave library). Still, ended up being 0.1 worse than the public model's starting point. Curious to learn from you experience!
+
+reply
+Reply
+Arpit1Bansal
+
+Posted a year ago
+
+· 489th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@jeroencottaar Hey would it be possible for you to tell what GPUs you used, as a student i was only able to use kaggle's T4 [recently got intern, now have little money]. In upcoming competition that required high vram and time for training. I would go for rented compute, if you can tell some info about what GPUs you used, rented or you own them and from where you think it's better to rent(you think they provide a friendly env for training). Thanks.
+
+reply
+Reply
+Jeroen Cottaar
+
+Posted a year ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I used vast.ai. I'm not sure if they're the cheapest, but you get full control over your instance (i.e. you just get a Unix environment and can do what you want, including running notebooks for any duration).
+
+reply
+Reply
+junlee789
+
+Posted a year ago
+
+arrow_drop_up
+7
+more_vert
+
+As a beginner and self-taught student of data science, I really love the culture of sharing their knowledge and solutions in Kaggle. Thank you for your sharing! Even tho, I did not participate this competition, but I will study this, following your notebook. Thank you😙
+
+reply
+Reply
+emoji_people
+Bartley
+
+Posted a year ago
+
+· 21st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congrats! Well deserved.
+
+reply
+Reply
+Mehwish
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations…..
+
+reply
+Reply
+emoji_people
+JezzLynn
+
+Posted a year ago
+
+· 128th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! If optimized to the limit, is there a chance to break 6?
+
+reply
+Reply
+Harshit Sheoran
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+If optimized to the limit, there is a chance to break 5…? Maybe… 6, most likely
+
+reply
+Reply
+1
+1
+emoji_people
+JezzLynn
+
+Posted a year ago
+
+· 128th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Amazing result😧
+
+reply
+Reply
+16 more replies
+arrow_drop_down
+灵曜
+
+Posted a year ago
+
+· 801st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations! @harshitsheoran Excellent work. You have a very good baseline model, and then you keep iterating on it. I think the essence is to constantly overfit the data, because they all come from the same simulation model. Anyway， congratulations again！
+
+reply
+Reply
+Johnny Hyland
+
+Posted a year ago
+
+· 540th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes. This is really cool. The iterative psuedo step is pretty wild, also the 4/10 types is a really nice find I wish I'd seen! awesome work.
+
+reply
+Reply
+CPMP
+
+Posted a year ago
+
+· 20th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on the win and the lead throughout the competition!
+
+I apply sigmoid on my logits and scale them in range of (1500, 4500)
+
+I had this on my todo list. Did you compare without sigmoid?
+
+reply
+Reply
+Harshit Sheoran
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you, I have been doing this from day 1 actually, without sigmoid was worse but my testing was primilinary at the time.
+
+reply
+Reply
+NikhilMishra
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations Harshit, great work and great result !
+
+reply
+Reply
+Lucas Candiani Souza
+
+Posted a year ago
+
+· 12th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @harshitsheoran! Very interesting ideas overall, you deserved it
+
+reply
+Reply
+golden9east
+
+Posted a year ago
+
+· 1314th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+can someone in simple language explain how much time in hrs did it take for training and on what resources. Is kaggle weekly 30 hr gpu sufficient. This was my first competition.
+
+reply
+Reply
+tinkei
+
+Posted a year ago
+
+· 471st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+The second last section mentioned:
+
+The whole process from start to finish takes about 15 days on 4x 5090.
+
+reply
+Reply
+golden9east
+
+Posted a year ago
+
+· 1314th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+So 15 continuous days of training, how does one do it on kaggle resources, or is it done on private resources. Does it mean from competitive pov, one has little chance of breaking into top ranking with just depending upon kaggle resources?
+
+reply
+Reply
+Jeroen Cottaar
+
+Posted a year ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+You have to do it in the cloud or using your own GPUs. For this competition in particular I don't think a top ranking using only Kaggle resources was possible. Luckily this is not the case for all competitions.
+
+reply
+Reply
+1
+Radek Osmulski
+
+Posted a year ago
+
+· 44th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congrats, @harshitsheoran! 🙂 Stellar performance and an awesome write-up! Really neat how you explain your reasoning at various steps and the experiments you ran based on your observations 🙏
+
+I also didn't think unets were the necessary arch here, but in my explorations I tried various archs (perceiver, custom arch, etc) from scratch, but the one take away from this competition for me was just how unbelievably powerful pretrained vision models are (both in terms of the weights and the priors the models themselves embody).
+
+Your exploration and the insights around vision transformers are on another level! 🙂 What an awesome 1st place and so well deserved!
+
+reply
+Reply
+Algre231
+
+Posted a year ago
+
+arrow_drop_up
+-1
+more_vert
+
+there is some mistakes, but good
+
+reply
+Reply
+nickyl
+
+Posted a year ago
+
+· 133rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Quite detail ths
+
+reply
+Reply
+Kyle Prior
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! That's amazing!
+
+reply
+Reply
+Abel George Abraham
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+woah super cool! Physics-guided ML models are up and coming.
+
+reply
+Reply
+bakhtawar shabbir
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Smart preprocessing insight
+
+reply
+Reply
+Benedict Pangilinan
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+May I know how does iteration improve the MAE.
+
+PS: I'm just a beginner
+
+reply
+Reply
+Sarah Arshad
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats man! interesting….
+
+reply
+Reply
+Arash karoudi
+
+Posted a year ago
+
+· 707th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+This is absolutely amazing, and I loved your thought process to arrive at such insights. As a newcomer to this field, however, I feel like this is where I have to stop. The computational resources needed in most competitions are truly discouraging and insane for me. Wishing you all the best going forward!
+
+reply
+Reply
+Jeroen Cottaar
+
+Posted a year ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Please don't be discouraged. This competition really is an outlier in terms of necessary compute. For example, I took second place in this one with 0 GPU hours: https://www.kaggle.com/competitions/ariel-data-challenge-2024/overview
+
+reply
+Reply
+Arash karoudi
+
+Posted a year ago
+
+· 707th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I went through your solution, and it's incredible how you deconstructed and simplified the problem—that's really something extraordinary. Figuring out how you even got to that solution is a whole other challenge? Anyway, thank you for the encouragement. I'll try to keep going, though I'm not sure for how long. It's just very exciting for me to see brilliant minds like yours at work here.
+
+reply
+Reply
+Arpit1Bansal
+
+Posted a year ago
+
+· 489th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@jeroencottaar Just read you solution in ariel competition, Truly smart, hats off to you.
+
+reply
+Reply
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Impressive job, learnt a lot!
+
+reply
+Reply
+L Catalano
+
+Posted a year ago
+
+· 468th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for sharing your solution!
+
+Do you have any validation plots of the predicted and actual velocity/geology. Since I'm a geologist, I'm just curious what the results look like.Thanks!
+
+reply
+Reply
+gguillard
+
+Posted a year ago
+
+· 535th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Not sure I got it right : (700,700) is more pixels than (5,1000,70), I guess you interpolated to increase the size ?
+
+So did I understand correctly that you did (5,1000,70) -> (350,350) -> (476,476) -> (588,588) -> (700,700) ?
+
+If so, why not (5,1000,70) -> (588,588) -> (700,700), or even (5,1000,70) -> (700,700) directly ?
+
+reply
+Reply
+Harshit Sheoran
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It is much more time efficient and stable to gradually increase the image size this way
+
+reply
+Reply
+1
+Kelvin Mwaisaka
+
+Posted a year ago
+
+· 1346th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thanks for sharing the results here. I've totally learned a lot. Its one of my freshest experiences while trying to dive deep in the Data science course.
+
+reply
+Reply
+ANGOUAH
+
+Posted a year ago
+
+· 1167th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congratulation well done
+
+reply
+Reply

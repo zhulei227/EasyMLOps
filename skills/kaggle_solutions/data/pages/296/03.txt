@@ -1,0 +1,192 @@
+url: https://github.com/takashioya/plasticc
+fetched: 2026-10-27
+chars: 7200
+
+GitHub - takashioya/plasticc: PLAsTiCC Astronomical Classification 3rd-place solution · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ takashioya plasticc Repository navigation Code Issues Pull requests 26  ( 26 ) Actions Projects Security and quality Insights More items 
+
+ plasticc Public Notifications You must be signed in to change notification settings Fork 1  ( 1 ) Star 15  ( 15 ) You must be signed in to star a repository About PLAsTiCC Astronomical Classification 3rd-place solution Resources Readme Activity Stars 15 stars Watchers 0 watching Forks 1 fork Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 51 Commits 51 Commits Folders and files Name Name Last commit message Last commit date buckets buckets     curve curve     data data     fe_extract fe_extract     features features     fi fi     models models     notebook notebook     others others     preds preds     prepare prepare     scripts scripts     sub sub     .gitignore .gitignore     README.md README.md     SETTINGS.json SETTINGS.json     entry_points.md entry_points.md     requirements.txt requirements.txt     View all files Repository files navigation README More items PLAsTiCC Astronomical Classification 3rd-place solution 
+ Overview of solution 
+ https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75131 
+ environment 
+ I used pyenv virtualenv to set up the environment.
+I think catboost==0.10.4.1 is important, but the versions of the other libraries won't affect the score so much. 
+ $ pyenv install 3.5.1
+$ pyenv virtualenv 3.5.1 plasticc
+$ pyenv activate plasticc
+$ pip install --upgrade pip
+$ pip install cython==0.27.3
+$ pip install numpy==1.13.0
+$ pip install PyYAML==3.12
+$ pip install -r requirements.txt
+
+ I used n1-standard-64 in Google Cloud Engine, which has 240GB RAM and 64 CPUs. 
+OS/Platform : Ubuntu 16.04 
+ datasets &amp; result files 
+ I will upload prepare.zip for the host, which contains these directories. 
+
+ buckets : 
+It contains nyanp's train &amp; test features. 
+
+ data : 
+It contains kaggle datasets.
+you can also download them via 
+
+ kaggle competitions download -c PLAsTiCC-2018
+
+ features : 
+It contains all of my train &amp; test features. 
+
+ fi : 
+It contains feature names and the number of rounds used for training. 
+
+ exp_*.npy 
+numpy array that contains feature names. 
+ exp_*rounds.pkl 
+pickle object that contains the number of rounds. 
+ whole_fn_s.npy 
+numpy array that contains all feature names. 
+ mamas_feature_names_*.npy 
+the names of features that yuval used. 
+
+ models : 
+It contains trained models. 
+
+ exp*.cbm 
+trained catboost model. 
+
+ others : 
+It contains class weights. 
+
+ W.npy 
+numpy array that contains class weights. 
+
+ sub : 
+It contains submission files 
+
+ experiment57_59(th985)_61_62.csv 
+nyanp's averaged submission file. 
+ pred*.csv 
+yuval's submission file. 
+
+ scripts 
+
+ utils.py : 
+It contains utility functions. 
+ preprocess_*.py : 
+I did easy preprocessing here, like converting .csv files into .feather files. 
+ save_features_train_*.py : 
+I saved test features here. 
+ save_features_test_*.py : 
+I saved train features here. 
+ save_features_nyanp.py : 
+I saved nyanp's train &amp; test features here. 
+ train.py : 
+I trained models here. 
+ predict.py : 
+I made predictions here. 
+ postprocess.py : 
+I did postprocessing like ensembling and class99 handling here. 
+
+ usage 
+
+ full version : 
+It will take a few months to run with a single machine (64 core, 240GB RAM). 
+I never recommend you to run it. 
+
+ cd mamas/
+unzip prepare.zip
+cp -r prepare/* .
+rm features/*
+rm models/*
+cd ../scripts
+python preprocess_01.py
+python preprocess_02.py
+python save_features_train_01.py
+python save_features_train_02.py
+python save_features_train_03.py
+python save_features_train_04.py
+python save_features_train_05.py
+python save_features_train_06.py
+python save_features_test_01.py
+python save_features_test_02.py
+python save_features_test_03.py
+python save_features_test_04.py
+python save_features_test_05.py
+python save_features_test_06.py
+python save_features_nyanp.py
+python save_features_for_yuval.py
+python train.py
+python predict.py
+python postprocess.py
+
+ Then, mamas/sub/host_sub.csv.gz will be generated. 
+
+ short version : 
+It's a short version, which will take about 4 hours.
+I use extracted features and trained model here. 
+
+ cd mamas/
+unzip prepare.zip
+cp -r prepare/* .
+cd scripts
+python preprocess_01.py
+python preprocess_02.py
+python predict.py
+python postprocess.py
+
+ Then, mamas/sub/host_sub.csv.gz will be generated. 
+It should score 0.680 on public LB, 0.700 on private LB. 
+ directory 
+
+ preds/ : 
+prediction files. 
+ curve/ : 
+linear interpolated curve files with yuval's method. 
+ fe_extract/ : 
+feature extraction library. 
+ notebook/ : 
+It contains .ipynb files. 
+ scripts/ : 
+It contains scripts. 
+
+ About PLAsTiCC Astronomical Classification 3rd-place solution Resources Readme Activity Stars 15 stars Watchers 0 watching Forks 1 fork Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

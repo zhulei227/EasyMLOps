@@ -1,0 +1,5 @@
+url: https://github.com/ChenglongChen/Kaggle_CrowdFlower
+fetched: 2026-10-27
+chars: 62
+
+FETCH_FAILED: <urlopen error [Errno 11001] getaddrinfo failed>

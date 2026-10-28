@@ -1,0 +1,423 @@
+url: https://www.kaggle.com/c/playground-series-s3e11/discussion/399401
+fetched: 2026-10-27
+chars: 7682
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+#1: A Zoo of Models — Regression with a Tabular Media Campaign Cost Dataset
+#1: A Zoo of Models
+
+Regression with a Tabular Media Campaign Cost Dataset
+
+Solution Writeup · 1st place
+
+My solution is based on the following observations:
+
+Only a subset of the features is useful, although it's not completely clear which features belong to the subset. Being in doubt which subset is the right one, we can make models for different feature subsets and blend them.
+After feature selection, there are lots of duplicates in the training data. We can reduce training time by grouping these duplicates. Training with 3000 groups rather than 360'000 samples speeds up the development cycle massively.
+If we add the original data to the training dataset, the score improves.
+store_sqft, which has only twenty unique values, looks like a numerical feature, but it is categorical.
+As most regression algorithms in the library have been developed to optimize rmse, we should make all models predict the transformed target log1p(cost) and submit expm1(pred).
+A "zoo of models", i.e. a diverse ensemble, averages out the prediction errors of the models.
+Training and test data adhere to the same distribution so that we may trust the cv scores completely.
+
+Point 4 is illustrated by the following diagram. The partial dependency plot for store_sqft doesn't look like a typical regression curve - it looks like a categorical feature which has been mistaken for a continuous one. This observation suggests that we might one-hot encode or target-encode the feature.
+
+The diversity of the model zoo can be analyzed with a dendrogram. The dendrogram represents a hierachical clustering of the models where similar models end up in the same cluster. We can easily identify four clusters:
+
+four models which were trained with the additional unit_sales or store_sales feature
+all random forests and extra-trees models
+the neural network
+all gradient-boosting models
+
+The bar chart shows the cv scores and training times of all models and ensembles. The final submission is a weighted blend of all 18 models with the weights determined by ridge regression.
+
+More details can be found in the source code.
+
+Author
+AmbrosM
+
+ambrosm
+
+arrow_drop_up
+90
+Share
+more_horiz
+Citation
+
+AmbrosM. #1: A Zoo of Models. https://www.kaggle.com/competitions/playground-series-s3e11/writeups/ambrosm-1-a-zoo-of-models. 2023. Kaggle
+
+comment
+24 Comments
+4 appreciation comments
+Hotness
+SSS
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@ambrosm well done, at very end I was convinced you used ET, so I did, though I again screwed the final pick up. Warm_start ET was given the boost:
+
+reply
+Reply
+JEANMPIA
+
+Posted 4 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+hey @sergiosaharovskiy, you beat us again ! you mind explaining briefly what ET is ?
+
+reply
+Reply
+SSS
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@janmpia I beat myself again, answering your question ExtraTreesRegressor
+
+reply
+Reply
+AmbrosM
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@sergiosaharovskiy Yes, I know that feeling after having selected the wrong submissions. Your record submission count of 71 in 14 days suggests that the public leaderboard might have distracted you from optimizing the cross-validation scores…
+
+reply
+Reply
+SSS
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@ambrosm that’s true, I contaminated the overall thing. My cv was really good and approach was really solid, we are talking about .00002 in the end of the day ;)
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+Matthijs Hogervorst
+
+Posted 4 years ago
+
+· 431st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Did you average over the predicted log1p(cost) of the different models, or over the exponentiated values?
+
+reply
+Reply
+AmbrosM
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@mhogervo I averaged over the logs and exponentiated afterwards. See these lines at the end of https://www.kaggle.com/code/ambrosm/pss3e11-zoo-of-models :
+
+def submit(test_preds, path):
+    ...
+    submission = pd.Series(np.expm1(test_preds), index=test.index, name='cost')
+    ...
+
+test_preds = optimum_blend.predict(test_preds)
+submit(test_preds, 'submission_weighted.csv')
+
+reply
+Reply
+ML_wishforall
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+That's a surprising piece of data. Thank you for comparing various combinations of ensemble. .. and Congratulation on winning #1
+
+reply
+Reply
+Tucker Lovell
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing, congrats on your win!
+
+reply
+Reply
+Marília Prata
+
+Posted 4 years ago
+
+· 182nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That's a position (1st) that makes sense for you AmbrosM. Now, I'm updated with yours Zoo code.
+Congratulations for your first place!
+
+reply
+Reply
+Bob Yelram
+
+Posted 4 years ago
+
+· 270th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing this clean model comparison and clustering ! 🙏
+
+reply
+Reply
+shoab ahamed
+
+Posted 4 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing I learned a lot of new things. Congratulation on winning
+
+reply
+Reply
+Jose Cáliz
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Excellent post @ambrosm, thanks for all your inputs and congratulations on excelling another competition.
+
+reply
+Reply
+Jeshua Céspedes
+
+Posted 4 years ago
+
+· 242nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing! This competition was enjoyable. I got to learn a lot!! Congrats! and keep up the good work!
+
+reply
+Reply
+Lucy
+
+Posted 4 years ago
+
+· 141st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@ambrosm Bravo! Wow, it is a very thorough work! Well deserved as always! I used the TargetEncode in the end which helped improve the model a bit. Thank you for your mentorship! Congratulations again!
+
+reply
+Reply
+Chase Rendall
+
+Posted 4 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing! Congratulations on a well-deserved win.
+
+reply
+Reply
+Abdenour Madani
+
+Posted 4 years ago
+
+· 318th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you very much for sharing your knowledge and solution!
+
+reply
+Reply
+JEANMPIA
+
+Posted 4 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Always very interesting to know what you did ! I was sure you used many models again, and you were able to do it thx to the duplicates removal, thats impressive. Learned something new again here !
+
+reply
+Reply
+Ericka42
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing I learned a lot of new things. Congratulation on winning!
+
+reply
+Reply
+Tanvir Ahmed
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+nice work!
+
+reply
+Reply
+Jagger Stephens
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for this awesome write-up, and congrats on the win!!!
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (4)
+haisei
+
+Posted 4 years ago
+
+· 151st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing 😄
+
+Arif Hossain
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the sharing ….
+
+Pragyanand Sahoo
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the sharing ….
+
+tyro logist
+
+Posted 4 years ago
+
+· 778th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing.

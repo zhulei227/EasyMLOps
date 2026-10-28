@@ -1,0 +1,63 @@
+url: https://github.com/Computational-Camera/Kaggle-CVPR-2018-WAD-Video-Segmentation-Challenge-Solution
+fetched: 2026-10-27
+chars: 5920
+
+GitHub - Computational-Camera/Kaggle-CVPR-2018-WAD-Video-Segmentation-Challenge-Solution: Kaggle Competition, Instance Segmentation · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ Computational-Camera Kaggle-CVPR-2018-WAD-Video-Segmentation-Challenge-Solution Repository navigation Code Issues 2  ( 2 ) Pull requests Actions Projects Security and quality Insights More items 
+
+ Kaggle-CVPR-2018-WAD-Video-Segmentation-Challenge-Solution Public Notifications You must be signed in to change notification settings Fork 10  ( 10 ) Star 86  ( 86 ) You must be signed in to star a repository About Kaggle Competition, Instance Segmentation Resources Readme Activity Stars 86 stars Watchers 3 watching Forks 10 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 39 Commits 39 Commits Folders and files Name Name Last commit message Last commit date pic pic     solution solution     readme.md readme.md     report_final.pdf report_final.pdf     trophy.jpg trophy.jpg     View all files Repository files navigation README More items CVPR 2018 Video Segmentation Challenge Solution 
+ I was lucky to secure the 2nd palace in 2018 CVPR workshop on Autonomous Driving Kaggle Competition. The goal of this Kaggle Challenge , is to accurately segment objects such as car and pedestrian at instance-level from the video sequences recorded by the autonomous driving car. Our solution is based on Mask R-CNN. We use both Apolloscape , and Cityscape datasets and only focus on a specific field of view of the image for achieving the possible highest resolution. 
+ Statistical Analysis 
+ The image resolution of Apolloscape is 3384 by 2710. However, our interesting objects are not uniformly distributed over the image. Actually, as revealed in the 2D
+histogram below, the distribution is densely concentrated in a narrow stripe of the whole field of view. For example, between y = 1560 to y = 2280, 99.7% of our interesting objects are localized in this region of interest (ROI). This is our key observation. 
+
+ Left, our perdiction result example. Right, 2D histogram of annotations. 
+
+ Implemenation 
+ The core algorithm in our solution is Mask R-CNN. There are a few open source implementations on the shelf. We use Detectron , the object detection library developed by the Mask R-CNN original authors Kaiming He, Piotr Dollar, Ross Girshick from Facebook AI Research team. As we learned from the previous Kaggle image segmentation competition , to achieve better performance, higher image resolution for training and inference is always preferred. However, due to the GPU memory size constraint and our statistical analysis in the previous section, we crop and resize the image to 3384 by 720. With a Nvidia P100 graphical card, training a 9-class Mask R-CNN FPN model with ResNet X101 backbone network requires around 1560 MB GPU memory when the batch size is 1. However, to have a reliable solution, a full field of view prediction at
+a lower resolution should be considered to recognize those objects that are not in our ROI coverage. In practice, we find it does not improve the performance.
+Another interesting finding is the threshold for the object detection. Through experiment, 0.25 is the optimal threshold to obtain the highest leader board score. We use the pretrained model from COCO dataset provided by the Detectron Model Zoo .
+More detailed information can be found from our project report. We also provide our model used for the competition. 
+ Usefull dataset links 
+ www.nuscenes.org 
+ apolloscape.auto 
+ About Kaggle Competition, Instance Segmentation Resources Readme Activity Stars 86 stars Watchers 3 watching Forks 10 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

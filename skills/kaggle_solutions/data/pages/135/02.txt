@@ -1,0 +1,56 @@
+url: https://github.com/owenzhang/kaggle-avazu
+fetched: 2026-10-27
+chars: 4283
+
+GitHub - owenzhang/kaggle-avazu: 2nd place solution for Avazu click-through rate prediction competition · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ owenzhang kaggle-avazu Repository navigation Code Issues 5  ( 5 ) Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-avazu Public Notifications You must be signed in to change notification settings Fork 249  ( 249 ) Star 437  ( 437 ) You must be signed in to star a repository About 2nd place solution for Avazu click-through rate prediction competition License Activity Stars 437 stars Watchers 35 watching Forks 249 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 3 Commits 3 Commits Folders and files Name Name Last commit message Last commit date AvazuModelDocumentation.pdf AvazuModelDocumentation.pdf     LICENSE.txt LICENSE.txt     READ.me READ.me     _0_run_me.sh _0_run_me.sh     _1_encode_cat_features.py _1_encode_cat_features.py     _2b_generate_dataset_for_vw_fm.py _2b_generate_dataset_for_vw_fm.py     _2c_generate_fm_features.py _2c_generate_fm_features.py     _3a_rf.py _3a_rf.py     _3b_gbdt.py _3b_gbdt.py     _3c_vw.py _3c_vw.py     _3d_fm.py _3d_fm.py     _4_post_processing.py _4_post_processing.py     utils.py utils.py     View all files Repository files navigation License More items Copyright 2015 Zhonghua Zhang
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+applicable law or agreed to in writing, software distributed under the License
+is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the specific language
+governing permissions and limitations under the License.
+ About 2nd place solution for Avazu click-through rate prediction competition License Activity Stars 437 stars Watchers 35 watching Forks 249 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

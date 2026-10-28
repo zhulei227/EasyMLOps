@@ -1,0 +1,77 @@
+url: https://github.com/geffy/kaggle-malware
+fetched: 2026-10-27
+chars: 4429
+
+GitHub - geffy/kaggle-malware: Kaggle &#39;Microsoft Malware Classification Challenge&#39; 3rd place solution · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ geffy kaggle-malware Repository navigation Code Issues 2  ( 2 ) Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-malware Public Notifications You must be signed in to change notification settings Fork 54  ( 54 ) Star 90  ( 90 ) You must be signed in to star a repository About Kaggle 'Microsoft Malware Classification Challenge' 3rd place solution Resources Readme Activity Stars 90 stars Watchers 7 watching Forks 54 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 5 Commits 5 Commits Folders and files Name Name Last commit message Last commit date src src     README.md README.md     create_dirs.sh create_dirs.sh     description.pdf description.pdf     final-submission-builder.ipynb final-submission-builder.ipynb     how-to-run.pdf how-to-run.pdf     learning-4gr-only.ipynb learning-4gr-only.ipynb     learning-main-model.ipynb learning-main-model.ipynb     semi-supervised-trick.ipynb semi-supervised-trick.ipynb     View all files Repository files navigation README More items Kaggle 'Microsoft Malware Classification Challenge' 3rd place solution 
+ Mikhail Trofimov, Dmitry Ulyanov, Stanislav Semenov. 
+ Gets score 0.0040 on private leaderboard 
+ How to reproduce submission 
+ Don't forget to check paths in ./src/set_up.py! 
+ ./create_dirs.sh
+cd ./src
+./main.sh
+cd ../
+
+ and run all the code in
+ learning-main-model.ipynb ,
+ learning-4gr-only.ipynb ,
+ semi-supervised-trick.ipynb and
+ final-submission-builder.ipynb . 
+ Dependencies 
+
+ python 2.7.9 
+ ipython 3.1.0 
+ sklearn 0.16.1 
+ numpy 1.9.2 
+ pandas 0.16.0 
+ hickle 1.1.1 
+ pypy 2.5.1 (with installed joblib 0.8.4) 
+ scipy 0.15.1 
+ xgboost-0.3 
+
+ Hardware 
+ We run this code on machine with 16 cores and 120 GB RAM.
+The most memory-consuming part is processing 4-gramms. All the others will require no more than 32 GB RAM. 
+ About Kaggle 'Microsoft Malware Classification Challenge' 3rd place solution Resources Readme Activity Stars 90 stars Watchers 7 watching Forks 54 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

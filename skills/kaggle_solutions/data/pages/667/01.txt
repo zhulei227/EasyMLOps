@@ -1,0 +1,477 @@
+url: https://www.kaggle.com/c/neurips-open-polymer-prediction-2025/writeups/1st-place-solution
+fetched: 2026-10-27
+chars: 37822
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — NeurIPS - Open Polymer Prediction 2025
+1st Place Solution
+
+NeurIPS - Open Polymer Prediction 2025
+
+Solution Writeup · 1st place · Sep 17, 2025
+
+Overview
+
+My solution is an ensemble of BERT, AutoGluon, and Uni-Mol models. I believe the unique aspects that allowed me to win were:
+
+Post-processing the predicted glass transition temperatures to account for a distribution shift between the training & leaderboard datasets.
+Pretraining the BERT models on a pseudolabeled subset of PI1M.
+
+I also got major gains from training on external labeled datasets and some tabular feature engineering tricks, but doubt those aspects were particularly unique.
+
+Scores for each of the models in my final ensemble are included below. These are raw scores, without the postprocessing trick. All models in the final ensemble were property-specific (not multi-task), so each row below corresponds to 5 models of the same type producing predictions for each of the 5 target properties.
+
+Model	Public LB score	Private LB score
+ModernBERT-base	0.059	0.089
+CodeBERT	0.058	0.090
+AutoGluon	0.062	0.091
+Uni-Mol 2 84M	0.062	0.091
+
+
+
+
+Ensemble scores:
+
+Post-processing used?	Public LB score	Private LB score
+No	0.058	0.089
+Yes	0.054	0.075
+
+
+
+
+External datasets used:
+
+Metrics from 1,116 MD simulations I ran locally
+PI1M (my pseudolabeled subset)
+LAMALAB curated Tg
+RadonPy sample data
+Seok et al.
+Borredon et al.
+Duke ChemProps
+
+Inference notebook: https://www.kaggle.com/code/jsday96/polymers-tabular-bert-unimol
+
+Training, test, and data generation code: https://github.com/jday96314/NeurIPS-polymer-prediction
+
+Post-processing
+
+tl;dr - the key trick was submission_df["Tg"] += (submission_df["Tg"].std() * 0.5644)
+
+The long version:
+
+I did not trust that the LB test data was fully fixed after the last update, so I did some probing to check for distribution shifts by adjusting the predictions for each property by +/- 0.1 * (the standard deviation of the predictions for that property). This revealed something fishy was going on for Tg, but I didn't try to investigate or aggressively exploit it immediately because I figured it might be random noise, and if something was genuinely broken someone else would probably complain. Then, in the last week I started probing to figure out the optimal offset, which revealed something was seriously wrong with the test data. A plot of those results is included below. This is partially based on some supplemental probing I did via late submissions after the competition, the results used to decide how my post-processing should work were less complete.
+
+There's no way the raw Tg predictions of the ensemble I was applying the offset to were off by that much, even for the public LB data with sparse labels, so the incomplete probing with coefficients <= 0.5 were sufficient to convince me something was broken in the test data. It was so bad that I didn't even think the low row count and potential for sparse labels were sufficient for random noise to be a plausible explanation; a p-value I calculated based on some sketchy assumptions came out to < 0.01, so I viewed this as statistical evidence that there over a 99% chance the test dataset's labels were systematically incorrect, random noise was not a plausible explanation.
+
+I was thinking that if the labels were off by a constant bias term (due to a bug in the host's data preparation pipeline), the relationship between the "bias coefficient" (the 0.5644 magic constant in the tl;dr) and the LB scores would likely be some sort of "V" shaped curve, with linear functions on either side of some optimal point, and with slopes that had opposite signs but identical magnitudes. Based on the public LB scores with bias coefficients <= 0.5 or == 1.0, it was possible to fit a V shaped curve that fit the data near-perfectly, and the predicted optimal coefficient was 0.5644, which indeed scored better on the public LB than anything I had tried thus far. I also tried stepwise functions that apply higher or lower offsets to the raw predictions in certain ranges, and ones with linear slopes that depend on the Tg predictions, but couldn't quickly get any of those approaches to score better than a simple constant bias that's the same for all predictions, so that's what I went with for one of my final submissions. The other final submission just produced raw Tg predictions, in case the problem was fixed in the private LB data (which it wasn't).
+
+Now that the private LB scores are revealed, it is pretty obvious that whatever caused the training vs. public LB distribution shift was even worse for the private LB data, but I couldn't see that until the end. As a result, the post-processing I chose was somewhat suboptimal, but I didn't get blindsided anywhere near as badly as most other competitors.
+
+Handling dirty training labels
+
+The leaderboard's test dataset wasn't the only one with dirty labels, all of the external datasets I trained on had their own unique undesirable quirks too. Typically a mixture of random label noise, labels that had a strange non-linear relationship with the ground truth, labels that were off by some constant bias factor, and/or outlier samples that were way out of distribution. I dealt with this using a mixture of 5 strategies, outlined below. A combination of the first 3 strategies was sufficient to extract something useful from most datasets, the last 2 were only used in rare cases.
+
+Label rescaling: I predicted the properties of each polymer using a fairly strong ensemble trained on only the host's original training data (one whose predictions had a very nice linear relationship with the "ground truth" during cross validation testing), then trained an isotonic regression model to predict that ensemble's predictions based on the raw dataset labels, then used that isotonic regression models predictions as rescaled labels. Idea being that if the dataset's raw labels are off by some constant bias factor or have a strange non-linear relationship with the ground truth, the isotonic regression model would lear to adjust for that and produce cleaner labels. To reduce overfitting, the labels used to train my final were frequently a weighted average of the raw labels and rescaled, with weights tuned by optuna on a per-dataset basis.
+Error-based data filtering: After the rescaling step above, my code computes the absolute difference between each label and an ensemble's predictions, then discards all samples for which that error exceeds some threshold. These thresholds were typically expressed as a ratio of the sample error to the mean absolute error observed for the ensemble when testing against the original host dataset, so the thresholds for all properties were in a similar range, which made it easier to define a search space for Optuna to explore when finding the optimal configuration.
+Sample weighting: Even with the cleaning steps above, some datasets were still lower-quality than others. As a result, I had optuna tune the sample weights on a per-dataset basis, so models could pay less attention to the training examples from lower-quality datasets.
+Semi-manual filter rule: The "data.csv" file in RadonPy's GitHub repo has some thermal conductivity values that I thought were suspiciously high (based on a scatter plot of an ensemble's predictions vs the dataset's labels). As a result, I created a variant of it which drops all the rows with Tc values above 0.402. Optuna commonly favored this version over the original when tuning the external data usage configuration, so I think this filtering was beneficial for most models.
+Model stacking: I didn't use the cleaning approaches above for the properties or molecular descriptors based on MD simulations I ran myself. Partially because the data I generated myself had supplemental metrics that I wanted to make use of, and partially because I had a gut feeling that some of my labels might be so dirty that no amount of filtering, rescaling, and reweighting would be able to extract anything useful from them. As a result, I instead trained an ensemble of 41 XGBoost models to predict the simulation results, then used the predictions of those models as supplemental features that got fed to AutoGluon as inputs in the tabular part of my solution. Idea being that the 2nd level models could learn to make predictions based on whatever wacky non-linear relationships might be present in the data. For the tabular models, this gave me a CV wMAE score improvement of ~0.0005 vs. not using the simulation results at all, so I think it was useful.
+
+To keep cross-validation results consistent when tuning the external data configurations, and prevent unrealistic test samples from impacting my CV scores, cross-validation scores were computed using only samples from the original host data for testing purposes. Broadly speaking, the CV strategy was to train on 100% of the selected external data + 80% of the host data, then test on 20% of the host data, then repeat that process 5 times with different host data held in reserve each time.
+
+I didn't keep careful track of how much items 1 - 4 above helped, but Optuna liked them enough to enable them with some rather aggressive configurations, so I think they were at least beneficial in local cross-validation testing.
+
+Deduplication
+
+Many of the datasets contain polymers that are duplicates or near-duplicates of one another. I dealt with this using a mixture of two strategies, with more aggressive deduplication to avoid leakage between the training and test sets than duplicates within the training data.
+
+Eliminating duplicates within the training data: I converted all SMILES strings to their canonical format before checking for duplicate SMILES. If two training examples had identical canonical SMILEs, the one with the lower sample weight (selected by Optuna based on the dataset it originated from) was dropped. This causes duplicates from datasets with lower-quality labels to be dropped in the event of conflicting labels. And because all SMILES are converted to their canonical format before deduplication, minor notation discrepancies are not sufficient to fool this deduplication logic.
+Avoiding train vs. test leakage: For each test fold, Tanimoto similarity scores between all possible pairs of training and test monomers were computed, and any training example with a similarity score above 0.99 vs. any monomer in the test dataset was dropped to eliminate near duplicates. In retrospect, while near-duplicates with different canonical forms are present, they don't have much cross-validation score impact if I let them through, so I think just checking for exact-duplicate canonical SMILES would likely be adequate. This filtering mostly stems from a bug which caused me to see unrealistically "good" CV scores and become even more paranoid than usual in regards to eliminating data leakage; I kept it around even after the bug was fixed.
+BERT
+
+My BERT models were trained in 2 stages, after whatever pretraining was done to compute the pretrained weights on the HuggingFace hub.
+
+Pretraining on PI1M: I used an ensemble of BERT, Uni-Mol, AutoGluon, and D-MPNN models to predict the properties of 50,000 hypothetical polymers from PI1M, then pretrained other BERT models on a classification task to predict which pairs of polymers had higher or lower property values than one another. Loss values were ignored for pairs with similar property values, which reduced the degree to which the models were exposed to label noise related to inaccuracies in the raw ensemble predictions. For efficiency, this was a multi-task classification objective; models were pretrained to compute classification results for all 5 properties at once, so I didn't have to train separate foundation models for each property. This was inspired by the paper "RankUp: Boosting Semi-Supervised Regression with an Auxiliary Ranking Classifier", but I found using it for pretraining with precomputed pseudolabels to work better than the online version described in the original paper. It improved the scores of my BERT models by ~0.004 LB, ~0.01 CV in comparison to just using pretrained model weights from HuggingFace (tried 5 different third-party foundation models, and adding this additional pretraining stage boosted all of their scores). Some of the models finetuned after this pretraining tuned out more accurate than the original teacher ensembles used to compute the pseudolables, so I believe it was more effective than standard knowledge distillation.
+Finetuning: Most aspects of this were very standard for a BERT finetuning script - AdamW optimizer, no layers frozen, one cycle learning rate schedule with linear annealing, automatic mixed precision, learning rate + batch size + epoch count tuned using optuna, gradient norms clipped to 1, etc. The only things that felt a bit unusual or domain-specific were the data augmentation strategy and use of separate learning rate schedules (with different max_lr values) for the regression head and the backbone. Data augmentation is discussed more in its own section later. As for the dual max_lr trick (to set the head's learning rate to a value higher than the one used for the backbone), I heard of people doing that before, and had heard it is commonly beneficial for small datasets, but had never used it myself. For most foundation models and target properties in this competition, I found it slightly beneficial to set the head learning rates an order of magnitude higher than the backbone learning rates. The training datasets were relatively small, so that wasn't too surprising.
+
+Data augmentation:
+
+Training-time augmentation: During both pretraining and finetuning, I used Chem.MolToSmiles(..., canonical=False, doRandom=True, isomericSmiles=True) to create 10 non-canonical SMILES per input SMILES to increase the amount of training data ~10x. I also tried randomly using Kukulized SMILES, removing stereochemistry, and making the hydrogens & bonds more explicit, but those augmentations were not beneficial.
+Test-time augmentation: My inference code generates 50 predictions per SMILE using the same data augmentation strategy used during training, just with the amount of random variation increased 5x. The final predictions for each BERT model were the median of those 50 predictions.
+
+Test time augmentation alone provided a LB improvement of ~0.01 in one early experiment. My notes are too badly fragmented to say exactly how much the training data augmentation helped without additional ablation testing, but I'm under the impression it was very beneficial too, and a training data augmentation factor of 10x was optimal to within a margin of +/- 30% (unlike test time augmentation, more is not better).
+
+Foundation model selection:
+
+Chemistry-specific foundation models aren't very good: In one round of experiments without pseudolabeled training data, the best CV wMAE score achieved with ChemBERTa was 0.0634, the best score achieved with polyBERT was 0.592, and the best score achieved with ModernBERT-base was 0.0584. So, the general-purpose model beat anything chemistry or polymer specific.
+Bigger models aren't better: Using tuning and testing methodology identical to #1, above, ModernBERT-large scored 0.0587 whereas -base scored 0.0584. So scaling up made the score worse. DeBERTa-v3-large's scores also sucked, so I don't think this behavior was isolated to the ModernBERT family.
+Pretraining on code is better than natural language: The DeBERTa cross-validation results were so bad I didn't bother recording them or submitting any DeBERTa models, but I have vague recollections DeBERTa-v3-large was roughly as bad as ChemBERTa, substantially worse than ModernBERT-base or ModernBERT-large. While thinking about why that might be, I recalled that the ModernBERT family also scores disproportionately well on programming-related benchmarks, and had a relatively large amount of code in its pretraining dataset, so this caused me to wonder if a model trained on an even higher ratio of code to natural language would score even better, which led me to trying CodeBERT. CodeBERT wound up being ~tied for being my best single model. Slightly better than ModernBERT-base in cross-validation testing and on the public leaderboard, slightly worse on the private leaderboard, but generally close enough to be within margin of error, and substantially better than anything purely trained on chemistry or English data.
+Tabular models
+
+Feature engineering: Features were selected from the broad categories below. I used Optuna to tune what features were used for each property and type of tabular model that I tried. It was able to drop entire feature categories, adjust fingerprint dimension counts, and perform importance-based feature selection for molecular descriptors. Feature importance scores were precomputed for an ensemble of XGBoost and LightGBM models, averaged across target properties, and shared across subsequent runs. Optuna was able to tune how many of the top-N features of each type were kept.
+
+All of the 2D and graph based molecular descriptors supported by RDKit.
+Morgan fingerprints.
+Atom pair fingerprints.
+Topological-torsion fingerprints.
+MACCS keys.
+The networkx based graph features I saw used in many public notebooks.
+An extended version of the backbone vs. sidechain features I saw proposed in this public notebook. I had ChatGPT and Gemini brainstorm an extra 107 features that could be computed with the same general data preparation strategy.
+Predictions from an ensemble of 41 XGBoost models I trained to predict the results of MD simulations I ran myself (FFV, density, Rg predictions + a bunch of 3D structure related descriptors).
+Embeddings from polyBERT models pretrained on PI1M (the same pretraining strategy as my best BERT models, but without the final finetuning stage) - this was bolted on at the end, so not tuned as carefully as my usage of other feature types.
+~17 other miscellaneous features that were suggested by Gemini: some topological & shape based descriptors, Gasteiger charge statistics, and element composition and bond type ratios.
+
+Data generation: As mentioned above, I ran molecular dynamics simulations for over 1,000 hypothetical polymers from PI1M, and used it to train models whose predictions were used as supplemental features for other tabular models, which improved my CV scores slightly (~0.0005 wMAE). I took a lot of shortcuts to save CPU time, this was really complicated to setup, and I had no prior MD experience, so it is a small miracle the results were useful at all. The main steps in my data generation pipeline are outlined below.
+
+Picking the conformation search config: I had a fast unstable configuration that crashes or hangs for ~half of the polymers and a slower configuration that takes ~5x longer (i.e. ~5 hours per polymer instead of ~1 hour). I trained a LightGBM classification model to predict which polymers would cause the crashes based on their RDKit molecular descriptors, some of the higher-importance backbone vs. sidechain features, and the results of ETKDGv3 based conformer generation & MMFFOptimization (which quickly produces inaccurate conformers - the random errors and potential energy statistics from this step were useful clues to predict problems that would be encountered by downstream code). This allowed my data generation code to downsample the difficult polymers and jump straight to using the fast unstable config for the easy ones. The "fast unstable" config is based on psi4's Hartree-Fock geometry optimization method, the "slow stable" config is based on "b97-3c". There might be a one-size-fits-all configuration that gets the best of both worlds, but this was the best I could come up with in under a week, as a complete chemistry/molecular dynamics novice.
+Conformation search: RadonPy makes this simple, other than the configuration selection step above.
+Polymerization: The degree of polymerization was automatically adjusted to have ~600 atoms per chain regardless of the monomer size. RadonPy makes this fairly simple.
+Charge assignment: RadonPy makes this simple.
+Amorphous cell generation: I used 10 chains per cell with a starting density of 0.15. RadonPy makes this simple.
+Equilibrium simulation: This works by running LAMMPS as a subprocess. I built LAMMPS from source because I couldn't find a good precompiled executable with GPU support. @hengck23's LAMMPS starter was immensely useful when figuring out how to run it, although I did tinker with the settings a bit in order to get more realistic density results (which more closely matched the host data), improve throughput, and fix some miscellaneous errors. No longer recall all the differences - the problems were less 'interesting' than figuring out a viable conformation search config, so they barely registered in memory.
+Property & molecular descriptor estimation: This is a bunch of LLM-slop which ingests the raw simulation results and uses MDAnalsysis, RdKit, and a few hundred lines of custom logic to estimate FFV, Density, Rg, all of the 3D descriptors available in RDKit (for both the monomer and a full polymer change), and a bunch of statistics that ChatGPT thought would be useful that I never took the time to fully understand. My general philosophy was to compute all the features I could get my hands on, then compute feature importance values and let Optuna sort out which ones are worth keeping. The top-5 most important (according to XGBoost and LightGBM) were the FFV, density, NPR1, NPR2, and Eccentricity values, but Optuna found it beneficial to keep way more than that. It was sort of all-or nothing; for 3/5 targets it chose to keep all 41, for the other 2 (density and Rg) it decided to drop them all entirely. Importance based feature selection was not particularly useful when the results were used in conjuction with AutoGluon, possibly because the top features were poisonous in some way (maybe they caused overfitting for some targets?), but I did observe some gain when using it in conjunction with GBDT models.
+
+AutoGluon vs. "traditional methods": AutoGluon's "best" quality preset with a 2 hour limit for each property was able to beat an ensemble of XGBoost, LightGBM, and TabM models that I tuned with Optuna and ~20x that amount of compute (not counting data preprocessing tuning, which was in the ballpark of ~1 day per downstream prediction library I paired it with, or all the other models I tried before settling on XGB + LGBM + TabM for the relatively manual ensemble). Its wMAE score was ~2% better than the relatively manual ensemble, good enough that it was not useful to make an ensemble of AutoGluon + my more manually constructed ensemble. The "best" quality AutoGluon runs are very slow, so to let the data tuning run in a reasonable timeframe with a decent trial count I paired it with "good" quality AG runs with a 5 minute time limit. This was my first time using AutoGluon, and I found it very impressive. The level of effort invested in the manual ensemble was maybe only a third of what I used to win the UM MCTS competition, so it is plausible I could beat it if I really pulled out all the stops and wasn't distracted by non-tabular experiments, but I was absolutely gob-smacked by AutoGluon's efficiency. The "extreme" quality present introduced in AG 1.4.0 is supposedly even more accurate and efficient, but I did not observe any benefits when I tried switching over to it (possibly because the feature counts were too high for it to use all of its models - I saw some errors about that), so the tabular predictor in my final ensemble was created with the "best" quality preset.
+
+3D models (Uni-Mol 2 84M)
+
+This was the simplest of all the models accurate enough to make it into my final ensemble. Little more than tossing merged, cleaned, datasets for each target property into unimol_tools.MolTrain and using Optuna to tune the learning rate, epoch count, and batch size. It didn't require any feature engineering or a custom training loop. I didn't even tune the settings of my data preparation code; they were roughly the median of some configurations I tuned for various types of tabular models. The only real catches were that (1) this was more memory intensive than any other model I tried, so much so that OOM errors occur on 24 GB GPUs if the training data contains any monomers with more than ~130 atoms and (2) the FFV results weren't very good. The OOM issues were more of a problem for FFV than for any other target (because the FFV training datasets have bigger monomers than the ones for any other property), but even after upgrading to an RTX 5090 that could run the training with less restrictive filtering and letting Optuna spend several days on hyperparameter tuning I still wasn't able to get FFV results that were accurate enough to be useful. So Uni-Mol 2 only made it into the final ensemble for 4 of the 5 targets, AutoGluon and the BERTs were used for all 5.
+
+Things that didn't work as well
+GNNs (D-MPNN)
+The GMM-based data augmentation strategy I saw used in public notebooks.
+Author
+James Day
+
+jsday96
+
+arrow_drop_up
+116
+Share
+more_horiz
+Citation
+
+James Day. 1st Place Solution. https://www.kaggle.com/competitions/neurips-open-polymer-prediction-2025/writeups/1st-place-solution. 2025. Kaggle
+
+34
+comment
+15 Comments
+1 appreciation comment
+Hotness
+Fanjin Wang
+
+Posted a year ago
+
+· 578th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats James! This is very impressive and a lot to learn from your solution. Very much appreciated. And it's quite interesting to see that polyBert/chemberta performed worse than general ones - any clue?
+
+reply
+Reply
+Fanjin Wang
+
+Posted a year ago
+
+· 578th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Also may I ask if you've done anything to those SMILES with multiple stars (*>2) in your data cleaning? Did you notice any performance change excluding/augmenting them?
+
+reply
+Reply
+James Day
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Good questions.
+
+"it's quite interesting to see that polyBert/chemberta performed worse than general ones - any clue?" - I suspect it was likely a combination of two factors:
+
+My "bigger is not better" observation might only be true for models in the regime of 100+ million parameters. polyBERT and ChemBERTa are both quite small even in comparison to medium sized BERT models from other domains, so they might not have enough capacity to fit the data properly (i.e. they might be below the threshold at which scaling up is no longer beneficial). The way to check this theory would be to compare against something like ModernBERT-small, but ModernBERT doesn't have a "-small" variant, I wasn't impressed by the DeBERTa large results, and CodeBERT only comes in a single size, so I didn't check that.
+The pretraining strategies used by ChemBERTa and polyBERT might not teach the models any useful high-level concepts. I sometimes find that pretraining models on anything is better than using random initial weights (similar to how pretraining convnets on image classification tasks can boost audio classification accuracy), so it is quite possible the pretraining strategies used by the original researches didn't teach the models any useful domain-specific information. Any accuracy gains observed by the original researchers stemmed from other factors (like having a better initial weight distribution, or token embeddings that are more orthogonal to one another).
+
+"may I ask if you've done anything to those SMILES with multiple stars (*>2) in your data cleaning? Did you notice any performance change excluding/augmenting them?" - I didn't try anything special to account for the variations in placeholder counts. However, I did try replacing all the placeholders with C or At atoms. That seemed to yield small accuracy gains for some properties, but there was no replacement strategy that outperformed the baseline for all properties, and just leaving the placeholders/attachment points as-is had better overall wMAE scores, so I didn't do anything to replace them in my final solution.
+
+reply
+Reply
+2
+1
+yuhui Yao
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+thanks for nice information,very nice work
+
+reply
+Reply
+Zach Chn
+
+Posted a year ago
+
+· 1269th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Deserved, very nice work
+
+reply
+Reply
+Guanshuo Xu
+
+Posted a year ago
+
+· 384th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to your second solo win!
+
+reply
+Reply
+Hamza Abbas
+
+Posted a year ago
+
+· 838th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Amazing work James @jsday96 ! 🚀 The way you tackled distribution shifts and label noise with such a thoughtful ensemble of BERT, AutoGluon, and Uni-Mol is super impressive. The Tg post-processing trick was especially clever. 👏 Curious .. did you find AutoGluon consistently outperform your manual ensembles across all properties, or were there cases where the handcrafted approach still held an edge?
+
+reply
+Reply
+James Day
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It is a bit hard to answer your question precisely because:
+
+Most of my 5-fold cross validation runs with AutoGluon used the "good" quality preset & 5 minute time limit for each tabular predictor not "best" quality and 2-3 hour time limit. And no "best" quality 5-fold run ever had GPU acceleration enabled. I only used heavy configurations like that once I was done tuning all the data preparation settings, at which point I no longer held any data in reserve for testing purposes.
+All of my hyperparameter tuning for most models was done to directly improve my 5-fold cross validation scores, whereas AutoGluon does its own internal cross-validation, which I believe caused the results for other models to be relatively prone to overfitting to my cross validation, thereby causing their scores to be unrealistically "good". They had bigger search spaces and ~10x more Optuna trials, thereby letting them viciously exploit any random noise that is present in the test results, possibly in ways that can't be fully mitigated by changing the data partitioning seed after the tuning is done. The existence of AG's internal cross validation means my CV scores for AutoGluon are more analogous to nested 5-fold cross validation than standard 5-fold cross validation, and the number of Optuna trials done to improve them was lower, so I believe my CV results for AutoGluon were more robust.
+
+That being said, a comparison between a CPU-only "best" quality AutoGluon run with a quarter of the usual runtime limit and one of my stronger LightGBM runs is included below.
+
+Property	AutoGluon score	LightGBM score
+Tg	43.1	42.5
+FFV	0.0048	0.0047
+Tc	0.0241	0.0241
+Density	0.022	0.023
+Rg	1.27	1.25
+
+
+
+
+So, if you take the results at face value, it seems LGBM beat AG on 3/5 properties, with 1 tie, but I'd take those results with a huge grain of salt for the reasons above. Heavy AG configurations beat an ensemble of LGBM + XGB + TabM by a margin of 0.001 - 0.002 on the public leaderboard, and ensembling with the manual models did not yield a public LB improvement, which I viewed as a fairly credible indicator that the manual ensemble was not worth using, more credible than anything observed in cross validation results that I viewed as less-trustworthy. They were perfectly tied on the private leaderboard, so this decision wound up not mattering much - there was no "wrong" answer when deciding which semi-final tabular ensemble to incorporate into the final mega-ensemble.
+
+Broadly speaking, I think the main benefits of my manual involvement were located in the data preparation, post-processing, and non-tabular model selection/tuning aspects of the competition. AutoGluon was embarrassingly hard to beat on the tabular modeling side of things.
+
+reply
+Reply
+2
+tennogh
+
+Posted a year ago
+
+· 24th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thank you for sharing.
+Interestingly I tried a similar approach to clean the extra data and it ended it up worsening my LB (possibly because the bias in the datasets is actually good for the final score).
+
+I had the same experience with Autogluon outperforming my own models, it favored a lot of Tabm for most targets. I wasn't able to exploit the extreme quality setting either, I think it requires <500 features and too much memory for Kaggle notebooks.
+
+It would be interesting to see scores without Tg to know how much the postprocessing affected the end result (since the scores with no processing are still not reliable due to the data issues).
+
+reply
+Reply
+James Day
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! You did really well yourself. A few thoughts about your observations:
+
+I recall getting a slight public LB gain from the external data cleaning & reweighting, but looking back at old submissions it appears to have backfired on the private LB. My best submissions without post-processing are all ones which used a lot of uncleaned external datasets. A haphazardly constructed ensemble that was originally meant to exploit the data leaks scored ~0.087, which is better than my final solution (~0.089 without post-processing). I have a suspicion this means the private LB suffered from some problems similar to the external datasets, it might be more than just the singular Tg bug. I wish they'd share their LB data so we could investigate 🙁.
+Interesting that you saw AutoGluon favoring TabM - I didn't pay much attention to what it was using. In manual experiments, pytabkit's TabM implementation worked better than RealMLP or random forests, ~on-par with CatBoost, and a bit worse than XGBoost or LightGBM. pytabkit doesn't support setting sample weights, which may have put it at a disadvantage vs. other libraries; I recall wondering if maybe TabM could beat the other models if I worked around that limitation (similar to how I used TabM in the UM MCTS competition, prior to pytabkit's initial release), but never got around to prioritizing that.
+AutoGluon's "extreme" quality preset is capable of running with > 500 features, it just skips some of the models it would ordinarily try. I ran it on a local machine with 96 GB RAM & a 32 GB GPU, so I wasn't constrained by Kaggle notebook memory limits. It still wasn't better than "best" quality though.
+Yeah, I'd also be very curious how all the solutions score on clean data. The prospect of a rescore is a bit scary to me though; the problem with being #1 is there's nowhere for me to go but down 😂.
+reply
+Reply
+tennogh
+
+Posted a year ago
+
+· 24th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I think extreme quality is identical to best if it skips those models. I wonder if there is really a benefit to using them but I didn't get around testing that.
+
+Anecdotally my tabular models with no pre or post processing scored between .86 and .91, but they might still benefit from the data problems in some hidden way (I got pretty lucky with the final score).
+
+reply
+Reply
+EasonDD
+
+Posted 2 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi jsday96 — congratulations again on the 1st place finish! I've been studying your open-sourced repo and learned a ton from it. While reading the feature code I noticed something small I wanted to share with you:
+
+In tabular/train.py, get_feature_vector(), the # GET TORSION FINGERPRINT. block (~line 198) creates the generator with
+torsion_generator = rdFingerprintGenerator.GetAtomPairGenerator(fpSize=torsion_dim)
+while the variable name and config key suggest it was intended to be GetTorsionGenerator(fpSize=torsion_dim). As written, the "torsion" fingerprint is actually a second atom-pair fingerprint at a different size. The same snippet also appears in data_preprocessing/relabeling.py (~line 552) and several old_experiments/fingerprinting_*.py versions.
+
+Totally not questioning the results — since the whole pipeline was tuned around the actual computed features, everything remains perfectly valid and reproducible as-is. I just thought you might like to know, in case you want to fix the naming or correct it in a future update. 😊
+
+Thanks again for sharing such a complete and educational solution!
+
+reply
+Reply
+Sterolose
+
+Posted a year ago
+
+· 200th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Really deserved, thanks for sharing! From your perspective, what made your solution so robust and stable — the careful dataset merging, the diverse ensemble, or mainly the Tg post-processing trick?
+
+reply
+Reply
+James Day
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I think post-processing was the main factor.
+
+More broadly speaking, in most competitions I like to diversify my final submissions by having one that's purely optimized for my local CV ("trust CV") + one that's a bit overfitted to the public LB ("trust LB"). I think that's a pretty good way to survive shakeup. In this case, the private LB data was more similar to the public LB data than the data I was using for local cross-validation, so the "trust LB" submission won.
+
+reply
+Reply
+1
+rezayov
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Tunak Tunak tun tunak tunak tun tunak tunak tun da da da
+
+reply
+Reply
+Quang Dũng
+
+Posted a year ago
+
+· 12th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+It’s beautiful! Looking forward to the code 👀
+
+reply
+Reply
+1
+Appreciation (1)
+Kaiser
+
+Posted a year ago
+
+· 51st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Woa , thank for sharing solution

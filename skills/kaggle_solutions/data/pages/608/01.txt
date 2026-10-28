@@ -1,0 +1,635 @@
+url: https://www.kaggle.com/c/home-credit-credit-risk-model-stability/discussion/508337
+fetched: 2026-10-27
+chars: 17426
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+[1st Place Solution] My Betting Strategy — Home Credit - Credit Risk Model Stability
+[1st Place Solution] My Betting Strategy
+
+Home Credit - Credit Risk Model Stability
+
+Solution Writeup · 1st place · May 31, 2024
+
+Foreword
+
+Hello, this is yuuniee. Thank you to the competition host Home Credit and staff, Kaggle staff and everyone involved.
+
+The image below is a summary of my solution.
+
+The maximum Private LB Score for my model pool without Metric Hacking is close to about 0.53.
+
+As everyone knows, this competition takes place in two phases. Phase 1 was ML (Machine Learning), and Phase 2 was MH (Metric Hack). I will briefly introduce each part. (If you are only curious about ML, please read only Phase 1.)
+
+I. Phase 1 - ML (Machine Learning)
+
+Thank you for writing a great notebook for EDA and solution construction at the beginning of the competition. @sergiosaharovskiy - https://www.kaggle.com/code/sergiosaharovskiy/home-credit-crms-2024-eda-and-submission @greysky - https://www.kaggle.com/code/greysky/home-credit-baseline Additionally, I would like to thank the many participants who provided various insights.
+
+The CV strategy is StratifiedGroupKFold, and has been tested and trained in various forms: No Shuffle and Shuffle. In my case, differences in CV of around 0.001 to 0.005 had a low correlation with LB, while differences above 0.01 had a high correlation with LB. In addition, CV improvement through model parameter adjustment had a relatively low correlation with LB, and CV improvement through FE had a relatively high correlation with LB.
+
+There's nothing special about Feature Engineering. Max, Min, Avg, Var, First, Last and Max-Min Difference of each item were utilized. (I will release the code after cleaning it up.)
+
+LGBM was a bit lacking compared to Catboost, but was good for the ensemble. The reason why the number of features is smaller is because some items (mainly categorical types) were excluded because they caused performance degradation and overfitting in LGBM, and other slightly different types of features were added and deleted.
+
+DNN is a Denselight model and utilizes the LightAutoML library. There were some bugs, so I had to fix some of them myself, but overall, I think it is a good library. At first, I planned to lightly test with Denselight and then build the final model with a larger model (FT-Transformer, etc.). Surprisingly, I haven't created or found a model that beats Denselight performance. Perhaps I made a mistake, or the nature of the data is sensitive to overfitting, so I guess a simpler model worked better.
+
+Catboost was the model that performed best in this competition and I guess it performed well on a large number of categorical features (about 117).
+
+During this period, my public LB was close to top 5 and the competition seemed to be going very smoothly. But…
+
++ What didn't work
+Transformer type models such as Tabnet, TabTransformer, FT-Transformer, etc.
+Income, expenditure, and tax statistics by period (month, week, etc.).
+Differences between individual income, expenses, and taxes.
+K-means clustering
+II. Phase 2 - MH(Metric Hack)
+
+Pointed out problems with MH at the beginning of the competition, @at7459 - https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/discussion/476449 Announced the revival of MH in the latter half of the competition, @johnpateha - https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/discussion/497167
+
+Also, thanks to the many participants who suggested various other comments and solutions. Thanks to you, my knowledge has expanded. In particular, the two people above are true scientists and journalists who could have hidden this discovery and profited from it, but pursued the public interest by exposing it to everyone. (Why not consider Kaggle giving a special award for this sharing?) As a result, the problem was not solved, but we learned something(?) from it and at least I was able to take minimal measures.
+
+After @johnpateha's "Metric hack again, sorry" post, I tried Data Reversing and found that the difference between date_decision and min_refreshdate_3813885D had a high correlation (about 0.9 or more) with WEEK_NUM. (More information can be found at https://www.kaggle.com/code/eivolkova/how-to-restore-the-dates?scriptVersionId=180157891, published by @eivolkova immediately after the competition.) And the way suggested by @at7459:
+
+DEVIDE = 1/2
+REDUCE = 0.02
+condition = df['WEEK_NUM'] < (df['WEEK_NUM'].max()-df['WEEK_NUM'].min())*DEVIDE+df['WEEK_NUM'].min()
+df.loc[condition, 'score'] = (df.loc[condition, 'score'] - REDUCE).clip(0)
+
+
+Based on this, the results of examining the score details submitted by changing the REDUCE and DEVIDE values ​​were as follows.
+
+The public/private division of test data spans the entire period and it is difficult to identify a specific distribution, and the optimal value in private will probably be distributed around 1/4 to 3/4.
+The optimal public LB value of REDUCE is 0.03 (at least in my model), and the optimal value in private is probably distributed around 0.02 to 0.04.
+
+The difference in pure model performance between top competitors was 0.00X, Since the difference due to the above adjustment value was 0.0X, At this stage it became gambling for me.
+
+Some will bet low, others will bet high. Here, I trusted my model and chose neutral, and chose DEVIDE=1/2, REDUCE=0.03, which is the median of the expected distribution. I expected someone who bet high or low to take the prize, and I expected about a 50% chance of finishing in the top 10.
+
+III. Conclusion
+
+The first selected submission is the No Hack model with CV Best Score created in Phase 1, and the second selected submission is the application of Metric Hack to it. (I thought there was a high probability that Metric Hack would work, but I also submitted No Hack just in case)
+
+Rather than simply sharing solutions, I thought it would be better to share my experience in detail. To improve the bad parts that happened in this competition.
+
+My ranking was due to luck, and although it is the Best Private Score submitted, it probably won't be Best Solution.
+
+Although the competition ended on a gloomy note due to the metric hacking issue, the host and staff worked hard to make it a meaningful and successful competition.
+
+Based on this, we expect a more developed system in the future.
+
+thank you
+
+Edit : I posted the FE code here. 644(for lgbm) - https://www.kaggle.com/code/yuuniekiri/fork-of-home-credit-risk-lightgbm 661(for cat & dnn) - https://www.kaggle.com/code/yuuniekiri/fork-of-home-credit-catboost-inference
+
+Author
+yuuniee
+
+yuuniekiri
+
+arrow_drop_up
+175
+Share
+more_horiz
+Citation
+
+yuuniee. [1st Place Solution] My Betting Strategy. https://www.kaggle.com/competitions/home-credit-credit-risk-model-stability/writeups/yuuniee-1st-place-solution-my-betting-strategy. 2024. Kaggle
+
+57
+22
+24
+comment
+55 Comments
+4 appreciation comments
+Hotness
+Alexander Ryzhkov
+
+Posted 2 years ago
+
+arrow_drop_up
+5
+more_vert
+
+Hi @yuuniekiri,
+
+Congrats with the great performance and amazing solution! Also I would like to thank you for using LightAutoML models in your solution 😎
+
+DNN is a Denselight model and utilizes the Lightautoml library. There were some bugs, so I had to fix some of them myself, but overall, I think it is a good library.
+
+Could you please share the problems you had with our library using GitHub issue mechanism? It will help us to make LightAutoML better 😊
+
+P.S. If you already have fixes for the problems and you would like to share them, please use the Pull Request mechanism
+
+Alex (Head of LightAutoML team)
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you so much.
+
+LightAutoML is a really convenient and useful library. The problem I had was not fatal, but I will share it there soon. :)
+
+reply
+Reply
+JK-Piece
+
+Posted 2 years ago
+
+· 1754th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi @yuuniekiri, I cannot find the final submission notebook for the first place. Can you please share it?
+
+reply
+Reply
+MKRC7 ⵣ
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congrats @yuuniekiri for the winning. May I ask you what approach did you choose to find the best ensemble weights?
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you for your congrats. My approach is linear regression and weighted testing in OOF. Interestingly, the optimal weights of OOF score was close to the optimal weights of LB.
+
+reply
+Reply
+xianZ_waikato
+
+Posted 2 years ago
+
+· 1231st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Nice share, Congratulations for your first solo gold.
+
+reply
+Reply
+wajyjpku
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats @yuuniekiri for the winning. How do we filter out effective features and toxic features?Thank you for your response in advance.
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+As you can see in the article above, features that have a significant advantage in the CV score are kept, and features that have no advantage are removed. Additionally, even if there is no significant gain in score, logically meaningful and stable features can be kept. This can also apply in the opposite case.
+
+reply
+Reply
+1
+wuuthraad
+
+Posted 2 years ago
+
+· 345th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great work man!
+
+reply
+Reply
+Arjun M97
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your award! Thank you for the solution! Very interesting approach
+
+reply
+Reply
+Muhammed Tausif
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations, thanks for sharing. @yuuniekiri
+
+reply
+Reply
+Suzuki Yuto - W
+
+Posted 2 years ago
+
+· 262nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your award! Thank you for the solution! I will keep this in mind for future reference.
+
+reply
+Reply
+Josmar Augusto Fonseca Barbosa
+
+Posted 2 years ago
+
+· 3766th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wow! Quite a nice job! Congrats!!!
+
+reply
+Reply
+emoji_people
+Octavi Grau
+
+Posted 2 years ago
+
+· 1423rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Amazing @yuuniekiri ! Congrats!
+
+How did you manage OOM errors?
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you for your congrats.
+
+Except when there are more than 1000 features, I have not experienced OOM (Out of memory). But if you're having trouble, the following methods may help:
+
+Capture as many useless features as possible and remove them all.
+Use reduce_memory_useage in the step of reading each file.
+In addition to RAM, GPU RAM is used together. (A representative example is the cuDF library created by NVIDIA's RAPIDS team.)
+When data processing is complete, save the data locally as a file. Then, delete the DataFrame and reset the memory with commands such as gc.collect() and reset.
+In the prediction step, locally stored files are read in chunks and each is predicted.
+reply
+Reply
+1
+dib
+
+Posted 2 years ago
+
+· 1612th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats Yuuniee!! From your shared code I assume you used several models for each model category (LGBM, DNN, Catboost). Were those models the result of each folod of the CV process or were models result of training on the whole train dataset but with different params?
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks a lot. The CV score above is the score for all out of fold(OOF) of 5folds at StratifiedGroupKFold (no shuffle).
+
+reply
+Reply
+narsil (jobs-in-data.com)
+
+Posted 2 years ago
+
+· 2932nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+In addition, CV improvement through model parameter adjustment had a relatively low correlation with LB, and CV improvement through FE had a relatively high correlation with LB.
+
+This is consistently my experience as well on various problems (not only this competition).
+
+reply
+Reply
+Eduardo Toloza
+
+Posted 2 years ago
+
+· 2781st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thanks for the detailed explanation. Finally, the winning solution used the metric hack as was expected for some Kaggle experts.
+
+reply
+Reply
+Etienne Kaiser (郑翊天）
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your second #1 rank competition @yuuniekiri! Even though I didn't participate in the competition, I was following along since the beginning after my initial post some months ago. After reading your straightforward write-up and both notebooks, I totally agree with your choice of models, such as CatBoost, LGBM, and DNN (eventually NaiveBayes would've helped a bit). My only question that I have left is, did you try to use rankdata() after making the predictions? That gave me a huge boost in my first competition with almost exactly the same ensemble models. I'm just curious, if you don't mind, whenever you have time, could you please try a "Late submission" with the following updated part of your "Fork of Home Credit Risk (LightGBM)" at the very end:
+
+Edit after @yuuniekiri comment:
+
+from scipy.stats import rankdata  # <- newly added, import rankdata
+
+del reader
+gc.collect()
+
+ranked_preds = rankdata(y_pred) / len(y_pred)  # <- newly added
+
+df_subm = pd.read_csv(f"{ROOT}/sample_submission.csv")
+df_subm = df_subm.set_index("case_id")
+df_subm["score"] = ranked_preds  # <- newly adjusted
+df_subm.to_csv("submission.csv")
+print(df_subm)
+
+
+Thanks a lot for your try-out and response. Enjoy your preliminary win! Best regards, Etienne
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for your congratulations. However, the submissions resulting from the code above are different from the competition format. (Only two columns are allowed: case_id and score.) It will probably cause an error.
+
+reply
+Reply
+1
+Etienne Kaiser (郑翊天）
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+You're welcome. That's right, I had a logical mistake. We don't need an additional column, I updated my code above (Edit). I looked into my old competition and that's the way how I made it there. Now the predictions should be averaged ranked. Give it a shot, if it doesn't work it's also fine - just for quick testing purpose :) Thanks!
+
+reply
+Reply
+5 more replies
+arrow_drop_down
+Thiago Mantuani
+
+Posted 2 years ago
+
+· 1600th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the placement @yuuniekiri , how did you choose the features for each model? If possible, share your notebook with us.
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you, @thiagomantuani. A notebook link has been added.
+
+reply
+Reply
+nonchokablexd
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations
+
+reply
+Reply
+troostiticgh
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations
+
+reply
+Reply
+Krens
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing such a detailed and insightful breakdown of your solution, yuuniee! Your approach to combining LGBM, DNN, and Catboost models with a weighted ensemble clearly highlights the importance of diversity in modeling techniques.
+
+I particularly appreciate the transparency in discussing both phases of the competition—Machine Learning and Metric Hacking. Your use of StratifiedGroupKFold and various feature engineering techniques, along with your observations about the correlation between CV improvements and LB performance, are incredibly valuable for the community.
+
+The post-processing strategy and the thoughtful discussion on the impact of WEEK_NUM adjustments and the choices around DEVIDE and REDUCE values offer practical insights into handling similar challenges.
+
+It's also commendable how you acknowledged the contributions and insights from other participants like @sergiosaharovskiy and @greysky for their foundational notebooks, and @at7459 and @johnpateha for their critical discussions around Metric Hacking. The collaboration and knowledge sharing within this community are what make these competitions so enriching.
+
+Despite the challenges posed by Metric Hacking, your balanced approach to selecting submission strategies demonstrates a clear understanding of risk management in competition settings.
+
+reply
+Reply
+2
+Cheng Zhao
+
+Posted 2 years ago
+
+· 36th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thank you for the summary. Very inspiring
+
+reply
+Reply
+kerenshang
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Very useful article for fresh man.
+
+reply
+Reply
+Mr RRR
+
+Posted 2 years ago
+
+· 2130th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Very useful article for fresh man
+
+reply
+Reply
+Manav Trivedi
+
+Posted 2 years ago
+
+· 761st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Smart way of using the hacks!
+
+reply
+Reply
+catdoghu
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+helpful for me!
+
+reply
+Reply
+TomarAman
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great approach
+
+reply
+Reply

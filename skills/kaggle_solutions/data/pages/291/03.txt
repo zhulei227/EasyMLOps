@@ -1,0 +1,100 @@
+url: https://github.com/pmcheng/rsna-pneumonia
+fetched: 2026-10-27
+chars: 6019
+
+GitHub - pmcheng/rsna-pneumonia: 3rd place solution for RSNA pneumonia detection challenge · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ pmcheng rsna-pneumonia Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ rsna-pneumonia Public Notifications You must be signed in to change notification settings Fork 35  ( 35 ) Star 85  ( 85 ) You must be signed in to star a repository About 3rd place solution for RSNA pneumonia detection challenge Resources Readme License Activity Stars 85 stars Watchers 3 watching Forks 35 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 3 Commits 3 Commits Folders and files Name Name Last commit message Last commit date data data     keras-retinanet keras-retinanet     .gitignore .gitignore     LICENSE LICENSE     directory_structure.txt directory_structure.txt     entry_points.md entry_points.md     predict.py predict.py     prepare_data.py prepare_data.py     readme.md readme.md     requirements.txt requirements.txt     settings.json settings.json     train.py train.py     train_101.sh train_101.sh     train_50.sh train_50.sh     util.py util.py     View all files Repository files navigation README License More items 3rd place solution for the 2018 RSNA Pneumonia Detection Challenge 
+ by Phillip Cheng, MD MS 
+ Hello! Below is an outline of how I prepared the data, trained my models, and predicted bounding boxes for the RSNA Pneumonia Detection Challenge . Further details are in the model documentation submitted to Kaggle. For questions please contact me at phillip.cheng@med.usc.edu 
+ Directory structure 
+
+ data : contains raw and processed data from Kaggle 
+ keras-retinanet : modified version of keras-retinanet 
+ models : selected resnet-50 and resnet-101 model snapshots used for the prediction submissions
+
+ Note: the .h5 model files are too large to be stored in the Github repository, so you will need to manually download the .h5 files from the release and place them in this folder. 
+
+ snapshots : folder for saved snapshots after each epoch of training 
+ submissions : folder to hold output from predict.py 
+
+ My hardware 
+
+ Dell Precision T5500 with 3.07 GHz Intel Xeon X5675 CPU 
+ 12 GB NVIDIA Titan Xp GPU 
+ 512 GB HDD 
+ 16 GB DDR3 RAM 
+
+ Software 
+ (python packages are detailed separately in requirements.txt ): 
+
+ Ubuntu 18.04 LTS 
+ Python 3.6.6 
+ CUDA 9.0 
+ cuDNN 7.0.5 
+ NVIDIA driver v.390 
+
+ Data and keras-retinanet setup 
+ (assumes the Kaggle API is installed and configured) 
+ Run the following shell commands from the top level directory 
+ cd data
+kaggle competitions download -c rsna-pneumonia-detection-challenge
+unzip stage_2_test_images.zip -d stage_2_test_images
+unzip stage_2_train_images.zip -d stage_2_train_images
+cd ../keras-retinanet
+python setup.py build_ext --inplace
+cd ..
+python prepare_data.py
+
+ Note that settings.json is configured for creating training and validation sets from the Stage 1 training labels, which are what I used to train the models for the competition. I did not perform any training on the Stage 2 training set, which included Stage 1 test images. 
+ Model training 
+ There are two RetinaNets used in my solution, which are trained by the following scripts. 
+ ./train50.sh
+./train101.sh
+
+ Snapshots after each epoch of training are saved in snapshots . For the competition, I manually selected the best snapshots from several runs based on the precision score and maximum Youden index reported during training. 
+ Bounding box prediction 
+ python predict.py
+
+ Output .csv is saved to submissions folder 
+ About 3rd place solution for RSNA pneumonia detection challenge Resources Readme License Activity Stars 85 stars Watchers 3 watching Forks 35 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

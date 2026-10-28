@@ -1,0 +1,654 @@
+url: https://www.kaggle.com/c/playground-series-s6e5/writeups/1st-place-by-the-skin-of-my-teeth
+fetched: 2026-10-27
+chars: 17363
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place: By the skin of my teeth — Predicting F1 Pit Stops
+1st Place: By the skin of my teeth
+
+Predicting F1 Pit Stops
+
+Solution Writeup · 1st place · Jun 1, 2026
+
+Well, that was the most thrilling finish to a Kaggle competition that I've experienced so far - I won by the barest of margins (0.00001) with a (literally) last minute submission! I was expecting a good rank, but to end up 1st was a most pleasant surprise.
+
+Before I go on, I'd like to thank those who generously shared their code and/or insights, including (but not limited to) :
+
+@yekenot, @ern711, @masayakawamata, @siukeitin, @ravi20076, @amanatar, @quatlify, @yunsuxiaozi, @joypig
+
+I'd summarize my efforts in the competition as follows:
+
+Model Diversity : As usual, I tried many diverse models and approaches, including XGB, LGBM, CatBoost, RealMLP, TabM, HGB, RF, YDF, FT-Transformer, MLP-PLR, and many more. I took advantage of AutoML libraries like Autogluon, Light AutoML, FLAML and PyTabKit, and also used diverse metrics, though it was AUC in the vast majority of notebooks. Also the usual tricks like swapping features, hyperparameters etc. between well performing models.
+
+Feature Engineering I created several notebooks with "Heavy FE" of the kind seen in excellent notebooks by @cdeotte, @masayakawamata, @mahoganybuttstrings and others in past playground episodes, with 200-400 features; and also reused excellent features from @yekenot and others. I also tried AutoFE libraries like FeatureTools (which produced a poor AUC) and AutoFeat (which timed out after 12 hours without producing anything useful). I haven't looked into why the AutoFE tools failed this time - was it the nature of the data, or Claude's code?
+
+Ensemblers I tried many, including Ridge, Logistic Regression (LR) with Logits, XGB, LGB, CatBoost, Simple MLP, RealMLP, Autogluon. Autogluon was the best overall, followed closely by LR with Logits.
+
+Breakthrough While I made steady progress for the first 3 weeks or so, after reaching ~0.95470 on the public LB, it felt like I was spinning my wheels for a while. Going back to the drawing board, I revisited the relationship between the original dataset & the competition data. Even though adding the original data was boosting AUC, @siukeitin and others had pointed out significant differences between the datasets. In particular, @ravi20076 showed the adversarial AUC for each variable, and "Driver" stood out as being the most different. It made sense to try some models without using "Driver" - the "Driver_Dropped" models boosted the score a little, as did some which didn't use the original data. I also played around with modulating the impact of the original via sample weights - weights between 0.5 and 1 seemed to produce pretty much the same score, while dropping it to 0.25 reduced CV and LB scores.
+
+Final Push I made an effort to add many more models towards the end, though I couldn't reach my goal of 200 OOFs, ending up with 186. I'd been careful not to do any LB probing, and given how hard it had been to move beyond 0.95470, was wondering whether some of those ahead of me had perhaps overfit the public LB a bit. In the last two days, I took a judicious risk - that of adding some L2 OOFs to the OOF pool. This carries a risk of leakage, so I decided to keep one submission free of this. The 186 OOFs included 4 L2 OOFs and scored 0.95487 (public), 0.95503 (private) with LR Logits; while the 182 L1 OOFs combined for 0.95480 and 0.95495. A blend of two strong ensemblers often does better than both - I decided to try 50-50 and 80-20 blends of Autogluon and LR-Logits submissions that scored 0.95486 and 0.95487 on the public LB - the competition ended while I was submitting the 80-20 blend - but the 50-50 blend, which I'd submitted a minute ago, ended up scoring 0.95488 and 0.95503, landing me the 1st place by the barest of margins. I wouldn't have been surprised to end up at 3 or even 2 (nor shocked by a small fall down the rankings), but to end up pipping @cdeotte by 0.00001 in literally the last minute was quite the thrilling surprise 😀
+
+I used Claude throughout the month and it was a big help, though there were several occasions where I had to talk it out of quitting too soon. And it kept regenerating entire notebooks when only a few lines needed to be modified, causing me to be locked out too soon on many an occsion.
+
+I'd like to end with big congratulations to @cdeotte, @kagglersergio, @unseenuser, @milanfx, @mahog, @masayakawamata, @mikhailnaumov & all others who finished strong and/or learned new things. All the best for June, and Happy Kaggling!
+
+Author
+Optimistix
+
+optimistix
+
+arrow_drop_up
+55
+Share
+more_horiz
+Citation
+
+Optimistix. 1st Place: By the skin of my teeth. https://www.kaggle.com/competitions/playground-series-s6e5/writeups/1st-place-by-the-skin-of-my-teeth. 2026. Kaggle
+
+15
+2
+5
+comment
+29 Comments
+Hotness
+Chris Deotte
+
+Posted 5 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations @optimistix Fantastic finish with last minute submission and winning 1st place by +0.00001!
+
+reply
+Reply
+3
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much, and congrats to you, too! And thanks for all the notebooks and posts you have shared over many competitions, which certainly contributed to my solution.
+
+reply
+Reply
+Masaya Kawamata
+
+Posted 5 months ago
+
+· 8th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Huge congratulations on another 1st place, @optimistix!
+
+I'm always impressed by how much model diversity you manage to create. This time, I especially liked the idea of training some models without the Driver feature after noticing the distribution shift between the original and competition datasets.
+
+I have a quick question about your OOF generation workflow.
+
+When trying a new FE + model combination, how do you usually decide on hyperparameters before adding the resulting OOF to your pool?
+
+Do you generally run a full Optuna search, do some light tuning of the major parameters, or intentionally keep multiple hyperparameter variants of the same FE/model setup?
+
+I'd love to hear a bit about how you balance exploration versus tuning when building such a large collection of OOFs.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks so much, and congrats to you too! Also thanks for sharing your notebooks. There are many ways in which I can be more systematic, including proper HPO. On the other hand, more experienced Kagglers such as @cdeotte don't spend much time on it either, so perhaps it's ok. While I sometimes run Optuna or FLAML (it's great for some quick HPO), most of the time I start with HPs from my old models or good public notebooks, and tinker with a few important HPs. Of course such tinkering is best performed with a quick notebook, otherwise one has to restrict it to a subsample, or 1-2 folds, etc. And yes, I do often try the same notebook with a few different sets of hyperparameters. You usually run Optuna (at least in the beginning), right?
+
+reply
+Reply
+1
+Masaya Kawamata
+
+Posted 5 months ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for the detailed reply!
+
+Yes, I do tend to use Optuna, but usually not for every single FE + model idea from the start. Lately, for XGB for example, I often do some light manual tuning of key parameters like max_depth, colsample_bytree, and max_bin first, then keep that setting fixed while exploring feature sets. Once I find a promising FE set, I run Optuna more seriously as a final tuning step.
+
+The reason I asked was that, looking at your solutions and also some other strong solutions, I wondered whether keeping multiple HP variants of the same FE + model setup can itself add useful diversity. I remember seeing something similar in some of @cdeotte's older solutions too, with both shallower and deeper tree variants.
+
+So your answer makes a lot of sense — it seems like diversity and speed often matter more than perfectly tuning every single OOF.
+
+reply
+Reply
+1
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Once a diverse ensemble gets large enough, HP probably doesn't make much of a difference - come to think of it, that's pretty much Autogluon's guiding principle. But if you decide to compete with a small number of models (say 10-20, and obviously in the limit of a solo model), it would be quite crucial to have (at least near) optimal HPs.
+
+reply
+Reply
+1
+Ayush Khaire
+
+Posted 5 months ago
+
+· 2992nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@optimistix first of all , congratulations 🥳 also congratulations to @masayakawamata and @ravi20076 , because this is my learning of the day :) I am curious about the question asked by masaya in the comments as well !
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much! I've replied to @masayakawamata's question, let me know if you have any follow up question(s).
+
+reply
+Reply
+1
+Ayush Khaire
+
+Posted 5 months ago
+
+· 2992nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@optimistix Can you please give your opinion on a different thing ?
+
+I had gone on some very real life datasets and i have watched a pattern like they had missing values a lot , partially filled .
+
+Means let us imagine a situation . suppose there are 100 columns .
+
+Then i saw datasets having 60 % of the columns having null values count , between range , like I can say 40% to 70% .
+
+The null values can be in a linear block - imagine you have an unsolved sudoku board , the filled boxes have nulls and black ones are data-filled .
+
+Then , it is clear likewise it is randomly shuffled nulls around the column - and a sequence can exist but a scatter also can exist .
+
+So , Basically I was asking for your decision and design choice - how you would handle this ?
+
+I - basically tried three approaches :
+
+1 - I find a correlation between not null values of the column - against all the columns , and I test if corr > 0.95 and cv < 0.1 or let say < 0.01 . Then if it get passed then I would take the most correlative feature , , taking the ratio between them and saying like null val of the column = ratio * the available feature values from the highly correlated features set , and these have a priority order sorted by correlation .
+
+2 - I can use simpeimputer or iterative imputer , but i am not sure if this makes sense with so much scattered data .
+
+3 - training ML model to predict that feature , again I am fundamentally not sure with this approach , because small datasets will cause misleading scores . Because this caries a risk of overfitting .
+
+My trials where exactly how order i wrote - priority goes to that corr and cv , then that imputer and model at last .
+
+I can tell you one more situation - here in kaggle .
+
+In that ROGII competition , there is a kinda folder between trin and test , each represents a well , so basically , it is about oil well . i am keeping it short , but I will add a link later .
+
+so in that we have two datasets for a well .
+
+typerwell and horrizontal well . in train well and test . and such are 773 wells , for each well there is file for horrizontal and vertical .
+
+now the point is , their features are like this :
+
+TRAIN
+
+Typewell:
+[TVT, GR, Geology]
+
+Horizontal Well:
+[MD, X, Y, Z, GR, TVT_input, TVT, ANCC, ASTNU, ASTNL, EGFDU, EGFDL, BUDA]
+
+
+TEST
+
+Typewell:
+[TVT, GR] ----- [ Geology] MISSING
+
+Horizontal Well:
+[MD, X, Y, Z, GR, TVT_input] ---- [ ANCC, ASTNU, ASTNL, EGFDU, EGFDL, BUDA ] ALL MISSING 
+
+
+To make a difference , looks like only GR is not enough here , so this was the whole situation .
+
+competition link : https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction/overview
+
+I will be happy if I would get other people opinion on this as well - I would like to know if how should you have approached these problem . specially from @cdeotte @masayakawamata @ravi20076 . Can you please please take a look at it ?
+
+It will help me a lot , I would be grateful for your time and efforts !
+
+reply
+Reply
+Shounak Patra
+
+Posted 5 months ago
+
+arrow_drop_up
+2
+more_vert
+
+Hi I am a new to kaggle
+
+reply
+Reply
+1
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi - welcome to Kaggle!
+
+reply
+Reply
+Mikhail Naumov
+
+Posted 5 months ago
+
+· 9th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @optimistix! It was a real race.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, and congrats to you, too! Indeed - I spent a few days seeing you guys clustered around 0.95490, wondering how to get there. Thanks for sharing your excellent notebooks, as always.
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 5 months ago
+
+· 17th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@optimistix I am happy some of my work was of use to the eventual winner!
+All the best and congrats! You are great!!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks so much - you're great as well! Interesting that you were exactly the same place on public and private LB this time.
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 5 months ago
+
+· 17th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes, stability is all I need @optimistix
+
+reply
+Reply
+Dnyanesh
+
+Posted 5 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @optimistix
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, but I refuse to call you God 😛
+
+reply
+Reply
+1
+Ajit Ashwath
+
+Posted 5 months ago
+
+arrow_drop_up
+1
+more_vert
+
+This was a really enjoyable read. The amount of experimentation behind that tiny margin of victory is honestly impressive.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Yes, Kaggle does require a bit of craziness, esp. if you want to squeeze that extra 0.0000x out 😀
+
+reply
+Reply
+Data User
+
+Posted 5 months ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congrats on the win, @optimistix!
+
+One Claude-related question, if you don't mind: with 186 OOFs in the pool, how did you keep Claude organized across that many notebooks?
+
+Many thanks for the detailed and interesting writeup. Wishing you many more wins ahead!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, and congrats to you too for public #1, private #5 - your writeup shows you did things the right way, and I fully expect you to continue to rank highly, and win soon. The simple answer to the Claude question is that I don't keep it organized across notebooks - I'm still the layer in between.
+
+reply
+Reply
+1
+AshishSinghRawat
+
+Posted 5 months ago
+
+· 241st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That's a lot of work congrats on 1st place :
+question: what's your approach of using public notebooks as some of them have only test preds not oof so how you use them to generate oof do you train them again or what can you help me with this as you are the master of using public notebooks:
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I do train them, unless they follow the same CV strategy & are from trusted Kagglers - or I'm in a hurry and willing to gamble 😀
+
+reply
+Reply
+1
+Tanvir Sheikh
+
+Posted 5 months ago
+
+· 755th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I always get irritated when I'm stuck on the same score, so I really admire people like you who stick with solving problems.
+Congratulations @optimistix on this achievement!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much! Persistence does pay off - often, even if not always. All the best for the next time you're stuck!
+
+reply
+Reply
+BlueFlame202
+
+Posted 5 months ago
+
+· 1056th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Wow, this is super cool and insightful!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot!
+
+reply
+Reply
+Durga Kumari
+
+Posted 5 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Fantastic write up. The emphasis on model diversity and disciplined ensembling clearly paid off.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much! A little luck went my way as well.
+
+reply
+Reply
+Muhammad Usman Khan
+
+Posted 5 months ago
+
+· 355th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @optimistix 😄
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 5 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much!
+
+reply
+Reply
+1
+Shivam Atri
+
+Posted 5 months ago
+
+arrow_drop_up
+0
+more_vert
+
+i am new user of kaggle. And i am earn more please help me 🙏🏻
+
+reply
+Reply
+1

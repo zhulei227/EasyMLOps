@@ -1,0 +1,108 @@
+url: https://github.com/simaaron/kaggle-Rain
+fetched: 2026-10-27
+chars: 7974
+
+GitHub - simaaron/kaggle-Rain: Winning solution to the Kaggle competition - How Much Did It Rain? II · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ simaaron kaggle-Rain Repository navigation Code Issues 1  ( 1 ) Pull requests Actions Projects Security and quality Insights More items 
+
+ kaggle-Rain Public Notifications You must be signed in to change notification settings Fork 77  ( 77 ) Star 154  ( 154 ) You must be signed in to star a repository About Winning solution to the Kaggle competition - How Much Did It Rain? II Resources Readme MIT license Activity Stars 154 stars Watchers 9 watching Forks 77 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 2 Commits 2 Commits Folders and files Name Name Last commit message Last commit date LICENSE.txt LICENSE.txt     NN_architectures.py NN_architectures.py     NNpredictor_v1.py NNpredictor_v1.py     NNpredictor_v2.py NNpredictor_v2.py     NNregression_v1.py NNregression_v1.py     NNregression_v2.py NNregression_v2.py     README.md README.md     data_augmentation_test.py data_augmentation_test.py     data_augmentation_train.py data_augmentation_train.py     data_augmentation_valid.py data_augmentation_valid.py     data_preprocessing.py data_preprocessing.py     ensembling.py ensembling.py     pretrained_model_v1.npz pretrained_model_v1.npz     pretrained_model_v2.npz pretrained_model_v2.npz     View all files Repository files navigation README MIT license More items How Much Did It Rain? II 
+ Kaggle competition winning solution 
+ This document describes how to generate the winning solution to the Kaggle competition How Much Did It Rain? II . 
+ Further documentation on the method can be found in this blog post . 
+ Generating the solution 
+ Install the dependencies 
+ The models are written in Python 2.7 and makes use of the NumPy, scikit-learn, and pandas packages. These can be installed individually via pip or all together in a free Python distribution such as Anaconda . 
+ Theano can be installed and configured to use any available NVIDIA GPUs by following the instructions here and here . The Lasagne package often requires the latest version of Theano; a simple pip install Theano may give a version that is out-of-date (see Lasagne documentation for details). 
+ Lasagne can be installed by following the instructions here . 
+ Download the code 
+ To download the code run: 
+ git clone git://github.com/simaaron/kaggle-Rain.git
+
+ Create an empty data folder 
+ cd kaggle-Rain
+mkdir data
+
+ Download the training and test data 
+ The training and test data can be downloaded from the Kaggle competition webpage at this link . The two extracted files train.csv and test.csv should be placed in the data folder. 
+ Note: the benchmark sample solution and code provided by Kaggle are not required. 
+ Preprocess the data 
+ Replace the NaN entries with zeros (training and test data) and remove the outliers (training data only) by running: 
+ python data_preprocessing.py
+
+ This will also create three additional train , valid , and test folders. The size of the validation holdout subset and the outlier threshold expected rainfall value can be changed in the above Python script. 
+ Augment the data sets with dropin copies 
+ Create random augmentation copies of the datasets by running: 
+ python data_augmentation_train.py
+python data_augmentation_valid.py
+python data_augmentation_test.py
+
+ This creates 61 randomly augmented copies of the preprocessed training and test data sets and one of the validation holdout set. Note that each copy is &gt; 2GB in size. If there is an issue with insufficient hard disk space, one should modify the training script NNregression_*.py and test script NNprediction_*.py to perform these augmentations dynamically. 
+ The number of copies can be changed in the above scripts. 
+ Train the networks 
+ The two best models can be trained by running: 
+ python NNregression_v1.py -v=1
+python NNregression_v2.py -v=2
+
+ The list of functions corresponding to the different models can be found in the Python script NN_architectures.py . The remaining models can be trained by simply modifying the corresponding function import and call within either script above and then saving and running a new script: 
+ python NNregression_v*.py -v=*
+
+ The outputs from different models are continually saved into separate output folders. These include the files training_scores.txt and validation_scores.txt which, for monitoring purposes, give the evolution of the training and validation errors respectively. The file model.npz is the current best fitting set of model parameters (w.r.t. the validation holdout set), and the last_learn_rate.txt records the current (decayed) learning rate. 
+ Generate predictions from augmented test sets 
+ The set of 61 augmented test set predictions from the model 'v1' can be obtained by running: 
+ for j in `seq 0 60`;
+do
+ python NNpredictor_v1.py -rd=$j
+done
+
+ The predictions from the pre-trained model included in the code download can be obtained by running: 
+ for j in `seq 0 60`;
+do
+ python NNpredictor_v1.py -rd=$j -i pretrained_model_v1.npz
+done
+
+ Average the augmented predictions 
+ The predictions from different augmented copies can be combined by running: 
+ python ensembling.py -v=1 -nr=61
+
+ This averages the 61 predictions of the model 'v1' and saves it to the file ens_submission_v1_61ave_mean.csv . 
+ The individual predictions from the models 'v1' and 'v2' would place one 2nd/3rd in the competition. A straight average of the two solutions would be sufficient for 1st place. 
+ About Winning solution to the Kaggle competition - How Much Did It Rain? II Resources Readme MIT license Activity Stars 154 stars Watchers 9 watching Forks 77 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

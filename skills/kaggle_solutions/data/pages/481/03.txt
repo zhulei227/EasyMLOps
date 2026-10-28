@@ -1,0 +1,54 @@
+url: https://www.kaggle.com/c/mens-march-mania-2022/discussion/318302
+fetched: 2026-10-27
+chars: 753
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Kaggle · Featured Prediction Competition · 5 years ago
+Late Submission
+more_horiz
+March Machine Learning Mania 2022 - Men’s
+
+Predict the 2022 College Men's Basketball Tournament
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Failed to load the discussion topic
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic

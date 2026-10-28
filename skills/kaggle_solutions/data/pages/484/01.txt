@@ -1,0 +1,230 @@
+url: https://www.kaggle.com/c/tabular-playground-series-apr-2022/discussion/322259
+fetched: 2026-10-27
+chars: 9877
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+#1 LB Solution — Tabular Playground Series - Apr 2022
+#1 LB Solution
+
+Tabular Playground Series - Apr 2022
+
+Solution Writeup · 1st place · May 2, 2022
+
+Thanks Kaggle for continuing to host these & providing resources and the opportunity to learn from other Kaggle users’ great ideas. I’ve learnt a lot from what others have been kind enough to share at various points during the Tabular series.
+
+Idea
+
+The main ideas for the solution (denoising autoencoder) are all contained in the topics below from the first 3 Playground competitions.
+
+https://www.kaggle.com/competitions/tabular-playground-series-jan-2021/discussion/216037 https://www.kaggle.com/competitions/tabular-playground-series-feb-2021/discussion/222745 https://www.kaggle.com/competitions/tabular-playground-series-mar-2021/discussion/229833 https://www.kaggle.com/competitions/tabular-playground-series-mar-2021/discussion/229868
+
+The below is also relevant (from non-playground competition) https://www.kaggle.com/c/porto-seguro-safe-driver-prediction/discussion/44629
+
+I’m not going to write a fresh description of the concept because @springmanndaniel provides some really nice notes and visualisations on the Denoising Autoencoder (DAE) concept in the Tabular series Jan-21 post above and his linked notebook. If you want a practical example of the ‘noise’ code in Pytorch then can check @ryanzhang post Github link from the Feb-21 competition, also I had a ‘starter’ notebook which transferred that code to the March-21 competition on Kaggle. https://www.kaggle.com/code/davidedwards1/tabularmarch21-dae-starter
+
+Here the data is a bit different as each sample is a sequence with multiple sensors, so the model structure and code for the noise needs to be adjusted, but it is the same concept of training an autoencoder to identify where ‘swap noise’ has been added to the input (using both the train and test data) so that the model learns about the relationships in the input data. The outputs from various layers of this model can then be used as features to feed a second neural network to predict the actual competition target.
+
+DAE design / training
+
+As this was all within the time quotas of Kaggle GPU, the time available to explore different settings for the autoencoder had a limit. Below are some things which seemed to work for me but maybe others would find different and better outcomes depending on exact model and training design etc.
+
+2 layers of LSTM seemed to work fine - I did not test with more LSTM layers
+Noise ‘swap’ was between samples (e.g. Seq1-Sensor00-Step02 and Seq2-Sensor00-Step02) or between different time steps for the same sample and sensor (e.g. swapping Seq1-Sensor00-Step00 with Seq1-Sensor00-Step50).
+Fairly high swap noise levels (e.g. 50%) didn’t seem to work as well, at least within the number of epochs I tested for. Best results were with <30% noise.
+Only some of the layers of the autoencoder seemed to help in the second step of predicting the target. Some layers seemed to make the outcome worse.
+The autoencoder did not seem to improve with any additional feature engineering - I used only the raw sensor data (scaled). I did try adding a subject ‘count’ and an embedding for the subject however neither of these gave an improvement based on the 2 single experiments I had time to run.
+Increasing the size of the DAE LSTM improved results however had significant cost in terms of training time, so was only able to go up to a certain point.
+I tested the predictive model CV (1 fold) based on different checkpoints with the DAE to estimate a reasonable number of DAE epochs. More epochs would probably still have given small incremental benefits but had to balance size of increment vs training time and possibility to explore other improvements.
+Performance was better if the second model (which predicts the competition target) was provided with both original (scaled) sensor data as well as the DAE features.
+The blend
+
+The final blend was a combination of various models and runs, though using ElasticNet to get model weights for a final prediction, many of the inputs were given 0 weight and the main contributors were the DAE runs, some TPU runs, and the LGBM models.
+
+4 main DAE runs (Pytorch / GPU)
+Tensorflow (TPU) With base data + feature engineering (shift + a rolling mean)
+Tensorflow (TPU) With base data + exported, saved DAE features (needed TFRecords for this)
+The usual LGBM, XGB, RandomForest, ExtraTrees etc - one LGBM model with the TSFlex features in the notebook linked at the end of this post.
+
+The main thing which seemed to improve results for me with all the predictive neural networks (not the DAE itself) was spatial dropout, often with quite high rates of dropout (>0.35). Not sure if this was just the result of my particular experiments, but it seemed to improve the end score and also seemed to make the training more stable.
+
+With the Tensorflow models, I struggled to make a big difference to outcomes with adjusting the model structure and features beyond the shift+rolling mean. I found GRU gave slightly better results than LSTM in Tensorflow, and in the final run I managed a small improvement by adding a BatchNorm - actually also found that relatively smaller / simpler models seemed to give similar and in some cases better results. For whatever reason, the results of using the DAE features in Tensorflow were substantially worse than Pytorch. Probably I just missed something, either way I lacked motivation to spend time improving Tensorflow results after a certain point as the Pytorch results were strong. Interested to read other solutions.
+
+I don’t think that I came up with any new feature engineering for any of the models - I am sure that all of the features I created manually have been tried / tested elsewhere in public notebooks etc.
+
+Results
+
+The best single Pytorch DAE run (1 DAE + 1 predictive model using its features) scored 0.98999 CV / 0.99134 private.
+
+The best Tensorflow model scored 0.9851 CV / 0.98668 private.
+
+The best total blend (all models) combined scores 0.9918 CV / 0.99249 private.
+
+Fortunately the CV/Leaderboard correlation seemed reasonably strong to me, particularly after blending all the models together (I burned through a lot of unnecessary submissions to have a better feeling of correlation) so I didn’t have too many worries about “trust your CV!”.
+
+Other stuff
+
+All the results were based on the same 10 folds and making sure that each ‘subject’ was fully contained within a single fold. Trying 20 folds seemed to give maybe a +0.001 improvement but the additional training time requirement for GPU/Pytorch notebooks seemed like a poor tradeoff compared to testing other things.
+
+The best DAE run required approx 8 hours DAE training on full train+test / 5.5 hours training second (predictive) model over 10 folds on Kaggle GPU. With a smaller DAE LSTM it was possible to get slightly worse results (best private score 0.98961) with reduced training times of approx 4.5 hours for each stage.
+
+I forked the below 2 notebooks during the competition, thank you to the authors:
+
+This one helped me to save some time getting started with a Tensorflow notebook, thank you. https://www.kaggle.com/code/hamzaghanmi/tps-april-tensorflow-bi-lstm
+
+I made use of the below to generate features for one LGBM run. I’d been struggling a bit with the docs / examples for TSFresh so this saved me some time and showed me something new, thanks. https://www.kaggle.com/code/jeroenvdd/tpsapr22-best-non-dl-model-tsflex-powershap?scriptVersionId=94240450
+
+Edit: apologies, in the initial version of this topic I incorrectly copied and pasted public LB model scores instead of private.
+
+Author
+Dave E
+
+davidedwards1
+
+arrow_drop_up
+40
+Share
+more_horiz
+Citation
+
+Dave E. #1 LB Solution. https://www.kaggle.com/competitions/tabular-playground-series-apr-2022/writeups/dave-e-1-lb-solution. 2022. Kaggle
+
+comment
+8 Comments
+1 appreciation comment
+Hotness
+Fiona Carson
+
+Posted 4 years ago
+
+· 696th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I'm new to all this but really enjoyed reading through your solution and learned a lot. Thanks for sharing and well done!
+
+reply
+Reply
+Niek van der Zwaag
+
+Posted 4 years ago
+
+· 122nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on 1st @davidedwards1 and thanks for sharing your solutions 🙌
+
+reply
+Reply
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great job, this is a very impressive solution!
+
+reply
+Reply
+Artem Li
+
+Posted 4 years ago
+
+· 246th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @davidedwards1 and thanks for sharing your solution with the Kaggle community! I guess it is time for many of us to start learning DAE you used for your solution!
+
+reply
+Reply
+Gilles Vandewiele
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @davidedwards1 and impressive to see how well DAE are performing here! It's something I will have to brush my knowledge on! Cool that our notebook was of any help as well :).
+
+reply
+Reply
+SRK
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @davidedwards1
+
+Thank you for sharing the solution with corresponding links as well.
+
+reply
+Reply
+DataRegressor
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats for the win, and thank you for the write-up.
+
+DAE is something I tried, but with Conv2D and Conv2DTranspose layers and it didn't work. LSTM should have been given a try.
+
+reply
+Reply
+Appreciation (1)
+LittleChika
+
+Posted 4 years ago
+
+· 223rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Big congrats and thanks for sharing.

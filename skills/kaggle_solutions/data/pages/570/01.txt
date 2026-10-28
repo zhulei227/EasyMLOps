@@ -1,0 +1,839 @@
+url: https://www.kaggle.com/c/asl-fingerspelling/discussion/434485
+fetched: 2026-10-27
+chars: 39539
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+[1st place solution] Improved Squeezeformer + TransformerDecoder + Clever augmentations — Google - American Sign Language Fingerspelling Recognition
+[1st place solution] Improved Squeezeformer + TransformerDecoder + Clever augmentations
+
+Google - American Sign Language Fingerspelling Recognition
+
+Solution Writeup · 1st place · Aug 31, 2023
+
+Thanks to kaggle and everyone involved for hosting such an interesting competition. It was a great extension to the isolated sign language classification and it was very interesting to see how much of speech-to-text research could also be applied to sign language fingerspelling. As always it was a great teaming experience with @darraghdog
+
+TLDR
+
+Our solution is based on a single encoder-decoder architecture. The encoder is a significantly improved version of Squeezeformer, where the feature extraction was adapted to handle mediapipe landmarks instead of speech signals. The decoder is a simple 2-layer transformer. We additionally predicted a confidence score to identify corrupted examples which can be useful for post-processing. We also introduced efficient and creative augmentations to regularize the model, where the most important ones were CutMix, FingerDropout and TimeStretch, DecoderInput Masking. We used pytorch for developing and training our models and then manually translated model architecture and ported weights to tensorflow from which we exported to tf-lite.
+
+Cross validation
+
+We split the training data into 4 folds by signer. In the beginning we had nearly perfect correlation between CV and public LB with this approach. With higher scores improvements on CV reflected a bit less on LB, mostly due to the fact that the LB score was always decently higher and hence saturated earlier. Most of the time we only trained and tracked the score of fold0 and not all folds.
+
+Data preprocessing
+
+In total 130 key points were used. These consisted of 21 key points from each hand, 6 pose key points from each arm, and the remaining 76 from the face (lips, nose, eyes). Locally the 130 key points were cached to .npy files for fast data loading. Prior to data augmentations, the data was normalized with std/mean and nans were zero filled.
+
+Augmentations
+
+Augmentations were essential to prevent overfitting, generalize to new signers and enable deep models. We used augmentations which were popular in the first ASL competition but also came up with a lot of new creative augmentations and some have proven to be very effective.
+
+Resizing along time axis.
+Shift the sequence along the time axis.
+Windowed resizing along time axis (similar to warping).
+Left-right flip of keypoints.
+Cutmix of samples timewise - draw a random percentage between [0,1] and cut 2 sequences and related phrases at that percentage and mix. Mixing only within same signer was best
+Spatial affine - scale, shear, shift and rotate.
+Drop/Zero-fill between 2 to 6 different fingers over 2 to 3 time windows.
+Drop/Zero-fill either all face landmarks or all pose landmarks.
+In rare cases (~5% of samples) drop/zero-fill all hand landmarks.
+Temporal masking (zero-fill) in windows of different sizes or counts.
+Spatial masking
+
+Most augmentations were applied to 50% of the samples, except for resizing and spatial affine which were applied to ~80% of samples.
+
+After augmentation, samples with more than 384 frames were resized along time axis, with channel-wise linear interpolation. Samples of less than 384 were padded to 384 for training only. tf-lite ran on variable length samples. No frames were dropped in preprocessing.
+
+Model
+
+In general, we observed that a deeper model gives significant gains (if we are able to prevent overfitting). As a consequence not only regularization techniques like augmentations are essential, but also every improvement in computational efficiency creates space to use deeper models and hence is equally important as the model architecture itself.
+
+Our model consists of 3 parts, Feature Extraction, Encoder, Decoder which are shown in the image below
+
+We interpret the data like a 3 channel image, where width is defined by the number of frames, height is given by the number of the selected 130 landmarks and channels are given by raw xyz coordinates. The feature extraction is based on a 2D convolution followed by batchnorm and a linear layer on the flattened features to extract features per frame. We have 5 of this feature extraction modules, one for all landmarks at once and one per landmark type (left_hand, right_hand, face, pose). The all-landmark module outputs 208 dim vector/ frame. The other 4 output 52 dim vectors each which are then concatenated to have also 208 dims. We had those two 208-dim vectors per frame and get a (batch_size x 384 x 208) input for our encoder where 384 is the maximum sequence length we chose.
+
+The main component of our model is an encoder which was adapted from the Squeezeformer architecture. We did not use the actual “squeeze” idea, i.e. a temporal Unet, but used the general architecture of Squeezeformer Blocks which consist of a combination of MultiHeadSelfAttention (MHSA), Convolution and FeedForward modules. We made several improvements to this architecture: ASR conformers (and Squeezeformer) use relative positional encoding which allow the self-attention module to generalize better on different input lengths. Relative positional encoding is performance intensive, as well as using many parameters, as they are stored separately in each layer. Replacing this with Llama attention which uses rotary embeddings sped up training ~2X and tf-lite inference approx ~3X allowing larger models to be used. In addition, we cached the rotary embeddings once and fed them into each layer with the input data so they are not duplicated in each layer. This resulted in 20% less parameters in the model. We saw no benefit in using time reduction which was introduced with Squeezeformer. So in our model all layers had the same sequence length as the original input. As suggested in the Squeezeformer paper, the pre-Layer Norm from the Macaron structure is redundant and was replaced with a learnable scaling layer which scales and shifts the activations.
+
+For decoding we used a simple 2 layer transformer decoder which is similar to hugging faces Speech2TextDecoder, which outputs a sequence prediction. We then used cross entropy loss for training our model End2end. An extra cross entropy auxiliary loss of the reversed sequence was used. A causal decoder mainly uses encoder cross attentions for the sequence's beginning and previous characters and cross attentions for the end. To improve the model's accuracy, we use a separate causal decoder on the reversed sequence as an auxiliary loss, making the model rely more on the encoder cross attention for the label's end. For decoder inference early stopping and past key value caching was used which sped up inference significantly. It should be noted that we found a transformer based Decoder superior to a CTC based decoding, even in a setting where computational efficiency matters a lot.
+
+Additionally to the decoder, we also added a single linear layer to take the features of the first token of the encoder output to predict a confidence score, which helps to identify garbage data and can be used in post-processing. As a target for this we used normalized levensthein distance clipped to [0,1] of OOF predictions of a decent previous model.
+
+We explored and trained all our models in pytorch, but whenever we deemed it good enough for a submission we translated each component manually to tensorflow and ported weights from our pytorch models.
+
+Training procedure
+
+Models were trained with a cosine learning rate schedule for 400 epochs with peak LR of 0.0045, weight decay of 0.08, 10 epochs warmup, mixed precision and an effective batch size of 512 samples. Dropout of 0.1 was used in the transformer encoder/decoder layers. It was important to train with mixed precision in order to leverage fp16 inference without performance drop. Training with fp32 and using tf-lite fp16 inference causes a drop of ~0.01 in CV vs LB.
+
+tf-lite inference used a single sample without padding, while model training was performed with time padded mini-batches. To avoid the model learning with pads, and ensure optimal inference runtime, the feature extractor and Macaron structure encoder layers were masked time wise during training. This needed to be manually implemented in pytorch on each layer. This took some effort, but paid off by significantly speeding up inference. As 1st place team in the previous ISL competition explained, this is much easier to do in tensorflow as keras has an off the shelf masking layer.
+
+Model training and tf-lite inference ran in fp16, so tf-lite files consumed almost half the disk size of of fp32. This was important, as the 40MB size was our limitation in the end. The two final model seeds measured 39988kb.
+
+Postprocessing
+
+The main idea of our postprocessing is to replace poor predictions with a dummy phrase which has a small levensthein distance to the train/ test data. @anokas showed in his notebook why '2 a-e -aroe' is a good candidate for that. Most of the poor prediction resulted from corrupted input data often only a few frames long. We used a confidence score predicted by our model as basis. Whenever the confidence score is below 0.15 or the sequence is shorter than 15 frames we replace the prediction with '2 a-e -aroe'.
+
+Supplemental Data
+
+We only marginally profited from using the supplemental data. We think the main reason is that although there are 50k samples in this supplemental data there are only 500 unique phrases, and hence the model rather learns to classify then to actually decode character-by-character. We tried a lot of approaches but only the following one gave a small boost (0.838 -> 0.839): First we group the supplemental data by phrase, which only leaves us with 500 groups. In each epoch of training we add one sample per group to the training dataset for our model. That means in each epoch we use 50k samples of the training data and only 500 samples of the supplemental data.
+
+Ensembling
+
+Our final submission is a 2-seed ensemble of our model trained on the complete training data (fullfit). We average resulting logits in each decoding step for ensembling.
+
+What did not help
+Fully using supplemental data
+Using edit distance as loss (tried different approaches)
+CTC loss (even as an auxiliary loss it hurt score)
+Label smoothing
+AWP - kept getting nans with FP16
+TTA (flip/stretch)
+Mixup of hidden layers & Specaugment++
+Beam search decoding (too costly)
+Ablation study (roughly)
+Augmentations
+Cutmix +0.005
+FingerDropout +0.005
+Face/PoseDropout +0.005
+masking decoder inputs +0.003
+Model improvements
+CNN Feature extraction +0.005
+2-branch Feature extraction with indiv norm +0.003
+Squeezeformer over 1stplace Net of 1 round +0.005
+Decoder over CTC +0.003
+Confidence over simple rules for post-processing +0.002
+Efficiency Improvements:
+Deeper model due to fp16 +0.003
+Deeper model due to llama attention +0.003
+Deeper model due to masking/ variable sequence len +0.005
+Deeper model due to caching/ early stopping in decoder +0.005
+Postprocessing
+Replace bad predictions with dummy phrase +0.006
+Used tools/ repos
+Pytorch/Tensorflow/Tf-lite (no onnx this time)
+Huggingface
+Albumentations (adapted their framework for using things like OneOf or Compose, but wrote our own augmentation implementations)
+Neptune.ai was our MLOps stack to track compare and share models. Below are example training runs using different model parameters and hardware (a100 card vs kaggle kernel). The data loading in the kaggle kernel below was slow and could probably be sped up with some work.
+
+Code & model weights
+
+https://github.com/ChristofHenkel/kaggle-asl-fingerspelling-1st-place-solution
+
+Paper
+
+tbd. Due to the novelty of our approach we are thinking about summarizing it in a paper.
+
+Thank you for reading, questions welcome
+
+Authors
+Dieter
+
+christofhenkel
+
+Darragh
+
+darraghdog
+
+arrow_drop_up
+243
+Share
+more_horiz
+Citation
+
+Dieter, Darragh. [1st place solution] Improved Squeezeformer + TransformerDecoder + Clever augmentations. https://www.kaggle.com/competitions/asl-fingerspelling/writeups/darragh-dieter-1st-place-solution-improved-squeeze. 2023. Kaggle
+
+16
+comment
+75 Comments
+2 appreciation comments
+Hotness
+Pascal Pfeiffer
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations @christofhenkel and @darraghdog A beautiful and clean solution. I am sure you tried a ton of different ideas how to encode these features.
+
+reply
+Reply
+Kyle Proffitt
+
+Posted 3 years ago
+
+· 380th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+I'm going to post a little comment. It might get long. Hopefully it's helpful for someone.
+
+First, Wow. I just saw Greysnow's comment saying he feels like a child… coming in 12th. Here I am 386 by copying others' work… if he's a child, I am… Anyway, really great writeup and lots of great ideas. I also look forward to seeing all the code.
+
+Well, I entered this competition as something to do and to run a couple of experiments. I've gone through a decent amount of the general learning stuff on kaggle. I don't have a background in coding (have a PhD in something else, so you know, I can probably learn things), but I love seeing what people can do in this arena and keep exploring whether I can truly get into it. I feel like I should be somewhat embarrassed to say chatGPT was my guide, and that was a big part of my experiment-- how much could this newer tool help someone as clueless as me to do anything useful. On the one hand, amazing what it could help me accomplish, but also as I think most of you know, it doesn't always take the most elegant approach, and sometimes after a few iterations of changes and errors, I'd hunker down and really try on my own and figure out how to fix the problem myself faster. My main goals were just to see how much of this I could understand, and when I had an idea, could I figure out how to implement it, all with the hope that at the end of the contest when the top solutions are posted, I could really grasp it at the least (not sure I'm there, but I've made progress). As I've posted elsewhere, I was curious whether the winner is really elegant and like totally new solutions, and/or brute force with systematic hyperparameter tuning, taking it offline to run near-infinite variations on some other dedicated hardware, etc. I'm not sure about the offline dedicated hardware part, but I think from this writeup, there's some of both.
+
+Well I do have a few general questions that I'd like to understand better. Some of the first stuff I did with other people's code was try to simplify down to only hand landmarks. I didn't and generally still don't see what face landmarks could be helpful for in a fingerspelling dataset. I suppose it's not that I can't imagine that perhaps on a pause as someone repeats a letter, that there might be an associated facial expression the model could pick up-- but it feels quite minimal to me, and I thought there would be more benefit to not having to look at so much extra information that is mostly useless. I did come to think that some of the pose landmarks are probably helpful with regard to motion letters like "z" and perhaps other things-- though it still seems like a good model should be able to get all the info it needs from just the hand. I also tried ignoring the z coordinates, and I tried flipping one of the hands, thinking that it made more sense for the model to learn a single set of signs and motions, where the opposite hand ultimately takes a flipped orientation. I was not super systematic with recording how a single change affected loss or score, but more often than not whatever change I attempted gave worse performance. Trying to get rid of lhand and rhand with an xy flip of one (while I was ignoring z) definitely hurt, which surprised me.
+
+I tried adding a displacement feature by calculating the, like Euclidean norm-change from frame to frame. I was hopeful that this might help the model with double letters and spaces, which it seemed to me from output was an area of trouble, maybe unsurprisingly. However, after much effort to finally successfully implement the addition of this feature and get it all to work together, again, it hurt model performance. Maybe that makes perfect sense to people who understand better how transformers work? As I understand it, it's never entirely clear whether adding a new feature will really help a model to focus on something, or will just be redundant information. I wondered, but did not try, whether trying to identify some like biggest changes, and creating new features based on that, might help-- like maybe calculating the distance from thumb to pinky as a new feature, just as potential example. Again, is that just likely to be redundant, or does the idea not work well with the transformer architecture?
+
+I tried separating out training and validation datasets based on the participant_id, thinking it might help if the model trained on one signer and their idiosyncrasies at a time-- well and I also tried batching by signer, I guess that's really the training on one signer at a time. Didn't help.
+
+I did what others have done to make little gifs out of the signing just so I could visualize it, and I also played around with adding to the dataset by recording new landmark data from YouTube videos (and even from myself, just to do it), but it wasn't easy for me to think of how I might systematically add to the dataset without being really manual about it. That's still a question that I'm curious about and haven't answered for myself: essentially what is "enough" data? If you take this winning model and you train on 20% of the data, how will that compare to using 80% of it- and if we kept increasing the quantity of data here, would we continue to see improvement?
+
+I also considered augmenting the data with little rotations, but I didn't get around to implementation. I'm intrigued by the augmentation of dropping fingers and such
+
+I used greysnow's notebook and code to get things working on TPU when I ran out of GPU time, but man it was painful. It seems every one of those efforts I made above added a layer of difficulty if I tried to run it on TPU. I can only imagine the use of PyTorch and translation efforts in this notebook were quite more work.
+
+So-- a general question. While it's amazing to watch the model work and create useful predictions, the 0.84 score means, I think, that on an average 11-12-character phrase, there's nearly 2 changes necessary to get to the right phrase. From looking at the output, I think it's actually the case that you get a decent amount of perfect translation, but there are also a number that are far off. Anyway, this is the best of the bunch here, it's definitely impressive, but is it objectively "good"? Is it only the starting point for developing a really useful application? I don't have the context to understand what threshold must be met for people to actually want to use it. This dataset includes garbage data, which is dealt with in this notebook and others, but aside from the truly garbage data, I would think if you took a few ASL-experienced individuals and had them watch the original signing, or perhaps even the mediapipe-processed stick figures, they would be able to achieve very nearly 100% accuracy. If yes, then I'd like to think we could train models to do just as well. And in a way there's a disconnect for me in what a human can infer primarily from watching for known symbols compared with the way these models work that are not in any way informed what an "A" or "B" looks like. I also explored the idea of feeding this information in some way, but I don't know that there's a good way to do that. A different question to ask is if there were not limitations made such that this can be a TFlite model or if we could throw more GPUs and much longer training time, etc., could we then pretty easily bump this accuracy up?
+
+Now that the competition is over, do people tend to tweak further using ideas from other notebooks? Basically I wonder if someone right now could take the best ideas from different notebooks, could we quickly get to 0.9? Or if this solution has already maxed out on what's possible given the constraints.
+
+Well, thank you for posting the writeup, congratulations on the good work, and I'm interested to learn and understand more.
+
+reply
+Reply
+Dieter
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+12
+more_vert
+
+Let me comment on a few of your point. Wont go into details, just give some of my thoughts
+
+Well, I entered this competition as something to do and to run a couple of experiments. I've gone through a decent amount of the general learning stuff on kaggle. I don't have a background in coding (have a PhD in something else, so you know, I can probably learn things),
+
+nobody starts with ML and directly wins competitions. Having also no python nor ML knowledge I worked my ass off and got a place of 500/2000 in my first kaggle competition, which by the way was on speech recognition 6 years ago. But with perseverance and curiosity I continued learning competition by competition and build a skill or two since then.
+
+Regarding your point of flipping hands and using face landmarks. Some signers tend to support their signing with lip movement, which can be supportive signal. Also, not all signs are single handed. E.g. + which is in nearly all phone numbers uses both hands
+
+the 0.84 score means, I think, that on an average 11-12-character phrase, there's nearly 2 changes necessary to get to the right phrase. From looking at the output, I think it's actually the case that you get a decent amount of perfect translation, but there are also a number that are far off.
+
+You need to keep in mind that 10% of the data is corrupted and without signal coming from artefacts where people just tapped the record button, and its impossible to predict the target. But those cases are not relevant to the final usability. For the sequences that contain the actual phrases, our model has a very high accuracy.
+
+reply
+Reply
+Kyle Proffitt
+
+Posted 3 years ago
+
+· 380th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wow, thank you for reading and commenting. I really like hearing that you learned on the job, so to speak, gives hope. (I certainly didn't think I'd win, but the prize money gives me cover for spending a lot of time on this and neglecting other things in life just the same).
+
+I didn't realize plus symbol used both hands. Oops. I probably looked at a few phrases that didn't have + signs and just saw the entire empty data from one hand. I recognize if this was not fingerspelling but more general ASL it would make total sense to use all of the data. I just thought we could simplify here. But just the + information makes quite clear why trying to flip hands or simplify to one ruined it. Thanks for the insight there.
+
+re: accuracy, Is it not true that when you look at a validation callback, you still see a number of phrases that your model just can't get right? I essentially thought that your code effectively removed the artifactual sequences from consideration, so at least for training and validation, this would be dealt with. If the test dataset also contains artifactual data, there's not much that can be done with it, and the model doesn't have the luxury of ignoring it, even though the landmark data in no way actually corresponds to the phrase. But then I'd expect you to be able to calculate your own Levenshtein score as much higher, since it ignores artifacts, and to see a big drop once it is used on test data. I guess at the end of the day I'd like to see the performance on purely cleaned up, like independently verified, data. Thanks again.
+
+reply
+Reply
+Dieter
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I was not talking about raw validation score but rather about the usefulness of our model in the real world, as (at least thats how I understand) it will be directly deployed in an app to help parents learn fingerspelling and support them communicate with their kids. In the real world example users, know when the did not do a proper recording, so only the quality of the model with respect to correctly recorded sequences matters. And thats where our model is quite strong. I would be very interested in human level performance for the train/ test dataset, but I would assume our model is on the same level. Dont know if hosts evaluated this.
+
+reply
+Reply
+greySnow
+
+Posted 3 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Wow, there is so much high-level work here to learn from. I eagerly await your code. Compared to your solution, I feel like a child 😅
+
+reply
+Reply
+Dheeraj Pandey
+
+Posted 3 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations @christofhenkel and @darraghdog
+
+Appreciate your effort! 🙏
+
+reply
+Reply
+2
+Giba
+
+Posted 3 years ago
+
+· 154th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Super congrats @darraghdog and @christofhenkel for this huge win! Thanks for sharing such detailed solution.
+
+reply
+Reply
+Jungwoo Park
+
+Posted 3 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+In general, we observed that a deeper model gives significant gains (if we are able to prevent overfitting).
+
+I agree. For me, 24L 256d was better than 9L 384d, even though they have similar sizes.
+
+reply
+Reply
+Rafi Hai
+
+Posted 3 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and great work! @christofhenkel @darraghdog Staying tuned for code and potential paper 😀
+
+reply
+Reply
+Kaggle God
+
+Posted 3 years ago
+
+· 169th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+absolute GOAT
+
+reply
+Reply
+Alexey Prikhodko
+
+Posted 3 years ago
+
+· 326th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @christofhenkel and @darraghdog!
+
+I would like to ask a few questions about sign language knowledge because I am a deaf signer of sign language. I work as a junior researcher and developer at our university in the field of sign language recognition, focusing more on Data-Centric AI rather than model-centric AI. In sign language recognition tasks, the main challenge is the lack of sufficient dataset. Your solution based on model-centric AI is impressive, and I fully agree that if I had created a clean dataset myself, your model could have achieved close to 100% accuracy.
+
+I only started participating in Kaggle about 4 months ago, and when the "GISLR" competition came up and beyond, I couldn't even achieve a bronze:) , but I'm learning from your examples and others, and gradually improving my model-centric AI skills.
+
+I'm not sure if you know sign language. I would like to ask some questions:
+
+If you were well-versed in sign language, would you approach the solution differently? If yes, how?
+Have you personally studied sign language or interacted with deaf individuals while working on this project?
+reply
+Reply
+Dieter
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for your questions.
+
+Have you personally studied sign language or interacted with deaf individuals while working on this project?
+
+I did not know any sign language before both competitions, but during competitions I also look at the specific domain and try to understand why a model behaves as it does, with respect to mistakes. I went through the different characters on a high level, just to get an understand what is needed to spell a character (single hand? two hands? more?) and how letters, digits and special characters are different. I think understanding of the subtleties helps in model design, because ideally the model is capable at addressing those. Here, understanding fingerspelling and how mediapipe works helped coming up with meaningful augmentations that help the model generalize to new signers. For letters I even spent an hour or two training signing skills via this online game (its quite fun) https://www.signlanguageforum.com/asl/fingerspelling/fingerspelling-game/
+
+If you were well-versed in sign language, would you approach the solution differently? If yes, how?
+
+I dont think so. I often approach problems iteratively. Train a model, look at the predictions and understand if I can find mistakes that are domain related and can be prevented by a better model design (or by improving data quality). It would be easier to understand the mistakes if I would be well-versed in sign language but the approach would be the same
+
+reply
+Reply
+Alexey Prikhodko
+
+Posted 3 years ago
+
+· 326th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your response. If in-depth knowledge of sign language is required for machine learning purposes, feel free to let me know—I'd be happy to assist you :)
+
+reply
+Reply
+Hossam Nasr
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats , A beautiful and clean solution.
+
+reply
+Reply
+S.Inamura
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Muhammad Usman
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @christofhenkel
+
+Great solution man!
+
+reply
+Reply
+Claudio Sturaro
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Amazing, congratulations!
+
+reply
+Reply
+Nathan Barkdull
+
+Posted 3 years ago
+
+· 361st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thanks for the write-up, great learning resource
+
+reply
+Reply
+dragon zhang
+
+Posted 3 years ago
+
+· 220th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+great. Very appreciate it for sharing.
+
+reply
+Reply
+Yassine Alouini
+
+Posted 3 years ago
+
+· 405th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+The diagram is always on point. Congratulations!
+
+reply
+Reply
+gezi
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Excellent work! So many brilliant ideas and you noticed nearly every corner details. While most teams using ctc encoder only method, the seq2seq win 1st place😀 , and also seems using seq2seq we can better ensemble. I have used public seq2seq notebook and also found supplement dataset not help, maybe related to seq2seq method and supplement dataset phrase distribution is very different comparing to train dataset. But for ctc encoder based method I found supplement dataset help improve a lot (more then 10 points). For fp16, I did not notice acc diff if train using fp32+awp then infer with converter.target_spec.supported_types = [tf.float16]. Not sure if there are other differences with your setting.
+
+reply
+Reply
+Zihua Meng
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Your solution is really enlightening to me! Especially the part related to Augmentations.
+
+reply
+Reply
+Al Sani
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great work and best wishes for your job
+
+reply
+Reply
+Hendrik Zimmermann
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Excited to see the code!
+
+reply
+Reply
+Murugesan Narayanaswamy
+
+Posted 3 years ago
+
+· 331st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This competition is about fingerspelling. However, your model uses 130 data points out of which only 27 points belong to fingers / fingerspelling. How much of the accuracy of your model is contributed by the data points related to face?
+
+In the case of 0.697 public notebook based on winning solution of the sign language competition, I found that the accuracy falls down to the extent of 0.02 if we just drop the lip related data points alone. So, how much of the increased accuracy of your model is contributed by additional 70 face related datapoints vs accuracy contributed by the improved model architecture?
+
+reply
+Reply
+Darragh
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+We started the competition with 118 key points referencing the top solution from the first competition. The only additional key points were adding the arms, from pose, which gave an additional ~0.003. We did not do experiments on removing key points. I can imagine by dropping the lips we would get a similar drop as you experienced.
+
+reply
+Reply
+Murugesan Narayanaswamy
+
+Posted 3 years ago
+
+· 331st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+As a research learning / conclusion from this competition, can we conclude that only way to increase the accuracy of American fingerspelling detection and translation is to include data points related to face etc., and just fingers and pose alone are not sufficient? Or is this conclusion reached in previous competition itself and is applicable for this competition also?
+
+Anyway, congratulations for winning this competition - even a week was so tiring, I could see how much of efforts your team would have put into this competition!
+
+(I came to this competition in the last week and it is my first deep learning competition. So, I was just tweaking the best public notebook parameters- those trivial experiments (which could also be misleading) made me to conclude as if no model architecture improvement can compensate for the information provided by datapoints related to lips etc. I am sure you would have done much more meaningful experiments. With your expertise in this area. what could be your insights on this?)
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 3 years ago
+
+· 196th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for topping the LB. Thank you for sharing details of your model. Its indeed a very innovative approach. Can you also share the running time of your notebook. Did you separate the training and inference notebooks?
+
+reply
+Reply
+Dieter
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+training and inference is completely separate. We train locally using pytorch, then convert trained model to tf-lite and only upload submission.zip to kaggle kernel to run inference. Inference runtime is 4.5h
+
+reply
+Reply
+Kyle Proffitt
+
+Posted 3 years ago
+
+· 380th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I think that addresses my question about offline. So PyTorch local. It's probably beyond scope here, but I made an effort to go offline to see if my Mac could handle any of this, tried importing the environment, but it was well above my abilities to get it to all work. I assume you're using Nvidia hardware and not a Mac.
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 3 years ago
+
+· 196th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thats very interesting approach. Can you provide specifics of how to save the model after training and then reload it for inferencing in another notebook?
+
+reply
+Reply
+Dieter
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+train the model, and upload the model weights to a kaggle dataset
+create an inference kernel and link the kaggle dataset which contains the model weights
+reply
+Reply
+hengck23
+
+Posted 3 years ago
+
+· 32nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+" To avoid the model learning with pads, and ensure optimal inference runtime, the feature extractor and Macaron structure encoder layers were masked time wise during training."
+
+i have a question. Besides speedup, is there a change in accuracy? e.g. whisper asr model doesn't not use masking
+
+"The Whisper feature extractor performs two operations. It first pads/truncates a batch of audio samples such that all samples have an input length of 30s. Samples shorter than 30s are padded to 30s by appending zeros to the end of the sequence (zeros in an audio signal corresponding to no signal or silence)"
+
+it seems possible to do without masking? thanks
+
+reply
+Reply
+Darragh
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Using no pad in inference and unmasked pad in training results in lower inference score than CV.
+Masking pads in training leads to same score as no pad in inference.
+We worked on masking until the output of a padded sample through pytorch model was the same as an unpadded sample through tfmodel - layer by layer. In the conformer structure we have layernorms, FFN, MHA and CNN. Layernorms, FFN can be masked with reshapes; the attention scores of MHA can be maskfilled, CNN was applied to whole sequence and the output was mask filled with zeros.
+Masking should be possible in whisper; although I'm not sure how it would affect pretrained weights - we trained from scratch.
+
+reply
+Reply
+Andy Atkinson
+
+Posted 3 years ago
+
+· 74th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Any tips on getting the mask to flow correctly? I tried to get to this point with tf as the prior competition winner used non-padded observations for inference too. I was able to track the existence of my pad mask through each encoder layer. Unfortunately, non-padded inference dropped my score. I noticed softmax accepts a mask argument, tried that. Custom Conv1d with self.support_mask=True allowed the mask to continue through with 'same' style padding. Maybe starting simple to check before adding on more complex layers would have been helpful, confirming each new layer work right would have been helpful?
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+bliao
+
+Posted 3 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations to this great work. I have some questions about the implementation:
+
+Do you use the z coordinate? And how do you normalize the data before augmentation?
+Most of the time we only trained and tracked the score of fold0 and not all folds. How do you evaluate your trained model? I.e. which fold is your validation set?
+reply
+Reply
+Darragh
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+z-coordinate was used. Normalization was performed as below.
+
+        # (seq_len, 3* n_landmarks) -> (seq_len, n_landmarks, 3)
+        x = x.reshape(x.shape[0],3,-1).permute(0,2,1)
+        nonan = x[~torch.isnan(x)].view(-1, x.shape[-1])
+        x = x - nonan.mean(0)[None, None, :]
+        x = x / nonan.std(0, unbiased=False)[None, None, :]
+
+
+Fold 0 was our validation set when running to check CV. Fold 0 had signers exclusively assigned to it.
+
+reply
+Reply
+bliao
+
+Posted 3 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+BTW, how much does ensemble help? Did you try to use one bigger model that is 2x of the ensembled model?
+
+reply
+Reply
+Darragh
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Ensemble of two seeds gave ~0.01+, not sure on the second point, I believe so - you can see in the neptune chart diminishing returns on model size, and more than 14 layers did not help noticeably. p.s. congrats on your gold!
+
+reply
+Reply
+JoAI
+
+Posted 3 years ago
+
+· 109th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks so much for the nice writeup. If I remember correctly, in the competition description, it suggested to discard the z axis data, as the depth info may not be accurate. If you were aware of the suggestion, may I know why you still included z axis data? Did you check the score difference between including and excluding z axis data? Thank you!
+
+reply
+Reply
+Durgesh Tambe
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! I learned a lot from your solution.
+
+reply
+Reply

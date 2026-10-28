@@ -1,0 +1,92 @@
+url: https://github.com/jiegzhan/multi-class-text-classification-cnn-rnn
+fetched: 2026-10-27
+chars: 5461
+
+GitHub - jiegzhan/multi-class-text-classification-cnn-rnn: Classify Kaggle San Francisco Crime Description into 39 classes. Build the model with CNN, RNN (GRU and LSTM) and Word Embeddings on Tensorflow. · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ jiegzhan multi-class-text-classification-cnn-rnn Repository navigation Code Issues 30  ( 30 ) Pull requests 1  ( 1 ) Actions Projects Security and quality Insights More items 
+
+ multi-class-text-classification-cnn-rnn Public Notifications You must be signed in to change notification settings Fork 256  ( 256 ) Star 601  ( 601 ) You must be signed in to star a repository About Classify Kaggle San Francisco Crime Description into 39 classes. Build the model with CNN, RNN (GRU and LSTM) and Word Embeddings on Tensorflow. www.kaggle.com/c/sf-crime/data Topics cnn embeddings kaggle lstm rnn tensorflow text-classification Resources Readme Apache-2.0 license Activity Stars 601 stars Watchers 51 watching Forks 256 forks Report repository main Branches Tags Go to file Code Open more actions menu Latest commit   History 82 Commits 82 Commits Folders and files Name Name Last commit message Last commit date data data     .gitignore .gitignore     LICENSE LICENSE     README.md README.md     data_helper.py data_helper.py     predict.py predict.py     requirements.txt requirements.txt     text_cnn_rnn.py text_cnn_rnn.py     train.py train.py     training_config.json training_config.json     View all files Repository files navigation README Apache-2.0 license More items Project: Classify Kaggle San Francisco Crime Description 
+ Highlights 
+
+ Multi-class text classification (sentence classification) problem. 
+ Classify Kaggle San Francisco Crime Descript into 39 Category labels. 
+ Hybrid TextCNN + GRU model implemented with TensorFlow 2.x Keras . 
+
+ Data: Kaggle San Francisco Crime 
+
+ Input: Descript 
+ Output: Category 
+
+ Examples: 
+
+ Descript 
+ Category 
+
+ GRAND THEFT FROM LOCKED AUTO 
+ LARCENY/THEFT 
+
+ POSSESSION OF NARCOTICS PARAPHERNALIA 
+ DRUG/NARCOTIC 
+
+ Setup 
+ python3 -m venv .venv
+ source .venv/bin/activate
+pip install -r requirements.txt 
+ Training data is included at ./data/train.csv.zip . Prediction sample data is at ./data/small_samples.csv . 
+ Train 
+ python3 train.py ./data/train.csv.zip ./training_config.json 
+ Artifacts are written to ./trained_results_&lt;timestamp&gt;/ : 
+
+ saved_model/ — exported SavedModel for inference 
+ best_model.keras — best validation checkpoint (primary load path for predict) 
+ words_index.json — vocabulary mapping 
+ labels.json — class labels 
+ trained_parameters.json — hyperparameters and sequence length 
+
+ Predict 
+ python3 predict.py ./trained_results_ &lt; timestamp &gt; / ./data/small_samples.csv 
+ Predictions are saved to ./predicted_results_&lt;timestamp&gt;/predictions_all.csv . 
+ Reference 
+
+ Implement a CNN for text classification in TensorFlow 
+
+ About Classify Kaggle San Francisco Crime Description into 39 classes. Build the model with CNN, RNN (GRU and LSTM) and Word Embeddings on Tensorflow. www.kaggle.com/c/sf-crime/data Topics cnn embeddings kaggle lstm rnn tensorflow text-classification Resources Readme Apache-2.0 license Activity Stars 601 stars Watchers 51 watching Forks 256 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

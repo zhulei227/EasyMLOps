@@ -1,0 +1,574 @@
+url: https://www.kaggle.com/c/ubiquant-market-prediction/discussion/338220
+fetched: 2026-10-27
+chars: 16412
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+[1st Place Solution] - Our Betting Strategy — Ubiquant Market Prediction
+[1st Place Solution] - Our Betting Strategy
+
+Ubiquant Market Prediction
+
+Solution Writeup · 1st place · Jul 20, 2022
+
+Thanks to Ubiquant and everyone involved for hosting the contest. And all the competitors who were with us on the six-month journey worked hard.
+
+In particular, the Alphas provided by Ubiquant showed relatively stable and high correlation with the target in the ever-changing financial market. It was a valuable and enjoyable experience to utilize such high-quality data. Thanks again.
+
+Although we were the winners, this is the result of many Kaggler's discussions and public notebooks. Also, I think we were lucky enough that the market conditions made our model smile.  Nevertheless, we want to share the process we went through to increase our chances of getting this luck.
+
+I. Summary
+
+A. Used Models: LGBM, TABNET B. Feature Engineering: 300 + 100 C. Data Sampling: (train.csv + supplemental_train.csv)[2400000:] D. Cross Validation for FE and Parameter Tuning: PurgedGroupTimeSeries, TimeSerieseSplit E. Cross Validation for Training : KFold
+
+II. Detailed description
+
+A. Used Models : LGBM, TABNET
+
+Sorry if you were expecting a special model, this time it's LGBM and TABNET. :D
+LGBM is a powerful model whose performance has been proven in many competitions. It was also the most stable (especially the consistency of CV and LB) and excellent in the experiment on the competition data. (at least for me)
+In addition, candidate models to be ensembled in LGBM were found and tested. Among them, TABNET was selected with the best ensemble effect while being relatively stable.
+Some Custom MLP models were also candidates, and there were models with a significant ensemble effect even on the LB basis, but as a result, they were excluded because they were not stable in CV.
+For loss_fn, rmse and mse are used, respectively, and Pearson Corr. is commonly used for eval_metric.
+The ensemble method : Average of (LGBM x 5 Folds) + (TABNET x 5 Folds)
+
+B. Feature Engineering: 300 + 100 
+
+First, to reduce or remove the influence of unnecessary features, we investigated the importance and corr. of each feature, but did not find any meaningful numerical evidence, and then conversely, we contemplated the features to be added.
+The above 300 means built-in features, and the added 100 features showed consistent and significant improvement in CV and LB Score (CV: 0.141 -> 0.154, LB: 0.141 -> 0.149 based on LGBM single model) .
+Although we only used 100 additional features, this was the largest compromise within the limits allowed by Kernel Resources (especially RAM), and I guess that there would be an additional score increase if more useful features were included.
+The added 100 is calculated in the following way. [ The average value at each time_id for the top 100 features by obtaining and sorting the corr. of 300 features and each target ] [ Code ]
+
+features = [f'f_{i}' for i in range(300)]
+
+corr = train_df[features[:] + ['target']].corr()['target'].reset_index() corr['target'] = abs(corr['target']) corr.sort_values('target', ascending = False, inplace = True) best_corr = corr.iloc[3:103, 0].to_list()
+
+time_id_mean_features = [] for col in tqdm(best_corr):    mapper = train_df.groupby(['time_id'])[col].mean().to_dict()    train_df[f'time_id_{col}'] = train_df['time_id'].map(mapper)    train_df[f'time_id_{col}'] = train_df[f'time_id_{col}'].astype(np.float16)    time_id_mean_features.append(f'time_id_{col}')
+
+features += time_id_mean_features
+
+C. Data Sampling: (train.csv + supplemental_train.csv)[2400000:]
+
+The above means the concatenation of train.csv and supplementa_train.csv, meaning that we used the last 2400k rows of it.
+The reason for this sampling was related to FE of 2, of course, the added features caused a huge memory increase, and we had to trade off [more features] VS [more data].
+For this, various probabilistic measures were performed on Score gains on PurgedGroup and TimeSeriesSplit CV, and we finally decided that additional features have a probabilistic advantage in score improvement.
+After that, as a result of testing in memory (RAM 13GB), the Data Row was stable up to approximately 2500k, but in order to pursue more stability, an additional 100k was dropped. :(
+
+D. Cross Validation for FE and Parameter Tuning : PurgedGroupTimeSeries, TimeSerieseSplit
+
+As already described above, various CVs were used to measure the performance of FE, and the most effective FE was selected from all of these CVs.
+This course also includes Hyper Parameter Tuning.
+
+E. Cross Validation for Training : KFold, GroupKFold
+
+There was another trivial strategy for this choice, which is a self-test data set, which looks like this: training set: (time_id >= 0) and (time_id <= 1000) test set: (time_id >= 1001) and (time_id <= 1202)
+There were various training methods, but as a result of testing in the above environment, [limited training KFold] was selected as the method that showed the most stable and excellent results.
+To elaborate a bit, this has the advantage of being able to include more data in a variety of ways, while at the same time risking overfitting for future references.
+So, to reduce the risk of overfitting, we used an early stop for validation and a method of limiting the number of training (num_boost_round or epoch) to a certain value or less.
+
+P.S.
+
+Second Submission? I didn't mention it above, but yes, I also want to keep the second submission short. Our second submission takes a very different direction from the above. First, supplementa_train.csv was not included, and the above model, mlp, and catboost were included, and there were a little more about 150 features, and it was considerably overfitted with unlimited training (of course, there is an early stop for validation). However, this submission resulted in a silver medal score(0.115796). In this part, I think there was an effect from the exclusion of supplemental data or excessive CV and LB overfitting. Then, in time series data training, I think that the method such as early stop at the time when the CV score decreases to a few percent or less is also a factor to consider, but it is only a guess.
+
+Many Thanks.
+
+============================================= Answering for this guys > @agenlu @hdynamics @ygygyv How to make a feature from test? > Take the average of each feature in the test set by referring to the list of features stored in best_corr in the code above. like this, [Code]
+
+for col in best_corr:   test_df['time_id'] = test_df['row_id'].str[0:4].astype(np.int64)   mapper = test_df.groupby(['time_id'])[col].mean().to_dict()   test_df[f'time_id_{col}'] = test_df['time_id'].map(mapper)
+
+Authors
+yuuniee
+
+yuuniekiri
+
+Karbitrage
+
+jihoonchung
+
+kimimgo
+
+imgyukim
+
+arrow_drop_up
+199
+Share
+more_horiz
+Citation
+
+yuuniee, Karbitrage, kimimgo. [1st Place Solution] - Our Betting Strategy. https://www.kaggle.com/competitions/ubiquant-market-prediction/writeups/k-i-y-1st-place-solution-our-betting-strategy. 2022. Kaggle
+
+comment
+58 Comments
+26 appreciation comments
+Hotness
+mavillan
+
+Posted 4 years ago
+
+· 56th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congrats for the great work you did! Your model was in 1st place in all the last updates, so no luck here just robust modeling.
+
+I have one question for you, how did you blend the predictions of lgbm and tabnet?
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks. I have added the content of what you said to the post. The answer is Average of (LGBM x 5 Folds) + (TABNET x 5 Folds).
+
+reply
+Reply
+Mengfei Li
+
+Posted 4 years ago
+
+· 68th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+It's amazing that GBDT and TABNET beat NN on purely numerical data, and you bravely dropped some features. It seems that in the competitions of stock market predictions, use of neural networks should be carefully chosen. Congratulations!
+
+reply
+Reply
+sirlancelot93
+
+Posted 4 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Is this fact not to be expected though? All the NNs based results in this competition did not look robust at all
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+SIROHAN2
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+nice sharing
+
+reply
+Reply
+Optimo
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Hi, congratulations on the 1st place!
+
+Did you use pytorch-tabnet library? Could you share the hyper-parameters you ended up with for tabnet please?
+
+reply
+Reply
+agenlu
+
+Posted 4 years ago
+
+· 588th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@yuuniee, How do you calculate the added 100 on the test?
+
+Do you have the targets of the test set?
+
+I suppose I am missing something.
+
+reply
+Reply
+Daisy
+
+Posted 4 years ago
+
+· 1048th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+You're great! Congratulations! I think that the following way is different from others. Is this a general way for regression models in complex tables segmented by group like time_id although I know this as a knowledge to build classification models? How do you know this knowledge? Is this your experience through the competitions? Is there a textbook summarized knowledges like this?
+
+The average value at each time_id for the top 100 features by obtaining and sorting the corr. of 300 features and each target
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This is just intuition. However, in this case, I think that it will be possible to create a new feature by examining the correlation between each target and feature between different investment_ids to determine the presence or absence of features for the overall market flow.
+
+reply
+Reply
+Daisy
+
+Posted 4 years ago
+
+· 1048th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You have a good intuition! I think it is the most effective features in this table. I am convinced about it at the present. By the way, how did you make 100 features in test data? We could have obtain one or two rows of test data through API, so we cannot calculate means of features a time_id. How did you overcome it? I understand that you infer the relation between features and target in training data, but grouped features cannot be made. When I recall this, I gave up making them at that time. It can be made in fact?
+
+Thank you for the below answer, @yuuniekiri The reason why I lost is no understanding Ubiquant API!
+
+col in best_corr: test_df['time_id'] = test_df['row_id'].str[0:4].astype(np.int64) mapper = test_df.groupby(['time_id'])[col].mean().to_dict() test_df[f'time_id_{col}'] = test_df['time_id'].map(mapper)
+
+reply
+Reply
+Bella Pisani
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing. It's always helpful when the first place team shares their solution. And congratulations!
+
+reply
+Reply
+Stirkoff
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Both first and nice notebook. cool!
+
+reply
+Reply
+ShroukAli
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Nice Sharing
+
+reply
+Reply
+Danny Sanchez Sanchez
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+thank you so much for sharing this work!
+
+reply
+Reply
+Asghar Ali Khan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+nice sharing, particularly graph explain all the things very clearly
+
+reply
+Reply
+kimimgo
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Best work! It was an honor to be with you @yuuniekiri
+
+reply
+Reply
+xiaoyaojiushao
+
+Posted 4 years ago
+
+· 353rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+The added feature seems to be a whole market trend of one day. In fact, the market really usually go together. Good idea, thanks for sharing👍
+
+reply
+Reply
+ygygyv
+
+Posted 4 years ago
+
+· 364th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! I have a question, the added 100 features are the highest correlation with target at each time id. But how do you deal with test data which don't have target? Thanks!
+
+reply
+Reply
+yuuniee
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Take the average of each feature in the test set by referring to the list of features stored in best_corr in the code above.
+
+reply
+Reply
+Dezheng Huang
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+nice sharing!
+
+reply
+Reply
+hyd
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Very impressive.👍
+
+reply
+Reply
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+`
+
+🎾 Presenting TennisMatrix Data to the Kaggle Community
+
+We at TennisMatrix Data are proud to officially introduce ourselves to the Kaggle community.
+
+For anyone working in sports analytics—especially tennis—we know firsthand how much time is consumed by data collection, cleaning, and feature engineering. That's why we built TennisMatrix Essentials: to give data professionals like you a clean, reliable, and ML-ready dataset from day one.
+
+Our curated ATP men's singles dataset spans 2010–2025 (over 380k rows) and is engineered specifically for predictive modeling.
+What makes our data stand out?
+Clean, structured, and pipeline-ready – No data wrangling needed
+Features engineered for match outcome prediction
+15 years of detailed match-level data
+Strict anti-leakage measures applied throughout the entire dataset design
+Superior predictive potential compared to most public tennis datasets
+
+We believe in transparency and trust. That's why we're offering a free 300-row sample with complete documentation, so you can verify the quality and structure firsthand.
+
+🎁 Kaggle Community Offer
+
+As a thank you for welcoming us here, the first 15 members to use the code:
+
+TENNISMATRIXDATA_2025
+
+will receive 20% off the full dataset.
+
+Whether you're advancing research, exploring betting markets, or sharpening your sports analytics skills, TennisMatrix Essentials is designed to deliver actionable insights from the moment you load the data.
+
+📁 Access Our Free Sample
+
+To get the free sample dataset and documentation, please visit our Kaggle profile where you can download it directly.
+
+Visit our profile to explore the data and see the quality for yourself.
+
+📊 Proof of Predictive Power
+
+We've included a downloadable file with a detailed graph showing the performance of a basic XGBoost model trained on our dataset. This visualization demonstrates the real predictive power that quality, leakage-free data can deliver.
+
+The results speak for themselves—even simple models achieve impressive accuracy with properly engineered features.
+
+🛡️ Anti-Leakage Assurance
+
+Every feature in TennisMatrix Essentials has been developed with strict anti-leakage rules by our professional data science team. We guarantee that our data is temporally correct and ready for robust backtesting and real-world model deployment.
+
+We're here to contribute to the community and support data-driven innovation in tennis analytics. Feel free to ask us anything about the dataset, our methodology, or potential use cases.
+
+📬 Questions or Support?
+
+Reach out to our team directly at:
+
+support@tennismatrixdata.com
+
+We typically respond within 24 hours.
+
+Where data meets the court
+
+TennisMatrix Data Team
+
+`
+
+AUC__ACC_Tournaments.png
+reply
+Reply
+chuxiliyixiaosa
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+How to effectively reduce differences in the distribution of training and testing sets when using historical data to predict the future
+
+reply
+Reply
+gianni
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+is the competition data available somewhere?
+
+reply
+Reply
+Fei Teng zju
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+limited training KFold, could you describe more about this? Does it means "select serveral timezones to train models" ?
+
+reply
+Reply
+Oriol Palau
+
+Posted 4 years ago
+
+· 2255th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations for the success and thanks for shaing this post!
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (26)
+Hide
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+thanks for sharing!
+
+pa920072
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+thanks for sharing

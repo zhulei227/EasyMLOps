@@ -1,0 +1,501 @@
+url: https://www.kaggle.com/c/foursquare-location-matching/discussion/336055
+fetched: 2026-10-27
+chars: 12353
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Foursquare - Location Matching
+1st place solution
+
+Foursquare - Location Matching
+
+Solution Writeup · 1st place · Jul 10, 2022
+
+First of all, thanks to the host for an interesting competition and congratulations to all the winners!
+
+While we learned many things from this competition, it is truly regrettable that there was leakage. It was very sad that we had to spend so much time looking for leaks in the last few days.
+
+Summary
+
+ We divided the generation of candidates and the determination of whether they were the same POI into four separate stages.
+
+1st stage : Create candidates
+2nd stage : Feature engineering and LightGBM
+3rd stage : xlm-roberta-large and mdeberta-v3-base and Catboost
+4th stage : Post Process and Predicting newly emerged candidates with xlm-roberta-large
+
+Next, since there was the same data in train and test, we tried to link them and deleted the pairs that would have been incorrect.
+
+Cross validation strategy
+Local evaluation was done with 2 fold cross validation. In the training for submit, we used all of the 2 fold data.
+1st stage
+For each id, we selected 100 candidates for each of the following two methods
+Euclidean distance in latitude and longitude
+Cos similarity of name embedding
+model : bert-base-multilingual-uncased
+knn : cuml
+Generate features for candidates. Here, to save memory, only a few features were generated, such as jaro distance for names and jaro distance for categories.
+Using LightGBM, each of the above two patterns was predicted, leaving the top 20 candidates each, for a total of about 40 candidates. To reduce inference time, we used Forestinference.
+Max IOU: 0.979
+2nd stage
+We created about 120 features based on the following notebook.
+https://www.kaggle.com/code/ryotayoshinobu/foursquare-lightgbm-baseline
+Character similarity features such as Levenshtein distance and Jaro-winkler Distance.
+Character similarity statistics (maximum, minimum, average) using id as key. Also, the ratio of those statistics.
+Euclidean distance using latitude and longitude
+Embedding of name with svd for dimensionality reduction
+model : bert-base-multilingual-uncased
+LightGBM ( Inference : Forestinference)
+CV : 0.875
+Threshold value : 0.01
+The number of candidates was reduced to about 10%.
+3rd stage
+We had suspected overlap between train and test, but had no direct evidence, so we created train overfit models to increase LB and models to increase CV at the same time. After finding evidence of train and test overlap, we only needed to concentrate on improving the accuracy of the data that existed only in test, so we finally used models that had the highest CV and did not overfit train data(e.g. do not increase the number of epochs, use FGM, etc.)
+catboost
+The same features were used as in the 2nd
+CV : 0.878
+xlm-roberta-large
+text : name + categories + address + city + state
+Combine some features of 2nd ( about 70)
+3 epochs
+mdeberta-v3-base
+text : name + categories + address + city + state
+Combine some features of 2nd and new features ( about 90 )
+manhattan distance, harversinie distance, etc
+Trained with FGM and EMA
+4 epochs
+CV : 0.907
+Ensemble : 2nd lgb * 0.01 + 3rd catboost * 0.32 + 3rd xlm-roberta-large * 0.29 + 3rd medebeta-v3-base * 0.38
+CV : 0.911
+Threshold value : 0.5
+4th stage
+Post procress
+Compare the matches of two ids and merge the matches of two ids if the common id exceeds 50% from either side.
+Prediction with xlm-roberta-large for the newly created pair above.
+Threshold value : 0.02
+CV : 0.9166
+Merge train (Leak)
+Tie train and test by name,lat,lon
+Add true positive
+Create all pairs of true positive with POI as key (1)
+Remove false positive
+Remove Pairs of id's tied with train data (2)
+It was possible to determine whether the id associated with the train data was false positive or not
+Remove pairs of id tied with training data and id not tied with training data(3)
+By using LB, we validated the effects of (1) add train-train tp, (2) remove train-train fp, (3) remove train-test fp, which are explained above.
+We compared LB with submission at stage2.
+Without merge train : 0.900
+(1) : 0.943
+(1) + (2) + (3) : 0.971
+Since we were not sure whether (3) would work for private data, we chose both (1) + (2) and (1) + (2) + (3) for the final submission.
+Private Score / Public Score
+Over fit version
+mdeberta-v3-base(no dropout) 8epoch + xlm-roberta-large 8epoch
+without train merge : 0.946 / 0.947
+with train merge : 0.976 / 0.976
+Non over fit version1
+as explained above
+without train merge : 0.941 / 0.941
+with train merge : 0.977 / 0.978
+(1) + (2) + (3)
+Non over fit version2
+Slightly changed model compared to non over fit version1
+with train merge : 0.966 / 0.966
+(1) + (2)
+About Leakage
+
+For the past few weeks, we have been suspicious of leak for many reasons:
+
+There is a large gap between CV and LB. Max IOU is already high, so a gap of this magnitude is unnatural.
+LB score is higher with overfitted models. For example, no dropout or many epochs training. Training with many epochs leads to a worse CV score.
+As the CV increased, the CV/LB correlation disappeared. We had a big improvement of CV by training of NNs with FGM but LB was worse.
+The host explained that "we include a few example instances selected from the test set." and the two of the five sample records exist in training data.
+
+In the few days just before the deadline, we focused on thinking about how to find and utilize leakage. And fortunately, we succeeded in discovering how to take advantage of leakage.
+
+Inference code
+
+https://www.kaggle.com/code/takoihiraokazu/sub-ex73-74-75-ex104-115-90-101-merge-train3
+
+Authors
+charmq
+
+charmq
+
+Takoi
+
+takoihiraokazu
+
+pao
+
+go5kuramubon
+
+arrow_drop_up
+92
+Share
+more_horiz
+Citation
+
+charmq, Takoi, pao. 1st place solution. https://www.kaggle.com/competitions/foursquare-location-matching/writeups/re-waiwai-1st-place-solution. 2022. Kaggle
+
+comment
+22 Comments
+2 appreciation comments
+Hotness
+Dogukan Celik
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Great approach, thanks for sharing the solution with us! Lot to learn from this.
+
+reply
+Reply
+Subhajit
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Great blog and nice approach! i certainly learned a lot from this. Thanks @takoihiraokazu
+
+reply
+Reply
+Old Monk
+
+Posted 4 years ago
+
+· 240th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great approach, thanks for sharing the solution with us! Lot to learn from this.
+
+reply
+Reply
+zhehao liang
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you its a good approach. Use kaggle like code to solve kaggle problem.. :>
+
+reply
+Reply
+Man of the year
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+xlm-roberta-large text : name + categories + address + city + state Combine some features of 2nd ( about 70) 3 epochs
+
+How do you add features to the roberta model?
+
+reply
+Reply
+Takoi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I have concated it to the output of roberta.
+
+class FourSquare_model(nn.Module):
+    def __init__(self):
+        super(FourSquare_model, self).__init__()
+        self.model = AutoModel.from_pretrained(THIRD_BERT_MODEL1)
+        self.ln1 = nn.LayerNorm(1024)
+        self.linear1 = nn.Sequential(
+            nn.Linear(1024,128),
+            nn.LayerNorm(128),
+            nn.ReLU(),
+            nn.Dropout(0.2))
+
+        self.linear2 = nn.Sequential(
+            nn.Linear(76,128),
+            nn.LayerNorm(128),
+            nn.ReLU(),
+            nn.Dropout(0.2))
+
+        self.linear3 = nn.Sequential(
+            nn.Linear(128 + 128,64),
+            nn.LayerNorm(64),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(64,1),
+           )
+
+
+
+    def forward(self, ids, mask, token_type_ids,num_features):
+        # pooler
+        out = self.model(ids, attention_mask=mask,token_type_ids=token_type_ids)['last_hidden_state'][:,0,:]
+        out =  self.ln1(out)
+        out = self.linear1(out)
+        out2 = self.linear2(num_features)
+        out = torch.cat([out,out2],axis=-1)
+        out = self.linear3(out)
+        return out
+
+reply
+Reply
+TB_dzlb
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+thx for sharing the code
+
+reply
+Reply
+shanshilei
+
+Posted 4 years ago
+
+· 335th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+How to use ForestInference，and How to convert the model to Treelite-compatible format
+
+reply
+Reply
+The Devastator
+
+Posted 4 years ago
+
+· 340th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing your code with us. Your team's feature engineering is really impressive! Congrats!
+
+reply
+Reply
+Javokhir Rajabov
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Interesting approach, it was certainly helpful! Thanks.
+
+reply
+Reply
+Naman Sharma
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Really Nice Work!!
+
+reply
+Reply
+alu arjun
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great approach! thanks for sharing with us
+
+reply
+Reply
+Phaedrus
+
+Posted 4 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great writeup and solution. One question - Why did you choose such low threshold for 2nd stage (0.01), and even after choosing low value the candidates decreased by 90%? I assume threshold = predicted probability from lgbm with rich features.
+
+reply
+Reply
+Takoi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! Yes, I was able to eliminate almost 90% of the data with a threshold of 0.01. The threshold was determined by looking at the balance between the number of remaining data and the max iou. At the end of the 2nd stage, max iou was 0.974.
+
+reply
+Reply
+Phaedrus
+
+Posted 4 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Perfect, thanks! Congrats again.
+
+reply
+Reply
+qyxs
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation and one question, can you share the journey of finding the leak? I think it is very hard because the online train file is different with offline.
+
+reply
+Reply
+Takoi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! Here's how we found leak.
+
+First, the gap between CV and LB was large, LB increased when the number of epochs in the 3rd stage model was increased, and CV increased but LB decreased for the model trained with FGM. From these three points, we suspected that train and test had the same data.
+Next, for further confirmation, we trained the model with a dropout 0 in bert, a model that was more overfit to train. This also increased the LB.
+Furthermore, the host explains in the data tab that "we include a few example instances selected from the test set.", and two of the five sample records exist in training data. https://www.kaggle.com/competitions/foursquare-location-matching/data
+
+From the above, we were almost certain that there was data overlap between train and test. Next, we experimented with the train merge described in the solution using online train data and found that LB did not increase. However, since we were convinced that train and test had the same data, we did not give up and wondered what the problem was. We thought that the contents of train.csv might have been switched, so we used another data that we had uploaded for debugging in advance. When we did so, LB went up quite a bit and we noticed that the contents of train.csv had been replaced.
+
+reply
+Reply
+qyxs
+
+Posted 4 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Admire your team, especially the spirit of never giving up.
+
+reply
+Reply
+Bilal Suppal
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation and one question, can you share the journey of finding the leak? I think it is very hard because the online train file is different with offline.
+
+reply
+Reply
+OJASWA YADAV
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Appreciate this approach, kudos
+
+reply
+Reply
+Appreciation (2)
+Muhammad Rejwan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+thank you for sharing the code
+
+HendZB
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Very interesting, thanks for sharing.

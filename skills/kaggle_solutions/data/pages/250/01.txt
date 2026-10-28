@@ -1,0 +1,54 @@
+url: https://www.kaggle.com/c/kkbox-music-recommendation-challenge/discussion/45942
+fetched: 2026-10-27
+chars: 780
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+KKBOX · Research Prediction Competition · 9 years ago
+Late Submission
+more_horiz
+WSDM - KKBox's Music Recommendation Challenge
+
+Can you build the best music recommendation system?
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

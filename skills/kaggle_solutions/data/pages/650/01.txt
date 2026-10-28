@@ -1,0 +1,674 @@
+url: https://www.kaggle.com/c/drawing-with-llms/discussion/581027
+fetched: 2026-10-27
+chars: 15451
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Drawing with LLMs
+1st Place Solution
+
+Drawing with LLMs
+
+Solution Writeup · 1st place · May 28, 2025
+
+New Team Name - 1st Place Solution
+
+Congratulations to all the other winners and thanks to Kaggle for hosting such a unique competition - it was a lot of fun to participate in! Thanks also to my teammates @huanligong and @kenyeungtech !
+
+TL;DR
+
+The notebook for our top scoring submission can be found here.
+
+Generate 64 baseline images with Segmind's SSD-1B model.
+Convert each image to an SVG.
+Add the OCR decoy, prompt text, and a number of other aesthetic artifacts to each SVG.
+Convert the SVGs to images, apply the image processing pipeline, and calculate their aesthetic scores.
+Select the SVG with the highest aesthetic score for submission.
+OCR Exploits
+Avoiding Hallucinations
+
+We embed three visible characters in the top left corner of each SVG to avoid OCR hallucinations. Running a search across three-letter combinations of characters revealed that "ZOK" produced the highest average aesthetic scores without impacting VQA scores.
+
+Hiding Additional Text
+
+The most lightweight and reliable method of improving the VQA score is to directly include text related to the prompt in the image. However, simply embedding the prompt text would result in scores of zero due to the OCR penalties applied by the metric. To avoid these penalties, we hide any embedded text using the following repeating, noise-like pattern:
+
+<defs>
+    <pattern id="a" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+        <g opacity=".1">
+            <path fill="#fff" d="M1 1h1v1H1z"/>
+            <path fill="#ff0" d="M4 2h1v1H4z"/>
+            <path fill="#0f0" d="M6 8h1v1H6z"/>
+            <path fill="#00f" d="M9 5h1v1H9z"/>
+        </g>
+    </pattern>
+</defs>
+<rect width="100%" height="100%" fill="url(#a)"/>
+
+
+This results in text which is hidden in both the raw and partially processed image (which is used for OCR). The fully processed image, which is used to calculate aesthetic and VQA scores, reveals the hidden text:
+
+Image Generation and Conversion
+Diffusion Model
+
+We use Segmind's SSD-1B model to generate 64 images for the given description of the target SVG.
+
+To improve efficiency, we apply the following modifications to the base model:
+
+Replace the default VAE with madebyollin's Tiny AutoEncoder for Stable Diffusion (XL),
+Use a DPM-Solver multistep scheduler with 12 inference steps,
+Enable DeepCache with cache_interval=2 and cache_branch_id=0,
+Run image generation across both T4 GPUs in parallel, generating 32 images per GPU.
+
+Each image is generated at a resolution of 384×384 with a guidance scale of 8. We use the following prompts:
+
+Prompt
+flat vector illustration, flat color blocks, hard color boundaries, solid fills, clipart style, \
+no shading, no blending, minimalist, simple design, saturated colors, extremely simplistic and minimal, \
+style: vector clip art, small color palette prompt: vector art of {SVG_DESCRIPTION}
+
+Negative Prompt
+photorealistic, realistic, detailed, 3D, complex shading, gradients, soft edges, text, signature, \
+watermark, texture, painting, blurry, pixelated, thin lines, dots, cropped border, picture frame
+
+
+With multi-threading, image generation takes ~15 seconds for 64 samples. However, due to the multi-threading bug currently present in Kaggle packages, we opted to use single-threading for more reliable submissions, resulting in a ~30 second generation time.
+
+Conversion to SVG
+
+Each image is downsampled and quantized to six colors. For each of the six colors, we extract contours using OpenCV and simplify them to polygons. We then scale the polygons back to their original size and convert them to compressed SVG paths. We rank each extracted path by its size, centrality and simplicity and then continuously add them to the SVG until the 6000-byte size limit is reached. This process takes ~2.5 seconds for a batch of 64 images.
+
+Examples of Generated Images and Converted SVGs
+
+Constructing the SVG
+
+We scale the SVG we extracted from the generated image down to 40% of its original size and place it in the top center of our final SVG. We then add the anti-OCR hallucination text in the top left corner, remove all stopwords from the SVG description, and embed the text just below the image. The text is embedded using SVG paths which we also heavily compress.
+
+Finally, we add a number of other artifacts to the SVG which are designed to improve the aesthetic score without negatively impacting the VQA score:
+
+A 5×4 patch of colored squares (we test four different variations of these colored squares for each generated image),
+Green text spelling "KUZ",
+Green text spelling "3Q3",
+Gray text spelling "SSQ",
+Green text spelling "FRANCE XK ARTS" (if sufficient space is available after the SVG description text).
+
+Each of these artifacts was found using either a genetic algorithm, a hill climb search, or occasionally a manual guess and check approach.
+
+Examples of Fully Constructed SVGs (before and after processing)
+
+Fallback SVGs
+
+In case of timeouts or exceptions we also prepare a simple text-only SVG which includes anti-OCR hallucination text, the text from the SVG description with a simple suffix ("AMAZING EUROPE OIL ART EUROPE") and a few of the aforementioned aesthetic artifacts.
+
+We didn't spend too much time refining these fallback SVGs in the later stages of the competition as our highest scoring submissions didn't make any use of them.
+
+Final SVG Selection
+
+We convert each of the SVGs back to images and apply the image processing pipeline to them. We use a custom implementation of the image processor from the metric that is much more efficient and produces almost identical results. We then calculate the aesthetic score for each of the images and simply return the SVG that got the highest score. The average aesthetic score for our selected SVGs was ~0.563 and the VQA score was ~0.88 when run on the validation dataset in our highest scoring submission.
+
+What Didn't Work
+
+We experimented with many different techniques and variations on the above approach that didn't result in improved scores:
+
+Incorporating CLIP scores, VQA scores, etc. into the equation we used to select the final SVG for submission.
+Generating more than 64 images (although on the private LB this seemed to work quite well).
+Calculating mean aesthetic scores for each SVG across multiple applications of the image processing pipeline.
+Different placements of aesthetic patches of colored squares (along the border, to the left of the image, etc.).
+Bonus: Old Metric Solution
+
+For the old metric we used a differentiable approach to find a set of 237 small squares that produced the highest aesthetic score with some small text designed to maximize the VQA score. The following image got a score of 1.014 with an aesthetic score of >1.2: 
+
+Authors
+conor
+
+conormacamhlaoibh
+
+kenyeung.tech
+
+kenyeungtech
+
+Filtered
+
+huanligong
+
+arrow_drop_up
+76
+Share
+more_horiz
+Citation
+
+conor, kenyeung.tech, Filtered. 1st Place Solution. https://www.kaggle.com/competitions/drawing-with-llms/writeups/new-team-name-1st-place-solution. 2025. Kaggle
+
+14
+6
+comment
+43 Comments
+5 appreciation comments
+Hotness
+ISAKA Tsuyoshi
+
+Posted a year ago
+
+· 135th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your well-deserved victory! Your solution is truly impressive. If you don't mind, may I kindly ask how you prepared the dataset for local evaluation?
+
+reply
+Reply
+conor
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks! For local evaluation of aesthetic scores we generated 128 images for each of the prompts in the training data and converted them to SVGs. Whenever we wanted to test a new aesthetic feature we could just append new paths, etc. to the SVGs we'd previously generated.
+
+reply
+Reply
+3
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, outstanding solutions, learn a lot!
+
+reply
+Reply
+Sarah Arshad
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Fantastic….great job man!
+
+reply
+Reply
+Zhuang Jia
+
+Posted a year ago
+
+· 46th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, I have so much to learn.
+
+reply
+Reply
+RainClould
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, I have so much to learn,it's so good
+
+reply
+Reply
+Runlin Liu_04
+
+Posted a year ago
+
+· 25th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thank you for sharing!
+
+reply
+Reply
+BeaKaggle
+
+Posted a year ago
+
+· 249th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@conormacamhlaoibh , Congrats to you and your teammates—well deserved! We should all try to get an internship with you during the next competition. :-)
+
+Question: Would you mind sharing your notebooks for the genetic algorithm and hill climbing search that you used to create the artifacts you added to the SVGs to increase the aesthetic score?
+
+Thanks!
+
+reply
+Reply
+Filtered
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+here is a version of a different placement for your reference: https://www.kaggle.com/code/huanligong/fork-of-ga-share2
+
+reply
+Reply
+BeaKaggle
+
+Posted a year ago
+
+· 249th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you @huanligong
+
+reply
+Reply
+Sthepany Sté
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+nossa muita coisa legal de aprender , obrigado por compartilhar '-'
+
+reply
+Reply
+Meobius
+
+Posted a year ago
+
+· 111th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Awesome! So much to learn!
+
+reply
+Reply
+Henry
+
+Posted a year ago
+
+· 55th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Impressive!
+
+reply
+Reply
+Farhan Billah
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+🔥 Awesome! The way you hid the prompt text to avoid OCR penalties while still boosting VQA is really amazing. I’m curious—did you experiment with other diffusion models besides SSD-1B, or was this the clear winner in early testing?
+
+reply
+Reply
+conor
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We also tested SDXL-Turbo but didn't see much difference - we mainly wanted a model that was small and fast without worrying too much about image quality.
+
+reply
+Reply
+1
+nickyl
+
+Posted a year ago
+
+· 419th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, I have so much to learn,it's so good
+
+reply
+Reply
+DaleDew
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice solution, good for you
+
+reply
+Reply
+MJeremy
+
+Posted a year ago
+
+· 327th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+pretty cool, even hacking against the VQA score part is pro level.
+
+Wonder how did you decide to use this model segmind/SSD-1B, any decision process of trial and error?
+
+reply
+Reply
+conor
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+We initially chose it because it's smaller and faster than the base SDXL while still producing decent quality images. We tried out SDXL-Turbo too.
+
+All we were really looking for was speed and a small VRAM footprint so we could use large batch sizes.
+
+reply
+Reply
+1
+MANDAR INGOLE
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+great awsome
+
+reply
+Reply
+kaggle Osaka
+
+Posted a year ago
+
+· 259th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+おめでとうございます　大変勉強になります
+
+reply
+Reply
+Jack Zhang
+
+Posted a year ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your well-deserved victory! Thanks for your sharing! I didn't realize that the images for ocr test and vqa score are different. If you don't mind, may I kindly ask if this hack technique still works when the image for ocr is also full processed?
+
+reply
+Reply
+conor
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+When OCR is done on the fully processed image this exact method doesn't work. However, we were able to find another noise pattern and text format that made it so, for the exact same image, the OCR returned nothing but the VQA was still influenced by the hidden text.
+
+reply
+Reply
+Waylon Wu
+
+Posted a year ago
+
+· 34th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@conormacamhlaoibh This is a great idea! Let's say the image of OCR and VQA are done on the same level of processing, how woud you make "the OCR returned nothing but the VQA was still influenced by the hidden text."?
+
+reply
+Reply
+conor
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@waylongo I think this was one of the simpler versions we found that worked:
+
+For the same processed image, the OCR would only detect "ZOK" but the VQA scores would still be very high.
+
+The SVG for the noise pattern is:
+
+<svg width="384" height="384" viewBox="0 0 384 384">
+    <defs>
+        <pattern id="n" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+            <g opacity="0.1">
+                <rect x="1" y="1" width="2" height="2" fill="#fff"/>
+                <rect x="4" y="2" width="2" height="2" fill="#ff0"/>
+                <rect x="6" y="8" width="2" height="2" fill="#0f0"/>
+                <rect x="9" y="5" width="2" height="2" fill="#00f"/>
+            </g>
+        </pattern>
+    </defs>
+
+    <rect width="100%" height="100%" fill="url(#n)"/>
+</svg>
+
+reply
+Reply
+Marpini Pavan Srikar
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation, I have so much to learn.
+
+reply
+Reply
+Henry
+
+Posted a year ago
+
+· 55th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, good work!
+
+reply
+Reply
+LaNKuN
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! I have so much to learn.
+
+reply
+Reply
+Jawad Arshad
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, I have so much to learn.
+
+reply
+Reply
+Amirhosein Akbari
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+wow, so good
+
+reply
+Reply
+JP
+
+Posted a year ago
+
+· 302nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+You did it again!! Congratulations @conormacamhlaoibh and New Team Name! I love the way you took advantage of the difference in preprocessing pipelines for computing the OCR score, and the aesthetic and VQA scores. I found every part of the approach inspired! Full mark for originality!
+
+We didn't spend too much time refining these fallback SVGs in the later stages of the competition as our highest scoring submissions didn't make any use of them.
+
+Do you mean in the validation set? Otherwise, how do you know that these weren't used?
+
+reply
+Reply
+conor
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you!
+
+The fallback SVGs always had much lower aesthetic scores than the highest scoring generated SVG so we never deliberately selected them.
+
+The only other way a fallback SVG could have been selected is if an exception occurred or we ran out of time, but in our highest scoring submissions we had robust enough code and time management that we're pretty sure there weren't any such issues.
+
+reply
+Reply
+Amirhosean Akbari
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+that was so fantastic
+
+reply
+Reply
+Xueqi Ding
+
+Posted a year ago
+
+· 25th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thank you for sharing solutions.
+
+reply
+Reply

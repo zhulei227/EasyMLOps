@@ -1,0 +1,595 @@
+url: https://www.kaggle.com/c/playground-series-s4e12/discussion/554328
+fetched: 2026-10-27
+chars: 17288
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - Single Model - Feature Engineering — Regression with an Insurance Dataset
+1st Place - Single Model - Feature Engineering
+
+Regression with an Insurance Dataset
+
+Solution Writeup · 1st place
+
+This was a fun competition. In my first two playground competitions (Sept 2024, Nov 2024), feature engineering didn't improve CV nor LB too much, so in those competitions, I spent my time building a large ensemble of diverse models (GBDT, NN, SVM, etc).
+
+In this December Kaggle Insurance playground competition, feature engineering helped improve CV score and LB score, so in this competition, I was able to spend time building a single model and engineering features. It was very enjoyable to build a strong single model. My final submission is a single XGBoost model with 611 features! Thank you Kaggle for providing a fun competition that allowed Kagglers to practice categorical feature engineering!
+
+Solution Code Notebook
+
+I published a simple version of my final submission here which achieves CV = 1.019. The full version model achieves CV = 1.016 and takes 6 hours on 1xA100 GPU to feature engineer and train. The simple version takes 2 hours on 1xT4 GPU. The simple version uses only 229 out of 611 features. It uses learning_rate = 0.01 versus 0.001, and n_estimators = 2_000 versus 20_000, and target_encode(kfold=5) versus kfold=10. (These simplifications shorten training time but decrease CV score and LB score).
+
+Feature Engineering Categorical Columns
+
+A common way to improve the CV score and LB score of GBDT (gradient boosted decision trees like XGB, CAT, LGBM) is to provide various encodings for the categorical features. Given a categorical column, the basic encoding is label encoding. More advanced is target encoding mean(i.e. TE) and count encoding(i.e. CE). We can even TE median, TE min, TE max, TE nunique. We give the model the original column plus 6 different representations of the original. All 7 of these different encodings are input to the model and give GBDT multiple ways to understand the categorical column and improve CV score and LB score. And of course we can even invent more encodings.
+
+Create New Categorical Columns
+
+Since encoding categorical columns improves our CV score and LB score, we can create more categorical columns by combining existing categorical columns. Then we can engineer more encodings from the new columns and improve CV score and LB score even more. In my published code here, we create 20 new columns (by combining existing columns). We shared this idea in September's playground competition here.
+
+For example we can combine 2 columns together. If we have column Occupation which is categorical with 3 values ['Self-Employed', 'Employed', 'Unemployed'] and we have column Gender which is categorical with 2 values ['Female', 'Male']. Then we can create a new column by combining these two with train['new'] = train.Occupation +"_" + train.Gender. Then the new column is categorical with 6 values ['Self-Employed_Female', 'Self-Employed_Male', 'Employed_Female', 'Employed_Male', 'Unemployed_Female', 'Unemployed_Male']. We can also combine 3,4,5,6,etc columns together.
+
+Treat Numerical Columns as Categorical
+
+Another technique that often works is to treat numerical columns as if they are categorical. Then we can encode them with TE mean, TE median, TE min, TE max, TE nunique, and CE. And we can combine numerical columns with other numerical and/or categorical columns and apply TE and CE to the resultant new column.
+
+Search Using GPU RAPIDS cuDF-Pandas!
+
+In this competition after decomposing the Policy Start Date (into year, month, day, hour, etc), we have 23 original columns. If we create all combinations of 2,3,4,5 and 6 columns we will have 145_000 new columns! This is too many, therefore we need to find and use the best ones.
+
+For each combination, we need to create the new column, compute TE and CE which requires nested fold groupby aggreations, then train an XGBoost model. Evaluating a single combination takes time. Using GPU cuDF-Pandas, we can search 10x to 100x more combinations than using CPU, wow!
+
+During this competition, I left my computer running day and night in a for-loop running GPU cuDF-Pandas evaluating thousands of random combinations. Whenever feature engineering a combination with TE and CE improves CV score, the code saves it to a list. After running for multiple days, the code found 170 powerful combinations. I publish the best 20 combinations in my solution code here.
+
+Learn More About Categorical Encodings
+
+If you want to learn more about feature engineering categorical columns, NVIDIA KGMON will present a workshop at NVIDIA's 2025 GTC (i.e. GPU Technology Conference) in San Jose, California on March 17 thru 25th 2025 here. Specifically we will show how to perform TE (target encoding) and CE (count encoding) and explain why it works. And we will show how to incorporate these features into models to improve CV score and LB score!
+
+Author
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+235
+Share
+more_horiz
+Citation
+
+Chris Deotte. 1st Place - Single Model - Feature Engineering. https://www.kaggle.com/competitions/playground-series-s4e12/writeups/chris-deotte-1st-place-single-model-feature-engine. 2025. Kaggle
+
+46
+20
+31
+2
+1
+comment
+95 Comments
+21 appreciation comments
+Hotness
+Student
+
+Posted 2 years ago
+
+· 1651st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+In the published code, the function target_encode() implements target/count encoding. In the kfold for-loop, why is mn calculated using train df and not df_tmp? Wouldn't there be a risk of target leakage when the nan rows are filled with mn or when mn is used for smoothing? 
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Yes, you are correct that using train during each fold iteration is "leaky" (but not too much) compared with using the proper df_tmp. The original code from the TE tutorial (where I got this code) uses df_tmp. But the code in RAPIDS cuML Target Encoder uses train. So I tried both (even though the later is a little "leaky")
+
+Using train and accepting a little leakage improved CV and LB score, so I went with that. I think it is because all the NAN get replaced with the same mean. If we use a different mean per fold, then when we train our XGBoost using this output, than NAN has been transformed into 5 different values, so the GBDT must work harder to make the same prediction for all NAN. But when we use mean from train, then all NAN will get mapped to the same "leaky" mean and then GBDT can easily process all NAN similarly.
+
+None-the-less, you make a great observation and this is something to explore the ramifications of.
+
+reply
+Reply
+Student
+
+Posted 2 years ago
+
+· 1651st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+FWIW, I saw that sklearn has an implementation of target encoder too, and based on this simple example that I have tested, they use df_tmp instead of train.
+
+reply
+Reply
+2
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you that is good to know.
+
+reply
+Reply
+1
+Masaya Kawamata
+
+Posted 2 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations on your well-deserved first place! Your discussion posts have been incredibly insightful and valuable, especially for someone like me who is still learning and gaining experience. The clarity and generosity in sharing your approach have made a significant impact on my understanding and growth!
+
+reply
+Reply
+Mart Preusse
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congratulation on winning this playground. I was so occupied with the Santa competition that I realized this just now. I am not surprised. However, I am surprised that you made it with feature engineering and just one model (ok, a very complex one). Thanks for sharing your approach in detail.
+
+reply
+Reply
+1
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks @martinapreusse ! Congratulations winning 1st place in Used Car Playground comp!
+
+reply
+Reply
+laiflonglearner
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Awesome work, really appreciate you sharing this! 👏 I'm new to Kaggle and still a beginner in data science. Most notebooks I found for learning purposes are usually divided into different sections such as data cleaning, EDA, bivariate analysis, multivariate analysis, data modeling, etc. Is there any reason as to why in Kaggle competitions, we don't need to have our notebook/solution using that commonly used structure?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+A Kaggle notebook has 2 purposes. One purpose is to submit predictions to the leaderboard and the second reason is to make it readable to other Kagglers reading it (which includes adding some EDA and explanations).
+
+So some Kagglers just do their EDA and analysis in one notebook (and/or on their local computer), and make their submission is a second notebook. And Kagglers do different things regarding making their notebooks readable to other Kagglers and/or sharing or hiding their EDA. And Kagglers do different things regarding what part of their work they share with other Kagglers (i.e. maybe they just share EDA, or maybe just share final submission model, etc).
+
+reply
+Reply
+4
+laiflonglearner
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+That makes a lot of sense, thank you so much!
+
+reply
+Reply
+Student
+
+Posted 2 years ago
+
+· 1651st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Great work! Thank you for sharing. Just one question: how do you prevent over fitting when you test so many combinations of factors (over 145k)? Wouldn't many of the factors improve CV score just by chance?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+The train data has 1.2 million rows. Therefore it is hard to improve CV score by chance (i.e. it is hard to get lucky with 1.2 million OOF predictions all being better by chance). If we have less train data, then we need to be more careful and perhaps only consider combinations of 2 and 3. And not combinations of 2,3,4,5,6.
+
+reply
+Reply
+Marília Prata
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations and many top places/solutions on 2025 ChrisD!
+
+reply
+Reply
+Tulegen Didar - 26MD0292
+
+Posted 2 years ago
+
+· 2290th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hello Chris Deotte, your insights and approach in this competition are truly inspiring! I’m aspiring to become a data scientist and would love to know which online courses you would recommend for mastering this profession. Any guidance would be greatly appreciated. Thanks!
+
+reply
+Reply
+Vidushi mangal
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+"This post was a fantastic learning experience! Focusing on feature engineering, particularly for categorical variables, proved to be highly effective. The ability to build a strong single XGBoost model with 611 features, many generated through creative combinations and encodings, was incredibly rewarding.
+
+I'd like to express my gratitude to author for providing insightful details. It has reinforced the value of exploring diverse feature engineering techniques and their impact on model performance."
+
+reply
+Reply
+ML_Magic
+
+Posted 2 years ago
+
+· 528th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+great work.. congratulations
+
+reply
+Reply
+Sumit_08
+
+Posted 2 years ago
+
+· 1013th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on securing 1st place in the Kaggle Insurance competition! It’s impressive how you leveraged feature engineering, especially with categorical features, and made the most of advanced techniques like target encoding and count encoding. Your dedication and innovative use of GPU RAPIDS to search for combinations really paid off. It’s inspiring to see how you crafted such a strong model! @cdeotte
+
+reply
+Reply
+Ömer Tanır
+
+Posted 2 years ago
+
+· 38th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Huge congratulations, Chris, on securing 1st place with your exceptional single XGBoost model and innovative feature engineering! 🎉
+
+reply
+Reply
+Daniel Durbin
+
+Posted 2 years ago
+
+· 1600th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats, @cdeotte. Thanks for all the posts throughout this and others; they are super beneficial. Also, thanks for the GTC plug. I'm looking forward to (virtually) seeing it for the first time.
+
+reply
+Reply
+banbiossa
+
+Posted 2 years ago
+
+· 399th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I totally had thought that ensembling would be the 1st place solution. It's cool that there's always a new approach, and this sure was an elegant solution focusing on feature engineering and using only a single model! I'll take this code and see how long it takes to train on a 8GB mac mini :)
+
+reply
+Reply
+emoji_people
+Bhargav Borah
+
+Posted 2 years ago
+
+· 291st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @cdeotte for the very well deserved 1st place. And thanks for the insightful write-up and the helpful discussion posts throughout the competition. Also, if I may ask, how much of the feature engineering you do is automated as against manual?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thank you. Great question. In all cases, I do both. However when dealing with real data, I do more manual feature engineering using intuition about which features should be combined and what else should be tried. When working with synthetic data, I do more automated searching because the synthetic process can/will add signal that doesn't really make sense so we need to search everything.
+
+reply
+Reply
+2
+Thomas Meißner
+
+Posted 2 years ago
+
+· 865th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Its fantastic to see a single model solution working here, congratulations and happy new year 🎉
+
+reply
+Reply
+giim
+
+Posted 2 years ago
+
+· 397th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Agreeing with you! I did not try ensembling but I assumed that, again, it would be one of the ingredients for edging the competition.
+
+reply
+Reply
+Chris Akiki
+
+Posted 2 years ago
+
+· 1486th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+If you want to learn more about feature engineering categorical columns, NVIDIA KGMON will present a workshop at NVIDIA's 2025 GTC (i.e. GPU Technology Conference) in San Jose, California on March 17 thru 25th 2025 here. Specifically we will show how to perform TE (target encoding) and CE (count encoding) and explain why it works. And we will show how to incorporate these features into models to improve CV score and LB score!
+
+Would love to attend this, when exactly is this taking place @cdeotte ?
+
+reply
+Reply
+Edosuyi Enosakhare
+
+Posted 2 years ago
+
+· 1968th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This is cool
+
+reply
+Reply
+I2nfinit3y
+
+Posted 2 years ago
+
+· 306th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hey Chris, this article help me a lot about feature engineering! I also wanna know that in the KFold cross-validation, te( target encode) should be used before dataset split or after that? Is there data leakage if we use target encode for all the train data and then we split it into training dataset and validation dataset ?
+
+reply
+Reply
+Sani Kamal
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning this playground.
+
+reply
+Reply
+Akash Kumar
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Hi can anyone tell me which encoding method is best for categorical features for this datasets?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+The two most common and most often the best are TE_mean and CE. After that we can add more TE like TE_median, TE_min, TE_max, TE_nunique etc
+
+reply
+Reply
+adityaghai07
+
+Posted 2 years ago
+
+· 1028th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations , the solution looks great and shows your hardwork!
+
+reply
+Reply
+HaXL
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats friend your a inspiration to every kaggler 😁
+
+reply
+Reply
+Rounak Gera
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congrats and can you please mention some good resource to learn the ensembling and main techniques required to perform well in kaggle competitions. Thanks in advance
+
+reply
+Reply
+Mahmood Yousaf
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thanks. for sharing!
+
+reply
+Reply
+Oluwabori Ige
+
+Posted 2 years ago
+
+· 1009th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing @cdeotte. Generally, more research lights are shed on expanding the GPUs which is an intriguing topic. can the possibilities of using LLMs for this type of project be further examined? Maybe not for predictions purposes but for properly aligning the dataset and fitting missing values
+
+reply
+Reply

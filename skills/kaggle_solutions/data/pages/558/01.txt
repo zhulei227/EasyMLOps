@@ -1,0 +1,630 @@
+url: https://www.kaggle.com/c/vesuvius-challenge-ink-detection/discussion/417496
+fetched: 2026-10-27
+chars: 22839
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Vesuvius Challenge - Ink Detection
+1st place solution
+
+Vesuvius Challenge - Ink Detection
+
+Solution Writeup · 1st place
+
+It was a very nervy ending to this competition, we held first for a long time but I am always scared of a shake-up. We tried to play it very defensively to ensure that we weren't doing anything to over-optimize for the leaderboard. Still, there is always a certain level of uncertainty when the public leaderboard is so small and your local validation is not extremely stable.
+
+tl;dr At a high level, I would attribute most of our success to:
+
+Larger crops
+Strong depth-invariant models
+Averaging several models to give us better calibration
+Training against all available data after validating against fragment 1 rigorously
+
+Data prep We initially started with the 2.5d starter code and evolved it over time. What we ended up settling on was just taking the middle 16 layers, but we tried plenty of other things that didn't work. I will save that for another post. Initially, the code was configured to train against all of the crops of the image, but we filtered this very simply based on if a crop was blank. This greatly reduced our training time because many of the crops had no data in them at all.
+
+Early on there was very little progress being made and then we ran simple ablations to see how performance was impacted by the crop size and found that there was good scaling potential there. Seemed like one of the clearest patterns we saw early on. 128 got beat by 512 which got beaten by 1024.
+
+It seemed that the x,y context was very important here because the crop could look at a whole letter or even a couple letters at a time and draw them out more completely. Smaller crops yielded much patchier-looking outputs. One nice thing about this approach was it actually didn't increase training time at all. if you ran it with 1024x1024 crops you had to train against way less crops than if you did 128x128 crops so the epoch time and wall-clock convergence time was virtually identical, unlike some other competitions where increasing the resize makes the computation take longer.
+
+Models We started with the 2.5D approach but it became apparent that it wasn't optimal because the model was learning which layers had ink in them and we knew that this varied between fragments. We wanted a solution that was depth-invariant, that could detect ink in any layer. One approach would be training a simple 2d model on each slice of the 3d volume, but with the way the data was labeled, only 2d to start with, we would be giving bad signal to the model if we told it ink was in layers that it actually wasnt and vice versa. We had many discussions about how we handle this, 1D convolutions, max pooling, 3d convolutions with size (8, 1, 1) so it was only truly looking across the depth patterns. What we found to be the most performant was using strong 3d models that would output a new 3d volume with many channels and then we could flatten them along the depth axis with a max.
+
+So for example, our first approach in this vein was a simple 3dcnn. input shape was (batch_size, 1, 16, 1024, 1024). We applied 4 layers of 3d convolutions on top of this with progressively more filters until finally, we had an output volume of (batch_size, 16, 16, 1024, 1024). At this point we just took the max across the z-dimension to squish it down to (batch_size, 16, 1024, 1024) so our 16 depth dimensions were now replaced with 16 feature dimensions. This alone was a decent approach but then passing this through a strong 2d segmentation model made it much better. We heavily relied on segformer for this, as others have mentioned b3 backbone worked great, but we also found that directionally the even bigger models performed better on the leaderboard even if they didnt perform measurably better on local validation.
+
+We iterated on this design because it seemed to satisfy the qualities we wanted, a strong 2d segmenter applied to a 3d volume that was invariant to depth. We tried different first-stage 3d methods and found that even stronger 3d models yielded better results. Evolving to 3d unet's and then eventually 3d unetr. Sometimes the results were unclear if they were better but we found a clear trend that the on-paper better models also did better on the leaderboard. Our best individual model was a UNETR first stage that passed 32 channels into a b5 segformer which scored 0.82 on the public leaderboard and 0.67 on the private. We applied a small amount of dropout on the channels in between the 3d and 2d stage.
+
+One thing I always wondered about was if the strength of the segformer wasnt actually that it was the best model but that it was making predictions at a lower resolution. We pass it the 1024x1024 and it returns back a 256x256 segmentation map. We simply upscaled it with a very simple conv2d transpose. I believe the second place solution verifies this that the lower resolution actually helps because it is doing much coarser classification which makes it easier than trying to more precisely get every pixel.
+
+Our final best solution was 9 different models
+
+1st stage	2nd stage	Resolution	Public Score
+3d unet(16 channels)	segformer b3	1024	.78
+3d unet(16 channels)	segformer b3	512	.77
+3d unet(16 channels with SWA)	segformer b3	512	.78
+3d cnn(32 channels)	segformer b3	1024	.78
+3d cnn(32 channels)	segformer b5	1024	.77
+3d cnn(64 channels)	segformer b3	1024	.78
+3d unet(32 channels)	segformer b5	1024	.79
+3d unetr(32 channels)	segformer b5	512	.82
+3d unetr multiclass(32 channels)	segformer b5	512	?
+
+One thing we tried late-on was multi-class output. Instead of binary we tried to predict nothing-mask-ink. This ended up yielding a much cleaner looking output actually, in most of our models we had some amount of noise anywhere there was papyrus and this seemed to quiet that down a lot. We did not get to explore it thoroughly enough to confirm if this really worked or not though.
+
+Training procedure Our training procedure was fairly standard, we used the existing adamW optimizer, dice+bce loss and hyperparameters, fixing some small bugs in setting the min-lr and continuing to use the gradual warmup learning rate scheduling. We added on stochastic weight averaging to get wider optima instead of needing to pick a specific checkpoint because we found these pretty inconsistent. We found that validating against fragment 1 wasnt perfect but was at least directionally useful. Once we found something that worked on local validation against fold 1 we would submit that to the leaderboard to double-check its validity and we would continue training with all folds for several epochs after. We would submit and evaluate the new checkpoint trained against all folds and it was typically about 0.04 better. Sometimes we would train against all fragments from the start instead of training fragments 2, 3 and latter adding in 1, but we did not thoroughly evaluate this.
+
+Augmentations We tried many permutations of augmentation, mostly from albumentations, some custom, and some from 3d packages, but ultimately couldn't find strong alpha there with anything fancy. Our best model was trained with:
+
+50% horizontal and vertical flips
+75% 90-degree rotations
+50% brightness contrast
+25% 1-2 channel dropout(in this case our channels was actually depth)
+10% shift scale rotate
+10% noise and blur
+10% coarse dropout
+10% grid distortion
+
+Overall seemed like the rotations and flips were crucial and everything else was a non-factor. Rotations seemed important but we did not ascertain that the test set itself was actually rotated, we just knew it was important so tried to make the model as invariant as possible.
+
+Ensembling We ended up with a big pile of model checkpoints and had to whittle them down to what we believed to be the most performant trading off runtime vs throughput. We tried many different combinations, heavier tta with all rotations and flips, more models, smaller strides. The winner seemed to be 4x rotation TTA with 1/4 crop strided windows and as many good models as we could fit in. Halving the stride helped an extra .01, but that was trumped by being able to add way more models, flips didnt seem to add anything at all. It's possible with just the corrected orientation instead of TTA we could have done better but a model invariant to rotations seemed just as strong.
+
+One thing we struggled with a lot was how to best combine predictions. For each model we predicted on the same pixel 4x because of our strided approach and 4x of that because of TTA. With many models this actually gave us a ton of options for aggregating the predictions per pixel. We tinkered with a lot of stuff locally but what seemed to work best was averaging per pixel for each model all ~16x predictions and then applying the sigmoid to that averaged signal and then average those probabilities together. This posed a tough memory constraint on us on kaggles system so we had to be a bit efficient with putting things away and accumulating them as densely as possible instead of just creating large arrays and averaging at the end.
+
+Thresholding One thing we went back and forth on for a long time was the calibration of predictions. As discussed in other posts, deciding a threshold was critical to getting good results and choosing the wrong threshold could give you very misleading signal on your models performance. During training and evaluation we would constantly be monitoring the AUC, Precision, Recall and f0.5 at a sweep of thresholds. Some models were well-calibrated with an optimal threshold at 0.5, but many were not.
+
+Because of this, we knew that even a great model could show up as terrible on the leaderboard if its threshold wasn't set correctly. We considered using the percentile method that some people used but did not even make a submission for it because it seemed too risky if the distribution of ink was not what we expected. Ultimately what we relied on was that averaged out our predictions they would end up calibrated. We found this to be true on our local validation and held true for the leaderboard as well. Individual models would have wide optimal threshold ranges but after averaging many predictions from many models it was almost universally centered on 0.5. We actually took our last submission to be brave and try 0.55 but it did worse on the public leaderboard and finished with only 30 minutes left to spare so we didnt pick it. It did end up performing slightly higher on the private leaderboard though. I think we actually left a lot on the table in terms of ensembling and optimal thresholding.
+
+Postprocessing One little magic function we borrowed from the old cloud segmentation competition was used to clean up our predictions. After everything was done and already binarized we would use cv2.connectedcomponents to find the masses and remove them if they were beyond a certain size. This would clean up anything that was too small, just little speckles and noise. We found it locally optimal to set our threshold a little lower and then clean up the extras, anything under 25000 pixels, but we only cleaned up things under 10k on our submissions and didnt try more aggressive cleaning.
+
+Before
+
+After 
+
+Authors
+ryches
+
+ryches
+
+Alex Loftus
+
+loftuale000
+
+Aina Tersol
+
+ainatersol
+
+Ted K
+
+socated
+
+arrow_drop_up
+112
+Share
+more_horiz
+Citation
+
+ryches, Alex Loftus, Aina Tersol, Ted K. 1st place solution. https://www.kaggle.com/competitions/vesuvius-challenge-ink-detection/writeups/ryches-1st-place-solution. 2023. Kaggle
+
+comment
+28 Comments
+2 appreciation comments
+Hotness
+ryches
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+Hoping to aggregate a list of all the things we tried that didn't pan out as well but will have to add those later. One ironic thing with all of this is that I was visiting nvidia for work while the competition was closing so I got to see the news at their hq. Being there and winning a competition with one of their models dawned on me part way through the day.
+
+reply
+Reply
+Heads or Tails
+
+Posted 3 years ago
+
+· 49th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Many congrats on the win, and thanks for the fantastic write-up! Lots of valuable insight in there.
+
+I like the focus on depth invariance, and the ChannelDropout. One idea I had, which I didn't get round to testing, was to use ChannelShuffle in train & tta. Did you happen you try that, and would you reckon it might help with the depth invariance?
+
+reply
+Reply
+Ted K
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I didn't feel we had time to explore shuffling channels. If the signal we're chasing is exclusively located within the XY plane of each slice, then this would help with regularization. But to the extent that some of the signal lies in detecting where there is a transition from ink to no ink as you get deeper into the papyrus, then channel shuffle would have destroyed that. It's an interesting ablation to try!
+
+reply
+Reply
+ryches
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I actually tried a channel shuffled trial. It failed to converge at all. I specifically wanted to see how a sort of bag of depths approach worked and it completely failed with our models and a couple variations on them. I'll have to see if I can find the training graph for that one.
+
+reply
+Reply
+ryches
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+The one way down at the bottom is what happened when we shuffled the channels on the way into the model. Didnt seem to converge. We wouldve been better off just always grabbing the center channel than having them shuffled.
+
+reply
+Reply
+11 more replies
+arrow_drop_down
+ryches
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+One thing we tried that didnt work was instead of filtering the crops based on if they were empty or not, filter them in case they had any ink or not. This massively reduced the number of crops and looked pretty good on paper but it taught the model that every single crop must have some ink and it didnt learn to handle blank papyrus well. Became overexcited and greatly over predicted.
+
+maybe this would have worked with bigger crop sizes. This made it converge extremely fast but you can see the result isnt that great especially in reference to precision.
+
+reply
+Reply
+Vanshita Verma
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for this explanation!
+
+reply
+Reply
+emoji_people
+Viktor Cikojevic
+
+Posted 3 years ago
+
+· 39th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+nice writeup, congratulations for the 1st place!
+
+One question: did you train the 3dcnn and 2d segmentation models jointly or separately?
+
+reply
+Reply
+ryches
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+It was all trained end to end. My belief is training end to end and optimizing directly for your goal is almost always universally better. Sometimes you have to do things in stages just because of memory/compute constraints but in general I will always prefer end to end
+
+reply
+Reply
+emoji_people
+Viktor Cikojevic
+
+Posted 3 years ago
+
+· 39th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great, thanks for the insight!
+
+reply
+Reply
+Ted K
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I'll also add that I was a big proponent of end-to-end training. The downside is you typically need more data for the deeper pipeline. We only had three fragments to train on, but at least we had many crops per fragment and all of the image augmentations. In the end, we were able to get end-to-end to converge pretty well, so we stuck with it.
+
+reply
+Reply
+Stephen Demjanenko
+
+Posted 3 years ago
+
+· 566th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win! And thanks for sharing. I am a beginner when it comes to data science and I am trying to reproduce the results of one of your models (to prove to myself that I can make it work end to end). I have been unable to match the CV results that you shared for your models. I am running on a A100 in Google Colab, but I have to use 6 transformer heads for the UNETR, "nvidia/mit-b0" for the Segformer and set precision="16-mixed" for Pytorch lightning and run with a resolution of 512 in order to not run the GPU out of memory (of which it has 40 GB). I also hit NaN loss values (likely due to mixed precision) when using AdamW and therefore I have to use SGD. I am finding myself struggling a lot more with setting up a training harness that can run a big model and reproduce the results than with testing different architectures.
+
+What hardware did you train on? How long did each epoch take? How many epochs did you run for? How did you tune the hyperparams as the epochs progressed?
+
+Additionally, how did you load the images from disk and did you pre-process them to change the numeric range/normalize (or did you rely on the Normalize transformation from albumentations entirely?
+
+How did you define your folds and did you retrain the model N times assuming you had N-folds? How long did all this training take? Did you then use your best trained fold, did you average the weights from all folds, or did you train without holding back one of the folds for validation?
+
+Thanks in advance for the clarification. My goal with these questions is to closely reproduce the performance of one of your models. If you have exact code to share, I would love to learn from that.
+
+reply
+Reply
+Guillermo Perez G
+
+Posted 3 years ago
+
+· 102nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing your thoughts! It's always important to know what someone who achieves success thinks! Does your team plan to publish your complete solution on Github or similar platform, or not?
+
+reply
+Reply
+Bilzard
+
+Posted 3 years ago
+
+· 94th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for the 1st prize.
+
+I was also impressed of the thorough research.
+
+I have questions,
+
+I once used SegFormer for 2D encoder (only 1st stage), but it seemed to take much epochs than CNN encoder to converge. However, as shown in the performance graph, the conversion seems after <25 epochs. Do you think the second stage strategy (3D-2D) helps to converge faster?
+I was also observed very fluctuated metrics even if closed to convergence. It makes me hard to which model is strong is very difficult. So the most of experiments I used seed-average of the models. How do you evaluate the local model's performance?
+reply
+Reply
+ryches
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+generally I felt like segformer converged more quickly than other stage 2 models we tried like unet, upernet with various backbones. not sure exactly why you saw slow convergence but I never tried it on its own.
+
+I mostly just looked at the general trend of the model. If I measured performance with the swa model performance movement was very slow and smooth curves, but we saw a similar effect just using the running average of the charts on wandb
+
+reply
+Reply
+jrudolph
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on winning this competition! I'd like to play around with the models and training / fine-tuning on the actual scroll data sets. Did you share the training code somewhere? Would you be open to share the training code?
+
+reply
+Reply
+JP Posma
+
+Competition Host
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+All the code for the 10 winners is public, links are at https://scrollprize.org/community_projects#fragment-based-ink-detection
+
+reply
+Reply
+jrudolph
+
+Posted 3 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Ah, perfect, missed that. I looked in Ryan's Github but missed Aina's. Not the best premise for an aspiring treasure hunter…
+
+reply
+Reply
+WangXuC
+
+Posted 3 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Where can I find the segformerForSemanticSegmentation function? I would like to see the performance of segfomer.
+
+reply
+Reply
+ryches
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+It comes from the transformers package
+
+reply
+Reply
+WangXuC
+
+Posted 3 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! I find it.
+
+reply
+Reply
+WangXuC
+
+Posted 3 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+And how many epochs did you train for segformer?
+
+reply
+Reply
+
+This comment has been deleted.
+
+zhang jiaxun
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice thoughts and ideas from you and this is helpful for learners to improve our skills and gain insights.
+
+reply
+Reply
+PavanKalyan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Informative, Congratulations 🎉
+
+reply
+Reply
+Diesel X
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Amazing job!!! Congrats!
+
+reply
+Reply
+Rakha Abid Bangsawan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+so cool! congrats!
+
+reply
+Reply
+WangXuC
+
+Posted 3 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I want to know how you calculate the loss? The mask size output by segfomer is 1/4 of the input size. If the input size is 512 * 512, then the predicted mask size is 128 * 128. When calculating losses, should the predicted mask be upsampled to 512 * 512, or should the ground truth be downsampled to 128 * 128?
+
+reply
+Reply
+Ted K
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes, we upscale the predictions back to the original resolution. If you look in the models section above, Ryan shows in the forward pass that the output of the Segformer goes through two 2x upscaling layers. 
+
+reply
+Reply
+WangXuC
+
+Posted 3 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I feel that this method will introduce some errors, but it seems that everyone is doing it this way. Have you ever tried downsampling ground truth and calculating loss?
+
+reply
+Reply
+Jerjis Balamjan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+it's awesome 😲
+
+reply
+Reply
+Akshit Sharma
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations for the win, thanks for the writeup ! @ryches
+
+reply
+Reply
+Jerjis Balamjan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations to you
+
+reply
+Reply
+Appreciation (2)
+Denslin Nunes
+
+Posted 3 years ago
+
+· 837th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great work Thanks for Sharing
+
+dragon zhang
+
+Posted 3 years ago
+
+· 138th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+great! thank for sharing.

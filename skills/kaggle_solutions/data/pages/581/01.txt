@@ -1,0 +1,516 @@
+url: https://www.kaggle.com/c/predict-ai-model-runtime/discussion/456343
+fetched: 2026-10-27
+chars: 14646
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution for the Google - Fast or Slow? Predict AI Model Runtime Competition — Google - Fast or Slow? Predict AI Model Runtime
+1st Place Solution for the Google - Fast or Slow? Predict AI Model Runtime Competition
+
+Google - Fast or Slow? Predict AI Model Runtime
+
+Solution Writeup · 1st place · Nov 23, 2023
+
+First of all, thanks Kaggle and Google for hosting this great competition. Also, I'd like to thanks my teammates and friends @tomirol and @thanhhau097a, which made this journey even more special.
+
+Context
+Business context: https://www.kaggle.com/competitions/predict-ai-model-runtime/overview
+Data context: https://www.kaggle.com/competitions/predict-ai-model-runtime/data
+TLDR:
+We pruned and compressed the layout graphs in order to increase the efficiency of our experiments
+We removed duplicated configs for layout
+We changed the node_feat to use -1 padding instead of 0
+We used the provided train, val, test splits since we found good correlation with LB
+Data preprocessing:
+StandardScaler for node_feat[:134]
+Shared learned embedding (4 channels) for node_feat[134:] and node_config_feat
+Features are concatenated before first linear
+Models with the following architecture:
+Linear on the input features
+2x graph conv with attention blocks
+InstanceNorm -> SAGEConv -> SelfChannelAttetion -> CrossConfigAttetion -> +residual -> GELU
+Global (graph) mean pooling
+Linear logit layer
+PairwiseHingeLoss function
+Data preparation
+
+We joined the competition with a bit less than a month to finish, so one of the first problems we tried to tackle was the low efficiency in our training jobs.
+
+Graph pruning
+
+For layout, we noticed that only Convolution, Dot and Reshape were configurable nodes. Also, in most cases, the majority of nodes would be identical across the config set. Thus, we opted for a very simple pruning strategy where, for each graph, we would only keep the nodes that were either configurable models themselves or were connected to a configurable node, i.e., input or output to a configurable node. By doing this, we would transform a single big graph into multiple (possibly disconnected) sub-graphs, which was not a problem since the network has a global graph pooling layer in the end that fuses the sub-graphs information. This simple trick reduced 4 times the vRAM usage and sped up training by a factor of 5 in some cases.
+
+Deduplication
+
+Most of the configuration sets for layout contain a lot of duplication. However, the runtime for the duplicated configs can vary quite a bit and make training less stable. Thus, we opted for removing all the duplicated configs for layout.
+
+Compression
+
+Even with pruning and de-duplication, the RAM usage to load all configs to memory for NLP collection was super high. We circumvent that issue by compressing node_config_feat beforehand and only decompressing it on-the-fly in the dataloader after config sampling. This enabled us to load all data to memory at the beginning of training, which reduced IO/CPU bottlenecks considerably and allowed us to train faster.
+
+The idea behind the compression is that each node_config_feat 6-dim vector (input, output and kernel) can only have 7 possible values (-1, 0, 1, 2, 3, 4, 5) and, thus, can be represented by a single integer in base-7 (from 0 to 7^6).
+
+Changing pad value in node_feat
+
+We noted that the features in node_feat were 0 padded. Whilst this is not a problem for most features, for others like layout_minor_to_major_* this can be ambiguous since 0 is a valid axis index. Also, the node_config_feat are -1 padded, which makes it incompatible with layout_minor_to_major_* from node_feat. With that in mind, we re-generated node_feat with -1 padded and this allowed us to use a single embedding matrix for both node_feat[134:] and node_config_feat.
+
+Data preprocessing
+
+For layout, we split node_feat into node_feat[:134] and node_feat[134:] (layout_minor_to_major_*). The former was simply normalised using a StandardScaler, while the latter, along with node_config_feat, was fed into a learned embedding matrix (4 channels). We found that the normalisation is essential here since node_feat has features like *_sum and *_product that can be very high and, consequently, disrupt the optimisation.
+
+For node_opcode, we also used a separate embedding layer with 16 channels. The input to the network is the concatenation of all features aforementioned and, for each graph, we sample on-the-fly 64 (default) or 128 (random) configs to form the input batch. For tile, on the other hand, we opt to use late fusion to integrate config_feat into the network.
+
+Network architecture
+
+Our network architecture was quite simple. We first feed the input features to a Linear block to map it to a 256d embedding vector followed by 2x Conv blocks, global graph mean pooling and a final linear layer.
+
+As for the graph convolutional layer itself, we tried many types but none was better than SAGEConv. In particular, I had good experience with GAT variants in the past but none worked well in this competition. If I were to guess the reason, I'd say that in the other application the graph itself was quite noisy, so attention helped to "ignore" the connections that were not meaningful. However, for TPU graphs, all connections are "real" and important so graph attention was not that helpful. Nonetheless, we found two other types of attention that were useful: self-channel attention and cross-config attention.
+
+Self-Channel Attention
+
+We borrowed the idea from Squeeze-and-Excitation to create a channel-wise attention layer. We first apply a Linear layer to bottleneck the channel dimensions (8x reduction) followed by ReLU. Then, we applied a second linear layer to increase the channels again to the original value followed by sigmoid. We finish by applying element wise multiplication on the obtained feature map and the original input.
+
+The idea behind this is to capture the correlations between channels and use it to suppress less useful ones while enhancing others.
+
+Cross-Config Attention
+
+Another dimension that we can exploit attention is the batch plane (cross-configs). We designed a very simple block that allows the model to explicitly "compare" each config against the others throughout the network. We found this to be much better than letting the model infer for each config individually and only compare them implicitly via the loss function (PairwiseHingeLoss). The attention code is as follows:
+
+class CrossConfigAttention(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.temperature = nn.Parameter(torch.tensor(0.5))
+
+    def forward(self, x):
+        # x of shape (nb_configs, nb_nodes, nb_features)
+        scores = (x / self.temperature).softmax(dim=0)
+        x = x * scores
+        return x
+
+
+By applying this simple layer after the self-channel attention at every block of the network, it gave us a huge boost for default collections. For inference, we simply use a reasonably large batch size of 128. However, since the prediction depends on the batch, we can leverage it further by applying TTA to generate N (10) permutations of the configs and average the result after sorting it back to the original order.
+
+Linear/Conv blocks design
+
+To create our Linear/Conv blocks we followed the good practices in computer vision. We start by using InstanceNorm to normalise the input feature map, followed by Linear/SAGEConv layer, SelfChannelAttetion and CrossConfigAttetion (we concat the output with its input to preserve the individuality of each sample). Then, we sum the residual connection and finish with GELU and dropout.
+
+Ensembling
+
+Our best single model prediction scored 0.714 (0.748) on private (public) LB. However, since the number of test samples is quite low for some collections, we opted to use ensembles to improve the results and prevent shaking up. Our best result was 0.736 (0.757) LB by using the simple average of 5-10 models for each collection but we sadly didn't select this sub.
+
+Things that didn't work
+Train together on both random and default data
+2nd level stacking on top of model's embeddings/predictions (worked well locally but not that well on LB)
+Pseudo labelling test set
+Finetunning models for specific graphs in test set (worked well locally but not that well on LB)
+Different ways to sample the configs, e.g., annealing the runtime spacing between configs
+Other loss functions
+Gradient accumulation and training with more than one graph at a time
+Sources
+Our code can be found in this GitHub repo
+Our work was based/forked on @werus23 public kernel (thank you!)
+The modified layout dataset with -1 padding can be found here
+
+I made a quick diagram of our network, it's a bit crap but should give a good idea 😅
+
+Authors
+Eduardo Rocha de Andrade
+
+arc144
+
+Thanh Hau Nguyen
+
+thanhhau097a
+
+matheus
+
+tomirol
+
+arrow_drop_up
+68
+Share
+more_horiz
+Citation
+
+Eduardo Rocha de Andrade, Thanh Hau Nguyen, matheus. 1st Place Solution for the Google - Fast or Slow? Predict AI Model Runtime Competition. https://www.kaggle.com/competitions/predict-ai-model-runtime/writeups/viet-br-connection-1st-place-solution-for-the-goog. 2023. Kaggle
+
+4
+comment
+26 Comments
+3 appreciation comments
+Hotness
+Marília Prata
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Hi Eduardo, I'm so glad to read your write-up. I'm a beginner, so it's very hard to understand it all.
+
+Congratulations for you and your team (Thanh Hau Nguyen and Tomirol) for the amazing achievement. Parabéns!
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Muito obrigado Marília 🙏
+
+Let me know if there is anything I can help clarifying!
+
+reply
+Reply
+Giba
+
+Posted 3 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congrats @arc144 and team! Nice to see a brazillian winner 😉 Thanks for sharing.
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Obrigado Giba! 🙇
+
+reply
+Reply
+Dmitrii Khizbullin
+
+Posted 3 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats on the 1st place! I am curious: what tool did you use to make this beautiful block diagram in the writeup?
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you Dmitrii! Congratulation to you and your team as well! I used a website called drawIo
+
+reply
+Reply
+Semih Günak
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Great competition solution! Your approach, especially using techniques like graph pruning and deduplication in data preprocessing, is quite interesting for achieving high performance. Additionally, your optimization of network architecture and attention mechanisms is very impressive. The results you obtained with ensembling are noteworthy. Congratulations! 🚀
+
+reply
+Reply
+Kilaru Vasudeva
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on winning the competition! :) Thanks for implementation details. If you could, kindly share training details, ex: GPU used, GPU training time etc.
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Sorry for the late response, was away recently. We used a RTX 4090 and it took around 1-2 hours (depends on the collection) to train the models after the optimisations we described in the thread.
+
+reply
+Reply
+Filtered
+
+Posted 3 years ago
+
+· 67th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congratulations!
+
+reply
+Reply
+belgraviton
+
+Posted 3 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great solution. Architecture ideas are quite amazing. Learning embeddings for configs' features is what I was missing :)
+
+reply
+Reply
+hyohyolim
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, first place! What tool did you use to create the graph in the last image?
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! I use a tool called drawIo
+
+reply
+Reply
+Md. Amanat Ullah
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations.
+
+reply
+Reply
+Suma Mallapragada
+
+Posted 3 years ago
+
+· 565th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thanks for sharing! The solution helps me capture all the details.
+
+reply
+Reply
+Min-Hsien Weng
+
+Posted 3 years ago
+
+· 97th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats for 1st place. Does an ensemble model use the same weight for each model?
+
+reply
+Reply
+Eduardo Rocha de Andrade
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! For the ensemble, we train the same model architecture many (5 - 10 usually) times with different random seeds (main impact is in the model's weights initialisation). Then, we just load each model/trained weight individually to make the prediction and average them up
+
+reply
+Reply
+Min-Hsien Weng
+
+Posted 3 years ago
+
+· 97th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Using different weights could sometimes improve accuracy. In another competition, I used the Optuna library to experiment with different weight combinations and found the optimal ones, leading to further accuracy gains. Congratulations again on your excellent solutions!
+
+reply
+Reply
+Indra Sonowal
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats brother on achieving 1st place.
+
+reply
+Reply
+Haohan Tsao
+
+Posted 3 years ago
+
+· 95th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing, congrats for winning
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 3 years ago
+
+· 134th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on topping the leaderboard. Thanks for sharing the details of your solution with flowcharts.
+
+reply
+Reply
+yy1165
+
+Posted 3 years ago
+
+· 70th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for your team and learn lots from your solution!
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (3)
+Zhuravlev Viktor
+
+Posted 3 years ago
+
+· 368th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Good job! Thanks for the sharing!
+
+Phil
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congrats! Thanks for sharing
+
+Haoqin Hong
+
+Posted 3 years ago
+
+· 84th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing！

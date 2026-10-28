@@ -1,0 +1,104 @@
+url: https://www.kaggle.com/artvolgin/exploring-phd-community-with-network-analysis
+fetched: 2026-10-27
+chars: 1587
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Artem Volgin +1 · 7y ago · 13,695 views
+arrow_drop_up
+130
+Copy & Edit
+111
+file_download
+Download
+more_vert
+Exploring PhD Community with Network Analysis
+Notebook
+Input
+Output
+Logs
+Comments (23)
+history
+Version 40 of 40
+Runtime
+play_arrow
+
+2m 39s
+
+Input
+Competitions
+
+2019 Kaggle Machine Learning & Data Science Survey
+
+Datasets
+
+[Private Dataset]
+
+Tags
+Beginner
+Language
+
+Python
+
+Table of Contents
+Deep Dive into Science: Exploring PhD Community with Network Analysis
+Introduction
+General Socio-Demographic Portrait of a PhD Kaggler
+What are the Skillset Types that Describe a PhD Kaggler? Specialization or Erosion of Boundaries?
+How Does the Skill-Related Environment of Kaggle PhD Holders in Data Science Differ Between Nations?
+What are the Core and the Periphery Skills for Doctorates Overall and Across Regional Communities?
+Do People in the Data Science Field Earn More with a PhD Status?
+Does Gender Discrimination Also Apply to Women with a PhD Degree?
+Conclusions
+References
+Competition Notebook
+
+2019 Kaggle Machine Learning & Data Science Survey
+
+Collaborators
+
+Artem Volgin (Owner)
+
+Ekaterina Melianova (Editor)
+
+License
+
+This Notebook has been released under the Apache 2.0 open source license.
+
+Continue exploring
+input
+Input
+2 files
+output
+Output
+0 files
+list_alt
+Logs
+158.6 second run - successful
+comment
+Comments
+23 comments

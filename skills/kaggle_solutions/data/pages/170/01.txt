@@ -1,0 +1,53 @@
+url: https://github.com/yandexdataschool/flavours-of-physics-start
+fetched: 2026-10-27
+chars: 4111
+
+GitHub - yandexdataschool/flavours-of-physics-start: Starter kit for &quot;Flavours of Physics&quot; challenge at Kaggle · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ yandexdataschool flavours-of-physics-start Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ flavours-of-physics-start Public Notifications You must be signed in to change notification settings Fork 49  ( 49 ) Star 42  ( 42 ) You must be signed in to star a repository About Starter kit for "Flavours of Physics" challenge at Kaggle www.kaggle.com/c/flavours-of-physics Resources Readme Activity Custom properties Stars 42 stars Watchers 14 watching Forks 49 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 11 Commits 11 Commits Folders and files Name Name Last commit message Last commit date baseline_c baseline_c     tau_data tau_data     .gitignore .gitignore     .nbrunnerdockerfile .nbrunnerdockerfile     AUTHORS AUTHORS     README.md README.md     baseline.ipynb baseline.ipynb     evaluation.py evaluation.py     flatness_boosting.ipynb flatness_boosting.ipynb     noise.ipynb noise.ipynb     tmva.ipynb tmva.ipynb     View all files Repository files navigation README More items First submission 
+ Follow the instructions First submission (python) to prepare your first solution 
+ More complex models 
+ Follow TMVA training, Boosting to uniformity to play with another machine learning library or to use 'flatness-oriented' classifiers 
+ ROOT Submission 
+ We have prepared c code to run TMVA in ROOT to produce submission. Follow the instructions First submission using root (c++) 
+ About Starter kit for "Flavours of Physics" challenge at Kaggle www.kaggle.com/c/flavours-of-physics Resources Readme Activity Custom properties Stars 42 stars Watchers 14 watching Forks 49 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

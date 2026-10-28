@@ -1,0 +1,547 @@
+url: https://www.kaggle.com/c/santa-2023/discussion/472405
+fetched: 2026-10-27
+chars: 16083
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Santa 2023 - The Polytope Permutation Puzzle
+1st Place Solution
+
+Santa 2023 - The Polytope Permutation Puzzle
+
+Solution Writeup · 1st place
+
+Solving 10x10x10 cube (272) in 454 steps
+
+Among the three types of puzzles, the wreath puzzle was not particularly focused on because a very short solution could be found using simple beam search, and it had a lower total score compared to the others, making it a lower priority. Therefore, we concentrate on the solutions for the remaining two types, the cube and the globe puzzles. The strategies for solving both puzzles are based on the same principle.
+
+Due to each move affecting a large number of pieces at once, simply applying moves as is can lead to a somewhat organized state, but fully solving the puzzle becomes extremely challenging. Thus, the key is to find sequences of moves that only swap a few pieces while leaving the rest unchanged. Remarkably, for both puzzles, there exist sequences of moves that only rotate three pieces and leave the rest unchanged, referred to as 3-rot.
+
+Example for the cube puzzle: d3.f2.d2.-f2.-d3.f2.-d2.-f2
+Example for the globe puzzle: f0.r0.f0.r1.f0.-r1.f0.-r0
+
+When considering the cluster decomposition of all pieces (a cluster being a set of pieces that can be interchanged through moves), it turns out that for most clusters, except for special parts like the cube's corners, there exists a 3-rot for any three elements within them.
+
+For the cube puzzle: Corners, centers of faces, and centers of edges are exceptions. For other clusters, taking symmetry into account, it suffices to consider the diagonal parts of a 4x4x4 (1,1), the cross parts of a 5x5x5 (1,2), the non-diagonal and non-cross parts of a 6x6x6 (1,2), and the edge parts of a 4x4x4 (0,1). For each, a bidirectional search was performed to enumerate all shortest 3-rot for any three elements, with the longest being 14 moves.
+For the globe puzzle: The central row when the number of rows is odd is an exception. For other clusters, with the number of rows as 2 and the number of columns as 2c, R=f0.r0.f0.r1.f0.-r1.f0.-r0 corresponds to a 3-rot of ((0,0) (1,c) (1,c-1)). A 3-rot for any three pieces can be found by first finding a sequence of moves A that moves those three pieces to a state where R can be applied (where other pieces can move freely), using breadth-first search, and then the 3-rot can be obtained by A.R.-A.
+
+When solving each cluster using 3-rot, it is important to note that all 3-rot are even permutations, so the overall permutation must also be even. Combining these insights, we can use the following approach:
+
+Solve the special parts.
+Operate without disrupting the solved parts so that all remaining clusters become even permutations.
+Solve each cluster independently using 3-rot.
+
+To achieve shorter solutions, we employ the following key ideas:
+
+Since 3-rot requires at least 8 moves and is lengthy, it's more efficient to bring the puzzle to a somewhat solved state using elementary moves or short sequences before employing 3-rot for the final touches.
+When adding a new sequence B to an existing sequence A, canceling out the end of A with the beginning of B can shorten the overall sequence. For example, if A=A'.ri and B=-ri.B', then A.B becomes A'.ri.-ri.B'=A'.B', thus saving 2 moves.
+If the current sequence is A=a[0]…a[T-1], instead of appending a 3-rot B for (i j k) at the end to form a[0]…a[T-1].B, at arbitrary time t, inserting a 3-rot B' for some (i' j' k') to achieve a[0]…a[t-1].B'.a[t]…a[T-1] results in the same state. Selecting the appropriate time t can make B' shorter than B or result in more cancellations. Therefore, rather than constructing the sequence from the front, it is better to try the insertions for all times and select the best time.
+
+Based on these ideas, we use the following approach:
+
+Solve the special parts.
+Use elementary moves to make all clusters even while roughly aligning them.
+Bring to a somewhat solved state using short sequences.
+Insert 3-rots at arbitrary times.
+
+The details of each part and the score table can be found in our repository: https://github.com/wata-orz/santa2023_permutation_puzzle
+
+Authors
+wata
+
+wataorz
+
+kitamasa
+
+kitamasa
+
+arrow_drop_up
+124
+Share
+more_horiz
+Citation
+
+wata, kitamasa. 1st Place Solution. https://www.kaggle.com/competitions/santa-2023/writeups/kmcoders-1st-place-solution. 2024. Kaggle
+
+1
+comment
+31 Comments
+1 appreciation comment
+Hotness
+
+Posted 3 years ago
+
+arrow_drop_up
+7
+more_vert
+
+I learned a lot. Thankyou for sharing !!!
+
+reply
+Reply
+Harshit Sharma
+
+Posted 3 years ago
+
+· 847th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Impressive strategy! The focus on 3-rot sequences for minimal disruption and efficiency in solving clusters demonstrates a sophisticated approach to puzzle-solving. Great work @wataorz !
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Thanks for sharing ! Congratulations with the victory !
+
+What do you think how close/far your solutions are from the optimal (shortest paths) ?
+
+reply
+Reply
+wata
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Due to the significantly limited range of available moves, we believe that even with the 4x4x4 cube, we are likely not achieving the optimal solution.
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for the answer ! What is your opinion - how far is from the optimal ?
+
+Theory says - diameter is around C*n^2/log(n) (and C is unknown, some estimates e.g. here https://arxiv.org/abs/2112.08602 )
+
+Your solution method "n" will work Const * n^2 log(n) ( a) worst case b) generic ) ? So the difference would be only in the constant or it has worse asympotic ?
+
+About globes A/B - same questions - any idea on the move number for your method for a) worst case b) generic ?
+
+Any ideas on the diameter estimation for globes ? Getting something like n^2/log(n) for cubes ?
+
+( It might not be that much hard - the size of the group is known (moreover the generated group is almost S_K - https://math.stackexchange.com/a/4848461/21498 - if no mistakes here; The growth can be estimated numerically so approximate diameter is log_{growth} ( Size) - but not sure how precise is that estimate.
+
+But may be there is a better way.
+
+Eleinberg's post - https://quomodocumque.wordpress.com/2011/07/17/should-you-be-surprised-by-the-diameter-of-the-nxnxn-rubiks-group/ sheds light that n^2/log(n) for cubes is not that much hard to guess.
+
+The generators for globes comes into two families - a) commutative b) involutions. Commutative is easy. Involutions - classical "square-free" words - https://en.wikipedia.org/wiki/Square-free_word However I have not thought yet about combining the two. )
+
+PS
+
+https://arxiv.org/abs/1706.06708 Solving the Rubik's Cube Optimally is NP-complete Erik D. Demaine, Sarah Eisenstat, Mikhail Rudoy (Thanks to Boris Minaev for refrence)
+
+reply
+Reply
+Guts
+
+Posted 3 years ago
+
+· 219th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+How did you find the 3 rot moves ?
+
+reply
+Reply
+Psyho
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on the win!
+
+I've read your description on github and I have a small question:
+
+For cubes bigger than 3x3x3, why did you solve the corners/parity first instead of reducing the cube into 3x3x3 and then using the optimal solver? I haven't participated in the contest, so I'm not sure how it would interact with the "allowed errors" part, but intuitively it feels that it would simplify the implementation (no need for banning some of the moves & 1st phase). AFAIK the downside is that for even cubes, in half of the cases you get a "parity" problem at the end, but I'd imagine it doesn't change much as you would simply discard such solutions
+
+reply
+Reply
+wata
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+We solved 3x3x3 first simply because it was the first strategy that came to mind and we did not see any significant disadvantages. One of the advantages of solving the 3x3x3 first is that we can insert 3-rots even within the sequence of moves to align the 3x3x3. This increases the degrees of freedom, especially for small cubes. In addition, finding the exact optimal solution for the 3x3x3 can be quite time-consuming, so we reused precomputed solutions when making improvements to the program and re-running it. When 3x3x3 is solved later, face moves can change the 3x3x3 problem to be solved, requiring recalculation each time.
+
+reply
+Reply
+Ivo Veverec
+
+Posted 3 years ago
+
+· 364th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+How did you handle puzzles with wildcards > 0?
+
+reply
+Reply
+wata
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Simply terminated when the remaining color difference is below the specified wildcard.
+
+reply
+Reply
+Vladimir
+
+Posted 3 years ago
+
+· 85th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Very interesting, thank you! Congratulations with the victory :) I had exactly the same idea and even found a way to generate all moves that swap 3 or 4 pieces given a puzzle parameters. But the solution search was too inefficient in Python… I guess, it is time to learn Rust
+
+reply
+Reply
+Vladimir
+
+Posted 3 years ago
+
+· 85th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Here is the notebook to generate such moves for cubes and some useful moves for globes: https://www.kaggle.com/code/shitovvladimir/generate-commutators-for-cubes-and-globes/notebook
+
+reply
+Reply
+WOOSUNG YOON
+
+Posted 3 years ago
+
+· 43rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I learned a lot. You are amazing. I tried to solve problems like a human, but it was difficult.
+
+reply
+Reply
+Serhii Hrynko
+
+Posted 3 years ago
+
+· 27th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Few questions:
+
+For other clusters, taking symmetry into account, it suffices to consider the diagonal parts of a 4x4x4 (1,1), the cross parts of a 5x5x5 (1,2), the non-diagonal and non-cross parts of a 6x6x6 (1,2), and the edge parts of a 4x4x4 (0,1). For each, a bidirectional search was performed to enumerate all shortest 3-rot for any three elements, with the longest being 14 moves.
+
+Do you have human readable version of found sequences corresponding to each 3 elements? I think it can be crucial for future development of algorithms to solve large rubik's cubes.
+
+Also have you considered applying same bidirectional search to entire 24 element clusters in any intermediate state after restoring parity (making them even), or is it not feasible?
+
+Should any configuration of a cluster with even number of swaps have diameter of 14 (same as diameter of 2x2x2 cube) or with requirement to keep remaining cube unchanged this does not stand?
+
+Corners, centers of faces, and centers of edges are exceptions.
+
+Wow, didn't think that centers of edges would be special. Is this because they occupy same space on 2 adjacent faces? So basically you can solve those special parts as regular 3x3x3 cube? (or 2x2x2 for even sizes)
+
+reply
+Reply
+wata
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Do you have human readable version of found sequences corresponding to each 3 elements? I think it can be crucial for future development of algorithms to solve large rubik's cubes.
+
+You can find here: https://github.com/wata-orz/santa2023_permutation_puzzle/blob/main/solution/src/rotate_all.txt The ids 0-23 are assigned in lexicographic order of (y,x), one is fixed at 0 and other cases are calculated from symmetry.
+
+Also have you considered applying same bidirectional search to entire 24 element clusters in any intermediate state after restoring parity (making them even), or is it not feasible?
+
+While it might be possible to find the optimal solution for a single cluster by focusing solely on it, we believe that solving multiple clusters simultaneously is likely to result in more cancellations and potentially a shorter overall solution.
+
+Should any configuration of a cluster with even number of swaps have diameter of 14 (same as diameter of 2x2x2 cube) or with requirement to keep remaining cube unchanged this does not stand?
+
+The maximum of 14 moves is simply the shortest number of moves to rotate a certain 3 pieces in a same cluster, and we do not know the maximum number of moves required to completely solve the cluster.
+
+Is this because they occupy same space on 2 adjacent faces?
+
+Yes. Unlike other pieces on the edge, we have to consider the operation of exchanging two adjacent colors.
+
+So basically you can solve those special parts as regular 3x3x3 cube? (or 2x2x2 for even sizes)
+
+Yes
+
+reply
+Reply
+Serhii Hrynko
+
+Posted 3 years ago
+
+· 27th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+For each, a bidirectional search was performed to enumerate all shortest 3-rot for any three elements, with the longest being 14 moves.
+
+Great thinking! That the part that we were probably missing the most.
+
+reply
+Reply
+Gabriel Freddi
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Sweet! You've done it in Rust 🦀
+
+Such an elegant language, truly a man of taste. Congrats for the achievement @wataorz
+
+reply
+Reply
+malakkafaq
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congrates dear for this great achievement
+
+reply
+Reply
+Fırat Kıyak
+
+Posted 3 years ago
+
+· 709th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I have analyzed the wreath puzzle code in your team's repository. As far as I understood, you use a modified beam search where you keep many "groups" separated based on the positions of the unique two beads. At each depth, you only pick the first 300 best from each group.
+
+Would you please explain the rationale behind this decision? What are the benefits of these groups over standard beam search? Is the position of the two beads are important, or is it just an instrument for partitioning? Thanks.
+
+reply
+Reply
+Abishek Sudarshan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congrats on the win and thanks for sharing!
+
+reply
+Reply
+Serhii Hrynko
+
+Posted 3 years ago
+
+· 27th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+A 3-rot for any three pieces can be found by first finding a sequence of moves A that moves those three pieces to a state where R can be applied (where other pieces can move freely), using breadth-first search, and then the 3-rot can be obtained by A.R.-A.
+
+Wow, only now I'm realizing how powerful this is. We were aware of f0.r0.f0.r1.f0.-r1.f0.-r0 in its f0.-r1.f0.-r0.f1.r0.f1.r1 variant, but didn't see that it can be used like this. E.g. f1.f0.r0.f0.r1.f0.-r1.f0.-r0.f1 rotates N2.N3.N1 to N1.N2.N3 within single layer leaving everything else intact.
+
+reply
+Reply
+Spartak Aghababyan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, fantastic solution!
+
+reply
+Reply
+rishikush
+
+Posted 3 years ago
+
+· 462nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the winning!!!
+
+reply
+Reply
+Devang Giri Goswami
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congrats, amazed to see the Interesting results! @wataorz
+
+reply
+Reply
+emoji_people
+Maximiliano
+
+Posted 3 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on your victory!
+
+reply
+Reply
+CroDoc
+
+Posted 3 years ago
+
+· 126th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Awesome! Well done. I found this santa a bit harder than the ones before. How much time did you invest to get under 100k?
+
+reply
+Reply
+Serhii Hrynko
+
+Posted 3 years ago
+
+· 27th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Anyone looking to learn how to solve NxNxN rubik's cubes from now on should start here!
+
+reply
+Reply
+emoji_people
+David List
+
+Posted 3 years ago
+
+· 31st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats, @wataorz !
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+This comment has been deleted.

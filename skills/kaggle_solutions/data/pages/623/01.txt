@@ -1,0 +1,645 @@
+url: https://www.kaggle.com/c/isic-2024-challenge/discussion/533196
+fetched: 2026-10-27
+chars: 19615
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — ISIC 2024 - Skin Cancer Detection with 3D-TBP
+1st Place Solution
+
+ISIC 2024 - Skin Cancer Detection with 3D-TBP
+
+Solution Writeup · 1st place · Sep 16, 2024
+
+Congratulations to all the winners and participants! I can hardly believe I’m writing a post for the “1st Place Solution.” I’m incredibly grateful to the organizers for the competition itself, and to the kagglers, especially @greysky for his public notebook, which I used as the starting point for my experiments (ISIC 2024 | Only Tabular Data) about three weeks ago, shortly after the LMSYS competition ended.
+
+Solution Overview
+
+My solution, like that of most participants, was based on ensembling various implementations of GBDT models along with image models. For the image models, I used two architectures: EVA02-small (eva02_small_patch14_336.mim_in22k_ft_in1k) and EdgeNeXt (edgenext_base.in21k_ft_in1k). A significant amount of time was also spent generating synthetic data and attempting to incorporate data from previous competitions into the current pipeline.
+
+Cross-Validation Strategy
+
+I used a simple 5-fold Stratified Group KFold without any specific tuning. For performance evaluation, I applied a strategy once described by @daniel89 for the Mercedes-Benz Greener Manufacturing competition. Just as he did, I ran CV 10 times with different seeds, calculated the t-statistic (using scipy.stats.ttest_rel), and used the p-value to guide my decisions. To address the multiple comparisons issue, I tested only the most significant changes using this approach. If CV showed any significant improvement, I tested it on the Public leaderboard, and if it improved there as well (which it almost always did), the changes were added to the final solution. However, towards the end of the competition, when I was stuck around a 0.185-0.186 score (0.173 on Private), I deviated from this rule (it was disheartening to see myself drop from 23rd place down) and started testing even small hypotheses, lowering the p-value threshold to 0.2 and mainly relying on the Public leaderboard. This led to my final solution performing better on the Public leaderboard, but slightly worse on the Private leaderboard.
+
+GBDT Models
+Parameters and Ensembling
+
+I used CatBoost, LGBM, and XGBoost. Each model was trained on a GPU using Group K-Fold (5-folds) 10 times with different seeds for the model and data splitting. This resulted in a total of 150 models. To be honest, this didn’t provide any significant improvement compared to the base setup with just 45 models, but since the models trained fairly quickly (the total training time was under 20 minutes), I decided to increase the ensemble size, even if the gains were minimal. For each model, the predictions were ranked (.rank(pct=True)) and averaged with equal weights. All models were trained with default parameters from @daniel89’s public notebook, including undersampling and oversampling. The only exception was CatBoost, which was trained for 1000 steps with early stopping based on the validation set (od_wait = 100). For CatBoost, I used the following parameters:
+
+1. 'learning_rate': 0.026
+2. 'l2_leaf_reg': 18
+3. 'random_strength': 4.7
+4. 'depth': 6
+5. 'bagging_temperature': 0.874
+6. 'border_count': 256
+7. 'grow_policy': 'Lossguide'
+8. 'min_data_in_leaf': 38    
+
+
+The parameters were initially selected using Optuna, based solely on the tabular data. Unfortunately, I didn’t have time to retune them after introducing features based on CV-models. I also didn’t optimize the parameters for the other models.
+
+Feature Engineering
+
+Most techniques adopted from here Additionally, I’ve added:
+
+Total Area of lesion per patient and per patient & anatom_site_general
+
+While most of the features describe absolute lesion parameters, I aimed to add additional relative information (e.g., describing how abnormal a specific lesion is for the patient). To achieve this, I selected the top features based on CatBoost’s feature importance and calculated the Local Outlier Factor score for each patient’s lesion. This resulted in a significant improvement in my CV score (from 0.18149 to 0.18185) and was reflected on the leaderboard as well.
+
+Didn’t work
+
+Another attempt involved clustering the moles using the most important features and calculating the Z-score for each one within the cluster. This slightly improved the CV and public leaderboard scores but didn’t result in significant improvement on the private leaderboard.
+
+Vision-models
+The augmentations were taken from a previous competition. I used EVA02 small and EdgeNeXt base as the models. They demonstrated a good balance between metrics and inference time.
+To address the significant class imbalance, the examples from different classes in the training batches were balanced at a 1:1 ratio. Both architectures were trained with different seeds following the previously described 5-fold Stratified Group KFold scheme with early stopping based on the validation set (200 epochs, early stopping tolerance = 10 validation checks). In practice, most models rarely trained beyond 100 epochs.
+Additionally, since validating the model on the entire validation dataset takes considerably more time than training one epoch with weighted sampling, in most experiments, validation was performed every 5 epochs initially, then every 4 epochs, and so on, reducing the frequency of checks until validation was done every epoch by the 50th epoch. All the resulting models were used for inference on the test data. The obtained OOF predictions were used to train GBDT models.
+Integration of Model Predictions into the GBDT Model
+The best-performing approach involved using standardized model predictions, where the standardization was applied independently for each model’s predictions. The resulting feature varied within the range of p1: -0.44 and p99: 4.99. During inference, predictions from models of the same type were averaged.
+However, since models tend to slightly overfit to the test dataset due to early stopping based on validation data, normally distributed noise with a standard deviation of 0.1 was added to the model predictions when training the GBDT. I tested noise values of 0.02, 0.05, 0.08, and 0.12 via leaderboard probing (one of few things tested without cv).
+Additionally, the ratio of each prediction to the average prediction for all of a patient’s moles was calculated, which consistently improved CV and leaderboard performance. Noise was added to these features in the same way as described above.
+Didn’t work
+I attempted to more frequently select hard examples from the negative class when forming batches, where the probability of selection increased based on the difficulty. The difficulty was assessed using LogLoss from the OOF predictions.
+I also experimented with pretraining on data from previous competitions and other sources, but this did not yield significant improvements.
+Averaging model predictions for several variations of augmented samples also did not produce any positive results.
+Using Data from Previous Competitions
+
+Due to the extremely small number of positive examples, it is expected that the model would struggle to recognize borderline cases of skin lesions. To address this, before integrating the models trained on the images from this competition, I trained a 3-class classification model (bkl/melanoma/nevus) using EVA02 small on data obtained from repo. I then applied the following rule based on diagnosis_pr:
+
+nevus -> nevus
+melanoma -> melanoma
+basal cell carcinoma -> bkl
+seborrheic keratosis -> bkl
+solar lentigo -> bkl
+lentigo NOS -> bkl
+
+
+All remaining samples were marked as benign_malignant == 'benign' but with diagnosis_pr != 'bkl' were labeled as ‘nevus’.
+
+Adding the predictions from this model to the models based only on tabular data significantly improved both the CV and leaderboard scores. CV: 0.1756 -> 0.1760, public LB: 0.180 -> 0.182, private LB: 0.163 -> 0.165.
+
+At the same time, in the final model, adding these features slightly improved the CV: 0.18185 -> 0.18195. However, there was also a slight improvement in the public and private leaderboard scores.
+
+Synthetic Data (or where most of the time was spent)
+
+I was particularly interested in the potential of using synthetic positive examples to improve the model’s performance, and this idea was one of the main reasons I decided to participate in the competition. A similar approach was implemented in Derm-T2IM The process for generating synthetic data is outlined below. 
+
+Below, you can compare real photographs of malignant lesions, examples generated by the Derm-T2IM model, and models trained on competition data. 
+
+The average metrics at the individual model level demonstrate the effectiveness of the synthetic data. 
+
+It’s evident that the CV scores for models trained on synthetic data are consistently better. The leaderboard (public and private) results are slightly better, and on average, models trained on synthetic data perform better.
+
+ 
+
+For example, an ensemble of models trained on synthetic data shows slightly better results on the Private LB (0.140 vs 0.142) and marginally better on the Public LB (within the range of 0.157). However, unfortunately, the addition of models trained on synthetic data did not improve the final ensemble, so they were not included in the final solution. If anyone is interested in continuing experiments in this direction, I’m attaching one of my datasets with synthetic mole images.
+
+P.S. All the source code for models training can be found here P.P.S. Submission code
+
+Author
+Ilya Novoselskiy
+
+ilya9711nov
+
+arrow_drop_up
+149
+Share
+more_horiz
+Citation
+
+Ilya Novoselskiy. 1st Place Solution. https://www.kaggle.com/competitions/isic-2024-challenge/writeups/ilya-novoselskiy-1st-place-solution. 2024. Kaggle
+
+50
+11
+comment
+51 Comments
+3 appreciation comments
+Hotness
+shash
+
+Posted 2 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Do generative models like stable diffusion work the best for creating synthetic datasets now? Did you try using autoencoders and such as well?
+
+reply
+Reply
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Most likely, several approaches are applicable here. Different diffusion models will also show different results. I just used what I was most confident in and what could be trained the fastest
+
+reply
+Reply
+yunsuxiaozi
+
+Posted 2 years ago
+
+· 842nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hello, I have attempted to synthesize some data. May I ask if this is considered successful? If there are any issues, please point them out to me. Thank you.
+
+Fine tune my Stable Diffusion
+
+reply
+Reply
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Sorry for the delayed response! I trained the model at a low resolution of 128x128 since the original image resolution is quite low. I also used slightly different parameters, and I didn’t use Dreambooth. I've just published all the source code, hope it helps
+
+reply
+Reply
+yunsuxiaozi
+
+Posted 2 years ago
+
+· 842nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+ISIC2024 Finetune SD synthetic data. I have a few questions to ask you.
+
+Do you think the image I generated in the end is real?
+
+What method do you use to determine the quality of the generated image? Is it judged by training the competition model to see if the score has improved?
+
+I am a beginner in SD. Do you have any suggestions for training T2IM? For example, what should be noted about prompt words and how should the learning rate be adjusted?
+
+I really hope to receive your guidance. If you are willing, please reply to this comment.
+
+I hope you can achieve good results in future competitions.
+
+reply
+Reply
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi! 1. I’m not an expert, but some images don’t look real to me, though some clearly have features of malignant moles. But they look much better comparing with old version of your notebook. Have you tried training using the same code I used (not DreamBooth)? 2. Synthetic data was validated based on CV/LB scores, but I manually verified images generated with different Stable Diffusion parameters, keeping those with realistic results. 3. In my experience, constant learning rates work well for T2IM models. You can check others’ results in Discord channels like OneTrainer.
+
+p.s. Feel free to message me on LinkedIn!
+
+reply
+Reply
+PhenomSG
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Absolutely amazing work. Such detailed explanations helped me a lot. Thankyou !! :)
+
+reply
+Reply
+1
+william.wu
+
+Posted 2 years ago
+
+· 75th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, I got one question:
+
+For performance evaluation, I applied a strategy once described by @daniel89 for the Mercedes-Benz Greener Manufacturing competition. Just as he did, I ran CV 10 times with different seeds, calculated the t-statistic (using scipy.stats.ttest_rel), and used the p-value to guide my decisions. To address the multiple comparisons issue, I tested only the most significant changes using this approach. If CV showed any significant improvement, I tested it on the Public leaderboard, and if it improved there as well (which it almost always did), the changes were added to the final solution.
+
+If the CV showed a significant improvement, which model will you submit? Since you have models trained with different seed. In my approach, I use VotingClassifier with seed blending and the CV becomes consistent with LB. But it's hard to apply it to Image model due to the inference time limit.
+
+reply
+Reply
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hmm, I’m not sure if I understood you correctly. Changes to the model were appled only if both the CV and LB showed improvements. However, during submission, models from all seeds were blended together.
+
+reply
+Reply
+Sumit_08
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations Bro. Really happy about your achievement and I love your code
+
+reply
+Reply
+Wanyi_Zhouzzz
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hello! I've tried to optimize the parameters of catboost several times(based on the tabular data) and private scores are around 0.1728-0.1729. Hope this helps! https://www.kaggle.com/code/wanyizhouzzz/isic-2024-catboost https://www.kaggle.com/code/wanyizhouzzz/first-place-submission-1
+
+reply
+Reply
+Oleksandr Kharytonov
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work! Congrats I have a bit general question about generation of synthetic medical data. What do you think about flow matching? And did you try using this approach in the competition?
+
+reply
+Reply
+Fábio Papais
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, great work!
+
+I have one question regarding the synthetic dataset. You said that you finetuned StableDiffusion 1.5 checkpoint, but the notebook on your repository shows that your pretrained model folder is called "ThisIsReal", which is another SD checkpoint. Could you provide more details into that?
+
+Thank you in advance!
+
+reply
+Reply
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi! Yes, I've used ThisIsReal (downloaded from civiat.ai) which is a StableDiffusion 1.5 based finetune
+
+reply
+Reply
+1
+tharun_01
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great Work @ilya9711nov.
+
+I have a quick question, how did you come up with only these two models that work for you: For the image models, I used two architectures: EVA02-small (eva02_small_patch14_336.mim_in22k_ft_in1k) and EdgeNeXt (edgenext_base.in21k_ft_in1k).
+
+How many models did you try and experiment with?
+
+reply
+Reply
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! Not that many, I've tried some EfficientNets and also MobileNetV3 but as a separate feature extractor. Also, I've tried bigger models of the same families (eg eva02_base / eva02_large)
+
+reply
+Reply
+FrostMagic
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hello, great work! Could you explain which approach you used to choose lof features below? top_lof_features = [ 'tbp_lv_H','hue_contrast', 'age_normalized_nevi_confidence_2', 'tbp_lv_deltaB', 'color_uniformity', 'tbp_lv_z', 'clin_size_long_diam_mm', 'tbp_lv_y', 'position_distance_3d', 'hue_contrast', 'tbp_lv_stdLExt', 'mean_hue_difference', 'age_normalized_nevi_confidence', 'lesion_visibility_score', 'position_distance_3d', 'tbp_lv_minorAxisMM', 'tbp_lv_Hext']
+
+reply
+Reply
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+hey, based on permutation feature importance
+
+reply
+Reply
+Putu Kavya Santha Guna
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+damn, that's so cool bro
+
+reply
+Reply
+2
+DC
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thank you for sharing - very insightful
+
+reply
+Reply
+2
+Aastha_048
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thank you for attaching the datasets as well!
+
+reply
+Reply
+1
+Min Sung Kim0
+
+Posted 2 years ago
+
+· 2153rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Props and congratulations! Was the tabular data also augmented?
+
+reply
+Reply
+1
+Rishan Hasan Tenis
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation and thank you for sharing here!
+
+reply
+Reply
+1
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+very very good
+
+reply
+Reply
+1
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+very good
+
+reply
+Reply
+1
+Kerin Payne
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great Explanations!
+
+reply
+Reply
+1
+Nityanand Ghosh
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work and thanks for sharing your work
+
+reply
+Reply
+1
+Vijaari
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work! Congratulations ✨
+
+reply
+Reply
+1
+Abhishek Vijayan
+
+Posted 2 years ago
+
+· 1275th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on the 1st place ! Thanks for sharing your solution approach.
+
+Could you please share what hardware / platform you used specifically for GPU ? (Just wondering if there's anyone with top ranks who relied just on Kaggle 30hr GPU)
+
+reply
+Reply
+1
+Ilya Novoselskiy
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! I’ve rented an A6000/A40 from Runpod. :)
+
+But if I consider all the experiments I’ve been running, I think the two-month Kaggle GPU quota should just barely suffice, though it might be a close call.​
+
+reply
+Reply
+1
+Exalted Joseph
+
+Posted 2 years ago
+
+· 1368th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+those who overfitted they are like way down, I didnt put much in the competition, discouraged by all those high score, GREAT WORK
+
+reply
+Reply
+1
+Jannik Wirtheim
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great work! Congratulations 🎉
+
+reply
+Reply
+1
+Mohammed Salem Lanqes
+
+Posted 2 years ago
+
+· 1408th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, synthetic data is the key. In addition, the approach you used in Vision-models was insightful
+
+reply
+Reply
+1
+Vedant Singh Thakur
+
+Posted 2 years ago
+
+· 382nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for sharing!!!
+
+reply
+Reply
+1

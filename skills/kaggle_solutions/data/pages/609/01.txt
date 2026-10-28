@@ -1,0 +1,685 @@
+url: https://www.kaggle.com/c/playground-series-s4e5/discussion/509043
+fetched: 2026-10-27
+chars: 20499
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+#1st place solution — Regression with a Flood Prediction Dataset
+#1st place solution
+
+Regression with a Flood Prediction Dataset
+
+Solution Writeup · 1st place · Jun 1, 2024
+
+Thank's to Kaggle for organizing tabular competitions like this one. I learned a lot from those competitions. I learned a lot also from public notebooks and discussions, thank you everyone for sharing so much.
+
+Because this dataset contains a sum of Poisson distributions, the winner of this competition had to be from France. Thank you M. Simeon Denis Poisson for giving us such a tool, and thank you for giving me a extra motivation during this competition.
+
+Thank you to all competitors, you are really challenging, playing with you is a pleasure. Congrat's to @mdoroch (I will contact you, you were very impressive), @lashfire, @mattop , @tilii7 : your submissions during last days stressed me so much !
+
+My solution is :
+
+an ensemble ajusted with a ridge regression positive = False, fit_intercept = False.
+and ajusted with 3 repeated oof predictions of a variety of models produced with catboost, xgboost, lightgbm and 2 public notebooks
+Auto Gluon Starter by @mfmfmf3 available https://www.kaggle.com/code/mfmfmf3/autogluon-starter
+Flood Prediction LGBM by @igorvolianiuk https://www.kaggle.com/code/igorvolianiuk/flood-prediction-lgbm
+
+EDA helped me to understand that original dataset was completly different from train dataset. EDA helped me to understand that the sum of 16 of 17 orginal features was still a Poisson distribution in train dataset, but sum of 18, 19, and 20 original features was not (neither in test dataset). And EDA helped me to find interesting features, correlated to target (thank you @ambrosm for the most important feature)
+
+I took care for my own GBMs to feature selection :
+
+usefull features : sum of each lign, std of each lign, max of each lign, sorted original features (thank you @siukeitin for Sorting along the feature axis as "feature engineering"'s discussion, number of variables which have a value higher than 6, or than 7, or than 8 (count features) :
+
+useless features : original features, skewness of each lign, kurtosis of each lign, redondant features. I dropped them.
+
+magic feature : because target could be seen as a discrete variable, I used a target encoder, and train.groupby("sum")["FloodProbability"].std() was an interesting feature (where train["sum"] = train[test.columns].sum(axis=1))
+
+I used permutation feature importance technique explained in scikit-learn or in Kaggle to detect useless features. I used backward technique too.
+
+Variety of models I trained more than 30 GBM's, with various sets of features : sometimes with sorted original features, or sometimes with count features "nb_inf4", "nb_inf3", "nb_inf2", "nb_sup6", "nb_sup7", "nb_sup8", sometimes with target encoder, sometimes without. I used also a target transformation sometimes : there was a strong signal (sum), and a noisy signal (deviance from sum). My transformed target was : train["target_transf"] = train["FloodProbability"] - df[original_features].mean(axis=1) * 0.1 or train["target_transf"] = (train["FloodProbability"]*400 - train[original_features].mean(axis=1) * 40).astype(np.int16) Thank's to @act18l for https://www.kaggle.com/competitions/playground-series-s4e5/discussion/499263#2787165
+
+During the first 10 days, I used only default parameters (with early stopming) and didn't optimize any GBM, concentrated on my features and my ensemble loop. After, hyperparameters were optimized with optuna by using only my kaggle quota of GPU. I optimized only the following hyper parameters (with max timeout = 5400 seconds, it's a lot) :
+
+depth for catboost and xgboost,
+num_leaves for lightgbm,
+alpha, lambda, min_child_weight or min_child_samples for xgboost and ligntgbm
+bagging_temperature, random_strength for catboost
+subsample, colsample_by_node for xgboost and lightgbm
+
+I used default grow_policy of each GBM method (xgboost, catboost and lightgbm have each a different default grow_policy value, it gives variety of predictions), I used default learning_rate or .1, I used early_stopping (od_wait in catboost) to fit n_iterations.
+
+Ensemble During the first two weeks, I trained my ensemble with LinearRegression and positive = True and fit_intercept = False. Until I tried Ridge and positive = False (still fit_intercept = False) which gave me a little improvement. To have a robust ensemble, I trained all my models on 3 repeated kfold, and select by CV the features for my ensemble.
+
+At the end of week 2, I made a submssion with a blind blend using https://www.kaggle.com/code/mfmfmf3/autogluon-starter output. I had a .86939 public score better than .96934 my previous one. Few days later, I had a first complete oofs file from AutoGluon. Then I fitted carefully a new ensemble, and get .86941 score at the end of week 3.
+
+Then I decided to get 3 oofs AutoGluon files and to fit AutoGluon with some other features (3 more oofs). I trained in parallel autogluon here to get 6 oofs files. And then I fitted my final ensemble which score .86943 on public LB.
+
+In conclusion, I have success by combining :
+
+EDA
+feature engineering
+variety of GBM
+AutoGluon
+a strong CV for my Ridge ensemble
+
+I'm proud to have made only 2 submissions between the 18th of may and the end, to win on public and private LB. My CV was highly reliable to public LB since the first day, I trusted my CV and didn't need to submit.
+
+My final ensemble is available here https://www.kaggle.com/code/adaubas/pss4e05-ensemble-with-ridge.
+
+I'm so happy ! Waouh
+
+Author
+aldparis
+
+adaubas
+
+arrow_drop_up
+106
+Share
+more_horiz
+Citation
+
+aldparis. #1st place solution. https://www.kaggle.com/competitions/playground-series-s4e5/writeups/aldparis-1st-place-solution. 2024. Kaggle
+
+47
+5
+4
+1
+comment
+56 Comments
+1 appreciation comment
+Hotness
+SSS
+
+Posted 2 years ago
+
+· 149th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+That's a lot of sweat, literally squeezed atoms. Fact check: the man from France predicts floods 0.00007 (actually fits R2) more accurate than anybody else. :)
+
+reply
+Reply
+kartikey bartwal
+
+Posted 2 years ago
+
+· 1201st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+You're amazing too!!! The best part is this healthy competition on Kaggle. The competition is tight (everyone competing to increase R2 by 0.002) but everyone is regardless are so heartwarming and collaborative. Best wishes to you :)
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thank you @kartikeybartwal ,
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you @sergiosaharovskiy ,
+
+you are right ! about sweat and sqeezed atoms,
+
+reply
+Reply
+Vikram12301
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Hey, Can you explain how finding sum of the features as a single poisson distribution help you?
+
+reply
+Reply
+Krens
+
+Posted 2 years ago
+
+· 247th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations on your 1st place win! Your detailed explanation and transparency about the process are incredibly valuable for the community.
+
+Your approach of using an ensemble adjusted with ridge regression, and combining models from CatBoost, XGBoost, LightGBM, and public notebooks, clearly highlights the power of diverse methodologies. The feature engineering techniques, especially understanding the Poisson distribution characteristics of the dataset, are impressive.
+
+I found your insights into the EDA particularly useful. Identifying that the sum of certain features maintained a Poisson distribution while others did not, and leveraging that for feature selection and engineering, is a brilliant strategy. The use of permutation feature importance and backward techniques for feature selection is also a great takeaway.
+
+Your strategy of focusing on features and ensemble loop during the initial days, and only later optimizing hyperparameters using Optuna, showcases a disciplined and effective approach to problem-solving.
+
+The final ensemble strategy, incorporating multiple OOF files and a strong CV approach, is clearly a winning formula. It's amazing to see how trusting your CV paid off, allowing you to make minimal submissions and still secure the top spot.
+
+reply
+Reply
+2
+Nick Erickson
+
+Posted 2 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats @adaubas on the win, and welcome to the AutoGluon Hall of Fame!
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi @innixma,
+
+Thank you for the link ! and the citation : it's you of course ? 😀
+
+Even if AutoGluon kept me busy the last 2 weeks (how to get oof predictions ?), and even if I admit that I am changing my mind about automl after having experimented with AutoGluon in this competition, I'd rather to say that's a mix of good models which made me win : final parsimonious ridge regression, many GBM, and AutoGluon (close to the top) :
+
+I was opportunistic by using a copy of a @mfmfmf3 's notebook (my copy is available here).
+
+@mfmfmf3 was the real promoter of AutoGluon in this competition.
+
+reply
+Reply
+3
+Tilii
+
+Posted 2 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Great job and thank you for a detailed explanation.
+
+I don't think it was Ridge or positive=True that were particularly important here. We are talking about miniscule differences on the 5th decimal place. I think you likely had a couple of better individual models, and that was it.
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you @tilii7,
+
+I really got CV improvement by using Ridge instead of LinearRegression, by using positive = False instead of positive = True, in this competition for this dataset. I can't explain why, that's my CV which told me that.
+
+reply
+Reply
+S Novi
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for getting !st Place in Kaggle Competitions @adaubas
+
+reply
+Reply
+Tri
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your win!
+
+reply
+Reply
+GARFIELD
+
+Posted 2 years ago
+
+· 792nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your win! I select useful features like sum, mean, sorted along axis=1, count feature higher than 9, cv, max, std etc, and drop useless features including originals, min, mode, median, skew, kurtosis etc. Before optuna tuning, my LGBM baseline r2 score on train dataset is 0.87089, but on test dataset my public score is only 0.86845 and private score is 0.86805. Why does my model suffer from overfitting?
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Hi @garfield2021 , Thank you for the compliment,
+
+Your question is not an easy question. First, data for training, data for public LB and data for private LB are different, we can not expect the same score on the three :
+
+I have .00062 difference between public and private, higher than your .0004 difference. 
+And my CV score is .86956, higher than my score on public LB (CV score - score on public LB = .00013) You : 0.00244
+
+Secondly, your .87089 score on train seems to be very high if it's a CV score. The only public notebooks with such high CV scores were those ones which were using original dataset to train and to compute their validation scores. Did you do so ?
+
+Those who made this, made 2 errors :
+
+first, they compute their validation scores with samples from original dataset. In PlaygroudSeries competition Kaggle always explained that train & test datasets are "close to, but not exactly the same, as the original". So our best estimator of our score with the test dataset, is a score computed on train dataset, and not computed with original dataset, in all PlagroundSeries competitions.
+secondly, they trained their models with samples from original dataset. To validate if we must or mustn't train with original dataset, we must compare a CV score of models trained without original dataset, and another CV score of models trained with original dataset. In this competition, the first one was higher than the second, so better.
+
+How to do this comparison ? Our CV loop must be something like that :
+
+    for fold, (trn_idx, val_idx) in enumerate(folds.split(train, train[target])):
+
+        if other_data is not None:
+            X_trn = pd.concat([train.iloc[trn_idx], other_data], axis=0)
+            y_trn = pd.concat([train[target].iloc[trn_idx], other_data[target]], axis=0)
+        else:
+            X_trn, y_trn = train.iloc[trn_idx], train[target].iloc[trn_idx]
+
+        X_val, y_val = train.iloc[val_idx], train[target].iloc[val_idx]
+
+
+And we have to compare CV score with other_data = None and with other_data = original_dataset (first > second in this competition, so first is better).
+
+And in this competition, It was public since the first day that original_dataset will be useless, because of this post :  In original dataset (right side) there was a trivial relation between target and features : FloodProbability = sum of features / 200. Relation between those 2 columns was more complex in train dataset (left side), therefore in test dataset too.
+
+Therefore, after this public discussion, everyone should had trained their models with other_data=None, always.
+
+And at the beginning of every PlaygroundSeries competition, we must validate if original dataset is usefull for training or not : original dataset is often usefull, but not always, it wasn't in PSS4E05 competition.
+
+And it may be is a third error. You wrote I select useful features like sum, mean ... But in this competition, train["mean"] == train["sum"] / 20, mean and sum are redondant : we need only one of those two features as it was explained here.
+
+reply
+Reply
+GARFIELD
+
+Posted 2 years ago
+
+· 792nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi @adaubas , Thank you very much for the prompt and detailed reply.
+
+First and second, I did concatenate the original dataset with train dataset. Doing so reduced my metric RMSLE in playground competition PSS4E4. But as you showed in this competition, we should not include the original dataset. Below are my codes. Some of them are borrowed from the notebook Flood prediction | LGBM mentioned in your post.
+
+`train.drop('id', axis=1, inplace=True) train = pd.concat([train, original], axis=0) train.reset_index(inplace=True, drop=True)
+
+test.drop('id', axis=1, inplace=True)`
+
+`cv = KFold(5, shuffle=True, random_state=0) cv_splits = cv.split(X_train, y_train) scores = list() model = LGBMRegressor(objective='regression', random_state=0, device='gpu', verbosity = -1, boosting_type='gbdt') for train_idx, val_idx in cv_splits: X_train_fold, X_val_fold = X_train[train_idx], X_train[val_idx] y_train_fold, y_val_fold = y_train[train_idx], y_train[val_idx] model.fit(X_train_fold, y_train_fold) y_pred = model.predict(X_val_fold) r2 = r2_score(y_val_fold, y_pred) scores.append(r2)
+
+print(f'Mean R2 score: {np.mean(scores):.5f}')`
+
+Samples from the original dataset are likely to have contributed in both training and cross validation. I also use the above codes to determine if an added feature is useful (increasing the R2 score) or not (decreasing the R2 score). I read those posts during the competition, but now I understand them better through your explanation.
+
+Third, both sum and mean give the same R2 score. I should have selected only one of them due to high correlation.
+
+I have been practicing feature selection following your approach in the past a few days. Thanks again for all the time and efforts you put into this reply. Good luck to your other competitions!
+
+reply
+Reply
+Sagar Mamodia
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and thanks for posting your solution
+
+reply
+Reply
+Yasir Mehmood2
+
+Posted 2 years ago
+
+· 1235th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@adaubas Congratulations on your win
+
+reply
+Reply
+omar mohammed
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thank you for sharing your solution. 🥰
+
+reply
+Reply
+Thiago Lima Santos
+
+Posted 2 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the first place, and just for the explanation I have already learned a lot, I will still read and read your notebook. you are rock!!!
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thank you for compliment @thiagolimasantos ,
+
+reply
+Reply
+Ivan Radko
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Hi, thank you very much for this post! I want to ask about Poisson distribution. How did you detect that sum of features have Poisson distribution? I used the Kolmogorov-Smirnov test and p-value <<0.05 and this rejects the hypothesis that distribution is Poissonian , but more of features have mean ~ std^2 this may indirectly indicate that the distribution is indeed Poissonian…
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @ivanrad17 ,
+
+It was admitted since the beginning of the competition that columns looked like Poisson : https://www.kaggle.com/competitions/playground-series-s4e5/discussion/499244
+
+reply
+Reply
+Pran
+
+Posted 2 years ago
+
+· 910th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!!!
+
+reply
+Reply
+Muhammad Azeem
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your win @adaubas
+
+reply
+Reply
+Fatima Azfar Ziya
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! This writeup was very insightful and helpful.
+
+reply
+Reply
+Abdulaziz Ergashev
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on your win @adaubas
+
+reply
+Reply
+Muhammad Azeem
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your 1st place win! Your detailed breakdown of the process is incredibly insightful.
+
+Your strategy of using an ensemble adjusted with ridge regression, and combining models from CatBoost, XGBoost, LightGBM, and public notebooks, showcases the power of diverse methodologies. The way you identified and leveraged the Poisson distribution characteristics of the dataset for feature selection is particularly impressive.
+
+Your disciplined approach to focusing on feature engineering and ensemble loop before hyperparameter optimization with Optuna clearly paid off. The final ensemble strategy, incorporating multiple OOF files and a strong CV approach, is a testament to your skill and meticulousness.
+
+Well done on a well-deserved victory!
+
+reply
+Reply
+sihe blu
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! 🎉🎉
+
+reply
+Reply
+George Papachristou
+
+Posted 2 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations🎉🏆 @adaubas!! Nice explaination!! I have a question about the following Few days later, I had a first complete oofs file from AutoGluon. Then I fitted carefully a new ensemble, and get .86941 score at the end of week 3.. Can you elaborate how you create the oofs file with AutoGluon and what do you mean with fitted carefully a new ensemble? Did you fitted in the oof files?
+
+reply
+Reply
+aldparis
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi @mscgeorges I made public my autogluon notebook, I hope everything is explained inside :
+
+https://www.kaggle.com/code/adaubas/pss4e05-copy-autogluon-starter
+
+reply
+Reply
+1
+Willy Wang
+
+Posted 2 years ago
+
+· 399th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I first learned about permutation feature importance. Thanks for sharing~~
+
+reply
+Reply
+Light_Shot
+
+Posted 2 years ago
+
+· 2073rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very nice. Congratulations. It requires lots of efforts.
+
+reply
+Reply
+Mubashir Ahmed Siddiqui
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations!
+
+reply
+Reply
+sun9sun9
+
+Posted 2 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Thank you for sharing your solution. I believe your effort is enough to take first place.
+
+reply
+Reply
+Paulo Robinson Giaciani (pt-BR)
+
+Posted 2 years ago
+
+· 205th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! 👏🏻👏🏻👏🏻👏🏻
+
+reply
+Reply

@@ -1,0 +1,54 @@
+url: https://www.kaggle.com/c/sp-society-camera-model-identification/discussion/49367
+fetched: 2026-10-27
+chars: 816
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+IEEE Signal Processing Society · Featured Prediction Competition · 9 years ago
+Late Submission
+more_horiz
+IEEE's Signal Processing Society - Camera Model Identification
+
+Identify from which camera an image was taken
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

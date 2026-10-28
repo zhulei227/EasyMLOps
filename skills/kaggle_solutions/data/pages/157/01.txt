@@ -1,0 +1,104 @@
+url: https://github.com/hochthom/kaggle-taxi-ii
+fetched: 2026-10-27
+chars: 5915
+
+GitHub - hochthom/kaggle-taxi-ii: Winning solution for the Taxi-Trip Time Prediction Challenge on Kaggle · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ hochthom kaggle-taxi-ii Repository navigation Code Issues 1  ( 1 ) Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-taxi-ii Public Notifications You must be signed in to change notification settings Fork 28  ( 28 ) Star 47  ( 47 ) You must be signed in to star a repository About Winning solution for the Taxi-Trip Time Prediction Challenge on Kaggle Resources Readme MIT license Activity Stars 47 stars Watchers 4 watching Forks 28 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 4 Commits 4 Commits Folders and files Name Name Last commit message Last commit date data data     doc doc     src src     .gitignore .gitignore     LICENSE LICENSE     README.md README.md     View all files Repository files navigation README MIT license More items kaggle-taxi-trip-time-prediction 
+ Winning solution for the Taxi-Trip Time Prediction Challenge on Kaggle ( https://www.kaggle.com/c/pkdd-15-taxi-trip-time-prediction-ii ). 
+ Documentation about the method is available in doc/Taxi_II_Winning_Solution.pdf .
+Information on how to generate the solution file can be found below. 
+ Generating the solution 
+ Install the dependencies 
+ I used python 2.7.9 with its popular scientific modules, in particular 
+
+ numpy for feature processing, 
+ pandas for data handling, and 
+ sklearn for model training. 
+
+ Download the code 
+ To download the code, run: 
+ git clone git://github.com/hochthom/kaggle-taxi-ii.git
+
+ Download the training data 
+ Download the data files from Kaggle . Place and extract the files into the data directory. 
+ Create the training and test sets 
+ Run the following scripts in any order. 
+ create_training_set_N1.py
+
+ Result: train_pp_N1.csv with size: 1658559 x 8, Duration: 679.9 sec * 
+ create_training_set_N2.py
+
+ Result: train_pp_N2.csv with size: 1658559 x 10, Duration: 771.8 sec * 
+ create_training_set_N3.py
+
+ Result: train_pp_N3.csv with size: 1658559 x 10, Duration: 819.9 sec * 
+ create_training_set.py
+
+ Result: train_pp_RND.csv with size: 1928087 x 17, Duration: 911.5 sec * 
+ create_training_set_Experts.py
+
+ Result: 319 Training Sets, with size 3 - 109915 x 17, Duration: 10135.2 sec * 
+train_pp_TST_0.csv - train_pp_TST_319.csv, no file for trip 125. 
+ *Note: The listed running times were achieved on a 12-core server with 24GByte of ram.
+The running time may be considerably longer if you use a machine with less ram! 
+ Create the single model predictions 
+ mk_submission.py
+
+ creates submissions for models N1, N2, N3, RND; Duration: 5175.5 sec * 
+Result: my_submission_xx.csv with xx in [N1,N2,N3,RND] 
+ mk_submission_Experts.py
+
+ creates the expert model predictions, Duration: 2968.3 sec * 
+Result: predictions_TVT_experts.pkl 
+ *Note: The listed running times were achieved on a 12-core server with 24GByte of ram.
+The running time may be considerably longer if you use a machine with less ram! 
+ Create the final (blended) submissions 
+ To generate blended prediction files from all the models, run: 
+ blend_submissions.py
+
+ Result: final_submission_1.csv and final_submission_2.csv 
+ Submit predictions 
+ Submit the files on Kaggle to get it scored. 
+ Submission 1 scored better in the private leaderboard than submission 2 (0.5092 vs. 0.5045), whereas for the public leaderboard it was the other way around (0.5253 vs. 0.5354). 
+ About Winning solution for the Taxi-Trip Time Prediction Challenge on Kaggle Resources Readme MIT license Activity Stars 47 stars Watchers 4 watching Forks 28 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

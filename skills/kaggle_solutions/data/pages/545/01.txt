@@ -1,0 +1,673 @@
+url: https://www.kaggle.com/c/icecube-neutrinos-in-deep-ice/discussion/402976
+fetched: 2026-10-27
+chars: 12505
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — IceCube - Neutrinos in Deep Ice
+1st Place Solution
+
+IceCube - Neutrinos in Deep Ice
+
+Solution Writeup · 1st place · Apr 23, 2023
+
+First and foremost, I would like to express my gratitude to the hosts and the Kaggle team for organizing such an engaging competition. Additionally, I want to extend my appreciation to those who shared their valuable insights by publishing notebooks and participating in the discussions. In particular, the following notebooks and posts have been incredibly helpful.
+
+graphnet_baseline_submission by @rasmusrse
+graphnet_example by @rasmusrse and @pellerphys
+∞ Explanation and Improvement von Mises-Fisher Loss by @synset
+Early Sharing Prize - DynEdge - 1.046 by @anjum48
+3 LSTMs; with Data Picking and Shifting by @seungmoklee
+NDI – Let's Learn Together – ELI5 and EDA by @dschettler8845
+Tensorflow LSTM Model Training TPU by @rsmits
+Architecture
+
+My model has a simple structure with EdgeConv and Transformer connected. I aimed to combine EdgeConv and Transformers in my model to efficiently gather information. GNNs were employed to capture local neighborhood information, while Transformers were used to collect global context, ensuring a comprehensive understanding of the data. This simple model achieves a public score of 0.9628 points and a private score of 0.9633 points as a single model.
+
+Static edge selection for GNN
+
+In the original paper, edges are calculated in each layer dynamically, but this edge selection is not differentiable and cannot be trained. This still works well for the segmentation task in the original paper, as points in the same segment are trained to be close in the latent space. However, the situation is different in this task, so I did not think it would make sense to dynamically select edges. Therefore, the edge selection used in EdgeConv is calculated at the input.
+
+Simple modification of EdgeConv
+
+Using EdgeConv, the latent parameter 
+𝑥
+𝑖
+ of 
+𝑑
+𝑜
+𝑚
+𝑖
+ is updated using the difference: 
+𝑥
+𝑗
+−
+𝑥
+𝑖
+, where 
+𝑥
+𝑗
+ is the latent parameter of the 
+𝑑
+𝑜
+𝑚
+𝑖
+'s k-nearest neighbour 
+𝑑
+𝑜
+𝑚
+𝑗
+. This is fine for x, y, z and time, but for charge and auxiliary, the absolute values are meaningful, so I make 
+𝑥
+𝑖
+ be updated using not only 
+𝑥
+𝑗
+−
+𝑥
+𝑖
+ but also 
+𝑥
+𝑗
+.
+
+Loss function
+
+VMFLoss is a good and stable loss function, but θ is in the form of cos:
+
+VMFLoss = -κ*cos(θ) + C(κ)
+
+
+(where θ is the angle between the ground truth and the prediction and κ is the length of the 3D prediction). On the other hand, the metric of this competition is the angle θ itself. To minimise θ itself, I defined the loss function as follows:
+
+MyLoss = -θ - κ*cos(θ) + C(κ)
+
+
+This simple modification resulted in a 0.005👍 gain compared to VMFLoss.
+
+Sequence Bucketing
+
+In transformers, computational complexity is proportional to the square of the sequence length, making it essential to reduce the sequence length. As a result, it is effective to group data with similar sequence lengths and create mini-batches. This approach speeds up computation and further decreases the GPU memory usage, allowing for the utilization of larger mini-batche size.
+
+It is easy to implement by changing collate_fn in the DataLoader.
+
+def collate_fn(graphs, split_list=[0.8, 1.0]):
+    graphs = [g for g in graphs if g.n_pulses > 1]
+    graphs.sort(key=lambda x: x.n_pulses)
+    batch_list = []
+    for minp, maxp in zip([0]+split_list[:-1], split_list):
+        min_idx = int(minp*len(graphs))
+        max_idx = int(maxp*len(graphs))
+        this_graphs = graphs[min_idx:max_idx]
+        this_batch = Batch.from_data_list(this_graphs)
+        batch_list.append(this_batch)
+    return batch_list
+
+
+Note that even if gradients are calculated individually for each length-biased mini-mini-batch in the batch_list, the negative effects can be mitigated by updating the weights collectively afterwards.
+
+Data loading
+
+Because the data was huge and it was difficult to put everything in memory, I tried to load one batch per epoch. The pseudo code is shown below.
+
+class IceCubeDataset(Dataset):
+    def reset_batch(self):
+        # get next batch id
+        self.this_batch_id = self.get_next_batch_id()
+        # read batch for next batch id
+        self.this_batch = pd.read_parquet(f"{BATCH_DIR}/batch_{self.this_batch_id}.parquet")
+        # filter meta with next batch id
+        self.this_meta = self.meta[self.meta.batch_id == self.this_batch_id]
+
+    def __len__(self) -> int:
+        return len(self.this_meta)
+
+    ・・・
+
+class IceCubeModel(Model):
+    def __init__(
+        self,
+        dataset,
+        ・・・
+    ):
+        ・・・
+        self._dataset = dataset
+
+    def training_epoch_end(self, outputs):
+        ・・・
+        # reset batch every epoch
+        # (reload_dataloaders_every_n_epochs must be set to 1)
+        self._dataset.reset_batch()
+
+Model parameters
+
+This is some information about base models which are used for stacking. 4 Layters, 6M parameters seems to be smaller than other top solutions.
+
+Depth of EdgeConv+Transformer block layer: 3 or 4
+Embedding dimension: 256
+Used sequence length (train): 200 to 500
+Used sequence length (inference): 6000
+With/without global features
+Number of parameters: 6M
+Parameters used in kNN for GNN: x,y,z or x,y,z,time
+Training time: 10 to 14 hours/epoch (on 2x titan RTX)
+Inference time: 30 minutes/5 batches ( on Kaggle notebook)
+
+Inference time is relatively slow due to the use of 6000 sequences.
+
+Stacking
+
+The framework for stacking was primarily based on the original base model. The main difference was that the model was replaced with a 3-layer MLP. Through stacking, an improvement of +0.003 was achieved.
+
+Code
+
+Inference notebook is available here.
+
+Author
+tito
+
+its7171
+
+arrow_drop_up
+77
+Share
+more_horiz
+Citation
+
+tito. 1st Place Solution. https://www.kaggle.com/competitions/icecube-neutrinos-in-deep-ice/writeups/tito-1st-place-solution. 2023. Kaggle
+
+comment
+33 Comments
+Hotness
+Sohangkumar Patel
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Great work!! Love your work!! Thanks for sharing with us👌.
+
+reply
+Reply
+Ivan Isaev
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Despite the high complexity of the task, the author clearly presented the solution process in the form of a simple flowchart. In addition, he explained how to efficiently use the PC's memory for such a huge amount of data. The article contains links to solutions on individual topics, which makes it very useful and relevant. I wish the author continued success!
+
+reply
+Reply
+Mahesh Jadhav
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+it was nice to go through your solution
+
+reply
+Reply
+ZhaounBooty
+
+Posted 4 years ago
+
+· 76th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing the solution. All of us will take a look at it. You gave an enormous impact!
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you. And thank you for publishing the notebook. It was very helpful.
+
+reply
+Reply
+Robin Smits
+
+Posted 4 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Really impressive work @its7171 Congratulations with the achieved 1st place.
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you. And thank you for publishing the notebook. It was insightful.
+
+reply
+Reply
+szebiniso
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Good job, congratulations @its7171
+
+reply
+Reply
+Asierae
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great solution
+
+reply
+Reply
+Passive Learner
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the solution and congradulations!!
+
+reply
+Reply
+Thomaz Pires
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great work"
+
+reply
+Reply
+Nicola Nicassio
+
+Posted 3 years ago
+
+· 112th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Mohamed Eltayeb
+
+Posted 3 years ago
+
+· 78th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing! Could I know why did you think EdgeConv is suitable here? it is a little new for me, so just want to know when it is best to use it?
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I just thought that it was the state-of-the-art for this task by this paper from hosts. https://iopscience.iop.org/article/10.1088/1748-0221/17/11/P11003/pdf
+
+It is typically used in Point Clouds segmentation tasks. https://arxiv.org/abs/1801.07829
+
+The data x,y,z and time contained of this competition are only meaningful for their differences. In this respect it is similar to Point Clouds, which I believe is why it was effective in this competition task.
+
+reply
+Reply
+Maciej Gomółka
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for posting your method. Great work.
+
+reply
+Reply
+AdithyaKolluru
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. Very nicely explained.
+
+reply
+Reply
+moto
+
+Posted 4 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on 1st place! Your approach to speed up the training is really great! I think that speeding up the training was very important in this competition.
+
+reply
+Reply
+Ericka42
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great work and thank you for posting your method!
+
+reply
+Reply
+Nicolas Rodriguez
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+This is a really great solution, thanks for sharing! And congratulations on getting 1st place!
+
+reply
+Reply
+Christian Aquino
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@its7171 awesome solution, thanks for sharing it. Congratulations on your results
+
+reply
+Reply
+CroDoc
+
+Posted 4 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@its7171 would you be willing to share the code of your model part?
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+@crodoc I made my inference notebook pulblic. https://www.kaggle.com/code/its7171/icecube-edgeconv-transformer-inference
+
+reply
+Reply
+CroDoc
+
+Posted 4 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much @its7171!
+
+reply
+Reply
+CroDoc
+
+Posted 4 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Awesome work @its7171! Really love your solution. Well deserved first place and top 15 overall!
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! And congratulations to new GM, Well deserved!🎉
+
+reply
+Reply
+Ryosuke Horiuchi
+
+Posted 4 years ago
+
+· 549th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for participating in this competition and sharing your solution! It's amazing to see that your very straightforward single model alone ranks gold. Looking forward to reading the complete version of this write-up as well as your code if possible! Thanks again.
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you!
+
+reply
+Reply
+edguy99
+
+Posted 4 years ago
+
+· 667th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great work and thank you for posting your method. Edge detection is new to me, so a little confused, but looks pretty interesting.
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you! The following documentation on EdgeConv may be helpful.
+
+https://arxiv.org/abs/1801.07829 https://www.nbi.dk/~petersen/Teaching/ML2022/Week5/IntroductionToGNNs_RasmusO.pdf https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.EdgeConv.html
+
+reply
+Reply
+Hozaifa Ahmed
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great write-up and congrats on your position @its7171, very well deserved!
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much!
+
+reply
+Reply
+Jacqueline Hynes
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the excellent learning materials!
+
+reply
+Reply
+Sathyanarayan Rao
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Very nice information! Outstanding work!
+
+reply
+Reply

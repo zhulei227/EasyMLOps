@@ -1,0 +1,701 @@
+url: https://www.kaggle.com/c/march-machine-learning-mania-2026/writeups/march-machine-learning-mania-2026-1st-place-solut
+fetched: 2026-10-27
+chars: 21763
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+March Machine Learning Mania 2026: 1st Place Solution — March Machine Learning Mania 2026
+March Machine Learning Mania 2026: 1st Place Solution
+
+Kill your darlings.
+
+March Machine Learning Mania 2026
+
+Solution Writeup · 1st place · Apr 9, 2026
+
+Final Score: 0.1097454 (MSE/Brier Score) | Rank: 1st / 3,485 teams
+
+Context
+
+Business context: https://www.kaggle.com/competitions/march-machine-learning-mania-2026/overview
+
+Data context: https://www.kaggle.com/competitions/march-machine-learning-mania-2026/data
+
+Philosophy
+Let the selection committee do the bulk of the work (i.e. trust seeding differential), then consider what they don't account for: continuous ranking of teams rather than strictly ordinal, some injuries (they're vague about how they account for injuries), matchup-specific advantages, etc.
+Treat the men's and women's tournaments as separate entities
+Play the game to win. Basically, work backwards from Brier Score and tweak the model towards a "finish in the money or bust" mentality (see: sharpening edges in post-processing).
+Approach
+Foundation: a blend of raddar's 2025 kaggle model and Rob Mulla's 2023 tutorial as a starting point. For a novice, there's nothing quite like a great tutorial.
+Data Preparation
+Efficiency Metrics
+
+The following efficiency metrics calculations feed into a custom rating (harry_Rating). I ended up not using rebound and free throw rate as features.
+
+df = df.assign(
+        WPoss = df["WFGA"] - df["WOR"] + df["WTO"] + (df["WFTA"] * .475),
+        LPoss = df["LFGA"] - df["LOR"] + df["LTO"] + (df["LFTA"] * .475),
+    ).assign(
+        Pace = lambda x: (200 / (x["WPoss"] + x["LPoss"])/2),
+        WOffEff = lambda x: (x["WScore"] / x["WPoss"]) * 70,
+        WDefEff = lambda x: (x["LScore"] / x["LPoss"]) * 70,
+        LOffEff = lambda x: (x["LScore"] / x["LPoss"]) * 70,
+        LDefEff = lambda x: (x["WScore"] / x["WPoss"]) * 70
+    ).assign(
+        WNetEff = lambda x: x["WOffEff"] - x["WDefEff"],
+        LNetEff = lambda x: x["LOffEff"] - x["LDefEff"]
+    ).assign(
+        WOffRebRate = df["WOR"] / (df["WOR"] + df["LDR"]),
+        LOffRebRate = df["LOR"] / (df["LOR"] + df["WDR"]),
+        WFTRate = df["WFTA"] / df["WFGA"],
+        LFTRate = df["LFTA"] / df["LFGA"]
+    )
+
+Injury Adjustments (Men's Only)
+
+I think there are two main options: a) you can let Vegas do the work, as their lines are injury-adjusted (looks like @kevinermille had success with this), or b) do it manually, which was my approach. I tried to do the same process for the women but opted out of adjusting for early season injuries (e.g. Ice Brady), so I ended up with no women's adjustments.
+
+Injury Data Source: https://www.rotowire.com/cbasketball/injury-report.php
+
+Player Efficiency Data Source: https://evanmiya.com/?player_ratings (manual data entry)
+
+I just used basic assumptions for how much to prorate injuries based on their rotowire Status:
+
+status_weights = {
+    "Out For Season": 1.0,
+    "Out": 0.75,
+    "Game Time Decision": 0.5,
+}
+
+
+Actual Adjustments
+
+Team	Player	Status	Adj BPR	Injury Deduction
+Alabama	Aden Holloway	Out	6.00	4.50
+Arkansas	Karter Knox	Game Time Decision	2.91	1.46
+BYU	Richie Saunders	Out For Season	6.05	6.05
+Clemson	Carter Welling	Out For Season	2.98	2.98
+Duke	Caleb Foster	Out	3.79	2.84
+Duke	Patrick Ngongba	Game Time Decision	7.07	3.54
+Gonzaga	Braden Huff	Out	5.36	4.02
+Gonzaga	Jalen Warley	Game Time Decision	4.71	2.36
+Michigan	L.J. Cason	Out For Season	3.16	3.16
+North Carolina	Caleb Wilson	Out For Season	6.27	6.27
+SMU	B.J. Edwards	Out	5.10	3.82
+Texas Tech	JT Toppin	Out For Season	6.20	6.20
+Texas Tech	LeJuan Watts	Game Time Decision	3.11	1.55
+UCLA	Tyler Bilodeau	Game Time Decision	4.40	2.20
+Villanova	Matthew Hodge	Out For Season	2.65	2.65
+Wisconsin	Nolan Winter	Game Time Decision	5.28	2.64
+Feature Engineering
+The strategy is minimalist. I've done some modeling with NBA data, so I began there and then added a few college-specific features.
+Each feature is a calculated differential between Team 1 and Team 2
+Seeding Differential
+tourney_data["seed_diff"] = tourney_data["T1_seed"] - tourney_data["T2_seed"]
+
+
+This is self-evident, but it is worth understanding how the committee actually seeds teams.
+
+Men's process
+Women's process
+Custom Rating (harry_Rating) Differential
+
+The goal of creating this was two-fold:
+
+Account for some of the things seeding doesn't capture
+Have a way to hand-tune rankings based on my opinion of teams
+Calculation
+Step 1: 2% Trim Mean Season Average Net Efficiency (calculated during data preparation)
+# calculate season averages (2% trim)
+ss = regular_data.groupby(["Season", "T1_TeamID"])[boxcols].agg(
+    lambda x: trim_mean(x, 0.02)
+    ).reset_index()
+
+Step 2: Injury Deductions from Net Rating
+
+All I did was subtract the Injury Deduction from the table above from those teams' Net Ratings.
+
+Step 3: Hand-Tuning Custom Ratings with MinMax Scalers
+
+This is where my greenness probably shows most (I'm in my first term of a Data Science Master's program), but this felt like a way I could inject my own opinion into the model.
+
+Scalers Strength of Schedule (opp_pts)
+
+I used tournament seeding and secondary tournament participation as a measure of team quality for that season.
+
+conditions = [
+    regular_data["T2_seed"] <= 4,
+    regular_data["T2_seed"] <= 16,
+    regular_data["T2_Tourney"].notna(),
+]
+choices = [6, 4, 2]
+
+regular_data["T1_Opp_Qlty_Pts"] = np.select(conditions, choices, default=0.25)
+
+
+So, 4 tiers of team quality:
+
+Tier	Criterion	Points
+Tier 1	4 seed or better in this year's tournament	6
+Tier 2	5 seed or worse in this year's tournament	4
+Tier 3	Participating in secondary tournament	2
+Tier 4	No tournament participation	0.25
+Power Conferences (power_conf)
+
+Forgot the old Pac-Ten.
+
+# split men and women in case the values differ
+M_conf["Power"] = np.where(
+    M_conf["ConfAbbrev"].isin(["big_ten", "acc", "sec", "big_twelve", "big_east", "pac_twelve"]),
+    1, 0
+)
+
+W_conf["Power"] = np.where(
+    W_conf["ConfAbbrev"].isin(["big_ten", "acc", "sec", "big_twelve", "big_east", "pac_twelve"]),
+    1, 0
+)
+
+AP Poll Week 6 Top 12 (top12)
+
+Men-only classifier that shies away from recency. "Were they ranked in the AP Poll top 12 in week 6 or not?"
+
+Full Calculation
+scaler_configs = {
+    1: {  # men
+        "opp_pts": (-0.55, 0.55),
+        "power_conf": (1, 1.3),
+        "top12": (1, 1.2),  # men only
+    },
+    0: {  # women
+        "opp_pts": (-0.5, 0.5),
+        "power_conf": (1, 1.1),
+    },
+}
+
+for gender, ranges in scaler_configs.items():
+    if gender == 1:
+        mask = ss["T1_TeamID"] < 3000
+    else:
+        mask = ss["T1_TeamID"] >= 3000
+
+    scaler_opp = MinMaxScaler(feature_range=ranges["opp_pts"])
+    scaler_conf = MinMaxScaler(feature_range=ranges["power_conf"])
+    ss.loc[mask, "T1_Opp_Qlty_Pts_MinMax"] = scaler_opp.fit_transform(ss.loc[mask, ["T1_Opp_Qlty_Pts"]])
+    ss.loc[mask, "T1_Power_MinMax"] = scaler_conf.fit_transform(ss.loc[mask, ["T1_Power"]])
+
+    if "top12" in ranges:
+        scaler_top12 = MinMaxScaler(feature_range=ranges["top12"])
+        ss.loc[mask, "T1_Top12_MinMax"] = scaler_top12.fit_transform(ss.loc[mask, ["T1_Top12"]])
+    else:
+        ss.loc[mask, "T1_Top12_MinMax"] = 1  # neutral multiplier for women
+
+ss["T1_harry_Rating"] = (
+    ss["T1_NetEff"]
+    * (1 + ss["T1_Opp_Qlty_Pts_MinMax"])
+    * ss["T1_Power_MinMax"]
+    * ss["T1_Top12_MinMax"]
+)
+
+Quality Wins Differential (Opp_Qlty_Pts)
+
+I wanted to reward teams who had accomplished hard things throughout the season. This is an extension of the Opponent Quality Points system (explained the Strength of Schedule scaler section above) and calculated by summing the opp_qlty_pts for wins.
+
+Feature Selection
+Men's Tournament
+Feature	Literal Name	Correlation
+Seed Differential	seed_diff	r=-0.5937
+Quality Wins Differential	opp_qlty_pts_won_diff	r=0.4603
+harry_Rating Differential	harry_diff	r=0.5971
+Women's Tournament
+Feature	Literal Name	Correlation
+Seed Differential	seed_diff	r=-0.7560
+Quality Wins Differential	opp_qlty_pts_won_diff	r=0.6437
+harry_Rating Differential	harry_diff	r=0.7743
+Avg. Blocks Differential	avg_blk_diff	r=0.4373
+Modeling
+XGBoost Regression on 'Win'
+
+Raw prediction baseline
+
+model = xgb.XGBRegressor(
+            eval_metric="rmse",
+            n_estimators=4_000,
+            learning_rate=0.003,
+            early_stopping_rounds=100,
+            **hparams[gender],
+        )
+
+hparams = {
+    "men":   dict(max_depth=2, min_child_weight=5, subsample=0.7, colsample_bytree=0.8, reg_alpha=0.1, reg_lambda=1.0),
+    "women": dict(max_depth=2, min_child_weight=3, subsample=0.8, colsample_bytree=0.8, reg_alpha=0.1, reg_lambda=1.0),
+}
+
+Cross-Validation
+
+Leave One Season Out (2003-2025)
+
+Isotonic Regression to Calibrate
+
+Applied across all games, so not specific to season
+
+men_calibrator = IsotonicRegression(y_min=0.001, y_max=0.999, out_of_bounds="clip")
+men_calibrator.fit(men_oof_preds, men_oof_labels)
+
+women_calibrator = IsotonicRegression(y_min=0.001, y_max=0.999, out_of_bounds="clip")
+women_calibrator.fit(women_oof_preds, women_oof_labels)
+
+Impact of Calibration
+Men's CV Brier (raw):           0.1850
+Men's CV Brier (calibrated):    0.1822
+Women's CV Brier (raw):         0.1390
+Women's CV Brier (calibrated):  0.1357
+Total CV Brier (raw):           0.1620
+Total CV Brier (calibrated):    0.1590
+
+Post-Processing
+
+@sqlrockstar started a nice dialogue on this strategy, so you can read up there, but here's my piece of it:
+
+I didn't hard-code any specific teams, but I did 'sharpen the edges' in post-processing, meaning I rounded predictions >= 97% and <= 3% to the extreme (see chart below). So my gamble was that no outcome with a 1 in 33.33 chance (3/100) would happen. I sharpened 28 first round games and projected to sharpen 35 total games, so that felt about right. Across 35 games P(at least one miss) is 65.6%. This is a negative expected value play but one way to gain an edge on the margins.
+
+What Didn't Work Well
+Pretty much every feature other than the ones I used. I tinkered quite a bit and the model just got worse (e.g. rebound and free throw rate)
+Rewarding recent performance
+Mistakes & Opportunities
+Optuna: auto-tuning is sensible, but I was just learning how to use it.
+Impact of coaching: wondering if anyone had luck with this. I didn't take the time to explore it, but my hunch is it matters sometimes (looking at you, Jake Diebler…)
+Incorporating betting/predictive market odds. This makes a ton of sense, but I just didn't take the time to do it.
+Sources
+Competition Data: (https://www.kaggle.com/competitions/march-machine-learning-mania-2026/data)
+AP Poll Data: (Nishaan Amin)
+Player Injuries: (rotowire)
+Player Ratings: (EvanMiya.com)
+Bracket Visualizer: https://marksmath.org/visualization/data/NCAABrackets/KaggleBrackets/
+Acknowledgements
+@addisonhoward and co. for hosting
+@raddar, because obviously
+@robikscube for the tutorial (2023)
+@mcmcclur for the sweet bracket visualizer
+@kevinermille for the solid writeup
+Tagged
+Basketball
+Feature Engineering
+Gradient Boosting
+XGBoost
+Sports
+Author
+Harrison Horan
+
+harrisonhoran
+
+arrow_drop_up
+73
+Share
+more_horiz
+Project Links
+harry March Mania 2026 Notebook
+
+7 months ago · 39 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+GitHub - harrisonhoran/kaggle-march-mania-2026-1st-place: Winning solution for Kaggle March Machine Learning Mania 2026 · GitHub
+
+https://github.com/harrisonhoran/kaggle-march-mania-2026-1st-place
+
+link
+
+github.com
+
+Citation
+
+Harrison Horan. March Machine Learning Mania 2026: 1st Place Solution . https://www.kaggle.com/competitions/march-machine-learning-mania-2026/writeups/march-machine-learning-mania-2026-1st-place-solut. 2026. Kaggle
+
+2
+9
+2
+comment
+22 Comments
+4 appreciation comments
+Hotness
+Ryan Armstrong
+
+Posted 7 months ago
+
+· 546th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Awesome stuff. I also made adjustments to my efficiency model for injuries this year and saw a minimal positive score impact (~.00022). Had Claude assist on the adjustments and it was probably not as robust as what you did. Was still happy to see it work despite some major downgrades (like Holloway/Alabama) backfiring for a few games.
+
+Curious about the metrics to limit recency on the men’s side. Historically I have seen value in weighting more recent games heavily, but I have not explored also introducing an element of early season rankings. I suppose both can be valuable.
+
+reply
+Reply
+2
+Harrison Horan
+
+Topic Author
+
+Posted 7 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yea, the recency thing is interesting to me. I think several of the top submissions had success in weighting recency. @brendancarlin , if you're game to share, how impactful was your RecentFormDiff feature? Someone who experimented with K-factors in their ELO might also be able to advise. You're probably right in that a blend of early and late season factors is best.
+
+As for injuries, your information tracks with what I saw, which was ~.0081 improvement on the men's tournament (I only adjusted for men's injuries), and ~.0041 overall brier improvement.
+
+reply
+Reply
+Ryan Armstrong
+
+Posted 7 months ago
+
+· 546th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I need to do some analysis to quantify the impact of recency on mine. My model is a ratings model based on the mean and variance of tempo and efficiency. Similar to BartTorvik or KenPom with an uncertainty estimation. So no direct importance measure on recency.
+I use a decaying “games ago” weighting function when I train the ratings model on the regular season results so the early season has less impact. In theory, I could remove that rating to see the brier score impact - I have actually never looked at the impact split by men/women and that would be interesting.
+I should take the time to build an ML model with additional features like early seasons rankings… maybe next year. Or I will just share the ratings and see what others come up with!
+
+reply
+Reply
+1
+melondonkey
+
+Posted 6 months ago
+
+· 402nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very mature thinking for someone just "studying" data science and not an active practitioner. Sure you'll do well in your career and glad you attached your name to give yourself the credit you deserve.
+
+Tell me if you disagree but I feel like of all the factors the edge-sharpening strategy might have made the difference between being a gold performer and being #1. However, the choice of 3% as opposed to another number seems in some sense lucky or maybe based on intuition. I could see a new meta developing for this competition where people are basically gambling on their edge-tolerance as opposed to their hardcodes.
+
+I'm not entirely sure though because the second-place solution actually did the opposite--clipped the probabilities at 2%.
+
+reply
+Reply
+1
+Harrison Horan
+
+Topic Author
+
+Posted 6 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for this, and I noticed the same in Brendan's submission. My thought process was that a ~1/3 gamble (as described in the writeup) was worthwhile if it created a marginal edge. That said, it was ultimately worth ~.00011, which wouldn't have changed my finishing position. It sort of just depends on how bunched the leaderboard is.
+
+reply
+Reply
+statstew
+
+Posted 7 months ago
+
+· 3344th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+For the opponent quality based on tournament seed and/or secondary tournament participation, are any "pre College Basketball Crown" years severely impacted by a team's decision to decline an NIT bid? One known example is the 2023 UNC team that was listed in the "First Four Out" of the main NCAAM tournament.
+
+If I am understanding your logic above, teams who have played UNC are being assessed a value of 0.25 in terms of quality points despite the fact that they would have most likely been a #1 seed in the NIT tournament (i.e., having a series of home games if they advanced) had they accepted the invite.
+
+Then with the 2024 NIT tournament (i.e., the last year before the College Basketball Crown started), there were a total of 15 teams from the power conferences (i.e., Big Ten, Big East, Big 12, ACC, SEC, and Pac-12) that year that declined a NIT invite.
+
+This means that there is a cascading effect that opponents of these 15 teams are being assessed on a value of 0.25 (instead of a probable 2).
+
+Then for the 15 teams that ultimately made the NIT, their opponents are seeing a bump up to a value of 2 (instead of the probable 0.25).
+
+The power conferences this year were also guaranteed at least two spots, but the Pac-12 only ended up using one of them as SEVEN of their EIGHT non-NCAAM tournaments teams declined an NIT bid.
+
+reply
+Reply
+Harrison Horan
+
+Topic Author
+
+Posted 7 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Yea, this was a known unknown (to me, at least) and could probably be optimized in future iterations. Some of its impact was also muted because I used it as a scaler in tandem with the power conference scaler.
+
+reply
+Reply
+Dan Falkenheim
+
+Posted 7 months ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and great work!
+
+reply
+Reply
+1
+Mark McClure
+
+Posted 7 months ago
+
+· 354th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I'm glad you found the visualizer handy, too!! 🎉
+
+reply
+Reply
+1
+ForSkool
+
+Posted 4 months ago
+
+arrow_drop_up
+0
+more_vert
+
+This is awesome! I am going to start working on something similar as the NBA is expanding to more two teams. I wanted to take the player stats and see how or who would have potential to be in those new teams as there more teams to create clutch players. Thanks for the share!
+
+reply
+Reply
+1
+Pranav Unni
+
+Posted 6 months ago
+
+arrow_drop_up
+0
+more_vert
+
+bookmarking for future references :p
+
+reply
+Reply
+1
+Navneet
+
+Posted 6 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Bravo for First Place @harrisonhoran
+
+reply
+Reply
+1
+Durga Kumari
+
+Posted 6 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Really impressive how much performance you extracted from such a minimal feature set
+
+reply
+Reply
+1
+Bhawesh Sinha
+
+Posted 6 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and great work!
+
+reply
+Reply
+1
+Bryan Arnold
+
+Posted 7 months ago
+
+· 2091st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Love the feature engineering ideas and insights. Great job!
+
+reply
+Reply
+1
+Devang Kushwaha
+
+Posted 7 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Impressive results
+
+reply
+Reply
+1
+Abdulrahman Ragheb
+
+Posted 7 months ago
+
+· 2872nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+"Huge congratulations on the well-deserved 1st place, Harrison! This is arguably one of the most elegantly structured write-ups in the competition.
+Coming from an industrial engineering and project management background, I deeply resonate with your 'philosophy'. Admitting that you started with a blend of raddar's and Rob Mulla's work instead of reinventing the wheel from scratch is exactly how robust, real-world systems are built.
+While many of us (I finished with a score of 0.207 using a rigid, pure-ML approach) tried to force the algorithms to learn everything, your manual 'Injury Deductions' was pure strategic genius. You recognized that algorithms don't read the daily news. That specific 'Human-in-the-loop' intervention was the ultimate edge.
+I have a specific question about your boldest move: Post-Processing and 'sharpening the edges' (rounding >= 97% to 1 and <= 3% to 0).
+Did you arrive at these specific 3% / 97% thresholds through rigorous historical backtesting to find the optimal Expected Value (EV), or was it more of an intuitive 'finish in the money or bust' gut decision? Also, how nerve-wracking was it watching those 28 specific first-round games, knowing that a single 1-in-33 upset would completely tank your Brier score?
+Phenomenal work and a true masterclass in strategic modeling. Kill your darlings, indeed!"
+
+reply
+Reply
+1
+2
+Harrison Horan
+
+Topic Author
+
+Posted 7 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Appreciate the kind words, @abdulrahmanragheb . Unfortunately as athletes get bigger, stronger, and faster, injuries become an increasingly important piece of predicting games. Also, injury reporting remains inconsistent, so it's hard to tame.
+
+As for the edges, it was somewhere in between science and intuition. As mentioned, it was actually a negative EV play. It's hard to say just how close scores will be in the end, so it was a gamble I felt okay with. And that's the thing about complementary probabilities: no individual game felt like much of a sweat because they're all mismatches, so you don't feel the actual risk across 35 instances. Also, for any game I had as >= 97%, it's likely that most other submissions had as lopsided as well, so there's probably a sweet spot in there somewhere.
+
+For what it's worth, the edge-sharpening ended up improving my score by ~.00011, which is quite a bit less than the impact of injury adjustments.
+
+reply
+Reply
+2
+ihbarddx
+
+Posted 7 months ago
+
+· 95th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Impressive results!
+
+reply
+Reply
+1
+Appreciation (4)
+SQLRockstar
+
+Posted 7 months ago
+
+· 21st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wonderful writeup, thanks for sharing!
+
+Cyrus
+
+Posted 7 months ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+Brian M
+
+Posted 2 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for keeping it zen!
+
+Olajide Oluwatosin O
+
+Posted 7 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Awesome!!!

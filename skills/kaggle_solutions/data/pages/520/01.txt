@@ -1,0 +1,396 @@
+url: https://www.kaggle.com/c/tabular-playground-series-nov-2022/discussion/369674
+fetched: 2026-10-27
+chars: 7783
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Tabular Playground Series - Nov 2022
+1st Place Solution
+
+Tabular Playground Series - Nov 2022
+
+Solution Writeup · 1st place · Dec 1, 2022
+
+Hey guys, Thanks for all the competition we had a great time dealing with this dataset. I’m going to follow @alexryzhkov and explain a bit of our team’s solution.
+
+Team name
+
+🌪️, @jcaliz and @samuelcortinhas
+
+Team place
+
+7 public LB and 1st private LB
+
+The brief description of the solution
+
+Lots of ensembles with different models architectures and different features. Final blend consists of:
+
+LightAutoML provided by @sergiosaharovskiy, @alexryzhkov
+One XGBoost models trained with different features.
+One LGBM models trained with different features.
+Two dense NN trained with different features.
+Used libraries/algorithms:
+
+We used: XGBoost, LightGBM, LightAutoML, Keras, and Weights and Biases among others.
+
+The key points which improve your score the most
+Good cross validation, we used 10 StratifiedKfold and other models with 20 StratifiedKfold
+Stacking using scipy.minimize thanks @pourchot
+Multistart the NNs to mitigate noise.
+Post processing by adding little values to predictions above and below 0.5. Always trusting the CV to select the positive and negative delta. Earlier in the competition EDA notebooks shown that models had more troubles to classify negative labels.
+Blend different types of models, not only on on the algorithm but o the features. We selected feature using Top-K AUC, L1 with o LogisticRegression, Feature importance (similar to RFE), permutation importance.
+Use logits instead of probablities, thanks @ambrosm
+Trust your CV its easy to overfit
+Swish and Mish for activation functions.
+Several ideas that didn't work
+Boltzmann ensemble, we didn’t go deeper after the first couple of iterations
+Geometric mean, similar to Boltzman.
+Residual blocks (a simple neural network was enough)
+What can be done in a better way?
+
+From my experience this is strange competition, because there were almost zero data analysis, I felt it was more like shoot everything until it works. Speaking from myself, I spent too much time trying to do things from scratch instead of reading others work.
+
+Lessons learned from the competition
+
+There is a huge importance of using an experiment tracking tool, it helps a lot to save oof preds and validate your hypothesis. Be really open to learn new things as required, AutoML is a great example.
+
+Special thanks to my teammate, I enjoyed a lot working in a team, and there is no better way to learn than having a common enemy haha.
+
+If you find this post helpful, make sure to upvote the notebooks that provided insigths:
+
+https://www.kaggle.com/code/mikhailkuz/lightautoml-nn-happiness
+https://www.kaggle.com/code/alexryzhkov/5k-features-not-a-problem-for-lightautoml
+https://www.kaggle.com/code/ambrosm/tpsnov22-eda-which-makes-sense
+https://www.kaggle.com/code/pourchot/stacking-with-scipy-minimize
+https://www.kaggle.com/code/sergiosaharovskiy/tps-nov-2022-in-automl-we-trust
+Authors
+Jose Cáliz
+
+jcaliz
+
+Samuel Cortinhas
+
+samuelcortinhas
+
+arrow_drop_up
+49
+Share
+more_horiz
+Citation
+
+Jose Cáliz, Samuel Cortinhas. 1st Place Solution. https://www.kaggle.com/competitions/tabular-playground-series-nov-2022/writeups/1st-place-solution. 2022. Kaggle
+
+comment
+21 Comments
+3 appreciation comments
+Hotness
+pineapple
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Really good job! Good to see how more complicated doesn't always mean better.
+
+reply
+Reply
+Laurent Pourchot
+
+Posted 4 years ago
+
+· 322nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats to the team !
+
+reply
+Reply
+Jose Cáliz
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, @pourchot, your input was extremely useful.
+
+reply
+Reply
+EphraimX
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your win.
+
+reply
+Reply
+Alexander Shumilin
+
+Posted 4 years ago
+
+· 137th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for the detailed explanation! And congratulations on your victory! 👍
+
+reply
+Reply
+Mikhail Kuznetsov
+
+Posted 4 years ago
+
+· 85th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for your detailed description of solution!
+
+reply
+Reply
+Gaju Ahmed
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and also thanks for your resources.
+
+reply
+Reply
+HZM
+
+Posted 4 years ago
+
+· 293rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+nice jobs I have done, could you please share your notebook, thanks so much
+
+reply
+Reply
+Alexander Ryzhkov
+
+Posted 4 years ago
+
+· 46th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@jcaliz @samuelcortinhas congrats with the 1st place on this competition and such a detailed description. That's nice to see that our LightAutoML helped you to be on top - well done 👍
+
+reply
+Reply
+sai nikhilesh
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!! @jcaliz @samuelcortinhas can we see the full final notebook, would love to learn more from them and the implementation. THanks!
+
+reply
+Reply
+Jose Cáliz
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hey @sainikhilesh333, that's a hard one as there were several versions of multiple notebooks (some locals) saving OOF preds and submissions. We might be able to gather everything into just one notebook but I'll take time to replicate all results (some may not be even possible).
+
+The final submission and blending was done using only OOF and submissions preds from a kaggle dataset.
+
+reply
+Reply
+Flavio Cavalcante
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats for your 1st place. @jcaliz @samuelcortinhas I learn a lot from your notebooks. Keep going!
+
+reply
+Reply
+Danushkumar Venkadesh
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @jcaliz. Keep rocking ♥️. Thanks for sharing ☺️.
+
+reply
+Reply
+Sahan Dissanayaka
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and it's a smart approach! and thanks for the detailed elaboration. I have a quick question. Have you tried TCN as an option other than LSTM?
+
+reply
+Reply
+Competitor
+
+Posted 4 years ago
+
+· 207th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Is it possible to get your NN architecture?
+
+reply
+Reply
+Samuel Cortinhas
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+def build_model():
+    # Sequential model
+    model = keras.Sequential()
+
+    # Input layer
+    model.add(layers.Input(shape=(X_train.shape[1],)))
+
+    # Hidden layers
+    for i in range(CFG['depth']-1):
+        model.add(layers.Dense(units=CFG['units']))
+        model.add(layers.BatchNormalization())
+        model.add(layers.Activation(CFG['activation']))
+        model.add(layers.Dropout(rate=CFG['dropout_rate']))
+
+    # Output layer
+    model.add(layers.Dense(units=1, activation='sigmoid'))
+
+    # Compile model
+    model.compile(optimizer=keras.optimizers.Adam(lr=0.001),
+              loss='binary_crossentropy',
+              metrics=['binary_accuracy'])
+
+    return model
+
+reply
+Reply
+Cyril Bourgeois
+
+Posted 4 years ago
+
+· 170th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for analysis and advises, going to use lightautoml :)
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (3)
+Teck Meng Wong
+
+Posted 4 years ago
+
+· 127th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing.
+
+Pavithra Devi M
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing ! great explanation
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing!

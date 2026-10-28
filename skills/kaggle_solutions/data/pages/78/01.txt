@@ -1,0 +1,5 @@
+url: https://www.csie.ntu.edu.tw/%7Ecjlin/papers/kddcup2013/
+fetched: 2026-10-27
+chars: 142
+
+FETCH_FAILED: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1125)>

@@ -1,0 +1,613 @@
+url: https://www.kaggle.com/c/image-matching-challenge-2022/discussion/329131
+fetched: 2026-10-27
+chars: 13189
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — Image Matching Challenge 2022
+1st Place Solution
+
+Image Matching Challenge 2022
+
+Solution Writeup · 1st place · Jun 5, 2022
+
+Thanks to all participants for their hard work in the competition. We are honored to have achieved a great result of 1st place in this competition.
+
+We would also like to express our deepest gratitude to the organizers for organizing such a wonderful competition. Thank you very much.
+
+Finally, thanks to my amazing teammates @gmhost, @xiuqi0, and @forcewithme the universe. I believe that their great insight and experimentation brought about honorable results. Thank you very much!
+
+OverView
+
+Our solution is based on an ensemble of matching results from three different models: LoFTR, SuperGlue, and DKM. They all use publicly available pre-trained weights and have not been trained or fine-tuned.
+
+Significant score increases were also achieved by matching at multiple resolutions and by cropping only the covibility region before matching.
+
+Our solution is a 2-stage method and the framework is as follows.
+
+We first concat the keypoints produced by LoFTR with a 840 resolution and keypoints produced by Superpoint_SuperGlue with 840, 1024, 1280 resolution. This is the first stage of our framework.
+
+We use DBSCAN to get clusters containing the top 80~90% matching keypoints. Generate a bbox for each image with those keypoints, and crop it. We call this method mkpt_crop. Mkpt_crop can efficiently filter outliers and extract key areas.
+
+Use LoFTR, dkm, SuperPoint_SuperGlue to rematch on the key area. This is the second stage of our framework.
+
+concat the keypoints produced by stage1 and stage2. Then do RANSAC and get fundamental matrix.
+
+KeyPoint
+mkpt crop
+ensemble multi-resolution matching
+mkpt crop (matching keypoints crop)
+
+Based on the hypothesis that regions not shared by two images are unnecessary for matching, we developed the idea of mkpt crop (matching keypoints crop), which crops images efficiently and accurately.
+
+The mkpt crop crops covisibility regions in the following way.
+
+We use pre-cropped images (original images) to match each other
+Clustering the matching points of each image with DBSCAN
+Extract clusters containing the top 80%~90% matching points to remove outlier regions
+Crop the outer boundary of the cluster
+
+Since a well pre-trained model finds quite a lot of correct matching points, we were able to find covisibility regions with high accuracy by thinning out the outliers to some extent.
+
+The models used in Step 1 were LoFTR and SuperGlue. At first, only the LoFTR results were used to calculate the crop area, but by adding the SuperGlue results, it was possible to cover the covisibility areas that LoFTR could not find, thus increasing the score significantly.
+
+In addition, mkpt crop is a very lean and efficient method because the matching points computed in step 1 can also be used for the final ensemble.
+
+We also tried to crop by segmentation using Mask2Former, but since segmentation crop cannot determine whether or not a region is common to two images, there were inevitably many wasted regions, and mkpt crop gave better results.
+
+However, mkpt_crop has the risk of removing small covisibility regions because it removes clusters with few matching points. Therefore, our team added the matching points from the original image to the ensemble to achieve more stable matching.
+
+ensemble multi-resolution matching
+
+We used LoFTR, SuperGlue, and DKM to perform matching at various resolutions and ensemble the results. The final model used was as follows.
+
+#	Model	input image	resolution
+1	LoFTR	original	840
+2	SuperGlue	original	1280
+3	SuperGlue	original	1024
+4	SuperGlue	original	840
+5	LoFTR	mkpt crop	1280
+6	DKM	mkpt crop	840
+7	SuperGlue	mkpt crop	1024
+8	SuperGlue	mkpt crop	1280
+9	SuperGlue	mkpt crop	1536
+
+(#1~4 are used for mkpt_crop calculation)
+
+The matching points output by these models are rescaled to fit the original image size and then concatenated using np.concatenate to compute the F matrix.
+
+We believe that changing the input resolution led to an improvement in scores because the matching points obtained were different and more diverse.
+
+Other tips
+Use of pretrained models
+
+All of our solutions this time use a publicly available pretrained model.
+
+Since the quality of the training and test data differed in this competition, we did not conduct fine tuning using the provided training data because we thought it would be less effective.
+
+RANSAC parameter
+
+We used USAC_MAGSAC to compute the F matrix.
+
+However, the parameter settings in the public notebook took a long time to calculate and resulted in a timeout, so we repeated several experiments and adopted the following parameters, which are fast and do not change the accuracy much.
+cv2.findFundamentalMat(mkpts0, mkpts1, cv2.USAC_MAGSAC, 0.2, 0.99999, 50000) With these parameters, the above model configuration took approximately 9 hours to complete the process, yielding a score of public:0.86287/private:0.86343.
+
+Incidentally, although not selected in the final submission, a solution that excluded the #4 model (SuperGlue/original/840), increased the DBSCAN eps parameter slightly, and employed the following parameters yielded private:0.86516. cv2.findFundamentalMat(mkpts0, mkpts1, cv2.USAC_MAGSAC, 0.19, 0.99999, 50000) We have not experimented enough with the model configuration and the combination of RANSAC parameters, so there may still be room for improvement.
+
+Things are also useful but not as effective as our final solution
+TTA
+
+Finally we did not use TTA. We initially used horizontal flip TTA, but found that multi-resolution improved scores more, so we eliminated TTA and increased the number of models used in multi-resolution.
+
+Other Matching Methods
+
+We also tried matchformer and keynet_affnet_hardnet, but ultimately did not adopt them.
+
+matchformer: Slow, can improve by about 0.002.
+keynet_affnet_hardnet: can improve by about 0.001
+Things do not work
+Train LoFTR, Superpoint, and SuperGlue.
+Larger resolution for dkm
+Use Segmentation to filter moving object(e. g. cars, people)
+Adding ASLFeat
+Adding ALike
+Authors
+XIUQI
+
+xiuqi0
+
+ForcewithMe
+
+forcewithme
+
+kwang
+
+gmhost
+
+YumeNeko
+
+kashiwaba
+
+arrow_drop_up
+116
+Share
+more_horiz
+Citation
+
+XIUQI, ForcewithMe, kwang, YumeNeko. 1st Place Solution. https://www.kaggle.com/competitions/image-matching-challenge-2022/writeups/correspondence-1st-place-solution. 2022. Kaggle
+
+comment
+39 Comments
+Hotness
+Chan Kha Vu
+
+Posted 4 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Congratulations on a well-deserved 1st place 🎉🎉🎉! Few other teams (including myself) have tried multi-stage inference, but your team's approach with density clustering is on a whole other level of creativity!!!!!!!!!!!!!!!! I guess DBSCAN was the missing sauce for all of those attempts.
+
+Have you tried substituting vanilla LoFTR with QuadTreeAttention one (from here: https://www.kaggle.com/competitions/image-matching-challenge-2022/discussion/328805)? I'm thinking about adding other top team's tricks to your solution to make an "ultimate solution" 😄😄
+
+reply
+Reply
+ForcewithMe
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+We missed quadtree😭. We are trying to add this to our pipeline. We will report the experiment result here once we finished. @chankhavu
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Vadim Timakin
+
+Posted 4 years ago
+
+· 28th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Tier-1 solution, congratulations!
+
+reply
+Reply
+hkchkc
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations! Very impressive solution with only pretrained models, and it would be nice if some ablations can be shared about how each component contribute to the final score :)
+
+reply
+Reply
+ForcewithMe
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+It’s very impressive of you to reach such a high rank solo. We really look forward to your solution. @hkchkc
+
+reply
+Reply
+tushar
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+How do I contact you @kashiwaba ? I have a project that aligns with Image matching and seems like you guys might be the right fit for it.
+
+reply
+Reply
+ForcewithMe
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats @kashiwaba to become a true master. It’s very enjoyable to working with you💯
+
+reply
+Reply
+YumeNeko
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+It was a wonderful experience for me to participate with you as well. Thank you!
+
+reply
+Reply
+Simone De Gasperis
+
+Posted 4 years ago
+
+· 558th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and great solution! I was wondering, how did you choose the parameters of the DBACAN algorithm? In particular, if possible to know, what values did you choose for (as in the sklearn DBSCAN implementation):
+
+The maximum distance between two samples for one to be considered as in the neighborhood of the other
+The number of samples (or total weight) in a neighborhood for a point to be considered as a core point
+reply
+Reply
+Isamu
+
+Posted 4 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great solution. It is truly deserving of first place. Congratulations!🎉🎉🎉
+
+reply
+Reply
+Jiwei Liu
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Could you please share your code using dbscan? Thanks!
+
+reply
+Reply
+Hyeokjoon Kwon (권혁준)
+
+Posted 4 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!!! Impressive and creative solutions! Thank you for sharing, there's a lot to learn from your solution. Looking forward to watching the IMC workshop for this year :)
+
+reply
+Reply
+Chan Kha Vu
+
+Posted 4 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Same! Would love to hear even more about their experimentation details and insights at the workshop!
+
+reply
+Reply
+k_s
+
+Posted 4 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! It's a great solution that deserves first place. Have you tried any method other than DBSCAN for clustering?
+
+reply
+Reply
+YumeNeko
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Originally, I was looking for a way to exclude outliers from the matching points, and I ended up with DBSCAN. Other than DBSCAN, I also tried Isolation Forest, which is an outlier detection method, although it is not a clustering method. However, it was not able to exclude outliers very cleanly, so I did not use it.
+
+reply
+Reply
+k_s
+
+Posted 4 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks. I have never used DBSCAN or Isolation Forest, and I will study them.
+
+reply
+Reply
+Abdur Rakib Mollah
+
+Posted 4 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Awesome technique. This solution deserves the first place.
+
+reply
+Reply
+Igor Lashkov
+
+Posted 4 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations to your team, awesome result! 2 stage multi resolution worked great!
+
+reply
+Reply
+ForcewithMe
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+In fact our solution is very alike. I notice you also use kmeans to filter outliers. @igorlashkov
+
+reply
+Reply
+Danil Vagapov
+
+Posted 4 years ago
+
+· 272nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing solution
+
+reply
+Reply
+SNKMRS
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!!
+
+reply
+Reply
+Bilal Ahmed
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @kashiwaba for sharing the solution.
+
+reply
+Reply
+Jyotirmay Nag Setu
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow! That's great.
+
+reply
+Reply
+Alex Li
+
+Posted 4 years ago
+
+· 435th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+zzsleepzz
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Do you have example code
+
+reply
+Reply
+Narshima_199712
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+From where to get the winners code kernel?
+
+reply
+Reply
+Grant Z.
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Giuseppe
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+sudhir kendre
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+great…congrats
+
+reply
+Reply
+Jinhui Guo
+
+Posted 4 years ago
+
+· 58th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! I wonder how effective DBSCAN is in improving accuracy, since it does not appear to be a regular process.
+
+reply
+Reply
+kwang
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Clustering the matching points of each image with DBSCAN=>improve about 0.02x.
+
+reply
+Reply
+Kazi Shadid Raiyan
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Truly Amazing :') Thanks a lot for sharing!!
+
+reply
+Reply
+Making TARS
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! And thanks you for sharing :)
+
+reply
+Reply

@@ -1,0 +1,375 @@
+url: https://www.kaggle.com/c/tabular-playground-series-jul-2022/discussion/341023
+fetched: 2026-10-27
+chars: 8690
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+#1 solution — Tabular Playground Series - Jul 2022
+#1 solution
+
+Tabular Playground Series - Jul 2022
+
+Solution Writeup · 1st place
+
+Here is a write-up of my approach ; see the actual code at https://www.kaggle.com/code/ymatioun/tps22jul-custom-em
+
+Data structure. Only 14 variables are relevant to clustering, the others are not used at all (this has been discovered early on in the competition). Variables f_07 - f_13 are integers (7 of them), and f_22 - f_28 are floating point (also 7 of them).
+
+Floating point variables already appear to have a normal distribution, so there is no need to transform them.
+
+But integer variables appear to come from some sort of mixed Poisson distribution. I tried to construct a model for them, but could not come up with anything that worked (that is, produced negative correlations but no negative values, and had a tractable probability mass function). So instead i did the same thing as everybody else - power-transformed them into a more 'normal' shape and treated them as multivariate normal vars. This is probably where the model could be improved the most [would be nice if competition organizers told us exactly how they constructed those vars, for future reference].
+
+Cluster structure. Data consists of 42 clusters, structured as 7 groups of 6 clusters each. Each cluster group is treated as one cluster as far as cluster labels are concerned, resulting in 7 distinct cluster labels.
+
+Integer variables only vary by 7 cluster groups (so they truly form 7 clusters, not 42). Their means and covariances seem to be completely independent across 7 cluster groups (some covariances are zero).
+
+Floating variables have two distinct distributions: for each cluster group, 2 floating variables have mean=0, standard deviation=1, and are uncorrelated with any other integer of floating point variables. Remaining 5 floating point variables have means that are -1 or +1, and full 5x5 covariance matrix. They are not correlated with integer variables, so full 14x14 covariance matrix consists of 7x7 block for integer vars, 5x5 block for correlated floating point vars, and 2x2 unit matrix for uncorrelated floating point vars.
+
+Background
+
+This data structure can be easily uncovered by running GaussianMixture(n_components=42) on floating point variables only, and looking at the means of mixture components.
+
+I realized this when i looked at the source code of BayesianGMMClassifier (doesn't everybody do that? -:) ), trying to understand why it improved results so much, and saw that it used the same n_components=7 for each of the 7 clusters, resulting in total of 49 clusters. I thought that was a mistake, and made it use 1 component for each cluster, but that greatly reduced the LB score. That demonstrated that true data structure consists of > 7 clusters; further experimentation showed that each cluster group actually has 6 clusters, not 7.
+
+Model.
+
+I wrote a custom EM (Expectation Maximization) algorithm for a Gaussian Mixture Model, taking into account details of the data structure described above. I hard-coded means of all the floating point variables (0, -1, 1) to ensure convergence to true cluster centers. And this is what resulted in my best LB score.
+
+Author
+Youri Matiounine
+
+ymatioun
+
+arrow_drop_up
+74
+Share
+more_horiz
+Citation
+
+Youri Matiounine. #1 solution. https://www.kaggle.com/competitions/tabular-playground-series-jul-2022/writeups/youri-matiounine-1-solution. 2022. Kaggle
+
+6
+comment
+27 Comments
+2 appreciation comments
+Hotness
+Joseph Zhou
+
+Posted 4 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+Congratulations. Seems that 42 plays an important role not only in seeds.😄
+
+reply
+Reply
+Ricky Young
+
+Posted 4 years ago
+
+arrow_drop_up
+4
+more_vert
+
+good~Congratulations! Really thoughtful solution.
+
+reply
+Reply
+RomainBdt
+
+Posted 4 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and thank you for sharing your results. I also tried 1, 6 and 7 components with BayesianGMMClassifier and discover pretty much the same thing as you. 1 component is bad for LB score, 6 and 7 components gave me similar results. By checking the weights of each sub-clusters, I could see that most of the time, there is only 6 sub-clusters remaining. It is still obscur to me why BayesianGMMClassifier worked so much better than simple Bayesian Gaussian Mixture model. I could not find any documents explaining the idea behind creating one Mixture model for each class and then checking the score_samples. What I learnt from your post is to spend more time on understanding the data than fine tuning on model.
+
+reply
+Reply
+martinerrazquin
+
+Posted 4 years ago
+
+· 192nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+AFAIK it worked better because every 'major' cluster was indeed composed of 'minor' sub-clusters, each of which were gaussian distributed. This is the hypothesis behind the BGMMClassifier. From the SKLearn docs, the score_samples method for a BGMM returns the log likelihood of a sample, hence the probability that a sample belongs to class i given it belongs to one of the classes would be likelihoods[i] / sum(likelihoods).
+
+reply
+Reply
+martinerrazquin
+
+Posted 4 years ago
+
+· 192nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on the first place! Well deserved. I too suspected there was a hierarchy with major clusters composed of sub-clusters (each cluster was a GM in itself) but failed to detect further structure, and stuck to 7 sub-components. Strongly agree that organizers should explain how the data was generated, specially given that there was no score other than public LB which to optimize against.
+
+reply
+Reply
+ArturRa
+
+Posted 4 years ago
+
+· 206th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Really thoughtful solution.
+
+reply
+Reply
+Will
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!
+
+reply
+Reply
+Will
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on first!
+
+reply
+Reply
+user7777777
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Only 14 variables are relevant to clustering
+How did you find that ? Also how one do feature selection in such examples. Please help i am stuck at this for few days.
+
+reply
+Reply
+Safrizal Ardana Ardiyansa
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations :D I very appreciate your solution sharing, but I am still wondering, can someone explained to me why we just use variables f_07 - f_13 and f_22 - f_28 ?
+
+reply
+Reply
+Ricky Young
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+great_Congratulations for winning and thank you so much for sharing your results. Such a great way to learn as a new machine learning engineer.
+
+reply
+Reply
+Oscar Aguilar
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for sharing your solution.
+
+reply
+Reply
+Yan Mazas
+
+Posted 4 years ago
+
+· 135th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+How did you realise that in each cluster there are 6 sub-clusters? Thank you very much for sharing your great work and congratulations!
+
+reply
+Reply
+Moon
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!!
+
+reply
+Reply
+Robert Gouldie
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations for winning and thank you so much for sharing your results. Such a great way to learn as a new machine learning engineer.
+
+reply
+Reply
+Francisco Javier Gallego
+
+Posted 4 years ago
+
+· 213th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing ! Moreover, congratulations.
+
+reply
+Reply
+Maciej Lorens
+
+Posted 4 years ago
+
+· 216th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Samuel Cortinhas
+
+Posted 4 years ago
+
+· 213th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Wonbin Lee
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Muhammed Tausif
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @ymatioun
+
+reply
+Reply
+Sinclair
+
+Posted 4 years ago
+
+· 162nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on first place! Thank you for sharing your approach. I am really curious as to what this data represented
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (2)
+Flavia Felicioni
+
+Posted 4 years ago
+
+· 252nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great job! Thanks for sharing.

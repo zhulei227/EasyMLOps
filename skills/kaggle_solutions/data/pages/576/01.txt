@@ -1,0 +1,584 @@
+url: https://www.kaggle.com/c/bengaliai-speech/discussion/447961
+fetched: 2026-10-27
+chars: 11161
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Bengali.AI Speech Recognition
+1st place solution
+
+Bengali.AI Speech Recognition
+
+Solution Writeup · 1st place · Oct 18, 2023
+
+STT Model:
+
+OpenAI whisper-medium
+Huggingface trainer
+Trained on 8x 48GB RTX A6000
+bs=8 and lr=1e-5
+Train steps 50k
+Spectrogram dithering
+Spectrogram time and frequency masking
+Resampling 16khz->8khz->16khz as augmentation
+Inference with max_length=260, num_beams=4 and chunk_length_s=20.1s
+Libsonic based speed/pitch augmentation
+Datasets: OpenSLR 37, OpenSLR 53, MadASR, Shrutilipi, Macro, Kathbath, GoogleTTS generated audios and pseudo labeled YouTube videos
+
+Punctuation Model:
+
+AutoModelForTokenClassification google/muril-base-cased
+Huggingface trainer
+Labels: period, comma and question mark
+bs=64, lr=2e-4 and max_seq_length=512
+Ensemble of 4 models (using 6, 8, 11 and 12 layers of google/muril-base-cased)
+Normalized IndicCorp v2 Bangla dataset
+
+In my daily job, I do speech speech recognition for low resource central Asian languages. From my experience, OpenAI Whisper works really well for OOD audios and can even transribe song lyrics. The downside is it is very sensitive to the annotation noise. So fixing the annotation noise, is the most crucial part of this competition.
+
+Because the competition dataset was not validated, the initial model was trained on OpenSLR datasets. We normalized the texts and filtered out texts containing Bengali digits. All punctuation was also removed. Additionally, we sampled 420k texts from the IndicCorp and synthesized audios using GoogleTTS, which were then used as training datasets.
+
+Following the training of an initial Whisper-medium model on OpenSLR and GoogleTTS, we conducted inference on MadASR, Shrutilipi, Macro, and Kathbath. We included audios with a WER of less than 15% in the next training phase. After three rounds of training, the model achieved an 8% WER on the Macro validation dataset and a public leaderboard score of approximately 0.380.
+
+Since most of the training set audios were short, we merged some short audios to create around 70k longer audios. Subsequently, we achieved a public leaderboard score of approximately 0.370.
+
+Whisper with the original tokenizer was slow on Bengali audios. Therefore, we trained a Whisper tokenizer with a 12k vocabulary on Bengali texts. With this tokenizer, we were able to perform inference with a num_beam value of up to 8 and a chunk_length_s of 20.1 seconds in less than 7 hours.
+
+In the next step, we applied pseudo labeling to some YouTube videos, which enabled us to achieve a public leaderboard score of approximately 0.360. When we combined the predictions of four punctuation models, our public leaderboard score improved to around 0.325.
+
+By adding more pseudo-labeled YouTube videos, our public leaderboard score further improved to 0.312 (private LB 0.372)
+
+model weight and inference notebook: https://www.kaggle.com/competitions/bengaliai-speech/discussion/447970 cleaned/long/pseudo data: https://www.kaggle.com/competitions/bengaliai-speech/discussion/448110
+
+Authors
+lhagiimn
+
+lhagiimn
+
+tugstugi
+
+tugstugi
+
+arrow_drop_up
+107
+Share
+more_horiz
+Citation
+
+lhagiimn, tugstugi. 1st place solution. https://www.kaggle.com/competitions/bengaliai-speech/writeups/chimege-1st-place-solution. 2023. Kaggle
+
+12
+comment
+33 Comments
+Hotness
+Mutian Hong
+
+Posted 3 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+So the whisper do performs better. But why most of us didn't successed with finetuning whisper? Do you have any insights into it?
+
+reply
+Reply
+tugstugi
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+I have updated the solution summary, the important part is you have to remove wrong annotations from the dataset.
+
+reply
+Reply
+Tran Le Minh Nhat
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your 1st place. Thanks for sharing this great solution. I will certainlyCongratulations on your 1st place. Thanks for sharing this great solution. I will certain get a 1sst like that .
+
+reply
+Reply
+YuanXu
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+amazing, congratulations!
+
+reply
+Reply
+Vishrut Grover
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+That's so cool!
+
+reply
+Reply
+amn
+
+Posted 3 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Learned a lot from Whisper performance with long train time, outperforming Wav2Vec2😃
+
+reply
+Reply
+Sameer
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+it's amazing congrats for achievement
+
+reply
+Reply
+Ali Aghayari
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations on your 1st place and thanks for sharing.
+
+reply
+Reply
+Max Marriott-Clarke
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratz on 1st place!!! that is crazy and thank you for sharing
+
+reply
+Reply
+Brian The Messiah 410
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Good job to you my sir!
+
+reply
+Reply
+Indra Sonowal
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing your approach @tugstugi
+
+reply
+Reply
+luddite^
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on 1st place and thank you for sharing a great solution write-up. Could you tell me how you downloaded YouTube videos which specifically contains Bengali speaks? Is there any criteria to which audio used?
+
+reply
+Reply
+tugstugi
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Browse YouTube and identify Bangle channels like news, cartoon, poetry etc. Then download all videos from the channels and do pseudo labeling. Nothing fancy. I have released the data here: https://www.kaggle.com/datasets/tugstugi/bengali-asr-data The audio file name starts with the channel name + YouTube id.
+
+reply
+Reply
+luddite^
+
+Posted 3 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I understood. Thank you!
+
+reply
+Reply
+Abdallah Hesham
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+impressive score. Congratulations
+
+reply
+Reply
+Konde Dinesh Kumar
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+It is very good and nice speech
+
+reply
+Reply
+ktr
+
+Posted 3 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very impressive score. Congratulations on your win. I have a question about the pseudo labels. How did you handle the alignment between audio and transcription? For example, a simple approach of audio separation at 30 seconds and transcription?
+
+reply
+Reply
+tugstugi
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Long youtube audios are splitted using with VAD. Reject too short or too long audio segments and let's say use only segments between 5 and 22 seconds.
+
+reply
+Reply
+ktr
+
+Posted 3 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you. An additional question, did you use any libraries for the VAD?
+
+reply
+Reply
+tugstugi
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+you can use any VAD library, but i have used webrtcvad.
+
+reply
+Reply
+1
+ktr
+
+Posted 3 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the clarification!
+
+reply
+Reply
+Benedikt Droste
+
+Posted 3 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Unique approach in this competition, outstanding score in private and public lb. Impressive! Well done!
+
+reply
+Reply
+Marília Prata
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+A huge congratulations Tugstugi for your 1st place!
+
+reply
+Reply
+tahsin1221
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi Tugstugi,
+
+Congratulations on your phenomenal victory.
+
+Would it be possible to replicate your training scripts on a 24GB RTX4090 by reducing batch sizes? How many GPU hours did it take to train your model 8x48GB RTX A6000 setup? What was the aggregated size of the datasets for the STT models? Thank you.
+
+reply
+Reply
+BIraj Ar
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+oh good good.
+
+reply
+Reply
+Mansour Hassan
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+hey pal congratulations 🎉
+
+sorry if my question is off-topic; it is just that your use of external GPU power contradicts my understanding of code competition, has this competition changed rules after your submission? or does code competition allow the use of external cloud resources during training?
+
+reply
+Reply
+Curtis Chong
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+in a code competition, only the inference time is limited. So you can upload the trained weights (as a dataset) beforehand, then make a blank notebook that imports those weights and performs the inference within the timeframe.
+
+reply
+Reply
+Tariq Mahmood
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @tugstugi inspirational news.
+
+reply
+Reply
+Shubham Agnihotri
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+can you please share the training notebook as well?
+
+reply
+Reply
+zisa123
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+amazing, congratulations!!!. On your 1st place.
+
+reply
+Reply
+Wayne Lau
+
+Posted 3 years ago
+
+· 689th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Just curious how much was the cost of the training? Was a cloud hosted GPU used? Fantastic write-up by the way!
+
+reply
+Reply
+Nicholas Broad
+
+Posted 3 years ago
+
+· 661st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Did you preprocess the dataset beforehand or did you read the audio files before each batch?
+
+reply
+Reply
+tugstugi
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We don't do any preprocessing except converting to 16khz. During the training, audios are read from the disk and applied ramdom speed/pitch etc before computing features.
+
+reply
+Reply
+Nicholas Broad
+
+Posted 3 years ago
+
+· 661st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great solution! I also noticed how inefficient the tokenizer was for whisper. How did you initialize the word embeddings after changing the tokenizer?
+
+reply
+Reply
+lhagiimn
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Thanks, @nbroad, The original Whisper tokenizer employs character-level tokens for low-resource languages, which can be time-consuming. So we trained a BPE tokenizer with 12,000 tokens specifically for Bengali text. We then replaced some tokens in the Whisper tokenizer with these. We carefully replaced tokens after the 10,000th position of the original Whisper's tokens.
+
+reply
+Reply
+Matt S.
+
+Posted 3 years ago
+
+· 659th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wow that's a great approach and idea. For the text, do you use BPE for just text from speech examples or did you even include written text like stuff from news articles or wiki dumps? My first thought is that written data would would be different enough from speech text to cause issue, but maybe those minor difference are drowned out from the overall tokenization benefit?
+
+reply
+Reply

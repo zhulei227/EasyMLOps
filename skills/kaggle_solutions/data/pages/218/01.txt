@@ -1,0 +1,5 @@
+url: http://blog.kaggle.com/2016/08/05/predicting-shelter-animal-outcomes-team-kaggle-for-the-paws-andras-zsom/
+fetched: 2026-10-27
+chars: 64
+
+FETCH_FAILED: <urlopen error [WinError 10054] 远程主机强迫关闭了一个现有的连接。>

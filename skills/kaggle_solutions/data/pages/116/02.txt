@@ -1,0 +1,87 @@
+url: https://github.com/alzmcr/allstate
+fetched: 2026-10-27
+chars: 5301
+
+GitHub - alzmcr/allstate: Kaggle&#39;s Allstate Purchase Prediction Challenge · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ alzmcr allstate Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ allstate Public Notifications You must be signed in to change notification settings Fork 108  ( 108 ) Star 89  ( 89 ) You must be signed in to star a repository About Kaggle's Allstate Purchase Prediction Challenge Resources Readme License Activity Stars 89 stars Watchers 10 watching Forks 108 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 14 Commits 14 Commits Folders and files Name Name Last commit message Last commit date submission submission     .gitattributes .gitattributes     .gitignore .gitignore     LICENSE.txt LICENSE.txt     README.md README.md     majorityvote_modelselection.py majorityvote_modelselection.py     parallel.py parallel.py     utils.py utils.py     View all files Repository files navigation README License More items Allstate Purchase Prediction Challenge 
+ Requirements 
+ Python 2.7.5 with Scikit-Learn 0.14a1, Numpy 1.8, Pandas 0.12 
+Windows 8, Intel i5-3230M @ 2.60Ghz, 16GB RAM 
+Developed on a HP Envy 17 j100tx laptop 
+ How to generate the solution 
+ Type "python majorityvote_modelselection.py" in Python shell or
+easily double click on Windows. Watch out on memory usage, even
+though "should" be configured not to exceed 8 GB with the
+default settings. 
+ Comments 
+ Using the default setting, this will fit the model and creates
+the submission which will score 0.53705 in the private L. This
+is the setting which combined with Breakfast Pirate ABCEDF
+combination, scored 0.53715 in the private LB and .54535 in the
+public LB. On the above system configuration this will take
+approximately 3 hours. If you’re impatience, set N=10 and NS=7
+and will score 0.53710 in just 30 minutes! If you think is still
+slow try setting N=8, NS=6, params=[(30,5,23)] and is going to
+be even faster scoring as my best submission 0.53705 but lower
+on the public LB. If still slow, get a better computer!!! 
+ The script will perform the the following steps: 
+
+ Prepare the data (load the files, transformation, clean and
+create the engineered features) 
+ Fit the Random Forests 
+ Make the prediction of the product G 
+ Selected the best Random Forest given the train set accuracy 
+ Do a majority vote using all the N model(s) and print the
+score on the cross validation set 
+ Do a majority vote using the NS selected model(s) and print
+the score on the cross validation set 
+
+ Then, if submit is set to False: 
+a. Records the performance of the k-fold and loop 
+b. Exit the loop and make the prediction on the test set, do
+a majority vote using the selected models, fix the product
+accordingly with the state rule and create the submission file 
+ License 
+ Please refer for LICENSE.txt file 
+ About Kaggle's Allstate Purchase Prediction Challenge Resources Readme License Activity Stars 89 stars Watchers 10 watching Forks 108 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

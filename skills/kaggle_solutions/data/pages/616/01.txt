@@ -1,0 +1,621 @@
+url: https://www.kaggle.com/c/leash-BELKA/discussion/519020
+fetched: 2026-10-27
+chars: 12441
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution [UPDATED] — NeurIPS 2024 - Predict New Medicines with BELKA
+1st place solution [UPDATED]
+
+NeurIPS 2024 - Predict New Medicines with BELKA
+
+Solution Writeup · 1st place · Jul 22, 2024
+
+[UPDATE]
+
+a) Here is the dataset with the (i) code - model and data processing utils (ii) SMILES encoder vocabulary. I will upload processed training data too (just to save ones time). Once I recover the the trained weights I will add them as well - I have only the light version of the model left (tf.keras.export), so I will likely retrain it from scratch. For those of you who prefer Kaggle notebooks - here is one (but I would not really process data here - it should take close to infinity).
+
+b) The architecture is fairly simple and model is very flat - just 4 encoder layers with 8 heads. With a vocabulary size of just 43 tokens I end-up with a fixed dimensionality of 32. I've tried 64 and 16 too - they do not perform.
+
+c) I guess I used atomInSmiles in a somewhat incorrect way and end up with a schema where separate tokens are either, atom (C, H, S, etc) or digits, or anything in square brackets, like [C@@] are distinct tokens. I leave it to chemistry practitioners to decide what this mess really means :)
+
+d) Pre-training. I pre-trained model from scratch in two stages:
+
+MLM - the standard prediction of masked tokens (15% of which 80% are masked, 10% are replaced with random token and 10% are retained - classics from "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"). I used dynamic mini-batch alpha weights for CategoricalFocalCrossEntropy, but it was just for fun. Not sure it contributed much. II've trained for about 100 epochs 10K steps each with 2028 samples per batch - the model processed dataset for about 20 times. Note that I've combined all the data here - train, test and external data (reference is in the original text below).
+
+SMILES-to-ECFP (size=2048, include_chirality=True). Same model, just a different head (Dense layer with sigmoid activation) and locked embeddings. Some 20-50 epochs, if I recall correctly. The model did not performed great (there's many papers saying that SMILES encoders generally have a difficult time to predict topological fingerprints, and it was exactly the case) with MAP around 0.4, however, I guess that's exactly where it learned some useful representations.
+
+My motivation here was to train model on some general task without taking a major overfitting risk. I picked ECFP for 2 reasons (a) performance - they were fast enough to compute, especially with scikit-fingerprints library, and (b) predicting fingerprints with no predefined meanings for each bit position (unlike MACCS or PubChem) is a challenging task for SMILES transformer, which is good - "no pain - no gain", as they say…
+
+And, yes, I still wonder what "chirality" is :)
+
+e) Training. Combined BELKA train set and external data. Masked loss and metrics since external data has labels just for sEH protein.
+
+f) Validation. I put aside 3% of blocks from train set so my validation set included molecules with one ore more non-shared blocks - some 9 million of samples.
+
+g) Tech - A100 on google collab.
+
+That's it. As being said - no magic, just a pure luck and randomness…
+
+Frankly speaking, the final LB results came as a bit of a surprise to me. The winning model is a very basic encoder: Self-Attention -> FeedForward with 4 layers and 8 heads per layer and key/value dimension of 32. The classics from the Transformers chapter of Tensorflow tutorials :)
+
+I used the atomInSmiles tokenizer, but I did it incorrectly, so my tokenization scheme was almost character-based. I have not used any pre-trained models like ChemBERTa or similar.
+
+The difference might have come from a two-stage pre-training schedule: (a) MLM - with 15% masking rate (b) SMILES to ECFP prediction. I'm not good at chemistry, to tell the truth, but I guess the second stage is where the encoder "learned" to extract some meaningful results from the SMILES.
+
+Oh, last but not least: I used the data provided by the competition host and the dataset from "Building Block-Based Binding Predictions for DNA-Encoded Libraries", sited by @hengck23 and preprocessed by @chemdatafarmer early in the competition.
+
+Now, the list of things that didn't work out as expected: 1) Complex tokenization schemes: bi- and tri-grams, atomInSmiles 2) Any model with a depth above 32 and more than 6 encoder layers 3) Multi-input models (SMILES + fingerprints) 4) Pre-training on a larger dataset—I spent about a month experimenting with ZINC… 5) Custom loss functions—BinaryFocusLoss was just fine 6) Gated fusion of building blocks 7) And many more—I will update the list.
+
+Author
+Victor Shlepov
+
+victorshlepov
+
+arrow_drop_up
+86
+Share
+more_horiz
+Citation
+
+Victor Shlepov. 1st place solution [UPDATED]. https://www.kaggle.com/competitions/leash-BELKA/writeups/victor-shlepov-1st-place-solution-updated. 2024. Kaggle
+
+17
+10
+17
+comment
+33 Comments
+2 appreciation comments
+Hotness
+C R Suthikshn Kumar
+
+Posted 2 years ago
+
+· 176th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on winning this competition. Thanks for sharing details of your approach.
+
+reply
+Reply
+Jack Li
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on winning the competition! Your innovative approach and persistence have paid off. Well done!
+
+reply
+Reply
+Robert Hatch
+
+Posted 2 years ago
+
+· 84th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+So you pretrained the model to predict ECFP first, and then with same inputs (smiles in both case) that took the pretrained final output layer as input to the transformer?
+
+Or something like that?
+
+Smart! As much randomness as there was, honestly something like that is what I would've expected to win, something that avoids just learning the character strings matched to "good BBs".
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Almost like that. I've pre-trained transformer on MLM/ECFP tasks (input - SMILES, outputs - SMILES and ECFP) and then just changed the head (dense layer with 3 units and sigmoid activation).
+
+Well, you never know, but pre-training on a larger task with low overfitting risks is usually my first move…
+
+reply
+Reply
+Frenio Redeker
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+What a brilliant approach, congratulations on your win! Would you mind sharing how much data you used and how many epochs you spent on pre-training and post-training, respectively?
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Done :) Let me know if missed some of the questions, OK?
+
+reply
+Reply
+Frenio Redeker
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you! No further questions for now. Congratulations again!
+
+reply
+Reply
+Francois Berenger
+
+Posted 2 years ago
+
+· 1018th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think the extracted tokens (and so your use of atomInSMILES) are correct. I know SMILES pretty well and I looked at your tokens dictionary.
+
+reply
+Reply
+Luigi Brancati
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Quite informative post, congrats on the win!
+
+reply
+Reply
+Rishit Jakharia
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+And thank you, the post sure is insightful
+
+reply
+Reply
+amulya_incorrigible
+
+Posted 2 years ago
+
+· 1399th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Woww! Simple approach and yet powerful….can you share your notebook if possible?
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Sure, just published it
+
+reply
+Reply
+Gitanshu Vaghasiya
+
+Posted 2 years ago
+
+· 65th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!!! Great work!!!
+
+reply
+Reply
+Kaavya Mahajan
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the win! Thank you for sharing the approach as well as the things that didn't work, it's truly informative.
+
+reply
+Reply
+Vlad Vinogradov
+
+Posted 2 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the winning solution! Please, link it as your team's solution using this instruction: https://www.kaggle.com/discussions/product-feedback/373153
+
+reply
+Reply
+Francois Berenger
+
+Posted 2 years ago
+
+· 1018th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Is there some code somewhere we can look at?
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Sure, I just need to recover it from Colab archives… Will do over the weekend…
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Just shared.
+
+reply
+Reply
+Andrius Bernatavicius
+
+Posted 2 years ago
+
+· 183rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing this!
+
+I just wanted to know whether the key/value dimension that you used was per head or per attention layer?
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi! Just published the code, hope it addresses the question…
+
+reply
+Reply
+Francois Berenger
+
+Posted 2 years ago
+
+· 1018th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+What license is your code under?
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I don't know… I guess there's some general rules on Kaggle… Anyway, there's nothing really special about the code - not even close to "Attention Is All You Need" or "ChemBERTa: Large-Scale Self-Supervised Pretraining for Molecular Property Prediction" :)
+
+reply
+Reply
+Aaron Ma
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win!
+
+reply
+Reply
+qtx202
+
+Posted 2 years ago
+
+· 28th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great job！I learnt a lot
+
+reply
+Reply
+kostopr4v
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!!!
+
+reply
+Reply
+William Zebrowski
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great work! @victorshlepov !! Just, wow.
+
+reply
+Reply
+Antonina Dolgorukova
+
+Posted 2 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+WOw! thanks for sharing and congrats 🥳! interesting approach :) could you please share some code?
+
+I also wonder what part of the test was most successfully predicted? (at least which one of shared, non-shared triazines, and non-triazines) here I have posted ours scores for non-triazines
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Sure, will do - as soon as I find it in the Colab archives… :)
+
+reply
+Reply
+3
+1
+David khaldi
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+we still highly waiting 🫠
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Frankly, I have not checked the model performance by segments yet. At the end of the day, I'm not a real data-scientist :)
+
+reply
+Reply
+1
+David khaldi
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+can we have a check to the winning notbook ? i'll appriciat it
+
+reply
+Reply
+Akshhat Shethia
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for sharing :)
+
+reply
+Reply
+yoruoo
+
+Posted 2 years ago
+
+· 104th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning this competition. Thanks for sharing your approach.
+
+reply
+Reply
+Arjan Hada
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+In the additional dataset, how did you decide on 1 and 0 for your labels (binding to sEH)? Did you process read_count somehow?
+
+reply
+Reply
+Victor Shlepov
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Just any read_count above zero…
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Appreciation (2)
+Gcdelgado
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Nice! Awesome job, thanks for sharing!
+
+rhubain mageswaran
+
+Posted 2 years ago
+
+· 1314th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!, thanks for sharing :)

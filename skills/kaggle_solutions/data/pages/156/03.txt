@@ -1,0 +1,72 @@
+url: https://github.com/vinhkhuc/kaggle-sentiment-popcorn
+fetched: 2026-10-27
+chars: 4863
+
+GitHub - vinhkhuc/kaggle-sentiment-popcorn: Code for the Kaggle competition &quot;Bag of Words Meets Bags of Popcorn&quot; · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ vinhkhuc kaggle-sentiment-popcorn Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-sentiment-popcorn Public Notifications You must be signed in to change notification settings Fork 30  ( 30 ) Star 50  ( 50 ) You must be signed in to star a repository About Code for the Kaggle competition "Bag of Words Meets Bags of Popcorn" Topics kaggle-competition machine-learning sentiment-analysis Resources Readme Activity Stars 50 stars Watchers 5 watching Forks 30 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 6 Commits 6 Commits Folders and files Name Name Last commit message Last commit date data data     iclr15 iclr15     kaggle_run kaggle_run     scripts scripts     .gitignore .gitignore     README.md README.md     requirements.txt requirements.txt     run.sh run.sh     View all files Repository files navigation README More items What is it? 
+ This is the source code of my submission for the Kaggle competition ["Bag of Words Meets Bags of Popcorn"]
+( https://www.kaggle.com/c/word2vec-nlp-tutorial ). The leader board score is 0.9766. 
+ The model is an ensemble of NBSVM, Paragraph Vector and Gated Recurrent Neural Network. It is based on the code
+from the paper ["Ensemble of Generative and Discriminative Techniques for Sentiment Analysis of Movie Reviews"]
+( http://arxiv.org/abs/1412.5335 ) by Grégoire Mesnil and others. 
+ How to run 
+
+ Data should be put into the directory data . 
+
+ The code requires numpy, pandas, Theano and passage which can be installed by running: 
+
+ sudo pip install -r requirements.txt
+
+ After that, run the following command to generate the submission file "ensemble-submission.csv": 
+
+ chmod +x run.sh &amp;&amp; time ./run.sh
+
+ The code was tested on Ubuntu 14.04. It took about 1h16' on an i7 quad-core with a GTX Titan. The submission should give
+the score of ~0.976 on the leader board (it can be slightly different due to data shuffling during training). 
+
+ License 
+ Since the code is based on Grégoire Mesnil's work at iclr15 , all files except
+ scripts/passage_nn.py 
+are released under Creative Commons Attribution-NonCommercial 4.0 International License . 
+ About Code for the Kaggle competition "Bag of Words Meets Bags of Popcorn" Topics kaggle-competition machine-learning sentiment-analysis Resources Readme Activity Stars 50 stars Watchers 5 watching Forks 30 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

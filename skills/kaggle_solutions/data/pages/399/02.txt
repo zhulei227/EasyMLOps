@@ -1,0 +1,45 @@
+url: https://www.kaggle.com/c/birdsong-recognition/discussion/183269
+fetched: 2026-10-27
+chars: 507
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Cornell Lab of Ornithology · Research Code Competition · 6 years ago
+Late Submission
+more_horiz
+Cornell Birdcall Identification
+
+Build tools for bird population monitoring
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Failed to load the discussion topic

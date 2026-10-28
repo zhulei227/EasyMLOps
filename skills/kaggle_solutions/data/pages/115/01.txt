@@ -1,0 +1,103 @@
+url: https://github.com/asutera/kaggle-connectomics
+fetched: 2026-10-27
+chars: 5789
+
+GitHub - asutera/kaggle-connectomics: Connectomics · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ asutera kaggle-connectomics Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-connectomics Public Notifications You must be signed in to change notification settings Fork 8  ( 8 ) Star 11  ( 11 ) You must be signed in to star a repository About Connectomics Resources Readme Activity Stars 11 stars Watchers 6 watching Forks 8 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 60 Commits 60 Commits Folders and files Name Name Last commit message Last commit date code code     .gitignore .gitignore     README.md README.md     SOLUTION.md SOLUTION.md     View all files Repository files navigation README More items Kaggle Connectomics 
+ If you use this code, please cite :
+Sutera, A., Joly, A., François-Lavet, V., Qiu, Z. A., Louppe, G., Ernst, D., &amp; Geurts, P. (2014). Simple connectome inference from partial correlation statistics in calcium imaging. JMLR: Workshop and Conference Proceedings of ECML2014 (Nancy). 
+ If you are interested in more explanations, have a look at http://orbi.ulg.ac.be/handle/2268/169767 (Mirror: http://arxiv.org/abs/1406.7865 ). 
+ https://www.kaggle.com/c/connectomics 
+ Team AAAGV (#1) 
+ Contact 
+
+ Antonio Sutera a.sutera@ulg.ac.be 
+ Arnaud Joly a.joly@ulg.ac.be 
+ Aaron Qiu zqiu@ulg.ac.be 
+ Gilles Louppe g.louppe@ulg.ac.be 
+ Vincent François v.francois@ulg.ac.be 
+
+ Dependencies 
+ The following programs and packages were used for the contest: 
+ - Python 2.7
+- NumPy &gt;= 1.6.2
+- SciPy &gt;= 0.11
+- scikit-learn == master branch (last update, the hash commit was `8d04380d474723467b5a717328efd0c9fc5bd898`)
+
+ with appropriate blas and lapack binding such as MKL, accelerate or ATLAS.
+In order to test the code, we recommend you to use the Anaconda python
+distribution ( https://store.continuum.io/cshop/anaconda/ ). 
+ Code ran on MacOsx 10.9.2 and Linux (version 2.6.18-194.26.1.el5
+( brewbuilder@norob.fnal.gov ) (gcc version 4.1.2 20080704 (Red Hat 4.1.2-48))
+1 SMP Tue Nov 9 12:46:16 EST 2010). 
+ How to train your model 
+ No model is learnt to produce the connectivity score matrix. 
+ How to make predictions on a new test set 
+ In order to reproduce the result, you can launch the main.py file.
+The usage is the following: 
+ usage: main.py [-h] -f FLUORESCENCE [-p POSITION] -o OUTPUT -n NETWORK
+
+optional arguments:
+ -h, --help show this help message and exit
+ -f FLUORESCENCE, --fluorescence FLUORESCENCE
+ Path to the fluorescence file
+ -p POSITION, --position POSITION
+ Path to the network position file
+ -o OUTPUT, --output OUTPUT
+ Path of the output/prediction file
+ -n NETWORK, --network NETWORK
+ Network name
+
+ For example on the "test" dataset, you would use the following command: 
+ python main.py -f fluorescence_test.txt -p networkPositions_test.txt -o score_test.csv -n test
+
+ To run the script, you will need a machine with at least 8GB RAM, a fast
+processor (&gt; 2.5 GHz), 4 cores and sufficient disk space. On our last
+test, it took around 10 hours (with 7 process) on normal-1 and +-2 hours on small-1. 
+ The performance obtained on normal-1 and small-1 are the following: 
+ On normal-1: 0.94356018640593564
+On small-1: 0.71027913026472989
+
+ Note that all parameters have been optimized for a big dataset, i.e. 1000 neurons, and it explains the poor result on small-1. 
+ About Connectomics Resources Readme Activity Stars 11 stars Watchers 6 watching Forks 8 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

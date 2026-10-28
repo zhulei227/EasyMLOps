@@ -1,0 +1,46 @@
+url: https://www.kaggle.com/c/global-wheat-detection/discussion/175961
+fetched: 2026-10-27
+chars: 570
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+University of Saskatchewan · Research Code Competition · 6 years ago
+Late Submission
+more_horiz
+Global Wheat Detection
+
+Can you help identify wheat heads using image analysis?
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

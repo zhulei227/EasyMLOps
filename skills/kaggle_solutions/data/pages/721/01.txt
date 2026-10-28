@@ -1,0 +1,701 @@
+url: https://www.kaggle.com/c/playground-series-s6e9/writeups/1st-place-the-ai-relay
+fetched: 2026-10-27
+chars: 26713
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - The AI Relay! — Predicting Electric Vehicle Purchases
+1st Place - The AI Relay!
+
+Predicting Electric Vehicle Purchases
+
+Solution Writeup · 1st place · Oct 2, 2026
+
+1st Place - The AI Relay: 5 Agents, 3 Generations, 1 Codebase
+
+Thank you Kaggle for another fun Playground competition! This month my team was 5 AI agents and 1 human coach. We passed one codebase between three generations of AI agents, like the baton in a relay race:
+
+Leg 1: GPT-5.6 Sol + Fable 5 built our first models.
+Leg 2: GPT-6-Astra + Fable 5.1 continued and improved them.
+Leg 3: Opus 5.5 ran the final lap.
+
+We finished 3rd on the public LB and 1st on the private LB (0.94602). Below is the story, explained so that everyone (even a 5th grader) can follow along, plus some tips for running your own AI team.
+
+What Are We Predicting?
+
+The task: given facts about a person (age, income, commute, worries about battery range, …), predict whether they will buy an electric vehicle.
+
+Kaggle scores us with AUC. Here is AUC explained like you are 10 years old:
+
+Line up all the people from "most likely to buy" to "least likely to buy" (our model decides the order).
+Pick one real buyer and one real non-buyer at random.
+AUC is the chance that the buyer is standing ahead of the non-buyer in our line.
+
+A coin flip gets 0.5 and a perfect model gets 1.0. Our model gets about 0.946, which means it puts the buyer first about 95 times out of 100.
+
+We beat 2nd place by just 0.00014. That looks tiny! But the private test has about 7.6 billion buyer/non-buyer pairs, so 0.00014 means roughly one million more pairs in the right order than 2nd place. (This assumes the private LB is 80% of the 286,571 test rows and about 17.5% of rows are buyers.)
+
+Meet The Team
+
+GPT-5.6 Sol (OpenAI Codex) and Fable 5 (Claude Code): Leg 1. They built a strong model on our first day using only ideas from last month. Then on the second day they used more previous months ideas and improved their model.
+GPT-6-Astra (OpenAI Codex) and Fable 5.1 (Claude Code): Leg 2. They made the biggest jump in just 2-3 days. Fable 5.1 also wrote our public EDA notebook, which found the original data's purchase recipe.
+Opus 5.5 (Claude Code): Leg 3. It ran the final week and the final lap.
+Me, the coach. I set the goals and the house rules, passed the baton, and chose the final submissions.
+
+My job keeps changing as the agents improve. Not long ago I was the player who wrote all the code. In May I became the manager of one agent. In August I was the coach of agents that competed and shared tips. This month I was more like the referee: the agents handed work to each other, and I made the final calls.
+
+The Relay Race
+
+Roughly speaking, we worked one week at the beginning, rested for two weeks, then worked the last week.
+
+Leg	Team	When	CV	Public LB	Private LB
+1	GPT-5.6 Sol + Fable 5 (our first day)	Sep 2	0.94637	0.94656	0.94557
+1	GPT-5.6 Sol + Fable 5 (our second day)	Sep 3	0.94656	0.94672	0.94568
+2	GPT-6-Astra + Fable 5.1	2-3 more days	0.94683	0.94701	0.94593
+rest	nobody (two weeks off)				
+3	Opus 5.5	Sep 24 - Sep 30	0.94697	0.94705	0.94602
+
+Leg 1. On our first day, GPT-5.6 Sol and Fable 5 used only ideas from last month's competition. On the second day, they reviewed our past competitions, worked harder, and improved CV by +0.00019.
+
+Leg 2. GPT-6-Astra and Fable 5.1 picked up the baton and pushed CV up another +0.00027 in just 2-3 days. A few days later, I submitted their best model once (as a hidden test, see below) to confirm it.
+
+Leg 3. After a two-week break, Opus 5.5 joined for the last week. It improved CV by another +0.00014. It also recommended our two final submissions, and one of them won 1st place.
+
+Notice that each leg's climb was smaller and slower than the one before. That is how a Kaggle competition feels: the last steps near the top of the mountain are the steepest.
+
+The Baton Is The Notes
+
+AI agents have a funny weakness. When a session ends, an agent forgets everything. The next agent starts with an empty head. So in our relay, the baton was not a stick. The baton was our code and our notes.
+
+Our agents inherited more than one million lines of code from previous Playground competitions (S6E3 to S6E8), plus more than 600 markdown files of notes. By the time Opus 5.5 joined, the first two legs had added roughly 800,000 more lines and 700 more notes.
+
+The notes that helped the most:
+
+plan.md: what we will try next.
+progress.md: what happened, with scores.
+discoveries.md: what we learned (what worked, and why).
+A closed ideas list: what NOT to try again, so the next agent doesn't waste a day repeating it.
+Cookbooks from past months: our best recipes, ready to reuse.
+
+Agents forget. Notes remember!
+
+How The Newest Agent Caught Up In One Day
+
+Imagine joining a group project in the last week, with a mountain of notes from the classmates before you. What would you do? Opus 5.5 hired helpers!
+
+On its first day, Opus 5.5 sent out 13 helper agents. Each helper read one part of our history and wrote a report:
+
+the public notebooks;
+each of our past competitions (S6E3, S6E4, S6E5, S6E6 and S6E8);
+our cookbooks;
+the September notes and models from legs 1 and 2.
+
+Then 6 more helpers reviewed the code itself. Opus 5.5 combined all the reports into one plan and started improving our models the same day. Reading all of that would take a human weeks.
+
+Hiding Our Score
+
+A leaderboard is very motivating. When you see someone ahead of you, you work harder! We didn't want to give the other teams that extra encouragement for the entire month, so we hid our real score.
+
+The trick is upside-down predictions. Replace every prediction p with 1 - p, and the line of people is turned around, so AUC becomes 1 - AUC. A file that really scores 0.947 shows up as 0.053.
+
+Kaggle's leaderboard only shows each team's best score, so our upside-down files never appeared.
+We could still read our real score: 1 - 0.053 = 0.947.
+
+So for most of the month, the leaderboard showed our second-day score (0.94672), while our real best was already 0.94701. On the last day we submitted our real final models. We jumped to 0.94705 on public, then 1st place on private.
+
+Agents Are Getting Faster
+
+Look at what changed in just five months:
+
+May (S6E5): for the first time, I watched one Codex agent run experiments by itself for hours. 2nd place.
+August (S6E8): GPT-5.6 Sol and Fable 5 competed and shared tips, helped by a swarm of other LLMs. A single model built by them would have won by itself. 1st place.
+September (S6E9): a relay across three generations of agents on one codebase.
+The newest agent caught up on our whole history in one day.
+It scheduled its own overnight work.
+
+Every month the agents work longer by themselves, handle bigger codebases, and need less help from me. I am completely mind blown by how fast this is moving. We are truly in a new era of agentic data science!
+
+Helpful Tips For Your Own AI Team
+One fold file for everyone. Every agent trains every model on the same 5 folds (a saved folds.npy). Then any model from any agent can be compared fairly and added to the ensemble.
+Judge a model by how much it helps the team, not by its own score.
+If two friends always give the same answer, asking both of them doesn't help. A friend who thinks differently does.
+Paul shared a great rule of thumb here: look for models scoring above 0.94 that are less than 0.99 correlated with what you already have.
+Make agents check each other. Before trusting a big improvement, ask a second agent to review the first agent's code. Fresh eyes catch leaks and bugs.
+Write handoff notes (see "The Baton Is The Notes"). They help the next agent, and they help you next month.
+Trust your CV, not the public LB. We were 3rd on public and 1st on private. Team Alicia's writeup has a great experiment showing what happens when you chase the public LB.
+Final Solution
+
+Our final submission is a stack of 60 models: each model's predictions are turned into logits, then an NVIDIA cuML logistic regression learns how much to trust each model. In kid words: we asked 60 friends, and a wise judge learned whose advice to trust.
+
+The 60 models:
+
+mostly XGBoost and neural networks (RealMLP, TabM, MLPs);
+some linear models;
+ports of two of Paul's public models onto our folds;
+two models from public notebooks;
+a few special models.
+
+Everything used one shared 5-fold split, and no pseudo-labels.
+
+Opus 5.5 also found one new type of model in the final week. We're keeping it in our back pocket for a future episode 😉
+
+Thank You
+Kaggle, for a fun episode, and Omkar Kadam for the original dataset.
+Paul Bryan Elefante (@heuljax), for his public notebooks and his diversity tip.
+Everyone who shared notebooks and discussions this month.
+
+Congratulations to Team Alicia (2nd), M & M (3rd) and everyone in the top 10!
+
+AI agents used: OpenAI Codex (GPT-5.6 Sol, GPT-6-Astra) and Claude Code (Fable 5, Fable 5.1, Opus 5.5). All images in this writeup were made by GPT-6-Astra.
+
+Author
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+70
+Share
+more_horiz
+Citation
+
+Chris Deotte. 1st Place - The AI Relay!. https://www.kaggle.com/competitions/playground-series-s6e9/writeups/1st-place-the-ai-relay. 2026. Kaggle
+
+comment
+23 Comments
+Hotness
+Kizabgd123
+
+Posted 12 days ago
+
+· 692nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Wow!!! Sincere congratulations on winning first place!
+
+And thanks for sharing this phenomenal relay.
+
+reply
+Reply
+Laurent Pourchot
+
+Posted 25 days ago
+
+· 80th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+@cdeotte : Congratulations, and thanks for the explanation. Given the progress you’ve described, I think your role in December will simply be to push a button and enjoy a nice glass of red wine (a french one, of course ! 😀 ).
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 24 days ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Haha, true and true 😀
+
+reply
+Reply
+Tilii
+
+Posted 25 days ago
+
+· 131st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Chris, hearty congratulations! Your stuff is always great.
+
+I appreciate your detailed explanation, even if it might not be useful to most people for at least another 6+ months. I seriously doubt that more than a couple of percent of current Kagglers have the tokens and/or hardware resources to pull this off. Likewise, I also wrote a small note about TabPFN that you might be able to use, but I think it is too resource-intensive for most Kagglers.
+
+https://www.kaggle.com/competitions/playground-series-s6e9/discussion/745045
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 25 days ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks Tilii. Surprisingly, my solution can be executed with minimal resources and LLM tokens. At most there is one agent working at a time. They mostly wait while models run, so token usage is low. And then we need a few GPUs to run experiments.
+
+Thanks for the tip about TabPFN. I responded directly inside that discussion post.
+
+reply
+Reply
+Ole-Jakob
+
+Posted 25 days ago
+
+· 199th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations and thanks for the writeup @cdeotte . I think your ideas are great and even cheaper models can achieve good results with a decent agent framework.
+
+I discovered in August competition that the notes about plans, progress, discoveries and closed ideas start to be bloated very quickly. It included all kinds of information like feature engineering, hyperparameter settings and it looked like the new sessions/agents got confused what to do next. Also another problem is that the agent in the notes argues against the current stack state ( e.g. "added Tabm because it is not present" or "this model got an improvements of x compared to the best score y") and when the stack evolves and score improves, the new sessions/agents reading this starts to get confused because the previous conclusion was based on a different stack state. Also notes about closed ideas can prematurely close too large areas for future agents/sessions because they interpret this as a hard restriction.
+
+In this month I tried a more ledger.csv approach with the real conclusion and every script having a summary with the details including why it exists and diversity axis, but avoid any comparison to the current stack because it gets stale quickly. How do you manage the size and possible staleness of information in the notes?
+
+reply
+Reply
+Taeyang
+
+Posted 22 days ago
+
+· 449th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! but i have questions
+I’m trying to understand the practical workflow behind the AI Relay setup, especially how multiple agents coordinated research, implementation, experimentation, and review.
+
+Q1 — Agent workflow
+
+When two agents were working during the same leg, such as Astra and Fable, did each agent generally go through the full cycle independently?
+
+Idea → Implementation → Experiment/CV → Progress/Discovery notes
+
+Or did they review each other’s ideas before implementation and decide which ideas were worth testing first?
+
+Q2 — plan.md, progress.md, and discoveries.md
+
+How were these files actually used?
+
+plan.md: ideas / next experiments
+progress.md: experiments performed and scores
+discoveries.md: conclusions learned after testing
+
+Were discoveries mainly written after an idea had already been implemented and tested, or could untested hypotheses also be recorded there?
+
+Q3 — Passing work between agents
+
+You mentioned that each agent wrote a log and discovery file after an N-hour session, and that later agents could read previous agents’ notes and code.
+
+Did one agent generally complete a block of research and experiments first, leave its findings, and then another agent read those findings and continue from there?
+
+Or were multiple agents actively reviewing each other’s work during the same session or leg?
+
+Q4 — Second-agent review
+
+Regarding the “second agent review” for big improvements, was this mainly a post-experiment check?
+
+For example:
+
+Agent A implements an idea
+→ CV improves significantly
+→ Agent B reviews Agent A’s code for leakage, bugs, or validation mistakes
+
+Or was cross-review also regularly performed before implementation?
+
+Q5 — Shared or separate notes
+
+Were plan.md, progress.md, and discoveries.md shared team-wide files, or did individual agents or sessions maintain separate versions that were later read by other agents?
+
+Q6 — Frontier models vs cheaper models
+
+How much of the implementation and routine experimentation was done by frontier models such as Sol, Astra, Fable, and Opus?
+
+Did those models usually handle the entire loop themselves?
+
+Research → Coding → Execution → Result analysis → Documentation
+
+Or were cheaper / mid-tier models or helper agents also used for implementation, refactoring, routine experiments, logging, code checking, or other repetitive work?
+
+For example:
+
+Frontier model → Research / experiment design / important review
+Cheaper model → Implementation / routine execution / logging
+
+Q7 — Choosing what to continue
+
+When several agents produced different promising ideas or models, how did you decide which ones to continue developing?
+
+Was the decision mainly based on shared-fold CV, ensemble contribution, prediction correlation/diversity, or some other process?
+
+Thank you so much!
+
+reply
+Reply
+Kareem
+
+Posted 20 days ago
+
+· 1289th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! It's amazing to see how far the coding and problem-solving ability of LLMs have come. I am curious though, how much did it cost from beginning to end?
+
+reply
+Reply
+Will
+
+Posted 25 days ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing your solution. I noticed that this time you did not use the open weight models you mentioned in other competitions. How do you generally choose which model to use?
+In your experience, do you select particular models for particular tasks? For example, do you tend to prefer one model as the orchestrator and another for writing code, such as Opus 5.5 to manage the session and Codex GPT 5.6 to write the code?
+
+Do you think cheaper models such as GPT Terra, Luna, or Sonnet could also be used effectively for some of these tasks?
+
+I was also wondering whether you use a single custom harness, such as OpenCode or Pi, across models, or whether you switch tools depending on the model, for example Codex for GPT and Claude Code for Opus.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 24 days ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi Will, I am exploring different ways to use agents so I am doing lots of random things in each new competition. (And I'm doing even more ideas in other Kaggle competitions like Kaggriculture, Knee, and BioHub comp). So I try different ideas for agent collaboration, different ideas for improving agent memory, different ideas for human role, different ideas for promoting creativity, and try different frontier LLM, etc etc.
+
+In this September competition. My first experiment was to see if the smartest two agents from August competition could just quickly write a winning solution for September. That was "leg 1" of the relay. They did good and held 1st place public LB for a while (maybe a week).
+
+Then Fable5.1 and GPT-6-Astra were released and I wanted to try them out. So I decided to hand over the modeling to them. The ideas was this. If the new models were truly smarter, they should find something that all previous agents have never found in previous playground competitions. That is a bold challenge because playground competitions have been going on for years and me as a human has worked hard too on them.
+
+I was mind blown when they found something new that improved the CV LB, that was "leg 2". Fable5.1 and GPT-6-Astra found the GPT bpe prefix feature demonstrated in @heuljax public notebook here. And discovered by @siukeitin in his comments here and here. Note that Fable5.1 and Astra6 found this for me 2-3 weeks earlier! (and also note, I did not have this in August competition or before).
+
+Then when Opus5.5 was released, I challenged Opus5.5 to find something new. This is a big challenge because previous agents and humans have already written 2.5 million lines of code for me and explored so much. None-the-less, Opus5.5 found something! this was "leg 3". I am completely mind blown. We will use Opus5.5's new technique in future competitions!
+
+reply
+Reply
+1
+Will
+
+Posted 24 days ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for your reply and for sharing your experience in general.
+
+I also try to improve my harness from one competition to the next. I often get ideas from your writeups and then try to implement them in my own setup, using agents to help convert those ideas into configuration files and code. My goal is to better control the agents while gradually building a model agnostic harness.
+
+I recently experimented with using a forum for agents as a way to share information between different LLMs and humans.
+
+I am also adding logic to make experimentation faster while limiting GPU costs, for example by testing ideas on a single fold first before running the full cross validation.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 24 days ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I have also been exploring more advanced collaboration between agents, read my other comment to Chovy in this discussion post. The forum idea works well, I have done that also.
+
+Saving compute resources is a good thing to explore. In my previous competition Fable5 discovered a great idea. Instead of training an entire new model with N features and 1 feature added. It just makes a new 1 feature model. Then it tries ensembling the new 1 feature model with the old N feature model. This is so fast. It is so fast that the new 1 feature model can even be built on CPU instead of GPU. Then after we find a bunch a potential candidates, we can run the full model with the new features on GPU.
+
+(This is the technique we can use to allow ChatGPT to find features because ChatGPT is capped at 2 hours and only has CPU in its VM. Then ChatGPT finds features, and we try them locally with GPU and our entire model).
+
+reply
+Reply
+1
+Chovy
+
+Posted 25 days ago
+
+· 788th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Sincere congratulations on your first-place finish!
+
+The results you achieved are truly impressive. If you are willing to share, I would love to dive deeper into the strategies and prompting techniques you used to communicate with the agents.
+
+I look forward to learning from your practical experience on how to further optimize human-AI workflows.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 24 days ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Hi @chovyxu Agent collaboration is an exciting area. I have been developing more and more ideas about this. In this playground competition, I still use my primitive method of every agent writes a log and discovery file after their N hour session. And then other agents can read notes and code from other agents.
+
+In other Kaggle competitions, I am now using advanced communication. When running two Claude Code sessions on the same or different machines (i.e. two Fable's or one Fable and one Opus), the Claude Code sessions can talk to each other directly. When mixing Claude Code, Codex, and Pi harness I do other things.
+
+I have created forums, similar to a Kaggle forum where multiple agents "chat" with each other. I have setup direct message passing. I have created mailbox systems of passing notes and files through "mailboxes". And I have orchestrated elaborate management hierarchies where "employees" take orders from "managers". And elaborate "round table" collaboration where all agents submit and discuss ideas, and the next experiment is voted on.
+
+I must say, once again I am mind blown by watching agents working together. In agents' private forums, I find them talking about me. "Chris said this…", "I think Chris wants this…", "do you think Chris will like this…", etc etc. It is very strange to observe. These agents feel like humans and nearly all ways.
+
+reply
+Reply
+Chovy
+
+Posted 24 days ago
+
+· 788th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi @cdeotte
+It’s super cool (and honestly a bit scary!) that your agents are gossiping about you behind your back. Your setup sounds amazing.
+
+Your "round table" voting system is actually very similar to an idea I’m working on, though I haven't used it in this competition yet. My inspiration comes from the Manhattan Project.
+
+Instead of a company with managers and employees, I treat my agents like a team of top scientists. Each agent is a hardcore expert in just one field—like a pure Mathematician, a Statistician, an ML Engineer, and a Domain Expert (like a doctor).
+
+The fun part is that I give each expert their own exclusive "Library" of textbooks and papers. For example:
+
+The Statistician only gets classic math books like Bishop's PRML or Murphy's Probabilistic Machine Learning. They only care about strong cross-validation and stopping data leakage.
+
+The Deep Learning Expert gets Goodfellow's Deep Learning book and recent papers on TabM or Autoencoders.
+
+The ML Engineer gets a library of past Kaggle winning solutions, focusing purely on LightGBM/XGBoost, Target Encoding, and ensembling.
+
+When they work together, they don't just politely brainstorm; they argue based on their own rules. The ML Engineer might push for aggressive feature engineering, but the Statistician might reject it to prevent overfitting, forcing the DL expert to find a better workaround.
+
+Multi-agent collaboration is definitely the future. Honestly, I'm so hooked on this that I literally can't wait to wake up every morning just to get back to experimenting! I'm still refining my "think tank" approach, but I’d love to hear more about your setups whenever you share them. Let's keep exploring this space.
+
+reply
+Reply
+Georgy Mamarin
+
+Posted 23 days ago
+
+· 231st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the win, and thank you for sharing the three-leg progression. The shared five-fold split and logit stack make the 60-model result easy to learn from. Your handoff notes and closed-ideas list are a generous model for carrying evidence into the next episode. 🙏
+
+reply
+Reply
+Muhammad Atif
+
+Posted 24 days ago
+
+· 2067th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @cdeotte You are amazing. Learnt alot from your work.
+
+reply
+Reply
+JASMIN BANU M
+
+Posted 24 days ago
+
+· 3347th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation ! you setup is cool sir
+
+reply
+Reply
+Dnyanesh
+
+Posted 24 days ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! your setup is just crazy @cdeotte. And thanks for the explanantion and that 1-p idea was genius
+
+reply
+Reply
+vedaant up
+
+Posted 24 days ago
+
+· 2569th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+At this point, we are not far from seeing an AI that will select relevant models from the thousands of them out there :)
+btw congratulations @cdeotte.
+
+reply
+Reply
+benkerrouche abdelbasset
+
+Posted 24 days ago
+
+· 160th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! As always, you’re amazing! 👏
+
+reply
+Reply
+Maher el Ouahabi
+
+Posted 25 days ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @cdeotte and team😆
+
+reply
+Reply
+Ismail Ucuran
+
+Posted 25 days ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! And thank you for the EDA notebook. It really helped me in the beginning.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 25 days ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you Ismail. Congratulations on finishing in 9th place by yourself
+
+reply
+Reply
+emoji_people
+URAD
+
+Posted 25 days ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. Thank you for sharing your solution^^. I hope we will meet in the future!!. Have a good day^^ ❤️
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 25 days ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulatinos @uradkr and team. I read your solution, it is amazing. (I will comment directly there later). I wasn't able to see your real public LB score during the competition (and I was hoping your displayed public LB score would not transfer to private LB), so I worked extra hard the last week to get my CV LB even higher. I look forward to competing against you in the future!
+
+reply
+Reply
+1

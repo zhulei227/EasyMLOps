@@ -1,0 +1,74 @@
+url: https://github.com/alexandrebarachant/DecMeg2014
+fetched: 2026-10-27
+chars: 4784
+
+GitHub - alexandrebarachant/DecMeg2014: Code and documentation for the winning solution to the DecMeg2014 challenge https://www.kaggle.com/c/decoding-the-human-brain · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ alexandrebarachant DecMeg2014 Repository navigation Code Issues Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ DecMeg2014 Public Notifications You must be signed in to change notification settings Fork 15  ( 15 ) Star 49  ( 49 ) You must be signed in to star a repository About Code and documentation for the winning solution to the DecMeg2014 challenge https://www.kaggle.com/c/decoding-the-human-brain Resources Readme Activity Stars 49 stars Watchers 4 watching Forks 15 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 14 Commits 14 Commits Folders and files Name Name Last commit message Last commit date data data     doc doc     .gitattributes .gitattributes     README.md README.md     applyfilters.m applyfilters.m     extract_features.m extract_features.m     final_submission.m final_submission.m     mdmfilter.m mdmfilter.m     preprocessing.m preprocessing.m     submission.csv submission.csv     trainfilter.m trainfilter.m     View all files Repository files navigation README More items DecMeg2014 
+ Winning submission for the DecMeg2014 Challenge 
+ Usage : 
+
+ put data from the challenge to the data folder 
+ Download and install the covariance toolbox : https://github.com/alexandrebarachant/covariancetoolbox 
+ Open matlab 
+ Run preproc script : run preprocessing.m 
+ Run final script : run final_submission.m 
+
+ Author : Alexandre Barachant 
+ #License 
+ Copyright (c) 2014, Alexandre Barachant
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+
+ About Code and documentation for the winning solution to the DecMeg2014 challenge https://www.kaggle.com/c/decoding-the-human-brain Resources Readme Activity Stars 49 stars Watchers 4 watching Forks 15 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

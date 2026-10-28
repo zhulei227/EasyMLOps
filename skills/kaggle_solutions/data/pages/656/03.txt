@@ -1,0 +1,56 @@
+url: https://www.kaggle.com/c/waveform-inversion/discussion/587419
+fetched: 2026-10-27
+chars: 860
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Yale University · Research Prediction Competition · a year ago
+Late Submission
+more_horiz
+Yale/UNC-CH - Geophysical Waveform Inversion
+
+Develop physics-guided machine learning models to solve full-waveform inversion problems
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+Failed to load the discussion topic
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

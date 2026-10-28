@@ -1,0 +1,959 @@
+url: https://www.kaggle.com/c/playground-series-s5e6/discussion/587393
+fetched: 2026-10-27
+chars: 38389
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - Fast GPU Experimentation with RAPIDS cuDF cuML — Predicting Optimal Fertilizers
+1st Place - Fast GPU Experimentation with RAPIDS cuDF cuML
+
+Predicting Optimal Fertilizers
+
+Solution Writeup · 1st place · Jul 2, 2025
+
+Thanks Kaggle for another fun playground competition! My June playground "Predicting Optimal Fertilizers" solution uses techniques from my previous 6 months of playground solutions. Below are links to old solutions with more info. And I will describe the techniques again briefly below.
+
+Techniques from Previous Playground Comps using GPU Acceleration!
+Date	Name	Metric	Technique(s)	Solution Link	Rank
+Dec 2024	Insurance Comp	RMSLE	RAPIDS cuDF
+Feature Engineering	link	1st
+Jan 2025	Forecasting Comp	MAPE	Boosting over Residuals	link	2nd
+Feb 2025	Backpack Comp	RMSE	Use Original Data	link	1st
+Mar 2025	Rainfall Comp	AUC	RAPIDS cuML	link	2nd
+Apr 2025	Podcast Comp	RMSE	cuML Stacking	link	1st
+May 2025	Calorie Comp	RMSLE	GPU HillClimbing	link	1st
+RAPIDS cuDF Feature Engineering
+
+The secret sauce in this competition is cuDF feature engineering, specifically Target Encoding. The competition data has 8 features which can each be treated as categorical.
+
+First we make all pairs which is 28 new columns. Then we make all triples which is 56 new columns. Then we make all quadruples which is 70 new columns. From these 162 = 8+28+56+70 columns, we use cuML Target Encoder to encode the 7 binary targets, y==0?, y==1?, ..., y==6?. This produces 1134 new columns. Then we target encode using the original dataset to produce another 1134 new columns. We then train an XGBoost using all these 2268 columns!
+
+Use Original Data
+
+Using relevant external data helps in all Kaggle competitions. This technique is especially important in Kaggle's playground competitions because every competition is synthetic data generated from an original dataset. Therefore we want to utilize the original data.
+
+There are two ways to use external data like the original dataset. We can add the data as new rows. Or we can add the data as new columns. Most public notebooks in this competition used the former technique. But no public notebook used the latter. (In our final hill climbing ensemble we need models trained with former and models trained with later).
+
+To use the later, we first create a categorical column (by using original column or combination of original columns). Once we have a categorical column, we target encoding it using the original data.
+
+TE = original_data.groupby(CAT_COL)[TARGET].agg("mean")
+TE.name = f"TE_{CAT_COL}_orig"
+train = train.merge(TE, on=CAT_COL, how='left')
+
+Stacking (with cuML)
+
+Stacking is especially beneficial for the MAP@3 metric which likes calibrated probabilities. We train an NN level 2 stacking model with categorical cross entropy loss and it doesn't matter if stage 1 models are calibrated or not.
+
+For stage 1 models, we don't even need multi-class. We can train individual models to predict single binary classification, Is the target y=0?, Is the target y=1? etc etc. We predict OOF probabilities using XGBoost, CatBoost, NN, cuML Linear Regression. Then we train a level 2 NN stacking model using categorical cross entropy loss to predict multi-class probabilities. This uses all the knowledge of stage 1 models and produces calibrated multi-class stage 2 predictions!
+
+We also build an GBDT level 2 stacking model using XGBoost and objective='multi:softprob'. The average of NN level 2 and GBDT level 2 is better than each stage 2 model individually!
+
+Repeated KFold
+
+Bizen250 published a beautiful public notebook here, which illustrates an important concept about MAP@3 metric. This metric is very sensitive to the randomness of training (and predicted probabilities). Therefore an easy way to boost MAP@3 metric is to train the same model again with different seed and average the predicted probabilities before selecting top3 for MAP@3.
+
+For example, I train all my NNs 100 times and average the probabilities before selecting top 3 fertilizers. And I train all my GBDT dozens of times using 100% data and average the probabilities before selecting the top 3.
+
+In the plot below, we see that each fold of each 5-Fold XGB has average MAP@3=0.376 but when we average the probabilities from 100 5-Fold XGB and then compute MAP@3, we achieve 0.380!
+
+Hill Climbing (with cuML)
+
+The effectiveness of hill climbing comes from creating a diverse set of models. Then when we combine them with weighted average, the result is better than any of the individual models. The key ingredients to tabular data hill climbing is building diverse GBDT, NN, and ML models. The fastest way to produce ML models is using RAPIDS cuML.
+
+Boosting over Residuals
+
+Note that we can give XGBoost starting predictions. First we train a cuML Linear Regression model. Then we use XGBoost's dtrain.set_base_margin(LINEAR_REGRESSION_LOGITS) to begin the boosting from the predictions of the linear regression model. This is an overlooked XGBoost trick!
+
+Pseudo Labeling
+
+A helpful trick in all competitions in the final days is to add test data labeled with your best ensemble. For classification, NN naturally handle the soft target probabilities (with their default cross entropy losses). For XGB, we write a custom objective to train multi-class with soft targets.
+
+Re-Train with 100% Train
+
+Another helpful trick in all competitions in the final days is to retrain all the most important models in your final ensemble using 100% train data. For XGBoost when going from 5-Fold to 100% we use fixed number of iterations equal to 25% more than average fixed during early stopping. And for NN, we just create a fixed step learning schedule from the average reduce on plateau of early stopping from 5-Fold.
+
+Trust Your CV
+
+For my final submission, I chose my best CV ensemble which was also my best LB score. My CV ensemble described below has CV MAP@3 = 0.386! Wow!
+
+Final Submission - CV 0.386
+
+My final submission is an ensemble of 9 models where each is trained many times with different seeds. The CV score is 0.386 and Private LB is 0.38652 and public LB is 0.38450!
+
+XGBoost cuDF FE - use original data as columns w/ tree depth = 4. (And train 10 models with 100% data)
+XGBoost cuDF FE - use original data as columns w/ tree depth = 10. (And train 10 models with 100% data)
+Stacking NN with many stage 1 models (And train 25 models)
+XGBoost RepeatedStratifiedKFold - use original data as rows - Public notebook by @bizen250 here (Trains 50 XGB)
+Stacking XGB over LGBM - Public notebook by @ayushchandramaurya here (And train multiple versions different seeds)
+XGBoost - use original data as rows w/ tree depth = 18 - Public notebook by @elainedazzio here (And train multiple versions different seeds)
+NN - Public notebook by @ricopue here (And train 100 NNs)
+Stacking XGB with many stage 1 models and with pseudo label COLUMNS (i.e KNN features).
+NN with pseudo label ROWS (And train 25 NNs)
+
+So we use 9 models and train each many times with different seeds. Therefore our final ensemble is approximately combining 300 sets of predictions! Weights (for the 9 models) are determined by GPU Hill Climbing !
+
+Enjoy!
+
+Consider using all these techniques in Kaggle's July playground competition!
+
+Author
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+194
+Share
+more_horiz
+Citation
+
+Chris Deotte. 1st Place - Fast GPU Experimentation with RAPIDS cuDF cuML. https://www.kaggle.com/competitions/playground-series-s5e6/writeups/chris-deotte-1st-place-fast-gpu-experimentation-wi. 2025. Kaggle
+
+42
+1
+6
+comment
+99 Comments
+12 appreciation comments
+Hotness
+Vignesh BalaChander
+
+Posted a year ago
+
+arrow_drop_up
+4
+more_vert
+
+Yes, I often use SHAP or feature importance to prune features early — it helps reduce overfitting and speeds up training. Training binary classifiers per class usually gives more decorrelated predictions, which improves the meta-learner’s performance. It forces base models to specialize more. Glad you’re enjoying the competition and happy to discuss more!Yes, I often use SHAP or feature importance to prune features early — it helps reduce overfitting and speeds up training. Training binary classifiers per class usually gives more decorrelated predictions, which improves the meta-learner’s performance. It forces base models to specialize more. Glad you’re enjoying the competition and happy to discuss more!
+
+reply
+Reply
+Masaya Kawamata
+
+Posted a year ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Hi Chris, Congratulations on another dominant and well-deserved 1st place! It was truly impressive to watch.
+
+I was particularly astonished by the speed of your score improvement. Your first submission appeared only about 10 days before the deadline, and you climbed the leaderboard at an incredible pace. I was simply left in awe.
+
+This leads me to a question about your methodology, if you're open to sharing. Do you typically formulate a comprehensive strategy beforehand—based on deep EDA and reviewing discussions, much like solving a math problem—before you start modeling? Or is your process more iterative, where you continuously experiment with ideas as they arise?
+
+I'm very curious about your general approach. Thank you for sharing your work with the community!
+
+reply
+Reply
+1
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks @masayakawamata . Congrats on solo 2nd place victory!
+
+My process is very iterative. Model OOF and EDA, CV scores, and submission scores inform how I proceed. In this competition, before I entered I read a discussion post saying that the original dataset (that Kaggle used to create the synthetic data) was random targets, so I immediately knew what strategy was needed here.
+
+This competition is exactly like Feb 2025 Backpack comp (which also had original data random targets). I immediately knew that the most important model would be to merge the original data as new columns. This allows models to "reverse engineer" the Kaggle synthetic data generation process.
+
+In every Kaggle playground comp, we are learning two signals. The original dataset signal (i.e. whatever patterns exist in the original dataset) and the Kaggle synthetic data generation signal. When the original dataset targets are random numbers, we need only focus on the Kaggle synthetic data signal.
+
+So the first model I built was making new columns from combinations of existing columns and merging original data targets. (This is how we "reverse engineer" the Kaggle synthetic data process). This diverse model combined with public notebooks boosted me to 1st place. (Note when the original dataset has strong signal, then this technique isn't very helpful).
+
+The next important observation was the metric. Our models predict probabilities but the metric is ranked MAP@3. I noticed early that training the same model with different seed and ensemble with itself improved MAP@3. So every model in my ensemble I trained with 100% data and train multiple times multiple seeds.
+
+I think these two things secured my 1st place win.
+
+reply
+Reply
+2
+Masaya Kawamata
+
+Posted a year ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much for your detailed reply! I'm always amazed by how incredibly clear and insightful your explanations are.
+
+Your strategic thinking is exactly what I aspire to. I'm excited to enjoy the journey and will work hard to hopefully catch up to, and one day even surpass, your level!
+
+Seriously, thank you again for being such an inspiration!
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+HijabZahra
+
+Posted a year ago
+
+arrow_drop_up
+3
+more_vert
+
+U shared this I found it very useful thanks @cdeotte
+
+reply
+Reply
+Haruki Kakinuma
+
+Posted a year ago
+
+· 7th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations! I’ll use your work as a reference in future competitions—thank you!
+
+reply
+Reply
+Mahog
+
+Posted a year ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats on another win! How many has it been already :V. i also thought of using TE features but I could only do 2-way combinations (the feature count exploded after that).
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @mahoganybuttstrings on solo 3rd place finish!
+
+Thankfully, I have access to some A100 GPU 80GB VRAM. When creating all pairs, triples, quadruples and then TE the 7 binary targets using both train.csv and original.csv. Produces around 3000 features. Train data has 7.5 e5 rows. When training I think it used about 50GB VRAM. Having large GPU helped train this monster model !!
+
+This diverse monster model boosted an ensemble of public notebooks from CV 0.384 to 0.386. So this diverse model was probably the secret sauce!
+
+reply
+Reply
+Mahog
+
+Posted a year ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I'm curious, what was the CV score for that model?
+
+reply
+Reply
+5 more replies
+arrow_drop_down
+Avesh Mishra
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @cdeotte Thank you for sharing such valuable resources, this is an incredibly well documented notebook and will surely help many in their learning journey. Much appreciated!
+
+reply
+Reply
+Utkarsh
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations, sir, @cdeotte
+
+reply
+Reply
+Sadia Shahid latif
+
+Posted a year ago
+
+· 2079th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+thanks for sharing this with us . its really helpful @cdeotte
+
+reply
+Reply
+aimlVeera
+
+Posted a year ago
+
+· 1471st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Absolutely phenomenal work Chris! I recently jumped back into a Kaggle comp after a long break, and this Playground comp was my first one. it’s been incredibly energizing to be part of the community again. I had a few questions and curiosities from your approach:
+
+1.Since target encoding creates so many features, have you ever tried dropping some of them early using feature importance or SHAP—just to reduce the load a bit before training? Would love to know if that helps.
+
+Your Level 1 models were trained on binary targets (Is y==0?, etc.) rather than as multi-class models. From an ensemble perspective, do you find that this approach generates more decorrelated OOF predictions for the Level 2 meta-learner compared to using the OOFs from standard multi-class base models? It seems like a powerful way to force the base models to specialize.
+
+Thanks again for sharing your work and the knowledge you share with the community.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi. Welcome back.
+
+I did not try to remove features. I have tried in previous playground competitions after I do mass feature engineering like this but it never helps much. I think this is because of the nature of Kaggle synthetic data. In real life certain combination of features don't help. But since this comp's original data had no signal and we were only detecting the synthetic data artifacts, then every combo had equal importance.
+
+Regarding stage 1 models, yes training on binary targets makes more diverse and decorrelated models. I actually included both binary and multi-class in my stage 1 models. I observed that adding binary after already having the multiclass improved CV score, so the binary were decorrelated.
+
+reply
+Reply
+Roman@Ahmed
+
+Posted a year ago
+
+· 1317th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi @cdeotte , I hope you're doing well. First of all, I want to thank you for sharing your work — I’ve been learning a lot by studying your notebooks and solutions. I really admire how thoughtfully you apply different techniques to improve your scores. I have a small question that I’m a bit confused about, and I’d be really grateful if you could share your perspective. When starting a in data , should we focus first on applying various modeling and feature engineering techniques, and more more techniques to improve the score step-by-step, or should we spend more time initially understanding the training and test data — their behavior, characteristics, patterns, and possible challenges? It would be incredibly helpful to know how you usually approach a dataset. What are the main steps you follow when you start working on a new problem? Especially since we often see you using techniques so thoughtfully, it would mean a lot to understand how you decide what to try and when. Thanks
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This is a great question. Give me a few days and I'll respond with a thoughtful answer.
+
+reply
+Reply
+1
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+@romanahmed2024 You are astute to observe that each of my solutions is customized to the data and problem. There is no AutoML formula that can consistently get top3 finish in multiple competitions (whereas there are formulas to get top25).
+
+I begin each competition by understanding the data. Make plots and determine visually what features or combinations of features are driving the target (and what is the nature of the relationship). Then I set up KFold CV. Then I build quick baselines for all types of models, Stats models (like predict the mean), ML models (like linear regression, SVM, KNN), GBDT, and NN. Next I do simple simple ensembles to see which combinations of models achieve the best CV score. (Sometimes GBDT+NN is the same as GBDT alone, and sometimes the combinations achieve big boosts).
+
+Everything above lets us understand the data. Models have personalities. If a model does well then we know the data has that personality also. Our EDA answers questions like
+
+Does target depend on interactions of features (or just features in isolation)?
+Do any features have special relationship with target (like form clear linear relationship)?
+Are there some very powerful features and/or weak features?
+If someone asks us to explain what affects the target, could we explain it clearly in a few sentences?
+
+It's very important to understand "the connection between features and targets ourselves without the models". Because then for 1 month our goal is to build a solution which can extract this "connection". Different techniques excel at extracting different types of connections between features and targets. Some techniques extract strong linear relationships, some techniques extract deep interaction between features, etc etc.
+
+Then we spend our time improving single models through feature engineering, stacking (over residuals of other models and/or OOF features of other models), hyperparameter tuning, learning schedules, external data, etc. We focus on all the types of models that can help what our EDA discovered. (And each type of model has different techniques for feature engineering, tuning, learning schedules, etc).
+
+We end by ensembling all the models either with hill climbing or stacking. Then we ice the cake with retraining with pseudo labeling, retraining with 100% data, retraining multiple seeds, and post processing.
+
+reply
+Reply
+1
+3
+Roman@Ahmed
+
+Posted a year ago
+
+· 1317th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you so much @cdeotte — for your invaluable guidance and the time you took to share your approach. I truly appreciate it and wish you continued good health and success. Following your advice, I’ve already started learning and applying the steps you described . If it’s not too much to ask, and if you happen to have the time, I would be truly grateful if you could kindly suggest any notebooks you’ve prepared (or ones you personally recommend, or by other Kaggle users), where the concepts you mentioned are demonstrated clearly. It would really help me understand and learn in a more structured and practical way. I’m asking for notebooks because they help me learn faster and understand how to apply things properly, while also helping me spot and fix my own mistakes. Also, if there are any notebooks you think are worth regularly following and practicing on Kaggle (for building strong fundamentals), I’d be thankful if you could point me to those as well. Wishing you a peaceful and fulfilling life as well
+
+reply
+Reply
+KIMBUMJU
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Dear Dr. Chris Deotte,
+
+Greetings. I am a recent university graduate from South Korea, currently preparing to become a data scientist. I would like to express my sincere gratitude for the incredible solutions you have shared across various Kaggle competitions. Studying and trying to understand your work has provided me with not only a wealth of knowledge but also great inspiration.
+
+As I carefully reviewed numerous solutions and discussions from different competitions, I noticed one particularly striking pattern: the public/private score shake-up in your submissions tends to be remarkably minimal compared to other participants. This insight became especially meaningful to me recently when I competed in a challenge on another platform. While my public score was quite strong, my private score turned out to be very disappointing. It was a frustrating experience, but it reminded me of your consistent performance and resilience to such shake-ups.
+
+Through this, I realized the critical importance of cross-validation strategies. I’m very eager to learn how you approach this issue. Could you kindly share what techniques or considerations you use to minimize public/private score differences? Do you also believe that cross-validation plays a key role in addressing this, as I do? If so, would it be possible for me to learn about your cross-validation strategy?
+
+I had hoped to reach out to you personally, but I couldn’t find a way to contact you directly, so I decided to leave a comment on one of your recent posts instead. I would greatly appreciate it if you could share your thoughts.
+
+Thank you very much for your time and consideration.
+
+Warm regards, Bumju Kim
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi. Nice to meet you.
+
+The secret to avoiding shakeup is cross validation. In every competition, I select my best CV score for my final submission. My model which achieves best public LB is different than my model which achieves best private LB.
+
+I view each competition as two challenges. One challenge is best public LB and second challenge is best private LB. What is confusing to observers is that the same model that achieves best public LB is not the same model that achieves best private LB.
+
+To achieve best public LB, we basically Hill Climb the public LB. We add models to our ensemble and keep those that increase public LB score. However at the same time, we build a second ensemble where we use Hill Climbing to improve local CV score. We select this second model as our final submission because this second model will generalize and achieve best private LB score.
+
+reply
+Reply
+1
+2
+KIMBUMJU
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+@cdeotte Thank you again for your kind response. Your willingness to share your ideas has been incredibly helpful to me.
+
+I now have a few follow-up questions, if you don’t mind:
+
+When optimizing the local cross-validation (CV) score, do you also use a Hill Climbing approach similar to what you use for improving the public leaderboard score? I’ve heard that using a large ensemble of models can actually help prevent overfitting and improve generalization—do you agree with this idea?
+
+I’m also curious about what kind of cross-validation strategy you tend to use most often. There are many options such as KFold, StratifiedKFold, GroupKFold, and RepeatedKFold. Since different strategies often yield different CV scores, how do you decide which one to rely on? Do you apply the same CV method for both classification and regression problems?
+
+In particular, for regression problems, if the target distribution is not normal, it’s not straightforward to apply stratification like in classification tasks. In such cases, how do you ensure the CV splits are reliable?
+
+Thank you very much for taking the time to read my questions!
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Natsu.sv9
+
+Posted a year ago
+
+· 939th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This is very well explained and knowable. Thank you for such explanation.
+
+reply
+Reply
+Peter Moorhouse
+
+Posted a year ago
+
+· 100th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Am I right in thinking that you didn't apply the 're-train on 100% train' trick to any stacking models? I was trying a stack with 100% of train data from the outset, since we can still calculate CV metrics for models in the second layer.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+You are correct. The two stacking models (NN stage 2 and XGB stage 2) are trained with 5 KFold (the same nested folds as the stage 1 models). I did train them multiple times with different seeds and average with themselves. But I did not train without KFold (i.e. train with 100%).
+
+I tried an experiment training them 100% without KFold and submitting to LB. The score was basically the same. So I think the benefits from 100% are negated by the leak degrading inference. (But for the other non-stacking models in my ensemble, the LB scores improved using 100% versus not using 100%).
+
+reply
+Reply
+Hamed Abedi
+
+Posted a year ago
+
+· 637th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+You're truly the Usain Bolt of the Kaggle Playground series, everyone expects you to win, but still surprised by the margin of victory! Huge congrats as always!
+
+I have a question: I was wondering the behavior of MAP@3. A standard predict_proba gives us a ranked list based on the probabilities, but it feels like it's not explicitly designed for the "second guess" scenario where we know that our 1st prediction was wrong!
+
+Using a political analogy in a presidential election as an example: imagine two candidates (A, B) from one strong party and one candidate (C) from another. Candidate A might be the most probable winner overall. But if we learn A is eliminated, the next most likely winner is probably B (from the same party), even if C initially had a higher individual probability than B. The probabilities aren't independent here.
+
+But anyways, I would want to know your perspective on this. Have you ever considered a sequential approach? For example, training one model to get the 1st prediction, and then a second model on the remaining classes/rows (masking out the first predicted class) to predict the 2nd choice (for the rows that first guess was wrong) and do the same for 3rd? Or do you find that this is not a correct way to frame the problem?
+
+I mean, maybe framing the model this way can brings diversity to our ensemble. what do you think of it?
+
+Thanks in advance.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+haha i like the Usain Bolt analogy 😀
+
+@hamedabedi Your comment is insightful. You are correct that predict_proba does not optimize MAP@3. Your idea of using conditional probabilities to predict 2nd and 3rd given 1st is wrong is interesting. This sounds like it could improve MAP@3 and it certainly sounds like it would provide diversity to an ensemble. I have never tried it but this would be a fun idea to try.
+
+reply
+Reply
+
+Posted a year ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! As a newcomer to Kaggle, it's incredible to learn from solutions like yours. Really appreciate how you shared your approach. very helpful!
+
+reply
+Reply
+Pearblossom
+
+Posted a year ago
+
+· 11th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and thanks for sharing.
+
+I see that you trained the model many times with different seed and constructed your 'monster model' through a large number of feature combinations.
+
+This is actually something I've always wanted to do but couldn't (limited by computing resources).
+
+But from your sharing, I still learned a lot. I believe this will be very helpful in future competitions.
+
+Thank you again.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @pearblossom for achieving 1st place public LB and 11th place private LB. I tried so hard to beat you on public LB but could not. Great job!
+
+I'm looking forward to reading your writeup. What do you think were your top 3 strengths in your final solution?
+
+reply
+Reply
+Syed Ahmad Rayyan
+
+Posted a year ago
+
+· 1530th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congratulations, Chris, on yet another phenomenal finish! 🏆 Your consistent ability to top these competitions — and more importantly, to share so much of your process and insight — is truly inspirational. The community learns so much from your notebooks and thoughtful explanations. This win was extremely well deserved. Looking forward to seeing how you continue pushing the boundaries of structured data modeling.
+
+reply
+Reply
+Pearblossom
+
+Posted a year ago
+
+· 11th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Since I am unable to use different random seeds to train a large number of models within the limited time, nor can I extract better information through feature combinations. My focus was on building models with sufficient differences, even if there were fewer models.
+
+In my final ensemble, there were only 30 models, including 7 DNN, 11 XGBoost, 8 LightGBM, and 4 LogisticRegression.
+
+Taking DNN as an example, I attempted to build models with different numbers of layers (2 layers, 4 layers, etc.), different structures (whether to use residual connections and where to use them), different activation functions ('relu', 'swish', or no activation) and so on. Then, select the model that has sufficient differences and relatively good performance.
+
+Additionally, to increase the diversity of the models, I also tried different combinations of the training set and the original dataset. I found that combining the model (use df_train * 1 + df_original * 4) and the model (use df_train * 2 + df_original * 4) had the most significant improvement in CV scores (0.0002 ~ 0.0003).
+
+As for the parameter tuning, sometimes I adjusted based on experience, and sometimes I used optuna.
+
+Overall, the method I used was actually quite simple. The main reason for the good public LB score, I think, lies in: the models are diverse enough, the quality of each individual model is relatively high and in the meta model, I used optimized parameters.
+
+However, my private LB score is not as good as public LB score. So, it's obvious that there are some shortcomings in my approach. I think the main drawback is that the feature engineering is not rich or effective enough, and when dealing with such a random dataset, the model was not trained multiple times.
+
+I will do my best to overcome these problems in future competitions.
+
+Finally, I would like to say that from your sharing, I learned more methods to improve the quality of models, which is very helpful. Thank you again.
+
+reply
+Reply
+Syed Ahmad Rayyan
+
+Posted a year ago
+
+· 1530th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congratulations, Pear Blossom, on topping the public leaderboard! 🌟 Your thoughtful reflections — especially your appreciation for the learning process — really stood out.
+
+It’s clear you brought both strong modeling and curiosity to the table, and it clearly paid off.
+
+I’m sure many others, like me, found your perspective inspiring. Looking forward to seeing your future work — you've definitely made a mark in this competition!
+
+reply
+Reply
+davidlowryduda
+
+Posted a year ago
+
+· 1190th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi Chris,
+
+Congratulations! And thank you for taking the time to write an easy-to-follow description of your approach, with links.
+
+It seems that you don't spend a lot of time tuning hyperparameters and instead form an ensemble with many different models. You mention that these have some different tree depths. Do you also vary over hyperparemeters (other than setting random seeds) too?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+No I did not vary other hyperparameters. In this comp I trained the same model multiple times with different seeds and I varied tree depth.
+
+Note that I don't always do this. I observed that the MAP@3 metric benefited from this kind of diversity. In previous comps, I just trained one model without varying seeds nor tree depth.
+
+reply
+Reply
+2
+Komil Parmar
+
+Posted a year ago
+
+· 261st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+First of all congratulations 👏🏻 for securing 1st place 3rd time in a row Chris. Sorry to say but I do wish this community breaks the streak soon.
+
+During this competition i tried tuning xgboost model for using the num_parallel_tree parameter> 1 but it never worked. My reasoning is that it smoothed the probabilities hence making it harder to differentiate between the classes for ranks.
+
+However, you used like 100 models averaging their probabilities and yet it worked. Can you explain why? If you would have used Voting or its variant it would make sense but averaging doesn't. Thanks
+
+Also, it would surely take a new revolutionary model or training strategy itself to break the streak backed by so much of compute power.
+
+reply
+Reply
+paperxd
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hello!
+
+Looking through your methods, there are some really brilliant ideas that I never thought was possible! For example, I thought TargetEncoder was meant if the target had an inherent order, but it seems your method utilizes one hot encoding the target labels, but I don't understand the full idea of it. Also, boosting over residuals confuses me since the target is multiclass, I thought boosting over residuals only worked for regression / classification, could you explain how it works for multiclass? Also, the idea of binary predicting L1 models seems like a new idea, but how would the L2 models know which 'label' the L1 models are binary predicting?
+
+Thanks, paperxd
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi. Congratulations on finishing 6th place!
+
+The way i did target encoding is as follows. First i create 7 new targets with
+
+# FIRST WE LABEL ENCODE FERTILIZER NAME TARGET to integers 0 thru 6
+for k in range(7):
+    n = f"target_{k}"
+    df[n] = (df["Fertilizer Name"]==k).astype("int32")
+
+
+Then we target encode with
+
+for k in range(7):
+    t = f"target_{k}"
+    n = f"TE_{c}_{k}"
+    X_train[n] = TE.fit_transform(X_train[c],X_train[t])
+
+
+I thought boosting over residuals only worked for regression / classification
+
+XGBoost regardless of objective needs to start with some starting prediction. For multi-class with 7 classes it starts with logits equal to [0,0,0,0,0,0,0]. So instead of starting with these logits, we take our OOF predictions from linear regression
+
+def probs_to_logits(probs, eps=1e-7):
+    probs = np.clip(probs, eps, 1 - eps)
+    return np.log(probs)
+
+base_logits_train = probs_to_logits( OOF_PROBS )
+dtrain.set_base_margin(base_logits_train.reshape(-1))
+
+reply
+Reply
+paperxd
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank for your response! I just have a few more questions for you,
+
+What value do you fill the nan values when you add the additional data as columns?
+Which way do you do hill climbing : first use a hill climber to choose the best models, then use another hill climber to choose the best weights between the model, or use a hill climber to choose the best models and best weights at the same time? Once again, thank you for your responses, I am learning a lot from you!
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+I leave NAN as NAN. That will let XGB do whatever it wants with them.
+It depends, sometimes I use Hill Climber to pick both the models and weights at the same time and I use what it says.
+
+But sometimes, I just use Hill Climber to pick the best models. Then I find weights myself that are more equal. For example, I run Hill Climber. Then I find all models that it selected with weight>0.1 or some threshold. Then I just do equal weight with those models.
+
+It depends how much I trust the local CV and reliability of the metric. In this comp, MAP@3 is very sensitive and I also Hill Climb with models that used different KFold schemes. So I didn't trust the weights that Hill Climb told me (but I did trust which models it selected if weight was positive and over 0.1). So I used Hill Climb to pick 9 models for me and then basically used equal weights on the 9 models. (I did a little other tweaking of the weights based on my intuition and LB feedback, but basically used equal).
+
+reply
+Reply
+yunsuxiaozi
+
+Posted a year ago
+
+· 351st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing. I used to think that repeatkfold was designed to deal with the randomness of small datasets, but I didn't expect that even large datasets could be used. The playground of episode 7 has high accuracy and a small amount of data, so repeatkfold also should be effective.
+
+reply
+Reply
+Adriel O'Malley
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Fantastic explanation!
+
+reply
+Reply
+Chris J Mears
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @cdeotte ! Thanks for the great write-up and tips!
+
+reply
+Reply
+Victoria Li Tan
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+RAPIDS cuDF is such a powerful tool. Have you tried alternatives to RAPIDS cuDF, such as AutoInt architectures or Feature Tools?
+
+reply
+Reply
+Khushi Yadav
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing this fantastic approach.✨
+
+reply
+Reply
+bakhtawar shabbir
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+Brilliant engineering—GPU stacking and feature tricks shine!
+
+reply
+Reply

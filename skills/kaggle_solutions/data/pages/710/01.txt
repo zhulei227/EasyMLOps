@@ -1,0 +1,282 @@
+url: https://www.kaggle.com/c/maze-crawler/writeups/maze-crawler-1st-place-preliminary-solution-wr
+fetched: 2026-10-27
+chars: 15858
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Maze Crawler - 1st Place Solution Writeup — Maze Crawler
+Maze Crawler - 1st Place Solution Writeup
+
+A fully heuristic agent: no learning, no search tree. A single scored BFS drives movement, standard node-mining and combat
+
+Maze Crawler
+
+Solution Writeup · 1st place · Jul 2, 2026
+
+First, thanks to the organizers for a genuinely fun environment, and to everyone who competed. Below is the full breakdown of how the agent thinks, in the order the pieces build on each other.
+Main keys of the solution
+
+Three layers, each on top of the previous:
+
+Movement - a first-move BFS that scores every reachable cell and takes the best. Behavior is steered entirely through the score formula.
+Economy (the "standard" top approach) - head to mining nodes (node > bfs), and switch to a worker for survival when sbd gets low.
+Combat win condition (the reason it won) - win the factory-collision energy tiebreak. This is the part that beats the many top solutions that just farm energy and wait to win the tiebreak after step 500.
+1. The Movement Module
+
+The core is a breadth-first search from the factory that expands over the known map and records, for every reachable cell, the first move needed to start heading there.
+
+Two things make it more than a plain BFS:
+
+(a) Jump-aware expansion. The BFS explores both walking edges and jump edges. When two paths reach the same cell - one with a jump and one without - I keep whichever has the better score, not blindly the shorter one. Each cell_best entry is (arrival_ticks, jump_cd_at_arrival, first_move, jumped_flag), so later logic knows whether a route needed a jump.
+
+(b) Score-driven selection. After the BFS fills cell_best, I score every candidate cell and take the max. The dominant term is sbd (steps-before-death - how many ticks until the scroll boundary reaches that row), evaluated at the arrival tick, not the current one:
+
+def _pick_action(cell_best, tbl, wm, fc, fr, width, south, north, spawn_col=None, crossed=False, enemy_col=None):
+    best_score = None; best_action = None
+    for (c, r), (ticks, jcd, first, jumped) in cell_best.items():
+        if r < fr:            # only consider cells at or above the factory
+            continue
+        sc = _score_cell(tbl, wm, c, r, ticks, jcd, width, south, north, spawn_col if not crossed else None)
+        if enemy_col is not None:
+            sc += max(0, 3 - abs(c - enemy_col)) * ENEMY_COL_BONUS
+        if best_score is None or sc > best_score:
+            best_score = sc; best_action = first
+    return best_action, ...
+
+
+The key idea: movement is entirely a function of the score formula, so I can shape behavior just by adding terms. The very same BFS is reused for exploration, for approaching a node, and for closing on the enemy - only the scoring changes. That reuse is what lets the combat and economy layers plug in cleanly later.
+
+Basic movement terms:
+
+Edge penalty (EDGE_PENALTY, EDGE_COLS) - the outer columns are traps; you get pinned against the wall as the map scrolls. Penalizing them keeps the factory in the safer central corridor.
+One-time crossing bonus (CROSS_BONUS) - the map is left/right symmetric and both players start on opposite halves, so the enemy is obviously on their side. A one-shot bonus pushes the factory to cross into the opposite half, then switches off once crossed.
+2. The Economy - the "standard" top approach (node mine + worker)
+
+The second ingredient is the one most strong solutions share: energy economy, with a strict priority - node > bfs.
+
+When a reachable mining node is visible and still safe on arrival (sbd above a threshold), the factory drops exploration and goes to it. It builds a miner, the miner TRANSFORMs into a mine, and the factory sits on the mine to farm energy - energy that later wins tiebreaks.
+
+As the scroll catches up and sbd gets small, the agent switches to worker mode for survival: the worker clears walls to the north so the factory can keep escaping the scroll where plain BFS would be stuck.
+
+Gated by a few tunables so it's easy to rebalance:
+
+MINER_PHASE_END = 350          # after this step, stop starting new mining
+MIN_NODE_SBD    = 30           # only commit to a node if it's this safe on arrival
+ENERGY_CAP      = 3000         # once banked, permanently stop farming and hunt instead
+WORKER_PHASE_START = 400       # only build the survival worker this late
+
+
+ENERGY_CAP is a one-shot latch. Once total energy crosses it, the agent permanently stops caring about nodes and commits to finding the enemy — resources are already sufficient to win the tiebreak, so from that point time is better spent hunting than farming.
+
+Figure 1 - The factory sits on a mine (a miner transformed into a mine), farming energy that will later decide the tiebreak.
+
+3. Combat - the win condition that actually won
+
+This is the part I believe made the difference. The match ends when the two factories collide (or one is scrolled out), and a factory-vs-factory collision is decided by total energy of surviving robots.
+
+Most strong solutions treat this as: farm as much energy as possible, then win the tiebreak once the game runs long (past step ~500). My agent instead treats combat as an active objective - it seeks the collision on its own terms with an energy edge, rather than passively waiting. That's why it beats pure energy-farmers: it doesn't let the game drift to a neutral late-game tiebreak; it forces a favorable one.
+
+The whole thing reduces to two subgoals: find the enemy, and have more energy at the moment of collision.
+
+3.1 Finding the enemy
+
+(1) Score manipulation. Beyond the edge penalty, an enemy-column bonus biases motion toward where the enemy likely is:
+
+# added in _pick_action when the enemy is known but not directly chaseable:
+sc += max(0, 3 - abs(c - enemy_col)) * ENEMY_COL_BONUS
+
+
+It applies when the enemy is seen but unreachable in BFS, or was last seen and then lost, so the factory drifts toward the enemy's column and closes in as the map opens. The bonus zeroes out once the factory reaches that column, so it never gets glued to a stale column.
+
+(2) Path-capture priority. When the enemy is actually reachable, target selection is strict:
+
+enemy  >  node  >  normal BFS
+
+
+If the enemy appears in the BFS while the factory is en route to a node, it drops the node and switches to the enemy.
+
+(3) Scouts. Cheap eyes (SCOUT_COST = 50). They spawn right after the factory jumps - a jump usually clears a dead end, and the factory pauses on the gap tick, so it's a free moment to spawn a scout that can explore onward. Scouts are tuned to fan out and cross into the half opposite their own spawn, maximizing coverage. Each scout is also a bundle of energy that adds to the tiebreak total.
+
+Figure 2 - Scouts fanning out across both halves of the map, maximizing vision coverage while each adds energy to the tiebreak total.
+
+3.2 Winning the tiebreak - the early miner drop
+
+The miner is the biggest energy unit (300 energy), so dropping a miner next to the factory just before a collision is the single strongest tiebreak swing. The whole trick is timing.
+
+TIEBREAK_DIST           = 5    # build the tiebreak miner when the enemy is within this manhattan distance
+TIEBREAK_ENERGY_MARGIN  = 50   # keep this much spare after paying MINER_COST
+# fires if: enemy visible, within TIEBREAK_DIST, build cd ready, and no live miner already counts
+
+
+Two refinements made it reliable:
+
+Placement behind the advance - the miner drops on the cell the factory just left (OPPOSITE[last_move_dir]), so as the factory pushes toward the enemy it never runs over its own miner. If that cell is blocked, fallback directions are sorted away from the enemy.
+Lookahead death prediction - a miner that will be scrolled out within the next 1–2 ticks is treated as already dead, so the replacement is built early. This dodges the worst case: the miner dying and the factory colliding on the same tick, which would lose the tiebreak.
+TIEBREAK_MINER_LOOKAHEAD = 2   # treat a soon-to-be-scrolled miner as already dead
+
+
+Figure 3 - The factory drops a tiebreak miner on the cell behind it just before closing on the enemy.
+
+Figure 4 - The moment of the factory collision, with the freshly dropped miner's 300 energy counted on my side of the tiebreak.
+
+4. Collision avoidance between my own units
+
+Small but genuinely valuable: my own units don't crush each other. The factory outranks scouts and miners, so a naive step would delete a friendly unit.
+
+Scouts reserve their next cells (planned_moves) and never walk into each other or the factory's next cell.
+When the factory would step onto its own miner, they swap: the miner steps OPPOSITE, the factory takes its place.
+Engine subtlety: a freshly built miner has a move cooldown and can't vacate on its first tick - so the factory waits one tick instead of crushing it.
+def _swap_with_miner(actions, obs, player, factory_uid, fc, fr):
+    a = actions.get(factory_uid)
+    if not a or a not in OFFSETS: return
+    dc, dr = OFFSETS[a]; tc, tr = fc + dc, fr + dr
+    for uid2, d2 in obs.robots.items():
+        if d2[4] == player and d2[0] == MINER_TYPE and d2[1] == tc and d2[2] == tr:
+            if d2[5] > 0:                      # miner still on move cooldown -> can't move yet
+                actions[factory_uid] = "IDLE"  # wait instead of crushing it
+            elif uid2 not in actions:
+                actions[uid2] = OPPOSITE[a]    # swap places
+            break
+
+5. The near-mirror match: rival bunterrrr
+
+Here's the honest part of the story. I designed every feature to beat the standard energy-farming solutions as hard as possible — targeting ~95% win rate against them. I did not expect anyone to build essentially the same idea, so I never tuned for a symmetric match, or for evenness against a copy of myself.
+
+Then bunterrrr showed up with a very similar approach - same combat-first, miner-drop core - but without scouts and without node mining. Against a near-mirror, two of my choices actually cost me games:
+
+Their miner drop was later than mine. A mine loses 1 energy per tick, so an early drop bleeds value over the run-up to the collision. Because bunterrrr dropped later, in some head-to-heads their miner simply carried more energy at impact and won the tiebreak.
+I had removed "leave the mine when the enemy is visible." I removed it after seeing games where the factory couldn't free up build_cd for a fresh miner in time (it had just placed one), so I disabled leaving the mine to avoid that failure - but I should have kept it. Against bunterrrr that rigidity occasionally handed them the initiative.
+
+So against the standard field my agent dominated as intended, but against its own near-twin the match was close to 50/50 - I'd estimate something like 53/47 in my favor, though I didn't count exact games. It's genuinely hard to be sure, because per-game rating changes never settled to ±1: they were always around ±5, and asymmetric with the rating gap (e.g. when I was rated higher, a loss cost me −5 while costing the lower-rated player only −4). With two nearly equal players, that kind of update is slow to converge. My final rating ended up slightly higher, so on balance I think I won a little more often - but it was close.
+
+Figure 5 - Final ratings: my agent and bunterrrr ended up nearly tied, with my rating slightly ahead.
+
+6. Tunability as a design philosophy
+
+Because every behavior is either a score term or a named threshold, the whole agent is a flat block of tunable constants - rebalancing never meant rewriting logic, just changing numbers:
+
+ENEMY_LOGIC_START = 35     # first ticks: pure exploration, no combat logic yet
+TIEBREAK_DIST     = 5
+CHASE_BUILD_MARGIN = 2     # only pursue if there's time to place the tiebreak miner en route
+ENEMY_LOW_SBD_WALK = 12    # enemy too low to chase (safe, if reachable on foot)
+ENEMY_LOW_SBD_JUMP = 23    # enemy too low to chase (jumping down is riskier -> higher bar)
+CROSS_BONUS = 40.0
+ENEMY_COL_BONUS = 15.0
+
+
+Example of that philosophy: I don't dive after an enemy that's about to be scrolled out anyway - but walking down is safer than jumping down, so the "too low to chase" bar is lower on foot (12) and higher when only a jump reaches it (23).
+
+Other micro-details: the early game (step < ENEMY_LOGIC_START) is pure exploration to build map knowledge first; the map's left/right symmetry is used to predict walls on never-seen cells (prediction only - observed truth is never overwritten, avoiding phantom walls at the door exceptions); and every spawn path has a bounded wait + reset so the factory never idles to death on a failed build.
+
+Closing
+
+The agent is deliberately simple: one scored BFS, a standard node-mine + worker economy, and a combat-first win condition with a well-timed miner drop. No learning - all the strength came from making the score function express the right incentives and from treating the energy tiebreak as something to force, not wait for. The one thing I'd change is tuning for the near-mirror case against bunterrrr rather than only for crushing the standard field.
+
+A personal note: this is easily the most significant thing I've competed for (even without any prizes😭🙏🙏), and being in contention for first - even in a relatively small competition by Kaggle's standards - kept me on edge the whole way through. I literally left Kaggle for eval period to be away from checking leaderboard and be worried. I'm genuinely relieved it's finally over. Thanks for reading, and thanks to everyone who made the run worth it.
+
+Author
+Maksim Savelev
+
+quatlify
+
+arrow_drop_up
+12
+Share
+more_horiz
+Citation
+
+Maksim Savelev. Maze Crawler - 1st Place Solution Writeup. https://www.kaggle.com/competitions/maze-crawler/writeups/maze-crawler-1st-place-preliminary-solution-wr. 2026. Kaggle
+
+3
+comment
+3 Comments
+Hotness
+Prema Ananda
+
+Posted 4 months ago
+
+· 16th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congratulations on 1st place!
+Taking part in this competition was pure enjoyment. 🎉
+Your solution impressed me with its simplicity — I think that's exactly what made the difference and won it for you.
+Tell me, did you use AI while writing the code? I ask because I also took part, but my architecture turned out too complex for my skill level :)) I trusted the AI too much and gave it too much freedom.
+Awesome work, keep it up!
+
+reply
+Reply
+Maksim Savelev
+
+Topic Author
+
+Posted 4 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks, at first I used AI much without understanding, but then I realized that ai interprets very poorly and often hallucinates and does not know how to do very specific tasks at all, as well as the LLM has 1D world of text and spatial thinking is difficult for it. Therefore, I started from scratch and empirically thought out a strategy in my notebook notebook with observations, delved into the code and into the causes and effects when I made a standart solution - mining and worker and tried to improve (for example, if a node cluster, then install several mines at once)I realized that improvements are very situational. And I remembered my discussion about my defeats in mutual collisions, and I realized that this was a win condition.
+
+reply
+Reply
+1
+Prema Ananda
+
+Posted 4 months ago
+
+· 16th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+With such a serious approach, you have a good chance of doing well in this competition too: https://www.kaggle.com/competitions/pokemon-tcg-ai-battle
+
+reply
+Reply
+Daniel Bekker
+
+Posted 4 months ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great job! Nice writeup and congratulations on first !
+
+reply
+Reply

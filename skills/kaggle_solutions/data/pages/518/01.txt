@@ -1,0 +1,141 @@
+url: https://www.kaggle.com/c/kaggle-survey-2022/discussion/374157
+fetched: 2026-10-27
+chars: 5220
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Kaggle · Analytics Competition · 4 years ago
+Late Submission
+more_horiz
+2022 Kaggle Machine Learning & Data Science Survey
+
+The most comprehensive dataset available on the state of ML and data science
+
+Overview
+Data
+Code
+Models
+Discussion
+Rules
+Michal Bogacz · Posted 4 years ago
+arrow_drop_up
+19
+more_vert
+1st place solution approach "behind the scenes" - part I: before development
+
+Hello everyone, As promised, I wanted to share with you how I worked on my submission in this year's competition.
+
+However, this will not be a post only about the methods and the code itself, but more about how I approached the problem and how the work on the competition looked like. On Kaggle you can easily find similar material from model contest winners about how they approach the problem and I found it inspiring so I thought I'd share my thoughts on the best notebook analytics competitions which is a completely different issue.
+
+The post will be divided into several parts, which I will successively upload in next days/weeks
+
+First of all… unfortunately, there are no shortcuts when it comes to time. The development of the notebook itself took about 80 hours of development work, but the the whole process starts with an idea and design.
+
+Therefore, I just started walking and thinking about what to create this year and in what form. It is time consuming because it is a decision that I was not able to make quickly and I wanted to think it over very well, therefore I would write down various ideas and put them aside for a 2/3 days and then come back to them with a fresh mind and I was better able to determine whether is this idea suitable for a contest or is it better to think of something else.
+
+The development of the notebook actually starts when we take the data, but before that I started making little sketches of charts to verify that my idea made sense. However, the project itself required a lot of changes, but decent sketches allowed me to think about many things before development. Thanks to this, when I start development, I already have an idea, a general project and a clear direction in which the development should go, which means that I will not have to go back to the basics.
+
+In practice, then also a lot of things changed according to the original plan, but this approach still saved a lot of work and brain resources for the intense development stage. I'm sure if I hadn't thought the idea through before starting development, the notebook wouldn't have been so good.
+
+A common approach that people take on such contests is to start working right away with loading data and try everything step by step in a spontaneous way. It is not a good direction in my opinion, the notebook then often does not have a clear narrative, a unique idea and elements, and consistency between subsequent parts that can be thought out in advance. The plan does not have to be as detailed as possible, and the design does not have to be long, the mere existence of these two elements, even in a small form, makes the work much easier in my opinion.
+
+More from "behind the scenes" soon in the next posts. I hope you found the above information useful and/or inspiring. Let me know what you think in the commentary or if you have any suggestions on how you think it's worth working on such problems, share in the comment - I'd love to read it!
+
+Please sign in to reply to this topic.
+
+comment
+7 Comments
+1 appreciation comment
+Hotness
+Om Ashish Mishra
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great work @michau96 !
+
+Oscar Aguilar
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing your journey so far👍
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+I read many notebooks in this competition (at first out of curiosity about the Kaggle community, but later out of interest). Before the results were announced, I thought: "If some notebooks (including yours) will not be winners, runners up, etc., there will be a really, really major problem with these analytics contests" (following a disappointment with the way some Kaggle analytics competitions were assessed to the point that one sometimes has the impression that the notebooks have not even been read given the contradictions and many other things that any data scientist can detect, etc.). The results of this analytics competition, fortunately, provide some comfort. Congrats, and yes, your analysis thread can be easily followed throughout the notebook (in addition, the analyses are amazing and accurate…). And the final conclusion and "E" point are particularly awesome.
+
+Zakir Khan
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Amazing @michau96 💥
+
+Sahan Dissanayaka
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing, some approaches are really vital to get started with
+
+Basel Ayman
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+wonderful and informative
+
+Appreciation (1)
+Vandit
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+it was impressive. Thanks @michau96

@@ -1,0 +1,73 @@
+url: https://github.com/sonnylaskar/Competitions/tree/master/Kaggle/Avito%20Duplicate%20Ad%20Detection
+fetched: 2026-10-27
+chars: 4666
+
+Competitions/Kaggle/Avito Duplicate Ad Detection at master · sonnylaskar/Competitions · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ sonnylaskar Competitions Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ Files Expand file tree master Breadcrumbs Competitions / Kaggle / Avito Duplicate Ad Detection / Copy path Directory actions More options More options Directory actions More options More options Latest commit   History History History master Breadcrumbs Competitions / Kaggle / Avito Duplicate Ad Detection / Copy path Top Folders and files Name Name Last commit message Last commit date parent directory .. cache cache     code code     input input     output output     tokenizers/ punkt/ PY3 tokenizers/ punkt/ PY3     Documentation - TheQuants Team - Avito Contest.pdf Documentation - TheQuants Team - Avito Contest.pdf     README.md README.md     config.cfg config.cfg     runAll.sh runAll.sh     View all files README.md Kaggle Avito Duplicate Ad Detection Contest 
+ Winning Solution Blog : https://blog.kaggle.com/2016/08/31/avito-duplicate-ads-detection-winners-interview-2nd-place-team-the-quants-mikel-peter-marios-sonny/ 
+ Contest Link: https://www.kaggle.com/c/avito-duplicate-ads-detection/ 
+ Private Leaderboard Score - 0.95294 ( Rank 2 / 548) 
+ Final solution of Avito Duplicate Ad Detection - TheQuants 
+ ##Prerequisites:
+ OS: Any Linux Distribution (Ubuntu 14.04 Preferred) 
+ RAM: 128GB+ (64GB for feature extraction) 
+ CPU: 36 cores+ (Preferred) 
+ GPU: CUDA-compatible NVIDIA GPU with Compute Capability 3.5+ (TITAN X Preferred) 
+ Storage: 64GB+ (not including input data) - Images on SSD highly recommended 
+ R Version: 3.1+ 
+ R Packages: data.table, dplyr, dummies, feather, Hmisc, igraph, jsonlite, parallel, raster, readr, reshape2, stringdist, stringr, stylo, textreuse, tidyr, tm, xgboost 
+ Python Version: 3.5.1 
+ Python Packages: scikit-learn, numpy, pandas, python-Levenshtein, codecs, OpenCV, feather-format, jellyfish, nltk, PIL, fuzzywuzzy, stop_words, haversine 
+ Python Version: 2.7.1 
+ Python Packages: scikit-learn, feather-format, numpy, pandas
+XGBoost (0.4.0) 
+Keras (0.3.2) 
+Theano (0.8.0rc1) 
+ ##How to Generate the Submission File 
+
+ Update config.cfg and set all config parameters 
+ Ensure all directories mentioned in config.cfg are write-able 
+ Run RunAll.sh 
+
+ Note : In order to generate the full submission including models, it may take several weeks and needs at least 128GB of RAM 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

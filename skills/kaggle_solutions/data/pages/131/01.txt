@@ -1,0 +1,72 @@
+url: https://github.com/daxiongshu/tradeshift-text-classification
+fetched: 2026-10-27
+chars: 4412
+
+GitHub - daxiongshu/tradeshift-text-classification: This is the 1st place solution of a kaggle machine contest: Tradeshift Text Classification. http://www.kaggle.com/c/tradeshift-text-classification · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ daxiongshu tradeshift-text-classification Repository navigation Code Issues 1  ( 1 ) Pull requests Actions Projects Wiki Security and quality Insights More items 
+
+ tradeshift-text-classification Public Notifications You must be signed in to change notification settings Fork 59  ( 59 ) Star 151  ( 151 ) You must be signed in to star a repository About This is the 1st place solution of a kaggle machine contest: Tradeshift Text Classification. http://www.kaggle.com/c/tradeshift-text-classification Resources Readme Activity Stars 151 stars Watchers 11 watching Forks 59 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 2 Commits 2 Commits Folders and files Name Name Last commit message Last commit date src src     README.md README.md     TradeshiftTextClassification.pdf TradeshiftTextClassification.pdf     reset.sh reset.sh     run.py run.py     View all files Repository files navigation README More items This code generates the 1st place solution of Tradeshift Text Classification from our team "carl and snow" 
+ https://www.kaggle.com/c/tradeshift-text-classification 
+ It mainly includes two kinds of models: 
+
+ two-stage models using Xgboost and sklearn. 
+ online logistic regression. 
+
+ Dependencies
+Python 2.7
+pypy 2.4.0
+Scikit learn-0.15.2
+numpy 1.7.1
+scipy 0.11.0
+Xgboost 0.3 
+ To generate a solution: 
+
+ Set Up all the dependencies 
+ change the data dir in run.py 
+ change the xgboost wrapper path in ./src/xgb_classifier.py 
+ python run.py 
+
+ The best single solution:
+xgb-part1-d18-e0.09-min6-tree120-xgb_base.csv private LB 0.0044595 
+ The best ensemble solution:
+best-solution.csv private LB 0.0043324 (1st place) 
+ About This is the 1st place solution of a kaggle machine contest: Tradeshift Text Classification. http://www.kaggle.com/c/tradeshift-text-classification Resources Readme Activity Stars 151 stars Watchers 11 watching Forks 59 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

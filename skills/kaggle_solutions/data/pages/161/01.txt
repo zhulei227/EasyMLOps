@@ -1,0 +1,67 @@
+url: https://github.com/owenzhang/kaggle-avito
+fetched: 2026-10-27
+chars: 4858
+
+GitHub - owenzhang/kaggle-avito: Winning solution to the Avito CTR competition · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ owenzhang kaggle-avito Repository navigation Code Issues 1  ( 1 ) Pull requests 1  ( 1 ) Actions Projects Wiki Security and quality Insights More items 
+
+ kaggle-avito Public Notifications You must be signed in to change notification settings Fork 69  ( 69 ) Star 137  ( 137 ) You must be signed in to star a repository About Winning solution to the Avito CTR competition Resources Readme MIT license Activity Stars 137 stars Watchers 6 watching Forks 69 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 4 Commits 4 Commits Folders and files Name Name Last commit message Last commit date LICENSE LICENSE     README.md README.md     WinningModelDocumentation--AvitoContextAdClicks.pdf WinningModelDocumentation--AvitoContextAdClicks.pdf     _fast_10pct_run.R _fast_10pct_run.R     _full_100pct_run.R _full_100pct_run.R     avito_cat_cnt.R avito_cat_cnt.R     avito_data1.R avito_data1.R     avito_data_merge.R avito_data_merge.R     avito_phone.R avito_phone.R     avito_search.R avito_search.R     avito_train_xgb.R avito_train_xgb.R     avito_utils.R avito_utils.R     avito_visit.R avito_visit.R     avito_xgb1.R avito_xgb1.R     View all files Repository files navigation README MIT license More items kaggle-avito 
+ Winning solution to the Avito CTR competition 
+ Some high level description of the solution can be found in the .pdf file. 
+ How to run: 
+
+ change the folder at the top of _fast_10pct_run.R and _full_100pct_run.R to point to where the data files are stored 
+ (recommended) run _fast_10pct_run.R and verify that it produces expected results -- this will take a few hours 
+ run _full_100pct_run.R to produce a submission file. 
+
+ Summary of other files:
+avito_data1.R -- Load datasets
+avito_phone.R -- feature extraction from phone dataset
+avito_search.R -- feature extraction from search dataset
+avito_visit.R -- feature extration from visit dataset
+avito_cat_cat.R -- more features + data merge
+avito_data_merge.R -- rest of the features + data merge
+avito_train_xgb.R -- fit xgboost models
+avito_utils.R -- some utility functions 
+ Hardware requirement:
+To run the full data solution (_full_100pct_run.R) I recomment a machine with 256GB of ram + (at least) 200GB of swap space. This is due to the combination of my own inefficient code and inefficiency in R's memory handling. 
+ About Winning solution to the Avito CTR competition Resources Readme MIT license Activity Stars 137 stars Watchers 6 watching Forks 69 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

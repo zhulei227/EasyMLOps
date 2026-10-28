@@ -1,0 +1,756 @@
+url: https://www.kaggle.com/c/predict-energy-behavior-of-prosumers/discussion/472793
+fetched: 2026-10-27
+chars: 18060
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st place solution — Enefit - Predict Energy Behavior of Prosumers
+1st place solution
+
+Enefit - Predict Energy Behavior of Prosumers
+
+Solution Writeup · 1st place · May 14, 2024
+
+Thanks to Enefit and Kaggle for hosting this great competition. And thanks to the great notebooks and discussions, I learned a lot. I have a feeling this comp is going to be slightly more volatile than optiver one and wish I could end up in top place. I am so happy to win my third solo win! 😃😀😀
+
+Overview
+
+My final solution consists of 4 XGBoost models (for two targets and two is_consumption) and 2 GRU models (for two targets). These models share same 600 features.
+
+model name	validation set	test set w/o online training	test set w/ update one time	test set w/ update three times
+XGBoost	41.5912(2 targets:42.2531/42.6607)	55.6231	54.1343	54.1213
+GRU	43.0815(2 targets:43.7182/45.1687)	56.6651	54.9948	54.6960
+XGBoost+GRU	40.6790(2 targets:40.9613/41.5294)	53.6627	52.4813	52.3090
+Validation Strategy
+
+My validation strategy is pretty simple, train on first 500 days and set the rest days as my holdout validation set which has good indication with leaderboard score. And I only checked the final overall score and didn't print single model's score.
+
+Features
+
+I think my features are not special compared with other top teams. I simply merge all tables excluding gas_df with train_df and create lots of lagged features. I didn't spend much time to cutdown feature size since we have not much memory pressure in this competition. With careful feature design, I believe the final feature size can be reduced to around 100-200. Maybe generating different features and targets according to different conditions will achieve better model performance after reading other kagglers' solutions, but this is also very time consuming for me.
+
+fw_new_feature from this discussion help a bit(about 0.1~0.2), Thanks to @mohammadpakdaman0
+
+# client_df
+client_df = client_df.drop(["date"]).sort(["data_block_id"], descending=False)
+df = df.join(client_df.select(["county", "is_business", "product_type", "data_block_id","eic_count","installed_capacity"]), how="left", on=["county", "is_business", "product_type", "data_block_id"])
+# electricity
+electricity_df = electricity_df.drop(["origin_date"]).rename({"forecast_date":"datetime"}).with_columns([(pl.col("datetime").str.to_datetime()+pl.duration(days=1)).alias("datetime"), (pl.col("euros_per_mwh").abs()+0.1).alias("euros_per_mwh"),])
+df = df.join(electricity_df[["data_block_id","datetime","euros_per_mwh"]], how="left", on=["data_block_id","datetime"])
+
+# fw_df 
+fw_df = fw_df.with_columns(
+                (pl.col("origin_datetime").str.to_datetime()+pl.duration(hours="hours_ahead")).alias("datetime"),
+                pl.col("latitude").cast(pl.datatypes.Float32).round(1),
+                pl.col("longitude").cast(pl.datatypes.Float32).round(1),
+                pl.col("data_block_id").cast(pl.datatypes.Int64),
+            ).join(weather_station_to_county_mapping.drop(["county_name"]).with_columns(
+                pl.col("latitude").cast(pl.datatypes.Float32).round(1),
+                pl.col("longitude").cast(pl.datatypes.Float32).round(1),
+            ), how="left",on=["longitude","latitude"]).drop(["longitude","latitude","origin_datetime"])
+fw_df = fw_df.group_by(["county","datetime","data_block_id"]).agg([pl.mean(col).alias("fw_{}".format(col)) for col in forecast_weather_cols]).with_columns([pl.col("county").cast(pl.datatypes.Int64),    
+                                                                    pl.col("data_block_id").cast(pl.datatypes.Int64),])
+df = df.join(fw_df, how="left", on=["county","datetime","data_block_id"]).with_columns([(pl.col("installed_capacity")*pl.col("fw_surface_solar_radiation_downwards") / (pl.col("fw_temperature") + 273.15)).alias("fw_new_feature"),])
+
+# hw_df 
+hw_df = hw_df.with_columns(
+            (pl.col("datetime").str.to_datetime()+pl.duration(days=1)).alias("datetime"),
+                pl.col("latitude").cast(pl.datatypes.Float32).round(1),
+                pl.col("longitude").cast(pl.datatypes.Float32).round(1),
+                pl.col("data_block_id").cast(pl.datatypes.Int64),
+            ).join(weather_station_to_county_mapping.drop(["county_name"]).with_columns(
+                pl.col("latitude").cast(pl.datatypes.Float32).round(1),
+                pl.col("longitude").cast(pl.datatypes.Float32).round(1),
+            ), how="left",on=["longitude","latitude"]).drop(["longitude","latitude"])
+hw_df = hw_df.group_by(["county","datetime","data_block_id"]).agg([pl.mean(col).alias("hw_{}".format(col)) for col in historical_weather_cols]).with_columns([                                                            pl.when(pl.col("datetime").dt.hour()>10).then(pl.col("datetime")+pl.duration(days=1)).otherwise(pl.col("datetime")).alias("datetime"),
+                                                                pl.col("county").cast(pl.datatypes.Int64),    
+                                                                pl.col("data_block_id").cast(pl.datatypes.Int64),])
+df = df.join(hw_df, how="left", on=["county","datetime","data_block_id"])
+
+target
+(target-target_shift2)/installed_capacity.
+target/installed_capacity.
+target-target_shift2
+raw target
+
+I only use 1&2 since 3&4 have no benefit to my final overall score.
+
+model
+
+I didn't spend much time to tune my xgboost models, just simply train and predict. And I find there is no team using NN models yet, which really surprises me. My GRU models are also very simple. input tensor's shape is (batch_size, 24 hours, 600 dense_feature_dim + 6*16 cat_feature_dim), followed by 2 layers GRU, output tensor's shape is (batch_size, 24 hours). Categorical features are ['county', 'product_type', 'hour', 'month', 'weekday', 'day']. NN models boost my final score by 0.9.
+
+online learning strategy
+
+Although online learning didn't help much in public leaderboard, I think it is crucial in private leaderboard since we
+will have additional 8 months‘ data. So I just gave up chasing higher public leaderboard score by ensembling with more models and decided to retrain less models every month.
+
+What not worked for me
+solar features from this notebook
+1dcnn model and transformer model
+multi-days input instead of singe day input when applying GRU models
+split into more models given is_business equals 0/1.
+
+Thank you all! I will write more if necessary.
+
+Author
+hyd
+
+hydantess
+
+arrow_drop_up
+178
+Share
+more_horiz
+Citation
+
+hyd. 1st place solution. https://www.kaggle.com/competitions/predict-energy-behavior-of-prosumers/writeups/hyd-1st-place-solution. 2024. Kaggle
+
+1
+16
+comment
+66 Comments
+1 appreciation comment
+Hotness
+
+Posted 3 years ago
+
+arrow_drop_up
+4
+more_vert
+
+Thanks alottt. You too have done great work dude !!!
+
+reply
+Reply
+emoji_people
+snehal
+
+Posted 3 years ago
+
+· 253rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats and thank you for sharing solution hyd! Why do you think transformers didn't perform as well as RNN this competition?
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! I usually don't use transformer to learn time sequence information like RNN do but to learn information across stocks in optiver or counties in this competition. The relative target in optiver indicates there is some information you can learn by transformer models. But target here is very simple and there is no strong connection among different counties.
+
+reply
+Reply
+emoji_people
+snehal
+
+Posted 3 years ago
+
+· 253rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Ah ok that makes sense. Thanks again hyd we learn a lot from your solutions and good luck on becoming kaggle #1. I'm a big fan of your work
+
+reply
+Reply
+wasjaip
+
+Posted 3 years ago
+
+· 47th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+great job =) waiting for testing =)))
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Good luck to you too!
+
+reply
+Reply
+well well well
+
+Posted 3 years ago
+
+· 337th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! 大佬
+
+reply
+Reply
+paul rogov
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Hey Huang, thanks for another great content🥇
+
+Two questions to you:
+
+how much time do you roughly spend on competitions mean()? From first seeing a new dataset until training a good-enough model ensemble to be top 1-10 on Public Leaderboard
+
+Is pl.when() a polars or a spark sql function? If so, do you use Polars/Spark for handy dataset querying and feature engineering? Is it more flexible than pandas dataframe api? Have you noticed any difference in processing speed or memory usage against standard pandas?
+
+Thx
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, I can't believe you know my last name is Huang.
+
+2 hours per day, about 25 days, 10 days to reach 1-10 on lb.
+polars, much faster than pandas.
+reply
+Reply
+paul rogov
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Haha, @whydata in one of the comments above called you Teacher Huang and I've guessed that he knows what is talking about.
+
+I lived in China for some time but for too short to learn Pǔtōnghuà.
+
+Thank you for the answer
+
+reply
+Reply
+MaxUhl98
+
+Posted 2 years ago
+
+· 2275th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Huang, may I know how you are able to consistently perform well with this small amount of time you are investing into kaggle?
+
+reply
+Reply
+Yao SiYing
+
+Posted 2 years ago
+
+· 50th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+hahaha， 😁
+
+reply
+Reply
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Interesting
+
+reply
+Reply
+Edouard Gaudreau
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Sumit Pardhiya
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Amazing Solution!!!
+
+reply
+Reply
+emoji_people
+WhyData
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations！Teacher Huang NB! I am also your fan~ I also tried a similar approach to target processing, but it was strange that I would lose points on the public leaderboard every time, so I ultimately chose not to handle the target in any way. SO I guess that your proprecessing for the installed_capacity and target may the key to get so higher score at lb with sample XGB & GRU. I noticed that you ended up using these two target processing methods, (target-target_shift2)/installed_capacity. target/installed_capacity. Are you using the first target for consumption and the second target for production? Or did they only construct duplicate models using two different objectives separately？ Anyway, thank you for bringing such a wonderful solution！
+
+reply
+Reply
+emoji_people
+WhyData
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Oh sorry, I find the answer4 xgboost models (for two targets * two is_consumption)🥹
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I think maybe we should generate different features when applying different targets. Proprecessing for installed_capacity is not the key role. I am not sure.
+
+reply
+Reply
+emoji_people
+WhyData
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+WOW teacher, I just realized that you seem to have only filled the target and installed capacity in the last 1-4 hours by shift, rather than 1-4 days ? I estimate that there may be more than 7 consecutive missing items in the public list due to some bugs. Perhaps you are right, the difference and ratio features may be more suitable for the processed target. Additionally, high-frequency retraining may weaken the effectiveness of target processing.
+
+reply
+Reply
+Jiaxiu Zou
+
+Posted 3 years ago
+
+· 292nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hello! I'd like to ask about the meaning of the variable target_shift_tmp. Does it mean shifting the data of each row in the target down by 2 + 3 + 4 rows? Thank you very much for your response!
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Yes, you are right!
+
+reply
+Reply
+emoji_people
+hahahaj
+
+Posted 3 years ago
+
+· 144th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats hyd! I would like to ask why you chose to use Xgboost instead of Lightgbm.
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+There is no big difference between these two models, I just randomly choose xgboost and have no enough time to train lightgbm.😄
+
+reply
+Reply
+Timmy Juicehouse
+
+Posted 3 years ago
+
+· 238th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation, I learn a lot from your post and am looking forward to your performance in next competition. I am your fan.
+
+client_df
+
+client_df = client_df.drop(["date"]).sort(["data_block_id"], descending=False) df = df.join(client_df.select(["county", "is_business", "product_type", "data_block_id","eic_count","installed_capacity"]), how="left", on=["county", "is_business", "product_type", "data_block_id"])
+
+Do you notice high installed_capacity(about over 5000, I am not sure of the specific volume) in consumption (is_consumption == 1) is hard to predict, hopefully it's relatively not huge part in the whole datasets. I'm struggle to deal with high installed_capacity.
+
+(target-target_shift2)/installed_capacity. target/installed_capacity.
+
+Actually I tried them because I don't know how to solve high installed_capacity.
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! I also find county 0 is very hard to predict because of its large consumption. Normalized by installed_capacity helps a bit. And I didn't take any other action, I think this represents the difficulty of the problem itself.
+
+reply
+Reply
+Daisy
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+You're transformer, but it seems not to be used in this competition. I'm looking forward to seeing you at 1st place in the Private Leaderboard!
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! Yes, transformer does not hep in this competition~
+
+reply
+Reply
+emoji_people
+DongYK
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Amazing! Congratulations 1st in public score. I hope you keep the same place for the private leaderboard. We thought the GRU for production / installed_capacity and ANN for consumption, but we gave up because we are not used to those models for the data with many categorical features like segment, county, …, etc. I came up with (batch_size, 24 * 7, < 50 feature_dim). Wow. It's much easier to use features for 24 hours (maybe from start of the day to end of the day). If you don't mind, can you explain how to deal with the categorical features in GRU, NN (did you use one hot encoding? or some embedding layers?) and XGBoost? I have failed to build XGBoost models. So, I was wondering it is attributed to the difference of categorical features or hyperparameter.
+
+reply
+Reply
+hyd
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+For GRU, I just concat dense features with categorical features like this:
+
+cats = [embedding(x_cat[:, :, i]) for i, embedding in enumerate(self.cats)]
+x_cat_emb = torch.cat(cats, 2)
+x = torch.cat([x, x_cat_emb], 2)
+
+
+For GBDT, I didn't do anything special, because all categorical features are low-dimension, I think GBDT can learn very well.
+
+reply
+Reply
+emoji_people
+DongYK
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great architecture. It's very impressive to reduce the dimension of time.
+
+For GBDT, I didn't do anything special, because all categorical features are low-dimension, I think GBDT can learn very well.
+
+Can I understand your words as you didn't set county, weekday, … as categorical features in XGBoost because of the low number of dimensions?
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+MrSimple
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Great solution!
+
+reply
+Reply
+silver
+
+Posted 3 years ago
+
+· 162nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+"So I just give up chasing higher public leaderboard score"
+
+I am hurt😭
+
+reply
+Reply
+subhani
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Fr! Loved the approach!
+
+reply
+Reply
+faeqsu10
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you so much for the great insights into solving time series data problems. I've learned a lot thanks to you! :)
+
+reply
+Reply
+João Mesquita
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Can you share your notebook?
+
+reply
+Reply
+JK-Piece
+
+Posted 2 years ago
+
+· 334th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hello Hyd. I cannot find the code/notebook for the first place. Can you please share it?
+
+reply
+Reply
+Aakash D
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I really appreciate you sharing this information.
+
+reply
+Reply
+bc_bot
+
+Posted 2 years ago
+
+· 532nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Can you provide more details on how you combined your XGBoost and GRU models? Weighted ensemble or other method
+
+reply
+Reply
+JK-Piece
+
+Posted 2 years ago
+
+· 334th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on the 1st place🎉
+
+reply
+Reply
+Jiaxiu Zou
+
+Posted 3 years ago
+
+· 292nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much for your sharing! I'd like to ask, what do target_shift_tmp and installed_capacity_tmp mean? I didn't quite understand the code.
+
+reply
+Reply
+zhangwuji
+
+Posted 3 years ago
+
+· 189th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great solution
+
+reply
+Reply
+Huma Perveen
+
+Posted 3 years ago
+
+· 267th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations, Thank you for sharing your approach to achieve 1st place on public.
+
+reply
+Reply

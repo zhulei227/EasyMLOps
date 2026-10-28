@@ -1,0 +1,54 @@
+url: https://www.kaggle.com/c/feedback-prize-2021/discussion/313235
+fetched: 2026-10-27
+chars: 801
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Georgia State University · Featured Code Competition · 5 years ago
+Late Submission
+more_horiz
+Feedback Prize - Evaluating Student Writing
+
+Analyze argumentative writing elements from students grade 6-12
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+
+error
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

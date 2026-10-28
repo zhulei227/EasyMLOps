@@ -1,0 +1,578 @@
+url: https://www.kaggle.com/c/playground-series-s4e4/discussion/499174
+fetched: 2026-10-27
+chars: 14603
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution for the Regression with an Abalone Dataset Competition — Regression with an Abalone Dataset
+1st Place Solution for the Regression with an Abalone Dataset Competition
+
+Regression with an Abalone Dataset
+
+Solution Writeup · 1st place
+
+Thanks for hosting the Playground series, it's a great place for experimenting and focusing on model building 👏🏽
+
+Context
+
+Business context: https://www.kaggle.com/competitions/playground-series-s4e4 Data context: https://www.kaggle.com/competitions/playground-series-s4e4/data
+
+Overview of the Approach
+
+With this competition, I tried to max out the heavy ensembling GBDT strategy. In an earlier tabular data competition I tried different neural network architectures only to observe that none of them is competitive. I guess the papers claiming ANNs are finally on a par with GBDTs for tabular data haven't done proper preprocessing and fine-tuning. So here I focused mainly on GBDTs. AutoGluon indirectly adds some ANN to the ensemble, though.
+
+The solution in a nutshell:
+
+Feature Engineering using an AutoML solution (OpenFE, Zhang et al. (2022) OpenFE: Automated Feature Generation with Expert-level Performance, https://github.com/IIIS-Li-Group/OpenFE)
+Selecting ca. 20 features (in addition to the original columns) using Sequential Feature Selection, individually for LGBM, XGB, Catboost. Examples: 'freq(Shell_weight)', '(Length-Shell_weight)', '(Whole_weight/Shucked_weight)', 'freq(Whole_weight)', '(Whole_weight+Shell_weight)', '(Length/Shell_weight)', 'residual(Whole_weight)', 'log(Whole_weight)', 'max(Whole_weight,Height)'
+Find some good hyperparam combinations using Bayesian Optimization (WandB Sweeps) for LGBM, XGB, CatBoost, HistGB and RandomForest Regression. Attempts with custom MLP were quickly abandoned, see my comment above 😞
+Train those models (10-folds CV), save OOF predictions. Use complete original Abalone dataset for training in each fold, never for validation.
+AutoGluon (first I had some failed attempts that exceeded the Kaggle time limit or didn't return proper OOF predictions)
+Two-step ensemble:
+The ensemble itself consists of 49 models. I optimized the weights using the OOF predictions and Nelder-Mead algorithm. The best results included negative coefficients and summed up to 0.997. That seemed cheesy to me but consistently outperformed coefficients that were clipped at min=0.0 and scaled to sum up to 1.0. Thus, I kept the optimized coefficients to blend the models' predictions.
+Tried adding some well-performing public notebook submissions to the ensemble. In the absence of OOFs I used some submissions against public LB to find an optimal weight of 17% and ended up with using only one ANN-based submission by endofnight17j03 👋
+
+My second submission skipped the external public notebook and scored 0.14372/0.14379 (public/private LB), i.e. it would have finished first, too.
+
+Details of the submission
+Handling of the RMSLE metric
+
+…by using proper loss fn. and eval. metric if possible:
+
+LGBM: custom MSLE loss (similar to proposal by broccoli beef in this discussion 👋) - btw 'gamma' objective scored only slightly worse
+XGB: 'reg:squaredlogerror'
+np.log1p / np.expm1 for other models
+Best individual models with CV RMSLE:
+LGBM: 0.14611
+CatBoost: 0.14620
+XGB: 0.14616
+XGB Classifier with Regression Head: 0.14680
+HistGB: 0.14648
+(AutoGluon: 0.14592)
+(Ensemble: 0.14514)
+Classification with custom Regression Head
+
+Prajwal Anagani introduced an unusual approach👋: Using an XGB Classifier with 'multi:softprob' objective but adding a Softmax-based regression head. I still don't know why it works (maybe due to the synthetical nature of the dataset and the discrete regression target) but the optimized ensemble weights include it despite worse individual CV results in comparison to (traditional) XGB regressors.
+
+What did not work
+
+Polynomials, more sophisticated stacking/blending/meta-model approaches, classic ML approaches, Stratified KFold, any kind of encoding of 'Sex' feature (except OHE for models that don't accept categorical features natively).
+
+High Value Targets
+
+My models never predicted more than a maximum of 20 Rings (with 29 being the maximum in the train dataset). Any approach to tackle that gap (SMOTE, augmentation) worsened CV significantly. So did excluding the outlier samples from training.
+
+What I learned in the competition:
+AutoML approaches work (AutoFE, AutoGluon) but require manual post-processing to achieve competitive results.
+The Kaggle API is awesome for writing code locally in PyCharm and having it executed at Kaggle with a few clicks.
+Wrap often-used code (e.g. Trainer for CV and prediction) into a custom Python Package to guarantee comparable results when experimenting. Kaggle API helps here, too, to automate deployment.
+
+Thanks to the authors and other Kagglers who shared lots of great insights👍
+
+Tagged
+Ensembling
+Feature Engineering
+Gradient Boosting
+Optimization
+Regression
+Author
+Johannes Heller
+
+stopwhispering
+
+arrow_drop_up
+122
+Share
+more_horiz
+Citation
+
+Johannes Heller. 1st Place Solution for the Regression with an Abalone Dataset Competition. https://www.kaggle.com/competitions/playground-series-s4e4/writeups/johannes-heller-1st-place-solution-for-the-regress. 2024. Kaggle
+
+51
+15
+1
+6
+comment
+47 Comments
+3 appreciation comments
+Hotness
+ms_island
+
+Posted 2 years ago
+
+arrow_drop_up
+7
+more_vert
+
+wow very good !! i'm korean
+
+reply
+Reply
+George Papachristou
+
+Posted 2 years ago
+
+· 137th in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+Congratulations for your winning 🎊 and thanks for sharing!!
+
+I just have two questions, why you said that stratified CV didn't work? Tha abalone dataset have Rings with very few samples, this target skewness will effect the CV scores by creating significant deviation. In my mind, either use CV with many folds (e.g 10+) or with few folds (e.g <4) and stratified on Rings will be equivalent.
+
+And the second part of my question is about the following sentence "Use complete original Abalone dataset for training in each fold, never for validation.". Can you elaborate more? It sounds weird to me to train with whole dataset for each fold, so maybe I'm missing something 🥹
+
+reply
+Reply
+Prajwal Anagani
+
+Posted 2 years ago
+
+· 339th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I had tried Stratified too, and i my cv and lb scores were matching up very well. I think it might be because of lack of the less occuring labels in the test set.
+
+reply
+Reply
+George Papachristou
+
+Posted 2 years ago
+
+· 137th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! @inagana what about train with whole dataset for each fold?
+
+reply
+Reply
+Prajwal Anagani
+
+Posted 2 years ago
+
+· 339th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I think it means that when training we use the original dataset, doesn't make sense to use a part of the original dataset for validation as the LB dataset will have a distribution similar to the synthetic dataset generated than the original one. So, maybe it's better used for training, but not a good validation data
+
+reply
+Reply
+ms_island
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+wow good idea
+
+reply
+Reply
+1
+Prajwal Anagani
+
+Posted 2 years ago
+
+· 339th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congratulations @stopwhispering! Also, the XGB with softmax regression head ended up in my ensemble with a decent weightage (which I was not expecting because of the CV) as well I was always reluctant to use Wandb sweeps, but since it worked well for you, I'm going to give it a try sometime :)
+
+reply
+Reply
+Johannes Heller
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I prefer WandB Sweeps to Optuna & Hyperopt mainly because of the easy parallelization: Just copy your notebook up to 5 times, use same Sweep ID, and run it. Then check the interim results at WandB every now and then and when scores are no longer improving, cancel the kernels. Then try some good combinations either via copy&paste, API, or Excel export. The feature list, however, is somewhat smaller in comparison to Optuna. Still more than enough for a competition like this.
+
+reply
+Reply
+Prajwal Anagani
+
+Posted 2 years ago
+
+· 339th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+That's very intresting! It'd be great to speed up optimization tbh, a good amount of time goes in me optimising via Optuna. Will try that out in the current playground series :) Thanks!
+
+reply
+Reply
+Mart Preusse
+
+Posted 2 years ago
+
+· 130th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@stopwhispering thanks for sharing your strategic approach, which involved a lot of effort. It is a well earned victory. Congratulations!
+
+reply
+Reply
+danzoda
+
+Posted 2 years ago
+
+· 129th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+a huge number of models! great job
+
+reply
+Reply
+Kaius de Paula Correa
+
+Posted 2 years ago
+
+· 1431st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!! I'll be conducting a few changes to my solution inspired by what you've said here, so thank you for your insights!!
+
+reply
+Reply
+Isaac Moura
+
+Posted 2 years ago
+
+· 1570th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @stopwhispering , thanks for sharing
+
+reply
+Reply
+Optimistix
+
+Posted 2 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on achieving the 1st place, and thanks for sharing your solution! I tried most of the same things, but model-specific feature selection is a simple yet brilliant idea that would have probably gotten me close to 0.14440, or under. I should look into WandB Sweeps and using AutoML more extensively in the future. Congrats once again!
+
+reply
+Reply
+Mubashir Ahmed Siddiqui
+
+Posted 2 years ago
+
+· 1606th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @stopwhispering !
+
+reply
+Reply
+Guilherme P Oliveira
+
+Posted 2 years ago
+
+· 1227th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the great results @stopwhispering! Thank you very much for sharing your solution :)
+
+reply
+Reply
+Kumar S
+
+Posted 2 years ago
+
+· 1894th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+yes, I also tried different neural network architectures only to observe that they could not reach beyond .15xx
+
+reply
+Reply
+Cony Kuo
+
+Posted 2 years ago
+
+· 228th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Thank you for the informative sharing.
+
+reply
+Reply
+Amaan Akhtar
+
+Posted 2 years ago
+
+· 2005th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @stopwhispering!
+
+reply
+Reply
+Amal A P
+
+Posted 2 years ago
+
+· 1980th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @stopwhispering !!!!!
+
+reply
+Reply
+rrr584466
+
+Posted 2 years ago
+
+arrow_drop_up
+1
+more_vert
+
+👍wow very nice
+
+reply
+Reply
+Minato Namikaze
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @stopwhispering
+
+Thanks for sharing the approach :)
+
+reply
+Reply
+MaxUhl98
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi Johannes,
+
+Congratulations on your victory!
+
+Regarding your write-up, I have some questions:
+
+If you train the 5 models LGBM, XGB, CatBoost, HistGB, and RandomForest for 10 folds each, plus probably 1 AutoGluon model and a classificator with a custom regression head, how do you end up with only 49 models in the final ensemble?
+
+How did you generate or access the AutoGluon OOF predictions and ensure they predict the values for the same columns as the OOF predictions from the other models? (I assume that you did not train multiple AutoGluon models since AutoGluon does CV by itself.)
+
+Did you use scipy.minimize for Nelder-Mead and sklearn.SequentialFeatureSelector for SFS or are there better tools for the job?
+
+Thank you for sharing, and good luck in your future endeavors.
+
+Best regards, Max
+
+reply
+Reply
+Logan
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for sharing your approach.
+
+reply
+Reply
+Zhousi Chen
+
+Posted 2 years ago
+
+· 2352nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+LightGBM is handy. Thanks for sharing the winning methodology!
+
+reply
+Reply
+Ayush Kumar
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great Work
+
+reply
+Reply
+Kaizo ML World
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi Johannes, congratulations for this achievement and lots of success for your future competitions. You mentioned using OpenFE to get on fast lane for FE. Unfortunately they do not provide a lot of parametrization options or documentation, e.g. the number of estimators is hard coded and fixed. Did you just let it run for several hours or did you adjust the setup, for example to test the outputs of OpenFE. Can you provide the setup of OpenFE or some links in regards of this matter?
+
+reply
+Reply
+Johannes Heller
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Fb, in the absence of any proper API documentation I just ran OpenFE with the default setting. For the 8 original features, it generated 192 additional features. I was able to exclude some of them due to very high correlation to other features. For the rest, I ran sequential feature selection over night. With the competition's little amount of data this was perfectly feasible. For a real-world project with more original features and more sample rows, some other approach would probably be better.
+Generally it seems to be a suitable tool for a small project like this with little, flat, high-quality data. For everything else there are better alternatives. OpenFE seems to be no longer maintained, the last commits being from last year .
+
+reply
+Reply
+Kaizo ML World
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for taking your time to respond. They seem to have published the code for the paper only. But it sure sounded promising. Have you used any other modules, e.g. Featuretools?
+
+reply
+Reply
+Sheema Zain
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations for your winning !
+
+reply
+Reply
+uday guntupally
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations for winning thanks for sharing!!!!
+
+reply
+Reply
+Nick Erickson
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on the win and thanks for sharing your approach!!
+
+I have added you to the AutoGluon Hall of Fame :) https://github.com/autogluon/autogluon/blob/master/AWESOME.md#2024
+
+reply
+Reply

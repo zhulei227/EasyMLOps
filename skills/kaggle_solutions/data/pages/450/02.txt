@@ -1,0 +1,46 @@
+url: https://www.kaggle.com/c/seti-breakthrough-listen/discussion/266397
+fetched: 2026-10-27
+chars: 600
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Berkeley SETI Research Center · Research Prediction Competition · 5 years ago
+Late Submission
+more_horiz
+SETI Breakthrough Listen - E.T. Signal Search
+
+Find extraterrestrial signals in data from deep space
+
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+
+Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.

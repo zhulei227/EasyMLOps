@@ -1,0 +1,59 @@
+url: https://github.com/stevenwudi/CVPR_2018_WAD
+fetched: 2026-10-27
+chars: 4098
+
+GitHub - stevenwudi/CVPR_2018_WAD · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ stevenwudi CVPR_2018_WAD Repository navigation Code Issues Pull requests Actions Projects Security and quality Insights More items 
+
+ CVPR_2018_WAD Public Notifications You must be signed in to change notification settings Fork 4  ( 4 ) Star 3  ( 3 ) You must be signed in to star a repository About No description, website, or topics provided. Resources Readme Activity Stars 3 stars Watchers 1 watching Forks 4 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 15 Commits 15 Commits Folders and files Name Name Last commit message Last commit date configs configs     evaluation evaluation     helpers helpers     lib lib     utils utils     .gitignore .gitignore     README.md README.md     _init_paths.py _init_paths.py     convertVideoToCSV_custom.py convertVideoToCSV_custom.py     convertVideoToCSV_multi_images.py convertVideoToCSV_multi_images.py     convertVideoToCSV_multiprocessing.py convertVideoToCSV_multiprocessing.py     infer_retrain.sh infer_retrain.sh     infer_retrained_WAD.py infer_retrained_WAD.py     infer_retrained_WAD_multiprocess.py infer_retrained_WAD_multiprocess.py     infer_simple_CVPR_WAD.py infer_simple_CVPR_WAD.py     submission_clean_and_combine.py submission_clean_and_combine.py     test_net_WAD.py test_net_WAD.py     train_net_step_wad.py train_net_step_wad.py     View all files Repository files navigation README More items Instance segmentation 
+ This project is the SZU_N606 solution for CVPR 2018 WAD Video Segmentation Challenge 
+ Steps: 
+
+ Trainining 
+ Testing 
+
+ Implementation details 
+ Trainining 
+ train_net_step_wad.py 
+ Testing 
+ test_net_WAD.py 
+ About No description, website, or topics provided. Resources Readme Activity Stars 3 stars Watchers 1 watching Forks 4 forks Report repository Releases Packages Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.

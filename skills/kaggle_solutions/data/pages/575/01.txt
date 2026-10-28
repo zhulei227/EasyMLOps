@@ -1,0 +1,768 @@
+url: https://www.kaggle.com/c/rsna-2023-abdominal-trauma-detection/discussion/447449
+fetched: 2026-10-27
+chars: 18896
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution: Team Oxygen — RSNA 2023 Abdominal Trauma Detection
+1st Place Solution: Team Oxygen
+
+RSNA 2023 Abdominal Trauma Detection
+
+Solution Writeup · 1st place · Oct 22, 2023
+
+Firstly, Thank you RSNA for hosting another interesting competition & my teammates @haqishen @harshitsheoran - formation of Team oxygen ? :)) It was amazing to be #1 on public leaderboard for almost a month. I am sharing a quick overview of our solution, we will release the entire solution soon. It was really fun competing for #1 with @theoviel
+Edit: Full solution published.
+Here is the inference code you may refer: link Our GitHub repo w/ all preprocessing + training code: link Demo Inference notebook: link
+
+Split used: 4 Fold GroupKFold ( Patient Level)
+Our solution is divided into three parts:
+
+Part 1: 3D segmentation for generating masks / crops [Stage 1] Part 2: 2D CNN + RNN based approach for Kidney, Liver, Spleen & Bowel [Stage 2] Part 3: 2D CNN + RNN based approach for Bowel + Extravasation [Stage 2]
+
+Data Preprocessing:
+
+Here comes the key part of our solution, we will describe it later in more depth. Note: All models were trained on image size 384 x 384. We use datasets preprocessing from @TheoVeol and our data which we made rescale dicoms and applying soft-tissue windowing.
+
+We take a patient/study, we run a 3d segmentation model on it, it outputs masks for each slice, we make a study-level crop here based on boundaries of organs - liver, spleen, kidney & liver.
+
+Next, we make volumes from the patient, each volume extracted with equi-distant 96 slices for a study which is then reshaped to (32, 3, image_size, image_size) in a 2.5D manner for training CNN based models.
+
+3 channels are formed by using the adjacent slices.
+
+All our model takes in input in shape (2, 32, 3, height, width) and outputs it as (2, 32, n_classes) as the targets are also kept in shape (2, 32, n_classes).
+
+To make the targets, we need 2 things, patient-level target of each organ and how much the organ is visible compared to its maximum visibility, this data is available after normalizing segmentation model masks in 0-1 based on number of positive pixels
+
+Then we multiply targets * patient-level target for each middle slice of the sequence and that is our label
+
+For example if a patient has label 0 for liver-injury and the liver visibility is as follows in the slice sequence
+
+[0., 0., 0., 0.01, 0.05, 0.1, 0.23, 0.5, 0.7, 0.95, 0.99, 1., 0.95, 0.8, 0.4 …. 0. ,0., 0.]
+
+We multiply it with label which is currently 0 results in an all zeros list as output, but if target label for liver-injury was 1, then we use the list mentioned above as our soft labels.
+
+Stage2: 2.5D Approach ( 2D CNN + RNN):
+
+In stage 2, we trained our models using the volumes either based on our windowing or theo's preprocessing approach and the masks/crops generated from 3D segmentation approach. Each model is trained for multiple tasks (segmentation + classification). For all 32 sequences, we predicted slice level masks and sigmoid predictions. Further, simple maximum aggregation is applied on sigmoid predictions to fetch study level prediction used in submissions.
+
+For training our models, some common settings were:
+
+Learning rate: (1e-4 to 4e-4) range
+Optimizer: AdamW
+Scheduler: Cosine Annealing w/ Warmup
+Loss: BCE Loss for Classification, Dice Loss for segmentation
+Auxiliary Segmentation Loss:
+
+One of the key things which made our training much more stable and helped in improving scores was using auxiliary losses based on segmentation.
+
+Encoder was kept same for both classification & segmentation decoders, we used two types of segmentation head:
+
+Unet based decoder for generating masks
+2D-CNN based head
+nn.Sequential(
+            nn.Conv2d(nb_ft, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 4, kernel_size=1, padding=0),
+        )
+
+        self.mask_head_3 = self.get_mask_head(true_encoder.feature_info[-2]['num_chs'])
+        self.mask_head_4 = self.get_mask_head(true_encoder.feature_info[-1]['num_chs'])
+
+
+We used the feature maps generated mainly from last and 2nd last blocks of the backbones & apply dice loss on the predicted masks & true masks. This trick gave us around +0.01 to +0.03 boost in our models. We used similar technique in Covid 19 detection competition held few years back, you can also refer my solution for more detailed use of auxiliary loss & code snippets. link of discussion
+
+Here is an example code for applying aux loss:
+
+class CustomLoss(nn.Module):
+    def __init__(self):
+        super(CustomLoss, self).__init__()
+        #self.bce = nn.BCEWithLogitsLoss(pos_weight=torch.as_tensor([2.318]).cuda()).cuda()
+        self.bce = nn.BCEWithLogitsLoss()
+        self.dice = smp.losses.DiceLoss(smp.losses.MULTILABEL_MODE, from_logits=True)
+
+    def forward(self, outputs, targets, masks_outputs, masks_outputs2, masks_targets):
+        loss1 = self.bce(outputs, targets.float())
+
+        masks_outputs = masks_outputs.float()
+        masks_outputs2 = masks_outputs2.float()
+
+        masks_targets = masks_targets.float().flatten(0, 1)
+
+        loss2 = self.dice(masks_outputs, masks_targets) + self.dice(masks_outputs2, masks_targets)
+
+
+        loss = loss1 + (loss2 * 0.125) 
+
+        return loss
+
+Architectures used in Final ensemble:
+Coat Lite Medium w/ GRU - original source code
+Coat Lite Small w/ GRU!
+Efficientnet v2s w/ GRU [Timm]
+Augmentations:
+
+We couldn't come up with several augmentations to use, but these were the ones which we used in our training.
+
+        A.Perspective(p=0.5),
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.5),
+        A.Rotate(p=0.5, limit=(-25, 25)),
+
+Post Processing / Ensemble:
+
+Final ensemble for all organs model includes multiple Coat medium and V2s based models trained on either 4 Folds or Full data.
+
+For extravasation, We mainly used Coat Small and v2s in ensemble. No major postprocessing was applied except for tuning scaling factors based on CV scores. To get the predictions, we aggregated the model outputs at slice level and simply took the maximum value for each patient.
+
+Ensemble:
+
+Within folds of each models, we are doing slice level ensemble. For different architectures & cross data models (theo/ours), we did ensemble after the max aggregation.
+
+Best Ensemble OOF CV: 0.31x
+Best single model 4 fold OOF CV: 0.326 [Coat lite Medium]
+
+Organ level OOF for single model looks like this: 
+
+Thank you.
+
+EDIT 1: 3D segmentation code: notebook link
+
+Authors
+Harshit Sheoran
+
+harshitsheoran
+
+Nischay Dhankhar
+
+nischaydnk
+
+Qishen Ha
+
+haqishen
+
+arrow_drop_up
+133
+Share
+more_horiz
+Citation
+
+Harshit Sheoran, Nischay Dhankhar, Qishen Ha. 1st Place Solution: Team Oxygen. https://www.kaggle.com/competitions/rsna-2023-abdominal-trauma-detection/writeups/team-oxygen-1st-place-solution-team-oxygen. 2023. Kaggle
+
+comment
+38 Comments
+1 appreciation comment
+Hotness
+Kiurtis
+
+Posted 3 years ago
+
+· 540th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulation and thanks for sharing those insights ! Waiting for the full solution.
+
+reply
+Reply
+Qishen Ha
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+😀😀😀 Congrats and Big Thanks to my wonderful teammates!! @nischaydnk @harshitsheoran
+
+reply
+Reply
+C R Suthikshn Kumar
+
+Posted 3 years ago
+
+· 603rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations on winning the top position. Thanks for sharing the solution.
+
+reply
+Reply
+David Roberts
+
+Posted 3 years ago
+
+· 83rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Nice work from all three of you, as usual. Thanks for sharing with us!
+
+reply
+Reply
+ls
+
+Posted 3 years ago
+
+· 294th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congrats and thanks, looking forward to the training code
+
+reply
+Reply
+MLV Prasad
+
+Posted 3 years ago
+
+arrow_drop_up
+2
+more_vert
+
+@nischaydnk congratulations,
+
+After many years of hard work, your routine is now .. eat sleep get 1st rank .. post it in LinkedIn and repeat..
+
+Is there any secret sauce for noobies? 😁
+
+reply
+Reply
+Nischay Dhankhar
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Haha Thank you. I guess you already mentioned secret sauce. "hard work, routine" :D
+
+reply
+Reply
+devchopin
+
+Posted 3 years ago
+
+· 54th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi! Congratulations on your 1st. Your solutions always amaze me.
+
+And I think this is a really amazing idea and the heart of the competition!
+
+"For example if a patient has label 0 for liver-injury and the liver visibility is as follows in the slice sequence
+
+[0., 0., 0., 0.01, 0.05, 0.1, 0.23, 0.5, 0.7, 0.95, 0.99, 1., 0.95, 0.8, 0.4 …. 0. ,0., 0.]"
+
+(However, for example, if the upper part of the organ is damaged and the lower part is normal, this may be an incorrect soft-label. What do you think?)
+
+reply
+Reply
+Feng Qilong
+
+Posted 3 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wow a really clean way of creating image level labels, congrats!
+
+reply
+Reply
+dragon zhang
+
+Posted 3 years ago
+
+· 252nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+thx for sharing. To honest, Host should show 3 or 4 decimals, to see how close the competition is .
+
+reply
+Reply
+Nischay Dhankhar
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you. We are curious about that too :))
+
+reply
+Reply
+EE22M215 VIJAY RAJ
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on securing the top position .Looking forward to see full code
+
+reply
+Reply
+Grey Benhin
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Tq for your work
+
+reply
+Reply
+Reynita_777
+
+Posted 3 years ago
+
+· 935th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, team! Nice job :) Looking forward to seeing the final notebook.
+
+reply
+Reply
+koihoo Wang
+
+Posted 3 years ago
+
+· 29th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!!! thinks for sharing！
+
+reply
+Reply
+wenzhia
+
+Posted 3 years ago
+
+· 34th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations！I would appreciate it if you share the code。
+
+reply
+Reply
+Romain Hardy
+
+Posted 3 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the win! Your solution is very elegant :)
+
+For the auxiliary segmentation objective, did you use the masks generated by your 3D segmentation models as the ground truth labels? If so, does that mean you also added a decoder module to your classification models to predict segmentation masks?
+
+reply
+Reply
+Nischay Dhankhar
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thank you, yes we used 3D segmentation models output as ground truth, while training classification models, along with linear classifier head, we used 1 / 2 separate mask heads/decoders. So, our loss function looks something like this.
+
+class CustomLoss(nn.Module):
+    def __init__(self):
+        super(CustomLoss, self).__init__()
+        #self.bce = nn.BCEWithLogitsLoss(pos_weight=torch.as_tensor([2.318]).cuda()).cuda()
+        self.bce = nn.BCEWithLogitsLoss()
+        self.dice = smp.losses.DiceLoss(smp.losses.MULTILABEL_MODE, from_logits=True)
+
+    def forward(self, outputs, targets, masks_outputs, masks_outputs2, masks_targets):
+        loss1 = self.bce(outputs, targets.float())
+
+        masks_outputs = masks_outputs.float()
+        masks_outputs2 = masks_outputs2.float()
+
+        masks_targets = masks_targets.float().flatten(0, 1)
+
+        loss2 = self.dice(masks_outputs, masks_targets) + self.dice(masks_outputs2, masks_targets)
+
+
+        loss = loss1 + (loss2 * 0.125) 
+
+        return loss
+
+reply
+Reply
+Romain Hardy
+
+Posted 3 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great, thank you!
+
+reply
+Reply
+Harshit Sheoran
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes, we did use masks prediction by 3D segmentation model as the ground truth label, we used 2 approaches on how to predict them in the model, one is like you say, Unet decoder blocks, and the other is direct conv head from the encoder
+
+reply
+Reply
+Romain Hardy
+
+Posted 3 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That makes sense, thanks. Out of curiosity, did you find that using two decoders/mask heads improved performance over using just one?
+
+reply
+Reply
+Nischay Dhankhar
+
+Topic Author
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Not much difference in performance, but it brought some diversity between the models, improving the ensemble scores.
+
+reply
+Reply
+Khushi Yadav
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!!! thinks for sharing！
+
+reply
+Reply
+Ataracsia
+
+Posted 2 years ago
+
+· 338th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I would like to be allowed to ask a question from the future, more than a year after the competition has ended.
+
+Where does the f‘{PATHS.TOTAL_SEGMENTOR_FOLDER}/meta.csv’ in make_segmentation_data1.py in the repository come from?
+
+reply
+Reply
+Tokuro Kono
+
+Posted a year ago
+
+· 841st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The file exists in Totalsegmentator_dataset, which is used to train the segmentation model as described in the original dataset description.
+
+segmentations/ Model generated pixel-level annotations of the relevant organs and some major bones for a subset of the scans in the training set. This data is provided in the nifti file format. The filenames are series IDs. You can find a description of the source model (total segmentator) here and the data used to train that model here.
+
+reply
+Reply
+Po-Cheng Cheng
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thank you for the amazing work. But I have some questions to ask. When I did the preprocessing part, it showed that there is no file called, meta.csv. Did I miss anything, or is there any preparation for the datasets I should do first?
+
+reply
+Reply
+Syed Muhammad Sameer
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+You guys have used a contrails model. What is that and why are you using that?
+
+reply
+Reply
+Harshit Sheoran
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+We do not use contrails model, we used the code of the model that comes from another competition which is regarding contrails segmentation
+
+reply
+Reply
+Richard Luo
+
+Posted 3 years ago
+
+· 973rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for sharing your excellent work. I ran into some problems as I was replicating your solution.
+
+The library src.coat and src.layers in Models/coatmed384fullseed_model.py are missing.
+
+from src.coat import CoaT,coat_lite_mini,coat_lite_small,coat_lite_medium from src.layers import *
+
+I guess this library is from repo mlpc-ucsd/CoaT. I have downloaded the repo and set PATHS.CONTRAIL_MODEL_BASE. But I checked its source code and it turned out the CoaT repo doesn't have anything as src.coat and src.layers. It does have src.model.coat, which may be a substitute to src.coat. But I can't find anything similar to src.layers. Is there something wrong with the code?
+
+reply
+Reply
+Harshit Sheoran
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+We are sorry, we somehow forgot to mention this, https://www.kaggle.com/datasets/iafoss/contrails-model-def1, you might need to rename the folder "src_inference1" to "src"
+
+reply
+Reply
+Richard Luo
+
+Posted 3 years ago
+
+· 973rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you so much.
+
+reply
+Reply
+Syed Muhammad Sameer
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hey, congratulations on the win! I had a few question:
+
+You mentioned using @Theviel's dataset processing code. I saw on their profile and the one that I found converts dcm to png. Did you guys also do it?
+>each volume extracted with equi-distant 96 slices. What does this mean? Let's say a study has 1000 slices, you'd pick a slice after every 96 slices? Also why did you do this?
+
+Sorry for the basic questions, I am a noob trying to replicate your solution for understanding purposes.
+
+reply
+Reply
+Harshit Sheoran
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Answer 1
+
+Yes, Early in the competition we created our own dataset, we used it for a long time, near the end, we tried theo's public dataset, which results in similar scores to our own but the ensemble boost was relevant
+
+Answer 2
+
+For example, If a study has 1000 slices, then we make volumes by selecting (0-96), (96-192), (192-288) and so on… and then each volume will be given to the model to make predictions on, generally taking more slices than 96 might result in better performance but it also uses a lot of GPU memory
+
+reply
+Reply
+Syed Muhammad Sameer
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Sorry for asking the same kind of question again, but just to clarify, PNGs produced a better result than dicoms?
+
+Also, did you use the nii files provided by the authors to do something?
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Alex
+
+Posted 3 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! You have done an excellent job. However, I still have 2 questions.
+
+Question 1: When you train the extravasation model, how do you obtain the segmentation head label? I'm asking because the dataset only provides image-level information for extravasation. Is it set like this: If the image indicates a true extravasation injury, is the segmentation training label set to all 1s? If not, is it set to all 0s?
+
+Question 2: In your GitHub code, the criterion uses nn.BCEWithLogitsLoss() directly without any weights. However, during inference, you added the weight as a post-process. Have you tried using a weighted BCEWithLogitsLoss?
+
+reply
+Reply
+Harshit Sheoran
+
+Posted 3 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Answer 1 Segmentation head segments liver-kidney-spleen, and not extravasation, it is like an auxiliary guidance which does not directly helps extravasation
+
+Answer 2 Yes, we did try weighted BCE loss, in our experiments, it did not help model converge, one reason for this could be our sampling, in our GitHub code, you can see that we are sampling injured and non-injured patients equally
+
+reply
+Reply
+Alex
+
+Posted 3 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you very much！
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+This comment has been deleted.

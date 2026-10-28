@@ -1,0 +1,700 @@
+url: https://www.kaggle.com/c/playground-series-s5e2/discussion/565539
+fetched: 2026-10-27
+chars: 21963
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place - Single Model - Feature Engineering — Backpack Prediction Challenge
+1st Place - Single Model - Feature Engineering
+
+Backpack Prediction Challenge
+
+Solution Writeup · 1st place · Mar 11, 2025
+
+Single Model Wins!
+
+My favorite solution in a Kaggle competition is a powerful single model versus a large ensemble. I'm excited that a single model with creative feature engineering wins this competition! Although this was a weird competition with weird data, this was one of my favorite competitions because this was a tricky puzzle to solve that required lots of creative features!
+
+Weird Competition Data
+
+This competition's data was weird and unnatural as explained here. The techniques that were successful in this competition are not what we would need if we were predicting real backpack prices. However it is important to note that every technique used here is used in other real world models. So it is beneficial to learn these techniques.
+
+Final Solution
+
+My final solution is a single model trained with 500 features using 1xA100 GPU 80GB. However a single model with only 138 features trained with Kaggle's 1xT4 GPU 16GB also wins first place. I publish this simple Kaggle T4 GPU solution here.
+
+Feature Engineering
+
+The key to success in this competition was running as many experiments as possible trying as many different feature engineering ideas as possible. To perform experiments as fast as possible, I used RAPIDS cuDF-Pandas as shown in my starter notebook here. In one month, I trained over 300 XGBoost models and tried thousands of different feature engineering ideas! My final solution keeps the best ideas. Below I list some of my favorite ideas from my final solution.
+
+Groupby(COL1)[COL2].agg(STAT)
+
+Basic groupby stats are explained in my starter discussion here. We pick a column COL1, then pick a column COL2, then pick a STAT like "mean", "std", "count", "min", "max", "nunique", "skew" etc etc. (If COL2 is a target column, we use nested folds to prevent leakage). Below are more advanced features!
+
+Groupby(COL1)['Price'].agg(HISTOGRAM BINS)
+
+I had fun inventing this technique. I have never seen it being used before. When we groupby(COL1)['Price'] we have a set of number for each group.
+
+Below we display histogram for the group Weight Capacity = 21.067673. We can count the number of elements in each (equally spaced) bucket and create a new engineered feature with this bucket count to return to the groupby operation! Below we display 7 buckets, but we can treat the number of buckets as a hyperparameter.
+
+result = X_train2.groupby("Weight Capacity (kg)")["Price"].apply(make_histogram)
+X_valid2 = X_valid2.merge(result, on="Weight Capacity (kg)", how="left")
+
+
+Groupby(COL1)['Price'].agg(QUANTILES)
+
+After groupby, we can compute the quantiles for QUANTILES = [5,10,40,45,55,60,90,95] and return the 8 values to create 8 new columns.
+
+for k in QUANTILES:
+    result = X_train2.groupby('Weight Capacity (kg)').\
+        agg({'Price': lambda x: x.quantile(k/100)})
+
+All NANs as Single Base-2 Column
+
+We can create a new column from all the NANs over multiple columns. This is a powerful column which we can subsequently use for groupby aggregations or combinations with other columns!
+
+train["NaNs"] = np.float32(0)
+for i,c in enumerate(CATS):
+    train["NaNs"] += train[c].isna()*2**i
+
+Put Numerical Column into Bins
+
+The most powerful column in this competition is Weight Capacity. We can create more powerful columns based on this column by binning this column with rounding!
+
+for k in range(7,10):
+    n = f"round{k}"
+    train[n] = train["Weight Capacity (kg)"].round(k)
+
+Extract Float32 as Digits
+
+The most powerful column in this competition is Weight Capacity. We can create more powerful columns based on this column by extracting digits! This technique seems weird but it is often used in real life to extract info from a product ID where individual digits within a product ID convey info about a product such as brand, color, etc. (idea from @jordanbarker here)
+
+for k in range(1,10):
+    train[f'digit{k}'] = ((train['Weight Capacity (kg)'] * 10**k) % 10).fillna(-1).astype("int8")
+
+Combination of Categorical Columns
+
+There are 8 categorical columns in this dataset (excluding numerical column Weight Capacity). We can create 28 more categorical columns by combining all combinations of categorical columns. First we label encode the original categorical column into integers with -1 being NAN. Then we combine the integers:
+
+for i,c1 in enumerate(CATS[:-1]):
+     for j,c2 in enumerate(CATS[i+1:]):
+        n = f"{c1}_{c2}"
+        m1 = train[c1].max()+1
+        m2 = train[c2].max()+1
+        train[n] = ((train[c1]+1 + (train[c2]+1)/(m2+1))*(m2+1)).astype("int8")
+
+Use Original Dataset which Synthetic Data is Created From
+
+The following feature seems weird, but it is based on the idea that a product's price is based on manufacture suggested retail price. We can treat the original dataset that this competition was created from as the manufacture suggested retail. And this competition's data as the individual stores' price. Therefore we can help predictions by giving each row knowledge of the MSRP:
+
+tmp = orig.groupby("Weight Capacity (kg)").Price.mean()
+tmp.name = "orig_price"
+train = train.merge(tmp, on="Weight Capacity (kg)", how="left")
+
+Division Features
+
+After creating new columns with groupby(COL1)[COL2].agg(STAT), we can can then combine these new columns to make even more new columns! For example
+
+# COUNT PER NUNIQUE
+X_train['TE1_wc_count_per_nunique'] = X_train['TE1_wc_count']/X_train['TE1_wc_nunique']
+# STD PER COUNT
+X_train['TE1_wc_std_per_count'] = X_train['TE1_wc_std']/X_train['TE1_wc_count']
+
+Final Submission Code
+
+I publish a simplified version of my single model code here!
+
+Author
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+190
+Share
+more_horiz
+Citation
+
+Chris Deotte. 1st Place - Single Model - Feature Engineering. https://www.kaggle.com/competitions/playground-series-s5e2/writeups/chris-deotte-1st-place-single-model-feature-engine. 2025. Kaggle
+
+26
+28
+15
+10
+comment
+97 Comments
+5 appreciation comments
+Hotness
+Aditya Akuskar
+
+Posted 2 years ago
+
+· 724th in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+do you by any chance teach, i would really love to learn this things from you and congrats
+
+reply
+Reply
+Optimistix
+
+Posted 2 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations for another first place finish, and thanks for all the code and insights you shared along the way! Hope you keep making time for this series.
+
+reply
+Reply
+3
+1
+payal156
+
+Posted 2 years ago
+
+arrow_drop_up
+4
+more_vert
+
+I learn something new everytime I open and this time it was no different! Thankyou for the innovative approach!
+
+reply
+Reply
+1
+Jeevan Venkatesh
+
+Posted 2 years ago
+
+arrow_drop_up
+4
+more_vert
+
+This is great, man. I recently started with Kaggle Competitions, and learning from this quality of work is too insightful
+
+reply
+Reply
+Samay Ashar
+
+Posted 2 years ago
+
+· 1156th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Never thought we can use all the NaN's as a separate column - amazing Chris! thanks so much.
+
+reply
+Reply
+Bhargav Chirumamilla
+
+Posted 2 years ago
+
+· 362nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+This is a fantastic breakdown of a winning Kaggle solution, and it highlights some of the key takeaways from the competition. Here are my thoughts on the approach and why it worked so well:
+
+Key Strengths of the Approach Single Model with Feature Engineering Instead of Large Ensembles
+
+Many Kaggle competitions are won with massive ensemble models, but a well-engineered single model can often outperform them due to its interpretability and efficiency. Training 300+ XGBoost models allowed for extensive experimentation, leading to a robust single model. Innovative Feature Engineering
+
+The success of this solution came from trying thousands of feature engineering techniques and keeping the best ones. The Histogram Binning, Quantile Aggregation, and Numerical Column Binning approaches are particularly creative and powerful. The Base-2 encoding of NaN values is an interesting way to preserve missing data patterns. Handling "Weird Data"
+
+Recognizing that the competition's data wasn’t natural but still using techniques applicable to real-world problems was a great insight. Features like Extracting Float Digits seem unconventional but are useful in real-world datasets (e.g., product IDs encoding meaningful information). Groupby Aggregation and Derived Features
+
+The groupby-based feature engineering using quantiles, mean prices, and histogram bins added critical information to the model. Using the original dataset’s mean price as a feature was a brilliant move, mimicking real-world MSRP pricing influence. Combining Categorical Features
+
+Label encoding categorical variables and creating combinations of categorical columns expanded the feature space effectively. The approach of combining categorical variables with computed ratios added valuable interaction terms. Derived Features Through Mathematical Transformations
+
+Division features, such as count per unique values or standard deviation per count, helped the model capture hidden relationships in the data. Lessons for Future Competitions Feature Engineering Matters More Than Model Complexity Instead of relying on deep ensembles, crafting the right features can lead to simpler yet more powerful models.
+
+Experimentation is Key Testing thousands of feature combinations and retaining only the best ones ensures the model generalizes well.
+
+Understand the Dataset’s Origin Using domain knowledge, like incorporating MSRP pricing logic, can give a competitive edge.
+
+This approach is a textbook example of how thoughtful feature engineering can outperform brute-force ensembling, making it a valuable lesson for both Kaggle and real-world machine learning applications. 🚀
+
+reply
+Reply
+1
+Aditya Chute
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Massive respect for this achievement! @cdeotte Your commitment to excellence and innovation is truly inspiring. Keep leading the way!
+
+reply
+Reply
+Ahmed Samir
+
+Posted 2 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Your ideas never fail to impress me @cdeotte Congrats!
+
+reply
+Reply
+MickeyO
+
+Posted 2 years ago
+
+· 1171st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hey congrats Chris. Can you explain though why you want to add so many new features, like from combining all categorical combinations for example? Why does this improve the model if it doesn’t provide any new information?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+13
+more_vert
+
+Many of these techniques just help the decision tree be able to split stuff. Let's imagine that we have two categorical columns and each has cardinality 5. The first have values 1,2,3,4,5. And the second have values A, B, C, D, E. There are 25 combinations 1-A, 1-B, … 2-A, 2-B, …., 5-D, 5-E. If we do not combine and then target encode, how can a decision tree send 1-A, 2-C, 2-D, 3-B, 3-E, 5-A to the left split and everything else to the right split?
+
+To isolate 2-C, it would first need to send "1" to left and "2,3,4,5" to right using first column. Then it would need to send "2" to left and "3,4,5" to right. Now it has "2". Then it would need to send "A,B,C" to left and "D,E" to right. Then it would need to send "A,B" to left and "C" to right. That is 4 splits just to get "2-C". Then we would need 4 splits to get "1-A" and 4 splits to get "2-D" and 4 splits to get "3-B" etc etc. We would need a total of 24 splits to get "1-A, 2-C, 2-D, 3-B, 3-E, 5-A" and send them all together
+
+When we combine and target encode. Then the values "1-A, 2-C, 2-D, 3-B, 3-E, 5-A" may all be encoded with 0.3 and all other pairs may be encoded with 0.7. Then the model can make 1 split and send all 0.3 to left and all 0.7 to right. The model is then able to isolate "1-A, 2-C, 2-D, 3-B, 3-E, 5-A" with 1 split.
+
+And this is just 2 columns. There are many other columns the GBDT needs to juggle at the same time. In conclusion by combining columns and assigning target encoding. It organizes the data in such a way that a decision tree (and XGBoost) can actually split stuff and find what it is look for.
+
+reply
+Reply
+6
+MickeyO
+
+Posted 2 years ago
+
+· 1171st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Makes sense, thank you for the response. If I may ask, how do you get really good at this kind of thing? Does it just come down to building a really strong background in the theory + throwing yourself at a lot of different problems?
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+KARTIK SHETTY
+
+Posted 2 years ago
+
+· 1310th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Feature engineering is crucial.
+
+reply
+Reply
+Bhargav Chirumamilla
+
+Posted 2 years ago
+
+· 362nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+How did you decide on the final submission? Was it purely based on validation score, or did you consider additional factors? Did you track how individual features impacted performance using SHAP values or another interpretability method?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+For my final submission, I submitted my best CV score which was also my best LB score.
+
+reply
+Reply
+Bhargav Chirumamilla
+
+Posted 2 years ago
+
+· 362nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Some feature engineering techniques (e.g., digit extraction) seem very specific to this dataset. Have you seen them work effectively in other domains? Would this single-model approach hold up in a real-world production environment, or would an ensemble be necessary for robustness?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Have you seen them work effectively in other domains?
+
+Yes, extracting digits works well in real life for product IDs and user IDs. Because these ids are long sequences of numbers of letters and the individual numbers/letters contain information about the product or user.
+
+Would this single-model approach hold up in a real-world production environment, or would an ensemble be necessary for robustness?
+
+This would work well in real-world production because the CV score is based on 4 million samples. We can trust the CV if it is based on lots of samples. If train data is small, then CV score will be based on fewer samples and if it is only 100s, 1000s, or 10,000s we need to be careful.
+
+reply
+Reply
+Bhargav Chirumamilla
+
+Posted 2 years ago
+
+· 362nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Training 300+ XGBoost models is computationally expensive—how did you manage this efficiently? Did you use any distributed computing or model checkpointing? Were there significant differences in performance between the 500-feature A100 model and the 138-feature T4 model?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Experiments were mostly sequential. I used a few A100 GPU. So I would try a few ideas at the same time. Any features that improved CV score I kept. I could train a 5 fold model with feature engineering in about 1 hour. So each day, I could do many experiments.
+
+reply
+Reply
+Bhargav Chirumamilla
+
+Posted 2 years ago
+
+· 362nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Given the competition data was "weird and unnatural," how did you ensure your model wasn’t overfitting? Did you experiment with techniques like cross-validation strategies or regularization to combat overfitting?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Overfitting is mostly a function of train data size. Since this competition had 4 million rows which is a lot, I was not afraid of overfitting. Everything that improved CV score also improved public LB score and improved private LB score.
+
+reply
+Reply
+Bhargav Chirumamilla
+
+Posted 2 years ago
+
+· 362nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+You mentioned trying thousands of feature engineering ideas—how did you prioritize which ones to keep? Did you use automated feature selection techniques, or was it based on intuition and leaderboard results? Were there any surprising feature transformations that significantly boosted the model's performance?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I would add about a dozen new features at a time. If the group improved CV score, then I kept the entire group and made it part of the new baseline. I tried some feature elimination techniques every once in a while, but removing features did not help much, so I ended up keeping all features that were discovered to improve CV score.
+
+reply
+Reply
+Soheib Miloudi
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+congrats for the feature engineering insights
+
+reply
+Reply
+Mohammed Salem Lanqes
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations thanks for sharing your code. your thought in feature engineer make difference in this competition.
+
+reply
+Reply
+Madina Ly
+
+Posted 2 years ago
+
+· 2930th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This was my first competition, and I'm thrilled to have participated! I'm especially glad that the winner, @cdeotte, is also a teacher who generously shares his knowledge. I’m following your work as I continue to learn and improve my skills. Thank you, and congratulations! 🎉
+
+reply
+Reply
+Mohammad Ziyari
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on your well-deserved win! Your feature engineering approach is truly impressive, especially the use of groupby histogram bins and extracting Float32 digits—these are clever techniques that go beyond conventional methods.
+
+I have a question regarding the trade-off between feature engineering and model complexity. While adding diverse features clearly boosted performance, at what point do you decide that additional feature interactions or transformations no longer provide meaningful improvement? Did you encounter cases where certain feature combinations led to overfitting or diminishing returns in cross-validation?
+
+Again, great work, and thanks for sharing such valuable insights🌱💐
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi. I decide the trade-off based on the size of the training data. When we have lots of training data like 4 million rows in this competition, then I do not worry about overfitting (because it is nearly impossible to overfit 4 million rows) and instead I make as many features as I can.
+
+When train data is small like 100s, 1000s or 10,000s of rows, then we need to be careful not to engineer features that are too complex. Instead we can focus on model optimization, architecture, and learning parameters. When train data is small we need to be careful not to overfit.
+
+reply
+Reply
+Karishma Battina
+
+Posted 2 years ago
+
+· 2519th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Wow! As a kaggle beginner, this is such a crucial learning for me, especially feature engineering. Thanks for sharing.
+
+reply
+Reply
+delai50
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations and thanks for sharing as always! The level of the top Kagglers is incredible. A couple of questions:
+
+Could you elaborate a bit more about how did you select the final 500 features amongst thousands of features you tried? Were there included incrementally or you used some automated method like RFE over all of them?
+What about the XGB hyperparameters during the process? Did you tweak them from time to time when adding an enough number of new features to the model?
+
+Thanks!
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+I would add a new group of features. If they improved CV score, then I kept them. If not, I discarded them.
+
+I mainly kept the XGB parameters the same the entire time. However as the number of features grew, I changed colsample_bytree=0.5 to colsample_bynode=0.3
+
+reply
+Reply
+1
+Kishor J K
+
+Posted 2 years ago
+
+· 1050th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!, and thank you for the advice. Now i realize the importance of FEATURE ENGINEERING.
+
+reply
+Reply
+Anita Rostami
+
+Posted 2 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thanks for all the code and insights you shared.
+
+reply
+Reply
+Jimmer
+
+Posted 2 years ago
+
+· 126th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Thank you for the game, for sharing great advice, and for guiding us through this competition! Your articles are a pleasure to read and bring great value to the competition!
+
+reply
+Reply
+Sarun P M
+
+Posted 2 years ago
+
+· 128th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+From the beginning, it was clear that "Weight Capacity" has a huge role in improving the score. Hence, feature modification with other items and weight capacity has contributed much to improving the score. However, it is very difficult to test all the variations possible with the limited GPU limit per week. In this scenario, give some insight into how to choose or eliminate the features to be used in training the model. Also, I would like to know the effect of merging original data on the score of your final trained model.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Also, I would like to know the effect of merging original data on the score of your final trained model.
+
+This boosted the CV score and LB score by 0.005
+
+reply
+Reply
+1
+1

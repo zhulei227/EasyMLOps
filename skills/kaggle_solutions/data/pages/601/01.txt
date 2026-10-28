@@ -1,0 +1,174 @@
+url: https://www.kaggle.com/c/march-machine-learning-mania-2024/discussion/493793
+fetched: 2026-10-27
+chars: 4325
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution — March Machine Learning Mania 2024
+1st Place Solution
+
+March Machine Learning Mania 2024
+
+Solution Writeup · 1st place · Apr 15, 2024
+
+2024 March Madness Mania Competition
+
+Notebook
+
+Private Leaderboard Score: 0.05313 Private Leaderboard Place: 1st
+
+Background:
+
+I am a science and statistics teacher, and make baseball player projections and do consulting work in baseball R & D. Students in my high school Advanced Statistics class built decision trees to participate in Titanic - Machine Learning from Disaster early in the school year and a number of them participated in this contest as well. I'm planning to have them participate in Spaceship Titanic in the coming weeks and they've also used a number of Kaggle Datasets for individual projects. In short, I really appreciate what Kaggle has contributed to my classes.
+
+Solution:
+
+In the past, I've played around with ELO ratings and mixed effects models to make predictions but this year I kept it simple.
+
+My submission started with Nate Silver's ratings for Men's and Women's teams. It then gambles by making South Carolina's women's team and UConn's men's team super teams (good enough to win all of their games in every simulation). In retrospect, this may have been more gambling than I should have used to maximize my chances of finishing in the top 8.
+
+A simple formula turns the differences between the ratings of two matched teams into the probability of a team winning (with a bump for home-field advantage for the top 4 seeds in the first two rounds of the women's tournament):
+
+msilver_wpct = function(pwr1, pwr2){
+    pred_pt_margin = (pwr1-pwr2)
+    tscore = pred_pt_margin/11
+    pnorm(tscore)
+}
+
+wsilver_wpct = function(pwr1, pwr2, home=0){
+    # home = 1 (home), 0 (neutral), -1 (away)
+    hfa = 2.73*home
+    tscore = (pwr1 - pwr2 + hfa)/11.5
+    pnorm(tscore)
+}
+
+
+The tournaments are then simulated 5000 times which takes under an hour. My thinking was that 5000 simulations was sufficient to make my average bracket quite close to the expected probabilities (according to the Silver ratings).
+
+Closing Thoughts:
+
+I enjoyed the format and liked the idea that we were submitting (a portfolio of) regular brackets. I also like that the format has changed over the years because I think that makes us all write new code and devise new strategies and that's fun. I do think that predicting point differentials evaluated by MAE (as Jack Lichtenstein suggests) has the potential to be a great format. I'm looking forward to reading all of the solutions to this year's format!
+
+Author
+Jared Cross
+
+jaredcross
+
+arrow_drop_up
+33
+Share
+more_horiz
+Citation
+
+Jared Cross. 1st Place Solution. https://www.kaggle.com/competitions/march-machine-learning-mania-2024/writeups/jared-cross-1st-place-solution. 2024. Kaggle
+
+10
+comment
+7 Comments
+Hotness
+Punith P N
+
+Posted 3 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+13
+more_vert
+
+Congratulations on the finish. My understanding was that Nate Silver’s projections are paywalled except for the east men’s region and Albany 1 region.
+
+reply
+Reply
+OBS$E$SED
+
+Posted 3 years ago
+
+· 64th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! wow,high school starts to teach ML! you definitely got the vision. i wish my high school could teach me ml though.
+
+reply
+Reply
+KAMALJIT_SINGH
+
+Posted 3 years ago
+
+· 519th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! wow,high school starts to teach ML! you definitely got the vision.
+
+reply
+Reply
+NLDAAAA
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+great！！！Congratulations! high school starts to teach ML!
+
+reply
+Reply
+Guntas Dhanjal
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+This was very good explanation. I too took part in the Wharton Data science competition and then landed here to further hone by skills. You have given me more ideas as to how to expand my knowledge further. Thank you.
+
+reply
+Reply
+Ravindra Singh Kushwaha
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+such a amazing work!!!
+
+reply
+Reply
+
+This comment has been deleted.

@@ -1,0 +1,279 @@
+url: https://www.kaggle.com/c/march-machine-learning-mania-2025/discussion/572717
+fetched: 2026-10-27
+chars: 7521
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+First Place Solution — March Machine Learning Mania 2025
+First Place Solution
+
+March Machine Learning Mania 2025
+
+Solution Writeup · 1st place · Apr 11, 2025
+
+Thanks to Kaggle for hosting this competition again.
+
+Background My journey this year on this competition was not smooth, on mid February ( weeks before the tournament ) I decided to start slowly collecting different data to build my model based on, mainly: Kenpom, MassyOrdinal, and 538. I had kenpom data prepared and tested on data up to 2024 ( last year ), however I missed the fact that 538 is not available for 2025, and MassyOrdinal ( was available late ). This is when I had to shift my approach, drawing inspiration from @raddar notebook.
+
+Details The notebook provide really well engineered feature, the feature include the provided data, features derived using average statistics and team quality.
+
+I built my approach based on that.
+
+Although I tried tunning different algorithms ( Castboost, LightGBM ), XGBoost performed the best, so I made feature selection ( 29 feature ) instead of ( 25 feature selected by raddar ) features = [ "men_women", "T1_seed", "T2_seed", "Seed_diff", "T1_avg_Score", "T1_avg_FGA", "T1_avg_OR", "T1_avg_DR", "T1_avg_Blk", "T1_avg_PF", "T1_avg_opponent_FGA", "T1_avg_opponent_Blk", "T1_avg_opponent_PF", "T1_avg_PointDiff", "T2_avg_Score", "T2_avg_FGA", "T2_avg_OR", "T2_avg_DR", "T2_avg_Blk", "T2_avg_PF", "T2_avg_opponent_FGA", "T2_avg_opponent_Blk", "T2_avg_opponent_PF", "T2_avg_PointDiff", "T1_elo", "T2_elo", "elo_diff", "T1_quality", "T2_quality", ]
+
+I tunned XGBoost parameters further. param = {} param["objective"] = "reg:squarederror" param["booster"] = "gbtree" param["eta"] = 0.0093 param["subsample"] = 0.6 param["colsample_bynode"] = 0.8 param["num_parallel_tree"] = 2 param["min_child_weight"] = 4 param["max_depth"] = 4 param["tree_method"] = "hist" param['grow_policy'] = 'lossguide' param["max_bin"] = 38 num_rounds = 704
+
+The performance was better, and achieved a lower brier score.
+
+Then comes the final part, since I had a bumpy experience this year, I decided to boost the model prediction, so I did :
+
+Increase prediction that is below 85% by 10% ( Men & Women Predictions )
+Manually overriding (30-70% increase ) few games in the men tournament, that the model did not seem confident even though, for early rounds higher seed has higher chances of winning + Experts confirmed it :
+Match	ID	Pred	Pred-New
+Baylor v Mississippi State	2025_1124_1280	0.58185013	0.98185013
+BYU vs VCU	2025_1140_1433	0.683304479	0.980304479
+ST Mary CA vs Vanderbilt	2025_1388_1435	0.714379186	0.954379186
+Mississippi vs North Carolina	2025_1279_1314	0.664069204	0.964069204
+Texas A&M vs Yale	2025_1401_1463	0.853761116	0.953761116
+UCLA vs Utah St	2025_1417_1429	0.673425592	0.973425592
+
+Initially, the features helped to achieve a lower Brier score. Tuning XGBoost further improved the score, and finally, manual adjustments corrected a few bad predictions in the early rounds, resulting in an overall better Brier score.
+
+Source Final code: https://www.kaggle.com/code/modeh7/final-solution-ncaa-2025
+
+Author
+mohammad odeh
+
+modeh7
+
+arrow_drop_up
+32
+Share
+more_horiz
+Citation
+
+mohammad odeh. First Place Solution. https://www.kaggle.com/competitions/march-machine-learning-mania-2025/writeups/mohammad-odeh-first-place-solution. 2025. Kaggle
+
+4
+8
+4
+3
+2
+3
+comment
+12 Comments
+Hotness
+Jack Lichtenstein
+
+Posted 2 years ago
+
+· 326th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Using closing vegas odds for those 1st round overrides, the chance that all 6 of those games went in your favor was ~ 4.87%. Basically, you hit a +2000 parlay. If you put $476.19 on that parlay you'd have won the $10k prize money in that manner as well!
+
+reply
+Reply
+Robert Hatch
+
+Posted 2 years ago
+
+· 191st in this Competition
+
+arrow_drop_up
+-2
+more_vert
+
+I think for most competitors going for a 5% chance to win prize money is a really good approach, so ::shrug::. 0 money down, and worked well.
+
+reply
+Reply
+Jack Lichtenstein
+
+Posted 2 years ago
+
+· 326th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+I think unfortunately this competition has devolved into a glorified standard ESPN bracket challenge
+
+7 of the 8 in the money gambled on multiple games, 3 of the 7 who gambled over-rid champion(s) 100% all the way, 2 of the 7 who gambled actually made an incorrect 100% prediction but because they had so many other gambles that won and brier only punishes with a 1 error instead of infinite (like logloss) still were able to win $$.
+
+If this doesn't make the organizers take a deep look about how to disincentivize gambling whether through how the competition is scored or # of submissions or anything, I don't know what will. This competition ceases to be about strong modeling and is simply about who can hit a parlay.
+
+reply
+Reply
+Robert Hatch
+
+Posted 2 years ago
+
+· 191st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Oh I agree. I don't think that 1 sub is the right answer or even in the right direction, but disincentivizing gambling would be a big help.
+
+Adding conference games and/or logit Brier would help. And there's another thing that can be reduced: usage of gambling odds or 3rd party best in class model predictions. Those level the playing field enough for gambling on top of them to be easier and (if enough people do it) more powerful than a great model.
+
+So that's why I proposed in the other thread the Code Competition with Conference tourneys included. It really does more to prevent gambling than most other suggestions (mostly by leveraging other suggestions, but still).
+
+reply
+Reply
+John Mitchell
+
+Posted 2 years ago
+
+· 103rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Many congratulations! There are a few bold predictions there. 2025_1124_1280 is actually Baylor v Mississippi State (typo?) and, like Ole Miss v North Carolina, I had that down as very evenly balanced. Did you hedge either of these in your other submission?
+
+reply
+Reply
+mohammad odeh
+
+Topic Author
+
+Posted 2 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+yes it was a typo, its actually "Baylor v Mississippi State"
+
+My other submission was 5% increase instead of 10% + the same 6 games mentioned above, it scored " 0.10483 ", so I did not hedge
+
+reply
+Reply
+klog
+
+Posted 2 years ago
+
+· 685th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! It's impressive that you not only used standard XGBoost predictions but also applied manual adjustments based on domain knowledge!
+
+reply
+Reply
+2
+Süleyman Temir
+
+Posted a month ago
+
+arrow_drop_up
+0
+more_vert
+
+LearnMore LearnMore
+
+reply
+Reply
+1
+Süleyman Temir
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+
+temir5
+
+reply
+Reply
+1
+YASHI KATIYAR
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Odeh. This approach is genuinely creative.
+
+reply
+Reply
+Kalilur Rahman
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Good work! Congrats on winning this close competition. Thanks for sharing your solution as well.
+
+reply
+Reply
+Ghiffari Kenang Sagraha
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great insights! congratulations!
+
+reply
+Reply
+bakhtawar shabbir
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Many congratulations
+
+reply
+Reply
+2
+
+This comment has been deleted.

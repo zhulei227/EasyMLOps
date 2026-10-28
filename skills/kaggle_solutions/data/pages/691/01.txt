@@ -1,0 +1,612 @@
+url: https://www.kaggle.com/c/vesuvius-challenge-surface-detection/writeups/1st-place-solution-for-the-vesuvius-challenge-su
+fetched: 2026-10-27
+chars: 15310
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+1st Place Solution for the Vesuvius Challenge - Surface Detection Competition — Vesuvius Challenge - Surface Detection
+1st Place Solution for the Vesuvius Challenge - Surface Detection Competition
+
+Our solution consisted of an nnU-Net ensemble plus post-processing.
+
+Vesuvius Challenge - Surface Detection
+
+Solution Writeup · 1st place · Feb 28, 2026
+
+Thanks to the organizers for this fun and important competition, and congratulations to all the winners!
+
+Context
+https://www.kaggle.com/competitions/vesuvius-challenge-surface-detection/overview
+https://www.kaggle.com/competitions/vesuvius-challenge-surface-detection/data
+Overview of the approach
+
+Our solution consisted of an nnU-Net ensemble plus post-processing.
+
+Details of the submission
+nnU-Net
+
+First, we would like to appreciate @jirkaborovec 's work! His notebook served as the starting point of our training pipeline.
+
+Single Model Strategy
+We used all available data for training and built our baseline nnU-Net model (Model 1) with the following settings:
+patch size: 128
+batch size: 2
+epochs: 4000
+
+
+We then fine-tuned Model 1 with larger patch sizes of 192 and 256, training for 250 epochs each.
+
+Due to the extension of the competition, we trained additional models from scratch (for 4000 epochs) with patch sizes of 160, 192, and 224 to increase model diversity. Among these, the 192-patch model was included in our final ensemble.
+
+As for the single model performance, , and two of our best single models are (due to submission quota, we only did basic post processing on single model submission for A/B tests, so full post processing may produce better results):
+
+Setting	Public LB	Private LB
+fine-tuned 192-patch model at 250 epochs	0.577	0.614
+from-scratch 192-patch model at 4000 epochs	0.587	0.613
+Ensemble Strategy
+
+We prepared two sets of 4-model ensembles as our final submissions:
+
+Set 1: Baseline 128-patch Model 1 (weight: 0.12) + fine-tuned 192-patch model (0.28) + fine-tuned 256-patch model at 100 epochs (0.18) + fine-tuned 256-patch model at 250 epochs (0.42).
+Set 2: Baseline 128-patch Model 1 (weight: 0.12) + fine-tuned 192-patch model (0.28) + fine-tuned 256-patch model at 250 epochs (0.18) + from-scratch 192-patch model at 4000 epochs (0.42).
+
+For each ensemble, we fused the post-softmax probabilities using the assigned model weights and applied different thresholds and post processing methods (will be discussed in the following section).
+
+Ensemble	Public LB	Private LB	Threshold
+Set 1	0.613	0.620	0.20
+Set 2	0.606	0.627	0.26
+Post-processing
+
+As discussed in many of the forum posts, minimizing holes and cavities in the predicted masks was essential for getting a good score.
+To that end, we applied five post-processing steps:
+
+0. We removed mask components that have less than 20K voxels.
+
+Then for each sheet (where a sheet is a connected-component in a predicted mask), we did the following:
+
+1. Applied scipy.ndimage.binary_closing(), with a spherical footprint of radius 3. This closes holes and cavities of radius 3 or less.
+
+2. Patching: To repair larger holes, we represented each sheet as a height map, and filled any gaps in the height map by linear interpolation across the gap. We did this separately along the x and y directions, and averaged the two results, weighted by distance to the nearest gap-edge. The projection axis for creating the height map was chosen to be the one that gave the largest projected sheet area. This method is capable of significant repairs:
+
+3. We created a simple function to plug any small (1-voxel) remaining holes. For each voxel in a given sheet, we look at it's 2 x 2 x 2 neighborhood
+and add whatever voxels are needed to make that neighborhood 6-connected watertight. For example:
+
+(This method was inspired by the scikit-image euler_number() function, which uses such neighborhoods to compute the Euler number.) We don't have a proof that our function plugs all 1-voxel holes, but it seems to work well in practice. The algorithm is implemented as a lookup table, with 256 entries for the 256 possible neigborhoods. To create the lookup table, we used a very high tech scotch-tape-and-paper model to visualize all the cases:
+
+(Ordinary dilation will also plug holes, but it tends to add too many voxels, which can degrade the dice score.)
+
+4. Finally, we called scipy.ndimage.binary_fill_holes() on the whole mask, which fills arbitrary-size cavities.
+
+Our best version of this post-processing pipeline also included a check of the number of holes before and after patching, because the patching can actually introduce small holes, for example when the sheet is very curved. In such cases we discard the patch.
+
+The following table shows the cumulative effect of each post-processing step on our best nnU-Net ensemble:
+
+Step	Public Score	Private Score
+No post-proc	.572	.596
+Remove small components	.586	.614
+Plug small holes	.598	.622
+Patch large holes	.601	.625
+Binary closing	.606	.627
+Fill_holes	.606	.627
+What didn't work
+
+Unfortunately, we did not find an effective solution to the problem of touching sheets. We just relied on nnu-Net to minimize their occurrence.
+
+What we misled by public LB
+logits fusion performs better on private LB, but we trusted (overfitted) on probability fusion
+larger threshold (Like 0.35-0.4 is the best searched value on our model on training set) performs better on private LB
+How Vibe Coding helps
+
+Initially, our ensemble pipeline got resources issues (GPU memory, hard disk space, …) even with 2 models ensemble, ChatGPT helps us redesign the pipeline, and enables 4 models ensemble.
+
+Sources
+https://www.kaggle.com/code/jirkaborovec/surface-nnunet-training-inference-with-2xt4
+0.627 solution notebook
+Authors
+Tony Li
+
+tonylica
+
+OzanM.
+
+analyticaobscura
+
+Yiheng Wang
+
+yiheng
+
+PaulG
+
+pgeiger
+
+arrow_drop_up
+66
+Share
+more_horiz
+Citation
+
+Tony Li, OzanM., Yiheng Wang, PaulG. 1st Place Solution for the Vesuvius Challenge - Surface Detection Competition. https://www.kaggle.com/competitions/vesuvius-challenge-surface-detection/writeups/1st-place-solution-for-the-vesuvius-challenge-su. 2026. Kaggle
+
+20
+comment
+24 Comments
+Hotness
+ForcewithMe
+
+Posted 8 months ago
+
+· 17th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats for all @yiheng , @tonylica . Rank1 in both public and private. You really worth it! 🥳
+
+But It's so sad for us to read this posts. We found that more epochs works better before the first update, and that's why we placed top1 for a long time before the first update. But After the first update and before the second update, this trick does not work. So we just throw it away. We just didn't try it after the second update. Sooooo Sad 😭
+
+reply
+Reply
+Yiheng Wang
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Hi @forcewithme , as for the long epochs trick, yes it's really helpful. We found the following tricks: long epochs + small batch size performs better than less epochs + large batch size.
+Regret that you missed a gold medal, but I do think you are a role model within our Chinese Kagglers ❤️
+
+reply
+Reply
+2
+Adam
+
+Posted 8 months ago
+
+· 244th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! May I ask why you chose to set the epoch of the nnUNet model to 4000？Initially, I set the epoch to 500, and the public score was only 0.533. When adjusting the epoch to 1000, the score was 0.537, which only increased by 0.004. I think it consumes a lot of kaggle GPU but benefits very little. By setting the TransUNet epoch to 500, the public score can reach 0.555. Eventually, I gave up the nnUNet model.
+
+reply
+Reply
+Manas Choudhary
+
+Posted 8 months ago
+
+· 44th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yeaah, the models started overfitting as soon as 120-30 epochs.
+
+reply
+Reply
+Cody_Null
+
+Posted 8 months ago
+
+· 10th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Nice work guys, I would love to see any code you have on post processing. Looks like for us we had a really solid setup but we had basically 0 post processing. Anything I could learn about how you found it and what you used would be great. I feel like I tried lots of things that many are describing but it didn’t improve score
+
+reply
+Reply
+1
+Yiheng Wang
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Shared our solution: https://www.kaggle.com/code/tonylica/nnunet-4-model-7-5-2-1-final-submit-so-long?scriptVersionId=300373304
+
+reply
+Reply
+Sean Johnson_SP
+
+Competition Host
+
+Posted 8 months ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats guys great work! I love the blocks. Also great to see some familiar faces here from the discord!
+
+reply
+Reply
+2
+
+This comment has been deleted.
+
+Arpit1Bansal
+
+Posted 8 months ago
+
+· 725th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hey, can you share your train/val curves while training?
+What things let you decide, that this needs to train for 100, 250 even 4000 epochs. which is a large number.
+And yes congrats to the whole team.
+
+reply
+Reply
+2
+PaulG
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks!
+
+Here's a training graph from one of our 4000-epoch runs, but runs with a smaller number of epochs all had a similar shape. That up-surge at the end of the graph made it impossible to resist increasing the number of epochs even further! @sugupoko posted a very nice discussion about why more epochs improve the score.
+
+reply
+Reply
+4
+GG Ayo (AyoGG)
+
+Posted 8 months ago
+
+· 9th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Impressive. I'll try it
+
+reply
+Reply
+GG Ayo (AyoGG)
+
+Posted 7 months ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+https://www.kaggle.com/competitions/vesuvius-challenge-surface-detection/discussion/681341
+
+reply
+Reply
+Arpit1Bansal
+
+Posted 7 months ago
+
+· 725th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks for sharing
+
+reply
+Reply
+Giorgio Angelotti
+
+Competition Host
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats for the great achievement! 🥳
+
+Do you feel that your silver bullet has been the heightmap based post processing?
+
+reply
+Reply
+PaulG
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks!
+
+The heightmap code targets large holes and, although it's really satisfying to see those big holes disappear, it doesn't lead to much of a score improvement, unfortunately.
+The reason is that there aren't very many holes like that, and their area, as a fraction of the total area of all the sheets in a volume, is usually small.
+
+reply
+Reply
+Maapu
+
+Posted 8 months ago
+
+· 758th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Our notebook link is broken means its not yet to be shared?
+
+reply
+Reply
+Yiheng Wang
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for point it out, we public it. Could you re-check?
+
+reply
+Reply
+Maapu
+
+Posted 8 months ago
+
+· 758th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+works now, thanks.
+
+reply
+Reply
+Quan Vu
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Great job, team! Congratulations! I've been reading through a few other top solutions and noticed that nnU-Net is used very frequently. I'm quite surprised why nnU-Net is the go-to choice for this problem. Have SOTA backbones like DINOv3 been benchmarked/compared against it yet?
+
+reply
+Reply
+1
+Yiheng Wang
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+other frameworks like MONAI, and public code shared JAX pipelines perform worse than nnUNet under same training time, therefore we focus on nnUNet
+
+reply
+Reply
+1
+Taha_Alshatiri
+
+Posted 8 months ago
+
+· 27th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+great solution thanks for sharing and congrats on the win!
+
+looking at how you close holes I just realized my mistakes
+regarding touching sheets problem this really gets me back to my proposed solution I discussed in my write up which I didn't complete due to time constraints, this is a qoute in case someone doesn't have the energy so go the write up which I understand given that am now awake for like 30 hours
+
+also I had an idea in the last 3 days were I though about an algorithm that looks at the volume from top where it sees the upper edges of the papers and then go down from slice to slice, if 2 lines/components that are slightly parallel combined into a single one then it is a wrong merge and it add a small cut, they should be parallel and not close to each other tips or else that is just the end of a hole/tunnel in a sheet that merge again, unfortunately I didn't have enough time to try and refine it specially that we had other experiments to try, but I thought that it was worth mentioning this is a simple clauded sample of the code which probably have problems and buggy
+
+I really want to see someone smart trying to work with this and see how it goes
+
+reply
+Reply
+1
+saifeddinelakhadar
+
+Posted 5 months ago
+
+arrow_drop_up
+0
+more_vert
+
+**nice work guys **
+
+reply
+Reply
+Bartley
+
+Posted 8 months ago
+
+· 30th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to the team on the win! Do you know how much your post processing improved your Public/Private scores?
+
+reply
+Reply
+PaulG
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+That's a great question. I am curious about it too, so I'll do some runs with all post-processing turned off, and then with the post-processing steps turned on one-by-one. I'll post the results here when I have them.
+
+reply
+Reply
+1
+PaulG
+
+Topic Author
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I added a table near the end of the write-up. Thanks for the suggestion!
+
+reply
+Reply
+Wasiq Ali
+
+Posted 8 months ago
+
+arrow_drop_up
+0
+more_vert
+
+1st congratulations on getting first positione in competition and creating a real world problem solving solution with us with great and detail understanding of information
+
+reply
+Reply
+Durga Kumari
+
+Posted 8 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Big congrats to @yiheng, @tonylica for dominating both the public and private leaderboards - Rank 1 in both is seriously impressive!🥳
+
+reply
+Reply
+Abdulmuiz Abdullateef
+
+Posted 8 months ago
+
+· 401st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratualtions, Winning Team. You did a great job.
+Can you please make the dataset you used public now?
+
+reply
+Reply
+artineon
+
+Posted 8 months ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+what is the contribution of threshold tuning?
+
+reply
+Reply
+Yiheng Wang
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Impact is much less than post processing, like 1e-3 level. Since we don't have validation set, changing thresholds is just a way we choose to make full use of submission quota
+
+reply
+Reply
+1
+Yiheng Wang
+
+Posted 8 months ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+add one more comment: it's a place that can be enhanced (updated the writeup). Larger thresholds like 0.35-0.4 perform better on local search & and private LB, but worse on public LB. We overfitted on this part.
+
+reply
+Reply

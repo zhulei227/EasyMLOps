@@ -1,0 +1,208 @@
+url: https://github.com/miha-skalic/youtube8mchallange
+fetched: 2026-10-27
+chars: 10799
+
+GitHub - miha-skalic/youtube8mchallenge: 1st place solution to Kaggle&#39;s 2018 YouTube-8M Video Understanding Challenge · GitHub 
+
+ Skip to content 
+
+ Navigation Menu Sign in Appearance settings Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes Code Quality Enforce quality at merge APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government See all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events &amp; webinars Ebooks &amp; reports Business insights GitHub Skills SUPPORT &amp; SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing Search / Sign in Sign up Appearance settings 
+
+ You signed in with another tab or window. Reload to refresh your session. 
+ You signed out in another tab or window. Reload to refresh your session. 
+ You switched accounts on another tab or window. Reload to refresh your session. 
+
+ Dismiss alert 
+
+ {{ message }} 
+
+ miha-skalic youtube8mchallenge Repository navigation Code Issues 6  ( 6 ) Pull requests 16  ( 16 ) Actions Projects Security and quality Insights More items 
+
+ youtube8mchallenge Public Notifications You must be signed in to change notification settings Fork 52  ( 52 ) Star 199  ( 199 ) You must be signed in to star a repository About 1st place solution to Kaggle's 2018 YouTube-8M Video Understanding Challenge Resources Readme Apache-2.0 license Contributing Contributing Activity Stars 199 stars Watchers 8 watching Forks 52 forks Report repository master Branches Tags Go to file Code Open more actions menu Latest commit   History 326 Commits 326 Commits Folders and files Name Name Last commit message Last commit date fake_utls fake_utls     feature_extractor feature_extractor     CONTRIBUTING.md CONTRIBUTING.md     LICENSE LICENSE     README.md README.md     README_original.md README_original.md     __init__.py __init__.py     average_precision_calculator.py average_precision_calculator.py     cloudml-4gpu.yaml cloudml-4gpu.yaml     cloudml-gpu-distributed.yaml cloudml-gpu-distributed.yaml     cloudml-gpu.yaml cloudml-gpu.yaml     convert_prediction_from_json_to_csv.py convert_prediction_from_json_to_csv.py     devel_models.py devel_models.py     eval.py eval.py     eval_custom.py eval_custom.py     eval_util.py eval_util.py     export_model.py export_model.py     frame_level_models.py frame_level_models.py     graph_ensemble.py graph_ensemble.py     inference.py inference.py     inference_gpu.py inference_gpu.py     losses.py losses.py     mean_average_precision_calculator.py mean_average_precision_calculator.py     model_configs.xlsx model_configs.xlsx     model_utils.py model_utils.py     models.py models.py     prepare_distill_dataset.py prepare_distill_dataset.py     quantize.py quantize.py     readers.py readers.py     requirements.txt requirements.txt     runme.md runme.md     train.py train.py     train_distill.py train_distill.py     utils.py utils.py     video_level_models.py video_level_models.py     weights_average.py weights_average.py     View all files Repository files navigation README Contributing Apache-2.0 license More items Next top GB model solution to The 2nd YouTube-8M Video Understanding Challenge 
+ This repository contains all code used by first placed team "Next top GB model" ( David and Miha skalic ) in the Kaggle's competition The 2nd YouTube-8M Video Understanding Challenge . 
+ The repository is a fork of google's repository and borrows from Wang et al , Miech et al and Skalic et al . Code is released under Apache License Version 2.0. 
+ This readme walks through a specific example to reproduce training, eval, distillation, quantization, graph combination for a single model type. 
+ Citation 
+ @inproceedings{skalic2018building,
+ title={Building A Size Constrained Predictive Models for Video Classification},
+ author={Skalic, Miha and Austin, David},
+ booktitle={European Conference on Computer Vision},
+ pages={297--305},
+ year={2018},
+ organization={Springer}
+}
+
+ Background 
+ All models herein were trained in single GPU mode and the instructions that follow will reproduce this step. The
+overall flow for training each model is as follows: 
+
+ Train model 
+ Evaluate model 
+ (Optional) Perform EMA- Exponentially weighted Moving Average of weights 
+ Quantize model 
+ Perform inference on quantized model 
+ (Optional) If running distillation, create distillation dataset, then repeat from step 1. 
+ Combine multiple graphs into single graph 
+
+ This readme will walk through all commands to train both stand-alone and a distillation model. For model details for other models
+see all_models.txt. 
+ Requirements 
+ All code was run using Python 2.7 and Tensorflow 1.8.0. All models were trained on GPU's. The requirements.txt file
+contains a list of all libraries installed in the environment used for training and testing. While all libraries are not
+required, the having the full list should ensure complete compatibility with all code. 
+ Training Models 
+ Make sure to set your local paths correctly for the train and save paths: 
+ export CUDA_VISIBLE_DEVICES=0
+SAVEPATH="../trained_models"
+RECORDPAT="../data/frame/train"
+
+python train.py \
+ --train_data_pattern="$RECORDPAT/*.tfrecord" \
+ --model=NetVLADModelLF \
+ --train_dir="$SAVEPATH//NetVLAD" \
+ --frame_features=True --feature_names="rgb,audio" \
+ --feature_sizes="1024,128" \
+ --batch_size=160 --base_learning_rate=0.0002 \
+ --netvlad_cluster_size=256 \
+ --netvlad_hidden_size=1024 \
+ --moe_l2=1e-6 --iterations=300 \
+ --learning_rate_decay=0.8 \
+ --netvlad_relu=False \
+ --gating=True \
+ --moe_prob_gating=True \
+ --lightvlad=False \
+ --num_gpu 1 \
+ --num_epochs=10 \
+
+ Eval model 
+ Once training is complete, eval is performed as follows: 
+ RECORDPATVAL="../data/frame/train"
+
+python eval.py \
+ --eval_data_pattern="$RECORDPATVAL/*.tfrecord" \
+ --model=NetVLADModelLF \
+ --train_dir="$SAVEPATH//NetVLAD" \
+ --frame_features=True --feature_names="rgb,audio" \
+ --feature_sizes="1024,128" \
+ --batch_size=160 --base_learning_rate=0.0002 \
+ --netvlad_cluster_size=256 \
+ --netvlad_hidden_size=1024 \
+ --moe_l2=1e-6 --iterations=300 \
+ --learning_rate_decay=0.8 \
+ --netvlad_relu=False \
+ --gating=True \
+ --moe_prob_gating=True \
+ --lightvlad=False \
+ --num_gpu 1 \
+ --num_epochs=10 \
+ --run_once \
+ --build_only \
+ --sample_all
+
+ Perform EMA 
+ python train.py \
+ --train_data_pattern="$RECORDPAT/*.tfrecord" \
+ --model=NetVLADModelLF \
+ --train_dir="$SAVEPATH//NetVLAD_ema" \
+ --video_level_classifier_model="LogisticModel" \
+ --frame_features \
+ --feature_names="rgb, audio" \
+ --feature_sizes="1024, 128" \
+ --batch_size=160 \
+ --base_learning_rate=0.00008 \
+ --lstm_cells=1024 \
+ --num_epochs=2 \
+ --num_gpu 1 \
+ --num_readers 8 \
+ --loss_lambda 0.5 \
+ --ema_halflife 2000 \
+ --ema_source "$SAVEPATH//NetVLAD/inference_model"
+
+python eval.py \
+ --eval_data_pattern="$RECORDPATVAL/*.tfrecord" \
+ --model=NetVLADModelLF \
+ --train_dir="$SAVEPATH//NetVLAD_ema" \
+ --video_level_classifier_model="LogisticModel" \
+ --frame_features \
+ --feature_names="rgb, audio" \
+ --feature_sizes="1024, 128" \
+ --batch_size=160 \
+ --base_learning_rate=0.00008 \
+ --lstm_cells=1024 \
+ --num_epochs=2 \
+ --num_gpu 1 \
+ --num_readers 8 \
+ --build_only \
+ --run_once \
+ --sample_all
+
+ Quantize Model and copy model_flags.json 
+ Change savefile to specific save path 
+
+python quantize.py \
+ --transform_type quant_uniform \
+ --model "$SAVEPATH//NetVLAD_ema/inference_model" \
+ --savefile ../trained_models/quants/your_model/inference_model
+
+cp $SAVEPATH//NetVLAD_ema/model_flags.json ../trained_models/quants/your_model
+
+ Combine multiple graphs into single graph 
+ graph_ensemble.py takes in 2 or more trained models and combines them into a single graph. Sample usage: 
+ python graph_ensemble.py \
+--models ../trained_models/quants/74/inference_model \
+ ../trained_models/model_1/inference_model \
+ ../trained_models/model_2/inference_model \
+ ../trained_models/model_3/inference_model \
+--weights 0.3333 0.3333 0.3334 \
+--save_folder ../train_models/your_combined_output_graph
+
+ Perform Inference 
+
+RECORDPATTEST="../data/frame/test"
+
+python inference_gpu.py \
+ --train_dir "../trained_models/quants/your_model" \
+ --output_file="./output.csv" \
+ --input_data_pattern="$RECORDPATtest/*.tfrecord" \
+ --batch_size 200 \
+ --sample_all
+
+ Create Distillation Set and Train on it. 
+ WARNING: Large dataset creation! Creating a new Distillation set will consume ~1.4TB of data so you'll need
+to have the storage space available. 
+ python prepare_distill_dataset.py --batch_size 128 --file_size 512 --input_data_pattern "$RECORDPATVAL/*.tfrecord" --output_dir "output_folder/train_distill/" --model_file "../train_models/your_ensemble_model/inference_model"
+
+ Training on a distillation dataset can be done using train_distill.py script. Use same flags as in train.py . 
+ Model configurations 
+ File model_configs.xlsx contains the arhitectures of models used in the work. 
+ Trained Model 
+ Trained model as .tar.gz can be downloaded from here .
+See inference.py for sample usage of the model. Folder feature_extractor contains information on
+preprocessing custom videos. 
+ About 1st place solution to Kaggle's 2018 YouTube-8M Video Understanding Challenge Resources Readme Apache-2.0 license Contributing Contributing Activity Stars 199 stars Watchers 8 watching Forks 52 forks Report repository Releases Packages Used by Contributors Languages 
+
+ Footer 
+
+ &copy; 2026 GitHub,&nbsp;Inc.
+
+ Footer navigation 
+
+ Terms 
+
+ Privacy 
+
+ Security 
+
+ Status 
+
+ Community 
+
+ Docs 
+
+ Contact 
+
+ Manage cookies
+
+ Do not share my personal information
+
+ You can’t perform that action at this time.
