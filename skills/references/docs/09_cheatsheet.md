@@ -179,6 +179,15 @@
 |------|------|---------|
 | OptunaTuner | Optuna 贝叶斯搜索 native_init_params，CV 评估后全量重训 | model_class, fixed_params(含 y), search_space, n_trials, cv, task |
 
+## 表格神经网络 (nn，v0.2.6，需 torch)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| TabularMLPClassification | 数值标准化 + 类别 Embedding + MLP 分类，输出概率列(列名=类别标签) | y, cols, categorical_cols/numeric_cols(None=按 dtype 自动), embedding_dim, hidden_dims, dropout, epochs, batch_size, lr, random_state |
+| TabularMLPRegression | 同上回归版，输出 pred_name 列 | 同上 + pred_name |
+
+> 未见类别/缺失自动映射到 id 0；权重随 save/load 持久化；transform 前强制 eval()。
+
 ## 目标编码增强 (encoding，v0.2.5)
 
 TargetEncoding 新增：`smoothing_k`（标准平滑 (count*mean+k*global)/(count+k)）与

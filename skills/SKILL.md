@@ -247,6 +247,7 @@ python scripts/_tech_scan.py                                     # 技术×词�
 | TextTfidfSvd | `easymlops.table.text_features` | 文本列 → TF-IDF → TruncatedSVD 压缩特征，让 LGBM 消费自由文本 |
 | OptunaTuner | `easymlops.table.tuner`（需 optuna） | 对模型 `native_init_params` 贝叶斯搜索，CV 评估后全量重训；`search_space` 为 dict[param→callable(trial)] |
 | TargetEncoding 增强 | `easymlops.table.encoding` | 新增 `smoothing_k`（标准平滑）与 `cv`（`fit_transform_oof` 折外编码防目标泄漏） |
+| TabularMLPClassification / TabularMLPRegression | `easymlops.table.nn`（需 torch） | 表格 MLP：数值自动标准化、类别自动 Embedding（未见值→id 0）；分类输出概率列、回归输出 pred 列；权重随 save/load 持久化 |
 | 单 pipe save/load | 任意 table pipe | `pipe.save(path)` / `pipe.load(path)`（参数快照，模型类 pipe 含底层模型对象；0.2.5 起基类支持） |
 
 ## 版本实测陷阱（对照 easymlops 0.2.4 验证，docs 部分描述有漂移）
