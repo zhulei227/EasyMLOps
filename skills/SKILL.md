@@ -108,10 +108,10 @@ python scripts/deploy_fastapi.py   # 然后访问 http://127.0.0.1:8901/health �
 
 ## 离线安装
 
-skill 已随附 wheel（`assets/easymlops-0.2.4-py3-none-any.whl`，与 PyPI 最新版本一致），可直接本地化安装：
+skill 已随附 wheel（`assets/easymlops-0.2.6-py3-none-any.whl`，与 PyPI 最新版本一致），可直接本地化安装：
 
 ```bash
-pip install <本skill目录>/assets/easymlops-0.2.4-py3-none-any.whl
+pip install <本skill目录>/assets/easymlops-0.2.6-py3-none-any.whl
 ```
 
 注意：wheel 不携带依赖，核心功能仍需安装 lightgbm、scikit-learn、pandas；0.2.4 起 psutil、matplotlib、arch（GARCH）已在依赖声明中；时序深度模型另需 torch，部署另需 fastapi、uvicorn。
@@ -131,7 +131,7 @@ pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 
 ## 参考文档（references/docs/）
 
-以下文档已全部对照 easymlops 0.2.4 实测校正（含导入、构造参数、方法存在性），可直接按文档编写代码。torch 深度模型签名与持久化亦在 0.2.4 实测通过（见文末版本实测陷阱第 7 条）。
+以下文档已全部对照 easymlops 0.2.6 实测校正（含导入、构造参数、方法存在性），可直接按文档编写代码。torch 深度模型签名与持久化亦已实测通过（见文末版本实测陷阱第 7 条）。
 
 按需加载对应文档，不要一次性全部读取：
 
@@ -202,7 +202,7 @@ python scripts/_tech_scan.py                                     # 技术×词�
 
 注：以上为原书方法论的自有语言提炼笔记（原书 CC BY-NC-SA，禁止商用），细节以原书（mlyearning.org 可免费获取）为准。与 playbooks/00_framework.md 的 7 步迭代闭环配套使用：①② 对应 01/04 文档，④⑤ 对应 02/03 文档，⑥⑦ 对应 05 文档。
 
-## 诊断工具扩展（0.2.4 wheel 已包含以下全部能力）
+## 诊断工具扩展（0.2.6 wheel 已包含以下全部能力）
 
 为补齐 playbooks 反复外补的评估/诊断缺口，本仓库源码新增以下能力（`tests/test_diag_tools.py` 全部实测通过，含 auto_test 验收）：
 
@@ -250,7 +250,7 @@ python scripts/_tech_scan.py                                     # 技术×词�
 | TabularMLPClassification / TabularMLPRegression | `easymlops.table.nn`（需 torch） | 表格 MLP：数值自动标准化、类别自动 Embedding（未见值→id 0）；分类输出概率列、回归输出 pred 列；权重随 save/load 持久化 |
 | 单 pipe save/load | 任意 table pipe | `pipe.save(path)` / `pipe.load(path)`（参数快照，模型类 pipe 含底层模型对象；0.2.5 起基类支持） |
 
-## 版本实测陷阱（对照 easymlops 0.2.4 验证，docs 部分描述有漂移）
+## 版本实测陷阱（对照 easymlops 0.2.6 验证，docs 部分描述有漂移）
 
 以下差异已在真实环境验证，编写代码时以本节为准：
 

@@ -28,6 +28,14 @@ Set-Location $projectDir
 python setup.py sdist bdist_wheel
 if ($LASTEXITCODE -ne 0) { throw "build failed" }
 
+# ---- 1.5 同步 wheel 到 skills/assets(保持离线安装包与 PyPI 一致) ----
+$skillAssets = Join-Path $projectDir "skills/assets"
+if (Test-Path $skillAssets) {
+    Get-ChildItem $skillAssets -Filter "easymlops-*.whl" | Remove-Item -Force
+    Copy-Item (Join-Path $projectDir "dist/easymlops-$Version-py3-none-any.whl") $skillAssets -Force
+    Write-Host "skills/assets wheel synced to v$Version"
+}
+
 # ---- 2. 提交并推送(普通快进 push) ----
 if (-not $SkipPush) {
     git add -A
