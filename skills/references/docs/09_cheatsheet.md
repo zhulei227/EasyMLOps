@@ -198,6 +198,13 @@
 > 训练损失（v0.2.7）：`loss="ce"/"focal"`（focal 需 `focal_gamma`）、`class_weight={类别id: 权重}`；
 > 支持软标签训练（`_train` 接受 2D 概率目标，供蒸馏使用）。
 
+## TabNet 风格模型 (nn，v0.2.7，需 torch)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| TabNetClassification | sparsemax 稀疏特征选择 + 多步决策 + 输出聚合（简化实现，复用 MLP 管线） | y, n_d, n_a, n_steps, gamma + TabularMLP 通用参数 |
+| TabNetRegression | 同上回归版，输出 pred_name 列 | 同上 |
+
 > 未见类别/缺失自动映射到 id 0；权重随 save/load 持久化；transform 前强制 eval()。
 
 ## 目标编码增强 (encoding，v0.2.5)

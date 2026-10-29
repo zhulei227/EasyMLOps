@@ -379,3 +379,167 @@ class TabularMLPRegression(NNBase):
             self.device = "cpu"
             self.torch_model = self._build_model(1)
             self._dl_load_state_bytes(params["model_state"])
+
+
+def _sparsemax(z, dim=-1):
+    """稀疏投影(TabNet 特征掩码用), 纯 torch 向量ized sparsemax。"""
+    import torch
+    z_sorted, _ = torch.sort(z, dim=dim, descending=True)
+    k = torch.arange(1, z.size(dim) + 1, device=z.device, dtype=z.dtype).unsqueeze(0)
+    cumsum = torch.cumsum(z_sorted, dim=dim)
+    support = (k * z_sorted - cumsum + 1.0) > 0
+    k_z = support.sum(dim=dim, keepdim=True).clamp(min=1)
+    cumsum_k = torch.gather(cumsum, dim, (k_z.long() - 1).clamp(min=0))
+    tau = (cumsum_k - 1.0) / k_z
+    return torch.clamp(z - tau, min=0.0)
+
+
+def _build_tabnet_module(cat_vocabs, embedding_dim, n_numeric,
+                         n_d, n_a, n_steps, gamma, out_dim):
+    """构建 TabNet 风格网络: sparsemax 特征选择 + 多步决策 + 输出聚合。"""
+    import torch
+    import torch.nn as nn
+
+    class _GLU(nn.Module):
+        def forward(self, x):
+            out, gate = x.chunk(2, dim=1)
+            return out * torch.sigmoid(gate)
+
+    class _FCBlock(nn.Module):
+        """FC -> LayerNorm -> GLU（LayerNorm 兼容任意 batch size）"""
+
+        def __init__(self, in_dim, out_dim):
+            super().__init__()
+            self.fc = nn.Linear(in_dim, out_dim * 2)
+            self.norm = nn.LayerNorm(out_dim * 2)
+            self.glu = _GLU()
+
+        def forward(self, x):
+            return self.glu(self.norm(self.fc(x)))
+
+    class _AttentiveTransformer(nn.Module):
+        def __init__(self, in_dim, n_features):
+            super().__init__()
+            self.fc = nn.Linear(in_dim, n_features)
+            self.norm = nn.LayerNorm(n_features)
+
+        def forward(self, a, prior):
+            return _sparsemax(self.norm(self.fc(a)) * prior, dim=1)
+
+    class TabNetModule(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.embeddings = nn.ModuleList(
+                [nn.Embedding(v, embedding_dim) for v in cat_vocabs])
+            n_features = n_numeric + embedding_dim * len(cat_vocabs)
+            self.n_d = n_d
+            self.n_steps = n_steps
+            self.gamma = gamma
+            self.init_fc = _FCBlock(n_features, n_d + n_a)
+            self.feature_steps = nn.ModuleList(
+                [_FCBlock(n_features, n_d + n_a) for _ in range(n_steps)])
+            self.attentives = nn.ModuleList(
+                [_AttentiveTransformer(n_a, n_features) for _ in range(n_steps)])
+            self.final_fc = nn.Linear(n_d, out_dim)
+
+        def forward(self, num_x, cat_x):
+            if len(self.embeddings) > 0:
+                embs = [emb(cat_x[:, i]) for i, emb in enumerate(self.embeddings)]
+                x = torch.cat([num_x] + embs, dim=1)
+            else:
+                x = num_x
+            prior = torch.ones_like(x)
+            # 初始特征变换: 取注意力部分(n_d 部分为首个决策的无效输出, 丢弃)
+            init_out = self.init_fc(x)
+            a = init_out[:, self.n_d:]
+            aggregated = torch.zeros(x.size(0), self.n_d, device=x.device)
+            for step in range(self.n_steps):
+                mask = self.attentives[step](a, prior)
+                prior = prior * (self.gamma - mask)
+                masked = mask * x
+                step_out = self.feature_steps[step](masked)
+                d, a = step_out[:, :self.n_d], step_out[:, self.n_d:]
+                aggregated = aggregated + torch.relu(d)
+            return self.final_fc(aggregated)
+
+    return TabNetModule()
+
+
+class TabNetClassification(TabularMLPClassification):
+    """
+    TabNet 风格分类模型（v0.2.7 新增，简化实现）：sparsemax 稀疏特征选择掩码 +
+    多步决策 + 残差特征变换 + 输出聚合。复用 TabularMLP 的数据准备/训练/持久化
+    管线，仅重写网络结构。
+
+    Args:
+        y: 目标变量（构造时绑定）
+        n_d: 决策输出维度
+        n_a: 注意力输出维度
+        n_steps: 决策步数
+        gamma: 掩码松弛系数（先验尺度）
+        其余参数同 TabularMLPClassification（hidden_dims 为父类持久化字段，TabNet 不使用）
+
+    Example:
+        >>> from easymlops.table.nn import TabNetClassification
+        >>> pipe = TabNetClassification(y=y_train, n_steps=3, epochs=15)
+        >>> pipe.fit(train_df)
+    """
+
+    def __init__(self, y=None, n_d=16, n_a=16, n_steps=3, gamma=1.3, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.n_d = int(n_d)
+        self.n_a = int(n_a)
+        self.n_steps = max(1, int(n_steps))
+        self.gamma = float(gamma)
+
+    def _build_model(self, out_dim: int):
+        return _build_tabnet_module(
+            cat_vocabs=[len(self.cat_encoders_[c]) + 1 for c in self.cat_cols_],
+            embedding_dim=self.embedding_dim, n_numeric=len(self.num_cols_),
+            n_d=self.n_d, n_a=self.n_a, n_steps=self.n_steps,
+            gamma=self.gamma, out_dim=out_dim)
+
+    def udf_get_params(self) -> dict:
+        params = super().udf_get_params()
+        params.update({"n_d": self.n_d, "n_a": self.n_a,
+                       "n_steps": self.n_steps, "gamma": self.gamma})
+        return params
+
+    def udf_set_params(self, params: dict):
+        # 先恢复结构超参, 再走父类(内部按超参重建权重)
+        self.n_d = params["n_d"]
+        self.n_a = params["n_a"]
+        self.n_steps = params["n_steps"]
+        self.gamma = params["gamma"]
+        super().udf_set_params(params)
+
+
+class TabNetRegression(TabularMLPRegression):
+    """TabNet 风格回归模型（v0.2.7 新增）：输出 pred_name 列，其余同 TabNetClassification。"""
+
+    def __init__(self, y=None, n_d=16, n_a=16, n_steps=3, gamma=1.3, **kwargs):
+        super().__init__(y=y, **kwargs)
+        self.n_d = int(n_d)
+        self.n_a = int(n_a)
+        self.n_steps = max(1, int(n_steps))
+        self.gamma = float(gamma)
+
+    def _build_model(self, out_dim: int):
+        return _build_tabnet_module(
+            cat_vocabs=[len(self.cat_encoders_[c]) + 1 for c in self.cat_cols_],
+            embedding_dim=self.embedding_dim, n_numeric=len(self.num_cols_),
+            n_d=self.n_d, n_a=self.n_a, n_steps=self.n_steps,
+            gamma=self.gamma, out_dim=out_dim)
+
+    def udf_get_params(self) -> dict:
+        params = super().udf_get_params()
+        params.update({"n_d": self.n_d, "n_a": self.n_a,
+                       "n_steps": self.n_steps, "gamma": self.gamma})
+        return params
+
+    def udf_set_params(self, params: dict):
+        self.n_d = params["n_d"]
+        self.n_a = params["n_a"]
+        self.n_steps = params["n_steps"]
+        self.gamma = params["gamma"]
+        super().udf_set_params(params)
