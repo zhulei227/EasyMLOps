@@ -328,3 +328,144 @@ class PseudoLabelPipe(TablePipeObjectBase):
             self.model_.set_params(params["model_params"])
         else:
             self.model_ = None
+
+
+class StackingClassification(TablePipeObjectBase):
+    """
+    分类 OOF 堆叠（v0.2.7 新增，源自 Kaggle: model stacking with OOF meta features）。
+
+    流程:
+        1. StratifiedKFold 分折: 每折用"排除该折"训练的各 base 模型预测该折概率,
+           拼成 OOF 概率矩阵(行数=训练集, 列=类别);
+        2. 用 OOF 概率矩阵训练 meta 模型;
+        3. 各 base 模型在全量数据重训(最终模型), transform 时
+           base 概率 → meta 模型 → 输出最终类别概率。
+
+    Args:
+        base_pipes: 已配置好(构造时绑定 y)的分类模型 pipe 列表(基学习器)
+        meta_pipe: 元模型 pipe(如 LogisticRegressionClassification, 构造时绑定 y)
+        cv: 折数(>=2)
+        random_state: 分折随机种子
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> from easymlops.table.ensemble import StackingClassification
+        >>> from easymlops.table.classification import LGBMClassification, LogisticRegressionClassification
+        >>> stack = StackingClassification(
+        ...     base_pipes=[LGBMClassification(y=y_train, use_faster_predictor=False),
+        ...                 LogisticRegressionClassification(y=y_train)],
+        ...     meta_pipe=LogisticRegressionClassification(y=y_train), cv=5)
+        >>> stack.fit(train_df)
+        >>> probs = stack.transform(test_df)
+    """
+
+    def __init__(self, base_pipes=None, meta_pipe=None, cv=5, random_state=42, **kwargs):
+        super().__init__(**kwargs)
+        self.base_pipes = list(base_pipes) if base_pipes else []
+        self.meta_pipe = meta_pipe
+        self.cv = max(2, int(cv))
+        self.random_state = random_state
+        self.final_bases_ = []
+        self.meta_model_ = None
+        self.class_order_ = []
+
+    def _check(self):
+        if not self.base_pipes or self.meta_pipe is None:
+            raise Exception("StackingClassification requires base_pipes and meta_pipe")
+        for base in self.base_pipes:
+            if getattr(base, "num_class", None) is None:
+                raise Exception("base_pipes must be classification model pipes with y bound")
+        if getattr(self.meta_pipe, "num_class", None) is None:
+            raise Exception("meta_pipe must be a classification model pipe with y bound")
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        self._check()
+        from sklearn.model_selection import StratifiedKFold
+        y_ids = np.asarray(self.base_pipes[0].y, dtype=np.int64)
+        class_order = [self.base_pipes[0].id2label[i] for i in range(self.base_pipes[0].num_class)]
+        self.class_order_ = class_order
+        splitter = StratifiedKFold(n_splits=self.cv, shuffle=True,
+                                   random_state=self.random_state)
+        oof = np.zeros((len(s), len(class_order)), dtype=np.float64)
+        for train_idx, valid_idx in splitter.split(s, y_ids):
+            s_tr = s.iloc[train_idx].reset_index(drop=True)
+            s_va = s.iloc[valid_idx].reset_index(drop=True)
+            y_tr = pd.Series(y_ids[train_idx]).reset_index(drop=True)
+            for base in self.base_pipes:
+                fold_model = copy.deepcopy(base)
+                fold_model.y = y_tr
+                fold_model.fit(s_tr)
+                probs = fold_model.transform(s_va)
+                probs = probs[class_order]   # 按统一类别顺序对齐
+                oof[valid_idx] += probs.to_numpy(dtype=np.float64)
+        oof /= max(len(self.base_pipes), 1)
+
+        # meta 模型: 用 OOF 概率矩阵训练
+        meta_model = copy.deepcopy(self.meta_pipe)
+        meta_model.y = pd.Series(y_ids)
+        meta_model.fit(pd.DataFrame(oof, columns=class_order))
+
+        # 最终 base 模型: 全量重训
+        self.final_bases_ = []
+        for base in self.base_pipes:
+            final_model = copy.deepcopy(base)
+            final_model.fit(s)
+            self.final_bases_.append(final_model)
+        self.meta_model_ = meta_model
+        return self
+
+    def _base_probs(self, s: dataframe_type) -> dataframe_type:
+        frames = [base.transform(s) for base in self.final_bases_]
+        combined = frames[0].copy()
+        for frame in frames[1:]:
+            combined = combined + frame
+        return combined / float(len(frames))
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        if self.meta_model_ is None:
+            raise Exception("StackingClassification is not fitted, call fit before transform")
+        probs = self._base_probs(s)[self.class_order_]
+        return self.meta_model_.transform(probs)
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        if self.meta_model_ is None:
+            raise Exception("StackingClassification is not fitted, call fit before transform")
+        combined = {}
+        for base in self.final_bases_:
+            for key, value in base.transform_single(copy.deepcopy(s)).items():
+                combined[key] = combined.get(key, 0.0) + float(value)
+        averaged = {k: v / len(self.final_bases_) for k, v in combined.items()}
+        return self.meta_model_.transform_single(averaged)
+
+    def udf_get_params(self) -> dict_type:
+        return {"cv": self.cv, "random_state": self.random_state,
+                "class_order_": self.class_order_,
+                "base_classes": [b.__class__ for b in self.base_pipes],
+                "base_params": [b.get_params() for b in self.base_pipes],
+                "meta_class": self.meta_pipe.__class__ if self.meta_pipe else None,
+                "meta_params": self.meta_pipe.get_params() if self.meta_pipe else None,
+                "final_bases_params": [b.get_params() for b in self.final_bases_],
+                "meta_model_params": self.meta_model_.get_params() if self.meta_model_ else None}
+
+    def udf_set_params(self, params: dict_type):
+        self.cv = params["cv"]
+        self.random_state = params["random_state"]
+        self.class_order_ = params["class_order_"]
+        self.base_pipes = []
+        for cls, bp in zip(params["base_classes"], params["base_params"]):
+            m = cls()
+            m.set_params(bp)
+            self.base_pipes.append(m)
+        self.meta_pipe = None
+        if params["meta_class"] is not None:
+            self.meta_pipe = params["meta_class"]()
+            self.meta_pipe.set_params(params["meta_params"])
+        self.final_bases_ = []
+        for cls, bp in zip(params["base_classes"], params["final_bases_params"]):
+            m = cls()
+            m.set_params(bp)
+            self.final_bases_.append(m)
+        self.meta_model_ = None
+        if params["meta_model_params"] is not None and params["meta_class"] is not None:
+            self.meta_model_ = params["meta_class"]()
+            self.meta_model_.set_params(params["meta_model_params"])

@@ -248,6 +248,13 @@ python scripts/_tech_scan.py                                     # 技术×词�
 | OptunaTuner | `easymlops.table.tuner`（需 optuna） | 对模型 `native_init_params` 贝叶斯搜索，CV 评估后全量重训；`search_space` 为 dict[param→callable(trial)] |
 | TargetEncoding 增强 | `easymlops.table.encoding` | 新增 `smoothing_k`（标准平滑）与 `cv`（`fit_transform_oof` 折外编码防目标泄漏） |
 | TabularMLPClassification / TabularMLPRegression | `easymlops.table.nn`（需 torch） | 表格 MLP：数值自动标准化、类别自动 Embedding（未见值→id 0）；分类输出概率列、回归输出 pred 列；权重随 save/load 持久化 |
+| StackingClassification | `easymlops.table.ensemble`（v0.2.7） | 分类 OOF 堆叠：StratifiedKFold 折外概率 → meta 模型；`base_pipes`/`meta_pipe` 均须绑定 y |
+| DistillationPipe | `easymlops.table.distillation`（v0.2.7） | 知识蒸馏：教师(LGBM 等)软标签 + `alpha`/`temperature` 混合训练学生 TabularMLP；save/load 持久化学生 |
+| TextStatsFeatures | `easymlops.table.text_features`（v0.2.7） | 文本统计特征：长度/词数/数字占比/大写占比 |
+| AnomalyScoreFeatures | `easymlops.table.features`（v0.2.7） | IsolationForest 异常分数特征列 |
+| ClusterFeatures(method="gmm") | `easymlops.table.features`（v0.2.7） | 聚类特征新增 GMM 后端（负加权对数概率作为距离代理） |
+| TabularMLP loss 选项 | `easymlops.table.nn`（v0.2.7） | `loss="focal"`(+`focal_gamma`) / `class_weight={类别id: 权重}`；`_train` 支持软标签(2D 概率目标) |
+| group_kfold_eval | `easymlops.table.validation`（v0.2.7） | GroupKFold 分组防泄漏 CV 评估：`build_model(fold_y)` 回调注入折标签，返回 scores/mean/std |
 | 单 pipe save/load | 任意 table pipe | `pipe.save(path)` / `pipe.load(path)`（参数快照，模型类 pipe 含底层模型对象；0.2.5 起基类支持） |
 
 ## 版本实测陷阱（对照 easymlops 0.2.6 验证，docs 部分描述有漂移）

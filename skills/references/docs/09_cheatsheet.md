@@ -143,6 +143,13 @@
 | Parallel | 并行集成 | pipe_objects, drop_input_data |
 | SeedAveraging | 同构模型多种子训练并平均预测（v0.2.5） | base_pipe(须绑定 y), n_seeds, seed_start, seed_param |
 | PseudoLabelPipe | 伪标签半监督（v0.2.5） | base_pipe(须绑定 y), confidence, n_rounds, unlabeled |
+| StackingClassification | 分类 OOF 堆叠（v0.2.7） | base_pipes(须绑定 y), meta_pipe(须绑定 y), cv |
+
+## 验证工具 (validation，v0.2.7)
+
+| 函数 | 说明 | 关键参数 |
+|------|------|---------|
+| group_kfold_eval | GroupKFold 分组防泄漏 CV 评估（同一实体不跨折） | build_model, x, y, groups, cv, task |
 
 ## 预测后处理 (postprocess，v0.2.5)
 
@@ -155,7 +162,8 @@
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
 | GroupAggregateFeatures | 按 key 列 groupby 聚合回填(mean/std/min/max/median/count)，未见组回退全局值 | group_cols, agg_cols, stats, drop_key_cols, out_prefix |
-| ClusterFeatures | KMeans 簇编号+到各簇中心距离 | cols, n_clusters, add_cluster_id, add_distances, out_prefix |
+| ClusterFeatures | KMeans/GMM 簇编号+距离特征（v0.2.7 加 GMM） | cols, n_clusters, method("kmeans"/"gmm"), add_cluster_id, add_distances |
+| AnomalyScoreFeatures | IsolationForest 异常分数特征列（v0.2.7） | cols, n_estimators, contamination, out_prefix |
 | QuantileClip | 分位数截断 Winsorize（自动上下界） | cols, lower, upper |
 | LogTransform | log1p 变换（右偏分布） | cols |
 | SqrtTransform | 平方根变换（计数/右偏） | cols |
@@ -172,6 +180,7 @@
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|
 | TextTfidfSvd | 文本列 → TF-IDF → TruncatedSVD 压缩特征追加 | cols, n_components, tfidf_params, drop_origin_cols |
+| TextStatsFeatures | 文本统计特征：长度/词数/数字占比/大写占比（v0.2.7） | cols, drop_origin_cols |
 
 ## 超参搜索 (tuner，v0.2.5，需 optuna)
 
@@ -185,6 +194,9 @@
 |------|------|---------|
 | TabularMLPClassification | 数值标准化 + 类别 Embedding + MLP 分类，输出概率列(列名=类别标签) | y, cols, categorical_cols/numeric_cols(None=按 dtype 自动), embedding_dim, hidden_dims, dropout, epochs, batch_size, lr, random_state |
 | TabularMLPRegression | 同上回归版，输出 pred_name 列 | 同上 + pred_name |
+
+> 训练损失（v0.2.7）：`loss="ce"/"focal"`（focal 需 `focal_gamma`）、`class_weight={类别id: 权重}`；
+> 支持软标签训练（`_train` 接受 2D 概率目标，供蒸馏使用）。
 
 > 未见类别/缺失自动映射到 id 0；权重随 save/load 持久化；transform 前强制 eval()。
 

@@ -29,7 +29,8 @@ class NNBase(TablePipeObjectBase):
     def __init__(self, y=None, cols="all", categorical_cols=None, numeric_cols=None,
                  embedding_dim=8, hidden_dims=(256, 128), dropout=0.2,
                  epochs=20, batch_size=256, lr=1e-3, weight_decay=0.0,
-                 random_state=42, **kwargs):
+                 random_state=42, loss="ce", focal_gamma=2.0, class_weight=None,
+                 **kwargs):
         super().__init__(skip_check_transform_type=True, **kwargs)
         self.y = copy.deepcopy(y)
         self.cols = cols
@@ -43,6 +44,9 @@ class NNBase(TablePipeObjectBase):
         self.lr = float(lr)
         self.weight_decay = float(weight_decay)
         self.random_state = int(random_state)
+        self.loss = loss if loss in ("ce", "focal") else "ce"
+        self.focal_gamma = float(focal_gamma)
+        self.class_weight = copy.deepcopy(class_weight)
         self.task_ = "regression"
         # fit 时填充
         self.feature_cols_ = []
@@ -147,9 +151,34 @@ class NNBase(TablePipeObjectBase):
         device = "cuda" if torch.cuda.is_available() else "cpu"
         self.device = device
         self.torch_model = self._build_model(out_dim).to(device)
+        weight_t = None
+        if self.task_ == "classification" and self.class_weight:
+            weight_t = torch.FloatTensor(
+                [self.class_weight.get(i, 1.0) for i in range(out_dim)]).to(device)
         if self.task_ == "classification":
-            criterion = nn.CrossEntropyLoss()
-            targets_t = torch.LongTensor(targets)
+            targets_ndim = np.asarray(targets).ndim
+            if targets_ndim == 2:
+                # 软标签交叉熵(蒸馏): -sum(p * log_softmax(output))
+                targets_t = torch.FloatTensor(np.asarray(targets, dtype=np.float32))
+
+                def criterion(output, target):
+                    log_probs = torch.log_softmax(output, dim=1)
+                    return -(target * log_probs).sum(dim=1).mean()
+            else:
+                if self.loss == "focal":
+                    gamma = self.focal_gamma
+
+                    def criterion(output, target_idx):
+                        log_probs = torch.log_softmax(output, dim=1)
+                        log_p_t = log_probs.gather(1, target_idx.unsqueeze(1)).squeeze(1)
+                        p_t = log_p_t.exp()
+                        batch_loss = -((1 - p_t) ** gamma) * log_p_t
+                        if weight_t is not None:
+                            batch_loss = batch_loss * weight_t[target_idx]
+                        return batch_loss.mean()
+                else:
+                    criterion = nn.CrossEntropyLoss(weight=weight_t)
+                targets_t = torch.LongTensor(np.asarray(targets, dtype=np.int64))
         else:
             criterion = nn.MSELoss()
             targets_t = torch.FloatTensor(targets)
@@ -170,6 +199,15 @@ class NNBase(TablePipeObjectBase):
                 loss.backward()
                 optimizer.step()
         self.torch_model.eval()
+
+    def udf_get_params(self) -> dict_type:
+        return {"loss": self.loss, "focal_gamma": self.focal_gamma,
+                "class_weight": self.class_weight}
+
+    def udf_set_params(self, params: dict_type):
+        self.loss = params["loss"]
+        self.focal_gamma = params["focal_gamma"]
+        self.class_weight = params["class_weight"]
 
     def _predict_output(self, s: dataframe_type) -> np.ndarray:
         import torch

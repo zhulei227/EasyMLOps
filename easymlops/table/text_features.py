@@ -124,3 +124,63 @@ class TextTfidfSvd(TablePipeObjectBase):
         self.tfidf_models_ = params["tfidf_models_"]
         self.svd_models_ = params["svd_models_"]
         self.output_cols_ = params["output_cols_"]
+
+
+class TextStatsFeatures(TablePipeObjectBase):
+    """
+    文本统计特征（v0.2.7 新增，源自 Kaggle: string statistical features）：
+    为文本列追加轻量统计特征——字符长度/词数/数字占比/大写占比。
+    无需训练，纯函数变换。
+
+    Args:
+        cols: 文本列名列表（必填）
+        drop_origin_cols: 是否删除原文本列（默认 False）
+
+    Example:
+        >>> from easymlops.table.text_features import TextStatsFeatures
+        >>> pipe = TextStatsFeatures(cols=["remark"])
+        >>> result = pipe.fit_transform(train_df)   # 追加 remark_len/remark_words/... 列
+    """
+
+    def __init__(self, cols, drop_origin_cols=False, **kwargs):
+        super().__init__(**kwargs)
+        self.cols = [cols] if isinstance(cols, str) else list(cols)
+        if len(self.cols) == 0:
+            raise Exception("TextStatsFeatures requires at least one text col")
+        self.drop_origin_cols = drop_origin_cols
+
+    def _stats_frame(self, s: dataframe_type):
+        stats = {}
+        for col in self.cols:
+            text = s[col].fillna("").astype(str)
+            length = text.str.len().clip(lower=1)
+            stats["{}_len".format(col)] = text.str.len().astype(float)
+            stats["{}_words".format(col)] = text.str.split().str.len().astype(float)
+            stats["{}_digit_ratio".format(col)] = text.str.count(r"\d") / length
+            stats["{}_upper_ratio".format(col)] = text.str.count(r"[A-Z]") / length
+        return pd.DataFrame(stats, index=s.index)
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        result = s.copy()
+        for name, values in self._stats_frame(s).items():
+            result[name] = values
+        if self.drop_origin_cols:
+            result = result.drop(columns=[c for c in self.cols if c in result.columns])
+        return result
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        import re as _re
+        for col in self.cols:
+            text = "" if s.get(col) is None else str(s[col])
+            length = max(len(text), 1)
+            s["{}_len".format(col)] = float(len(text))
+            s["{}_words".format(col)] = float(len(text.split()))
+            s["{}_digit_ratio".format(col)] = len(_re.findall(r"\d", text)) / length
+            s["{}_upper_ratio".format(col)] = len(_re.findall(r"[A-Z]", text)) / length
+        if self.drop_origin_cols:
+            for col in self.cols:
+                s.pop(col, None)
+        return s
