@@ -284,6 +284,26 @@ table.transform_single(x_test.to_dict("record")[0])
 | 类名 | 说明 |
 |------|------|
 | **Parallel** | 并行运行多个管道 |
+| **SeedAveraging** | 同构模型多种子训练并平均预测（v0.2.5） |
+| **PseudoLabelPipe** | 伪标签半监督（v0.2.5） |
+
+#### 9.x 表格特征工程与后处理 (`features` / `postprocess` / `text_features` / `tuner` / `nn`，v0.2.5/0.2.6 新增)
+
+| 类名 | 说明 |
+|------|------|
+| **GroupAggregateFeatures** | 按 key 列 groupby 聚合统计回填到行 |
+| **ClusterFeatures** | KMeans 簇编号 + 距离特征 |
+| **QuantileClip / LogTransform / SqrtTransform** | 分位数截断 / log1p / 平方根变换 |
+| **CountEncoding / CategoryCross** | 频次编码 / 类别×类别交叉列 |
+| **CorrFilter / NullImportanceFilter / RFEFilter** | 高相关去重 / 空重要性筛选 / 递归消除 |
+| **TextTfidfSvd** | 文本列 → TF-IDF → SVD 压缩特征 |
+| **OptunaTuner** | Optuna 贝叶斯超参搜索（需 optuna） |
+| **PredictionPostProcess** | 预测列 clip/round/二值化/自定义映射 |
+| **TabularMLPClassification / TabularMLPRegression** | 表格 MLP（数值标准化 + 类别 Embedding，需 torch） |
+| **TargetEncoding 增强** | `smoothing_k` 标准平滑 + `fit_transform_oof` 折外编码防泄漏 |
+
+> 以上均源自 kaggle_solutions 离线语料的高频优胜技术挖掘，端到端示例见
+> `docs/table_pipes_demo.ipynb`，验收测试见 `tests/test_*_pipes.py`。
 
 #### 10. 特征降维 (`easymlops.table.decomposition`)
 

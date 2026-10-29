@@ -146,16 +146,17 @@ class OptunaTuner(TablePipeObjectBase):
         return self.model_.transform_single(s, **kwargs)
 
     def udf_get_params(self) -> dict_type:
+        # search_space 含 lambda 不可 pickle, 只持久化参数名清单(load 后仅需 transform)
         return {"model_class": self.model_class, "fixed_params": self.fixed_params,
-                "search_space": self.search_space, "n_trials": self.n_trials,
-                "cv": self.cv, "task": self.task, "seed": self.seed,
-                "best_params_": self.best_params_, "best_score_": self.best_score_,
+                "search_space_param_names": sorted(self.search_space.keys()),
+                "n_trials": self.n_trials, "cv": self.cv, "task": self.task,
+                "seed": self.seed, "best_params_": self.best_params_,
+                "best_score_": self.best_score_,
                 "model_params": self.model_.get_params() if self.model_ is not None else None}
 
     def udf_set_params(self, params: dict_type):
         self.model_class = params["model_class"]
         self.fixed_params = params["fixed_params"]
-        self.search_space = params["search_space"]
         self.n_trials = params["n_trials"]
         self.cv = params["cv"]
         self.task = params["task"]

@@ -284,6 +284,27 @@ The Table Pipeline is the core module for tabular data processing.
 | Class | Description |
 |-------|-------------|
 | **Parallel** | Run multiple pipes in parallel |
+| **SeedAveraging** | Multi-seed training with averaged predictions (v0.2.5) |
+| **PseudoLabelPipe** | Pseudo-labeling semi-supervision (v0.2.5) |
+
+#### 9.x Table Feature Engineering & Post-processing (`features` / `postprocess` / `text_features` / `tuner` / `nn`, new in v0.2.5/0.2.6)
+
+| Class | Description |
+|-------|-------------|
+| **GroupAggregateFeatures** | Groupby aggregation statistics merged back to rows |
+| **ClusterFeatures** | KMeans cluster id + distance features |
+| **QuantileClip / LogTransform / SqrtTransform** | Quantile winsorize / log1p / sqrt transforms |
+| **CountEncoding / CategoryCross** | Frequency encoding / categorical cross columns |
+| **CorrFilter / NullImportanceFilter / RFEFilter** | Correlation dedup / null-importance / recursive elimination |
+| **TextTfidfSvd** | Text column → TF-IDF → SVD compressed features |
+| **OptunaTuner** | Optuna Bayesian hyperparameter search (requires optuna) |
+| **PredictionPostProcess** | Prediction clip/round/binarize/custom mapping |
+| **TabularMLPClassification / TabularMLPRegression** | Tabular MLP (numeric scaling + categorical embedding, requires torch) |
+| **TargetEncoding enhanced** | `smoothing_k` smoothing + `fit_transform_oof` leak-free encoding |
+
+> All derived from high-frequency winning techniques mined from the bundled
+> kaggle_solutions corpus. See `docs/table_pipes_demo.ipynb` for end-to-end
+> examples and `tests/test_*_pipes.py` for acceptance tests.
 
 #### 10. Dimensionality Reduction (`easymlops.table.decomposition`)
 
