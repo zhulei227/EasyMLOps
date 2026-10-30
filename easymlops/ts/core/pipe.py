@@ -1,4 +1,5 @@
 import pandas as pd
+from easymlops.core.storage import open_model_file
 import copy
 import numpy as np
 from tqdm import tqdm
@@ -21,6 +22,9 @@ class PipeBase(PipeObjectBase):
     """
     PipeBase
     """
+
+    # TS pipe 均为跨行(窗口/序列)变换, 不支持分布式 transform_spark
+    distributed_safe = False
 
     def __init__(self, name=None, transform_check_max_number_error=1e-5, skip_check_transform_type=False,
                  skip_check_transform_value=False, leak_check_transform_type=True, leak_check_transform_value=True,
@@ -291,7 +295,7 @@ class PipeBase(PipeObjectBase):
         """
         import pickle
         params = self.get_params()
-        with open(path, "wb") as f:
+        with open_model_file(path, "wb") as f:
             pickle.dump(params, f)
 
     def load(self, path):
@@ -302,7 +306,7 @@ class PipeBase(PipeObjectBase):
         :return:
         """
         import pickle
-        with open(path, "rb") as f:
+        with open_model_file(path, "rb") as f:
             params = pickle.load(f)
         self.set_params(params)
 

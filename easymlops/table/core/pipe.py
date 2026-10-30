@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from easymlops.core.storage import open_model_file
 
 from easymlops.core import *
 import pandas as pd
@@ -269,7 +270,7 @@ class TablePipeObjectBase(PipeObjectBase):
         """
         import pickle
         params = self.get_params()
-        with open(path, "wb") as f:
+        with open_model_file(path, "wb") as f:
             pickle.dump(params, f)
 
     def load(self, path):
@@ -280,9 +281,27 @@ class TablePipeObjectBase(PipeObjectBase):
             path: 加载路径
         """
         import pickle
-        with open(path, "rb") as f:
+        with open_model_file(path, "rb") as f:
             params = pickle.load(f)
         self.set_params(params)
+
+    def transform_spark(self, spark_df):
+        """
+        pyspark 分布式变换（v0.2.8+ 新增）：以 mapInPandas 分区计算，结果与本地
+        transform/transform_single 一致（行级确定变换）。
+
+        约束:
+            - 仅行级变换 pipe 支持（TS 窗口类 pipe 的 distributed_safe=False 会拒绝）
+            - 参数须可 pickle（含用户 lambda 的 pipe 需改传模块级函数）
+
+        Args:
+            spark_df: pyspark DataFrame（列须与 fit 时输入列一致，多余列允许）
+
+        Returns:
+            pyspark DataFrame: 变换结果
+        """
+        from easymlops.table.core.spark_compat import transform_spark_dataframe
+        return transform_spark_dataframe(self, spark_df)
 
     def get_params(self) -> dict_type:
         """

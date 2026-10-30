@@ -1,4 +1,5 @@
 from .pipe import *
+from easymlops.core.storage import open_model_file
 from easymlops.table.ensemble import Parallel
 import copy
 from tqdm import tqdm
@@ -259,7 +260,7 @@ class TSPipeLine(PipeBase):
         # with open(path, "wb") as f:
         #     pickle.dump([model.get_params() for model in self.models], f)
 
-        with open(path, "wb") as f:
+        with open_model_file(path, "wb") as f:
             # 1.递归提取结构信息
             structs = [self.extract_structs(model) for model in self.models]
             # 2.参数信息
@@ -277,7 +278,7 @@ class TSPipeLine(PipeBase):
         #     for i, params in enumerate(pickle.load(f)):
         #         self.models[i].set_params(params)
 
-        with open(path, "rb") as f:
+        with open_model_file(path, "rb") as f:
             data = pickle.load(f)
             structs = data["structs"]
             params = data["params"]

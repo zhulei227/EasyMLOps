@@ -232,6 +232,16 @@ TargetEncoding 新增：`smoothing_k`（标准平滑 (count*mean+k*global)/(coun
 |------|------|---------|
 | Eval | 模型评估，使用SQL表达式对数据进行计算评估 | label, metrics, sql |
 
+## Spark 与远程存储 (v0.2.8+)
+
+| 能力 | 用法 | 约束 |
+|------|------|------|
+| transform_spark | `pipeline.transform_spark(spark_df)`（TablePipeLine 与任意单 pipe 均有） | 仅行级变换（TS 窗口类拒绝）；pyspark 懒导入（`pip install pyspark`）；lambda 参数需改模块级函数 |
+| HDFS 模型文件 | `pipe.load("webhdfs://user@nn:9870/models/x.pkl")`；save 同理 | 经 fsspec；`webhdfs://`(REST,无 JVM) / `hdfs://`(pyarrow,需 JVM) / `memory://`(测试)；省写可用环境变量 WEBHDFS_HOST/PORT/USER |
+
+> 单 pipe/pipeline 的 `save/load` 均走统一存储层（本地路径行为不变）。
+> 分块等价性等验收见 `tests/test_spark_hdfs.py`。
+
 ## NLP 预处理 (nlp.preprocessing)
 
 | 类名 | 说明 | 关键参数 |

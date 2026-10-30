@@ -1,4 +1,5 @@
 from easymlops.table.core import TablePipeLine
+from easymlops.core.storage import open_model_file
 from typing import Union, List
 import pandas as pd
 
@@ -45,7 +46,7 @@ class OCRPipeLine(TablePipeLine):
         :return: self
         """
         import pickle
-        with open(path, "rb") as f:
+        with open_model_file(path, "rb") as f:
             data = pickle.load(f)
             structs = data["structs"]
             params = data["params"]

@@ -116,11 +116,40 @@ pip install <本skill目录>/assets/easymlops-0.2.6-py3-none-any.whl
 
 注意：wheel 不携带依赖，核心功能仍需安装 lightgbm、scikit-learn、pandas；0.2.4 起 psutil、matplotlib、arch（GARCH）已在依赖声明中；时序深度模型另需 torch，部署另需 fastapi、uvicorn。
 
+## Spark 与 HDFS（v0.2.8+）
+
+**transform_spark（pyspark 分布式变换）**：`TablePipeLine` 与任意单 pipe 均有该算子，结果与本地
+`transform`/`transform_single` 一致（行级确定变换，mapInPandas 分区计算）：
+
+```python
+import pyspark
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.master("local[*]").getOrCreate()
+out = pipeline.transform_spark(spark_df)   # 返回 pyspark DataFrame
+```
+
+- 仅行级变换 pipe 支持（TS 窗口类 `distributed_safe=False` 会显式拒绝）
+- 参数须可 pickle：`PredictionPostProcess(mapping=lambda...)` 等含 lambda 的 pipe 需改传模块级函数
+- pyspark 懒导入：`pip install pyspark`（driver/executor 需 pandas 版本一致）
+
+**HDFS 模型文件**：全部 save/load 走统一存储层（`easymlops/core/storage.py`），本地路径行为不变，
+远程路径经 fsspec 透明读写：
+
+```python
+pipe.load("webhdfs://user@nn:9870/models/x.pkl")   # WebHDFS REST, 无需 JVM
+pipe.save("webhdfs://user@nn:9870/models/x.pkl")
+# webhdfs://path 省写: 设 WEBHDFS_HOST / WEBHDFS_PORT(默认9870) / WEBHDFS_USER 环境变量
+# hdfs:// 走 pyarrow HadoopFileSystem(需 JVM/libhdfs)
+```
+
 ## 额外依赖（按需安装）
 
 ```bash
 # YOLO 视觉任务
 pip install "numpy>=1.24.4,<2" "torch>=1.12.0" "torchvision>=0.13.0" ultralytics
+
+# Spark 分布式变换(transform_spark)
+pip install pyspark
 
 # OCR 任务(RapidOCR, 推荐: 轻量 ONNX, CPU 20-50ms)
 pip install rapidocr onnxruntime
