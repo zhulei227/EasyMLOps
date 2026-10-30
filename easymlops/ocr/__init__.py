@@ -1,3 +1,3 @@
 from easymlops.ocr.core.pipeline import OCRPipeLine
 
-from easymlops.ocr.text import EasyOCRText
+from easymlops.ocr.text import EasyOCRText, RapidOCRText

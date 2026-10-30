@@ -122,7 +122,9 @@ pip install <本skill目录>/assets/easymlops-0.2.6-py3-none-any.whl
 # YOLO 视觉任务
 pip install "numpy>=1.24.4,<2" "torch>=1.12.0" "torchvision>=0.13.0" ultralytics
 
-# OCR 任务
+# OCR 任务(RapidOCR, 推荐: 轻量 ONNX, CPU 20-50ms)
+pip install rapidocr onnxruntime
+# OCR 任务(EasyOCR, 原型级: 较重且慢)
 pip install easyocr
 pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
 ```
