@@ -131,6 +131,10 @@ out = pipeline.transform_spark(spark_df)   # 返回 pyspark DataFrame
 - 仅行级变换 pipe 支持（TS 窗口类 `distributed_safe=False` 会显式拒绝）
 - 参数须可 pickle：`PredictionPostProcess(mapping=lambda...)` 等含 lambda 的 pipe 需改传模块级函数
 - pyspark 懒导入：`pip install pyspark`（driver/executor 需 pandas 版本一致）
+- Spark 不保证全局行序：`transform_spark` 输出行序与输入无对应关系，需要行对齐时自行带唯一键列
+- 分类模型输出列名（整数类别标签）在 Spark 输出中会字符串化（"0"/"1"）
+- Windows 本地运行需 JAVA_HOME（Spark 3.5 支持 8/11/17）；`PYSPARK_PYTHON` 建议设为当前解释器
+- 验收：`tests/test_spark_hdfs.py`（12 项，含 Spark local 端到端一致性，max diff=0.0）
 
 **HDFS 模型文件**：全部 save/load 走统一存储层（`easymlops/core/storage.py`），本地路径行为不变，
 远程路径经 fsspec 透明读写：

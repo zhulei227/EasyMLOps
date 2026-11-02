@@ -135,26 +135,35 @@ if HAS_PYSPARK:
                 os.environ["JAVA_HOME"] = jdir
                 os.environ["PATH"] = os.path.join(jdir, "bin") + os.pathsep + os.environ.get("PATH", "")
         from pyspark.sql import SparkSession
+        os.environ["PYSPARK_PYTHON"] = sys.executable
+        os.environ["PYSPARK_DRIVER_PYTHON"] = sys.executable
         spark = (SparkSession.builder.master("local[2]")
                  .appName("easymlops-transform-spark-test")
                  .config("spark.ui.enabled", "false")
                  .config("spark.sql.shuffle.partitions", "2")
                  .config("spark.driver.host", "127.0.0.1")
+                 .config("spark.pyspark.python", sys.executable)
+                 .config("spark.pyspark.driver.python", sys.executable)
                  .getOrCreate())
         spark_df = spark.createDataFrame(
             [(float(r.f0), float(r.f1), float(r.f2), float(r.f3), float(r.f4), str(r.city))
              for r in test.itertuples()],
             schema=["f0", "f1", "f2", "f3", "f4", "city"])
         out_sdf = pl.transform_spark(spark_df)
+        # Spark 不保证全局行序: 两侧均按连续值列 f1 排序后比对(等价集合)
         out_spark = out_sdf.toPandas().sort_values("f1").reset_index(drop=True)
-        whole_df = pl.transform(test.copy()).reset_index(drop=True)
+        whole_df = pl.transform(test.copy()).sort_values("f1").reset_index(drop=True)
         check("spark_end_to_end", len(out_spark) == len(whole_df) and
               np.allclose(out_spark["city"].astype(float).to_numpy(),
                           whole_df["city"].astype(float).to_numpy(), atol=1e-9))
         single_pipe_spark = mlp.transform_spark(spark_df)
-        out_single = single_pipe_spark.toPandas().sort_values("f1").reset_index(drop=True)
-        check("spark_single_pipe", np.isfinite(
-            out_single[[c for c in out_single.columns]].astype(float).values).all())
+        out_single = single_pipe_spark.toPandas()
+        # 模型 pipe 输出仅概率列(Spark 字段名为字符串化的类别标签); 行级一致性
+        # 已由 pipeline 用例与分块等价性用例证明
+        check("spark_single_pipe", len(out_single) == len(test) and
+              set(out_single.columns) == {"0", "1"} and
+              np.isfinite(out_single.astype(float).values).all() and
+              np.allclose(out_single.astype(float).sum(axis=1), 1.0, atol=1e-5))
         spark.stop()
     except Exception as exc:
         check("spark_end_to_end", False, "exception: {}: {}".format(type(exc).__name__, str(exc)[:120]))

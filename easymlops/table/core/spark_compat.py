@@ -131,7 +131,8 @@ def infer_output_schema(result_pdf: pd.DataFrame):
     fields = []
     for col in result_pdf.columns:
         t = str(result_pdf[col].dtype)
-        fields.append(StructField(col, mapping.get(t, StringType()), True))
+        # Spark 字段名必须为字符串(分类模型输出列名可能是整数类别标签)
+        fields.append(StructField(str(col), mapping.get(t, StringType()), True))
     return StructType(fields)
 
 
