@@ -1,4 +1,4 @@
-__version__ = "0.2.9"
+__version__ = "0.2.10"
 
 from .table.core import TablePipeLine
 from .nlp.core import NLPPipeline
