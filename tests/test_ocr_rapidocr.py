@@ -132,6 +132,58 @@ if HAS_PADDLE:
 else:
     print("[SKIP] paddleocr not installed")
 
+# ============ 6. PaddleOCRStructure(版面/表格解析) ============
+print("=== 6. PaddleOCRStructure ===")
+try:
+    from easymlops.ocr import PaddleOCRStructure
+    HAS_STRUCT = True
+except ImportError:
+    HAS_STRUCT = False
+
+if HAS_STRUCT:
+    # 复用 _paddle_sample.png(纯文本) + 生成带表格的图
+    SIMG = "d:/datas/share/traes/easymlops-trae/tests/_structure_sample.png"
+    from PIL import Image, ImageDraw, ImageFont
+    img_s = Image.new("RGB", (500, 300), "white")
+    ds = ImageDraw.Draw(img_s)
+    ds.rectangle([20, 20, 280, 160], outline="black", width=2)
+    ds.line([20, 90, 280, 90], fill="black", width=2)
+    ds.line([150, 20, 150, 160], fill="black", width=2)
+    try:
+        sfont = ImageFont.truetype("arial.ttf", 24)
+    except Exception:
+        sfont = ImageFont.load_default()
+    ds.text((40, 45), "Name", fill="black", font=sfont)
+    ds.text((170, 45), "Age", fill="black", font=sfont)
+    ds.text((40, 115), "Tom", fill="black", font=sfont)
+    ds.text((170, 115), "25", fill="black", font=sfont)
+    ds.text((300, 40), "Hello document", fill="black", font=sfont)
+    img_s.save(SIMG)
+    sdf = pd.DataFrame({"image_path": [SIMG]})
+
+    sengine = PaddleOCRStructure(lang="en")
+    sengine.fit(sdf)
+    sout = sengine.transform(sdf.copy())
+    srequired = {"image_path", "type", "text", "html", "bbox_x1", "bbox_y1", "bbox_x2", "bbox_y2"}
+    check("structure_contract", srequired.issubset(set(sout.columns)) and len(sout) >= 1)
+    tables = sout[sout["type"] == "table"]
+    check("structure_table_detected", len(tables) >= 1 and
+          any("<table" in str(h).lower() for h in tables["html"]),
+          "regions: {}".format(sout["type"].tolist()))
+    md = PaddleOCRStructure.to_markdown(sout)
+    check("structure_to_markdown", isinstance(md, str) and len(md) > 0)
+    sengine.save(PKL)
+    sengine2 = PaddleOCRStructure()
+    sengine2.load(PKL)
+    sout2 = sengine2.transform(sdf.copy())
+    check("structure_save_load", sout2["type"].tolist() == sout["type"].tolist())
+    ss = sengine.transform_single(dict(sdf.iloc[0]))
+    check("structure_single", "markdown" in ss and "regions" in ss)
+    if os.path.exists(SIMG):
+        os.remove(SIMG)
+else:
+    print("[SKIP] paddleocr not installed")
+
 print("================ SUMMARY ================")
 print("PASS: {}, FAIL: {}".format(len(PASS), len(FAIL)))
 if FAIL:

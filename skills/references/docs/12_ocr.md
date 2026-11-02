@@ -6,6 +6,7 @@ OCR 模块提供两套文本检测与识别引擎：
 |------|----|------|
 | **RapidOCR**（推荐） | `RapidOCRText` | PaddleOCR 模型 ONNX 化轻量推理，CPU 20-50ms 级，无深度学习框架依赖，生产级 |
 | **PaddleOCR**（官方） | `PaddleOCRText` | PP-OCR 官方引擎，SOTA 精度，111 种语言（v0.2.9+ 新增；需 paddlepaddle 框架） |
+| **PP-Structure**（官方） | `PaddleOCRStructure` | 版面分析 + 表格解析（输出表格 HTML），文档结构化/RAG 入口（v0.2.9+ 新增） |
 | EasyOCR | `EasyOCRText` | 原型/MVP 友好，80+ 语言，但推理慢（150-400ms）且精度上限低 |
 
 > 2025-2026 OCR 领域调研结论：RapidOCR 为 EasyOCR 的生产级替代；
@@ -49,6 +50,20 @@ result = pipe.fit(df).transform(df)
 | model_path | str | None | 自定义 det 模型目录 |
 
 兼容 paddleocr 2.x 与 3.x 两代 API；注意 paddleocr 3.x 需 python>=3.9（py3.8 用 `paddleocr==2.10.x + paddlepaddle>=3.0`）。输出字段与 RapidOCRText 对齐。
+
+## 0a2. 版面与表格解析 (PaddleOCRStructure)
+
+```python
+from easymlops.ocr import PaddleOCRStructure
+
+pipe = PaddleOCRStructure(lang="ch")
+result = pipe.fit(df).transform(df)      # image_path/type/text/html/bbox 列
+md = PaddleOCRStructure.to_markdown(result)   # 阅读顺序的 Markdown(表格为 HTML 块)
+single = pipe.transform_single({"image_path": "doc.png"})   # 含 markdown 与 regions
+```
+
+- `type` 区域类型：text / table / figure / title 等；表格区域 `html` 列含完整表格 HTML
+- 当前实现基于 paddleocr 2.x 的 PPStructure API（3.x 的 PPStructureV3 需 py3.9+）
 
 ## 0b. 文本识别 (RapidOCRText，推荐)
 

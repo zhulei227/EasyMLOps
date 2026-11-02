@@ -505,3 +505,187 @@ class PaddleOCRText(OCRPipeObjectBase):
     def transform_single(self, s: dict_type, **kwargs) -> dict_type:
         # OCR 语义为"一行输入 -> 多行输出", 与框架 extract_dict 逻辑不兼容, 直接走 udf
         return self.udf_transform_single(dict(s), **kwargs)
+
+class PaddleOCRStructure(OCRPipeObjectBase):
+    """
+    PaddleOCR 版面分析与表格解析 Pipe（v0.2.9+ 新增，PP-Structure）。
+
+    对文档图片做版面分区（text/table/figure/title...），文本区域给出识别文本，
+    表格区域给出 HTML 结构——面向 RAG/LLM 的文档结构化入口。
+
+    输出字段: image_path / type / text / html / bbox_x1..bbox_y2
+    另提供 `to_markdown(result_df)` 把分区结果转为阅读顺序的 Markdown 文档。
+
+    注意:
+        - 当前实现基于 paddleocr 2.x 的 PPStructure API（py3.8 环境）
+        - 首次运行会自动下载版面/表格模型（约 20-30MB）
+        - 引擎不可 pickle，load 后按恢复的参数自动重建
+
+    Args:
+        model_name: 模型名称
+        lang: 语言代码（'ch' / 'en'）
+        layout: 是否启用版面分析（False 时退化为纯 OCR 分区）
+        table: 是否启用表格识别
+        text_score: 识别置信度阈值（默认 0.5）
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> from easymlops.ocr import PaddleOCRStructure
+        >>> pipe = PaddleOCRStructure(lang="ch")
+        >>> df = pd.DataFrame({"image_path": ["doc.png"]})
+        >>> result = pipe.fit(df).transform(df)
+        >>> md = PaddleOCRStructure.to_markdown(result)
+    """
+
+    def __init__(self, model_name="paddle_structure", model_path=None, lang="ch",
+                 layout=True, table=True, text_score=0.5, **kwargs):
+        super().__init__(model_name=model_name, model_path=model_path,
+                         lang=lang, **kwargs)
+        self.layout = layout
+        self.table = table
+        self.text_score = text_score
+
+    def udf_get_params(self):
+        """获取参数。"""
+        params = super().udf_get_params()
+        params.update({"layout": self.layout, "table": self.table,
+                       "text_score": self.text_score})
+        return params
+
+    def udf_set_params(self, params: dict_type):
+        """设置参数。"""
+        super().udf_set_params(params)
+        self.layout = params.get("layout", self.layout)
+        self.table = params.get("table", self.table)
+        self.text_score = params.get("text_score", self.text_score)
+        # 引擎不可 pickle, load 后按恢复的参数重建
+        self.udf_fit(None)
+
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        """
+        加载 PP-Structure 引擎（当前实现基于 paddleocr 2.x API）。
+
+        Args:
+            s: 输入数据，DataFrame
+            **kwargs: 其他参数
+
+        Returns:
+            self
+        """
+        try:
+            from paddleocr import PPStructure
+        except ImportError:
+            raise ImportError("请安装 paddleocr: pip install paddleocr paddlepaddle")
+        import paddleocr
+        if int(paddleocr.__version__.split(".")[0]) >= 3:
+            raise ImportError("PaddleOCRStructure 当前支持 paddleocr 2.x; "
+                              "3.x 请使用 PPStructureV3（python>=3.9）")
+        self.model = PPStructure(layout=self.layout, table=self.table, ocr=True,
+                                 lang=self.lang if isinstance(self.lang, str) else self.lang[0],
+                                 show_log=False)
+        return self
+
+    def _run_engine(self, image_path):
+        """调用引擎并归一化输出为 [{type, text, html, box}]。"""
+        regions = self.model(image_path)
+        items = []
+        for region in regions or []:
+            res = region.get("res") or {}
+            text = ""
+            if res.get("text"):
+                text = res["text"]
+            elif res.get("rec_texts"):
+                text = " ".join(res["rec_texts"])
+            html = res.get("html") or ""
+            items.append({"type": region.get("type", "unknown"),
+                          "text": text, "html": html,
+                          "box": region.get("bbox", [0, 0, 0, 0])})
+        return items
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """
+        批量版面解析。
+
+        Args:
+            s: 输入数据，DataFrame，包含 image_path 列
+
+        Returns:
+            DataFrame: image_path/type/text/html/bbox_x1..bbox_y2
+        """
+        results_list = []
+        for idx, row in s.iterrows():
+            image_path = row.get("image_path", row.get("path", row.get("image", None)))
+            if image_path is None:
+                raise ValueError("未找到图像路径列，请确保数据包含image_path/path/image列")
+            for item in self._run_engine(image_path):
+                if item["type"] != "table" and item["text"] and self.text_score:
+                    # 文本区域不做逐行分数过滤(引擎内部已过滤), 表格保留 html
+                    pass
+                box = np.asarray(item["box"], dtype=float).reshape(-1, 2) \
+                    if np.asarray(item["box"]).ndim > 1 else np.asarray(item["box"], dtype=float)
+                results_list.append({
+                    "image_path": image_path,
+                    "type": item["type"],
+                    "text": item["text"],
+                    "html": item["html"],
+                    "bbox_x1": float(np.min(box)),
+                    "bbox_y1": float(np.min(box)),
+                    "bbox_x2": float(np.max(box)),
+                    "bbox_y2": float(np.max(box)),
+                })
+
+        if not results_list:
+            results_list.append({"image_path": "", "type": "", "text": "", "html": "",
+                                 "bbox_x1": 0.0, "bbox_y1": 0.0, "bbox_x2": 0.0, "bbox_y2": 0.0})
+
+        return pd.DataFrame(results_list)
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """
+        单张图像版面解析。
+
+        Args:
+            s: 输入数据，dict，包含image_path键
+
+        Returns:
+            包含解析结果的dict
+        """
+        df = pd.DataFrame([s])
+        result_df = self.transform(df)
+
+        if len(result_df) == 0 or result_df.iloc[0].get("type", "") == "":
+            return {"text": "", "markdown": "", "regions": []}
+
+        regions = result_df.to_dict("records")
+        return {
+            "text": " ".join(r["text"] for r in regions if r["text"]),
+            "markdown": self.to_markdown(result_df),
+            "regions": regions,
+        }
+
+    def transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        # OCR 语义为"一行输入 -> 多行输出", 与框架 extract_dict 逻辑不兼容, 直接走 udf
+        return self.udf_transform_single(dict(s), **kwargs)
+
+    @staticmethod
+    def to_markdown(result_df: dataframe_type) -> str:
+        """
+        把版面解析结果转为阅读顺序（按 bbox 从上到下）的 Markdown 文档:
+        文本区域输出识别文本, 表格区域输出 HTML 块。
+
+        Args:
+            result_df: transform 的输出 DataFrame
+
+        Returns:
+            str: Markdown 文本
+        """
+        df = result_df[result_df["type"] != ""].sort_values(
+            ["bbox_y1", "bbox_x1"]).reset_index(drop=True)
+        parts = []
+        for _, row in df.iterrows():
+            if row["type"] == "table" and row["html"]:
+                parts.append(str(row["html"]))
+            elif row["text"]:
+                parts.append(str(row["text"]))
+        return "\n\n".join(parts)
