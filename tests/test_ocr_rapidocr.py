@@ -184,6 +184,72 @@ if HAS_STRUCT:
 else:
     print("[SKIP] paddleocr not installed")
 
+# ============ 7. VLDocumentParser(OpenAI 兼容适配器, 本地 mock 服务) ============
+print("=== 7. VLDocumentParser ===")
+try:
+    from easymlops.ocr import VLDocumentParser
+    import threading
+    import json as _json
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    class _MockVLMServer(BaseHTTPRequestHandler):
+        def do_POST(self):
+            length = int(self.headers.get("Content-Length", 0))
+            body = _json.loads(self.rfile.read(length).decode("utf-8"))
+            # 校验请求形态(OpenAI 兼容)
+            assert body["model"] == "mock-vlm"
+            assert body["messages"][0]["content"][0]["type"] == "text"
+            assert body["messages"][0]["content"][1]["type"] == "image_url"
+            content = "# Parsed Document\n\n| Name | Age |\n|------|-----|\n| Tom | 25 |"
+            resp = {"choices": [{"message": {"role": "assistant", "content": content}}]}
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(_json.dumps(resp).encode("utf-8"))
+
+        def log_message(self, *args):
+            pass
+
+    mock_server = HTTPServer(("127.0.0.1", 0), _MockVLMServer)
+    mock_port = mock_server.server_address[1]
+    threading.Thread(target=mock_server.serve_forever, daemon=True).start()
+    HAS_STRUCT = True
+except ImportError:
+    HAS_STRUCT = False
+
+if HAS_STRUCT:
+    # 用回测试图片
+    from PIL import Image, ImageDraw, ImageFont
+    img_v = Image.new("RGB", (400, 120), "white")
+    dv = ImageDraw.Draw(img_v)
+    try:
+        vfont = ImageFont.truetype("arial.ttf", 32)
+    except Exception:
+        vfont = ImageFont.load_default()
+    dv.text((20, 40), "mock doc", fill="black", font=vfont)
+    VIMG = "d:/datas/share/traes/easymlops-trae/tests/_vlm_sample.png"
+    img_v.save(VIMG)
+    vdf = pd.DataFrame({"image_path": [VIMG]})
+
+    vpipe = VLDocumentParser(api_base="http://127.0.0.1:{}".format(mock_port),
+                             model="mock-vlm", timeout=30)
+    vpipe.fit(vdf)
+    vout = vpipe.transform(vdf.copy())
+    check("vlm_markdown_output", "markdown" in vout.columns and
+          "Parsed Document" in vout["markdown"].iloc[0])
+    vs = vpipe.transform_single(dict(vdf.iloc[0]))
+    check("vlm_single", "markdown" in vs and "Parsed Document" in vs["markdown"])
+    vpipe.save(PKL)
+    vpipe2 = VLDocumentParser()
+    vpipe2.load(PKL)
+    check("vlm_save_load", vpipe2.model == "mock-vlm" and
+          "Parsed Document" in vpipe2.transform(vdf.copy())["markdown"].iloc[0])
+    mock_server.shutdown()
+    if os.path.exists(VIMG):
+        os.remove(VIMG)
+else:
+    print("[SKIP] easymlops.ocr.VLDocumentParser unavailable")
+
 print("================ SUMMARY ================")
 print("PASS: {}, FAIL: {}".format(len(PASS), len(FAIL)))
 if FAIL:

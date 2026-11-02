@@ -1,3 +1,4 @@
 from easymlops.ocr.core.pipeline import OCRPipeLine
 
-from easymlops.ocr.text import EasyOCRText, RapidOCRText, PaddleOCRText, PaddleOCRStructure
+from easymlops.ocr.text import EasyOCRText, RapidOCRText, PaddleOCRText, PaddleOCRStructure, \
+    VLDocumentParser

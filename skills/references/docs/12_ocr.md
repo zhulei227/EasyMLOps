@@ -7,7 +7,11 @@ OCR 模块提供两套文本检测与识别引擎：
 | **RapidOCR**（推荐） | `RapidOCRText` | PaddleOCR 模型 ONNX 化轻量推理，CPU 20-50ms 级，无深度学习框架依赖，生产级 |
 | **PaddleOCR**（官方） | `PaddleOCRText` | PP-OCR 官方引擎，SOTA 精度，111 种语言（v0.2.9+ 新增；需 paddlepaddle 框架） |
 | **PP-Structure**（官方） | `PaddleOCRStructure` | 版面分析 + 表格解析（输出表格 HTML），文档结构化/RAG 入口（v0.2.9+ 新增） |
+| **VLM**（适配器） | `VLDocumentParser` | OpenAI 兼容 API 视觉模型（vLLM 部署的 DeepSeek-OCR/Qwen-VL 等），复杂版面 Markdown 输出（v0.2.9+ 新增） |
 | EasyOCR | `EasyOCRText` | 原型/MVP 友好，80+ 语言，但推理慢（150-400ms）且精度上限低 |
+
+> VLM 幻觉风险提示：调研实证 VLM-OCR 存在"低 CER 但改写实体"的问题；忠实度攸关场景
+> （档案/法律/合规）建议与 RapidOCRText/PaddleOCRText 结果交叉校验。
 
 > 2025-2026 OCR 领域调研结论：RapidOCR 为 EasyOCR 的生产级替代；
 > 追求 SOTA 精度/文档结构化可用 PaddleOCR-VL（0.9B，OmniDocBench 94.5%）；
@@ -64,6 +68,28 @@ single = pipe.transform_single({"image_path": "doc.png"})   # 含 markdown 与 r
 
 - `type` 区域类型：text / table / figure / title 等；表格区域 `html` 列含完整表格 HTML
 - 当前实现基于 paddleocr 2.x 的 PPStructure API（3.x 的 PPStructureV3 需 py3.9+）
+
+## 0a3. VLM 文档解析 (VLDocumentParser)
+
+```python
+from easymlops.ocr import VLDocumentParser
+
+pipe = VLDocumentParser(api_base="http://localhost:8000/v1",   # vLLM 等本地服务
+                        model="deepseek-ocr", temperature=0)
+result = pipe.fit(df).transform(df)      # 原输入列 + markdown 列
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| api_base | str | http://localhost:8000/v1 | OpenAI 兼容服务地址 |
+| model | str | 必填 | 模型名 |
+| prompt | str | 内置 | 解析指令（默认文档→Markdown） |
+| image_col | str | "image_path" | 输入图像路径列名 |
+| temperature | float | 0.0 | OCR 场景建议 0 |
+| timeout | int | 120 | 请求超时秒数 |
+
+图片经 base64 data URI 提交 `/chat/completions`（支持本地路径与 webhdfs:// 远程路径）。
+无本地模型对象，save/load 仅持久化配置。
 
 ## 0b. 文本识别 (RapidOCRText，推荐)
 

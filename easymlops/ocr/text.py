@@ -1,5 +1,6 @@
 from easymlops.ocr.core.pipe import OCRPipeObjectBase
 from easymlops.table.core import dataframe_type, dict_type
+from easymlops.core.storage import is_remote_path, load_model_bytes
 import pandas as pd
 import numpy as np
 
@@ -689,3 +690,164 @@ class PaddleOCRStructure(OCRPipeObjectBase):
             elif row["text"]:
                 parts.append(str(row["text"]))
         return "\n\n".join(parts)
+
+class VLDocumentParser(OCRPipeObjectBase):
+    """
+    VLM 文档解析适配器（v0.2.9+ 新增）：调用 **OpenAI 兼容 API** 的视觉语言模型
+    做端到端 OCR/文档解析，输出 Markdown——对接 vLLM/LM Studio 等本地服务
+    （如 DeepSeek-OCR、Qwen2.5-VL、GLM-OCR）或云端多模态 API。
+
+    与传统引擎(RapidOCR/PaddleOCR)的分工:
+        - VLM: 公式/表格/阅读顺序/手写等复杂版面的结构化输出(Markdown)
+        - 传统引擎: 忠实度更高(调研实证: VLM 存在幻觉风险, CER 低但可能改写实体),
+          忠实度攸关场景建议两者交叉校验
+
+    Args:
+        api_base: OpenAI 兼容服务地址（如 "http://localhost:8000/v1"）
+        api_key: API Key（本地服务默认 "EMPTY"）
+        model: 模型名（如 "deepseek-ocr"、"qwen2.5-vl-7b-instruct"）
+        prompt: 解析指令（默认通用文档转 Markdown 指令）
+        image_col: 输入图像路径列名（默认 "image_path"）
+        temperature: 采样温度（OCR 场景建议 0）
+        max_tokens: 最大生成 token 数
+        timeout: 请求超时秒数
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> from easymlops.ocr import VLDocumentParser
+        >>> pipe = VLDocumentParser(api_base="http://localhost:8000/v1",
+        ...                         model="deepseek-ocr")
+        >>> df = pd.DataFrame({"image_path": ["doc.png"]})
+        >>> result = pipe.fit(df).transform(df)   # 追加 markdown 列
+    """
+
+    DEFAULT_PROMPT = ("You are an OCR engine. Convert ALL text in the image into "
+                      "markdown, preserving reading order, tables as HTML tables, "
+                      "and formulas as LaTeX. Output ONLY the markdown content, "
+                      "no explanations.")
+
+    def __init__(self, api_base="http://localhost:8000/v1", api_key="EMPTY", model=None,
+                 prompt=None, image_col="image_path", temperature=0.0, max_tokens=4096,
+                 timeout=120, **kwargs):
+        super().__init__(**kwargs)
+        self.api_base = api_base.rstrip("/")
+        self.api_key = api_key
+        self.model = model
+        self.prompt = prompt or self.DEFAULT_PROMPT
+        self.image_col = image_col
+        self.temperature = float(temperature)
+        self.max_tokens = int(max_tokens)
+        self.timeout = int(timeout)
+
+    def udf_get_params(self):
+        """获取参数（无模型对象, 配置即全部状态）。"""
+        params = super().udf_get_params()
+        params.update({"api_base": self.api_base, "api_key": self.api_key,
+                       "model": self.model, "prompt": self.prompt,
+                       "image_col": self.image_col, "temperature": self.temperature,
+                       "max_tokens": self.max_tokens, "timeout": self.timeout})
+        return params
+
+    def udf_set_params(self, params: dict_type):
+        """设置参数。"""
+        super().udf_set_params(params)
+        self.api_base = params.get("api_base", self.api_base).rstrip("/")
+        self.api_key = params.get("api_key", self.api_key)
+        self.model = params.get("model", self.model)
+        self.prompt = params.get("prompt", self.prompt)
+        self.image_col = params.get("image_col", self.image_col)
+        self.temperature = params.get("temperature", self.temperature)
+        self.max_tokens = params.get("max_tokens", self.max_tokens)
+        self.timeout = params.get("timeout", self.timeout)
+
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        """
+        校验配置（VLM 为外部服务, 无本地模型对象; 此处仅做参数完整性检查）。
+
+        Args:
+            s: 输入数据，DataFrame
+            **kwargs: 其他参数
+
+        Returns:
+            self
+        """
+        if not self.api_base:
+            raise Exception("VLDocumentParser requires api_base")
+        if not self.model:
+            raise Exception("VLDocumentParser requires model (e.g. 'deepseek-ocr')")
+        return self
+
+    def _image_to_data_uri(self, image_path: str) -> str:
+        """把本地图片编码为 base64 data URI。"""
+        import base64
+        if is_remote_path(image_path):
+            data = load_model_bytes(image_path)
+        else:
+            with open(image_path, "rb") as f:
+                data = f.read()
+        ext = str(image_path).split(".")[-1].lower()
+        mime = "jpeg" if ext in ("jpg", "jpeg") else ext
+        return "data:image/{};base64,{}".format(mime, base64.b64encode(data).decode("ascii"))
+
+    def _call_vlm(self, image_path: str) -> str:
+        """调用 OpenAI 兼容 /chat/completions, 返回模型输出的 Markdown。"""
+        import requests
+        payload = {
+            "model": self.model,
+            "messages": [{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": self.prompt},
+                    {"type": "image_url",
+                     "image_url": {"url": self._image_to_data_uri(image_path)}},
+                ],
+            }],
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+        }
+        headers = {"Authorization": "Bearer {}".format(self.api_key)}
+        resp = requests.post(self.api_base + "/chat/completions", json=payload,
+                             headers=headers, timeout=self.timeout)
+        if resp.status_code != 200:
+            raise Exception("VLM api error {}: {}".format(resp.status_code, resp.text[:200]))
+        content = resp.json()["choices"][0]["message"]["content"]
+        return content if isinstance(content, str) else str(content)
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """
+        批量 VLM 文档解析：对每行图片调用视觉模型，输出 Markdown。
+
+        Args:
+            s: 输入数据，DataFrame，包含图像路径列
+
+        Returns:
+            DataFrame: 原输入列 + markdown 列（模型输出的 Markdown 文本）
+        """
+        result = s.copy()
+        markdowns = []
+        for idx, row in s.iterrows():
+            image_path = row.get(self.image_col, row.get("image_path",
+                                                         row.get("path", None)))
+            if image_path is None:
+                raise ValueError("未找到图像路径列，请确保数据包含{}列".format(self.image_col))
+            markdowns.append(self._call_vlm(image_path))
+        result["markdown"] = markdowns
+        return result
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """
+        单张图像 VLM 文档解析。
+
+        Args:
+            s: 输入数据，dict，包含图像路径键
+
+        Returns:
+            dict: 原输入键 + markdown 键
+        """
+        result = dict(s)
+        image_path = s.get(self.image_col, s.get("image_path", s.get("path", None)))
+        if image_path is None:
+            raise ValueError("未找到图像路径键，请确保数据包含{}键".format(self.image_col))
+        result["markdown"] = self._call_vlm(image_path)
+        return result

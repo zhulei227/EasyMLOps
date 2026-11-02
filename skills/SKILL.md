@@ -159,6 +159,7 @@ pip install pyspark
 pip install rapidocr onnxruntime
 # OCR 任务(PaddleOCR, 官方 SOTA: 需 paddlepaddle 框架; py3.8 用 paddleocr==2.10.x)
 pip install paddleocr paddlepaddle
+# OCR 任务(VLM 适配器: 需 OpenAI 兼容视觉模型服务, requests 已随依赖)
 # OCR 任务(EasyOCR, 原型级: 较重且慢)
 pip install easyocr
 pip install "numpy<2" "Pillow<10" "torch>=1.12.0" "torchvision>=0.13.0"
