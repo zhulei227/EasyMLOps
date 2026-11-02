@@ -92,6 +92,46 @@ if os.path.exists(IMG):
 if os.path.exists(PKL):
     os.remove(PKL)
 print("")
+# ============ 5. PaddleOCRText(官方引擎对照) ============
+print("=== 5. PaddleOCRText ===")
+try:
+    from easymlops.ocr import PaddleOCRText
+    HAS_PADDLE = True
+except ImportError:
+    HAS_PADDLE = False
+
+if HAS_PADDLE:
+    from PIL import Image, ImageDraw, ImageFont
+    img_p = Image.new("RGB", (600, 200), "white")
+    d = ImageDraw.Draw(img_p)
+    try:
+        pfont = ImageFont.truetype("arial.ttf", 48)
+    except Exception:
+        pfont = ImageFont.load_default()
+    d.text((30, 70), "Hello easymlops 12345", fill="black", font=pfont)
+    PIMG = "d:/datas/share/traes/easymlops-trae/tests/_paddle_sample.png"
+    img_p.save(PIMG)
+    pdf = pd.DataFrame({"image_path": [PIMG]})
+
+    ppipe = PaddleOCRText(lang="en", text_score=0.3)
+    ppipe.fit(pdf)
+    pout = ppipe.transform(pdf.copy())
+    check("paddle_output_contract", required_cols.issubset(set(pout.columns)) and len(pout) >= 1)
+    pjoined = " ".join(pout["text"].tolist()).lower()
+    check("paddle_recognizes_text", "easymlops" in pjoined and "12345" in pjoined,
+          "recognized: {}".format(" | ".join(pout["text"].tolist())[:80]))
+    ppipe.save(PKL)
+    ppipe2 = PaddleOCRText()
+    ppipe2.load(PKL)
+    pout2 = ppipe2.transform(pdf.copy())
+    check("paddle_save_load", list(pout2["text"]) == list(pout["text"]))
+    ps = ppipe.transform_single(dict(pdf.iloc[0]))
+    check("paddle_single", "text" in ps and "easymlops" in ps["text"].lower())
+    if os.path.exists(PIMG):
+        os.remove(PIMG)
+else:
+    print("[SKIP] paddleocr not installed")
+
 print("================ SUMMARY ================")
 print("PASS: {}, FAIL: {}".format(len(PASS), len(FAIL)))
 if FAIL:

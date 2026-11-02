@@ -330,3 +330,178 @@ class RapidOCRText(OCRPipeObjectBase):
     def transform_single(self, s: dict_type, **kwargs) -> dict_type:
         # OCR 语义为"一行输入 -> 多行输出", 与框架 extract_dict 逻辑不兼容, 直接走 udf
         return self.udf_transform_single(dict(s), **kwargs)
+
+class PaddleOCRText(OCRPipeObjectBase):
+    """
+    PaddleOCR 文本检测与识别 Pipe（v0.2.9+ 新增）。
+
+    基于 PaddleOCR 官方引擎（PP-OCR 系列，SOTA 精度、支持 111 种语言）。
+    兼容 paddleocr 2.x(ocr.ocr API) 与 3.x(predict API) 两代接口；
+    输出契约与 RapidOCRText/EasyOCRText 对齐：
+    image_path/text/confidence/bbox_x1..bbox_y2。
+
+    注意:
+        - paddleocr 3.x 需 python>=3.9；python 3.8 请用 paddleocr==2.10.x + paddlepaddle>=3.0
+        - 首次运行会自动下载 PP-OCR 模型（约 10-20MB）
+        - 引擎不可 pickle，load 后按恢复的参数自动重建
+
+    Args:
+        model_name: 模型名称
+        model_path: 自定义模型目录（透传 det/rec 模型路径；None 用默认下载）
+        lang: 语言代码（'ch' 中英混合 / 'en' 英文 / 'japan' / 'korean' 等）
+        use_angle_cls: 是否使用方向分类器矫正文本行
+        text_score: 识别置信度阈值（默认 0.5）
+        gpu: 是否使用 GPU
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> from easymlops.ocr import PaddleOCRText
+        >>> pipe = PaddleOCRText(lang="ch", text_score=0.5)
+        >>> df = pd.DataFrame({"image_path": ["receipt.png"]})
+        >>> result = pipe.fit(df).transform(df)
+    """
+
+    def __init__(self, model_name="paddleocr", model_path=None, lang="ch",
+                 use_angle_cls=True, text_score=0.5, **kwargs):
+        super().__init__(model_name=model_name, model_path=model_path,
+                         lang=lang, **kwargs)
+        self.use_angle_cls = use_angle_cls
+        self.text_score = text_score
+
+    def udf_get_params(self):
+        """获取参数。"""
+        params = super().udf_get_params()
+        params.update({"use_angle_cls": self.use_angle_cls, "text_score": self.text_score})
+        return params
+
+    def udf_set_params(self, params: dict_type):
+        """设置参数。"""
+        super().udf_set_params(params)
+        self.use_angle_cls = params.get("use_angle_cls", self.use_angle_cls)
+        self.text_score = params.get("text_score", self.text_score)
+        # 引擎不可 pickle, load 后按恢复的参数重建
+        self.udf_fit(None)
+
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        """
+        加载模型（兼容 paddleocr 2.x 与 3.x 两代 API）。
+
+        Args:
+            s: 输入数据，DataFrame
+            **kwargs: 其他参数
+
+        Returns:
+            self
+        """
+        try:
+            from paddleocr import PaddleOCR
+        except ImportError:
+            raise ImportError("请安装 paddleocr: pip install paddleocr paddlepaddle")
+        import paddleocr
+        kwargs_engine = {"lang": self.lang if isinstance(self.lang, str) else self.lang[0]}
+        if self.model_path:
+            kwargs_engine["det_model_dir"] = self.model_path
+        if int(paddleocr.__version__.split(".")[0]) >= 3:
+            # 3.x: predict API
+            kwargs_engine.update({
+                "use_doc_orientation_classify": False,
+                "use_doc_unwarping": False,
+                "use_textline_orientation": self.use_angle_cls,
+            })
+        else:
+            # 2.x: ocr.ocr API
+            kwargs_engine.update({
+                "use_angle_cls": self.use_angle_cls,
+                "show_log": False,
+            })
+        self.model = PaddleOCR(**kwargs_engine)
+        self._engine_major_version = int(paddleocr.__version__.split(".")[0])
+        return self
+
+    def _run_engine(self, image_path):
+        """调用引擎并归一化输出为 [{box, text, score}]（兼容 2.x/3.x API）。"""
+        items = []
+        if getattr(self, "_engine_major_version", 2) >= 3:
+            for res in self.model.predict(image_path):
+                texts = res.get("rec_texts") or []
+                scores = res.get("rec_scores") or []
+                polys = res.get("rec_polys") or res.get("rec_boxes") or []
+                for box, text, score in zip(polys, texts, scores):
+                    items.append({"box": box, "text": text, "score": float(score)})
+            return items
+        raw = self.model.ocr(image_path, cls=self.use_angle_cls)
+        # 2.x: 全局 list 或按图嵌套 list, 元素为 [box, (text, score)]
+        if raw and isinstance(raw[0], list) and raw[0] and \
+                isinstance(raw[0][0], list) and len(raw[0][0]) == 2:
+            img_items = raw[0]
+        else:
+            img_items = raw or []
+        for item in img_items:
+            if item is None:
+                continue
+            box, (text, score) = item[0], item[1]
+            items.append({"box": box, "text": text, "score": float(score)})
+        return items
+
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        """
+        批量OCR识别。
+
+        Args:
+            s: 输入数据，DataFrame，包含 image_path 列
+
+        Returns:
+            包含OCR结果的DataFrame（image_path/text/confidence/bbox_x1..bbox_y2）
+        """
+        results_list = []
+        for idx, row in s.iterrows():
+            image_path = row.get("image_path", row.get("path", row.get("image", None)))
+            if image_path is None:
+                raise ValueError("未找到图像路径列，请确保数据包含image_path/path/image列")
+            for item in self._run_engine(image_path):
+                if item["score"] < self.text_score:
+                    continue
+                box = np.asarray(item["box"], dtype=float)
+                results_list.append({
+                    "image_path": image_path,
+                    "text": item["text"],
+                    "confidence": float(item["score"]),
+                    "bbox_x1": float(box[:, 0].min()),
+                    "bbox_y1": float(box[:, 1].min()),
+                    "bbox_x2": float(box[:, 0].max()),
+                    "bbox_y2": float(box[:, 1].max()),
+                })
+
+        if not results_list:
+            results_list.append({"image_path": "", "text": "", "confidence": 0.0})
+
+        return pd.DataFrame(results_list)
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        """
+        单张图像OCR识别。
+
+        Args:
+            s: 输入数据，dict，包含image_path键
+
+        Returns:
+            包含OCR结果的dict
+        """
+        df = pd.DataFrame([s])
+        result_df = self.transform(df)
+
+        if len(result_df) == 0 or (len(result_df) == 1 and result_df.iloc[0].get("text", "") == ""):
+            return {"text": "", "all_texts": []}
+
+        texts = result_df["text"].tolist()
+        return {
+            "text": " ".join(texts),
+            "all_texts": texts,
+            "detail": result_df.to_dict("records")
+        }
+
+    def transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        # OCR 语义为"一行输入 -> 多行输出", 与框架 extract_dict 逻辑不兼容, 直接走 udf
+        return self.udf_transform_single(dict(s), **kwargs)

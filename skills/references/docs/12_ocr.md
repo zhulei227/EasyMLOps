@@ -5,6 +5,7 @@ OCR 模块提供两套文本检测与识别引擎：
 | 引擎 | 类 | 定位 |
 |------|----|------|
 | **RapidOCR**（推荐） | `RapidOCRText` | PaddleOCR 模型 ONNX 化轻量推理，CPU 20-50ms 级，无深度学习框架依赖，生产级 |
+| **PaddleOCR**（官方） | `PaddleOCRText` | PP-OCR 官方引擎，SOTA 精度，111 种语言（v0.2.9+ 新增；需 paddlepaddle 框架） |
 | EasyOCR | `EasyOCRText` | 原型/MVP 友好，80+ 语言，但推理慢（150-400ms）且精度上限低 |
 
 > 2025-2026 OCR 领域调研结论：RapidOCR 为 EasyOCR 的生产级替代；
@@ -26,10 +27,30 @@ RapidOCR 依赖：onnxruntime、opencv-python-headless、omegaconf（建议 >= 2
 ## 模块导入
 
 ```python
-from easymlops.ocr import OCRPipeLine, EasyOCRText, RapidOCRText
+from easymlops.ocr import OCRPipeLine, EasyOCRText, RapidOCRText, PaddleOCRText
 ```
 
-## 0. 文本识别 (RapidOCRText，推荐)
+## 0a. 文本识别 (PaddleOCRText，官方引擎)
+
+```python
+import pandas as pd
+from easymlops.ocr import PaddleOCRText
+
+df = pd.DataFrame({"image_path": ["path/to/image.jpg"]})
+pipe = PaddleOCRText(lang="ch", text_score=0.5)
+result = pipe.fit(df).transform(df)
+```
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| lang | str | "ch" | 语言（'ch' 中英混合 / 'en' / 'japan' / 'korean' 等） |
+| use_angle_cls | bool | True | 方向分类器矫正文本行 |
+| text_score | float | 0.5 | 识别置信度阈值 |
+| model_path | str | None | 自定义 det 模型目录 |
+
+兼容 paddleocr 2.x 与 3.x 两代 API；注意 paddleocr 3.x 需 python>=3.9（py3.8 用 `paddleocr==2.10.x + paddlepaddle>=3.0`）。输出字段与 RapidOCRText 对齐。
+
+## 0b. 文本识别 (RapidOCRText，推荐)
 
 ```python
 import pandas as pd

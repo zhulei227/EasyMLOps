@@ -14,9 +14,11 @@ matplotlib
 arch>=5.0.0
 # 可选: TS 深度模块(deep_learning/transformer/state_space/generative)
 # torch>=1.12.0
-# 可选: OCR(RapidOCR, 推荐) / OCR(EasyOCR, 原型级)
+# 可选: OCR(RapidOCR, 推荐) / OCR(PaddleOCR, 官方SOTA) / OCR(EasyOCR, 原型级)
 # rapidocr
 # onnxruntime
+# paddleocr
+# paddlepaddle
 # easyocr
 # 可选: 在线部署(easymlops.table.deploy)
 # fastapi
