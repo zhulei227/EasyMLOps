@@ -1,0 +1,255 @@
+url: https://www.kaggle.com/c/playground-series-s6e7/writeups/4th-place-from-414-to-4-trusting-oof-when-the
+fetched: 2026-11-03
+chars: 11074
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+[4th Place] From #414 to #4: Trusting OOF When the Leaderboard Lied — Predicting Student Health Risk
+[4th Place] From #414 to #4: Trusting OOF When the Leaderboard Lied
+
+Predicting Student Health Risk
+
+Solution Writeup · 4th place · Aug 3, 2026
+
+Hi everyone! First, congratulations to all participants, and thank you to Kaggle and the community for another fun Playground competition.
+
+My final submission scored 0.95094 on the public leaderboard (rank 414) and 0.95084 on the private leaderboard (rank 4 out of 3,356 teams). The score changed by only -0.00010, but the rank improved by 410 places.
+
+That shake-up is the main reason I wanted to write this. The final solution was not a huge stack or an exotic feature factory. It was one FT-Transformer family, one useful representation trick, one metric-aware decision rule, and—most importantly—the decision to trust honest out-of-fold validation over a crowded public leaderboard.
+
+TL;DR
+Model: FT-Transformer, 7 folds, with 4 independently initialized members inside each fold.
+Features: 13 raw features + 39 multiclass exact-value target-encoding features.
+CV: 7-fold stratified CV with every target-derived feature fitted inside the training fold.
+Biggest gain: changing the final decision from argmax(p) to argmax(p / class_prior) improved OOF balanced accuracy from 0.89187 to 0.95063.
+Final result: Public #414 → Private #4.
+Main lesson: align your decision rule with the metric, then trust clean OOF more than tiny public-LB differences.
+1. The problem in one minute
+
+We had 690,088 training rows, 295,753 test rows, 13 features, and three target classes:
+
+Class	Training share
+at-risk	85.87%
+fit	5.77%
+unhealthy	8.36%
+
+The metric was balanced accuracy, which is simply the average recall across the three classes.
+
+This matters because ordinary accuracy and balanced accuracy want different things. A model can achieve high ordinary accuracy by favoring the 86% majority class, while balanced accuracy gives the small fit class exactly the same importance as at-risk.
+
+2. Final pipeline
+official train/test
+    ↓
+7-fold StratifiedKFold (shuffle=True, seed=42)
+    ↓
+fold-local exact-value target encoding
+13 raw features + 13 × 3 TE features
+    ↓
+FT-Transformer × 4 internal members per fold
+    ↓
+OOF probabilities + fold-averaged test probabilities
+    ↓
+prior-corrected decision: argmax(probability / class_prior)
+    ↓
+final labels
+
+
+There was no cross-model stacking in the final submission. XGBoost, HistGradientBoosting, RealMLP, and kNN-density experiments were useful for checking ideas, but none replaced the FT-Transformer submission.
+
+3. The biggest improvement was not the model
+
+The neural network was trained with ordinary multiclass loss and no class weights. Its raw probabilities therefore reflected the heavily imbalanced training distribution. A normal argmax strongly preferred at-risk.
+
+For balanced accuracy, I used this decision rule:
+
+𝑦
+^
+(
+𝑥
+)
+=
+arg
+⁡
+max
+𝑘
+𝑝
+(
+𝑦
+=
+𝑘
+∣
+𝑥
+)
+𝜋
+𝑘
+
+Here, $\pi_k$ is the training prior of class $k$. Dividing by the priors asks a simple question: which class would be most likely if all classes were equally common? That is much closer to what balanced accuracy rewards.
+
+The code is tiny:
+
+classes = np.array(["at-risk", "fit", "unhealthy"])
+prior = y.value_counts(normalize=True).reindex(classes).to_numpy()
+
+pred = classes[(probabilities / prior).argmax(axis=1)]
+
+
+But the OOF effect was huge:
+
+Decision rule	OOF balanced accuracy
+Raw argmax(p)	0.8918688
+argmax(p / prior)	0.9506326
+Improvement	+0.0587637
+
+The corrected OOF recalls were also nicely balanced:
+
+Class	OOF recall
+at-risk	0.93735
+fit	0.94963
+unhealthy	0.96492
+
+This single rule changed 18,151 test predictions, or 6.14% of the test set.
+
+The general lesson is bigger than this competition: probability estimation and the final hard-label decision are separate problems. Before tuning another model parameter, derive what your evaluation metric actually wants.
+
+One warning: class-weighted training and prior correction solve a similar problem. Applying both without checking can over-correct the minority classes.
+
+4. Why exact-value target encoding helped
+
+The second useful idea was to target-encode not only categorical columns, but also the seven numeric columns by their exact values.
+
+That sounds strange. We usually think of numbers as continuous. However, many values in this synthetic dataset were repeated: the generator appeared to resample from a finite support instead of adding fresh continuous noise. A numeric value could therefore behave like a high-cardinality category.
+
+For every one of the 13 input columns and every one of the three classes, the pipeline added the estimated conditional class probability for that exact value:
+
+13 columns × 3 classes = 39 additional features
+
+
+For example, a repeated step_count value received three features describing how often rows with that value belonged to at-risk, fit, and unhealthy—using training-fold rows only.
+
+Leakage control is essential here:
+
+The encoder for each outer fold was fitted only on that fold's training rows.
+Training-fold encodings were themselves generated out of fold.
+Validation and test rows only used mappings learned from the training fold.
+
+Without this separation, target encoding can produce a beautiful CV score that disappears immediately on the leaderboard.
+
+There was another useful lesson: this feature looked about -0.0017 on a small 70k-row screen, but about +0.0012 on the full dataset in the original paired experiment. High-cardinality statistics need enough repeated observations. If you want to make that experiment cheaper, reduce folds or epochs—do not remove the rows that allow the signal to exist.
+
+I later checked the same idea with XGBoost and saw the same direction:
+
+XGBoost representation	OOF balanced accuracy
+Raw features	0.9489047
++ exact-value TE	0.9495564
+
+That independent result gave me more confidence that the gain came from the data representation, not from one neural architecture getting lucky.
+
+5. Model recipe
+Component	Setting
+Model	FT-Transformer
+CV	7-fold stratified, shuffle, seed 42
+Features	13 raw + 39 exact-value TE
+Transformer	2 blocks, hidden size 128, 8 heads
+Numeric embedding	PLR-lite, 24 frequencies, sigma 0.1
+Training	16 fixed epochs, batch size 4096
+Optimizer	AdamW, learning rate 0.001, cosine schedule
+Regularization	weight decay 1e-5, no label smoothing
+Class weights	None
+Early stopping	None
+In-fold ensemble	4 independently initialized members
+Final decision	argmax(probability / class_prior)
+
+I used fixed epochs instead of selecting the best checkpoint on the same fold later used for scoring. This keeps the outer validation fold as an honest measurement rather than quietly using it for model selection.
+
+The seven corrected fold scores ranged from 0.94812 to 0.95295, so the final OOF score was not carried by one lucky split.
+
+6. What did not make the final solution
+
+A short list of dead ends is often more useful than another parameter table:
+
+Full PLR instead of PLR-lite: about +0.00003, effectively noise.
+Small-sample screening for exact-value TE: misleading because the per-value statistics were too sparse.
+Adding medium-resolution numeric TE on top of exact TE: -0.00004; no extra signal.
+kNN density features: +0.00014; positive, but below my minimum effect threshold.
+RealMLP with exact-value TE: strong OOF at 0.95051, but still below the FT-Transformer. Its public/private scores were 0.95062/0.95027.
+More complicated blending: no clean OOF evidence that it beat the simple incumbent.
+
+My mistake was spending too much time deeply auditing several tiny ideas after a strong candidate already existed. Next time I would use a two-stage process: cheap, leakage-safe screening for every idea, then full reproducibility work only for the best one or two finalists.
+
+7. Public #414, Private #4
+
+The final submission had an OOF score of 0.95063 and a public score of 0.95094, so there was no alarming CV/LB mismatch. But the public leaderboard was extremely dense, and that score was only rank 414.
+
+It was tempting to interpret this as evidence that the solution was not competitive. I did not replace it, because:
+
+the validation pipeline was leakage-safe;
+the gain had a clear mechanism;
+per-class recall was stable;
+all seven folds were reasonable;
+later candidates did not beat it honestly.
+
+The private score was 0.95084, almost unchanged from public, but it became the official fourth-place result. Kaggle displays five decimals, and places 3–8 all display 0.95084, so I cannot say anything about the hidden precision behind that ordering. I can only happily accept the official #4. 😄
+
+The public leaderboard was useful as a smoke test: it confirmed that the file format, label mapping, and broad validation story were sane. It was not precise enough to select among models separated by a few ten-thousandths.
+
+8. Credit and reproducibility
+
+The final FT-Transformer implementation, training recipe, and original OOF/test probability files came from Masaya Kawamata's public notebook. Full credit to Masaya for sharing a very strong solution with the community.
+
+My contribution was to treat it as a candidate rather than a black box: I audited the fold-local target encoding, recomputed the metric and prior correction, checked fold and class stability, reconstructed the final CSV from the saved probabilities, and compared it against independently trained alternatives. The reconstructed labels matched the submitted file exactly.
+
+I think public notebooks are one of Kaggle's best learning resources. Using one is easy; understanding why it works, checking that it is honest, and knowing when to trust it are the parts that transfer to the next competition.
+
+Final takeaways
+
+If I had to keep only four lessons from this competition, they would be:
+
+Align the decision rule with the metric. The largest gain may happen after predict_proba.
+Study the data generator. Repeated “numeric” values can contain categorical-style signal in synthetic tabular data.
+Match cheap experiments to the idea. High-cardinality statistics need the full sample size.
+Trust honest OOF over leaderboard noise. Public rank is a useful warning light, not always a useful steering wheel.
+
+Thanks for reading, and congratulations again to everyone! I am happy to discuss any part of the validation, target encoding, or prior correction in the comments. If this saves you from one misleading public-LB chase or one badly screened TE experiment, an upvote would make my day. 😄
+
+Author
+Ricky
+
+rickyds97
+
+arrow_drop_up
+5
+Share
+more_horiz
+Citation
+
+Ricky. [4th Place] From #414 to #4: Trusting OOF When the Leaderboard Lied. https://www.kaggle.com/competitions/playground-series-s6e7/writeups/4th-place-from-414-to-4-trusting-oof-when-the. 2026. Kaggle
+
+comment
+0 Comments
+Hotness

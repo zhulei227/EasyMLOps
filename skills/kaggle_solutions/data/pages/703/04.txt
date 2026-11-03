@@ -1,0 +1,188 @@
+url: https://www.kaggle.com/c/cafa-6-protein-function-prediction/writeups/4st-place-solution-for-the-cafa-6-protein-function
+fetched: 2026-11-03
+chars: 10276
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place Solution for the CAFA 6 Protein Function Prediction — CAFA 6 Protein Function Prediction
+4th Place Solution for the CAFA 6 Protein Function Prediction
+
+CAFA 6 Protein Function Prediction
+
+Solution Writeup · 4th place · Jun 19, 2026
+
+A. MODEL SUMMARY
+A1. Background on you/your team
+
+Competition Name: The 6th Critical Assessment of Functional Annotation (CAFA6)
+
+Team Name: FrOzen777
+
+Private Leaderboard Score: 0.43883 (maximum weighted F-measure, wFmax)
+
+Private Leaderboard Ranking: 4th
+
+Team Member:
+
+Wenbo Dai, School of Computer Science and Artificial Intelligence, Wuhan University of Technology, Wuhan, China
+Email: 339619@whut.edu.cn
+
+A.2 Team Research Background
+
+This is an individual entry. The entire work was completed during my internships at the Laboratory of Structural Biochemistry, University of Science and Technology of China, and HiDimension Biotechnology Co., Ltd. Participating in CAFA6 aimed to deepen my knowledge of biology, with a focus on learning, understanding and applying relevant methodologies. Meanwhile, parts of this competition work have been adopted for my undergraduate graduation project.
+
+A.3 Solution Overview
+
+The overall strategy consists of deploying multiple prediction approaches and integrating their outputs via various ensemble methods.
+
+Main Prediction Methods
+
+(1) FoldSeek-KNN[1]
+
+Implemented with reference to the solution of the 1st-ranked team in CAFA5, achieving a public leaderboard score of 0.233. Due to limited computational resources, several long protein sequences (with no corresponding entries in the AlphaFold Database, AFDB[2]) were excluded from modeling and scoring.
+
+(2) Sprof-GO[3]
+
+Adopted for inference only, yielding a public leaderboard score of 0.248.
+
+(3) Py-Boost[4]
+
+Developed based on the open-source solution of the 2nd-ranked team in CAFA5. Multiple feature extraction backbones were tested, and the predicted label quantities for Biological Process (BP), Cellular Component (CC) and Molecular Function (MF) were adjusted. The framework was adapted and retrained for CAFA6 datasets, with public leaderboard scores ranging from 0.295 to 0.335.
+
+(4) TRGO
+
+A self-developed model. Inspired by the hypersphere matching architecture of DeepGO-SE[5], it is designed for multi-label protein function classification. The model adopts a relatively concise structure, and stacks attention modules to adapt to large-scale datasets. Its public leaderboard score falls between 0.308 and 0.334.
+
+(5) GOA
+
+Directly adopted prediction results shared in the competition discussion forum.
+
+Ensemble Strategies
+
+Multiple ensemble approaches were explored:
+
+Taking the maximum predicted value across models
+Taking the minimum predicted value across models
+Calculating the median of predictions from multiple models
+Computing the average of predictions from multiple models
+Weighted ensemble via learned weight assignment functions
+
+After iterative tuning, the ensemble system reached a public leaderboard score of 0.404 (25th place).
+
+Two sets of results were finally submitted: one scoring 0.404 on the public leaderboard and another scoring 0.335. Notably, the awarded submission was the 0.335 result generated purely by the open-source Py-Boost framework from the CAFA5 runner-up team. This indicates that the ensemble strategies caused overfitting to public leaderboard data and degraded performance on the private leaderboard. In this task, the standalone Py-Boost already delivered competitive performance.
+
+For Py-Boost, the original ESM2-650M embedding was replaced with ESM3-3B (ESM2-650M also showed decent performance). The training dataset was expanded to over 150,000 sequences following the official data acquisition rules of CAFA6. Additionally, the updated go-basic.obo file introduced unforeseen changes to the Gene Ontology (GO) topological structure, including duplicate edges or self-loops, which required targeted code revision.
+
+A.4 Feature Selection and Feature Engineering
+Sequence Features
+
+We extracted sequence features using ESM2-650M, ESM2-3B and ProtT5. After multiple validation runs on the public leaderboard, ESM2-3B was selected for its stable performance.
+
+Structural Features
+
+Structural features were extracted using the esm3-sm-open-v1 model. For ultra-long protein chains, the Pfam-A database was used to identify conserved domains across full-length sequences. We performed structural prediction and feature extraction for individual domains, then fused domain-level features weighted by corresponding E-values. Nevertheless, domain-based structural features performed slightly worse than pure sequence features in this task.
+
+A.5 Model Training Pipeline
+
+Following the annotation acceptance rules of CAFA5, functional annotation data was collected from three authoritative databases: SwissProt, GOA and GO, forming a core dataset of over 150,000 protein sequences.
+
+Extended datasets were also constructed:
+
+Over 550,000 sequences extracted solely from SwissProt
+Over 1.88 million sequences combining SwissProt and TrEMBL
+The original competition dataset containing more than 80,000 sequences
+
+Four training schemes were designed based on the above datasets. The TRGO model was trained on the 550,000-sequence dataset for final submission, while Py-Boost was trained on the 150,000-sequence dataset.
+
+During TRGO training, a frequency-based weighted loss function was adopted. Given the extreme imbalance in label frequency, label weights were smoothed via logarithmic transformation and rescaled to a range from 0.25 to 16. Instead of time-split holdout validation, 5-fold cross-validation was conducted using the latest available annotation data.
+
+A.6 Key Experimental Findings
+Data Quality vs. Quantity
+
+Initial attempts incorporated all sequences and annotations from TrEMBL and SwissProt (1.88 million entries), as well as a standalone SwissProt dataset (550,000 entries). These datasets contained a large number of electronic annotations. We further filtered a high-quality subset of 150,000 sequences with experimentally verified annotations (including newly added entries in the late competition stage).
+
+Experimental results showed that models trained on the three expanded datasets achieved nearly identical performance to those trained on the original 80,000-sequence competition set. Moreover, the 550,000-sequence and 1.88 million-sequence datasets even led to slight score drops on the public leaderboard. A clear conclusion is drawn: data quality outweighs data quantity in this protein function prediction task.
+
+GO Label Post-processing
+
+In early trials, all GO labels appearing in the training set were predicted without quantity restrictions. In post-processing, filtering predictions by retaining labels with relatively high occurrence frequency in the training set and tuning the frequency threshold effectively boosted public leaderboard scores.
+
+Loss Function Comparison
+
+Three loss function designs were tested: Information Accretion (IA) weighting, label frequency weighting, and confidence adjustment based on label categories. Only frequency-based weighting brought moderate performance gains, while the other two approaches impaired model performance.
+
+A.7 Baseline and Simplified Feature Conclusion
+
+The standalone TRGO model with sequence features extracted by ESM2-3B achieved 85% to 90% of the final performance of the full ensemble system.
+
+A.8 Runtime Consumption
+Feature Preprocessing: Structure prediction for 220,000 test sequences and 550,000 training sequences was the most time-consuming step (some proteins have no structural records in AFDB), taking 1 to 2 weeks in total. Extraction of structural and sequence features took 1 to 2 days using three RTX 5090 GPUs.
+Model Training: Training on the 80,000-sequence dataset took 2 to 3 hours with three GPUs running in parallel for BP, CC and MF tasks respectively.
+Ensemble and Inference: Completed within dozens of minutes.
+A.9 Acknowledgement
+
+Special thanks to all authors of the open-source approaches referenced in this work. I am deeply thankful to the Laboratory of Structural Biochemistry, University of Science and Technology of China (USTC), and HiDimension Biotech, Hefei for their full support throughout this project. Furthermore, I would like to acknowledge the contest organizers, all competition staff, and every participant in the discussion area who selflessly shared valuable experience and insights. Thank you very much!
+
+A.10 References
+
+[1] van Kempen M, Kim SS, Tumescheit C, Mirdita M, Lee J, Gilchrist CLM, Soding J, Steinegger M: Fast and accurate protein structure search with Foldseek. Nat Biotechnol 2023.
+
+[2] Varadi M, Anyango S, Deshpande M, Nair S, Natassia C, Yordanova G, Yuan D, Stroe O, Wood G, Laydon A, et al: AlphaFold Protein Structure Database: massively expanding the structural coverage of protein-sequence space with high-accuracy models. Nucleic Acids Res 2022, 50:D439–D444.
+
+[3] Yuan Q, Xie J, Xie J, Zhao H, Yang Y: Fast and accurate protein function prediction from sequence through pretrained language model and homology-based label diffusion. Brief Bioinform 2023, 24:bbad117.
+
+[4] Alexander Chervov, Sergei Fironov, Btbpanda. Private 2nd/Public 5th solution: Py-Boost and GCN. https://www.kaggle.com/competitions/cafa-5-protein-function-prediction/writeups/u900-private-2nd-public-5th-solution-py-boost-and-. 2023. Kaggle
+
+[5] Kulmanov, M., Guzmán-Vega, F.J., Duek Roggli, P. et al. Protein function prediction as approximate semantic entailment. Nat Mach Intell 6, 220–228 (2024).
+
+Author
+FrOzen777
+
+frozen777
+
+arrow_drop_up
+11
+Share
+more_horiz
+Project Links
+GitHub - daiwb-sz/CAFA6-4th-from-CAFA5-2th: from CAFA5-2th · GitHub
+
+https://github.com/daiwb-sz/CAFA6-4th-from-CAFA5-2th
+
+link
+
+github.com
+
+Citation
+
+FrOzen777. 4th Place Solution for the CAFA 6 Protein Function Prediction. https://www.kaggle.com/competitions/cafa-6-protein-function-prediction/writeups/4st-place-solution-for-the-cafa-6-protein-function. 2026. Kaggle
+
+comment
+0 Comments
+Hotness

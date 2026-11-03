@@ -1,0 +1,198 @@
+url: https://www.kaggle.com/c/playground-series-s6e5/writeups/4th-place-5-day-rush
+fetched: 2026-11-03
+chars: 4533
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th place - 5 day rush — Predicting F1 Pit Stops
+4th place - 5 day rush
+
+Predicting F1 Pit Stops
+
+Solution Writeup · 4th place · Jun 1, 2026
+
+Wow! I restarted on this competition with only 5 days remaining (at 0.95406 LB) and I only expected a top 10 finish at most. Turns out its a top 4 finish :D! As usual, many thanks to the people who shared their code and insights, including but not limited to: @yekenot, @masayakawamata, @mikhailnaumov, @ern711, @onurkoc92.
+
+Now onto my solution (which is fairly standard :V):
+
+FE
+
+For GBDTs, my best feature set was relatively small:
+
+Count encoding on categorical columns
+Arithmetic interactions from @yekenot's (overpowered) RealMLP notebook
+TE on some pairs (also from @yekenot's notebook)
+
+I didn't really train that many NNs myself, so I just used the same feature set to train them, mostly just yoinked the oofs from various public NNs, they did the job
+
+Models
+
+I only really want to list out my best XGB's scores: CV 0.95378, Public 0.95313, Private 0.95346. If I listed out other model's scores, they would all be models from public notebooks :V
+
+Ensembling
+
+I tried a few ensemblers as usual and HC was the best for me, so I used it to the end. The final ensemble has CV 0.95529, Public 0.95469, Private 0.95488. I blended it with @mikhailnaumov's ensemble at the end since I couldn't reproduce his scores, and got Public 0.95471 Private 0.95490. Without his ensemble, I would have landed 6th :V
+
+Conclusion
+
+In conclusion, trust in yourself, even when you're ranked ~400th place in a comp with 5 days left. Happy Kaggling!
+
+Author
+Mahog
+
+mahoganybuttstrings
+
+arrow_drop_up
+22
+Share
+more_horiz
+Citation
+
+Mahog. 4th place - 5 day rush. https://www.kaggle.com/competitions/playground-series-s6e5/writeups/4th-place-5-day-rush. 2026. Kaggle
+
+1
+3
+comment
+4 Comments
+Hotness
+Chris Deotte
+
+Posted 5 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing job. Nice 5 day sprint. Congrats achieving 4th place!
+
+reply
+Reply
+Navneet
+
+Posted 5 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Bravo for the 4th Place @mahoganybuttstrings
+
+reply
+Reply
+Masaya Kawamata
+
+Posted 5 months ago
+
+· 8th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on another strong finish, Mahog!
+
+One thing I'd love to hear more about is the scale of experimentation behind the final ensemble. You mentioned the feature set and score of your best XGB, but roughly how many feature variants and OOFs did you manage to generate during those last few days?
+
+I'm also curious about the final HC setup—about how many candidate OOFs were in the pool, and roughly how many were ultimately selected?
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 5 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats to you too!
+
+roughly how many feature variants and OOFs did you manage to generate during those last few days?
+
+In total, I had 265 OOFs. Most of them were from tuning various models, I didn't experiment with different features for diversity that much this time.
+
+I'm also curious about the final HC setup—about how many candidate OOFs were in the pool, and roughly how many were ultimately selected?
+
+The 265 OOFs were inputted into HC and it selected 57 models
+
+reply
+Reply
+1
+Jerry
+
+Posted 5 months ago
+
+· 7th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on your finish Mahog! I am curous about how you generated 265 models in a few days - Is it a cartesian product of [different feature engineering] x [different models]? Do you use different hyperparameters for models of the same class (e.g. all XGBoost models)?
+
+reply
+Reply
+Mahog
+
+Topic Author
+
+Posted 5 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats to you too! It's more like a product of [different feature engineering] x [different models] x [different hyperparameters]
+
+reply
+Reply
+AshishSinghRawat
+
+Posted 5 months ago
+
+· 241st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congrats: on 4th place
+question: if there is a feature set A and you have to train xgb model so do you train one xgb model on this feature set A or like many xgb with same feature set but diff param if yes so how many whats your approach.
+i am curious how you able to generate 260s oofs please explain with small example:
+
+reply
+Reply

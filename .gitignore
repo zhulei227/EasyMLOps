@@ -8,3 +8,4 @@
 build/
 easymlops.egg-info/
 skills/kaggle_solutions/data/index/
+skills/kaggle_solutions/.playwright-cli/

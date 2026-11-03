@@ -1,0 +1,277 @@
+url: https://www.kaggle.com/c/playground-series-s6e4/writeups/4th-place-more-ensemblers-than-models
+fetched: 2026-11-03
+chars: 9947
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th place - more ensemblers than models! — Predicting Irrigation Need
+4th place - more ensemblers than models!
+
+Predicting Irrigation Need
+
+Solution Writeup · 4th place · May 1, 2026
+
+I've skipped the write-ups for a few of my recent Top 10-15 finishes, for a variety of reasons. The 2nd place finish last month (PSS6E3) certainly warranted a writeup, but I was down with Bronchitis and just not up to it. This month's competition was a bit weird with the combination of the High class being just 3.3% of the samples, and the metric being balanced accuracy - it made the CV-LB relationship a bit wonky. I'm glad to finish 4th, even though the submissions I selected ended being outside my top 10-15 (perhaps 20!) on the private LB. Before I go on, I'd like to thank those who generously shared their code and/or insights, including (but not limited to) :
+
+@aerdem4, @cdeotte, @siukeitin, @utaazu, @yunsuxiaozi, @yekenot
+
+Unlike most of my strong finishes in past episodes, where I built large ensembles of many models and usually tried a few ensemblers, with Ridge often being the one behind the top scoring solutions, this month was very different. Adding models often didn't improve CV or (especially) LB. The requirement of predicting a label rather than probability/number also mean that voting was an obvious thing to try. I always try a few ensemblers - typically Ridge, Hill Climbing (HC) & Autogluon; more occasionally NNs, GBDTs, Logistic Regression etc. This month, I decided to get a headstart by trying multiple ensemblers, and was especially keen on using Logistic Regression with logits, after reading @cdeotte's winning solution in PSS6E3, and finding out that it did indeed help my score as well(after the competition ended, of course). As I kept adding more ensemblers at both the L1 and L2 levels, soon my enembling notebook was taking an hour, so I also used a "leaner" version with "only" 6 L1 and 2 L2 ensemblers. The bigger one had as many as 11 L1 and 4 L2 ensemblers, including Rank Average, MLP, LGB, Ridge, LogReg with logits, Differential Evolution, Hill Climbing and more; with the L2 ensemblers being Hill Climbing, LogReg with logits, Differential Evolution and Top-K average. I also used the average of the L2 ensemblers (which was often but not always better than that of the individuals L2s), as well as the average across all L1 + L2 (which was typically weaker, so rarely used). It was clear that the combo of High being quite rare but as important as Medium and Low meant that the scores were very sensitive to slight variations in predicting High in particular, opening the door to "lottery ticket" situations. My best scores certainly all felt a bit like that - an L2 vote suddenly jumping ahead of the CV of individual L2s by quite a bit, or the occasional model with LB > CV + 0.001. My top solo model on the public LB was CatBoost with CV 0.979875, LB 0.98143 - a clear lottery ticket winner surrounded by several other CBs with just a few different features, slightly higher CVs, but scores in the 0.97996-0.98115 range (this nb scored only 0.98022 on the private LB, while the top solo was another, similar CB, with CV 0.980602, LB 0.98111 on public, and 0.98086 on private LB - quite amazing to think it could have placed 12th on the private LB as a solo model). Similarly, my top two ensembles (using only 14 and 12 models, respectively) on the public LB scored 0.98191 (0.98132 private) and 0.98190 (0.98140 private) with L2 voting, well ahead of the individual L2. My top public LB score of 0.98200 came via 3-way voting between these two and my strongest solo model (but this only scored 0.98133 on private LB). Given that CV-LB was wonky, I couldn't trust CV enough to base my final two selections on that - and L2 voting made that tricky anyway.
+
+Reviewing my scores on the private LB afterwards, it turned out that I had some 15-20 scores higher than my final 2 selections, all the way to 0.98148. But given how hard it was to know that, I can't really be mad - rather, I'm thankful to still end up being 4th. The 0.98148 was achieved with just 9 models - literally a case of more ensemblers than models! This notebook had scored only 0.98118 on the public LB, but its L2s were
+
+L2C_hillclimb 0.981457
+L2B_topK_avg 0.981448
+L2A_lr_logits 0.981355
+L2D_diffevol 0.981233
+
+So it ended up being pretty consistent with that on the private LB.
+
+Most of the month was spent trying various things that didn't help the final ensembles - lots of variants of GBDTs, various NNs, some notebooks with heavy feature engineering, and so on. I should also mention that I've been using Claude for the last several episodes, alternating between marveling at how much it helps, and being annoyed at how it often seems to give up too early, and how quickly I seem to run out of tokens on a $20 subscription. I've tried ChatGPT off and on, but find it more annoying and less effective than Claude. Wondering whether to try Gemini and/or other options - all feedback/suggestions are most welcome.
+
+In the end, it was weird but fun in its own way. I'd like to end with big congratulations to @kirill0212, @cdeotte, @nikita7364777 & all others who finished strong and/or learned new things. All the best for May, and Happy Kaggling!
+
+Author
+Optimistix
+
+optimistix
+
+arrow_drop_up
+24
+Share
+more_horiz
+Citation
+
+Optimistix. 4th place - more ensemblers than models!. https://www.kaggle.com/competitions/playground-series-s6e4/writeups/4th-place-more-ensemblers-than-models. 2026. Kaggle
+
+comment
+12 Comments
+Hotness
+Durga Kumari
+
+Posted 6 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation @optimistix on the 4th place finish. Especially in such a tricky setup with the rare High class and noisy CV-LB relationship.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 6 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you!
+
+reply
+Reply
+Chris Deotte
+
+Posted 6 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @optimistix finishing in top both public and private. You consistently finish high and achieving 4th place solo is great.
+
+The CV - LB relationship was very noisy in this competition. I too was confused what to pick and what to trust. Using many stackers and blending them was a nice way to minimize the variance and get it to generalize better.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 6 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much!
+
+reply
+Reply
+r0tor
+
+Posted 6 months ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on 4th place, and thank you very much for the mention!
+
+Your writeup describes the competition very accurately. I had almost the same experience: CV and LB were very unstable, and the rare high class made small prediction changes extremely important.
+
+It is very interesting that your best results also came from voting between strong ensemble outputs. This competition really felt like final submission selection mattered almost as much as the modeling itself.
+
+Great work and congrats again!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 6 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, and congrats once again to you too - your solution makes me wonder how it would have gone if I'd included more of the models that I built but left out of the ensembles. But it was also fun to do things differently for a change.
+
+reply
+Reply
+1
+Jerry
+
+Posted 6 months ago
+
+· 590th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I have a quick question for people who use a lot of models - how do you set it up on Kaggle? Do you just submit one long-running notebook that trains everything, or set up separate notebooks to pretrain the models and feed them to the submission notbook?
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 6 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! I guess it depends on a combo of Kagle constraints, how organized one is, etc. Kaggle's upper bound of 12 hours' runtime means you may not be able to fit too many models into one notebook, unless the dataset is pretty small. Nonetheless, many people have routinely packed anywhere from 5-25 models in one notebook in past competitions. Also, since the playground competitions allow one to simply submit the final results, offline code can potentially run much longer & accommodate more models. The most well organized competitors have templates, feature stores and various components that they reuse, some use tools like weights and biases, etc. I'm among the less organized ones who run many different notebooks, save OOF and Test Preds, combine them afterwards & ensemble (lather, rinse, repeat).
+
+reply
+Reply
+AshishSinghRawat
+
+Posted 6 months ago
+
+· 72nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+that's a lot of work, congrats.
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 6 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks - and congrats for a top 2% placing, and sharing one of the top public solo models.
+
+reply
+Reply
+1
+Ravi Ramakrishnan
+
+Posted 6 months ago
+
+· 87th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Superb pipeline @optimistix
+Perhaps trying more ensemblers was the key! I tried a few models early on and left early for other competitions but this is great to read through!!!
+
+reply
+Reply
+Optimistix
+
+Topic Author
+
+Posted 6 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! Looks like its back to "normal service" this month.
+
+reply
+Reply
+Ravi Ramakrishnan
+
+Posted 6 months ago
+
+· 87th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+and back to regular participation also @optimistix
+
+reply
+Reply

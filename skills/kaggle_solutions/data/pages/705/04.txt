@@ -1,0 +1,241 @@
+url: https://www.kaggle.com/c/nvidia-nemotron-model-reasoning-challenge/writeups/4th-place-solution
+fetched: 2026-11-03
+chars: 12767
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place solution — NVIDIA Nemotron Model Reasoning Challenge
+4th Place solution
+
+Learnings on trainable traces, LLM automation, bit manipulation and other solutions
+
+NVIDIA Nemotron Model Reasoning Challenge
+
+Solution Writeup · 4th place · Jun 23, 2026
+
+4th Place Solution — Trainable Traces & a Full-Solve Bit-Manipulation Reasoner
+
+First, a big thank you to NVIDIA and Kaggle for running this competition.
+It was a truly instructive challenge to figure out the quirks of compressing chain of thoughts and making sure it follows the algorithm exactly /make-no-mistakes and I learned a ton.
+
+Thanks also to everyone on the forums who shared ideas and baselines throughout. And a special thanks to @huikang for sharing the open progress prize baseline, just like many others, its a major part of my final model.
+
+TL;DR
+The main upside was 99.4% of bit-manipulation, as they actually map to only 5 templates.
+Designing trainable traces. I didn't have a whole lot of compute, so my principle was to refine the bit manipulation traces until they have >95% high accuracy with only ~2500 examples (original + generated). Huikang's original traces was close to 82% accurate with the same amount of training.
+I was able to use the trainable traces as guiding principles for an coding assistant LLM to refine the traces without me needing to review them, while not hiding compute or referencing information after already providing the output.
+Smaller wins on the other categories: frequency-ordered operator deduction for equation_numeric_deduce, also optimal solve rate for equation_numeric_guess, and symbol-splitting + an operator-glyph prior for cryptarithm which reduced errors.
+LoRA setup changes: MoE experts untied, lower batch size (12/16) learns better. Fully trained on RTX 6000 Pro, no Tinker api.
+Compute & data: I spent only about ~$120 total, on Colab Pro G4 instances + Kaggle weekly compute. Final Training data was 9,500 original problems + 15,000 synthetic traces.
+
+Basically all of the code in this solution was written by Claude (Opus 4.8). I actively tried to automate every step I was doing manually, including vague ideas like creating trainable traces to check for hidden compute.
+
+What makes a trace "trainable"
+
+To achieve high accuracy with low amount of training, when reading a trace, my intuition was "can I figure out in my head where this next token came from?". Effectively it follows the principles of scratchpad traces, but making the Opus follow the principles when iterating traces let me optimize it much better than I could manually.
+
+No hidden compute. Every emitted token must be derivable from visible
+context plus a small, fixed rule set. If your generator computes something (a
+join, a filter, a best-of-N pick) and prints only the result, thats too much compute to be done in a single forward pass.
+Locality. Computation must sit near its operands. Retrieving a short
+named value from far away is fine; computing over operands printed thousands
+of tokens earlier reliably fails, especially for smaller models. Rule of thumb:
+every line should be computable from ~10–20 lines above it, or be a verbatim
+copy of a named line.
+Causal consistency. The shape of the trace may only depend on what's
+already written. If only the winner gets a special verification block, the
+model learns "decide first, decorate later".
+Reference integrity. A deduction line may only cite names/values that
+literally appear earlier in the trace.
+Fewer, uniform rules. Every distinct rule is something the adapter has to learn. A complex set of rules that trigger only on a small percentage of traces won't get learnt reliably. That will end up needing a huge amount examples to fit. A structure that fires in only a handful of traces can't be learned at all.
+
+N.B I'm not trying to say complex rules cannot be learnt by the Nemotron model, its a 30B model with enough examples it can likely learn highly complex rules, but I needed to reduce the training samples needed.
+
+Tests for trainable traces
+
+Because these properties are mechanical, they can be checked with code. Claude wrote scripts that ran as tests on the full trace
+dump after every format change:
+
+a reference-integrity audit (every quoted entry exists in its source
+block)
+a locality audit (for every derived line, measure the token distance to
+the farthest source line it needs, bucketed by edge type)
+Metrics for correctness
+
+The main metric I observed for training was first token divergence, this can be measured at training time by greedily checking the model's next token against the ground truth. If you use all unique sequences during training, that's effectively an eval on an unseen trace. I also ran cheap non-generation eval the same way, "how many greedy next token probabilty matches the ground truth" (refer to the training code link shared below). In practice I observed that an 80% exactly meant over 95% generation match, because not all mistakes are load bearing, sometimes a wrong token during generation doesn't change the result.
+
+Pointing the LLM at the generation viewer
+
+I built several throwaway web-ui for the challenge, to help with visualization and understanding. One of them renders the trained
+model's generation side-by-side with the gold trace, with the divergences highlighted. Later I pointed Claude directly at this viewer's output, and it would
+spot the recurring failure pattern (e.g. "clustered misses on the Matched section")
+and propose a format fix that removed the hidden hop. Train → diff → classify → reformat → retrain, each training about ~1 hour.
+
+Per category solutions
+Fully solved bit manipulation (almost)
+
+Bit-manipulation was the category I invested the most in, and it's where the
+trainable-trace philosophy paid off. I discovered that all the problems that
+aren't 1op or 2op solvable follow one of 5 templates, built over three shifted
+leaves — SHLa = shift-left by a, SHRb = shift-right by b, ROTc = rotate
+by c:
+
+template	form	per-bit definition
+Majority	Majority(SHLa, SHRb, ROTc)	majority vote of the three leaves
+Choice	Choice(SHLa, SHRb, ROTc)	SHLa ? SHRb : ROTc
+M5	Majority(SHRb, SHLa OR ¬ROTc, ROTc OR ¬SHLa)	SHRb OR ¬(SHLa XOR ROTc)
+C3	Choice(SHLa, ROTc, SHRb OR ¬ROTc)	SHLa ? ROTc : (SHRb OR ¬ROTc)
+C4	Choice(SHLa, SHRb XOR ROTc, SHRb OR ¬ROTc)	SHLa ? (SHRb XOR ROTc) : (SHRb OR ¬ROTc)
+
+These solve all the remaining problems, and cruicially in the exact position as the template, for example the Choice templates always start with SHL.
+
+Unfortunately this cannot be solved with brute force search within 7500 tokens, so I still had to design a trace that reduces the search.
+
+The key insight: for these LSB-first bit problems, two anchor bit positions
+collapse the whole template+amount search:
+
+At position 7, every left-shift amount is dead, so the output column is a
+2-variable function of two input columns (the right-shift source and the
+rotate source).
+At position 0, every right-shift amount is dead, so the output column is a
+2-variable function of the left-shift and rotate sources.
+
+So instead of guessing shift amounts by counting (which never worked as a
+trainable trace), the reasoner reads the amounts off two anchor tables by
+classifying the four quadrants of each anchor output column, joins the bit-7 and
+bit-0 hypotheses on their shared rotate amount, and then runs a full verification line for every joint candidate (failing at the first wrong bit).
+Every line is either a direct candidate check or a scan-classification of
+columns printed just above it — no best-of-many scores anywhere.
+
+A trimmed slice of a real p=7 anchor table (cell streams truncated with …):
+
+P7:
+03  01:1 00:1 01:1 11:1 …  ->  11-1   1011 ORNOT 30
+04  00:1 01:1 00:1 11:1 …  ->  11-1   1011 ORNOT 40
+05  00:1 00:1 01:1 11:1 …  ->  11-1   1011 ORNOT 50
+
+
+Each row scans one source-column pair across the examples, prints each
+(bit_u bit_v):out_bit cell, then reduces them to the four-quadrant pattern
+over 00 01 10 11 (- = a quadrant the examples never hit). Here 11-1
+matches the ORNOT function 1011, and the trailing digits pin the source
+columns (e.g. 30 → cols 3,0) which convert directly to shift amounts. Every
+value sits on the line, so there's nothing to compute out of view.
+
+Results of the reasoner itself (gold generation, before training):
+
+metric	value
+exact-match	1593 / 1602 (99.4%)
+trace tokens (mean / p95 / max)	4,148 / ~4,600 / 6,739
+
+The 9 it misses are example underdetermined.
+
+Getting this trainable took several format passes guided by the generation
+viewer. The rules are actually look weirdly complex at first glance, but thats where iterating with a coding assistant to refine the traces helped.
+
+Other optimizations
+equation_numeric_deduce Candidate operations are tried in order of their measured frequency in the original problems, so the first consistent match is also the most probable one (e.g. signed subtraction is tried before absolute difference because it's far more common).
+equation_numeric_guess The same logic measured frequency logic as equation_numeric_deduce, but it achieves about 39% solve rate, which I literally didn't even look at, just asked Claude to follow the trainability principles and it came up with the trace. As long as it achieves low rates of token divergence in evals, it works.
+
+Code for generation of the traces are shared along with the dataset.
+
+Training and LoRA hyperparameters (Mostly same as Huikang's training code)
+setting	value
+LoRA rank / alpha / dropout	32 / 32 / 0.0
+target modules	q/k/v/o, up/down, in_proj/out_proj (Mamba), lm_head
+MoE experts	untied
+batch size	16 micro-batch 4 (lower batch size converged faster)
+learning rate	2e-4, cosine w/ warmup + final cooldown
+loss	Cut Cross-Entropy (no logits materialization)
+Compute & data
+~$120 total spend. I trained on Google Colab Pro (pay as you go) G4 instances and Kaggle weekly compute for RTX 6000
+Pro instance.
+Training data:
+9,500 curated/"original" problems (the competition-provided set, all 9
+categories), and
+15,000 synthetic problems generated by my reasoners (heaviest on bit-manipulation).
+The final mix oversamples/subsamples per category, with some randomly repeated samples from both original and generated.
+category	original	generated	total
+bit_manipulation	2,000	6,500	8,500
+cipher	2,000	2,400	4,400
+cryptarithm_deduce	150	1,400	1,550
+cryptarithm_guess	50	200	250
+equation_numeric_deduce	1,000	2,300	3,300
+equation_numeric_guess	100	1,900	2,000
+gravity	1,600	1,600	3,200
+numeral	1,600	400	2,000
+unit_conversion	1,600	900	2,500
+total	10,100	17,600	27,700
+
+Final training takes about 11 hours to converge to 99% solve rate on bit manipulation, but training on the same dataset for 5 hours should still achieve 0.89 private LB score.
+
+Discarded solutions
+Bit-manipulation "partial solve". Before the full anchor solver, I had a partial-solve trace that infers the operands based on Huikang's per bit operation deductions, this was about 93% solve rate, but had trainability issues. Though using this alone was enough to achieve a gold.
+Cryptarithm (full solve). Unfortunately I didn't have time to look into this, briefly tried to solve it using a limited set of operators and modulo arithmetic, but it didn't train well enough.
+Releases
+Dataset: https://www.kaggle.com/datasets/dipamc77/nemotron-final-v1-tokens
+Training notebook: https://www.kaggle.com/code/dipamc77/nemotron-training-final
+
+The training mix in the released dataset is identical to CATEGORY_SAMPLE_COUNTS
+in train.py.
+
+Closing thoughts
+
+Congratulations to the winners and thanks again to NVIDIA and Kaggle, and to everyone who shared their work. This was a genuinely great competition. This was my first time committing again on Kaggle after 1.5 years, and safe to say the use of LLMs supercharged everything, looking forward to future challenges.
+
+Author
+Dipam Chakraborty
+
+dipamc77
+
+arrow_drop_up
+9
+Share
+more_horiz
+Citation
+
+Dipam Chakraborty. 4th Place solution . https://www.kaggle.com/competitions/nvidia-nemotron-model-reasoning-challenge/writeups/4th-place-solution. 2026. Kaggle
+
+comment
+1 Comment
+Hotness
+Bobber Cheng
+
+Posted 4 months ago
+
+· 320th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I really appreciate your sharing. It's a great solution that only needs about 10 hours train with RTX 6000 Pro, 38 hours train with spark GB10 to replicate your solution with public 0.888, private 0.896. Here is my checkpoints and the final weight https://www.kaggle.com/datasets/bobber/gb10-vast-parity-nemotron-final-checkpoints.
+
+reply
+Reply

@@ -1,0 +1,367 @@
+url: https://www.kaggle.com/c/vesuvius-challenge-surface-detection/writeups/4-th-place-solution
+fetched: 2026-11-03
+chars: 13033
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4-th Place Solution — Vesuvius Challenge - Surface Detection
+4-th Place Solution
+
+Huge nnUNet and heavy postprocessing
+
+Vesuvius Challenge - Surface Detection
+
+Solution Writeup · 4th place · Feb 28, 2026
+
+Thanks for host for this meaningful and interesting competetion as well as detail answer for metric questions. And congradulations for winners!
+
+This competetion just show the powerful generalization of nnUNet again. It's the best segmentation framework in the world (I think) !
+
+TLDR:
+
+Huge nnUNet and heavy postprocessing
+
+1 . Segmentation Model:
+
+Model training :
+I did nothing just train a huge nnUNet (Resenc UNet with 7 stages covolution) with sufficient epoch (2000).
+
+Inference: Uses nnUNetPredictor with a tile_step_size of 0.5 and test-time augmentation (mirroring) to ensure smooth and robust predictions.
+
+Preliminary postprocessing: threshould=0.2 and remove components with size < 1000.
+
+2 . Postprocessing: Two Stage hole Filling and Metric Hacking
+1st Stage: PCA Hole Filling (Projection-based)
+
+This stage targets large, obvious topological loops (Betti-1 errors) by analyzing 2D projections.
+
+Detection: The projection_betti1_finding function projects 3D connected components onto XY, YZ, and ZX planes. It identifies "isolated regions" (background holes) that do not touch the image boundaries.
+
+Refinement:
+
+It extracts the 3D coordinates of these problematic surfaces and applies Principal Component Analysis (PCA) to find the optimal 2D fitting plane.
+The points are mapped to 2D, where a binary_fill_holes operation is performed.
+The filled results are re-mapped back to 3D space using the inverse_transform of the PCA.
+This step intend to fill some large holes.
+
+In fact, there are another more elegant solution for this part:
+component detection -> PCA transformation -> RBF function fitting (torchrbf acceleration) -> interpolation -> PCA inverse transformation -> 3D dialation
+
+However, there are a critical problem in this part:
+
+How to separate adhering sheets ?
+
+For those adhering sheets, this method would fail. And till now, I still can not find a good method to solve this problem. Looking forward other teams solution.
+
+2nd Stage: PCA Hole Filling (Betti-Matching-based)
+
+A more granular refinement stage using specialized topological tools.
+
+Detection: Utilizing the betti_matching (C++) library, the bmbarcode_betti1_finding function performs a local persistent homology analysis.
+
+Local Processing: The volume is divided into 20, 20, 20 chunks. If a local block exhibits a Betti-1 error (determined via barcode calculation), the PCA filling logic is applied locally to seal small breaks or gaps in the structure.
+
+If one check the competetion metric, it can be found that the topo score is very sensitive, even if a small hole would contribute to a large drop for topo score.
+
+Hacking the Metric
+
+This specific logic is designed to optimize the final topological score by manipulating the betti-2 count. Although host claim that practical impact at the top end should be limited, it still exist some bugs (I think) and can be utilized in the follow way:
+
+Automatic Betti-2 Hole Filling: The fill_betti2_holes function identifies background components completely enclosed by the foreground and fills them to eliminate unwanted internal cavities. Set betti-2 = 0
+
+Manual create betti2 number: In cases where specific error thresholds are met (e.g., high betti-0 or betti-1 error, for example: betti-0 > 50 or betti-1 > 5 , can be calculated using the bm.compute_barcode function), then create a small betti-2 error mannually. This step is dangerous to some degree, as it can just calculate betti-0 or betti-1 numbers of the whole predictions, but in evaluation, there are igore masks which could contribute to totally different betti-0 / 1 numbers.
+
+It locates a voxel that is "fully enclosed" (all 26 neighbors are foreground) within the largest connected component.
+It sets that single voxel to 0, effectively creating a manual Betti-2 hole.
+
+Strategy: This "hack" serves to balance the topological metrics if the evaluation criteria favor a specific distribution of Betti errors across different dimensions.
+
+Some other thoughs but have not try:
+end-2-end training a rbf function to get 0 holes sheets
+traing a point cloud seperation model to seperate the adhering sheets
+
+It must be acknowledged that my solution is not so elegant, but it do works. Looking forword to learn other teams solutions.
+
+This writeup maybe lose some details. I will refine it in following days. Feel free to ask any questions.
+
+Some ablations (Based on my best models)
+
+	Public LB	Private LB
+Segmentation Model + Remove dust	0.590	0.609
++ Stage1 + Stage2 + Hacking	0.602	0.622
+
+submission notebook: https://www.kaggle.com/code/shtljw/vcsd-4th-place-solution
+
+Author
+Starry
+
+shtljw
+
+arrow_drop_up
+31
+Share
+more_horiz
+Project Links
+VCSD_4th_place_solution
+
+10 months ago · 6 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+VCSD_nnunetv2_s7_bs8_ps192
+
+8 months ago · Usability 0.7
+
+tenancy
+
+Kaggle Model
+
+Public
+
+Citation
+
+Starry. 4-th Place Solution. https://www.kaggle.com/competitions/vesuvius-challenge-surface-detection/writeups/4-th-place-solution. 2026. Kaggle
+
+1
+1
+comment
+10 Comments
+Hotness
+Dieter
+
+Posted 8 months ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Haha, I think nnUnet is the worst. Unflexible and hard to integrate with anything external. They even advertise with forcing you to adopt their standards: "Simply convert your dataset into the nnU-Net format and enjoy the power of AI - no expertise required!"
+
+But everybody can have his own opinion. Congrats to your result!
+
+reply
+Reply
+3
+Starry
+
+Topic Author
+
+Posted 8 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+haha, the code of nnunet is definitely huge and highly intergrated so that hard to adopt for various ideas. But for most of us, it is powerful enough to get a relative good result. At least for me, develop a strong baseline is not so easy.
+
+Indeed, I read your byu and cryo
+competition solution writeups and try to train a diverse model based on monai framework in last few days for final ensemble , but I give up as the result is not so good. So I (as well as most of participates I think, as most of us are using nnunet) looking forward to learn your solution since I guess you use monai framework. I wonder what I lose to get a comparable results relative to you even if we use the same monai framework :) .
+
+reply
+Reply
+Dieter
+
+Posted 8 months ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I did not use monai either. Just coded everything from scratch. Or rather let it code by an Agent. E.g. Having an agent recode medicai based SEResNext + AttentionUnet in pure pytorch gives you more control and a 60% speedup. Our solution has in common to use bettimatching library (or rather a speed-up version) for tunnel detection and then filling the found tunnels. I think thats smart and directly addresses the tunnel problem.
+
+I think main differentiator is my loss. Really mad at hosts for prolonging 2 weeks for no critical reason. Additionally to that they shared nnUnet based top10 solution few weeks before end and pushing everyone to use that. To me it shows they are already set on the outcome and not interested in anything creative.
+
+Will do a write-up later, not for hosts but rather for the kaggle community.
+
+reply
+Reply
+3
+Giorgio Angelotti
+
+Competition Host
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+Dear Christof,
+
+First of all, I want to say that besides adopting nnUNet, many Kagglers, like @shtljw , have been creative, especially with post-processing. This is very useful. We are learning a lot from it, and some of these ideas will matter even beyond this competition.
+
+Of course we care about the final outcome, but we also believe progress comes from curiosity and trying different ideas. That is why we did not publicize our baseline at the beginning. The baseline is a “simple” nnUNet, and we knew it was very strong. We wanted to avoid everyone jumping to it immediately and stopping the exploration of the solution space.
+
+When we later decided to publicize it, we also chose not to say publicly that, at that moment, the baseline was second on the private LB and almost tied with first. We felt that would have been even more discouraging for the community. After two months, with that result still holding, we felt it was the right time to publicize what we had in a pinned post. In any case, it was already public and well known to many contestants, especially those familiar with the Vesuvius Challenge community, and to anyone who had looked at our monorepo.
+
+Even then, we did not want to push everyone to use nnUNet. We expected teams with a strong approach to keep going with their own ideas, and maybe take inspiration only from the loss functions or the post-processing. In the end, most people moved to nnUNet, and they trained in an exceptional way. You were probably the only one with a solid alternative, and that is truly remarkable.
+
+About the two-week extension: after talking with the Kaggle support team, we felt it was needed. The metrics take a long time to compute, and each team had a limited number of submissions per day. Also, after the urgent fixes to the test data, people needed time to recalibrate to the new public LB and understand what had changed. We knew this was controversial, because many people and also us hosts had already planned around the deadline, for example Chinese New Year for many Chinese Kagglers, or Carnival for Europeans and Brazilians. Still, given the situation, we felt we had to do it.
+
+If your solution is comparable to nnUNet but faster, we would really love to see it. We have to run these models on full scroll volumes, blending overlapping chunks. It is a lot of compute, and any speedup helps a lot.
+
+We are very happy that you participated in this competition.
+
+reply
+Reply
+
+This comment has been deleted.
+
+Maxim Shatskiy
+
+Posted 8 months ago
+
+arrow_drop_up
+1
+more_vert
+
+I observed the same at medical competitions… most people directly default to nnUnet…which is great baseline by default. But then all solution's look alike and the worst part.. some very fine details are very deep in the convoluted nnUnet code…and were not documented until recently, such as data preprocessing.
+
+reply
+Reply
+Giorgio Angelotti
+
+Competition Host
+
+Posted 8 months ago
+
+arrow_drop_up
+0
+more_vert
+
+I really like the Betti-matching based post-processing. It's a very nice idea!
+
+reply
+Reply
+Starry
+
+Topic Author
+
+Posted 8 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+To be honest, In my opinion, the best direction I think to get perfect surface is to fit a end-to-end model, input is image and output can be different fiited RBF functions, as I use the following method and get perfect segmentation (0 holes).
+
+component detection -> Voxel to Point Cloud -> PCA transformation -> RBF function fitting (torchrbf acceleration) -> interpolation -> PCA inverse transformation -> Point cloud to Voxel ->3D dialation
+
+However, the above method have a critical issue, which is this method can not handle the adhereing of multi sheets (RBF fitting would fail). But it is not easy to achieve. At least, I can not figure it out in few weeks.
+
+reply
+Reply
+SINAN SHEREEF
+
+Posted 8 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Impressive
+
+reply
+Reply
+Innat
+
+Posted 8 months ago
+
+arrow_drop_up
+0
+more_vert
+
+Great job. nnU-Net truly is an impressive framework; it’s no wonder it’s consistently referenced in medical research literature.
+
+reply
+Reply
+Starry
+
+Topic Author
+
+Posted 8 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Indeed, I use nnUNet get a gold medal in a medical segmentation competetion 4 years ago. nnUNet is not so popular in Kaggle at that moment. And 4 years past, nnUNet is still powerful to get gold medal.
+
+reply
+Reply
+1
+CPMP
+
+Posted 8 months ago
+
+· 86th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great solution. I started looking at PP during last two days and I implemented a closest plane filling a bit similar to yours. But I didn't went as far as using binary hole filling in the plane, I rather went for filling a circle in that plane, resulting in too much filling sometimes. Moving to the plane coordinates is a great idea.
+
+It is surprising that adding some cavities helps improve the metric. How much improvement do you get from filling cavities then adding back some?
+
+reply
+Reply
+1
+Starry
+
+Topic Author
+
+Posted 8 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It can get ~0.007 (0.602 -> 0.609) improvment in Public LB, but in Private LB, it can just get ~0.001 (0.618 -> 0.619) improvement.
+For different stage ablition, I would update afterward :).
+
+reply
+Reply
+1

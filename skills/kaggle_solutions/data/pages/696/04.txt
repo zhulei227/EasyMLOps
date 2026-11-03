@@ -1,0 +1,420 @@
+url: https://www.kaggle.com/c/march-machine-learning-mania-2026/writeups/4th-place-solution-for-the-march-machine-learning
+fetched: 2026-11-03
+chars: 10599
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place Solution for the March Machine Learning Mania 2026 Competition — March Machine Learning Mania 2026
+4th Place Solution for the March Machine Learning Mania 2026 Competition
+
+Machine Learning Is All You Need
+
+March Machine Learning Mania 2026
+
+Solution Writeup · 4th place · Apr 14, 2026
+
+Hi everyone, and thanks to Kaggle for organizing this competition.
+
+This is our official Solution Write-Up for the winning submission. Our final solution was a feature-engineered tabular ensemble built on top of XGBoost + LightGBM, trained on symmetrized tournament matchups with season-based GroupKFold validation.
+
+Code repository: [https://github.com/Xroxa/4th-Place-Solution-for-the-March-Machine-Learning-Mania-2026-Competition]
+
+The repository contains the full training pipeline, dependency versions, and exact commands to reproduce the final submission.
+
+Context
+
+Business context: [https://www.kaggle.com/competitions/march-machine-learning-mania-2026/overview]
+
+Data context: [https://www.kaggle.com/competitions/march-machine-learning-mania-2026/data]
+
+Overview of the Approach
+
+Our final approach was a relatively simple but strong tabular pipeline:
+
+Build team-level regular season summaries from the Detailed Results files.
+
+Add strength/context features such as seed, Elo, conference strength, late-season momentum, and Massey ordinals.
+
+Convert tournament games into pairwise team-vs-team training rows.
+
+Use symmetric augmentation:
+
+(TeamA, TeamB) -> y = 1
+(TeamB, TeamA) -> y = 0
+
+Train two gradient-boosted tree models:
+
+XGBoost
+LightGBM
+
+Blend the two models:
+
+0.65 * XGBoost + 0.35 * LightGBM
+
+Clip final probabilities to:
+
+[0.025, 0.975]
+
+The final code path used a unified men’s + women’s pipeline, with the same feature definitions wherever possible.
+
+Data used
+
+We used the following files from the competition dataset:
+
+Men
+
+MRegularSeasonDetailedResults.csv
+MNCAATourneyDetailedResults.csv
+MNCAATourneySeeds.csv
+MTeamConferences.csv
+MMasseyOrdinals.csv
+
+Women
+
+WRegularSeasonDetailedResults.csv
+WNCAATourneyDetailedResults.csv
+WNCAATourneySeeds.csv
+WTeamConferences.csv
+
+Submission
+
+SampleSubmissionStage2.csv
+
+We used the Detailed Results files rather than the compact versions because they enable possession-based and efficiency-based feature engineering.
+
+Feature engineering
+
+For each season and team, we built regular-season aggregates from game-level statistics.
+
+1. Basic team summaries
+
+We started from game-level quantities such as:
+
+PointDiff = WScore - LScore
+TotalPoints = WScore + LScore
+
+Then we aggregated team-level season features such as:
+
+AvgScore
+AvgDiff
+AvgScoreAllowed
+FGM
+FGM3
+FTA
+TO
+WinRate
+2. Possession and efficiency features
+
+We estimated possessions as:
+
+df['W_Poss'] = df['WFGA'] - df['WOR'] + df['WTO'] + 0.44 * df['WFTA']
+df['L_Poss'] = df['LFGA'] - df['LOR'] + df['LTO'] + 0.44 * df['LFTA']
+
+
+Then offensive efficiency:
+
+df['W_OE'] = 100 * df['WScore'] / df['W_Poss'].clip(1)
+df['L_OE'] = 100 * df['LScore'] / df['L_Poss'].clip(1)
+
+
+At the team-season level we aggregated:
+
+AvgOE
+AvgDE
+NetRating = AvgOE - AvgDE
+3. Shooting efficiency and rebounding
+
+We also added:
+
+df['W_TS'] = df['WScore'] / (2 * (df['WFGA'] + 0.44 * df['WFTA'])).clip(1)
+df['L_TS'] = df['LScore'] / (2 * (df['LFGA'] + 0.44 * df['LFTA'])).clip(1)
+
+total_reb = (df['WDR'] + df['WOR'] + df['LDR'] + df['LOR']).clip(1)
+df['W_RebRate'] = (df['WDR'] + df['WOR']) / total_reb
+df['L_RebRate'] = 1 - df['W_RebRate']
+
+
+These were aggregated into:
+
+AvgTS_combined
+AvgRebRate_combined
+4. Seed feature
+
+We extracted the numeric part of tournament seeds and used:
+
+missing seed -> 20
+5. Elo rating
+
+We computed end-of-regular-season Elo ratings with:
+
+K = 20
+home_adv = 100
+init_elo = 1500
+
+Games were processed in chronological order within each season, and ratings carried over between seasons with shrinkage:
+
+current_elo = {
+    tid: init_elo + 0.75 * (elo - init_elo)
+    for tid, elo in current_elo.items()
+}
+
+
+Margin of victory scaled the update:
+
+k_adj = K * np.log1p(abs(row['WScore'] - row['LScore'])) / 2
+
+6. Conference strength and late-season momentum
+
+We added two contextual features:
+
+Conf_Avg_Elo: mean Elo of a team’s conference in that season
+LateWinRate: win rate in games with DayNum > 100
+
+These were intended to capture schedule context and form entering tournament time.
+
+7. Massey ordinals
+
+For men’s teams we used MMasseyOrdinals.csv and kept only the final 30 days of rankings before tournament time. We aggregated:
+
+OrdinalRank_mean
+OrdinalRank_min
+OrdinalRank_std
+
+For women’s teams, where the same Massey file was not used, we filled aligned neutral defaults:
+
+OrdinalRank_mean = 175
+OrdinalRank_min = 175
+OrdinalRank_std = 0
+Pairwise dataset construction
+
+Tournament games were transformed into team-vs-team rows by merging team-season features for both sides and then taking differences:
+
+feature_cols = [
+    'AvgScore', 'AvgDiff', 'FGM', 'FGM3', 'FTA', 'TO',
+    'AvgScoreAllowed', 'WinRate', 'Seed',
+    'AvgOE', 'AvgDE', 'NetRating',
+    'AvgTS_combined', 'AvgRebRate_combined',
+    'Elo', 'Conf_Avg_Elo', 'LateWinRate',
+    'OrdinalRank_mean', 'OrdinalRank_min', 'OrdinalRank_std'
+]
+
+for col in feature_cols:
+    df[col] = df[f'{col}_1'] - df[f'{col}_2']
+
+
+We also included two interaction features:
+
+df['elo_ratio'] = df['Elo_1'] / df['Elo_2'].clip(1)
+df['seed_product'] = df['Seed_1'] * df['Seed_2']
+
+Symmetric augmentation
+
+To remove directional bias, every tournament game was duplicated in reverse order:
+
+X_rev = X.copy()
+for col in feature_cols:
+    X_rev[col] = -X_rev[col]
+X_rev['elo_ratio'] = 1 / X_rev['elo_ratio'].clip(0.01)
+
+
+Labels were:
+
+original row -> 1
+reversed row -> 0
+
+This was one of the most important design choices in the whole solution.
+
+Validation strategy
+
+We validated with:
+
+GroupKFold(n_splits=5)
+
+using:
+
+groups = Season
+
+This means the validation splits were done by season, not by randomly mixing tournament games. For this competition, season-based validation was much more realistic and helped avoid overly optimistic feedback.
+
+Models
+
+Our final ensemble had two components.
+
+XGBoost
+xgb_model = xgb.XGBClassifier(
+    n_estimators=4000,
+    max_depth=5,
+    learning_rate=0.02,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    min_child_weight=3,
+    reg_alpha=0.5,
+    reg_lambda=1.5,
+    eval_metric='logloss',
+    tree_method='hist',
+    random_state=42,
+    verbosity=0,
+    early_stopping_rounds=50,
+)
+
+LightGBM
+lgbm_model = lgb.LGBMClassifier(
+    n_estimators=4000,
+    learning_rate=0.02,
+    num_leaves=63,
+    min_child_samples=20,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    reg_alpha=0.5,
+    reg_lambda=1.5,
+    random_state=42,
+    verbosity=-1,
+)
+
+Ensemble
+
+Validation and test predictions were blended as:
+
+preds = 0.65 * preds_xgb + 0.35 * preds_lgb
+
+Details of the Submission
+What was important
+
+The biggest contributors were:
+
+using Detailed Results instead of only compact results
+building team-season efficiency features
+adding Elo, conference strength, and late momentum
+using Massey-based ranking features for the men’s side
+constructing pairwise difference features
+enforcing symmetry
+validating by season
+using a simple, stable XGBoost + LightGBM blend
+
+This was not a deep learning solution. In this competition, careful tabular feature engineering and a clean validation setup worked extremely well.
+
+What was special about the submission
+
+The most useful non-obvious choices were:
+
+1. Unified men + women training framework
+Instead of treating the two brackets completely separately, we used the same overall feature template and training logic for both sides, which simplified the pipeline and made the ensemble more consistent.
+
+2. Symmetric training rows
+This made the prediction target much cleaner. The model learned matchup strength rather than accidentally depending on ordering conventions.
+
+3. Context features on top of box score features
+Raw team statistics were already good, but adding context through seeds, Elo, conference average Elo, and end-of-season form improved stability.
+
+4. Conservative probability clipping
+The final predictions were clipped:
+
+sample['Pred'] = np.clip(final_preds, 0.025, 0.975)
+
+
+This reduced extreme probabilities and helped log loss robustness.
+
+What did not work
+
+A few directions were less useful than expected:
+
+relying only on raw scoring features without possession-based normalization
+using a single model instead of the final two-model blend
+skipping symmetric augmentation
+depending only on seeds and simple win rate without richer team-strength features
+
+In general, more complicated ideas were not necessary here. The final gains came more from data representation and validation discipline than from model complexity.
+
+Final training and inference
+
+After cross-validation, both models were retrained on the full symmetrized training set. For inference:
+
+Parse SampleSubmissionStage2.csv IDs into Season, Team1, Team2
+
+Merge team-season features for both teams
+
+Recreate the same pairwise difference features
+
+Predict with XGBoost and LightGBM
+
+Blend:
+
+0.65 * XGB + 0.35 * LGBM
+
+Clip predictions to [0.025, 0.975]
+
+Save submission.csv
+
+Inference code looked like this:
+
+preds_xgb = xgb_final.predict_proba(X_test)[:, 1]
+preds_lgb = lgbm_final.predict_proba(X_test)[:, 1]
+final_preds = 0.65 * preds_xgb + 0.35 * preds_lgb
+sample['Pred'] = np.clip(final_preds, 0.025, 0.975)
+sample.to_csv('./submission.csv', index=False)
+
+Reproducibility
+
+The repository includes:
+
+full training script
+dependency versions
+exact feature engineering logic
+exact inference pipeline
+instructions for generating submission.csv
+
+Thanks again to Kaggle and to everyone who participated. This was a very fun competition, and I hope this write-up is useful for anyone trying to reproduce or extend the solution.
+
+Author
+Nayeon
+
+yizhangxroxa
+
+arrow_drop_up
+4
+Share
+more_horiz
+Project Links
+GitHub - Xroxa/4th-Place-Solution-for-the-March-Machine-Learning-Mania-2026-Competition · GitHub
+
+https://github.com/Xroxa/4th-Place-Solution-for-the-March-Machine-Learning-Mania-2026-Competition
+
+link
+
+github.com
+
+Github Link
+
+Citation
+
+Rora (Xroxa). 4th Place Solution for the March Machine Learning Mania 2026 Competition. https://www.kaggle.com/competitions/march-machine-learning-mania-2026/writeups/4th-place-solution-for-the-march-machine-learning. 2026. Kaggle
+
+comment
+0 Comments
+Hotness

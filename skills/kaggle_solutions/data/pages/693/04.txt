@@ -1,0 +1,148 @@
+url: https://www.kaggle.com/c/deep-past-initiative-machine-translation/writeups/fourth-place-solution-writeup
+fetched: 2026-11-03
+chars: 10849
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Fourth Place Solution Writeup — Deep Past Challenge - Translate Akkadian to English
+Fourth Place Solution Writeup
+
+ByT5 and mt5 esemble with MBR
+
+Deep Past Challenge - Translate Akkadian to English
+
+Solution Writeup · 4th place · Mar 30, 2026
+
+We would like to first of all thank the host for such an interesting and exciting competition, as well as the massive support throughout. Congrats to the winning team for finishing so strongly.
+
+DATASET CURATION
+
+We curated a train dataset of 14.5K samples, and a validation set of 392 samples. We didn’t use the competition’s train.csv dataset. The moment the host released the PDF documents, we completely discarded train.csv, and built a new dataset from the provided documents. We also included "A Historical Geography of Anatolia in the Old Assyrian Colony Period" by Gojko Barjamovic (this was one of the books listed in publications.csv). As far as I can remember from our tests, all of train.csv could be found in these documents, so we lost nothing by discarding train.csv.
+
+During the initial processing of the PDFs, Tesseract and PyMuPDF Python packages were used to extract text (only for Barjamovic’s book): PyMuPDF for detecting and marking indented paragraphs (translations), superscripts (determinatives and translation indices), and subscripts (subscripts in some transliterated words); Tesseract for extracting the texts by feeding it images of selected pages.
+
+However, we quickly transitioned to AI studio (Gemini 3.1 Flash) for extracting text from the remaining documents. This is because Tesseract struggled with apostrophes, quotes, and superscripts. Because of this, it took two weeks to manually inspect and correct "hallucinations" of characters introduced by Tesseract for just one book. At that rate, it would be impossible to process all the documents in time.
+
+We specifically prompted Gemini to detect superscripts (assuming these were determinatives, which wasn’t always the case) and enclose them in braces; detect subscripts and prepend them with underscore (e.g., il_5-qé). We fed Gemini images of selected pages (15-20 pages at a time) from each book, asked it to extract translation-transliteration pairs, and format its output in json. All of this was done through the UI (no API calls were made).
+
+TRANSLATION OF NON-ENGLISH TRANSLATIONS OF OLD ASSYRIAN
+
+For AKT 1, 2, 3, 4, 7, 9, 10, and Hecker, the translations were not in English. Rather than use an LLM to translate these non-English sources, we used Google Translate on Google sheets. Specifically, we used the Google sheet formular =GOOGLETRANSLATE(Bi, "auto", "en"), where Bi is a cell containing a non-English translation, "auto" is the source language, and "en" is the target language. Then CTRL+ENTER to apply formular to all cells. This took a few seconds for each book.
+
+ALIGNING TRANSLATION-TRANSLITERATION PAIRSThis was done in two stages:
+Stage 1:
+
+Most of the texts in these books were in dual-column format. We wrote a function to scan texts line-by-line and split the texts based on some heuristics such as punctuations (.,?,:), length of texts (we targeted 34 words per sentence), and paragraph breaks. These rules were not uniform across all documents. So we also took into consideration what document was being processed.
+
+Stage 2:
+
+Manually inspect the splits and make corrections. Some of the splits were very long (as long as 1500 characters), and some were not accurate. At this point we were a bit familiar with OA grammar, and structure. This allowed us to manually split the texts further into smaller chunks. We also used Gemini whenever we were not sure exactly where in the text to split.
+
+VALIDATION SET
+
+We selected AKT 6d to serve as validation set. We initially struggled with this document because it had inconsistent line spacing for the translation and transliteration columns, making it hard for us to align translations to transliterations. As a result, we skipped this document and only processed it last. By that point, we decided to use it as the validation set.
+
+PREPROCESSING
+
+For preprocessing, our efforts were directed more at transforming any transliteration style into a single form, so that it didn’t matter what transliteration style was present in the test set. We did this both at the character level, and at the word level. For example: at the word level, we made sure that the model didn’t have to bother figuring out that the Sumerogram KÙ.GI and the phonetic reading GUŠKIN were equivalent, by replacing all instances of GUŠKIN with KÙ.GI. We also performed these transformations on the test set just before feeding it to the model. Also that MA.NA, ma.na, and ma-na were equivalent, among other transformations. Besides these, we also followed all the preprocessing recommendations given by the host. All underscores, were removed. Finally, we prefixed each transliteration with "translate Old Assyrian to English: ".
+
+MODEL ARCHITECTURES
+
+The core of our translation system relied on an ensemble of high-capacity Seq2Seq Transformer models. We experimented with several variants of the mT5 and ByT5 architectures to capture both semantic meaning and morphological nuances of the Old Assyrian language:
+
+mT5-Large / ByT5-Large: Used as the primary backbone for most models.
+ByT5-XL (bfloat16): A larger variant for diversity (CV for byt5-Large a little better than for byt5-XL).
+Dropout Variant: One version of the ByT5-Large model was trained with an increased dropout=0.2 to improve generalization on the low-resource dataset.
+Length Tuning: A length_penalty of 1.7 was applied during both training evaluation and final inference that showed eval_score improvement.
+WEIGHT AVERAGING
+
+To further improve generalization and stabilize scores, we implemented a custom weight averaging logic. Instead of picking a single best checkpoint, we averaged the state dictionaries of multiple high-performing checkpoints (e.g., 50/50 split between two different top checkpoints). This technique resulted in a measurable boost in the eval_score compared to any single model.
+
+INFERENCE PIPELINE: ENSEMBLE & MBR DECODING
+
+Our final submission used an Ensemble Minimum Bayes Risk (MBR) decoding strategy. This approach focuses on finding the "consensus" translation among multiple candidates rather than just taking the highest probability output from a single model.
+
+CANDIDATE GENERATION
+
+We generated a pool of 10 candidates per transliteration from four model configurations:
+
+mt5_large (3 candidates): num_beams=6, num_return=3.
+byt5_xl_bf16 (1 candidate): num_beams=5, num_return=1.
+byt5_large (3 candidates): num_beams=6, num_return=3.
+byt5_large_dropout_0.2 (3 candidates): num_beams=6, num_return=3.
+
+All candidates were generated with a length_penalty=1.7.
+
+MBR DECODING LOGIC
+
+From the 10-candidate pool, we used chrF++ as the primary metric for selection:
+Logic: For every candidate in the pool, we calculated its average chrF++ score against every other candidate.
+Selection: The candidate with the highest average similarity to the rest of the pool was chosen as the final prediction. This effectively filters out "hallucinations" or outlier translations that only one model produced, favoring the translation most models agreed upon at the character and word level.
+
+POST-PROCESSING
+
+Apart from converting fractions into the unicode format (the models were not trained on normal fractions, e.g., 1/4), we didn't perform any other form of post-processing. Just as the winning team noted, post-processing seemed to be the way to overfit to the public LB. Fortunately for us, most of our post-processing tricks did nothing but tank our public LB scores, which discouraged us from pursuing that direction.
+
+IDEAS THAT DIDN’T WORK
+Since we couldn’t train on the new dataset we curated, the plan was to replace uncapitalized PNs in the transliterations with their capitalized versions found in OA_Lexicon_eBL.csv to help the model nail the capitalizations. However, it became obvious that this wouldn’t work. For example the word "a-na" is both a personal name (Anna in English) and a preposition. Simply substituting "A-na" for every instance of "a-na" would be a disaster, as the preposition form of "a-na" is one of the most common words in OA. There were other words in the lexicon that behaved this way as well.
+We split our training dataset further into finer sentences in order to look like splits produced by "Sentences_Oare_FirstWord_LinNum.csv". Then we removed the prefix text "translate Old Assyrian into English". These changes actually resulted in lower local validation scores.
+SOME OBSERVED WEAKNESSES IN OUR MODEL
+
+The model struggled to generate short translations for very short transliterations.
+It also sometimes struggled with capitalization of proper nouns (PNs).
+
+AN OPPORTUNITY TO EXTEND OUR DATASET AND FIX THESE WEAKNESSES
+
+In the final moments of the competition (a day to the deadline) it became obvious to us that we were bottlenecked by data (as we observed that in some few examples in published_texts.csv, our model struggled with capitalization of proper nouns). We then decided to source more data, but unfortunately we were handicapped by compute. Although we couldn’t train on our new training data, we will detail how we curated it:
+
+We chose to include all the 7953 transliterations contained in the published_texts.csv. First of all, we filtered out all the training set documents from this leaving us with 6392 documents. We then split each document that was longer than 500 characters into chunks. This was done by first splitting the text by space, and concatenating the words until we reached the character limit (500). This process yielded 9237 samples. We then used our strongest model to translate all the samples. These translations were then fed into Gemini 3.1 Flash via AI studio. Gemini was prompted to evaluate the quality of each translation using the transliteration as context. It was instructed to only fix a translation if it evaluated it to be of poor quality. It was also instructed to do the following: follow the model’s language style (which mirrored human translators) and avoid robotic and overly complex grammar; correct capitalization in personal names; etc.
+
+LINKS TO CODE
+Submission Code
+Training Code
+Authors
+Wisdom Aduah
+
+anaphase21
+
+Vitaly Kudelya
+
+vitalykudelya
+
+arrow_drop_up
+6
+Share
+more_horiz
+Citation
+
+Wisdom Aduah, Vitaly Kudelya. Fourth Place Solution Writeup. https://www.kaggle.com/competitions/deep-past-initiative-machine-translation/writeups/fourth-place-solution-writeup. 2026. Kaggle
+
+comment
+0 Comments
+Hotness

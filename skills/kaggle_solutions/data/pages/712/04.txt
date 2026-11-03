@@ -1,0 +1,146 @@
+url: https://www.kaggle.com/c/neurogolf-2026/writeups/4th-place-solution-writeup
+fetched: 2026-11-03
+chars: 9915
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place Solution Writeup — The 2026 NeuroGolf Championship
+4th Place Solution Writeup
+
+The 2026 NeuroGolf Championship
+
+Solution Writeup · 4th place · Jul 18, 2026
+
+Thanks to Kaggle and the organizers for a great competition! It kept us engaged until the very end, and we had a lot of fun.
+
+Automated Optimization Pipeline
+
+The workflow connected an asynchronous agentic loop with a persistent task registry, a shared idiom system, leaderboard verification, and runtime-aware submission assembly.
+
+This is only a representative version of the pipeline. Some tasks received additional instructions or manually developed approaches, and we experimented with different combinations of prompt components, attached context, and tools.
+
+Agentic Loop
+
+Each agentic loop focused on improving a single task, while multiple independent loops could run in parallel across different tasks. Each loop's prompt contained a pre-crafted task description and reference algorithm implementation, the current best ONNX graph with its cost profile, a reference explaining the scorer, and a dynamically evolving idiom system. Agents had tools for model evaluation and for voting on or adding idioms. They also received targeted hints based on the current bottleneck: rethink the algorithm from scratch after a plateau, repair models failing local or leaderboard validation, or optimize runtime when evaluation was too slow.
+
+Task Registry
+
+For each task, we locally evaluated and retained multiple model versions by hash rather than keeping only the current best, together with each version's score, local evaluation time, and leaderboard status: unknown, correct, or broken. Models were validated before registration, including a check for convolution bias vectors shorter than the output-channel count, which could cause nondeterministic reads on the grader.
+
+Idiom System
+
+The idiom catalogue was built through agent tools and semi-automatic mining. Agents could vote on and comment on existing idioms or add new ones. Idioms repeatedly judged incorrect or misleading could be disabled. To keep the context compact, each optimization received only its own task-specific comment and a summary of all comments for an idiom, rather than the full comment history from every task.
+
+For example:
+
+title: ULP-collision finite-difference selector
+description: Inside a terminal fp32 Einsum, use adjacent-magnitude taps [c_hi, -c_lo] and a coordinate code Q chosen so fl(c_hi*Q[r]*Q[h]) and fl(c_lo*Q[r]*Q[h]) are identical for mismatched classes but differ by a positive ULP for matched classes. A singleton dimension of a repeated runtime input can broadcast over the tap axis and keep it coupled to the source coordinates, preventing premature reduction. This realizes an exact thresholded equality selector with two tap parameters instead of a conventional multi-row coordinate table.
+summary: 'Exploit fp32 rounding collisions: choose exact-bit Q codes and adjacent-magnitude signed taps so matched coordinate/class products retain a positive ULP while mismatches cancel to zero or nonpositive values; broadcast the tap axis through a singleton dimension of a repeated runtime input so source labels remain coupled until the terminal Einsum. It fits exact equality, adjacency, prefix, validity, and sparse signed routing—typically 2 taps for binary gates, 3–4 for richer relations, with 10-value color or 30-value coordinate Q vectors—and can fold taps into padded/dead Q slots for zero-memory graphs. Exact fp32 bit patterns, calibrated tap magnitudes, anchor factors, and empirically validated operand order are prerequisites: ORT reassociation, pre-summing, scalarizing/removing the tap axis, or premature reduction destroys the ULP barrier; non-separable/asymmetric relations and large multi-operand contractions are unreliable even when the isolated selector is exact. Evidence is strongly positive: 89 measured +2 confirmations versus 8 measured failures, 4 neutral probes, and 4 partial/+1 results; failures chiefly reflect contraction-order fragility or tasks whose relation is not representable by a shared Q collision code.'
+votes:
+  1:
+    comment: A searched pair of scalar color codes, multiplied in gate/copy/output role order and contracted against the cube of the shared adjacent-float tap, implements all four valid Boolean color cases.
+    model_md5: 057cd542b172612c9de268f35a18f5bf
+    vote: 2
+    certainty: 1.0
+  3:
+    comment: The four collision pairs remained exact after flattening and coordinated power-of-two rescaling; their eight coefficients could therefore double as the terminal color code.
+    model_md5: 4fe72afcfa2e4151b9e95a385cd40376
+    vote: 2
+    certainty: 1.0
+  # ... 106 more task votes/comments
+
+Verification
+
+Unknown models were verified through grouped leaderboard probes. Correct models preserved their local score, while broken models scored exactly zero on the leaderboard, allowing adaptive bisection to isolate them.
+
+Submission
+
+For final submission assembly, we approximately maximized the total score of selected models under a budget defined by their summed local evaluation time. Runtime was therefore a first-class constraint: selecting every task's highest-scoring model could produce a submission that was too slow to finish, as some operators—notably Einsum—could use only a few parameters yet take hours to run all examples on a single CPU.
+
+Final Submission and Selected Examples
+The local score was 8,142.02.
+Nine tasks achieved the perfect score of 25 points: 053, 067, 087, 129, 135, 140, 179, 241, and 326.
+224 models contained exactly one node.
+Of the 224 one-node models, 193 used Einsum.
+349 contained at least one Einsum.
+The complete submission contained 5,747 nodes.
+The largest model was task 023, with 491 nodes and a local score of 18.151.
+Example: Task 267
+
+Task 267 contains a connected single-color shape and an isolated marker pixel. The output removes the marker and recolors the shape with the marker's color while preserving its geometry. Our final solution implements the complete transformation with one Einsum node and a two-element float32 initializer.
+
+The input is a one-hot tensor with one channel per color. In the Einsum equation, p is the batch axis, h and w are the spatial axes, k is the input-color channel being contracted, and e is the output-color channel. The final pkhw operand supplies the per-pixel indicator for input color k; contracting k while retaining e performs the color routing independently at every position. All other input operands use independent spatial indices. Summing those indices produces repeated factors of the global occurrence counts of colors k and e.
+
+This reduces the transformation to color routing based on the pair (count(k), count(e)). A shape-color pixel must be routed to the color occurring once in the input, the singleton marker must be routed to the background color, and background pixels must remain background. Because the input is one-hot, only one input channel k is active at each in-grid position; the contraction only needs to make the correct output channel e win for each relevant pair of color counts.
+
+The two entries of T are nearly opposite float32 values, stored exactly as 0xC5BCCB9A and 0x45BCCF43 and shown in decimal in the figure. Reusing them along the q and r axes forms a finite-difference selector. With the exact operand order shown, float32 rounding makes unwanted count pairs cancel to zero or a nonpositive value, while every required color route retains a small positive residue. The output decoder therefore selects the marker color for the figure and background for both the removed marker and the unchanged black cells. Algebraically equivalent reorderings can round differently and break the cancellation, so contraction order is part of the program.
+
+The cost is 2 parameters + 0 intermediate-memory bytes = 2. The metric counts initializer elements rather than storage bytes, so the two-element tensor T contributes exactly two parameters. Reusing the input or T inside the equation adds no charge. Because the graph's only node writes directly to output, and graph inputs and outputs are excluded from the memory charge, there are no charged intermediate tensors. The score is therefore 25 − ln(2) = 24.307.
+
+Example: Task 053
+
+Task 053 moves every non-background pixel down by one row. The final solution uses a single parameter-free LpPool node.
+
+LpPool normally aggregates values inside a sliding window, but here its geometry makes it act as a sparse row gather. A vertical kernel of size 2 with dilation 3, negative padding, and a row stride of −2 makes output rows 0, 1, and 2 read input rows 2, 0, and 1, respectively. Input row 2 is always empty, so this is exactly a one-row downward shift. The horizontal kernel size is 1, preserving columns and color channels. The remaining padded rows stay zero-hot and are discarded by the standard output decoder, leaving the 3×3 grid.
+
+Each effective pooling window contains at most one nonzero one-hot value, so with p = 2, LpPool returns the selected 0 or 1 unchanged. The node has no initializers and writes directly to output, giving zero parameters, zero charged intermediate memory, cost 0, and the maximum score of 25 points.
+
+Authors
+hongan
+
+honganzhu
+
+MaxChen303
+
+maxchen303
+
+Maciej Sypetkowski
+
+maciejsypetkowski
+
+Natalia Jaśkowska
+
+nataliajakowska
+
+mrmldjr
+
+mrmldjr
+
+arrow_drop_up
+8
+Share
+more_horiz
+Citation
+
+hongan, MaxChen303, Maciej Sypetkowski, Natalia Jaśkowska, mrmldjr. 4th Place Solution Writeup. https://www.kaggle.com/competitions/neurogolf-2026/writeups/4th-place-solution-writeup. 2026. Kaggle
+
+1
+comment
+0 Comments
+Hotness
