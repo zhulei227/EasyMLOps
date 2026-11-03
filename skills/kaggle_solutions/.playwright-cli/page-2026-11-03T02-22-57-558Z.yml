@@ -1,0 +1,1053 @@
+- generic [ref=f22e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f22e3]:
+    - generic [ref=f22e5]:
+      - button "Navigation menu" [ref=f22e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f22e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f22e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f22e14]:
+      - link [ref=f22e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fyoutube8m-2018%2Fwriteups%2Fnext-top-gb-model-1st-place-solution-summary
+        - button "Login" [ref=f22e16]
+      - link [ref=f22e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fyoutube8m-2018%2Fwriteups%2Fnext-top-gb-model-1st-place-solution-summary
+        - button "Sign Up" [ref=f22e19]
+  - main [ref=f22e21]:
+    - generic [ref=f22e23]:
+      - generic [ref=f22e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f22e25]:
+        - link "Learn more" [ref=f22e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f22e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f22e29]:
+      - generic [ref=f22e31]: 1st place solution summary — The 2nd YouTube-8M Video Understanding Challenge
+      - separator [ref=f22e32]
+      - generic [ref=f22e34]:
+        - generic [ref=f22e35]:
+          - heading "1st place solution summary" [level=1] [ref=f22e36]
+          - generic [ref=f22e37]:
+            - link [ref=f22e38] [cursor=pointer]:
+              - /url: /competitions/youtube8m-2018
+              - paragraph [ref=f22e40]: The 2nd YouTube-8M Video Understanding Challenge
+            - paragraph [ref=f22e41]: Solution Writeup · 1st place · Aug 27, 2018
+        - separator [ref=f22e43]
+        - generic [ref=f22e44]:
+          - generic [ref=f22e46]:
+            - paragraph [ref=f22e47]: "First off: Congratulations to everyone who participated and was burning their GPUs trying to squeeze in as much performance into 1GB as possible. Personally I would like to thank David for all the effort, time and resources he put into this competition, carrying out all of our crazy ideas."
+            - paragraph [ref=f22e48]:
+              - strong [ref=f22e49]: TLDR
+              - text: ": Our final model was combination of 9 submodels belonging to 4 model families - NetVlad, Deep Bag of Frames (DBoF), Fisher Vector (FV) and Recurrent neural networks (RNNs), weighting contributions based on test set performance. To make things work efficiently we used (multilayer) distillation, 8bit partial weights quantization, exponential moving averaging of weights and “smarter” inference time frame sampling."
+            - heading "Models and Distillation schema" [level=2] [ref=f22e50]
+            - paragraph [ref=f22e51]:
+              - text: We did not use any fancy new architectures for our models. The four used model families (NetVLAD, FV, RNNs and DBoFs) were all used in the first year competition. The models were however adjusted due to the competition constraints. We found especially useful architectures provided by Miech et al (
+              - link "https://arxiv.org/abs/1706.06905) (opens in a new tab)" [ref=f22e52] [cursor=pointer]:
+                - /url: https://arxiv.org/abs/1706.06905)
+                - text: https://arxiv.org/abs/1706.06905)
+              - text: ". Following figure shows models scores and flow of distillation training:"
+            - paragraph [ref=f22e53]:
+              - img "enter image description here" [ref=f22e54]
+              - text: "*Scores in architecture figure are public leaderboard equivalent scores. Values were obtained through local validation which had a consistent offset to public leaderboard scores. The values are collected from quantized models."
+            - heading "Tricks" [level=2] [ref=f22e55]
+            - heading "1. Distillation" [level=3] [ref=f22e56]
+            - paragraph [ref=f22e57]:
+              - text: Distillation was done in a similar way as in work of Wang et. al. (
+              - link "https://arxiv.org/abs/1706.05150 (opens in a new tab)" [ref=f22e58] [cursor=pointer]:
+                - /url: https://arxiv.org/abs/1706.05150
+                - text: https://arxiv.org/abs/1706.05150
+              - text: ) using soft labels - mixture of ground truth and teacher model predictions. As a teacher model we used ensemble of 3 (or in case of 2nd layer model 6) models. For student networks we used same family of networks as teacher networks. This means that for a student NetVlad network we would use 3 teacher NetVlad. The idea was that similar networks could learn similar patterns from data - thus giving better results. This might not be entirely true since in some of our experiments, doing cross family training, the students performed as good as ones trained on same family while improving ensemble diversity. In general distillation allowed us to train lighter version of model with better performance. For NetVlad, we chose 2nd layer distillation because of the positive impact it had on the overall ensemble score (+0.001) even though the individual models produced by it were not better than the 1st level distillation.
+            - heading "2. Quantization" [level=3] [ref=f22e59]
+            - paragraph [ref=f22e60]: To minimize weight of the models we casted them into 8 bit encoding (cutting weights size down to 1/4) in addition to storing the centroids. To not lose too much performance we kept the graph nodes in default float32 format and at inference time the variables are cast back to float32 format. We limited quantization only to variables with less than 1700 elements. This means that weights of typical fully connected layer would get quantized while batch norm factors wouldn’t get. We used uniform min-max quantization, since other methods (such as quantile based quantization) did not work well.
+            - heading "3. Inference time sampling" [level=3] [ref=f22e61]
+            - paragraph [ref=f22e62]: During training, for models like FV, NetVLAD and DBoF a collection of 300 frames was selected based on random sampling with replacement. During test time we ensured at each frame would be selected at least once and the remainder of the frames were chosen at random. This can be considered as a way of data augmentation.
+            - heading "4. In model averaging" [level=3] [ref=f22e63]
+            - paragraph [ref=f22e64]: To improve performance of single model we used in model averaging of weights over training time. We let the model train to convergence and then started averaging. Performance improvement was significant for our smaller models (DBoF and RNNs 0.002-0.003), while for bigger models (NetVLAD and FV) we did not see an improved prediction. We applied exponential decay averaging as well as equal weight averaging - both of them giving similar boosts, but we did not detect increase in performance if combining the two averages.
+            - heading "Train and testing" [level=2] [ref=f22e65]
+            - paragraph [ref=f22e66]: For training we used all samples except for samples in 800 validation TF records. The 800 randomly selected record files (~5% of all data) were used to monitor training, model selection and weighting of final meta-model. We observed a very consistent 0.00207 offset between local validation and public leaderboard so we used local validation for all testing. The test set turned out to be sufficiently big enough to avoid overfitting. Training on all data with the 800 records included did not improve final score for us.
+            - paragraph [ref=f22e67]: Training was performed on single GPU’s, taking between 1.5-3.5 days per model. Approx 60 GPU-days would be required to train all models. We varied batch size, number of clusters, and number of hidden layers between models within a given family.
+            - paragraph [ref=f22e68]: Random search was performed on local system to determine final weights of the ensembles. We observed a ~0.0050 range in GAP score that could be achieved between taking a weighted average of models vs optimized weights determined by random search in 500 iterations.
+            - paragraph [ref=f22e69]: A detailed report/paper will be published at a later time in addition to making the code available.
+          - generic [ref=f22e70]:
+            - generic [ref=f22e71]:
+              - text: Authors
+              - generic [ref=f22e72]:
+                - link "Miha Skalic's profile" [ref=f22e73] [cursor=pointer]:
+                  - /url: /mihaskalic
+                  - generic "Miha Skalic" [ref=f22e74]
+                - generic [ref=f22e78]:
+                  - link "Miha Skalic" [ref=f22e79] [cursor=pointer]:
+                    - /url: /mihaskalic
+                  - paragraph [ref=f22e80]: mihaskalic
+              - generic [ref=f22e81]:
+                - link "David Austin's profile" [ref=f22e82] [cursor=pointer]:
+                  - /url: /tivfrvqhs5
+                  - generic "David Austin" [ref=f22e83]
+                - generic [ref=f22e87]:
+                  - link "David Austin" [ref=f22e88] [cursor=pointer]:
+                    - /url: /tivfrvqhs5
+                  - paragraph [ref=f22e89]: tivfrvqhs5
+            - separator [ref=f22e90]
+            - generic [ref=f22e91]:
+              - generic [ref=f22e92]:
+                - button "Upvote" [ref=f22e93] [cursor=pointer]:
+                  - generic [ref=f22e94]: arrow_drop_up
+                - button "83 votes" [ref=f22e95] [cursor=pointer]: "83"
+              - button "Share" [ref=f22e96] [cursor=pointer]
+              - button "Writeup actions" [ref=f22e98] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f22e99]
+        - paragraph [ref=f22e100]: Miha Skalic, David Austin. 1st place solution summary. https://www.kaggle.com/competitions/youtube8m-2018/writeups/next-top-gb-model-1st-place-solution-summary. 2018. Kaggle
+        - separator [ref=f22e101]
+        - generic [ref=f22e102]:
+          - generic [ref=f22e104]:
+            - generic [ref=f22e105]:
+              - generic [aria-hidden] [ref=f22e106]: comment
+              - generic [ref=f22e107]:
+                - heading "57 Comments" [level=2] [ref=f22e108]
+                - link "Go To Appreciation Comments (3 total)" [ref=f22e109] [cursor=pointer]:
+                  - /url: /competitions/youtube8m-2018/writeups/next-top-gb-model-1st-place-solution-summary#appreciation
+                  - text: 3 appreciation comments
+            - generic [ref=f22e112]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f22e113] [cursor=pointer]:
+                - generic [ref=f22e114]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f22e116]:
+            - generic [ref=f22e117]:
+              - generic [ref=f22e121]:
+                - link "Miha Skalic's profile" [ref=f22e122] [cursor=pointer]:
+                  - /url: /mihaskalic
+                  - generic "Miha Skalic" [ref=f22e123]
+                - generic [ref=f22e129]:
+                  - generic [ref=f22e130]:
+                    - link [ref=f22e131] [cursor=pointer]:
+                      - /url: /mihaskalic
+                      - heading "Miha Skalic" [level=3] [ref=f22e132]
+                    - paragraph [ref=f22e135]: Topic Author
+                  - generic [ref=f22e136]:
+                    - paragraph [ref=f22e137]: Posted 8 years ago
+                    - paragraph [ref=f22e139]: · 1st in this Competition
+                - generic [ref=f22e141]:
+                  - generic [ref=f22e142]:
+                    - button "Upvote" [ref=f22e143] [cursor=pointer]:
+                      - generic [ref=f22e144]: arrow_drop_up
+                    - button "8 votes" [ref=f22e145] [cursor=pointer]: "8"
+                  - button "More Options for this Comment" [ref=f22e146] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e150]:
+                  - text: "Code is now available:"
+                  - link "https://github.com/miha-skalic/youtube8mchallange (opens in a new tab)" [ref=f22e151] [cursor=pointer]:
+                    - /url: https://github.com/miha-skalic/youtube8mchallange
+                    - text: https://github.com/miha-skalic/youtube8mchallange
+                - button "Reply" [ref=f22e153] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e154]: reply
+              - separator [ref=f22e156]
+            - generic [ref=f22e157]:
+              - generic [ref=f22e161]:
+                - link "Kushajveer Singh's profile" [ref=f22e162] [cursor=pointer]:
+                  - /url: /kushaj
+                  - generic "Kushajveer Singh" [ref=f22e163]
+                - generic [ref=f22e169]:
+                  - link [ref=f22e171] [cursor=pointer]:
+                    - /url: /kushaj
+                    - heading "Kushajveer Singh" [level=3] [ref=f22e172]
+                  - paragraph [ref=f22e174]: Posted 8 years ago
+                - generic [ref=f22e176]:
+                  - generic [ref=f22e177]:
+                    - button "Upvote" [ref=f22e178] [cursor=pointer]:
+                      - generic [ref=f22e179]: arrow_drop_up
+                    - button "5 votes" [ref=f22e180] [cursor=pointer]: "5"
+                  - button "More Options for this Comment" [ref=f22e181] [cursor=pointer]: more_vert
+                - generic [ref=f22e184]:
+                  - paragraph [ref=f22e185]: My compilation of the research papers covering the topics discussed in the soln. If I missed some paper please reply and I would add it to the list. I know that you would give a reference to the papers in your paper for the solution but can you provide a quick list of some of the papers that I missed.
+                  - list [ref=f22e186]:
+                    - listitem [ref=f22e187]:
+                      - 'link "NetVlad: CNN architecture for weakly supervised place recognition (opens in a new tab)" [ref=f22e188] [cursor=pointer]':
+                        - /url: https://www.di.ens.fr/willow/research/netvlad/
+                        - text: "NetVlad: CNN architecture for weakly supervised place recognition"
+                    - listitem [ref=f22e189]:
+                      - 'link "Deep Bag of Frames approach: a not so sufficient model for soundscapes (opens in a new tab)" [ref=f22e190] [cursor=pointer]':
+                        - /url: https://arxiv.org/abs/1412.4052
+                        - text: "Deep Bag of Frames approach: a not so sufficient model for soundscapes"
+                    - listitem [ref=f22e191]:
+                      - link "A Discriminative CNN Video Representation for event Detection (opens in a new tab)" [ref=f22e192] [cursor=pointer]:
+                        - /url: https://arxiv.org/abs/1411.4006
+                        - text: A Discriminative CNN Video Representation for event Detection
+                    - listitem [ref=f22e193]:
+                      - link "Semi Supervised Fisher Vector Network (opens in a new tab)" [ref=f22e194] [cursor=pointer]:
+                        - /url: https://arxiv.org/abs/1801.04438
+                        - text: Semi Supervised Fisher Vector Network
+                    - listitem [ref=f22e195]:
+                      - link "Learnable Pooling with Context Gating for video classification (opens in a new tab)" [ref=f22e196] [cursor=pointer]:
+                        - /url: https://arxiv.org/abs/1706.06905
+                        - text: Learnable Pooling with Context Gating for video classification
+                    - listitem [ref=f22e197]:
+                      - link "Distilling the Knowledge in a Neural Network (opens in a new tab)" [ref=f22e198] [cursor=pointer]:
+                        - /url: https://arxiv.org/abs/1503.02531
+                        - text: Distilling the Knowledge in a Neural Network
+                    - listitem [ref=f22e199]:
+                      - link "The MonkeyTyping Soln to the Youtube-*M Video Understanding Challenge (opens in a new tab)" [ref=f22e200] [cursor=pointer]:
+                        - /url: https://arxiv.org/abs/1706.05150
+                        - text: The MonkeyTyping Soln to the Youtube-*M Video Understanding Challenge
+                - button "Reply" [ref=f22e202] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e203]: reply
+                - generic [ref=f22e205]:
+                  - generic [ref=f22e210]:
+                    - link "Miha Skalic's profile" [ref=f22e211] [cursor=pointer]:
+                      - /url: /mihaskalic
+                      - generic "Miha Skalic" [ref=f22e212]
+                    - generic [ref=f22e218]:
+                      - generic [ref=f22e219]:
+                        - link [ref=f22e220] [cursor=pointer]:
+                          - /url: /mihaskalic
+                          - heading "Miha Skalic" [level=3] [ref=f22e221]
+                        - paragraph [ref=f22e224]: Topic Author
+                      - generic [ref=f22e225]:
+                        - paragraph [ref=f22e226]: Posted 8 years ago
+                        - paragraph [ref=f22e228]: · 1st in this Competition
+                    - generic [ref=f22e230]:
+                      - generic [ref=f22e231]:
+                        - button "Upvote" [ref=f22e232] [cursor=pointer]:
+                          - generic [ref=f22e233]: arrow_drop_up
+                        - button "3 votes" [ref=f22e234] [cursor=pointer]: "3"
+                      - button "More Options for this Comment" [ref=f22e235] [cursor=pointer]: more_vert
+                    - generic [ref=f22e238]:
+                      - paragraph [ref=f22e239]: This is from the solution paper. Full paper will be released at a later time.
+                      - list [ref=f22e240]:
+                        - listitem [ref=f22e241]:
+                          - paragraph [ref=f22e242]: "LeCun, Y.A., Bengio, Y., Hinton, G.E.: Deep learning. Nature (2015)"
+                        - listitem [ref=f22e243]:
+                          - paragraph [ref=f22e244]: "Krizhevsky, A., Sutskever, I., Hinton, G.E.: ImageNet Classification with DeepConvolutional Neural Networks. Advances In Neural Information Processing Sys-tems (2012)"
+                        - listitem [ref=f22e245]:
+                          - paragraph [ref=f22e246]: "Graves, a., Mohamed, A., Hinton, G.: Speech recognition with deep recurrentneural networks. Icassp (2013)"
+                        - listitem [ref=f22e247]:
+                          - paragraph [ref=f22e248]: "Ng, J.Y.H., Hausknecht, M., Vijayanarasimhan, S., Vinyals, O., Monga, R.,Toderici, G.: Beyond short snippets: Deep networks for video classification. In:Proceedings of the IEEE Computer Society Conference on Computer Vision andPattern Recognition. (2015)"
+                        - listitem [ref=f22e249]:
+                          - paragraph [ref=f22e250]: "Abu-El-Haija, S., Kothari, N., Lee, J., Natsev, P., Toderici, G., Varadarajan, B.,Vijayanarasimhan, S.: Youtube-8m: A large-scale video classification benchmark.CoRRabs/1609.08675(2016)"
+                        - listitem [ref=f22e251]:
+                          - paragraph [ref=f22e252]: "Miech, A., Laptev, I., Sivic, J.: Learnable pooling with context gating for videoclassification. CoRRabs/1706.06905(2017)"
+                        - listitem [ref=f22e253]:
+                          - paragraph [ref=f22e254]: "Wang, H., Zhang, T., Wu, J.: The monkeytyping solution to the youtube-8m videounderstanding challenge. CoRRabs/1706.05150(2017)"
+                        - listitem [ref=f22e255]:
+                          - paragraph [ref=f22e256]: Li, F., Gan, C., Liu, X., Bian, Y., Long, X., Li, Y., Li, Z., Zhou, J., Wen, S.:Temporal modeling approaches for large-scale youtube-8m video understanding.CoRRabs/1707.04555(2017)
+                        - listitem [ref=f22e257]:
+                          - paragraph [ref=f22e258]: "Chen, S., Wang, X., Tang, Y., Chen, X., Wu, Z., Jiang, Y.: Aggregating frame-levelfeatures for large-scale video classification. CoRRabs/1707.00803(2017)"
+                        - listitem [ref=f22e259]:
+                          - paragraph [ref=f22e260]: "Skalic, M., Pekalski, M., Pan, X.E.: Deep learning methods for efficient large scalevideo labeling. CoRRabs/1706.04572(2017)"
+                        - listitem [ref=f22e261]:
+                          - paragraph [ref=f22e262]: "Abadi, M., Agarwal, A., Barham, P., Brevdo, E., Chen, Z., Citro, C., Corrado,G.S., Davis, A., Dean, J., Devin, M., Ghemawat, S., Goodfellow, I., Harp, A.,Irving, G., Isard, M., Jia, Y., Jozefowicz, R., Kaiser, L., Kudlur, M., Levenberg,J., Man ́e, D., Monga, R., Moore, S., Murray, D., Olah, C., Schuster, M., Shlens, J.,Steiner, B., Sutskever, I., Talwar, K., Tucker, P., Vanhoucke, V., Vasudevan, V.,Vi ́egas, F., Vinyals, O., Warden, P., Wattenberg, M., Wicke, M., Yu, Y., Zheng,X.: TensorFlow: Large-scale machine learning on heterogeneous systems (2015)Software available from tensorflow.org."
+                        - listitem [ref=f22e263]:
+                          - paragraph [ref=f22e264]: "Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., Wojna, Z.: Rethinking the in-ception architecture for computer vision. In: The IEEE Conference on ComputerVision and Pattern Recognition (CVPR). (June 2016)"
+                        - listitem [ref=f22e265]:
+                          - paragraph [ref=f22e266]: "Hochreiter, S., Schmidhuber, J.: Long Short-Term Memory. Neural Computation(1997)"
+                        - listitem [ref=f22e267]:
+                          - paragraph [ref=f22e268]: "Cho, K., van Merrienboer, B., G ̈ul ̧cehre, C ̧ ., Bougares, F., Schwenk, H., Bengio,Y.: Learning phrase representations using RNN encoder-decoder for statisticalmachine translation. CoRRabs/1406.1078(2014)"
+                        - listitem [ref=f22e269]:
+                          - paragraph [ref=f22e270]: "Laptev, I., Marsza lek, M., Schmid, C., Rozenfeld, B.: Learning realistic humanactions from movies. In: 26th IEEE Conference on Computer Vision and PatternRecognition, CVPR. (2008) Building Size Constrained Predictive Models for Video Classification9"
+                        - listitem [ref=f22e271]:
+                          - paragraph [ref=f22e272]: "Wang, H., Schmid, C.: Action recognition with improved trajectories. In: Proceed-ings of the IEEE International Conference on Computer Vision. (2013)"
+                        - listitem [ref=f22e273]:
+                          - paragraph [ref=f22e274]: "Wang, H., Ullah, M.M., Klaser, A., Laptev, I., Schmid, C.: Evaluation of localspatio-temporal features for action recognition. BMVC 2009 - British MachineVision Conference (2009)"
+                        - listitem [ref=f22e275]:
+                          - paragraph [ref=f22e276]: "J ́egou, H., Douze, M., Schmid, C., P ́erez, P.: Aggregating local descriptors intoa compact image representation. In: Proceedings of the IEEE Computer SocietyConference on Computer Vision and Pattern Recognition. (2010)"
+                        - listitem [ref=f22e277]:
+                          - paragraph [ref=f22e278]: "Perronnin, F., Dance, C.: Fisher kernels on visual vocabularies for image catego-rization. In: Proceedings of the IEEE Computer Society Conference on ComputerVision and Pattern Recognition. (2007)"
+                        - listitem [ref=f22e279]:
+                          - paragraph [ref=f22e280]: "Arandjelovic, R., Gronat, P., Torii, A., Pajdla, T., Sivic, J.: NetVLAD: CNNArchitecture for Weakly Supervised Place Recognition. IEEE Transactions onPattern Analysis and Machine Intelligence (2018)"
+                        - listitem [ref=f22e281]:
+                          - paragraph [ref=f22e282]: "Hinton, G., Vinyals, O., Dean, J.: Distilling the knowledge in a neural network.In: NIPS Deep Learning and Representation Learning Workshop. (2015)"
+                        - listitem [ref=f22e283]:
+                          - paragraph [ref=f22e284]: "Ruppert, D.: Efficient estimations from a slowly convergent robbins-monro process.Technical report, Cornell University Operations Research and Industrial Engineer-ing (2018)"
+                        - listitem [ref=f22e285]:
+                          - paragraph [ref=f22e286]: "Han, S., Mao, H., Dally, W.J.: Deep compression: Compressing deep neural networkwith pruning, trained quantization and huffman coding. CoRRabs/1510.00149(2015"
+                    - button "Reply" [ref=f22e288] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e289]: reply
+                  - generic [ref=f22e295]:
+                    - link "Kushajveer Singh's profile" [ref=f22e296] [cursor=pointer]:
+                      - /url: /kushaj
+                      - generic "Kushajveer Singh" [ref=f22e297]
+                    - generic [ref=f22e303]:
+                      - link [ref=f22e305] [cursor=pointer]:
+                        - /url: /kushaj
+                        - heading "Kushajveer Singh" [level=3] [ref=f22e306]
+                      - paragraph [ref=f22e308]: Posted 8 years ago
+                    - generic [ref=f22e310]:
+                      - generic [ref=f22e311]:
+                        - button "Upvote" [ref=f22e312] [cursor=pointer]:
+                          - generic [ref=f22e313]: arrow_drop_up
+                        - button "0 votes" [ref=f22e314] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f22e315] [cursor=pointer]: more_vert
+                    - paragraph [ref=f22e319]: Just what was needed to widen my knowledge scope
+                    - button "Reply" [ref=f22e321] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e322]: reply
+              - separator [ref=f22e324]
+            - generic [ref=f22e325]:
+              - generic [ref=f22e329]:
+                - link "Wudi Wang's profile" [ref=f22e330] [cursor=pointer]:
+                  - /url: /woodywang
+                  - generic "Wudi Wang" [ref=f22e331]
+                - generic [ref=f22e337]:
+                  - link [ref=f22e339] [cursor=pointer]:
+                    - /url: /woodywang
+                    - heading "Wudi Wang" [level=3] [ref=f22e340]
+                  - generic [ref=f22e341]:
+                    - paragraph [ref=f22e342]: Posted 8 years ago
+                    - paragraph [ref=f22e344]: · 9th in this Competition
+                - generic [ref=f22e346]:
+                  - generic [ref=f22e347]:
+                    - button "Upvote" [ref=f22e348] [cursor=pointer]:
+                      - generic [ref=f22e349]: arrow_drop_up
+                    - button "2 votes" [ref=f22e350] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f22e351] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e355]: Excellent! I never figured out how to combine several small models into one graph, which limits my solution to only one model. Looking forward to see your code! Surely it will be super helpful!
+                - button "Reply" [ref=f22e357] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e358]: reply
+                - generic [ref=f22e365]:
+                  - link "Youliang Yu's profile" [ref=f22e366] [cursor=pointer]:
+                    - /url: /aviatorx
+                    - generic "Youliang Yu" [ref=f22e367]
+                  - generic [ref=f22e373]:
+                    - link [ref=f22e375] [cursor=pointer]:
+                      - /url: /aviatorx
+                      - heading "Youliang Yu" [level=3] [ref=f22e376]
+                    - generic [ref=f22e377]:
+                      - paragraph [ref=f22e378]: Posted 8 years ago
+                      - paragraph [ref=f22e380]: · 21st in this Competition
+                  - generic [ref=f22e382]:
+                    - generic [ref=f22e383]:
+                      - button "Upvote" [ref=f22e384] [cursor=pointer]:
+                        - generic [ref=f22e385]: arrow_drop_up
+                      - button "4 votes" [ref=f22e386] [cursor=pointer]: "4"
+                    - button "More Options for this Comment" [ref=f22e387] [cursor=pointer]: more_vert
+                  - paragraph [ref=f22e391]: Hi Wudi. Scoring 0.88 on LB with a single model is impressive. Could you share your solution? A brief description would be good. Thanks.
+                  - button "Reply" [ref=f22e393] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f22e394]: reply
+              - separator [ref=f22e396]
+            - generic [ref=f22e397]:
+              - generic [ref=f22e401]:
+                - link "AbhishekSaitwal's profile" [ref=f22e402] [cursor=pointer]:
+                  - /url: /abhisheksaitwal
+                  - generic "AbhishekSaitwal" [ref=f22e403]
+                - generic [ref=f22e409]:
+                  - link [ref=f22e411] [cursor=pointer]:
+                    - /url: /abhisheksaitwal
+                    - heading "AbhishekSaitwal" [level=3] [ref=f22e412]
+                  - paragraph [ref=f22e414]: Posted 8 years ago
+                - generic [ref=f22e416]:
+                  - generic [ref=f22e417]:
+                    - button "Upvote" [ref=f22e418] [cursor=pointer]:
+                      - generic [ref=f22e419]: arrow_drop_up
+                    - button "1 votes" [ref=f22e420] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f22e421] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e425]: congratulations
+                - button "Reply" [ref=f22e427] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e428]: reply
+              - separator [ref=f22e430]
+            - generic [ref=f22e431]:
+              - generic [ref=f22e435]:
+                - link "ryches's profile" [ref=f22e436] [cursor=pointer]:
+                  - /url: /ryches
+                  - generic "ryches" [ref=f22e437]
+                - generic [ref=f22e443]:
+                  - link [ref=f22e445] [cursor=pointer]:
+                    - /url: /ryches
+                    - heading "ryches" [level=3] [ref=f22e446]
+                  - paragraph [ref=f22e448]: Posted 8 years ago
+                - generic [ref=f22e450]:
+                  - generic [ref=f22e451]:
+                    - button "Upvote" [ref=f22e452] [cursor=pointer]:
+                      - generic [ref=f22e453]: arrow_drop_up
+                    - button "1 votes" [ref=f22e454] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f22e455] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e459]: You might not have timed this but did you see any improvement in inference time after quantizing the weights? I originally tried that out a while ago when I was trying to run things on a raspberry pi after training on gpu. I forgot why but at the time tensorflow had a reason why no speedup occurred. Wasn't sure if that was something you tested?
+                - button "Reply" [ref=f22e461] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e462]: reply
+                - generic [ref=f22e464]:
+                  - paragraph [ref=f22e471]: This comment has been deleted.
+                  - generic [ref=f22e472]:
+                    - button "3 more replies" [ref=f22e473] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e475]: arrow_drop_down
+                    - generic [ref=f22e476]:
+                      - img "Profile picture for David Austin" [ref=f22e478]
+                      - img "Profile picture for RLin" [ref=f22e480]
+                      - img "Profile picture for ryches" [ref=f22e482]
+              - separator [ref=f22e483]
+            - generic [ref=f22e484]:
+              - generic [ref=f22e488]:
+                - link "notsofast's profile" [ref=f22e489] [cursor=pointer]:
+                  - /url: /danielchanthink
+                  - generic "notsofast" [ref=f22e490]
+                - generic [ref=f22e496]:
+                  - link [ref=f22e498] [cursor=pointer]:
+                    - /url: /danielchanthink
+                    - heading "notsofast" [level=3] [ref=f22e499]
+                  - paragraph [ref=f22e501]: Posted 8 years ago
+                - generic [ref=f22e503]:
+                  - generic [ref=f22e504]:
+                    - button "Upvote" [ref=f22e505] [cursor=pointer]:
+                      - generic [ref=f22e506]: arrow_drop_up
+                    - button "0 votes" [ref=f22e507] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e508] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e512]: Congrats! I think it's essentially ensembling rather than distillation? :)
+                - button "Reply" [ref=f22e514] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e515]: reply
+                - generic [ref=f22e517]:
+                  - generic [ref=f22e522]:
+                    - link "unfashionable's profile" [ref=f22e523] [cursor=pointer]:
+                      - /url: /unfashionable
+                      - generic "unfashionable" [ref=f22e524]
+                    - generic [ref=f22e530]:
+                      - link [ref=f22e532] [cursor=pointer]:
+                        - /url: /unfashionable
+                        - heading "unfashionable" [level=3] [ref=f22e533]
+                      - generic [ref=f22e534]:
+                        - paragraph [ref=f22e535]: Posted 8 years ago
+                        - paragraph [ref=f22e537]: · 16th in this Competition
+                    - generic [ref=f22e539]:
+                      - generic [ref=f22e540]:
+                        - button "Upvote" [ref=f22e541] [cursor=pointer]:
+                          - generic [ref=f22e542]: arrow_drop_up
+                        - button "0 votes" [ref=f22e543] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f22e544] [cursor=pointer]: more_vert
+                    - paragraph [ref=f22e548]: I agree!
+                    - button "Reply" [ref=f22e550] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e551]: reply
+                  - generic [ref=f22e557]:
+                    - link "Miha Skalic's profile" [ref=f22e558] [cursor=pointer]:
+                      - /url: /mihaskalic
+                      - generic "Miha Skalic" [ref=f22e559]
+                    - generic [ref=f22e565]:
+                      - generic [ref=f22e566]:
+                        - link [ref=f22e567] [cursor=pointer]:
+                          - /url: /mihaskalic
+                          - heading "Miha Skalic" [level=3] [ref=f22e568]
+                        - paragraph [ref=f22e571]: Topic Author
+                      - generic [ref=f22e572]:
+                        - paragraph [ref=f22e573]: Posted 8 years ago
+                        - paragraph [ref=f22e575]: · 1st in this Competition
+                    - generic [ref=f22e577]:
+                      - generic [ref=f22e578]:
+                        - button "Upvote" [ref=f22e579] [cursor=pointer]:
+                          - generic [ref=f22e580]: arrow_drop_up
+                        - button "1 votes" [ref=f22e581] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f22e582] [cursor=pointer]: more_vert
+                    - paragraph [ref=f22e586]: Depends on how you look at it. From another perspective the model had 15 student models and 9 models in final ensemble.
+                    - button "Reply" [ref=f22e588] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e589]: reply
+              - separator [ref=f22e591]
+            - generic [ref=f22e592]:
+              - generic [ref=f22e596]:
+                - link "fuhodev's profile" [ref=f22e597] [cursor=pointer]:
+                  - /url: /thanhtinqn97
+                  - generic "fuhodev" [ref=f22e598]
+                - generic [ref=f22e604]:
+                  - link [ref=f22e606] [cursor=pointer]:
+                    - /url: /thanhtinqn97
+                    - heading "fuhodev" [level=3] [ref=f22e607]
+                  - paragraph [ref=f22e609]: Posted 7 years ago
+                - generic [ref=f22e611]:
+                  - generic [ref=f22e612]:
+                    - button "Upvote" [ref=f22e613] [cursor=pointer]:
+                      - generic [ref=f22e614]: arrow_drop_up
+                    - button "0 votes" [ref=f22e615] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e616] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e620]: Could you tell me about what types of GPU did you use ?
+                - button "Reply" [ref=f22e622] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e623]: reply
+              - separator [ref=f22e625]
+            - generic [ref=f22e626]:
+              - generic [ref=f22e630]:
+                - link "zhou's profile" [ref=f22e631] [cursor=pointer]:
+                  - /url: /zhousu
+                  - generic "zhou" [ref=f22e632]
+                - generic [ref=f22e638]:
+                  - link [ref=f22e640] [cursor=pointer]:
+                    - /url: /zhousu
+                    - heading "zhou" [level=3] [ref=f22e641]
+                  - paragraph [ref=f22e643]: Posted 8 years ago
+                - generic [ref=f22e645]:
+                  - generic [ref=f22e646]:
+                    - button "Upvote" [ref=f22e647] [cursor=pointer]:
+                      - generic [ref=f22e648]: arrow_drop_up
+                    - button "0 votes" [ref=f22e649] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e650] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e654]: Congrats! May I ask how much accuracy drops if we quantize the weights but not mapping them back to float32? Thanks!
+                - button "Reply" [ref=f22e656] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e657]: reply
+                - generic [ref=f22e664]:
+                  - link "Miha Skalic's profile" [ref=f22e665] [cursor=pointer]:
+                    - /url: /mihaskalic
+                    - generic "Miha Skalic" [ref=f22e666]
+                  - generic [ref=f22e672]:
+                    - generic [ref=f22e673]:
+                      - link [ref=f22e674] [cursor=pointer]:
+                        - /url: /mihaskalic
+                        - heading "Miha Skalic" [level=3] [ref=f22e675]
+                      - paragraph [ref=f22e678]: Topic Author
+                    - generic [ref=f22e679]:
+                      - paragraph [ref=f22e680]: Posted 8 years ago
+                      - paragraph [ref=f22e682]: · 1st in this Competition
+                  - generic [ref=f22e684]:
+                    - generic [ref=f22e685]:
+                      - button "Upvote" [ref=f22e686] [cursor=pointer]:
+                        - generic [ref=f22e687]: arrow_drop_up
+                      - button "0 votes" [ref=f22e688] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f22e689] [cursor=pointer]: more_vert
+                  - paragraph [ref=f22e693]: Hi Zhou, Unfortunately we did not try quantized inference, so I cannot provide any numbers
+                  - button "Reply" [ref=f22e695] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f22e696]: reply
+              - separator [ref=f22e698]
+            - generic [ref=f22e699]:
+              - generic [ref=f22e703]:
+                - link "Wei Zheng's profile" [ref=f22e704] [cursor=pointer]:
+                  - /url: /ishootlaser
+                  - generic "Wei Zheng" [ref=f22e705]
+                - generic [ref=f22e711]:
+                  - link [ref=f22e713] [cursor=pointer]:
+                    - /url: /ishootlaser
+                    - heading "Wei Zheng" [level=3] [ref=f22e714]
+                  - generic [ref=f22e715]:
+                    - paragraph [ref=f22e716]: Posted 8 years ago
+                    - paragraph [ref=f22e718]: · 67th in this Competition
+                - generic [ref=f22e720]:
+                  - generic [ref=f22e721]:
+                    - button "Upvote" [ref=f22e722] [cursor=pointer]:
+                      - generic [ref=f22e723]: arrow_drop_up
+                    - button "0 votes" [ref=f22e724] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e725] [cursor=pointer]: more_vert
+                - generic [ref=f22e728]:
+                  - paragraph [ref=f22e729]: Congrats! I am also trying NetVLAD and had some trouble achieving your GAP. Can you please share your experiences/opinion on the following questions?
+                  - list [ref=f22e730]:
+                    - listitem [ref=f22e731]: Is it important to ensemble multiple NetVLADs? From my experience, a single NetVLAD can only reach ~83%. But your NetVLADs have an average of 87%.
+                    - listitem [ref=f22e732]: I flatten the NetVLAD matrix (shape = feature size x cluster size) and fed it into a dense layer. With 256 clusters I got CUDA_out of memory error on my Titan X 12 GB, even with batch size = 1. How did you address this problem?
+                    - listitem [ref=f22e733]: This question is a continuation from the 2nd question. I tried to avoid the OOM error by applying convolution. Basically I treat the NetVLAD matrix as 2D image and apply convolutions on it, then flatten and fed into Mixture of Experts. Do you think this strategy is reasonable? Thank you!
+                - button "Reply" [ref=f22e735] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e736]: reply
+                - generic [ref=f22e743]:
+                  - link "Miha Skalic's profile" [ref=f22e744] [cursor=pointer]:
+                    - /url: /mihaskalic
+                    - generic "Miha Skalic" [ref=f22e745]
+                  - generic [ref=f22e751]:
+                    - generic [ref=f22e752]:
+                      - link [ref=f22e753] [cursor=pointer]:
+                        - /url: /mihaskalic
+                        - heading "Miha Skalic" [level=3] [ref=f22e754]
+                      - paragraph [ref=f22e757]: Topic Author
+                    - generic [ref=f22e758]:
+                      - paragraph [ref=f22e759]: Posted 8 years ago
+                      - paragraph [ref=f22e761]: · 1st in this Competition
+                  - generic [ref=f22e763]:
+                    - generic [ref=f22e764]:
+                      - button "Upvote" [ref=f22e765] [cursor=pointer]:
+                        - generic [ref=f22e766]: arrow_drop_up
+                      - button "0 votes" [ref=f22e767] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f22e768] [cursor=pointer]: more_vert
+                  - generic [ref=f22e771]:
+                    - paragraph [ref=f22e772]:
+                      - text: Hi Wei, which implementation of netVLAD are you using? ones from
+                      - link "https://github.com/miha-skalic/youtube8mchallange (opens in a new tab)" [ref=f22e773] [cursor=pointer]:
+                        - /url: https://github.com/miha-skalic/youtube8mchallange
+                        - text: https://github.com/miha-skalic/youtube8mchallange
+                      - text: or some other? models from model_configs.xlsx in that repo should be able to achive 0.87, even on a single GPU.
+                    - paragraph [ref=f22e774]: In regards to TF (OOM) error - We had some unsolved problems ourselves but not on a single GPU. I'm not sure I can help you with this (maybe try different TF/CUDA/drivers/…).
+                  - button "Reply" [ref=f22e776] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f22e777]: reply
+              - separator [ref=f22e779]
+            - generic [ref=f22e780]:
+              - generic [ref=f22e784]:
+                - link "Kushajveer Singh's profile" [ref=f22e785] [cursor=pointer]:
+                  - /url: /kushaj
+                  - generic "Kushajveer Singh" [ref=f22e786]
+                - generic [ref=f22e792]:
+                  - link [ref=f22e794] [cursor=pointer]:
+                    - /url: /kushaj
+                    - heading "Kushajveer Singh" [level=3] [ref=f22e795]
+                  - paragraph [ref=f22e797]: Posted 8 years ago
+                - generic [ref=f22e799]:
+                  - generic [ref=f22e800]:
+                    - button "Upvote" [ref=f22e801] [cursor=pointer]:
+                      - generic [ref=f22e802]: arrow_drop_up
+                    - button "0 votes" [ref=f22e803] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e804] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e808]: Am I missing something here. But I am not able to see the figure with the distillation scheme.
+                - button "Reply" [ref=f22e810] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e811]: reply
+                - generic [ref=f22e813]:
+                  - generic [ref=f22e818]:
+                    - link "Miha Skalic's profile" [ref=f22e819] [cursor=pointer]:
+                      - /url: /mihaskalic
+                      - generic "Miha Skalic" [ref=f22e820]
+                    - generic [ref=f22e826]:
+                      - generic [ref=f22e827]:
+                        - link [ref=f22e828] [cursor=pointer]:
+                          - /url: /mihaskalic
+                          - heading "Miha Skalic" [level=3] [ref=f22e829]
+                        - paragraph [ref=f22e832]: Topic Author
+                      - generic [ref=f22e833]:
+                        - paragraph [ref=f22e834]: Posted 8 years ago
+                        - paragraph [ref=f22e836]: · 1st in this Competition
+                    - generic [ref=f22e838]:
+                      - generic [ref=f22e839]:
+                        - button "Upvote" [ref=f22e840] [cursor=pointer]:
+                          - generic [ref=f22e841]: arrow_drop_up
+                        - button "0 votes" [ref=f22e842] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f22e843] [cursor=pointer]: more_vert
+                    - generic [ref=f22e846]:
+                      - paragraph [ref=f22e847]: sorry, the link expired. Fixing it now.
+                      - paragraph [ref=f22e848]: "edit: fixed"
+                    - button "Reply" [ref=f22e850] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e851]: reply
+                  - generic [ref=f22e857]:
+                    - link "Kushajveer Singh's profile" [ref=f22e858] [cursor=pointer]:
+                      - /url: /kushaj
+                      - generic "Kushajveer Singh" [ref=f22e859]
+                    - generic [ref=f22e865]:
+                      - link [ref=f22e867] [cursor=pointer]:
+                        - /url: /kushaj
+                        - heading "Kushajveer Singh" [level=3] [ref=f22e868]
+                      - paragraph [ref=f22e870]: Posted 8 years ago
+                    - generic [ref=f22e872]:
+                      - generic [ref=f22e873]:
+                        - button "Upvote" [ref=f22e874] [cursor=pointer]:
+                          - generic [ref=f22e875]: arrow_drop_up
+                        - button "0 votes" [ref=f22e876] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f22e877] [cursor=pointer]: more_vert
+                    - paragraph [ref=f22e881]: Thanks
+                    - button "Reply" [ref=f22e883] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e884]: reply
+              - separator [ref=f22e886]
+            - generic [ref=f22e887]:
+              - generic [ref=f22e891]:
+                - link "WlMx's profile" [ref=f22e892] [cursor=pointer]:
+                  - /url: /wlmx91
+                  - generic "WlMx" [ref=f22e893]
+                - generic [ref=f22e899]:
+                  - link [ref=f22e901] [cursor=pointer]:
+                    - /url: /wlmx91
+                    - heading "WlMx" [level=3] [ref=f22e902]
+                  - paragraph [ref=f22e904]: Posted 8 years ago
+                - generic [ref=f22e906]:
+                  - generic [ref=f22e907]:
+                    - button "Upvote" [ref=f22e908] [cursor=pointer]:
+                      - generic [ref=f22e909]: arrow_drop_up
+                    - button "0 votes" [ref=f22e910] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e911] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e915]: Great!
+                - button "Reply" [ref=f22e917] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e918]: reply
+              - separator [ref=f22e920]
+            - generic [ref=f22e921]:
+              - generic [ref=f22e925]:
+                - link "The Bird's profile" [ref=f22e926] [cursor=pointer]:
+                  - /url: /pipboyguy
+                  - generic "The Bird" [ref=f22e927]
+                - generic [ref=f22e933]:
+                  - link [ref=f22e935] [cursor=pointer]:
+                    - /url: /pipboyguy
+                    - heading "The Bird" [level=3] [ref=f22e936]
+                  - paragraph [ref=f22e938]: Posted 8 years ago
+                - generic [ref=f22e940]:
+                  - generic [ref=f22e941]:
+                    - button "Upvote" [ref=f22e942] [cursor=pointer]:
+                      - generic [ref=f22e943]: arrow_drop_up
+                    - button "0 votes" [ref=f22e944] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e945] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e949]: Congrats!
+                - button "Reply" [ref=f22e951] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e952]: reply
+              - separator [ref=f22e954]
+            - generic [ref=f22e955]:
+              - generic [ref=f22e959]:
+                - link "Pedro Ulisses's profile" [ref=f22e960] [cursor=pointer]:
+                  - /url: /ulissesph
+                  - generic "Pedro Ulisses" [ref=f22e961]
+                - generic [ref=f22e967]:
+                  - link [ref=f22e969] [cursor=pointer]:
+                    - /url: /ulissesph
+                    - heading "Pedro Ulisses" [level=3] [ref=f22e970]
+                  - paragraph [ref=f22e972]: Posted 8 years ago
+                - generic [ref=f22e974]:
+                  - generic [ref=f22e975]:
+                    - button "Upvote" [ref=f22e976] [cursor=pointer]:
+                      - generic [ref=f22e977]: arrow_drop_up
+                    - button "0 votes" [ref=f22e978] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e979] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e983]: Parabéns, ótimo trabalho.
+                - button "Reply" [ref=f22e985] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e986]: reply
+              - separator [ref=f22e988]
+            - generic [ref=f22e989]:
+              - generic [ref=f22e993]:
+                - link "Arnab's profile" [ref=f22e994] [cursor=pointer]:
+                  - /url: /arnabthakuria
+                  - generic "Arnab" [ref=f22e995]
+                - generic [ref=f22e1001]:
+                  - link [ref=f22e1003] [cursor=pointer]:
+                    - /url: /arnabthakuria
+                    - heading "Arnab" [level=3] [ref=f22e1004]
+                  - paragraph [ref=f22e1006]: Posted 8 years ago
+                - generic [ref=f22e1008]:
+                  - generic [ref=f22e1009]:
+                    - button "Upvote" [ref=f22e1010] [cursor=pointer]:
+                      - generic [ref=f22e1011]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1012] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1013] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1017]: amazing technique
+                - button "Reply" [ref=f22e1019] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1020]: reply
+              - separator [ref=f22e1022]
+            - generic [ref=f22e1023]:
+              - generic [ref=f22e1027]:
+                - link "Pedro Aaron's profile" [ref=f22e1028] [cursor=pointer]:
+                  - /url: /paaron
+                  - generic "Pedro Aaron" [ref=f22e1029]
+                - generic [ref=f22e1035]:
+                  - link [ref=f22e1037] [cursor=pointer]:
+                    - /url: /paaron
+                    - heading "Pedro Aaron" [level=3] [ref=f22e1038]
+                  - paragraph [ref=f22e1040]: Posted 8 years ago
+                - generic [ref=f22e1042]:
+                  - generic [ref=f22e1043]:
+                    - button "Upvote" [ref=f22e1044] [cursor=pointer]:
+                      - generic [ref=f22e1045]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1046] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1047] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1051]: Congratulations!
+                - button "Reply" [ref=f22e1053] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1054]: reply
+              - separator [ref=f22e1056]
+            - generic [ref=f22e1057]:
+              - generic [ref=f22e1061]:
+                - link "Ales Pokorny's profile" [ref=f22e1062] [cursor=pointer]:
+                  - /url: /alespokorny
+                  - generic "Ales Pokorny" [ref=f22e1063]
+                - generic [ref=f22e1069]:
+                  - link [ref=f22e1071] [cursor=pointer]:
+                    - /url: /alespokorny
+                    - heading "Ales Pokorny" [level=3] [ref=f22e1072]
+                  - paragraph [ref=f22e1074]: Posted 8 years ago
+                - generic [ref=f22e1076]:
+                  - generic [ref=f22e1077]:
+                    - button "Upvote" [ref=f22e1078] [cursor=pointer]:
+                      - generic [ref=f22e1079]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1080] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1081] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1085]: Nice, good job!
+                - button "Reply" [ref=f22e1087] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1088]: reply
+              - separator [ref=f22e1090]
+            - generic [ref=f22e1091]:
+              - generic [ref=f22e1095]:
+                - link "kerriop's profile" [ref=f22e1096] [cursor=pointer]:
+                  - /url: /kerriop
+                  - generic "kerriop" [ref=f22e1097]
+                - generic [ref=f22e1103]:
+                  - link [ref=f22e1105] [cursor=pointer]:
+                    - /url: /kerriop
+                    - heading "kerriop" [level=3] [ref=f22e1106]
+                  - paragraph [ref=f22e1108]: Posted 8 years ago
+                - generic [ref=f22e1110]:
+                  - generic [ref=f22e1111]:
+                    - button "Upvote" [ref=f22e1112] [cursor=pointer]:
+                      - generic [ref=f22e1113]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1114] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1115] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1119]: good
+                - button "Reply" [ref=f22e1121] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1122]: reply
+              - separator [ref=f22e1124]
+            - generic [ref=f22e1125]:
+              - generic [ref=f22e1129]:
+                - link "Mohsen Kiskani's profile" [ref=f22e1130] [cursor=pointer]:
+                  - /url: /mhsnk12
+                  - generic "Mohsen Kiskani" [ref=f22e1131]
+                - generic [ref=f22e1137]:
+                  - link [ref=f22e1139] [cursor=pointer]:
+                    - /url: /mhsnk12
+                    - heading "Mohsen Kiskani" [level=3] [ref=f22e1140]
+                  - paragraph [ref=f22e1142]: Posted 8 years ago
+                - generic [ref=f22e1144]:
+                  - generic [ref=f22e1145]:
+                    - button "Upvote" [ref=f22e1146] [cursor=pointer]:
+                      - generic [ref=f22e1147]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1148] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1149] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1153]: Congrats Miha! Can't wait to see your paper and your code!
+                - button "Reply" [ref=f22e1155] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1156]: reply
+              - separator [ref=f22e1158]
+            - generic [ref=f22e1159]:
+              - generic [ref=f22e1163]:
+                - link "liuhao's profile" [ref=f22e1164] [cursor=pointer]:
+                  - /url: /liuhaothu
+                  - generic "liuhao" [ref=f22e1165]
+                - generic [ref=f22e1171]:
+                  - link [ref=f22e1173] [cursor=pointer]:
+                    - /url: /liuhaothu
+                    - heading "liuhao" [level=3] [ref=f22e1174]
+                  - generic [ref=f22e1175]:
+                    - paragraph [ref=f22e1176]: Posted 8 years ago
+                    - paragraph [ref=f22e1178]: · 20th in this Competition
+                - generic [ref=f22e1180]:
+                  - generic [ref=f22e1181]:
+                    - button "Upvote" [ref=f22e1182] [cursor=pointer]:
+                      - generic [ref=f22e1183]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1184] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1185] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1189]: Congrats!!!
+                - button "Reply" [ref=f22e1191] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1192]: reply
+              - separator [ref=f22e1194]
+            - generic [ref=f22e1195]:
+              - generic [ref=f22e1199]:
+                - link "Heda Wang's profile" [ref=f22e1200] [cursor=pointer]:
+                  - /url: /monkeytyping
+                  - generic "Heda Wang" [ref=f22e1201]
+                - generic [ref=f22e1207]:
+                  - link [ref=f22e1209] [cursor=pointer]:
+                    - /url: /monkeytyping
+                    - heading "Heda Wang" [level=3] [ref=f22e1210]
+                  - paragraph [ref=f22e1212]: Posted 8 years ago
+                - generic [ref=f22e1214]:
+                  - generic [ref=f22e1215]:
+                    - button "Upvote" [ref=f22e1216] [cursor=pointer]:
+                      - generic [ref=f22e1217]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1218] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1219] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1223]: Bravo! Congratulations!
+                - button "Reply" [ref=f22e1225] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1226]: reply
+              - separator [ref=f22e1228]
+            - generic [ref=f22e1229]:
+              - generic [ref=f22e1233]:
+                - link "Grey Fertich's profile" [ref=f22e1234] [cursor=pointer]:
+                  - /url: /greyfertich
+                  - generic "Grey Fertich" [ref=f22e1235]
+                - generic [ref=f22e1241]:
+                  - link [ref=f22e1243] [cursor=pointer]:
+                    - /url: /greyfertich
+                    - heading "Grey Fertich" [level=3] [ref=f22e1244]
+                  - paragraph [ref=f22e1246]: Posted 8 years ago
+                - generic [ref=f22e1248]:
+                  - generic [ref=f22e1249]:
+                    - button "Upvote" [ref=f22e1250] [cursor=pointer]:
+                      - generic [ref=f22e1251]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1252] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1253] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1257]: Congrats
+                - button "Reply" [ref=f22e1259] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1260]: reply
+              - separator [ref=f22e1262]
+            - generic [ref=f22e1263]:
+              - generic [ref=f22e1267]:
+                - link "Andrey Vykhodtsev's profile" [ref=f22e1268] [cursor=pointer]:
+                  - /url: /vykhand
+                  - generic "Andrey Vykhodtsev" [ref=f22e1269]
+                - generic [ref=f22e1275]:
+                  - link [ref=f22e1277] [cursor=pointer]:
+                    - /url: /vykhand
+                    - heading "Andrey Vykhodtsev" [level=3] [ref=f22e1278]
+                  - generic [ref=f22e1279]:
+                    - paragraph [ref=f22e1280]: Posted 8 years ago
+                    - paragraph [ref=f22e1282]: · 103rd in this Competition
+                - generic [ref=f22e1284]:
+                  - generic [ref=f22e1285]:
+                    - button "Upvote" [ref=f22e1286] [cursor=pointer]:
+                      - generic [ref=f22e1287]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1288] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1289] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1293]: Congratulations and thank you very much for sharing! Looking forward to see the code
+                - button "Reply" [ref=f22e1295] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1296]: reply
+              - separator [ref=f22e1298]
+            - generic [ref=f22e1299]:
+              - generic [ref=f22e1303]:
+                - link "Chris Deotte's profile" [ref=f22e1304] [cursor=pointer]:
+                  - /url: /cdeotte
+                  - generic "Chris Deotte" [ref=f22e1305]
+                - generic [ref=f22e1311]:
+                  - link [ref=f22e1313] [cursor=pointer]:
+                    - /url: /cdeotte
+                    - heading "Chris Deotte" [level=3] [ref=f22e1314]
+                  - paragraph [ref=f22e1316]: Posted 8 years ago
+                - generic [ref=f22e1318]:
+                  - generic [ref=f22e1319]:
+                    - button "Upvote" [ref=f22e1320] [cursor=pointer]:
+                      - generic [ref=f22e1321]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1322] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1323] [cursor=pointer]: more_vert
+                - paragraph [ref=f22e1327]: Congratulations!! And thanks for sharing your design and methodology.
+                - button "Reply" [ref=f22e1329] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1330]: reply
+              - separator [ref=f22e1332]
+            - generic [ref=f22e1333]:
+              - generic [ref=f22e1337]:
+                - link "Rob Wishart's profile" [ref=f22e1338] [cursor=pointer]:
+                  - /url: /robwishart
+                  - generic "Rob Wishart" [ref=f22e1339]
+                - generic [ref=f22e1345]:
+                  - link [ref=f22e1347] [cursor=pointer]:
+                    - /url: /robwishart
+                    - heading "Rob Wishart" [level=3] [ref=f22e1348]
+                  - generic [ref=f22e1349]:
+                    - paragraph [ref=f22e1350]: Posted 8 years ago
+                    - paragraph [ref=f22e1352]: · 99th in this Competition
+                - generic [ref=f22e1354]:
+                  - generic [ref=f22e1355]:
+                    - button "Upvote" [ref=f22e1356] [cursor=pointer]:
+                      - generic [ref=f22e1357]: arrow_drop_up
+                    - button "0 votes" [ref=f22e1358] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f22e1359] [cursor=pointer]: more_vert
+                - generic [ref=f22e1362]:
+                  - paragraph [ref=f22e1363]: Well done !
+                  - paragraph [ref=f22e1364]: Any information on how to combine Tensorflow models would be appreciated.
+                - button "Reply" [ref=f22e1366] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f22e1367]: reply
+                - generic [ref=f22e1369]:
+                  - generic [ref=f22e1374]:
+                    - link "Miha Skalic's profile" [ref=f22e1375] [cursor=pointer]:
+                      - /url: /mihaskalic
+                      - generic "Miha Skalic" [ref=f22e1376]
+                    - generic [ref=f22e1382]:
+                      - generic [ref=f22e1383]:
+                        - link [ref=f22e1384] [cursor=pointer]:
+                          - /url: /mihaskalic
+                          - heading "Miha Skalic" [level=3] [ref=f22e1385]
+                        - paragraph [ref=f22e1388]: Topic Author
+                      - generic [ref=f22e1389]:
+                        - paragraph [ref=f22e1390]: Posted 8 years ago
+                        - paragraph [ref=f22e1392]: · 1st in this Competition
+                    - generic [ref=f22e1394]:
+                      - generic [ref=f22e1395]:
+                        - button "Upvote" [ref=f22e1396] [cursor=pointer]:
+                          - generic [ref=f22e1397]: arrow_drop_up
+                        - button "2 votes" [ref=f22e1398] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f22e1399] [cursor=pointer]: more_vert
+                    - generic [ref=f22e1402]:
+                      - paragraph [ref=f22e1403]: It took us some time to figure out these kind of things ourselves. In general I find TF documentation hard to follow and not so descriptive - thus we applied trial and error approach.
+                      - code [ref=f22e1405]: "common_input = tf.placeholder(tf.float32, shape=(None, 300, 1152), name=\"CommonIn\") common_frames = tf.placeholder(tf.int32, shape=(None,)) with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess: for i, in_model in enumerate(in_models): with tf.variable_scope(\"model_{}\".format(i)), tf.device(\"/cpu:0\"): saver = tf.train.import_meta_graph(in_model + \".meta\", clear_devices=True) logging.info(\"restoring variables from \" + in_model) saver.restore(sess, in_model) input_tensor = tf.get_collection(\"input_batch_raw\") num_frames_tensor = tf.get_collection(\"num_frames\") predictions_tensor = tf.get_collection(\"predictions\") for g_inpt in input_tensor: tf.contrib.graph_editor.connect(common_input, g_inpt) for g_inpt in num_frames_tensor: tf.contrib.graph_editor.connect(common_frames, g_inpt) final_out = predictions_tensor[0] * weights[0] for sumodel_out, wfactor in zip(predictions_tensor[1:], weights[1:]): final_out = final_out + sumodel_out * wfactor tf.get_default_graph().clear_collection(\"input_batch_raw\") tf.add_to_collection(\"input_batch_raw\", common_input) tf.get_default_graph().clear_collection(\"num_frames\") tf.add_to_collection(\"num_frames\", common_frames) tf.get_default_graph().clear_collection(\"predictions\") tf.add_to_collection(\"predictions\", final_out) os.makedirs(save_folder) uninit = set(sess.run(tf.report_uninitialized_variables())) used_vars = [v for v in tf.global_variables() if v.name.split(':')[0] not in uninit] saver = tf.train.Saver(used_vars) saver.save(sess, os.path.join(save_folder, \"inference_model\")) ref_falgs = os.path.join(os.path.dirname(in_models[-1]), \"model_flags.json\") shutil.copy(ref_falgs, save_folder) logging.info(\"We are done!\")"
+                    - button "Reply" [ref=f22e1407] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e1408]: reply
+                  - generic [ref=f22e1414]:
+                    - link "Rob Wishart's profile" [ref=f22e1415] [cursor=pointer]:
+                      - /url: /robwishart
+                      - generic "Rob Wishart" [ref=f22e1416]
+                    - generic [ref=f22e1422]:
+                      - link [ref=f22e1424] [cursor=pointer]:
+                        - /url: /robwishart
+                        - heading "Rob Wishart" [level=3] [ref=f22e1425]
+                      - generic [ref=f22e1426]:
+                        - paragraph [ref=f22e1427]: Posted 8 years ago
+                        - paragraph [ref=f22e1429]: · 99th in this Competition
+                    - generic [ref=f22e1431]:
+                      - generic [ref=f22e1432]:
+                        - button "Upvote" [ref=f22e1433] [cursor=pointer]:
+                          - generic [ref=f22e1434]: arrow_drop_up
+                        - button "0 votes" [ref=f22e1435] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f22e1436] [cursor=pointer]: more_vert
+                    - paragraph [ref=f22e1440]: Thank you again.
+                    - button "Reply" [ref=f22e1442] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f22e1443]: reply
+              - separator [ref=f22e1445]
+            - generic [ref=f22e1450]:
+              - link "Amit Kumar Jaiswal's profile" [ref=f22e1451] [cursor=pointer]:
+                - /url: /amitkumarjaiswal
+                - generic "Amit Kumar Jaiswal" [ref=f22e1452]
+              - generic [ref=f22e1458]:
+                - link [ref=f22e1460] [cursor=pointer]:
+                  - /url: /amitkumarjaiswal
+                  - heading "Amit Kumar Jaiswal" [level=3] [ref=f22e1461]
+                - generic [ref=f22e1462]:
+                  - paragraph [ref=f22e1463]: Posted 8 years ago
+                  - paragraph [ref=f22e1465]: · 181st in this Competition
+              - generic [ref=f22e1467]:
+                - generic [ref=f22e1468]:
+                  - button "Upvote" [ref=f22e1469] [cursor=pointer]:
+                    - generic [ref=f22e1470]: arrow_drop_up
+                  - button "0 votes" [ref=f22e1471] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f22e1472] [cursor=pointer]: more_vert
+              - paragraph [ref=f22e1476]:
+                - text: Congratulations
+                - link "@mihaskalic (opens in a new tab)" [ref=f22e1477] [cursor=pointer]:
+                  - /url: /mihaskalic
+                  - text: "@mihaskalic"
+                - text: "!"
+              - button "Reply" [ref=f22e1479] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f22e1480]: reply
+  - alert [ref=f22e1484]

@@ -1,0 +1,483 @@
+- generic [ref=f12e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f12e3]:
+    - generic [ref=f12e5]:
+      - button "Navigation menu" [ref=f12e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f12e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f12e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f12e14]:
+      - link [ref=f12e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fvinbigdata-chest-xray-abnormalities-detection%2Fwriteups%2Fs-1st-place-solution
+        - button "Login" [ref=f12e16]
+      - link [ref=f12e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fvinbigdata-chest-xray-abnormalities-detection%2Fwriteups%2Fs-1st-place-solution
+        - button "Sign Up" [ref=f12e19]
+  - main [ref=f12e21]:
+    - generic [ref=f12e23]:
+      - generic [ref=f12e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f12e25]:
+        - link "Learn more" [ref=f12e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f12e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f12e29]:
+      - generic [ref=f12e31]: 1st Place Solution — VinBigData Chest X-ray Abnormalities Detection
+      - separator [ref=f12e32]
+      - generic [ref=f12e34]:
+        - generic [ref=f12e35]:
+          - heading "1st Place Solution" [level=1] [ref=f12e36]
+          - generic [ref=f12e37]:
+            - link [ref=f12e38] [cursor=pointer]:
+              - /url: /competitions/vinbigdata-chest-xray-abnormalities-detection
+              - paragraph [ref=f12e40]: VinBigData Chest X-ray Abnormalities Detection
+            - paragraph [ref=f12e41]: Solution Writeup · 1st place · Jan 27, 2022
+        - separator [ref=f12e43]
+        - generic [ref=f12e44]:
+          - generic [ref=f12e46]:
+            - paragraph [ref=f12e47]:
+              - strong [ref=f12e48]:
+                - text: Thanks to Kaggle and hosts for this very interesting competition with a too challenging dataset. This has been a great collaborative effort. Please give your upvotes to
+                - link "@fatihozturk (opens in a new tab)" [ref=f12e49] [cursor=pointer]:
+                  - /url: /fatihozturk
+                  - text: "@fatihozturk"
+                - link "@socom20 (opens in a new tab)" [ref=f12e50] [cursor=pointer]:
+                  - /url: /socom20
+                  - text: "@socom20"
+                - link "@avsanjay (opens in a new tab)" [ref=f12e51] [cursor=pointer]:
+                  - /url: /avsanjay
+                  - text: "@avsanjay"
+                - text: Congrats to The Winners.
+            - heading "TLDR" [level=2] [ref=f12e52]
+            - paragraph [ref=f12e53]:
+              - link "@fatihozturk (opens in a new tab)" [ref=f12e54] [cursor=pointer]:
+                - /url: /fatihozturk
+                - text: "@fatihozturk"
+              - text: explained in his
+              - link "post (opens in a new tab)" [ref=f12e55] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/229724
+                - text: post
+              - text: how was his path through this competition, this post is intended as an overall view of our final solution which achieved 0.354/0..314 PublicLB/PrivateLB. It is worth mentioning that we also had a better solution with 0.330/0.321 PublicLB/PrivateLB (which unfortunately we didn't select). As you all already know the main magic we have used for this competition was our Ensembling procedure, also there were lots of other important findings that we mention in this post.
+            - paragraph [ref=f12e56]:
+              - strong [ref=f12e57]: CV strategy
+              - text: ": This was our main challenge, we didn't have a unique validation scheme. Since we started the competition as different teams, we all were using different CV splits to train our models and to build our separated best ensembles. To overcome this difficulty we finally ended up using the public LB as an extra validation dataset. We felt that this strategy was a bit risky, so we also retrained some of our best models using a common validation split and then we ensemble them (this last approach didn't have the best score on the private LB by itself). We think that our last ensemble, using the public LB as a validation source, helped out our final solution to fit better the consensus method used to build the test dataset."
+            - heading "Our Validation Strategy" [level=2] [ref=f12e58]
+            - paragraph [ref=f12e59]: "Our strategy for the final submission can be divided into 3 stages :"
+            - list [ref=f12e60]:
+              - listitem [ref=f12e61]: Fully Validated Stage
+              - listitem [ref=f12e62]: Partially Validated Stage
+              - listitem [ref=f12e63]: Not validated Stage (Just validated using the Public LB)
+            - heading "Models, we used for Ensembling" [level=2] [ref=f12e64]
+            - list [ref=f12e65]:
+              - listitem [ref=f12e66]:
+                - paragraph [ref=f12e67]:
+                  - strong [ref=f12e68]: "Fully Validated Stage:"
+                - list [ref=f12e69]:
+                  - listitem [ref=f12e70]:
+                    - text: Detectron2 Resnet101 (notebook by
+                    - link "@corochann (opens in a new tab)" [ref=f12e71] [cursor=pointer]:
+                      - /url: /corochann
+                      - text: "@corochann"
+                    - text: ", Thanks)"
+                  - listitem [ref=f12e72]: YoloV5
+                  - listitem [ref=f12e73]: EffDetD2
+              - listitem [ref=f12e74]:
+                - paragraph [ref=f12e75]:
+                  - strong [ref=f12e76]: "Partially Validated Stage:"
+                - list [ref=f12e77]:
+                  - listitem [ref=f12e78]: YoloV5 5Folds
+              - listitem [ref=f12e79]:
+                - paragraph [ref=f12e80]:
+                  - strong [ref=f12e81]: "Not Validated Stage:"
+                - list [ref=f12e82]:
+                  - listitem [ref=f12e83]: 2 EffdetD2 model
+                  - listitem [ref=f12e84]: 3 YoloV5 (1x w/ TTA , 2x w/o TTA)
+                  - listitem [ref=f12e85]: 16 Classes Yolo model
+                  - listitem [ref=f12e86]:
+                    - text: 5 Folds YoloV5 by
+                    - link "@awsaf49 (opens in a new tab)" [ref=f12e87] [cursor=pointer]:
+                      - /url: /awsaf49
+                      - text: "@awsaf49"
+                  - listitem [ref=f12e88]: New Anchor Yolo
+                  - listitem [ref=f12e89]:
+                    - text: Detectron2 Resnet50 (notebook by
+                    - link "@corochann (opens in a new tab)" [ref=f12e90] [cursor=pointer]:
+                      - /url: /corochann
+                      - text: "@corochann"
+                    - text: ", Thanks)"
+                  - listitem [ref=f12e91]:
+                    - text: YoloV5
+                    - link "@nxhong93 (opens in a new tab)" [ref=f12e92] [cursor=pointer]:
+                      - /url: /nxhong93
+                      - text: "@nxhong93"
+                    - text: (
+                    - link "https://www.kaggle.com/nxhong93/yolov5-chest-512 (opens in a new tab)" [ref=f12e93] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/nxhong93/yolov5-chest-512
+                      - text: https://www.kaggle.com/nxhong93/yolov5-chest-512
+                    - text: )
+                  - listitem [ref=f12e94]: Yolov5 with image size (640)
+            - heading "Ensembling Strategy" [level=2] [ref=f12e95]
+            - paragraph [ref=f12e96]:
+              - text: To ensemble all the partial models we mainly used
+              - link "@zfturbo (opens in a new tab)" [ref=f12e97] [cursor=pointer]:
+                - /url: /zfturbo
+                - text: "@zfturbo"
+              - text: "'s ensembling repository"
+              - link "https://github.com/ZFTurbo/Weighted-Boxes-Fusion (opens in a new tab)" [ref=f12e98] [cursor=pointer]:
+                - /url: https://github.com/ZFTurbo/Weighted-Boxes-Fusion
+                - text: https://github.com/ZFTurbo/Weighted-Boxes-Fusion
+              - text: ". Our ensemble technic is shown in the following figure:"
+            - paragraph [ref=f12e99]:
+              - img "enter image description here" [ref=f12e100]
+            - paragraph [ref=f12e101]:
+              - text: As you can see at the end of the Not Validated Stage, we use WBF+p_sum. This last blending method is a variant of WBF proposed by
+              - link "@socom20 (opens in a new tab)" [ref=f12e102] [cursor=pointer]:
+                - /url: /socom20
+                - text: "@socom20"
+              - text: and was intended to simulate the consensus of radiologists used in this particular test dataset. By using WBF+p_sum improved our Not Validated stage from 0.319 to 0.331 in the PublicLB.
+            - paragraph [ref=f12e103]:
+              - strong [ref=f12e104]: "Modified WBF:"
+              - text: "It has more flexibility than WBF, it has 4 bbox blending technics, we found that only 2 of them were useful in this competition:"
+            - list [ref=f12e105]:
+              - listitem [ref=f12e106]:
+                - text: "\"p_det_weight_pmean\", has a behaviour similar to WBF, it finds the set of bboxes with iou > thr, and then weights them using their detection probabilities (detection confidences). The new p_det (detection confidence) is an"
+                - strong [ref=f12e107]: average
+                - text: over the detection probabilities of detections with iou > thr.
+              - listitem [ref=f12e108]:
+                - text: "\"p_det_weight_psum\": does the same with the bboxes. In this case, the new p_det is a"
+                - strong [ref=f12e109]: sum
+                - text: over the detection probability of bboxes with iou > thr. Because of the sum of the p_dets, "p_det_weight_psum" needs a final normalization step. The idea behind psum is to try to replicate "the consensus of radiologists" using the partial models. When adding the probabilities of detection, we weigh more those boxes in which more models/radiologists agree.
+            - paragraph [ref=f12e110]: In our final submission, the not validated stage had a high weighting, which lead to an overfitted problem in our final ensemble we got 0.354/0.314 Public/Private. If we had reduced the weighting for this not validated stage, the LB score would have become 0.330/0.321 Public/Private as we previously have mentioned in the post.
+            - heading "Some Interesting Findings" [level=2] [ref=f12e111]
+            - list [ref=f12e112]:
+              - listitem [ref=f12e113]:
+                - text: After spending more time understanding the competition metric, we realized that there is No Penalty For Adding More Bbox as
+                - link "@cdeotte (opens in a new tab)" [ref=f12e114] [cursor=pointer]:
+                  - /url: /cdeotte
+                  - text: "@cdeotte"
+                - text: "explains clearly here:"
+                - link "https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/229637 (opens in a new tab)" [ref=f12e115] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/229637
+                  - text: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/229637
+                - text: . Having more confident boxes is good but, at the same time, having many low confidence bboxes improves the Recall and can improve the mAP as well. We tested this approach by using two models, a Model A with a good mAP, and a Model B with a good Recall for all the classes. The following figure shows on the left the Precision vs Recall curves of Model A. It can be seen that many class tails end with a maximum recall = 0.7. We managed to add to Model A all the bboxes predicted for Model B which doesn't overlap with any bbox of predicted for Model A, the result is in the plot of the right. It can be seen that the main shape of the PvsR curves is still the same, but the tails now reach over recall=0.8. We didn't use this approach in our final model because the final ensemble already had a very good recall for all the classes.
+            - paragraph [ref=f12e116]:
+              - img "enter image description here" [ref=f12e117]
+            - list [ref=f12e118]:
+              - listitem [ref=f12e119]: Last competition days, we spent analyzing the predictions made for the ensemble both by submitting and also visually inspecting predicted bboxes. We found that our improved submissions were indeed improving for almost all classes including the easy and the rare ones.
+            - paragraph [ref=f12e120]:
+              - img "enter image description here" [ref=f12e121]
+            - heading "Things didn't work" [level=2] [ref=f12e122]
+            - list [ref=f12e123]:
+              - listitem [ref=f12e124]:
+                - text: "Multi-Label Classifier: We trained a multilabel classifier using as output the 14 classes. We used sigmoid as activation because we needed the probability of each disease and many images have more than one disease. The idea was to remove from the ensemble all the bboxes not predicted by this classifier model, This approach led to a reduction in performance. We also tried to switch the pooling layer and to use PCAM pooling (it is an attention pooling layer used in the"
+                - link "Top1 Solution of CheXpert (opens in a new tab)" [ref=f12e125] [cursor=pointer]:
+                  - /url: https://github.com/jfhealthcare/Chexpert
+                  - text: Top1 Solution of CheXpert
+                - text: ), but it didn't work either.
+              - listitem [ref=f12e126]: "Bbox Filter: We trained an EfficientNetB6 which classifies whether the detected bboxes belong to a selected class or not just by seeing the crop selected by the ensemble. The model couldn't understand the difference between each disease, perhaps it needed more information on the whole image."
+              - listitem [ref=f12e127]: "Usage of External Dataset: We tried to use the NIH dataset. We first trained a backbone as a Multi-Label Classifier using NIH classes, and then we transfer its weights to the detector's backbone. Finally, we trained only the detection heads using this competition's dataset. We couldn't detect any appreciable improvement in the particular detector score."
+              - listitem [ref=f12e128]: "ClassWise Model: we trained different models, one for each detection class. We used clsX + cls14 as each model's dataset. In this case, each model had its own set of anchors prepared for detecting the class of interest. Some classes improved their CV performance but others didn't. Joining all the models we got a very good model, unfortunately, the validation split used in this model was different from the others and it was unreliable to add it to the Validated Stage so we decided to include it in the Partially Validated Stage, but still, didn't give any improvements. We had a final ensemble using this model, which wasn't finally selected, but it had the same score as our winning submission."
+            - heading "Models we choose." [level=2] [ref=f12e129]
+            - list [ref=f12e130]:
+              - listitem [ref=f12e131]: "Best at local validation (around 0.47+ mAP on CV), Public: 0.300, private: 0.287"
+              - listitem [ref=f12e132]: "Best at LB. Public: 0.354, private: 0.314"
+              - listitem [ref=f12e133]: Our best submission in private was 0.321 which was 0.330 in Public
+            - heading "Hardware we used" [level=2] [ref=f12e134]
+            - list [ref=f12e135]:
+              - listitem [ref=f12e136]: 4x Quadro GV100
+              - listitem [ref=f12e137]: 4x Geforce GTX 1080
+              - listitem [ref=f12e138]: 4x Titan X
+              - listitem [ref=f12e139]: Ryzen 9 3950x
+              - listitem [ref=f12e140]: Nvidia RTX 3080
+              - listitem [ref=f12e141]: "Quadro RTX 6000 EDIT 1: The solution is reproducible by one GPU itself."
+          - generic [ref=f12e142]:
+            - generic [ref=f12e143]:
+              - text: Authors
+              - generic [ref=f12e144]:
+                - link "Sergio Manuel Papadakis's profile" [ref=f12e145] [cursor=pointer]:
+                  - /url: /socom20
+                  - generic "Sergio Manuel Papadakis" [ref=f12e146]
+                - generic [ref=f12e150]:
+                  - link "Sergio Manuel Papadakis" [ref=f12e151] [cursor=pointer]:
+                    - /url: /socom20
+                  - paragraph [ref=f12e152]: socom20
+              - generic [ref=f12e153]:
+                - link "Mohammed Rizin V K's profile" [ref=f12e154] [cursor=pointer]:
+                  - /url: /morizin
+                  - generic "Mohammed Rizin V K" [ref=f12e155]
+                - generic [ref=f12e159]:
+                  - link "Mohammed Rizin V K" [ref=f12e160] [cursor=pointer]:
+                    - /url: /morizin
+                  - paragraph [ref=f12e161]: morizin
+              - generic [ref=f12e162]:
+                - link "avsanjay's profile" [ref=f12e163] [cursor=pointer]:
+                  - /url: /avsanjay
+                  - generic "avsanjay" [ref=f12e164]
+                - generic [ref=f12e168]:
+                  - link "avsanjay" [ref=f12e169] [cursor=pointer]:
+                    - /url: /avsanjay
+                  - paragraph [ref=f12e170]: avsanjay
+              - generic [ref=f12e171]:
+                - link "Fatih Öztürk's profile" [ref=f12e172] [cursor=pointer]:
+                  - /url: /fatihozturk
+                  - generic "Fatih Öztürk" [ref=f12e173]
+                - generic [ref=f12e177]:
+                  - link "Fatih Öztürk" [ref=f12e178] [cursor=pointer]:
+                    - /url: /fatihozturk
+                  - paragraph [ref=f12e179]: fatihozturk
+            - separator [ref=f12e180]
+            - generic [ref=f12e181]:
+              - generic [ref=f12e182]:
+                - button "Upvote" [ref=f12e183] [cursor=pointer]:
+                  - generic [ref=f12e184]: arrow_drop_up
+                - button "62 votes" [ref=f12e185] [cursor=pointer]: "62"
+              - button "Share" [ref=f12e186] [cursor=pointer]
+              - button "Writeup actions" [ref=f12e188] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f12e189]
+        - paragraph [ref=f12e190]: Sergio Manuel Papadakis, Mohammed Rizin V K, avsanjay, Fatih Öztürk. 1st Place Solution. https://www.kaggle.com/competitions/vinbigdata-chest-xray-abnormalities-detection/writeups/s-1st-place-solution. 2021. Kaggle
+        - separator [ref=f12e191]
+        - generic [ref=f12e192]:
+          - generic [ref=f12e194]:
+            - generic [ref=f12e195]:
+              - generic [aria-hidden] [ref=f12e196]: comment
+              - heading "7 Comments" [level=2] [ref=f12e198]
+            - generic [ref=f12e201]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f12e202] [cursor=pointer]:
+                - generic [ref=f12e203]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f12e205]:
+            - generic [ref=f12e206]:
+              - generic [ref=f12e210]:
+                - link "Chanran Kim's profile" [ref=f12e211] [cursor=pointer]:
+                  - /url: /seriousran
+                  - generic "Chanran Kim" [ref=f12e212]
+                - generic [ref=f12e218]:
+                  - link [ref=f12e220] [cursor=pointer]:
+                    - /url: /seriousran
+                    - heading "Chanran Kim" [level=3] [ref=f12e221]
+                  - generic [ref=f12e222]:
+                    - paragraph [ref=f12e223]: Posted 6 years ago
+                    - paragraph [ref=f12e225]: · 193rd in this Competition
+                - generic [ref=f12e227]:
+                  - generic [ref=f12e228]:
+                    - button "Upvote" [ref=f12e229] [cursor=pointer]:
+                      - generic [ref=f12e230]: arrow_drop_up
+                    - button "1 votes" [ref=f12e231] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f12e232] [cursor=pointer]: more_vert
+                - paragraph [ref=f12e236]: Thank you for sharing! And you deserve it :) Congrats!
+                - button "Reply" [ref=f12e238] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f12e239]: reply
+              - separator [ref=f12e241]
+            - generic [ref=f12e242]:
+              - generic [ref=f12e246]:
+                - link "Mohammed Rizin V K's profile" [ref=f12e247] [cursor=pointer]:
+                  - /url: /morizin
+                  - generic "Mohammed Rizin V K" [ref=f12e248]
+                - generic [ref=f12e254]:
+                  - generic [ref=f12e255]:
+                    - link [ref=f12e256] [cursor=pointer]:
+                      - /url: /morizin
+                      - heading "Mohammed Rizin V K" [level=3] [ref=f12e257]
+                    - paragraph [ref=f12e260]: Topic Author
+                  - generic [ref=f12e261]:
+                    - paragraph [ref=f12e262]: Posted 6 years ago
+                    - paragraph [ref=f12e264]: · 1st in this Competition
+                - generic [ref=f12e266]:
+                  - generic [ref=f12e267]:
+                    - button "Upvote" [ref=f12e268] [cursor=pointer]:
+                      - generic [ref=f12e269]: arrow_drop_up
+                    - button "1 votes" [ref=f12e270] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f12e271] [cursor=pointer]: more_vert
+                - paragraph [ref=f12e275]: Sorry for being so late. We were busy in preparing the codes.
+                - button "Reply" [ref=f12e277] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f12e278]: reply
+              - separator [ref=f12e280]
+            - generic [ref=f12e281]:
+              - generic [ref=f12e285]:
+                - link "Piotr Czarnecki's profile" [ref=f12e286] [cursor=pointer]:
+                  - /url: /piotrczarnecki
+                  - generic "Piotr Czarnecki" [ref=f12e287]
+                - generic [ref=f12e293]:
+                  - link [ref=f12e295] [cursor=pointer]:
+                    - /url: /piotrczarnecki
+                    - heading "Piotr Czarnecki" [level=3] [ref=f12e296]
+                  - generic [ref=f12e297]:
+                    - paragraph [ref=f12e298]: Posted 5 years ago
+                    - paragraph [ref=f12e300]: · 882nd in this Competition
+                - generic [ref=f12e302]:
+                  - generic [ref=f12e303]:
+                    - button "Upvote" [ref=f12e304] [cursor=pointer]:
+                      - generic [ref=f12e305]: arrow_drop_up
+                    - button "0 votes" [ref=f12e306] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f12e307] [cursor=pointer]: more_vert
+                - paragraph [ref=f12e311]: hi, is it possible so you could share predictions of your final model made on 15k samples trainset? with my colleagues we would like to analyze your model deeper to learn more from the winner:) e.g. how model performed on different classes, and so on.
+                - button "Reply" [ref=f12e313] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f12e314]: reply
+                - generic [ref=f12e316]:
+                  - generic [ref=f12e321]:
+                    - link "Mohammed Rizin V K's profile" [ref=f12e322] [cursor=pointer]:
+                      - /url: /morizin
+                      - generic "Mohammed Rizin V K" [ref=f12e323]
+                    - generic [ref=f12e329]:
+                      - generic [ref=f12e330]:
+                        - link [ref=f12e331] [cursor=pointer]:
+                          - /url: /morizin
+                          - heading "Mohammed Rizin V K" [level=3] [ref=f12e332]
+                        - paragraph [ref=f12e335]: Topic Author
+                      - generic [ref=f12e336]:
+                        - paragraph [ref=f12e337]: Posted 5 years ago
+                        - paragraph [ref=f12e339]: · 1st in this Competition
+                    - generic [ref=f12e341]:
+                      - generic [ref=f12e342]:
+                        - button "Upvote" [ref=f12e343] [cursor=pointer]:
+                          - generic [ref=f12e344]: arrow_drop_up
+                        - button "0 votes" [ref=f12e345] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f12e346] [cursor=pointer]: more_vert
+                    - paragraph [ref=f12e350]: Do you need the final prediction file or what else ? i am confused
+                    - button "Reply" [ref=f12e352] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f12e353]: reply
+                  - generic [ref=f12e359]:
+                    - link "Piotr Czarnecki's profile" [ref=f12e360] [cursor=pointer]:
+                      - /url: /piotrczarnecki
+                      - generic "Piotr Czarnecki" [ref=f12e361]
+                    - generic [ref=f12e367]:
+                      - link [ref=f12e369] [cursor=pointer]:
+                        - /url: /piotrczarnecki
+                        - heading "Piotr Czarnecki" [level=3] [ref=f12e370]
+                      - generic [ref=f12e371]:
+                        - paragraph [ref=f12e372]: Posted 5 years ago
+                        - paragraph [ref=f12e374]: · 882nd in this Competition
+                    - generic [ref=f12e376]:
+                      - generic [ref=f12e377]:
+                        - button "Upvote" [ref=f12e378] [cursor=pointer]:
+                          - generic [ref=f12e379]: arrow_drop_up
+                        - button "0 votes" [ref=f12e380] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f12e381] [cursor=pointer]: more_vert
+                    - paragraph [ref=f12e385]: if possible, we would need file containing predictions performed on trainset (data which model saw during training), not final predicitons.
+                    - button "Reply" [ref=f12e387] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f12e388]: reply
+              - separator [ref=f12e390]
+            - generic [ref=f12e395]:
+              - link "xuzhaocheng's profile" [ref=f12e396] [cursor=pointer]:
+                - /url: /xuzhaocheng
+                - generic "xuzhaocheng" [ref=f12e397]
+              - generic [ref=f12e403]:
+                - link [ref=f12e405] [cursor=pointer]:
+                  - /url: /xuzhaocheng
+                  - heading "xuzhaocheng" [level=3] [ref=f12e406]
+                - generic [ref=f12e407]:
+                  - paragraph [ref=f12e408]: Posted 6 years ago
+                  - paragraph [ref=f12e410]: · 174th in this Competition
+              - generic [ref=f12e412]:
+                - generic [ref=f12e413]:
+                  - button "Upvote" [ref=f12e414] [cursor=pointer]:
+                    - generic [ref=f12e415]: arrow_drop_up
+                  - button "0 votes" [ref=f12e416] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f12e417] [cursor=pointer]: more_vert
+              - paragraph [ref=f12e421]:
+                - text: the pic in
+                - strong [ref=f12e422]: Ensembling Strategy
+                - text: is so small, can you please give me another more clear one
+              - button "Reply" [ref=f12e424] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f12e425]: reply
+              - generic [ref=f12e432]:
+                - link "Mohammed Rizin V K's profile" [ref=f12e433] [cursor=pointer]:
+                  - /url: /morizin
+                  - generic "Mohammed Rizin V K" [ref=f12e434]
+                - generic [ref=f12e440]:
+                  - generic [ref=f12e441]:
+                    - link [ref=f12e442] [cursor=pointer]:
+                      - /url: /morizin
+                      - heading "Mohammed Rizin V K" [level=3] [ref=f12e443]
+                    - paragraph [ref=f12e446]: Topic Author
+                  - generic [ref=f12e447]:
+                    - paragraph [ref=f12e448]: Posted 6 years ago
+                    - paragraph [ref=f12e450]: · 1st in this Competition
+                - generic [ref=f12e452]:
+                  - generic [ref=f12e453]:
+                    - button "Upvote" [ref=f12e454] [cursor=pointer]:
+                      - generic [ref=f12e455]: arrow_drop_up
+                    - button "1 votes" [ref=f12e456] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f12e457] [cursor=pointer]: more_vert
+                - paragraph [ref=f12e461]
+                - button "Reply" [ref=f12e463] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f12e464]: reply
+  - alert [ref=f12e468]

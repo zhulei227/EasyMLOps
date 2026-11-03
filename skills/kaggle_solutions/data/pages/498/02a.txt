@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/foursquare-location-matching/discussion/336072
-fetched: 2026-10-27
-chars: 732
+fetched: 2026-11-03
+chars: 3782
 
 menu
 Skip to
@@ -42,13 +42,169 @@ Models
 Discussion
 Leaderboard
 Rules
-Failed to load the discussion topic
-error
+T0m · 2nd in this Competition · Posted 4 years ago
+arrow_drop_up
+24
+more_vert
+2nd place solution - T0m Part
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+This post is part of the 2nd place solution.
 
-error
+Brief Summary
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336062
 
-Failed to load the discussion topic
+Other part
+
+https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336090
+Candidate Generation
+
+We picked up 128 candidates id for each of the following two ways.
+
+lat, lon base distance nearest ids
+name tfidf vector base cosine similarity nearest ids
+
+and then, select a total of 128 from both with country-specific optimized ratios. Max IoU 0.9895
+
+Transformer Candidate Blocking
+
+Absolute Features
+Lat, Lon
+Country embedding
+Categories embedding
+xlm-romerta-base name embedding
+tfidf-svd vector (name, all)
+Relative Features
+edit-distance (name, address, zipcode, phone, url, categories)
+tfidf-svd vector (name, all) cosine similarity
+
+single LB: 0.918
+
+Blocking
+
+threshold=0.005, and union find post process average candidates per id 4.1
+
+Max IoU 0.986
+
+Please sign in to reply to this topic.
+
+comment
+8 Comments
+Hotness
+pao
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+End to end transformer approach is interesting!! It can be cosnsidered to relationship which is not contained in pair training!
+
+T0m
+
+Topic Author
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@go5kuramubon
+
+Thanks for your comment, and congratulations on your win!!
+
+It was quite powerful for a 1st stage model. I was hoping that the model would interpolate the missing features from the surrounding samples. Also tried other things, such as optimizing the IoU directly, but not successed.
+
+Bilzard
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@tomyanabe
+
+Awesome work.
+
+Did you design the architecture of Transformer blocker by yourself? Or, do you have any references to other people's work or papers?
+
+T0m
+
+Topic Author
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@tatamikenn
+
+Thanks for your comment!
+
+I built this Transformer-based model myself. And it was my first choice on this competition.
+
+DeepUnderstanding
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+I am beginner here, can you briefly explain what 'Candidate Blocking' is actually doing
+
+Bilzard
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@mrinath
+
+"Blocking" here means narrowing candidate pairs in oder for efficiency in later stages.
+
+Because this can be a very computationally demanding task, particularly for large data sets, a technique known as blocking is often used to improve efficiency. Blocking attempts to restrict comparisons to just those records for which one or more particularly discriminating identifiers agree, which has the effect of increasing the positive predictive value (precision) at the expense of sensitivity (recall).
+
+https://en.wikipedia.org/wiki/Record_linkage
+
+T0m
+
+Topic Author
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@mrinath
+
+Thanks for your comment and sorry for the delay in reply! What bilzard has answered is correct.
+
+@tatamikenn
+
+Thank you for answering on my behalf!
+
+DeepUnderstanding
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @tomyanabe @tatamikenn Anyway really impressive how you thought about using a transformer!

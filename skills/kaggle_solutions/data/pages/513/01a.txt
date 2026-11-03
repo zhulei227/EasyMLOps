@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/rsna-2022-cervical-spine-fracture-detection/discussion/362787
-fetched: 2026-10-27
-chars: 826
+fetched: 2026-11-03
+chars: 7705
 
 menu
 Skip to
@@ -42,15 +42,439 @@ Models
 Discussion
 Leaderboard
 Rules
+Qishen Ha · 1st in this Competition · Posted 4 years ago
+arrow_drop_up
+147
+more_vert
+1st Place Solution -- Code
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Hi all, I've finished all my notebooks and made it public!
 
-error
+Stage1: https://www.kaggle.com/code/haqishen/rsna-2022-1st-place-solution-train-stage1
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Stage2 Type1: https://www.kaggle.com/code/haqishen/rsna-2022-1st-place-solution-train-stage2-type1
 
-Failed to load the discussion topic
+Stage2 Type2: https://www.kaggle.com/code/haqishen/rsna-2022-1st-place-solution-train-stage2-type2
 
-error
+Inference: https://www.kaggle.com/code/haqishen/rsna-2022-1st-place-solution-inference
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Solution Summary: https://www.kaggle.com/competitions/rsna-2022-cervical-spine-fracture-detection/discussion/362607
+
+If you find the notebooks helpful, please upvote the NOTEBOOKS.
+
+But if you have any questions for the code, please left comment at HERE instead of at the notebooks
+
+Please sign in to reply to this topic.
+
+comment
+39 Comments
+2 appreciation comments
+Hotness
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+13
+more_vert
+
+Hi all, I've finished all my notebooks and made it public!
+
+Rayane Aggoune
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot, really it's helpful.
+
+Behnam Molaee
+
+Posted 4 years ago
+
+· 463rd in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Thank you very much. The people like you make Kaggle the best place to learn AI.
+
+irotem98
+
+Posted 3 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Hi, thank you so much for sharing. I keep encountering excessive CPU RAM usage when trying to run the first stage. I attempted to run the code as you shared on Kaggle.
+
+README
+
+Posted 4 years ago
+
+· 526th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+stage2-type1 
+
+stage2-type2 
+
+Rusab Sarmun
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi Did you calculate F1 score? If so how was it?
+
+SEVEN
+
+Posted 2 years ago
+
+· 500th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, I recently started reviewing RSNA's competition proposal and I am very interested in multi-channel image fusion. However, I don't seem to have found any information on it in the public notebooks (I think I might have missed it). I would greatly appreciate it if you could post the detailed code for multi-channel image fusion. Thank you.
+
+Satheesh Bhukya
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+is this helpful for RSNA abdominal trauma competition
+
+Ifthika Kadhar basha
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi! could you provide your code of predicting 3D maks for 2k images and cropping vertebraes?
+
+Mariusz Wiśniewski
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great solution! @haqishen, could you explain why in stage1 (3D semantic segmentation) you repeat the input 3 times? Below is the piece of code I'm talking about. It is inside load_sample function.
+
+if image.ndim < 4:
+        image = np.expand_dims(image, 0).repeat(3, 0)  # to 3ch
+
+
+It copies the input of shape (128, 128, 128) 3 times and stacks the copies up on top of each other so that the shape becomes (3, 128, 128, 128).
+
+Chun-Ting, Lin
+
+Posted 4 years ago
+
+· 506th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Also thank you for sharing your remarkable idea and code.
+
+Maybe this is a naive question, In the stage 2 Type 2, what was your loss weight lw?
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Oh, my bad… fixed in new version.
+
+Chun-Ting, Lin
+
+Posted 4 years ago
+
+· 506th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank for your reply, share and kindness. Again, congratulate on your remarkable achievement in this competition.
+
+Shovon Ahmed
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Helpful Notebook.
+
+YujiAriyasu
+
+Posted 4 years ago
+
+· 28th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the great note! What were your final CVs for your stage1/stage2-type1/stage2-type2? And what was the batch size of your train environment?
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Final ensemble CV is around ~0.20 For type1 model bs >=8, for type2 model bs >=4
+
+YujiAriyasu
+
+Posted 4 years ago
+
+· 28th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for the detailed explanation. I look forward to seeing you achieve #1 ranking!
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+😂 That's not my objective. P.S. Congrats for your team's win in Kaggle Days Barcelona!
+
+IgorMuniz
+
+Posted 4 years ago
+
+· 72nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing the code. We are learning a lot from them.
+
+In the stage 1 notebook you put n_epochs=1000. Did you really train this model for 1000 epochs or it's just an example? How long it takes to train the 3D segmentation model?
+
+Would be possible to share the prediction code for that model?
+
+Thanks again.
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, it's really 1000ep, but only 87 samples so it's not slow.
+
+Priyanshu S. Prajapati
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Your grace !
+
+Igor Kuivjogi Fernandes
+
+Posted 4 years ago
+
+· 72nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for posting your solution in such a detailed way. From Stage 1, where do you get binary_dice_iou_score ? I can't find it.
+
+Pfamgmt
+
+Posted 4 years ago
+
+· 480th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I believe you should change it to binary_dice_score and remove the type variable
+
+4 more replies
+arrow_drop_down
+Shreyansh Dubey
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @haqishen! Gone through your amazing work. 😃
+
+However kernal link is not working on my system. Just wanted to know how to run that?
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, what do you mean by not working ? Can you share a screen shot or any error message?
+
+patriot
+
+Posted 4 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks for sharing!!
+
+Why is the output of your type1 model n_slice_per_c(=15) dim instead of 1? I thought the output of MIL is one for multiple slices like PANDA comp. labels = torch.tensor([row.label] * n_slice_per_c).float()
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+the performance is not so different, just to make the output format the same as Type2 models.
+
+Ravi Ramakrishnan
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hearty congratulations for the result @haqishen, can you please relook at the kernel link? It did not work for me.
+
+Many thanks and regards.
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Ouch, forgot to make it public, try again now!
+
+This comment has been deleted.
+
+This comment has been deleted.
+
+Qishen Ha
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+It's not that different, just for no reason…
+
+This comment has been deleted.
+
+Appreciation (2)
+Ibrahim Elsheikh
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot
+
+Hiten
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing

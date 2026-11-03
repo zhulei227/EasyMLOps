@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/ranzcr-clip-catheter-line-classification/discussion/227128
-fetched: 2026-10-27
-chars: 885
+fetched: 2026-11-03
+chars: 3755
 
 menu
 Skip to
@@ -42,15 +42,125 @@ Models
 Discussion
 Leaderboard
 Rules
+Qishen Ha · 1st in this Competition · Posted 6 years ago
+arrow_drop_up
+48
+more_vert
+1st Place Solution Kernels (small ver.) Released!
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Hi all,
 
-error
+I would like to congrat to all winners, and thank my wonderful teammates @boliu0 @garybios again here.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Congratulations to become new GM! @tonyxu @andy2709 @nguyenbadung
 
-Failed to load the discussion topic
+And congratulations to VinBigData Group, their employees won 3 solo golds in this competition! @moewie94 @andy2709 @nguyenbadung
 
-error
+This is a great achievement!
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Minimal Pipeline
+
+Our final pipeline has 4 training stages which is too complex, but the minimal pipeline I released here has only 2 stages.
+
+Beside, we removed ext data usage to simplify the minimal pipeline further.
+
+The 5-fold model trained by this minimal pipeline using official data only, is sufficient to achieve CV 0.968-0.969 and pub/pvt LB 0.972, with only a single 16GB GPU .
+
+I estimate that if the segmentation model uses 768 inputs and the classification model uses 384 inputs, we can also achieve a pvt LB of 0.970 to 0.971. If you plan to run our minimal pipeline with an 11GB GPU, you can try changing the inputs to this, without modifying any other setting.
+
+Here I published 3 notebooks to demonstrate how our minimal pipeline works.
+
+Stage1: Segmentation (https://www.kaggle.com/haqishen/ranzcr-1st-place-soluiton-seg-model-small-ver)
+
+Stage2: Classification (https://www.kaggle.com/haqishen/ranzcr-1st-place-soluiton-cls-model-small-ver)
+
+Inference (https://www.kaggle.com/haqishen/ranzcr-1st-place-soluiton-inference-small-ver)
+
+Acknowledge
+
+Special Thanks to Z by HP & NVIDIA for sponsoring me a Z8G4 Workstation with dual RTX6000 GPU and a ZBook with RTX5000 GPU!
+
+Using larger resolution images in this competition can significantly improve model performance, so the RTX6000 with 24GB memory really helped me a lot!
+
+Please sign in to reply to this topic.
+
+comment
+7 Comments
+1 appreciation comment
+Hotness
+toxu
+
+Posted 6 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Learned a lot from you. Segmentation part is interesting. Thanks!
+
+Mohammed Rizin V K
+
+Posted 6 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Really excited to try Segmentation Kernel!! Thanks
+
+Vitalii Mokin
+
+Posted 6 years ago
+
+· 716th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@haqishen , Great solution! Thanks for sharing. I added it to my collection in "Data Science with DL & NLP: Advanced Techniques", section "Prize Competition Winners: notebooks (kernels) and posts with Magic".
+
+Qishen Ha
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! 👍
+
+Gary
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+-2
+more_vert
+
+Thanks to the organizers and congrats to all the winners and my wonderful teammates! Here, I would like to give a special thanks to Z by HP & NVIDIA for sponsoring the HP Z8 G4 Workstation with Dual RTX6000 GPUs. The NVIDIA RTX6000 with 24GB RAM allowed me to train a deeper/larger models and larger image size, which was the key of our solution.
+
+This comment has been deleted.
+
+Appreciation (1)
+sin
+
+Posted 6 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the clean code. Amazing.

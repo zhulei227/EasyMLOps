@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75116
-fetched: 2026-10-27
-chars: 804
+fetched: 2026-11-03
+chars: 10941
 
 menu
 Skip to
@@ -42,15 +42,368 @@ Models
 Discussion
 Leaderboard
 Rules
+yuval reina · 3rd in this Competition · Posted 8 years ago
+arrow_drop_up
+39
+more_vert
+3rd Place Part I -CNN
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+First I want to thank the organizers for a very challenging and exciting competition. I also want to thank all the kagglers who already shared a lot of very useful information during and after the competition. And mostly I want to thank my team mates @mamas and @nyanp who thought me a lot and were great company.
 
-Failed to load the discussion topic
+Our solution was an ensemble of 3 different solutions: LGB and CatBoost with different features by @nyanp and @mamas and a CNN. The 3 solution where very different which meant, averaging really worked well for us.
 
-error
+In this post I will mostly describe the CNN.
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Our CNN is a Fully 1D Convolutional Neural Network with 256 * 8,5,3 convolution kernels followed by a GlobalMaxPulling , this FCN is close to the one described here "Time Series Classiﬁcation from Scratch with Deep Neural Networks: A Strong Baseline"
 
-error
+To the output of the last layer is concatenated with the output of a small MLP whose inputs are some meta features which would be described later.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+The inputs to the convolution layer is an 18 channels 128 long vectors:
+
+6 channels are built by linear interpolation of the Flux time series
+6 channels are built by linear interpolation of Flux*detected time series
+6 channels describe the distance of the current sampling point to the nearest valid sampling point in the corresponding channel (i.e. this channel have a high value if the interpolation is done with very distant points)
+
+There were 3 different NNs with different meta features as inputs to the MLP:
+
+Minimal - only 4 meta features: hostgal_photoz, distmod, delta mjd, Flux std (the two later ones are designed to keep the normalization data)
+Minimal + 16 best features from @mamas's model
+Minimal + 15 best features from @nyanp's model
+
+For augmentation during training we used:
+
+Before interpolation
+
+Deletion - up to 30% of the time samples in the training set where deleted (the deletion was done over all the set, not per object)
+Noise - random value proportional to flux_err
+
+After interpolation
+
+Cyclic shift
+Skew - every flux channel was multiplied by 1+k where k is a small random number
+
+We didn't use TTA as it degraded the LB
+
+Training was done on 4 folds, with changing learning rate, and averaging the best weights (More details can be found in this kernel)
+
+The best LBs scores of the individual NNs were 0.857, 0.857, 0.814 and the average scored 0.791
+
+Please sign in to reply to this topic.
+
+comment
+23 Comments
+1 appreciation comment
+Hotness
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+A kernel with the CNN can be found here
+
+CPMP
+
+Posted 8 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great solution, thanks for sharing, and congrats on the result! Including distance to nearest interpolation point is what makes it work probably.
+
+I am not sure I get 'We didn't use TTA as it degraded the LB' because you did use augmentation during training set. Can you clarify?
+
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I'm a little weak when in comes to all the professional terms, I actually meant TTA - Test Time Augmentation
+
+3 more replies
+arrow_drop_down
+Blonde
+
+Posted 8 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thank you for the interesting solution. It's inspiring how you manage to get exclusively gold medals :-)
+
+We didn't use TTA as it degraded the LB -- we did not do TTA cause it's a pain! But it's nice to see that somebody tried :-)))
+
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+It really is a pain ;) but I had to give it a try.
+
+pao
+
+Posted 8 years ago
+
+· 92nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for great NN solution!!! I have two question.
+
+How did you normalize the flux value? (like std 1.0 and mean 0?)
+If there are multiple value in 128 vector, how did you process? (mean?)
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+I divide by the std of the values of the all 6 channels. I then use the std as an extra feature which is an input the MLP. I don't shift the mean, I don't really find it necessary if the std is close to 1 and the mean is low enough.
+There is no special treatment to multiple values which fall between two sampling points. I use np.interp for interpolation.
+pao
+
+Posted 8 years ago
+
+· 92nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks!! I will try making 1D-CNN model in reference to your solution. And I'm looking forward to your kernel!
+
+mamas
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks yuval, I'm really impressed with your beautiful 1D-CNN model, and your many valuable ideas related to class99 handling. I'm really proud of working with such a great team :)
+
+Giba
+
+Posted 8 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great solution and congrats Yuval and team!
+
+henripal
+
+Posted 8 years ago
+
+· 114th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Super interesting! A question - how do you get from the long time series to a 128 long vector? You linearly interpolate the entire 1000 days then subsample 128 days from that?
+
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I just linear interpolate from the min(mjd) of that object to max(mjd)
+
+takuoko
+
+Posted 8 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats and thank you for sharing! mamas said your NN was super cool. I am looking forward that you post the kernel;)
+
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks, I will post it over the weekend
+
+DavidGbodiOdaibo
+
+Posted 8 years ago
+
+· 169th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! did your NN models do better than LGB?
+
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+They were very different. In the NN most of the features were actually extracted by the NN itself. The average of the 3 NN had a weight of about 50% of our solution, the LBG+CatBoost were the other 50%. and we gained about 0.035 by class99 probing
+
+Blonde
+
+Posted 8 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@yuval6967
+
+I actually have a few questions regarding your NN. I also tried to apply FCN with global max pooling as a feature extractor in my internship (medical signals), so far unsuccessfully. I used 1D FCN with 1 channel (around 10 layers with small kernels of 3-5)
+
+In your architecture:
+
+6 channels are built by linear interpolation of the Flux time series -- what are those 6 channels? How they differ? Was is critical to have 6 of them and not just 1, did it help ?
+
+256 * 8,5,3 convolution kernels -- this is not quite clear, did you use 256 filters with kernel sizes 8, 5 and 3 for each 6-channel group or did you change the amount of filters, or size of filters? How deep was your net for 128 signals then ? Also, NN needs lot's of augmentation, so do you recall approx order of signals you generated with augmentation (1000 000? )
+
+To the output of the last layer is concatenated with the output of a small MLP whose inputs are some meta features -- so was it a three 500 fully connected layers MLP like in that paper? When you concatenate before the softmax, did you bring both outputs (MLP and NN to the same size, like 32-32 or something like that)? Was it important to have the MLP to make it work? I have around 18 features in med signals, so you take a vector of M features x N signals for MLP input then?
+
+Too many questions, sorry :), I want to try to make my FCN work for med signals, and see yours architecture is much more advanced, but do not fully understand how to implement those advances. Thank you for that paper link as well
+
+yuval reina
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Below you can find the KERAS code with the model definition.
+
+The 6 channel inputs are the 6 passbands.
+
+The parameter num_samples in the definition is set in global scope to 128 This network is set to receive 6 extra features, in other networks I set it to 4, 19 (when added @nyanp features) or 20 (with @mamas featurs).
+
+The layer MySwitch forces the galactic outputs to be 0 for extragalactic objects and vice versa.
+
+When training, I augmented and interpolated on the fly (thanks to @mamas great code), I used 4 * 58 epochs for every training and I also repeated training with more noise/deletion.
+
+Later today I will release a full kernel
+
+def build_model():
+   input_timeseries = Input(shape=(num_samples, 6,),name='input_timeseries')
+   input_timeseries0 = Input(shape=(num_samples, 6,),name='input_timeseries0')
+   input_timeseriese = Input(shape=(num_samples, 6,),name='input_timeseriese')
+   input_meta = Input(shape=(6,),name='input_meta')
+   input_gal = Input(shape=(1,),name='input_gal')
+   _series=concatenate([input_timeseries,input_timeseries0,input_timeseriese])
+   x = Conv1D(256,8,padding='same',name='Conv1')(_series)
+   x = BatchNormalization()(x)
+   x = LeakyReLU(alpha=0.1)(x)
+   x = Dropout(0.2)(x)
+   x = Conv1D(256,5,padding='same',name='Conv2')(x)
+   x = BatchNormalization()(x)
+   x = LeakyReLU(alpha=0.1)(x)
+   x = Dropout(0.2)(x)
+   x = Conv1D(256,3,padding='same',name='Conv5')(x)
+   x = BatchNormalization()(x)
+   x = LeakyReLU(alpha=0.1)(x)
+   x = GlobalMaxPooling1D()(x)
+   x1 = Dense(16,activation='relu',name='dense0')(input_meta)
+   x1 = Dense(32,activation='relu',name='dense1')(x1)
+   xc = concatenate([x,x1],name='concat')
+   x = Dense(256,activation='relu',name='features')(xc)
+   x = Dense(real_targets.shape[0],name='bout')(x)
+   x = MySwitch(galactic_targets.shape[0])([input_gal,x])
+   out = Activation('softmax',name='out')(x)
+   model=Model([input_timeseries,input_timeseries0, 
+              input_timeseriese,input_meta,input_gal],out)
+   return model
+
+Blonde
+
+Posted 8 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you Yuval, now it's clear. I'll see if the trick with adding features in parallel works for medicine as well, looks like a good idea. :)
+
+Appreciation (1)
+Ahmed abdelreheem
+
+Posted 8 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, and thanks for sharing

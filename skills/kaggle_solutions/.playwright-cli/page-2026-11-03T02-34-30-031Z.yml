@@ -1,0 +1,471 @@
+- generic [ref=f39e2]:
+  - navigation "Main Kaggle page navigation" [ref=f39e3]:
+    - generic [ref=f39e5]:
+      - button "Navigation menu" [ref=f39e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f39e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f39e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f39e12] [cursor=pointer]:
+      - paragraph [ref=f39e18]: Create
+    - generic [ref=f39e21]:
+      - list [ref=f39e22]:
+        - listitem "Home List Item" [ref=f39e23]:
+          - link "Home" [ref=f39e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f39e31]: Home
+        - listitem "Competitions List Item" [ref=f39e32]:
+          - link "Competitions" [ref=f39e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f39e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f39e41]:
+          - link "Benchmarks" [ref=f39e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f39e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f39e50]:
+          - link "Arenas" [ref=f39e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f39e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f39e59]:
+          - link "Game Arena" [ref=f39e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f39e67]: Game Arena
+      - list [ref=f39e68]:
+        - listitem "Data Hub List Item" [ref=f39e69]:
+          - generic [ref=f39e70]:
+            - link "Data Hub" [ref=f39e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f39e77]: Data Hub
+            - button "Expand" [ref=f39e80] [cursor=pointer]
+      - list [ref=f39e82]:
+        - listitem "More on Kaggle List Item" [ref=f39e83]:
+          - generic [ref=f39e84]:
+            - link "More on Kaggle" [ref=f39e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f39e91]: More
+            - button "Expand" [ref=f39e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f39e97]:
+    - generic [ref=f39e98]:
+      - generic [ref=f39e102]:
+        - textbox "Search" [ref=f39e104]
+        - group [aria-hidden]
+      - generic [ref=f39e106]:
+        - link [ref=f39e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fpetfinder-adoption-prediction%2Fdiscussion%2F89042
+          - button "Login" [ref=f39e108]
+        - link [ref=f39e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fpetfinder-adoption-prediction%2Fdiscussion%2F89042
+          - button "Sign Up" [ref=f39e111]
+  - main [ref=f39e113]:
+    - generic [ref=f39e115]:
+      - generic [ref=f39e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f39e117]:
+        - link "Learn more" [ref=f39e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f39e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f39e123]:
+      - generic [ref=f39e125]:
+        - generic [ref=f39e126]:
+          - link "PetFinder.my's profile" [ref=f39e127] [cursor=pointer]:
+            - /url: /organizations/petfinder
+            - generic "PetFinder.my" [ref=f39e128]
+          - generic [ref=f39e132]:
+            - generic [ref=f39e133]: PetFinder.my
+            - generic [ref=f39e135]: · Featured Code Competition · 8 years ago
+          - generic [ref=f39e136]:
+            - button "Late Submission" [disabled] [ref=f39e138]
+            - button "Competition options menu collapsed" [ref=f39e141] [cursor=pointer]: more_horiz
+        - generic [ref=f39e143]:
+          - heading "PetFinder.my Adoption Prediction" [level=1] [ref=f39e144]
+          - paragraph [ref=f39e146]: How cute is that doggy in the shelter?
+      - generic [ref=f39e150]:
+        - tablist [ref=f39e157]:
+          - tab "Overview, 1 of 7" [ref=f39e158] [cursor=pointer]:
+            - generic [ref=f39e159]: Overview
+          - tab "Data, 2 of 7" [ref=f39e160] [cursor=pointer]:
+            - generic [ref=f39e161]: Data
+          - tab "Code, 3 of 7" [ref=f39e162] [cursor=pointer]:
+            - generic [ref=f39e163]: Code
+          - tab "Models, 4 of 7" [ref=f39e164] [cursor=pointer]:
+            - generic [ref=f39e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f39e166] [cursor=pointer]:
+            - generic [ref=f39e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f39e168] [cursor=pointer]:
+            - generic [ref=f39e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f39e170] [cursor=pointer]:
+            - generic [ref=f39e171]: Rules
+        - separator [ref=f39e173]
+      - generic [ref=f39e177]:
+        - generic [ref=f39e178]:
+          - generic [ref=f39e179]:
+            - generic [ref=f39e180]:
+              - link "takuoko's profile" [ref=f39e181] [cursor=pointer]:
+                - /url: /takuok
+                - generic "takuoko" [ref=f39e182]
+              - generic [ref=f39e186]:
+                - link "takuoko" [ref=f39e187] [cursor=pointer]:
+                  - /url: /takuok
+                - text: ·
+                - generic [ref=f39e188]: 1st in this Competition
+                - text: ·
+                - generic [ref=f39e189]: Posted 8 years ago
+            - generic [ref=f39e190]:
+              - generic [ref=f39e191]:
+                - button "Upvote" [ref=f39e192] [cursor=pointer]:
+                  - generic [ref=f39e193]: arrow_drop_up
+                - button "24 votes" [ref=f39e194] [cursor=pointer]: "24"
+              - button "More Options for this Topic" [ref=f39e195] [cursor=pointer]: more_vert
+            - heading "2nd solution tyu part" [level=3] [ref=f39e196]
+            - generic [ref=f39e199]:
+              - paragraph [ref=f39e200]: First of all, thank you very much Petfinder.my and kaggle for hosting such a fantastic competition. And congrats winners and all kagglers :) And I would like to express my great thanks to teammates.
+              - paragraph [ref=f39e201]: This post is mainly takuoko, ynktk, u++’s part. Here are our teams other parts.
+              - paragraph [ref=f39e202]:
+                - link "2nd Place Solution Summary (opens in a new tab)" [ref=f39e203] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/petfinder-adoption-prediction/discussion/88773#latest-512687
+                  - text: 2nd Place Solution Summary
+                - link "2nd Place Solution about k_features and LGBM2 (opens in a new tab)" [ref=f39e204] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/petfinder-adoption-prediction/discussion/88812#latest-512246
+                  - text: 2nd Place Solution about k_features and LGBM2
+                - link "g_features + XGB (part of 2nd place solution) (opens in a new tab)" [ref=f39e205] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/petfinder-adoption-prediction/discussion/88963#latest-513873
+                  - text: g_features + XGB (part of 2nd place solution)
+              - heading "Feature engineering" [level=1] [ref=f39e206]
+              - paragraph [ref=f39e207]: I made 4000～features. But because of 7200sec training time, I selected importance top 1000 features. Interesting thing is that CV improved with fewer features, but dropped LB. I think fewer features model tends not to overfit, but the result was opposite.
+              - table [ref=f39e208]:
+                - rowgroup [ref=f39e209]:
+                  - row [ref=f39e210]:
+                    - columnheader "n_feature" [ref=f39e211]
+                    - columnheader "CV" [ref=f39e212]
+                    - columnheader "LB" [ref=f39e213]
+                - rowgroup [ref=f39e214]:
+                  - row [ref=f39e215]:
+                    - cell "all" [ref=f39e216]
+                    - cell "0.460" [ref=f39e217]
+                    - cell "0.472" [ref=f39e218]
+                  - row [ref=f39e219]:
+                    - cell "1000" [ref=f39e220]
+                    - cell "0.462" [ref=f39e221]
+                    - cell "0.470" [ref=f39e222]
+                  - row [ref=f39e223]:
+                    - cell "150" [ref=f39e224]
+                    - cell "0.470" [ref=f39e225]
+                    - cell "0.460" [ref=f39e226]
+              - heading "Text" [level=3] [ref=f39e227]
+              - paragraph [ref=f39e228]: I used different preprocessing pipeline for BOW features or embedding features.
+              - list [ref=f39e229]:
+                - listitem [ref=f39e230]: BOW features from description
+              - list [ref=f39e231]:
+                - listitem [ref=f39e232]: puncts. ex. what's?→what's ?
+                - listitem [ref=f39e233]: misspell. ex. what's→what is
+                - listitem [ref=f39e234]: stemming. ex. going→go
+                - listitem [ref=f39e235]: number. ex. 3cats→3 cats
+                - listitem [ref=f39e236]: BOW/tf-idf→SVD/NMF/BM25
+              - paragraph [ref=f39e237]: on 5, I used 3 methods. 1st default, 2nd 1-3 gram, 3rd character one. This idea comes from my avito solution. We can get diverse features from its.
+              - list [ref=f39e238]:
+                - listitem [ref=f39e239]: embedding features from description
+              - list [ref=f39e240]:
+                - listitem [ref=f39e241]: puncts.
+                - listitem [ref=f39e242]: misspell
+                - listitem [ref=f39e243]: number
+                - listitem [ref=f39e244]:
+                  - text: embedding with glove and fasttex. When loading embeddings, I used
+                  - link "Quora 3rd solution (opens in a new tab)" [ref=f39e245] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/wowfattie/3rd-place
+                    - text: Quora 3rd solution
+                  - text: .
+                - listitem [ref=f39e246]: averaging embedding vectors per sentence.
+              - paragraph [ref=f39e247]:
+                - text: We checked percentage of embedded vocabulary ont by one. Finally, 93% words get embedding vectors. I tested other embeddings like elmo, bert, etc… But no improvement. I also tried
+                - link "scratch word2vec, fasttext (opens in a new tab)" [ref=f39e248] [cursor=pointer]:
+                  - /url: https://www.slideshare.net/JinZhan/kaggle-avito-demand-prediction-challenge-9th-place-solution-124500050
+                  - text: scratch word2vec, fasttext
+                - text: or
+                - link "finetune fasttext like Quora 4th (opens in a new tab)" [ref=f39e249] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/kfujikawa/word2vec-fine-tuning
+                  - text: finetune fasttext like Quora 4th
+                - text: . These also had no gain. I think it is because of few training data.
+              - list [ref=f39e250]:
+                - listitem [ref=f39e251]: BOW features from meta. I used all json files but kaeru and gege used only 1st one. This caused some diversity.
+              - list [ref=f39e252]:
+                - listitem [ref=f39e253]: concat meta text. sentiment +annots_desc +breed
+                - listitem [ref=f39e254]: same as BOW features from description. This part used only default one.
+              - heading "image features" [level=3] [ref=f39e255]
+              - paragraph [ref=f39e256]: I also used all image files but kaeru and gege used only 1st one.
+              - list [ref=f39e257]:
+                - listitem [ref=f39e258]:
+                  - text: Features from densenet121, InceptionResnetV2. I made reference
+                  - link "this benchmark (opens in a new tab)" [ref=f39e259] [cursor=pointer]:
+                    - /url: https://github.com/cgnorthcutt/benchmarking-keras-pytorch
+                    - text: this benchmark
+                  - text: and test some pretrained features like resnet152 pytorch, xception keras, densenet161 pytorch, etc… But this 2 combination had no problem.
+              - heading "Aggregation" [level=3] [ref=f39e260]
+              - list [ref=f39e261]:
+                - listitem [ref=f39e262]:
+                  - paragraph [ref=f39e263]: simple aggregation
+                - listitem [ref=f39e264]:
+                  - paragraph [ref=f39e265]: ratio aggregation ex. Fee of data is 100. Fee of aggregation with Breed is 30. ratio = 100 / 30 = 3.3. This means the pet is expensive.
+                - listitem [ref=f39e266]:
+                  - paragraph [ref=f39e267]: diff aggregation ex. Fee of data is 100. Fee of aggregation with Breed is 30. diff = 100 - 30 = 30. This means the pet is expensive.
+              - paragraph [ref=f39e268]: The following features are importance top 15.
+              - list [ref=f39e269]:
+                - listitem [ref=f39e270]: diff var Sterilized groupby RescuerID State
+                - listitem [ref=f39e271]: diff var Age groupby MaturitySize
+                - listitem [ref=f39e272]: ratio sum Sterilized groupby State
+                - listitem [ref=f39e273]: ratio count Age groupby RescuerID
+                - listitem [ref=f39e274]: median Age groupby RescuerID
+                - listitem [ref=f39e275]: ratio sum Age groupby State
+                - listitem [ref=f39e276]: diff mean Age groupby MaturitySize
+              - heading "simple aggregation for json files" [level=3] [ref=f39e277]
+              - paragraph [ref=f39e278]: I used all json files, all features(maybe😉).
+              - heading "external data" [level=3] [ref=f39e279]
+              - list [ref=f39e280]:
+                - listitem [ref=f39e281]:
+                  - link "emoji data (opens in a new tab)" [ref=f39e282] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/thomasseleck/emoji-sentiment-data
+                    - text: emoji data
+                - listitem [ref=f39e283]: State data.
+                - listitem [ref=f39e284]: Breed data.
+                - listitem [ref=f39e285]: Breed ranking data.
+              - paragraph [ref=f39e286]: External data was dirty. Some breeds name and states name are different from petfinder data. Mainly u++ cleaned these data. We also cleaned Breed1 Breed2. Some
+              - heading "Matrix Factorization" [level=3] [ref=f39e287]
+              - list [ref=f39e288]:
+                - listitem [ref=f39e289]: BOW->LDA/SVD I used all categorical feature combinations.
+              - heading "interactions features" [level=3] [ref=f39e290]
+              - paragraph [ref=f39e291]: Age * Quantity Age / Quantity PhotoAmt / Quantity
+              - heading "Feature selection" [level=1] [ref=f39e292]
+              - paragraph [ref=f39e293]:
+                - text: importance top 1000 features. There is some more imformation in
+                - link "other part (opens in a new tab)" [ref=f39e294] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/petfinder-adoption-prediction/discussion/88773#latest-512687
+                  - text: other part
+              - heading "validation strategy" [level=1] [ref=f39e295]
+              - paragraph [ref=f39e296]: Group K fold. We tested Group K fold, Stratified K fold, Group Stratified K fold. We decided to use it because of following 4 reasons.
+              - list [ref=f39e297]:
+                - listitem [ref=f39e298]: LB score Stratified K fold=Group K fold>Group Stratified K fold
+                - listitem [ref=f39e299]: CV score Stratified K fold>>Group K fold>Group Stratified K fold
+                - listitem [ref=f39e300]: run time Stratified K fold>>Group K fold=Group Stratified K fold
+                - listitem [ref=f39e301]: There are no RescuerID that is in train and test. I think Stratified K fold cause heavily overfitting for CV.
+              - heading "model" [level=1] [ref=f39e302]
+              - paragraph [ref=f39e303]: LGBM - CV(Group K fold)=0.462 , LB=0.470~ NN - CV(Group K fold)=0.435 , LB=??? Actually, I had better CV scored NN got CV=0.455. But I dropped it because of diversity and use scratch trained embeddings for 0.455NN. This NN got CV=0.447 and ensemble score improved well. But strangely, Public LB and Private LB was worse.
+              - heading "NN model" [level=3] [ref=f39e304]
+              - paragraph [ref=f39e305]:
+                - link "https://imgur.com/9THWht9.png" [ref=f39e306] [cursor=pointer]:
+                  - /url: https://imgur.com/9THWht9.png
+              - paragraph [ref=f39e307]:
+                - link "image https://imgur.com/1885bPT.png" [ref=f39e308] [cursor=pointer]:
+                  - /url: https://imgur.com/1885bPT.png
+                  - generic [ref=f39e309]: image
+                  - text: https://imgur.com/1885bPT.png
+              - paragraph [ref=f39e310]: When training, I used following params.
+              - list [ref=f39e311]:
+                - listitem [ref=f39e312]: Cyclic LR
+                - listitem [ref=f39e313]: epoch=20
+                - listitem [ref=f39e314]: batch size=256
+                - listitem [ref=f39e315]: optimizer=adam
+                - listitem [ref=f39e316]: loss=RMSE
+                - listitem [ref=f39e317]: embedding=not trainable
+              - paragraph [ref=f39e318]: CV=455 NN is different from above. It has following things.
+              - list [ref=f39e319]:
+                - listitem [ref=f39e320]: se module
+                - listitem [ref=f39e321]: skip connection important top100 features
+                - listitem [ref=f39e322]: RNN->self attention
+              - paragraph [ref=f39e323]:
+                - text: RNN Block also referenced
+                - link "Quora 3rd place solution (opens in a new tab)" [ref=f39e324] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/wowfattie/3rd-place
+                  - text: Quora 3rd place solution
+                - text: . I tested
+                - link "1st place solution model (opens in a new tab)" [ref=f39e325] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/quora-insincere-questions-classification/discussion/80568#latest-510114
+                  - text: 1st place solution model
+                - text: and other RNN architecture, but this one was best.
+              - paragraph [ref=f39e326]: I also tried following, but no gain.
+              - list [ref=f39e327]:
+                - listitem [ref=f39e328]:
+                  - text: GRU or LSTM like
+                  - link "talking data bestfitting (opens in a new tab)" [ref=f39e329] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/c/talkingdata-adtracking-fraud-detection/discussion/56262#latest-433060
+                    - text: talking data bestfitting
+                - listitem [ref=f39e330]: libfm
+                - listitem [ref=f39e331]: adabound
+                - listitem [ref=f39e332]: scratch embedding
+              - heading "other things that didn’t work" [level=1] [ref=f39e333]
+              - list [ref=f39e334]:
+                - listitem [ref=f39e335]: gege adversarial validation trick
+                - listitem [ref=f39e336]: other external data like cute image features, etc…
+                - listitem [ref=f39e337]: nima
+                - listitem [ref=f39e338]: A La Carte Embedding
+                - listitem [ref=f39e339]: word2vec, doc2vec, SCDV
+                - listitem [ref=f39e340]: target encoding, WOE
+                - listitem [ref=f39e341]: preprocssing chinese text
+                - listitem [ref=f39e342]: text static features like lenght, etc…
+                - listitem [ref=f39e343]: image statistic features like width, whiteness, etc…
+                - listitem [ref=f39e344]: catboost, xgboost, etc…
+                - listitem [ref=f39e345]: classification models
+          - separator [ref=f39e346]
+        - generic [ref=f39e347]:
+          - generic [ref=f39e348]:
+            - paragraph [ref=f39e351]:
+              - paragraph [ref=f39e352]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f39e353] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f39e354]
+          - generic [ref=f39e356]:
+            - generic [ref=f39e357]:
+              - generic [aria-hidden] [ref=f39e358]: comment
+              - heading "7 Comments" [level=2] [ref=f39e360]
+            - generic [ref=f39e363]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f39e364] [cursor=pointer]:
+                - generic [ref=f39e365]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f39e367]:
+            - generic [ref=f39e368]:
+              - generic [ref=f39e372]:
+                - link "corochann's profile" [ref=f39e373] [cursor=pointer]:
+                  - /url: /corochann
+                  - generic "corochann" [ref=f39e374]
+                - generic [ref=f39e380]:
+                  - link [ref=f39e382] [cursor=pointer]:
+                    - /url: /corochann
+                    - heading "corochann" [level=3] [ref=f39e383]
+                  - generic [ref=f39e384]:
+                    - paragraph [ref=f39e385]: Posted 8 years ago
+                    - paragraph [ref=f39e387]: · 12th in this Competition
+                - generic [ref=f39e389]:
+                  - generic [ref=f39e390]:
+                    - button "Upvote" [ref=f39e391] [cursor=pointer]:
+                      - generic [ref=f39e392]: arrow_drop_up
+                    - button "1 votes" [ref=f39e393] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f39e394] [cursor=pointer]: more_vert
+                - paragraph [ref=f39e398]: Congratulations! and thank you for posting solution. I feel Top 1, 2 are exceptionally different in terms of score, and I could never imagine such a important feature can be made! Especially how to preprocess "text" and "aggregation" feature is impressive for me!
+                - generic [ref=f39e404]:
+                  - link "takuoko's profile" [ref=f39e405] [cursor=pointer]:
+                    - /url: /takuok
+                    - generic "takuoko" [ref=f39e406]
+                  - generic [ref=f39e412]:
+                    - generic [ref=f39e413]:
+                      - link [ref=f39e414] [cursor=pointer]:
+                        - /url: /takuok
+                        - heading "takuoko" [level=3] [ref=f39e415]
+                      - paragraph [ref=f39e418]: Topic Author
+                    - generic [ref=f39e419]:
+                      - paragraph [ref=f39e420]: Posted 8 years ago
+                      - paragraph [ref=f39e422]: · 1st in this Competition
+                  - generic [ref=f39e424]:
+                    - generic [ref=f39e425]:
+                      - button "Upvote" [ref=f39e426] [cursor=pointer]:
+                        - generic [ref=f39e427]: arrow_drop_up
+                      - button "1 votes" [ref=f39e428] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f39e429] [cursor=pointer]: more_vert
+                  - paragraph [ref=f39e433]: Congrats you too and thank you for your comments. I am looking forward to see you other competitions ;)
+              - separator [ref=f39e434]
+            - generic [ref=f39e435]:
+              - generic [ref=f39e439]:
+                - link "Dieter's profile" [ref=f39e440] [cursor=pointer]:
+                  - /url: /christofhenkel
+                  - generic "Dieter" [ref=f39e441]
+                - generic [ref=f39e447]:
+                  - link [ref=f39e449] [cursor=pointer]:
+                    - /url: /christofhenkel
+                    - heading "Dieter" [level=3] [ref=f39e450]
+                  - generic [ref=f39e451]:
+                    - paragraph [ref=f39e452]: Posted 7 years ago
+                    - paragraph [ref=f39e454]: · 8th in this Competition
+                - generic [ref=f39e456]:
+                  - generic [ref=f39e457]:
+                    - button "Upvote" [ref=f39e458] [cursor=pointer]:
+                      - generic [ref=f39e459]: arrow_drop_up
+                    - button "0 votes" [ref=f39e460] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f39e461] [cursor=pointer]: more_vert
+                - paragraph [ref=f39e465]: "Seems like you are #1 on LB now"
+              - separator [ref=f39e466]
+            - generic [ref=f39e467]:
+              - generic [ref=f39e471]:
+                - link "fly's profile" [ref=f39e472] [cursor=pointer]:
+                  - /url: /zhangbaoan
+                  - generic "fly" [ref=f39e473]
+                - generic [ref=f39e479]:
+                  - link [ref=f39e481] [cursor=pointer]:
+                    - /url: /zhangbaoan
+                    - heading "fly" [level=3] [ref=f39e482]
+                  - generic [ref=f39e483]:
+                    - paragraph [ref=f39e484]: Posted 8 years ago
+                    - paragraph [ref=f39e486]: · 83rd in this Competition
+                - generic [ref=f39e488]:
+                  - generic [ref=f39e489]:
+                    - button "Upvote" [ref=f39e490] [cursor=pointer]:
+                      - generic [ref=f39e491]: arrow_drop_up
+                    - button "0 votes" [ref=f39e492] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f39e493] [cursor=pointer]: more_vert
+                - paragraph [ref=f39e497]: Congratulations. Thank you for your detailed explanation. One question I have is what mina and A La Carte Embedding means in the other things that didn’t work part.
+                - generic [ref=f39e503]:
+                  - link "takuoko's profile" [ref=f39e504] [cursor=pointer]:
+                    - /url: /takuok
+                    - generic "takuoko" [ref=f39e505]
+                  - generic [ref=f39e511]:
+                    - generic [ref=f39e512]:
+                      - link [ref=f39e513] [cursor=pointer]:
+                        - /url: /takuok
+                        - heading "takuoko" [level=3] [ref=f39e514]
+                      - paragraph [ref=f39e517]: Topic Author
+                    - generic [ref=f39e518]:
+                      - paragraph [ref=f39e519]: Posted 8 years ago
+                      - paragraph [ref=f39e521]: · 1st in this Competition
+                  - generic [ref=f39e523]:
+                    - generic [ref=f39e524]:
+                      - button "Upvote" [ref=f39e525] [cursor=pointer]:
+                        - generic [ref=f39e526]: arrow_drop_up
+                      - button "1 votes" [ref=f39e527] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f39e528] [cursor=pointer]: more_vert
+                  - paragraph [ref=f39e532]:
+                    - text: Thank you! NIMA is
+                    - link "this paper (opens in a new tab)" [ref=f39e533] [cursor=pointer]:
+                      - /url: https://arxiv.org/abs/1709.05424
+                      - text: this paper
+                    - text: . A La Carte Embedding is
+                    - link "this paper (opens in a new tab)" [ref=f39e534] [cursor=pointer]:
+                      - /url: https://arxiv.org/abs/1805.05388
+                      - text: this paper
+                    - text: .
+              - separator [ref=f39e535]
+            - generic [ref=f39e540]:
+              - link "'s profile" [ref=f39e541] [cursor=pointer]:
+                - /url: /
+              - generic [ref=f39e548]:
+                - generic:
+                  - link:
+                    - /url: /
+                    - heading [level=3]
+                - paragraph [ref=f39e550]: Posted 8 years ago
+              - generic [ref=f39e552]:
+                - generic [ref=f39e553]:
+                  - button "Upvote" [ref=f39e554] [cursor=pointer]:
+                    - generic [ref=f39e555]: arrow_drop_up
+                  - button "0 votes" [ref=f39e556] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f39e557] [cursor=pointer]: more_vert
+              - paragraph [ref=f39e561]: Congratulations and thanks for your detailed post.
+              - generic [ref=f39e567]:
+                - link "takuoko's profile" [ref=f39e568] [cursor=pointer]:
+                  - /url: /takuok
+                  - generic "takuoko" [ref=f39e569]
+                - generic [ref=f39e575]:
+                  - generic [ref=f39e576]:
+                    - link [ref=f39e577] [cursor=pointer]:
+                      - /url: /takuok
+                      - heading "takuoko" [level=3] [ref=f39e578]
+                    - paragraph [ref=f39e581]: Topic Author
+                  - generic [ref=f39e582]:
+                    - paragraph [ref=f39e583]: Posted 8 years ago
+                    - paragraph [ref=f39e585]: · 1st in this Competition
+                - generic [ref=f39e587]:
+                  - generic [ref=f39e588]:
+                    - button "Upvote" [ref=f39e589] [cursor=pointer]:
+                      - generic [ref=f39e590]: arrow_drop_up
+                    - button "0 votes" [ref=f39e591] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f39e592] [cursor=pointer]: more_vert
+                - paragraph [ref=f39e596]: Thank you. Congratulations you too;)
+  - alert [ref=f39e599]

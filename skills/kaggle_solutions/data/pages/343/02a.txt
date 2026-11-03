@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111321
-fetched: 2026-10-27
-chars: 825
+fetched: 2026-11-03
+chars: 14046
 
 menu
 Skip to
@@ -22,35 +22,457 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-IEEE Computational Intelligence Society · Research Prediction Competition · 7 years ago
-Late Submission
-more_horiz
+2nd Solution, CPMP View — IEEE-CIS Fraud Detection
+2nd Solution, CPMP View
+
 IEEE-CIS Fraud Detection
 
-Can you detect fraud from customer transactions?
+Solution Writeup · 2nd place · Oct 8, 2019
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+When Giba and I joined the team, @sggpls @tony321 and @krivoship already had a solid position in top 10 and there were less than 10 days left. It is hard to add value in this case, and I decided to focus on adding diversity to the models they were blending. For that I started my own dataset and borrowed bits of theirs. Let me describe the steps I took.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Data Cleaning The data was a bit similar to Malware, with time stamped observations, and many features with lots of values present in test and not in train. I screened all features by looking at train vs test distributions, for raw feature and also frequency encoding of features. Here is an example for card1.
+ Raw data is used on the left column, and feature encoding of it in the right column. Red is train, blue is test. Left row x axis is card1. Top left y axis is frequency. Top left show frequency of each card1 value in train (red) and test (blue). Bottom left y axis is mean of target with a log transform. 0 is the average for train. Right column is the same, except card1 is replaced by log of its frequency.
 
-error
+We see that lots of card1 values only appear in test. If we use it directly it will lead to major drop in private LB. We also see that frequency encoding of card1 looks more balanced across train and test. FOr this feature I discarded the original one and kept the frequency encoding.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I did not merge values as I did in Malware, for lack of time. I am not sure it would have helped a lot, in hindsight.
 
-Failed to load the discussion topic
+Cross Validation
 
-error
+Cross validation for time series is always tricky. Here is what I ended up with. I tried to mimic the fact that there is a significant time gap between train and test, and also that test can be several months away from train.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I run these folds, using months starting with with 0. The | indicates the train/val split 0 | 2 3 4 5 6 0 1 | 3 4 5 6 0 1 2 | 4 5 6 0 1 2 3 | 5 6 This makes me train 4 models for a given model type. I then average the auc score of each of these models on the corresponding validation data. This scheme or some variants were reused by my team mates for validating their models. The advantage is that we have folds that test long term forecast.
+
+I used this CV to evaluate features, to evaluate HPO, and for feature selection. For submission I tried two ways. One, to extrapolate the number of trees from the CV runs. I just ran a linear regression on the log of trees, and predicted the value for full train. I also tried to use an unshuffled 8 fold CV and average all fold model predictions for test. Both ways were giving similar LB score. I probably have used both and blend the result, but I didn't…
+
+Feature Engineering
+
+I started by computing frequency encoding of all features, then used lightgbm with the above cross validation to select features using permutation importance with some modification: I kept a feature only if permuting it did not improve any of the 4 model predictions. This removed some features. I repeated the process, using permutation importance to remove features until the feature list does not shrink anymore. With this I got 0.942 on public LB.
+
+The next level was to look for user id, and this is when I teamed. I was hoping my new team mates had sorted out the user id puzzle. They did. They actually had a number of different uids. I selected two of them defined as follows:
+
+data['uid1']` =  (data.day - data.D1).astype(str) +'_' + \
+            data.P_emaildomain.astype(str)
+data['uid2'] =  (data.card1.astype(str) +'_' + \
+            data.addr1.astype(str) +'_' + \
+            (data.day - data.D1).astype(str) +'_' + \
+            data.P_emaildomain.astype(str))
+
+
+where data.day is the number of days since the beginning, computed from TransactionDT.
+
+I did not want to use these user ids directly for fear of overfitting (in hindsight this was a mistake, and in my last sub I just ran catboost using these as features and it led to my best sub). I rather used these uids to compute aggregate features from the sequence of time intervals for transactions for a given uid, and also for teh transaction amount. Here is one way I used:
+
+def add_gr(data, col):
+    cols = data.columns
+    gr = data.groupby(col)
+    data[col+'_count'] = gr.TransactionID.transform('count').astype('int32')
+    data[col+'_next_dt'] = gr.TransactionDT.shift(-1)
+    data[col+'_next_dt'] -= data.TransactionDT
+    data[col+'_mean_dt'] = gr[col+'_next_dt'].transform('mean').astype('float32')
+    data[col+'_std_dt'] = gr[col+'_next_dt'].transform('std').astype('float32')
+    data[col+'_median_dt'] = gr[col+'_next_dt'].transform('median').astype('float32')
+
+    data[col+'_next_amt'] = gr.TransactionAmt.shift(-1)
+    data[col+'_mean_amt'] = gr.TransactionAmt.transform('mean').astype('float32')
+    data[col+'_std_amt'] = gr.TransactionAmt.transform('std').astype('float32')
+    data[col+'_median_amt'] = gr.TransactionAmt.transform('median').astype('float32')
+    new_cols = list(set(data.columns) - set(cols) -set([col+'_next_dt']))
+    return new_cols
+
+
+where col is one of uid1 or uid2.
+
+With these I got 0.952 public LB.
+
+Another significant improvement was to use target encoding of these uids and a set of transaction chains that my team mates derieed by combining uids with additional feature columns that represent successive transaction amounts, eg V307. This moved my lgb model to 0.9606 public LB unless mistaken.
+
+I added few other features that improved a bit, but nothing very important.
+
+Final Blend
+
+I mostly used lightgbm, but I also tried xgboost and catboost. XGboost was giving models extremely close to lgb, with both very high correlation in predictions and similar LB score. My features were added my team mates already very good models, yielding even higher scores: Giba had one at 0.9644, and my Russian team mates had models up to 0.9626. Giba then used his blending magic to reach 0.9662 public LB the day of original deadline. We then wondered about what could yield us the extra 0.001 we needed to reach prize zone. We realized we were not using the main property of the dataset: if a card is a fraud at some point, then it is a fraud in the future of that point. Well Giba captured that partially with some lag variables, but that was it. We then added some post processing that overrides predictions if a card is a fraud in the past, and this moved us to 0.9672 at the last minute.
+
+What did not work
+
+Many things, but the one I spent most time on what to try to leverage the fact that if a card is a fraud at some point, then it is a fraud in the future of that point. I didn't want to use post processing as it can lead to overfitting if the card ids are not perfect. Indeed, if one of our id actually covers several cards, then one fraud isn't necessarily followed by all frauds. I therefore tried this: Create one submission. Then for each uid create a lag variable equal to the average of predictions before the current point, and train again. This is like stacking, but with a temporal shift. This did not work, CV skyrocketed, but LB dropped by 0.01. I still think there is something to be done to make it work, but I could not find how.
+
+What worked
+
+Teaming. See here for more details.
+
+It is clear that 3 + 1 + 1 > 5 here. If you have never teamed then try, you will not regret it.
+
+Edit: Additional information about our solution can be found in these two posts:
+
+How to find card ids: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559 The whole team story: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554
+
+Authors
+Sergey Bryansky
+
+sggpls
+
+Tony
+
+tony321
+
+krivoship
+
+krivoship
+
+CPMP
+
+cpmpml
+
+Giba
+
+titericz
+
+arrow_drop_up
+121
+Share
+more_horiz
+Project Files
+table_chart
+card1.png
+get_app
+Download All
+Citation
+
+Sergey Bryansky, Tony, krivoship, CPMP, Giba. 2nd Solution, CPMP View. https://www.kaggle.com/competitions/ieee-fraud-detection/writeups/2-uncles-and-3-puppies-2nd-solution-cpmp-view. 2019. Kaggle
+
+comment
+51 Comments
+6 appreciation comments
+Hotness
+Chris Deotte
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats again CPMP and team. Great job!!
+
+Can you describe the main models in your ensemble and their individual LB scores? Were their features developed separately or did your models share the same features? Lastly, were the models' features chosen based on the same local validation scheme?
+
+I'm particularly curious because I suspect our solution and your solution are very similar. But I think our models stacked a higher score. For the original competition deadline, we stacked a CAT LB 0.9620, LGBM LB 0.9610, and XGB 0.9600 and achieved LB 0.9664 then post process to LB 0.9674. (This solution wins the comp). In the extra 2 days, we mixed features between the models and did more convoluted stacking and ensembling to get to LB 0.9677.
+
+Our original models had features different from each other and were discovered using different local validation schemes (that emphasized different mixtures of seen versus unseen clients). I think this added diversity and allowed them to reach a higher score when stacked.
+
+reply
+Reply
+CPMP
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Indeed, from reading your writeups our solutions are extremely similar (no surprise I guess). I was also surprised to see that our individual models look a bit better than yours on public LB.
+
+We had different datasets and different validation schemes. My Russian team mates had their own, with way more features than mine. And Giba started from theirs, selected features aggressively and added his own. This ensured some diversity but I reused the exact same card ids. The top models in the blend are:
+
+lgb 0.9644 Catboost 0.9626 xgb/lgb blend 0.9623
+
+reply
+Reply
+16 more replies
+arrow_drop_down
+LongYin/杰少
+
+Posted 7 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Great as usual.
+
+reply
+Reply
+corochann
+
+Posted 7 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Surprised such a many things done in only 10 days!
+
+reply
+Reply
+CPMP
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, but I didn't do that much. The time consuming part, analyzing data to find uids, was done by my team mates before I joined the team.
+
+reply
+Reply
+Hayato
+
+Posted 7 years ago
+
+· 249th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing, I learned a lot. Congratulations!
+
+reply
+Reply
+KhanhVD
+
+Posted 7 years ago
+
+· 1641st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing great solution! Congrats @cpmpml and your team
+
+reply
+Reply
+YaGana Sheriff-Hussaini
+
+Posted 7 years ago
+
+· 239th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @cpmpml and team "2 uncles and 3 puppies". Thanks for sharing your solution. I will take a break to recharge and then read yours and other top solutions carefully.
+
+reply
+Reply
+AmirH
+
+Posted 7 years ago
+
+· 29th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks CPMP for sharing, Could you share what method you used for target encoding? did you use some kind of regularization?
+
+Thanks!
+
+reply
+Reply
+CPMP
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Yes, I use a blend with overall target mean. The smaller the frequency, the closer to train average. Values that only appear in test get the average train value. This is key.
+
+reply
+Reply
+9 more replies
+arrow_drop_down
+Ailurophile
+
+Posted 7 years ago
+
+· 5174th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations Great Write-Up Thank You for Sharing Your Approach & Insights….!! @cpmpml
+
+reply
+Reply
+Taemyung Heo
+
+Posted 7 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great insights! Thanks for sharing and congrats!
+
+reply
+Reply
+Ngoc Bien
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+May you explain more clearly about your processing of card1 to get the down row in 4 pictures? Thanks a lots.
+
+reply
+Reply
+Ngoc Bien
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+That is very helpful. Thanks a lots to share
+
+reply
+Reply
+ZhouDeng
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+I kept a feature only if permuting it did not improve any of the 4 model predictions. how can i understand this ? can you elaborate with more detail. thanks
+
+reply
+Reply
+CPMP
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Are you familiar with permutation importance (link in my post)? Then I use it with the 4 models I got from my 4 different folds. A feature is fremoved if permuting the values then predicting improves the score for one of the models.
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+CPMP
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Additional information about our solution can be found in these two posts:
+
+How to find card ids: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559 The whole team story: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554
+
+reply
+Reply
+Appreciation (6)
+Yixinchen
+
+Posted 7 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congrats and thanks for share!
+
+Markus.JM
+
+Posted 7 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, thanks for sharing👍
+
+SanthoRiyu
+
+Posted 7 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Thanks for sharing.
+
+Zakrea Almansouri
+
+Posted 7 years ago
+
+· 3880th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Cool, thanks for the sharing!
+
+fraise
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Thanks for sharing!
+
+Ankit Mishra
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats,thanks for share !

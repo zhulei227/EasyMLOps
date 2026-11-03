@@ -1,0 +1,317 @@
+- generic [ref=f27e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f27e3]:
+    - generic [ref=f27e5]:
+      - button "Navigation menu" [ref=f27e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f27e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f27e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f27e14]:
+      - link [ref=f27e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Ffoursquare-location-matching%2Fwriteups%2F2-30-2nd-place-solution-colum2131-part
+        - button "Login" [ref=f27e16]
+      - link [ref=f27e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Ffoursquare-location-matching%2Fwriteups%2F2-30-2nd-place-solution-colum2131-part
+        - button "Sign Up" [ref=f27e19]
+  - main [ref=f27e21]:
+    - generic [ref=f27e23]:
+      - generic [ref=f27e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f27e25]:
+        - link "Learn more" [ref=f27e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f27e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f27e29]:
+      - generic [ref=f27e31]: 2nd place solution - colum2131 Part — Foursquare - Location Matching
+      - separator [ref=f27e32]
+      - generic [ref=f27e34]:
+        - generic [ref=f27e35]:
+          - heading "2nd place solution - colum2131 Part" [level=1] [ref=f27e36]
+          - generic [ref=f27e37]:
+            - link [ref=f27e38] [cursor=pointer]:
+              - /url: /competitions/foursquare-location-matching
+              - paragraph [ref=f27e40]: Foursquare - Location Matching
+            - paragraph [ref=f27e41]: Solution Writeup · 2nd place · Jul 10, 2022
+        - separator [ref=f27e43]
+        - generic [ref=f27e44]:
+          - generic [ref=f27e46]:
+            - paragraph [ref=f27e47]:
+              - text: Thank you very much for organizing this interesting and exciting competition, and thank you for teaming up with me,
+              - link "@no9more9ria10 (opens in a new tab)" [ref=f27e48] [cursor=pointer]:
+                - /url: /no9more9ria10
+                - text: "@no9more9ria10"
+              - text: ","
+              - link "@tomyanabe (opens in a new tab)" [ref=f27e49] [cursor=pointer]:
+                - /url: /tomyanabe
+                - text: "@tomyanabe"
+              - text: ","
+              - link "@tkm2261 (opens in a new tab)" [ref=f27e50] [cursor=pointer]:
+                - /url: /tkm2261
+                - text: "@tkm2261"
+              - text: ","
+              - link "@yukia18 (opens in a new tab)" [ref=f27e51] [cursor=pointer]:
+                - /url: /yukia18
+                - text: "@yukia18"
+              - text: .
+            - paragraph [ref=f27e52]: This post is part of the 2nd place solution in LB 0.949 (LB 0.971 with leak).
+            - paragraph [ref=f27e53]:
+              - link "Brief Summary (opens in a new tab)" [ref=f27e54] [cursor=pointer]:
+                - /url: https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336062
+                - text: Brief Summary
+            - paragraph [ref=f27e55]: Other part
+            - list [ref=f27e56]:
+              - listitem [ref=f27e57]:
+                - link "Candidate Generation (opens in a new tab)" [ref=f27e58] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336072
+                  - text: Candidate Generation
+            - 'heading "Stack-part 1: Binary classification of matches" [level=2] [ref=f27e59]'
+            - paragraph [ref=f27e60]: "Using the candidate matches created in the previous stage, we ensemble three models: GBDT (XGBoost, lightGBM), BERT(xlm-roberta-base). For this id-pair (e.g., src_id, dst_id), GBDT mainly used the edit distance feature, while BERT used text created in particular columns. These models classified whether the pair matched or not."
+            - heading "GBDT" [level=3] [ref=f27e61]
+            - heading "Features" [level=4] [ref=f27e62]
+            - paragraph [ref=f27e63]:
+              - text: XGBoost features were created by colum2131 (
+              - link "@columbia2131 (opens in a new tab)" [ref=f27e64] [cursor=pointer]:
+                - /url: /columbia2131
+                - text: "@columbia2131"
+              - text: ), and lightGBM features by ria (
+              - link "@no9more9ria10 (opens in a new tab)" [ref=f27e65] [cursor=pointer]:
+                - /url: /no9more9ria10
+                - text: "@no9more9ria10"
+              - text: "). Although there are some differences in each feature, the following XGBoost’s features were below:"
+            - list [ref=f27e66]:
+              - listitem [ref=f27e67]:
+                - text: Features generated independently with src_id and dst_id
+                - list [ref=f27e68]:
+                  - listitem [ref=f27e69]: latitude / longitude
+                  - listitem [ref=f27e70]: country with ordinal-encoding
+                  - listitem [ref=f27e71]: categories with ordinal-encoding
+              - listitem [ref=f27e72]:
+                - text: Features generated dependently with src_id and dst_id
+                - list [ref=f27e73]:
+                  - listitem [ref=f27e74]:
+                    - text: Edit distance (name, categories, address, city, state, zip, url, phone)
+                    - list [ref=f27e75]:
+                      - listitem [ref=f27e76]: gesh
+                      - listitem [ref=f27e77]: leven
+                      - listitem [ref=f27e78]: jaro
+                      - listitem [ref=f27e79]: simple_ratio (RapidFuzz)
+                      - listitem [ref=f27e80]: partial_ratio (RapidFuzz)
+                      - listitem [ref=f27e81]: token_set_ratio (RapidFuzz)
+                      - listitem [ref=f27e82]: token_sort_ratio (RapidFuzz)
+                      - listitem [ref=f27e83]: token_ratio (RapidFuzz)
+                      - listitem [ref=f27e84]: partial_token_ratio (RapidFuzz)
+                      - listitem [ref=f27e85]: wratio (RapidFuzz)
+                      - listitem [ref=f27e86]: qratio (RapidFuzz)
+                  - listitem [ref=f27e87]:
+                    - text: Set similarity with .split(“ ” or “, “) (name, cateogires)
+                    - list [ref=f27e88]:
+                      - listitem [ref=f27e89]: jaccard
+                      - listitem [ref=f27e90]: dice
+                      - listitem [ref=f27e91]: sympson
+                  - listitem [ref=f27e92]:
+                    - text: Cosine similarity of vectors encoded by tf-idf (name, categories, address, all)
+                    - list [ref=f27e93]:
+                      - listitem [ref=f27e94]: tfidf(ngram_range=(1, 1), analyzer=‘word’)
+                      - listitem [ref=f27e95]: tfidf(ngram_range=(1, 3), analyzer=‘char’)
+              - listitem [ref=f27e96]:
+                - text: Others
+                - list [ref=f27e97]:
+                  - listitem [ref=f27e98]: probability by transformer
+            - heading "Modeling" [level=5] [ref=f27e99]
+            - paragraph [ref=f27e100]: The cross-validation of the train data was purposely split so that leakage would occur. Specifically, instead of the folds with GroupKFold(n_splits=2, group=‘point_of_interest’), we created new folds with GroupKFold(n_splits=5, group=‘src_id’). This leakage improved the CV and Public LB because train and test data contained common records. We suspect that the latitude and longitude variables and the ordinal categories worked effectively as features to represent the common id’s records.
+            - heading "BERT" [level=3] [ref=f27e101]
+            - heading "Text & Numerical-Features" [level=4] [ref=f27e102]
+            - paragraph [ref=f27e103]: The text was defined as each lowercased name and cateogires connected by a SEP-token and country. Additionally, the numerical feature was logarithmic variables of haversine distance.
+            - code [ref=f27e105]: "def get_basearray(cfg, df): cfg.idx2id = df['id'].fillna('').to_numpy() cfg.id2idx = {c: i for i, c in enumerate(cfg.idx2id)} cfg.idx2name = df['name'].fillna('').str.lower().to_numpy() cfg.idx2categories = df['categories'].fillna('').str.lower().to_numpy() cfg.idx2address = df['address'].fillna('').str.lower().to_numpy() return cfg def get_text(cfg, i, j): # {i: index of src_id, j: index of dst_id} text = cfg.idx2country[i]+cfg.sep+\\ 'name1 '+cfg.idx2name[i]+cfg.sep+'category1 '+cfg.idx2categories[i]+\\ cfg.sep + cfg.sep +\\ 'name2 '+cfg.idx2name[j]+cfg.sep+'category2 '+cfg.idx2categories[j] return text"
+            - heading "Model Training" [level=4] [ref=f27e106]
+            - paragraph [ref=f27e107]: "The architecture of BERT is below:"
+            - code [ref=f27e109]: "class CustomModel(nn.Module): def __init__(self, cfg, criterion): super().__init__() self.cfg = cfg self.criterion = criterion self.config = AutoConfig.from_pretrained( cfg.MODEL_PATH, output_hidden_states=True ) self.config.attention_probs_dropout_prob = 0.0 self.config.hidden_dropout_prob = 0.0 self.backbone = AutoModel.from_pretrained( cfg.MODEL_PATH, # xlm-roberta-base config=self.config ) self.linear1 = nn.Sequential( nn.Linear(self.config.hidden_size+len(cfg.num_cols), 1024), nn.SELU(), nn.Linear(1024, 1) ) def forward(self, inputs, labels=None): outputs = self.backbone( inputs['input_ids'], attention_mask=inputs['attention_mask'] )[\"last_hidden_state\"] outputs = outputs[:, 0, :] outputs = torch.cat(( outputs, inputs['num_features'] ), dim=1) logits = self.linear1(outputs).flatten() loss = self.criterion(logits, labels) return logits, loss"
+            - paragraph [ref=f27e110]: This model was trained for 5 epochs on all train data.
+            - heading "Leak Post Process" [level=2] [ref=f27e111]
+            - paragraph [ref=f27e112]: As mentioned in other discussions, there was a duplication of train data in the test data. Therefore, the some test data was merged with the train data, and matches were created with the same poi. The prediction of LB0.949 was overwritten. We processed this matches overwriting the matches of LB0.949. Note that train.csv is replaced on submit, so we created a separate train.csv dataset.
+            - code [ref=f27e114]: "import cudf train = cudf.read_feather(‘../input/4sq-train-data-copy-feather/train.ftr’).fillna(‘[NAN]‘) test = cudf.read_csv(‘../input/foursquare-location-matching/test.csv’, dtype=str).fillna(‘[NAN]’) cols = [‘name’, ‘latitude’, ‘longitude’] test = test.merge(train[cols+[‘point_of_interest’]], on=cols, how=‘left’) test[[‘id’, ‘point_of_interest’]].to_pandas().to_csv(‘id2poi.csv’, index=False) id2poi = pd.read_csv('id2poi.csv') match_dict = {} for poi, group_df in id2poi.groupby('point_of_interest'): ids = set(group_df['id'].tolist()) for id_str in ids: match_dict[id_str] = ids sub = pd.DataFrame({ ‘id’: sub_dict.keys(), ‘matches’: [ match_dict.get(key, value) for key, value in sub_dict.items() ] }) sub[‘matches’] = sub[‘matches’].map(lambda x: ' ’.join(x)) http://sub.to_csv(‘submission.csv’, index=False)"
+          - generic [ref=f27e115]:
+            - generic [ref=f27e116]:
+              - text: Authors
+              - generic [ref=f27e117]:
+                - link "T0m's profile" [ref=f27e118] [cursor=pointer]:
+                  - /url: /tomyanabe
+                  - generic "T0m" [ref=f27e119]
+                - generic [ref=f27e123]:
+                  - link "T0m" [ref=f27e124] [cursor=pointer]:
+                    - /url: /tomyanabe
+                  - paragraph [ref=f27e125]: tomyanabe
+              - generic [ref=f27e126]:
+                - link "yabea's profile" [ref=f27e127] [cursor=pointer]:
+                  - /url: /yukia18
+                  - generic "yabea" [ref=f27e128]
+                - generic [ref=f27e132]:
+                  - link "yabea" [ref=f27e133] [cursor=pointer]:
+                    - /url: /yukia18
+                  - paragraph [ref=f27e134]: yukia18
+              - generic [ref=f27e135]:
+                - link "tkm2261's profile" [ref=f27e136] [cursor=pointer]:
+                  - /url: /tkm2261
+                  - generic "tkm2261" [ref=f27e137]
+                - generic [ref=f27e141]:
+                  - link "tkm2261" [ref=f27e142] [cursor=pointer]:
+                    - /url: /tkm2261
+                  - paragraph [ref=f27e143]: tkm2261
+              - generic [ref=f27e144]:
+                - link "colum2131's profile" [ref=f27e145] [cursor=pointer]:
+                  - /url: /columbia2131
+                  - generic "colum2131" [ref=f27e146]
+                - generic [ref=f27e150]:
+                  - link "colum2131" [ref=f27e151] [cursor=pointer]:
+                    - /url: /columbia2131
+                  - paragraph [ref=f27e152]: columbia2131
+              - generic [ref=f27e153]:
+                - link "rii's profile" [ref=f27e154] [cursor=pointer]:
+                  - /url: /no9more9ria10
+                  - generic "rii" [ref=f27e155]
+                - generic [ref=f27e159]:
+                  - link "rii" [ref=f27e160] [cursor=pointer]:
+                    - /url: /no9more9ria10
+                  - paragraph [ref=f27e161]: no9more9ria10
+            - separator [ref=f27e162]
+            - generic [ref=f27e163]:
+              - generic [ref=f27e164]:
+                - button "Upvote" [ref=f27e165] [cursor=pointer]:
+                  - generic [ref=f27e166]: arrow_drop_up
+                - button "27 votes" [ref=f27e167] [cursor=pointer]: "27"
+              - button "Share" [ref=f27e168] [cursor=pointer]
+              - button "Writeup actions" [ref=f27e170] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f27e171]
+        - paragraph [ref=f27e172]: T0m, yabea, tkm2261, colum2131, rii. 2nd place solution - colum2131 Part. https://www.kaggle.com/competitions/foursquare-location-matching/writeups/2-30-2nd-place-solution-colum2131-part. 2022. Kaggle
+        - separator [ref=f27e173]
+        - generic [ref=f27e174]:
+          - generic [ref=f27e176]:
+            - generic [ref=f27e177]:
+              - generic [aria-hidden] [ref=f27e178]: comment
+              - heading "2 Comments" [level=2] [ref=f27e180]
+            - generic [ref=f27e183]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f27e184] [cursor=pointer]:
+                - generic [ref=f27e185]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f27e187]:
+            - generic [ref=f27e188]:
+              - generic [ref=f27e192]:
+                - link "The Devastator's profile" [ref=f27e193] [cursor=pointer]:
+                  - /url: /thedevastator
+                  - generic "The Devastator" [ref=f27e194]
+                - generic [ref=f27e200]:
+                  - link [ref=f27e202] [cursor=pointer]:
+                    - /url: /thedevastator
+                    - heading "The Devastator" [level=3] [ref=f27e203]
+                  - generic [ref=f27e204]:
+                    - paragraph [ref=f27e205]: Posted 4 years ago
+                    - paragraph [ref=f27e207]: · 340th in this Competition
+                - generic [ref=f27e209]:
+                  - generic [ref=f27e210]:
+                    - button "Upvote" [ref=f27e211] [cursor=pointer]:
+                      - generic [ref=f27e212]: arrow_drop_up
+                    - button "1 votes" [ref=f27e213] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f27e214] [cursor=pointer]: more_vert
+                - paragraph [ref=f27e218]: Thanks for sharing your insights on this competition! Great job on your success in this competition!
+                - button "Reply" [ref=f27e220] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f27e221]: reply
+              - separator [ref=f27e223]
+            - generic [ref=f27e228]:
+              - link "nadare's profile" [ref=f27e229] [cursor=pointer]:
+                - /url: /nadare
+                - generic "nadare" [ref=f27e230]
+              - generic [ref=f27e236]:
+                - link [ref=f27e238] [cursor=pointer]:
+                  - /url: /nadare
+                  - heading "nadare" [level=3] [ref=f27e239]
+                - generic [ref=f27e240]:
+                  - paragraph [ref=f27e241]: Posted 4 years ago
+                  - paragraph [ref=f27e243]: · 7th in this Competition
+              - generic [ref=f27e245]:
+                - generic [ref=f27e246]:
+                  - button "Upvote" [ref=f27e247] [cursor=pointer]:
+                    - generic [ref=f27e248]: arrow_drop_up
+                  - button "1 votes" [ref=f27e249] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f27e250] [cursor=pointer]: more_vert
+              - paragraph [ref=f27e254]: I couldn't find the RapidFuzz library during the competition. Thank you for sharing the solution and congrats for your 2nd place in this competition.
+              - button "Reply" [ref=f27e256] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f27e257]: reply
+  - alert [ref=f27e261]

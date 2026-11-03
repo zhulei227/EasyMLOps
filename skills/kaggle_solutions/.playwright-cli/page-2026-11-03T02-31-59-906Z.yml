@@ -1,0 +1,319 @@
+- generic [ref=f28e2]:
+  - navigation "Main Kaggle page navigation" [ref=f28e3]:
+    - generic [ref=f28e5]:
+      - button "Navigation menu" [ref=f28e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f28e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f28e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f28e12] [cursor=pointer]:
+      - paragraph [ref=f28e18]: Create
+    - generic [ref=f28e21]:
+      - list [ref=f28e22]:
+        - listitem "Home List Item" [ref=f28e23]:
+          - link "Home" [ref=f28e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f28e31]: Home
+        - listitem "Competitions List Item" [ref=f28e32]:
+          - link "Competitions" [ref=f28e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f28e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f28e41]:
+          - link "Benchmarks" [ref=f28e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f28e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f28e50]:
+          - link "Arenas" [ref=f28e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f28e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f28e59]:
+          - link "Game Arena" [ref=f28e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f28e67]: Game Arena
+      - list [ref=f28e68]:
+        - listitem "Data Hub List Item" [ref=f28e69]:
+          - generic [ref=f28e70]:
+            - link "Data Hub" [ref=f28e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f28e77]: Data Hub
+            - button "Expand" [ref=f28e80] [cursor=pointer]
+      - list [ref=f28e82]:
+        - listitem "More on Kaggle List Item" [ref=f28e83]:
+          - generic [ref=f28e84]:
+            - link "More on Kaggle" [ref=f28e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f28e91]: More
+            - button "Expand" [ref=f28e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f28e97]:
+    - generic [ref=f28e98]:
+      - generic [ref=f28e102]:
+        - textbox "Search" [ref=f28e104]
+        - group [aria-hidden]
+      - generic [ref=f28e106]:
+        - link [ref=f28e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fnbme-score-clinical-patient-notes%2Fdiscussion%2F322893
+          - button "Login" [ref=f28e108]
+        - link [ref=f28e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fnbme-score-clinical-patient-notes%2Fdiscussion%2F322893
+          - button "Sign Up" [ref=f28e111]
+  - main [ref=f28e113]:
+    - generic [ref=f28e115]:
+      - generic [ref=f28e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f28e117]:
+        - link "Learn more" [ref=f28e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f28e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f28e123]:
+      - generic [ref=f28e125]:
+        - generic [ref=f28e126]:
+          - link "National Board of Medical Examiners's profile" [ref=f28e127] [cursor=pointer]:
+            - /url: /organizations/NBMEMedicalExam
+            - generic "National Board of Medical Examiners" [ref=f28e128]
+          - generic [ref=f28e132]:
+            - generic [ref=f28e133]: National Board of Medical Examiners
+            - generic [ref=f28e135]: · Featured Code Competition · 4 years ago
+          - generic [ref=f28e136]:
+            - button "Late Submission" [disabled] [ref=f28e138]
+            - button "Competition options menu collapsed" [ref=f28e141] [cursor=pointer]: more_horiz
+        - generic [ref=f28e143]:
+          - heading "NBME - Score Clinical Patient Notes" [level=1] [ref=f28e144]
+          - paragraph [ref=f28e146]: Identify Key Phrases in Patient Notes from Medical Licensing Exams
+      - generic [ref=f28e150]:
+        - tablist [ref=f28e157]:
+          - tab "Overview, 1 of 7" [ref=f28e158] [cursor=pointer]:
+            - generic [ref=f28e159]: Overview
+          - tab "Data, 2 of 7" [ref=f28e160] [cursor=pointer]:
+            - generic [ref=f28e161]: Data
+          - tab "Code, 3 of 7" [ref=f28e162] [cursor=pointer]:
+            - generic [ref=f28e163]: Code
+          - tab "Models, 4 of 7" [ref=f28e164] [cursor=pointer]:
+            - generic [ref=f28e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f28e166] [cursor=pointer]:
+            - generic [ref=f28e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f28e168] [cursor=pointer]:
+            - generic [ref=f28e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f28e170] [cursor=pointer]:
+            - generic [ref=f28e171]: Rules
+        - separator [ref=f28e173]
+      - generic [ref=f28e177]:
+        - generic [ref=f28e178]:
+          - generic [ref=f28e179]:
+            - generic [ref=f28e180]:
+              - link "CPMP's profile" [ref=f28e181] [cursor=pointer]:
+                - /url: /cpmpml
+                - generic "CPMP" [ref=f28e182]
+              - generic [ref=f28e186]:
+                - link "CPMP" [ref=f28e187] [cursor=pointer]:
+                  - /url: /cpmpml
+                - text: ·
+                - generic [ref=f28e188]: 2nd in this Competition
+                - text: ·
+                - generic [ref=f28e189]: Posted 4 years ago
+            - generic [ref=f28e190]:
+              - generic [ref=f28e191]:
+                - button "Upvote" [ref=f28e192] [cursor=pointer]:
+                  - generic [ref=f28e193]: arrow_drop_up
+                - button "46 votes" [ref=f28e194] [cursor=pointer]: "46"
+              - button "More Options for this Topic" [ref=f28e195] [cursor=pointer]: more_vert
+            - heading "2nd rank solution (inference code)" [level=3] [ref=f28e196]
+            - generic [ref=f28e199]:
+              - paragraph [ref=f28e200]: I'd like to thank host and kaggle for this challenge. I learned a lot in this competition (foremost insight is that debertav3 has replaced roberta as the baseline for NLP models that can fit on a single GPU.)
+              - paragraph [ref=f28e201]:
+                - text: "I will describe my solution in detail today but I shared my best selected inference notebook:"
+                - link "https://www.kaggle.com/code/cpmpml/sub-ensemble-010/notebook?scriptVersionId=94177123 (opens in a new tab)" [ref=f28e202] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/code/cpmpml/sub-ensemble-010/notebook?scriptVersionId=94177123
+                  - text: https://www.kaggle.com/code/cpmpml/sub-ensemble-010/notebook?scriptVersionId=94177123
+                - text: It scored 0.893 on public LB (my best public score) and 0.894 on private LB.
+              - paragraph [ref=f28e203]: It is 4 times 4 fold model model. The 4 models are the same model with a choice of backbone (deberta-large or deberta-v3-large) and a choice of rnn (LSTM or GRU). Each model is trained on 4 folds and also 4 times on full train data.
+              - paragraph [ref=f28e204]:
+                - strong [ref=f28e205]: "Edit:"
+                - text: "My solution is described in this post:"
+                - link "https://www.kaggle.com/competitions/nbme-score-clinical-patient-notes/discussion/323085 (opens in a new tab)" [ref=f28e206] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/competitions/nbme-score-clinical-patient-notes/discussion/323085
+                  - text: https://www.kaggle.com/competitions/nbme-score-clinical-patient-notes/discussion/323085
+          - separator [ref=f28e207]
+        - generic [ref=f28e208]:
+          - generic [ref=f28e209]:
+            - paragraph [ref=f28e212]:
+              - paragraph [ref=f28e213]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f28e214] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f28e215]
+          - generic [ref=f28e217]:
+            - generic [ref=f28e218]:
+              - generic [aria-hidden] [ref=f28e219]: comment
+              - heading "9 Comments" [level=2] [ref=f28e221]
+            - generic [ref=f28e224]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f28e225] [cursor=pointer]:
+                - generic [ref=f28e226]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f28e228]:
+            - generic [ref=f28e229]:
+              - generic [ref=f28e233]:
+                - link "Giba's profile" [ref=f28e234] [cursor=pointer]:
+                  - /url: /titericz
+                  - generic "Giba" [ref=f28e235]
+                - generic [ref=f28e241]:
+                  - link [ref=f28e243] [cursor=pointer]:
+                    - /url: /titericz
+                    - heading "Giba" [level=3] [ref=f28e244]
+                  - generic [ref=f28e245]:
+                    - paragraph [ref=f28e246]: Posted 4 years ago
+                    - paragraph [ref=f28e248]: · 633rd in this Competition
+                - generic [ref=f28e250]:
+                  - generic [ref=f28e251]:
+                    - button "Upvote" [ref=f28e252] [cursor=pointer]:
+                      - generic [ref=f28e253]: arrow_drop_up
+                    - button "2 votes" [ref=f28e254] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f28e255] [cursor=pointer]: more_vert
+                - paragraph [ref=f28e259]:
+                  - text: congrats
+                  - link "@cpmpml (opens in a new tab)" [ref=f28e260] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - text: "@cpmpml"
+                  - text: "! And thanks for sharing the notebook. Waiting for your full solution ;)"
+              - separator [ref=f28e261]
+            - generic [ref=f28e262]:
+              - generic [ref=f28e266]:
+                - link "cloudscomputes's profile" [ref=f28e267] [cursor=pointer]:
+                  - /url: /cloudscomputes
+                  - generic "cloudscomputes" [ref=f28e268]
+                - generic [ref=f28e274]:
+                  - link [ref=f28e276] [cursor=pointer]:
+                    - /url: /cloudscomputes
+                    - heading "cloudscomputes" [level=3] [ref=f28e277]
+                  - generic [ref=f28e278]:
+                    - paragraph [ref=f28e279]: Posted 4 years ago
+                    - paragraph [ref=f28e281]: · 115th in this Competition
+                - generic [ref=f28e283]:
+                  - generic [ref=f28e284]:
+                    - button "Upvote" [ref=f28e285] [cursor=pointer]:
+                      - generic [ref=f28e286]: arrow_drop_up
+                    - button "2 votes" [ref=f28e287] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f28e288] [cursor=pointer]: more_vert
+                - paragraph [ref=f28e292]: What trigers you to use rnn here? I mean what feature or character of the problem make you believe RNN is still applicable in it?
+                - generic [ref=f28e298]:
+                  - link "CPMP's profile" [ref=f28e299] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - generic "CPMP" [ref=f28e300]
+                  - generic [ref=f28e306]:
+                    - generic [ref=f28e307]:
+                      - link [ref=f28e308] [cursor=pointer]:
+                        - /url: /cpmpml
+                        - heading "CPMP" [level=3] [ref=f28e309]
+                      - paragraph [ref=f28e312]: Topic Author
+                    - generic [ref=f28e313]:
+                      - paragraph [ref=f28e314]: Posted 4 years ago
+                      - paragraph [ref=f28e316]: · 2nd in this Competition
+                  - generic [ref=f28e318]:
+                    - generic [ref=f28e319]:
+                      - button "Upvote" [ref=f28e320] [cursor=pointer]:
+                        - generic [ref=f28e321]: arrow_drop_up
+                      - button "2 votes" [ref=f28e322] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f28e323] [cursor=pointer]: more_vert
+                  - paragraph [ref=f28e327]: I'll answer that in my solution writeup.
+              - separator [ref=f28e328]
+            - generic [ref=f28e329]:
+              - generic [ref=f28e333]:
+                - link "biubiubiu~'s profile" [ref=f28e334] [cursor=pointer]:
+                  - /url: /mengvision
+                  - generic "biubiubiu~" [ref=f28e335]
+                - generic [ref=f28e341]:
+                  - link [ref=f28e343] [cursor=pointer]:
+                    - /url: /mengvision
+                    - heading "biubiubiu~" [level=3] [ref=f28e344]
+                  - generic [ref=f28e345]:
+                    - paragraph [ref=f28e346]: Posted 4 years ago
+                    - paragraph [ref=f28e348]: · 654th in this Competition
+                - generic [ref=f28e350]:
+                  - generic [ref=f28e351]:
+                    - button "Upvote" [ref=f28e352] [cursor=pointer]:
+                      - generic [ref=f28e353]: arrow_drop_up
+                    - button "1 votes" [ref=f28e354] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f28e355] [cursor=pointer]: more_vert
+                - paragraph [ref=f28e359]: Congrats !!! I looking forward to learn trainning detail for your solution detail!!👍👍
+              - separator [ref=f28e360]
+            - generic [ref=f28e361]:
+              - generic [ref=f28e365]:
+                - link "Zacchaeus's profile" [ref=f28e366] [cursor=pointer]:
+                  - /url: /zacchaeus
+                  - generic "Zacchaeus" [ref=f28e367]
+                - generic [ref=f28e373]:
+                  - link [ref=f28e375] [cursor=pointer]:
+                    - /url: /zacchaeus
+                    - heading "Zacchaeus" [level=3] [ref=f28e376]
+                  - generic [ref=f28e377]:
+                    - paragraph [ref=f28e378]: Posted 4 years ago
+                    - paragraph [ref=f28e380]: · 11th in this Competition
+                - generic [ref=f28e382]:
+                  - generic [ref=f28e383]:
+                    - button "Upvote" [ref=f28e384] [cursor=pointer]:
+                      - generic [ref=f28e385]: arrow_drop_up
+                    - button "1 votes" [ref=f28e386] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f28e387] [cursor=pointer]: more_vert
+                - paragraph [ref=f28e391]: Congrats! May I ask if you have 2 (backbone) * 2 (head) * 4 (fold) * 2 (w/ or w/o full data) = 32 models?
+                - generic [ref=f28e397]:
+                  - link "CPMP's profile" [ref=f28e398] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - generic "CPMP" [ref=f28e399]
+                  - generic [ref=f28e405]:
+                    - generic [ref=f28e406]:
+                      - link [ref=f28e407] [cursor=pointer]:
+                        - /url: /cpmpml
+                        - heading "CPMP" [level=3] [ref=f28e408]
+                      - paragraph [ref=f28e411]: Topic Author
+                    - generic [ref=f28e412]:
+                      - paragraph [ref=f28e413]: Posted 4 years ago
+                      - paragraph [ref=f28e415]: · 2nd in this Competition
+                  - generic [ref=f28e417]:
+                    - generic [ref=f28e418]:
+                      - button "Upvote" [ref=f28e419] [cursor=pointer]:
+                        - generic [ref=f28e420]: arrow_drop_up
+                      - button "2 votes" [ref=f28e421] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f28e422] [cursor=pointer]: more_vert
+                  - paragraph [ref=f28e426]: yes, 32 checkpoints. Scoring one checkpoint takes14 minutes or so.
+              - separator [ref=f28e427]
+            - generic [ref=f28e428]:
+              - generic [ref=f28e432]:
+                - link "NotQuiteZero's profile" [ref=f28e433] [cursor=pointer]:
+                  - /url: /chenshengabc
+                  - generic "NotQuiteZero" [ref=f28e434]
+                - generic [ref=f28e440]:
+                  - link [ref=f28e442] [cursor=pointer]:
+                    - /url: /chenshengabc
+                    - heading "NotQuiteZero" [level=3] [ref=f28e443]
+                  - generic [ref=f28e444]:
+                    - paragraph [ref=f28e445]: Posted 4 years ago
+                    - paragraph [ref=f28e447]: · 9th in this Competition
+                - generic [ref=f28e449]:
+                  - generic [ref=f28e450]:
+                    - button "Upvote" [ref=f28e451] [cursor=pointer]:
+                      - generic [ref=f28e452]: arrow_drop_up
+                    - button "0 votes" [ref=f28e453] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f28e454] [cursor=pointer]: more_vert
+                - paragraph [ref=f28e458]: Well done. Congratulations.
+              - separator [ref=f28e459]
+            - generic [ref=f28e460]:
+              - generic [ref=f28e464]:
+                - link "'s profile" [ref=f28e465] [cursor=pointer]:
+                  - /url: /
+                - generic [ref=f28e472]:
+                  - generic:
+                    - link:
+                      - /url: /
+                      - heading [level=3]
+                  - paragraph [ref=f28e474]: Posted 4 years ago
+                - generic [ref=f28e476]:
+                  - generic [ref=f28e477]:
+                    - button "Upvote" [ref=f28e478] [cursor=pointer]:
+                      - generic [ref=f28e479]: arrow_drop_up
+                    - button "0 votes" [ref=f28e480] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f28e481] [cursor=pointer]: more_vert
+                - paragraph [ref=f28e485]: This is an great solution. The author has clearly done a lot of research and put in a lot of hard work to get this score. Well done!
+              - separator [ref=f28e486]
+            - paragraph [ref=f28e493]: This comment has been deleted.
+  - alert [ref=f28e496]

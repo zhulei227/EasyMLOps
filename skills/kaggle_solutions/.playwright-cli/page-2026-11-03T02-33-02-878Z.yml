@@ -1,0 +1,182 @@
+- generic [ref=f33e2]:
+  - navigation "Main Kaggle page navigation" [ref=f33e3]:
+    - generic [ref=f33e5]:
+      - button "Navigation menu" [ref=f33e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f33e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f33e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f33e12] [cursor=pointer]:
+      - paragraph [ref=f33e18]: Create
+    - generic [ref=f33e21]:
+      - list [ref=f33e22]:
+        - listitem "Home List Item" [ref=f33e23]:
+          - link "Home" [ref=f33e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f33e31]: Home
+        - listitem "Competitions List Item" [ref=f33e32]:
+          - link "Competitions" [ref=f33e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f33e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f33e41]:
+          - link "Benchmarks" [ref=f33e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f33e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f33e50]:
+          - link "Arenas" [ref=f33e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f33e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f33e59]:
+          - link "Game Arena" [ref=f33e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f33e67]: Game Arena
+      - list [ref=f33e68]:
+        - listitem "Data Hub List Item" [ref=f33e69]:
+          - generic [ref=f33e70]:
+            - link "Data Hub" [ref=f33e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f33e77]: Data Hub
+            - button "Expand" [ref=f33e80] [cursor=pointer]
+      - list [ref=f33e82]:
+        - listitem "More on Kaggle List Item" [ref=f33e83]:
+          - generic [ref=f33e84]:
+            - link "More on Kaggle" [ref=f33e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f33e91]: More
+            - button "Expand" [ref=f33e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f33e97]:
+    - generic [ref=f33e98]:
+      - generic [ref=f33e102]:
+        - textbox "Search" [ref=f33e104]
+        - group [aria-hidden]
+      - generic [ref=f33e106]:
+        - link [ref=f33e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fshopee-product-matching%2Fdiscussion%2F238362
+          - button "Login" [ref=f33e108]
+        - link [ref=f33e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fshopee-product-matching%2Fdiscussion%2F238362
+          - button "Sign Up" [ref=f33e111]
+  - main [ref=f33e113]:
+    - generic [ref=f33e115]:
+      - generic [ref=f33e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f33e117]:
+        - link "Learn more" [ref=f33e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f33e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f33e123]:
+      - generic [ref=f33e125]:
+        - generic [ref=f33e126]:
+          - link "Shopee's profile" [ref=f33e127] [cursor=pointer]:
+            - /url: /organizations/shopee
+            - generic "Shopee" [ref=f33e128]
+          - generic [ref=f33e132]:
+            - generic [ref=f33e133]: Shopee
+            - generic [ref=f33e135]: · Featured Code Competition · 5 years ago
+          - generic [ref=f33e136]:
+            - button "Late Submission" [disabled] [ref=f33e138]
+            - button "Competition options menu collapsed" [ref=f33e141] [cursor=pointer]: more_horiz
+        - generic [ref=f33e143]:
+          - heading "Shopee - Price Match Guarantee" [level=1] [ref=f33e144]
+          - paragraph [ref=f33e146]: Determine if two products are the same by their images
+      - generic [ref=f33e150]:
+        - tablist [ref=f33e157]:
+          - tab "Overview, 1 of 7" [ref=f33e158] [cursor=pointer]:
+            - generic [ref=f33e159]: Overview
+          - tab "Data, 2 of 7" [ref=f33e160] [cursor=pointer]:
+            - generic [ref=f33e161]: Data
+          - tab "Code, 3 of 7" [ref=f33e162] [cursor=pointer]:
+            - generic [ref=f33e163]: Code
+          - tab "Models, 4 of 7" [ref=f33e164] [cursor=pointer]:
+            - generic [ref=f33e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f33e166] [cursor=pointer]:
+            - generic [ref=f33e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f33e168] [cursor=pointer]:
+            - generic [ref=f33e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f33e170] [cursor=pointer]:
+            - generic [ref=f33e171]: Rules
+        - separator [ref=f33e173]
+      - generic [ref=f33e177]:
+        - generic [ref=f33e178]:
+          - generic [ref=f33e179]:
+            - generic [ref=f33e180]:
+              - link "tkm2261's profile" [ref=f33e181] [cursor=pointer]:
+                - /url: /tkm2261
+                - generic "tkm2261" [ref=f33e182]
+              - generic [ref=f33e186]:
+                - link "tkm2261" [ref=f33e187] [cursor=pointer]:
+                  - /url: /tkm2261
+                - text: ·
+                - generic [ref=f33e188]: 2nd in this Competition
+                - text: ·
+                - generic [ref=f33e189]: Posted 5 years ago
+            - generic [ref=f33e190]:
+              - generic [ref=f33e191]:
+                - button "Upvote" [ref=f33e192] [cursor=pointer]:
+                  - generic [ref=f33e193]: arrow_drop_up
+                - button "45 votes" [ref=f33e194] [cursor=pointer]: "45"
+              - button "More Options for this Topic" [ref=f33e195] [cursor=pointer]: more_vert
+            - heading "2nd Place Solution Code" [level=3] [ref=f33e196]
+            - generic [ref=f33e199]:
+              - paragraph [ref=f33e200]: Hi all,
+              - paragraph [ref=f33e201]:
+                - text: In addition to our solution write-up at
+                - link "https://www.kaggle.com/c/shopee-product-matching/discussion/238022 (opens in a new tab)" [ref=f33e202] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/shopee-product-matching/discussion/238022
+                  - text: https://www.kaggle.com/c/shopee-product-matching/discussion/238022
+                - text: ", we have just published our submission code here."
+              - paragraph [ref=f33e203]:
+                - link "https://www.kaggle.com/lyakaap/2nd-place-solution (opens in a new tab)" [ref=f33e204] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/lyakaap/2nd-place-solution
+                  - text: https://www.kaggle.com/lyakaap/2nd-place-solution
+              - paragraph [ref=f33e205]: "My single part has Public LB: 0.782. After ensembling with lyakaap's GCN (Public LB 0.781) and LGB (Public LB: unknown), it achieves 0.792 in Public LB."
+              - paragraph [ref=f33e206]: We are also making all datasets public. You should be able to run and modify our code freely. Please let us know if you cannot see some datasets.
+              - paragraph [ref=f33e207]: Thanks!
+              - paragraph [ref=f33e208]: TKM
+          - separator [ref=f33e209]
+        - generic [ref=f33e210]:
+          - generic [ref=f33e211]:
+            - paragraph [ref=f33e214]:
+              - paragraph [ref=f33e215]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f33e216] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f33e217]
+          - generic [ref=f33e219]:
+            - generic [ref=f33e220]:
+              - generic [aria-hidden] [ref=f33e221]: comment
+              - generic [ref=f33e222]:
+                - heading "2 Comments" [level=2] [ref=f33e223]
+                - link "Go To Appreciation Comments (1 total)" [ref=f33e224] [cursor=pointer]:
+                  - /url: /c/shopee-product-matching/discussion/238362#appreciation
+                  - text: 1 appreciation comment
+            - generic [ref=f33e227]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f33e228] [cursor=pointer]:
+                - generic [ref=f33e229]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f33e232]:
+            - paragraph [ref=f33e238]: This comment has been deleted.
+            - separator [ref=f33e239]
+          - generic [ref=f33e240]:
+            - heading "Appreciation (1)" [level=2] [ref=f33e242]
+            - generic [ref=f33e247]:
+              - link "NoMalady's profile" [ref=f33e248] [cursor=pointer]:
+                - /url: /behlarjun
+                - generic "NoMalady" [ref=f33e249]
+              - generic [ref=f33e255]:
+                - link [ref=f33e257] [cursor=pointer]:
+                  - /url: /behlarjun
+                  - heading "NoMalady" [level=3] [ref=f33e258]
+                - generic [ref=f33e259]:
+                  - paragraph [ref=f33e260]: Posted 5 years ago
+                  - paragraph [ref=f33e262]: · 482nd in this Competition
+              - generic [ref=f33e264]:
+                - generic [ref=f33e265]:
+                  - button "Upvote" [ref=f33e266] [cursor=pointer]:
+                    - generic [ref=f33e267]: arrow_drop_up
+                  - button "0 votes" [ref=f33e268] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f33e269] [cursor=pointer]: more_vert
+              - paragraph [ref=f33e273]: "Thank you for sharing your approach : )"
+  - alert [ref=f33e276]

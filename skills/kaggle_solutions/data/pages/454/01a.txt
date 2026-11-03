@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275476
-fetched: 2026-10-27
-chars: 853
+fetched: 2026-11-03
+chars: 13807
 
 menu
 Skip to
@@ -22,35 +22,482 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-European Gravitational Observatory - EGO · Research Prediction Competition · 5 years ago
-Late Submission
-more_horiz
+Top 1 solution: Deep Learning part — G2Net Gravitational Wave Detection
+Top 1 solution: Deep Learning part
+
 G2Net Gravitational Wave Detection
 
-Find gravitational wave signals from binary black hole collisions
+Solution Writeup · 1st place · Oct 2, 2021
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+We decided to make two posts to make them more or less focused and concise. DSP part https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275507
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Baseline solution, simple Conv1D (0.88 public LB)
 
-error
+At the very beginning we tried different inputs:
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+CQT - could not make it past 0.87
+Spectrograms - with nnAudio, a bit better
+raw signal - much better
 
-Failed to load the discussion topic
+After applying highpass filter at 20Hz 1D conv on stacked channels input quickly produced good val scores. Also it was much easier to make experiments as training on a single GPU took less than 1 hour. The model was very simple, just a bunch of conv-bn-silu blocks and maxpools. For convolutions we used kernel sizes (by block) 64- > 32 -> 16 -> 8.
 
-error
+At that stage for augmentations we used:
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+channel shuffle (only Hanford, Livingston) minor time shifts between channels, 5ms
+
+This approach gave us 0.877 public LB score with a single 5fold model.
+
+SGD is better than AdamW for Conv1D without synthetic data
+
+Even though model capacity was quite low, the model quickly overfitted, usually after 20 epochs, which took around 30 mins. Switching to SGD with weight decay and nesterov momentum improved LB score to 0.880. Other Optimizers like AdamW with whatever weight decay, MadGrad gave lower quality.
+
+Improved Conv1D model (0.883 public LB)
+
+At that time the generated synthetic dataset was not good enough and we felt that 1D model could be improved. Following the Inception V3 approach we added different kernel sizes in each conv block, the starting block was with 32, 64, 128 kernel sizes. This gave us a boost from 0.88 to 0.881 on the LB. Next step was to try even more kernel sizes as it also made sense from DSP theory. Inception like block with 5 different kernels (16, 32, 64, 128, 256) allowed us to get 0.8823 single model LB score. A small ensemble improved LB score to 0.883. Adding more kernel sizes did not improve CV/LB scores.
+
+# Main building block for Conv1D models
+class ConcatBlockConv5(nn.Module):
+    def __init__(self, in_ch, out_ch, k, act=nn.SiLU):
+        super().__init__()
+        self.c1 = conv_bn_silu_block(in_ch, out_ch, k, act)
+        self.c2 = conv_bn_silu_block(in_ch, out_ch, k * 2, act)
+        self.c3 = conv_bn_silu_block(in_ch, out_ch, k // 2, act)
+        self.c4 = conv_bn_silu_block(in_ch, out_ch, k // 4, act)
+        self.c5 = conv_bn_silu_block(in_ch, out_ch, k * 4, act)
+        self.c6 = conv_bn_silu_block(in_ch * 5 + in_ch, out_ch, 1, act)
+    def forward(self, x):
+        x = torch.cat([self.c1(x), self.c2(x), self.c3(x), self.c4(x), self.c5(x), x], dim=1)
+        x = self.c6(x)
+        return x
+
+
+Hyperparameters
+
+optimizer: SGD, wd=1e-4, nesterov momentum
+learning rate: 0.1 with cosine annealing
+batch size: 128
+epochs: 40
+input: 3 channels of raw signal filtered with butterworth filter at 20hz
+augmentations: freq masking, time masking, small shifts, channel shuffle
+Using synthetic dataset (0.886 public LB)
+
+As soon as Denis found a more or less good approach to signal/noise generation we started experimenting with additional data. Overall we had 2 million noise samples and 1 million pure signal samples. During training positive sample = random noise sample + random signal sample.
+
+From these experiments
+
+mixing synthetic data with the train dataset did not work
+augmentations are actually harmful in this case
+pretraining on synthetic data and fine tuning on the train set works great
+
+During pretraining stage for simplicity we used the same amount of samples in epoch as in the train set. Pre-training around 100 epochs and fine tuning 5 folds on the train set gave 8836 on the public LB for the single Conv1d model. As detectors, especially Virgo, have different noise distribution it makes sense to use a separate conv1d encoder for each channel. Split encoders and a linear classifier on top of concatenated features boosted the LB score to 0.8842.
+
+It is clear that a fully connected layer is not the best fusion approach for the model with separate encoders for each channel. That’s where resnet34 came into play and surprisingly it worked better than other 2D models. We also predicted signal parameters during pretraining (SNR, chirp mass, Q) which also brought minor improvements. Pretraining 200 epochs and fine tuning 5 folds just 1 epoch gives 0.8858 public LB score. Augmentations during finetuning or pretraining negatively affected CV, so the best models are without any augmentations and trained with AdamW optimizer. 
+
+Input to Resnet34 looked the following way (Handford band)
+
+Segmentation
+
+Binary segmentation using output of Conv1D predicted good masks for strong signals but did not improve recall on weak signals. In general it could be a useful tool to analyse the data, but we did not get any boost on the LB from that. 
+
+Things that did not work
+
+There were much more experiments that I won't describe (including different frontends, training approaches etc.), but most noticeable are:
+
+Denoising autoencoder
+
+I trained different variants of autoencoders to separate noise and signals which worked great for strong signals but produced poor results on medium to low amplitude signals.
+
+OHEM collapse and reverse labels mystery
+
+I tried different versions of hard example mining to improve model performance on hard samples but usually the model collapsed and started predicting the same probability for all samples.
+
+Which led to an interesting experiment:
+
+from full OOF predictions select positive samples with low probability and negative with high probability
+train on this subset but validate on proper split
+evaluate using predicted probabilities
+evaluate using reversed predctions (1 - p)
+
+That result was really confusing and at first we thought that the dataset was mislabeled. Later even with generated synthetic data we had the same problem. It is clear that because of the SNR wall some positive samples can be considered as just noise, but how the model generalized to predict signal from noise samples, that’s what we could not find.
+
+Authors
+Selim Seferbekov
+
+selimsef
+
+Denis Kanonik
+
+denisbsu
+
+arrow_drop_up
+131
+Share
+more_horiz
+Citation
+
+Selim Seferbekov, Denis Kanonik. Top 1 solution: Deep Learning part. https://www.kaggle.com/competitions/g2net-gravitational-wave-detection/writeups/kdl-top-1-solution-deep-learning-part. 2021. Kaggle
+
+comment
+27 Comments
+Hotness
+Giba
+
+Posted 5 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Solid approach, congrats. I tried synthetic data but couldn't score better than 0.865. Could you describe how you generated the synthetic data?
+
+reply
+Reply
+Selim Seferbekov
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Yes it is quite tricky to make it work. @denisbsu is writing a separate post on that right now, will be ready soon
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+ChristopherZerafa
+
+Competition Host
+
+Posted 5 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Hey All,
+
+Thank you all for taking part in our competition. The participation has been overwhelmingly positive. We are currently conducting a survey to gauge the demographic and outreach achieved. Kindly spare 2min and fill in this survey https://forms.gle/QP9L16niPexozyhu5.
+
+Thank you all,
+
+Regards, Chris
+
+reply
+Reply
+RabotniKuma
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Beautiful solution, congratulations!
+
+reply
+Reply
+hengck23
+
+Posted 5 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+thank you for the write-up. it is a brilliant solution.
+
+"Input to Resnet34 looked the following way (Handford band)" How are the features sorted? e.g. by kernel_size (64,32,16,8) or random or by frequency response?
+
+i think the frequency response is related to the length. that is why you can see the banana shape for the chirp wave in the segmentation diagram?
+
+reply
+Reply
+Selim Seferbekov
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Surprisingly random is working just fine, just hoped that model learned the right represenation needed for classification :) If we add segmentation mask as an additional target then it learns sorting implicitly. For example you can see the effect of notch filter at 300Hz on the segmentation mask in the main post. Also we removed low freq signal part from the masks because signals are attenuated at low frequencies due to filtering. So in general model learns to detect something that is similar to GW, visualisation of logits clear shows that. Unfortunately it doesn't matter for the CV/LB scores.  Spectrograms of GW look similar to the masks just with low frquency part.
+
+reply
+Reply
+hengck23
+
+Posted 5 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+"Surprisingly random is working just fine," "That’s where resnet34 came into play and surprisingly it worked better than other 2D models"
+
+so the resnet34 has to enforce some spatial consistency in the stacked response image in its own ways (e.g. 2 nearby 1dcnn encoders should activate at the same location in the stack image). we should see some line-like structure (the banana shape is deformed and dismantled). max pooling on the stacked response image would max it more obvious (different 1d features is activated for different wave)
+
+This is probably a simple convolution 2dCNN is better.
+
+"If we add segmentation mask as an additional target then it learns sorting implicitly." this is basically a modern-day matched filter. Basically, we can trace out the ridge and recover the wavelet parameters.
+
+as a side note, I wonder what happens if you use your 1dCNN encoder+2dCNNdecoder on other data. How would the 2d decoder image look like? what if we use it on NLP?
+
+reply
+Reply
+Selim Seferbekov
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+what if we use it on NLP?
+
+ufortunately last time I seriously worked with NLP data was when GloVe and word2vec + LSTM were state of the art approaches 😄
+
+How would the 2d decoder image look like?
+
+Have not done any experiments with UNet here though I doubt that it would bring any improvements to the score. The limit here is how well Conv1D can handle signals with low SNR. While playing with synthetic data we saw a lot of examples when model could properly predict 1.2* signal + noise as 1. with high probability and the same singal + noise with close to 0 probability. There was a clear threshold (SNR wall) where model could not differentiate GW from noise.
+
+reply
+Reply
+عثمان
+
+Posted 5 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Would love to see you two distill this into a white paper.
+
+reply
+Reply
+Selim Seferbekov
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+writing a good paper would take more time than the challenge itself😧
+
+reply
+Reply
+Rinat
+
+Posted 5 years ago
+
+· 29th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Brilliant solution! Well done, as always)
+
+reply
+Reply
+CPMP
+
+Posted 5 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very interesting method, congrats!
+
+It is clear that additional data helped but it looks like you could have won without it.
+
+reply
+Reply
+Selim Seferbekov
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That would be much harder without big ensembles, on the other hand that would push us to experiment more with Conv1D architecture and augmentations.
+
+reply
+Reply
+astroboysanju
+
+Posted 3 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @selimsef , is your whole code of this problem publically available? where one can get your complete solution for this competition ?
+
+reply
+Reply
+skynet
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+hello, it' there is a github for the solution with the deep learning as there is for DSP part ? @selimsef
+
+reply
+Reply
+Selim Seferbekov
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Unfortunately no, I have not uploaded this one to github
+
+reply
+Reply
+Anandhu H
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Wow, this is awesome
+
+reply
+Reply
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Awesome, great to see new stuff, well posted @selimsef
+
+reply
+Reply
+Shashank Rathi
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Such a wonderful solution!
+
+reply
+Reply
+Kalilur Rahman
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Wow. Beautiful solution indeed. Congratulations 👏🎉
+
+reply
+Reply
+hengck23
+
+Posted 5 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+"OHEM collapse and reverse labels mystery"
+
+check my post related to this (comparison of zebra augmentation with others): https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275335
+
+reply
+Reply
+Bibek
+
+Posted 5 years ago
+
+· 793rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Data centric approach!! Congrats. So PB score of 0.8864 was from ensemble? If yes, how many and all of them were resnet34?
+
+reply
+Reply
+Selim Seferbekov
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We also trained 20 folds on the same model - it gave 0.8862, but basically anything above is exponentially hard, at that point all models make the same mistakes and ensemble brings very minor boost. They key was not resnet34 but the features from Conv1d.
+
+reply
+Reply

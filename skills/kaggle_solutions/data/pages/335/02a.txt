@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/champs-scalar-coupling/discussion/106468#latest-618474
-fetched: 2026-10-27
-chars: 860
+fetched: 2026-11-03
+chars: 17061
 
 menu
 Skip to
@@ -22,35 +22,629 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-CHAMPS (CHemistry And Mathematics in Phase Space) · Featured Prediction Competition · 7 years ago
-Late Submission
-more_horiz
+#2 solution 🤖 Quantum Uncertainty 🤖 — Predicting Molecular Properties
+#2 solution 🤖 Quantum Uncertainty 🤖
+
 Predicting Molecular Properties
 
-Can you measure the magnetic interactions between a pair of atoms?
+Solution Writeup · 2nd place · Dec 11, 2019
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+We want to thank Kaggle and CHAMPs for organizing such an awesome competition:
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+No leakage.
+Same distribution in train, private and public test (very stable CV vs. LB, public LB vs. private LB). This is very relevant in other competitions given so many participants when the 3 distributions are different some winners (not all, e.g. CPMP approach to manually align test ~ train in the Microsoft malware comp) are just lucky they fit private test distribution by chance; not the case here.
+Inspiring and useful science problem hopefully used for good purposes as described in the context (new drugs, etc.).
 
-error
+Neither my teammate @pavelgonchar nor I had any previous domain expertise and we made the decision early on that we would tackle this problem using a very pure deep learning way: letting the model build the features for us, not the other way around (b/c obviously we were at a disadvantage if we tried to become quantum experts in 1 month… hence our team name 🤖Quantum Uncertainty🤖 we didn't know if our yet-to-be-developed approach was going to work).
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Our solution had two major parts: 1) the input representation and 2) deep learning architecture.
 
-Failed to load the discussion topic
+Input representation
 
-error
+This is in our opinion the key part: we take a molecule and a source atom and move it so the source atom is @ (0,0,0). For each molecule we create N molecule siblings (N being as many source atoms are defined for that molecule), and each molecule sibling is translated so its source is at (0,0,0).
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+The x (input) are three arrays of dimension 29 (maximum number of atoms):
+
+1) x,y,z position of each atom, 2) atom type index (C=0, H=1, etc…) 3) j-coupling type index (1JHC=0,'2JHH=1,etc.)
+
+Padding is done by placing -1 in atom type index and j-coupling type for molecules which have less than 29 atoms.
+
+The y (ground truth) is just an array of dimension 29 containing j-couplings located at target atom indices.
+
+Note that there is no graph information nor any other manually engineered features.
+
+Data augmentation
+
+We did two types of data augmentation:
+
+Rotations: which worked and were useful in our first attempt model: pointnet-based, but proved worthless in the final models (atomic transformer).
+J-coupling symmetry: as described in this discussion
+
+First attempt: Pointnet-inspired architecture (got up to -2.28200 LB)
+
+Our input representation is basically a point cloud: an unordered set of elements with absolute positions x,y,z and two attributes atom type and j-coupling type. We modified the Pointnet architecture to regress j-couplings. Training was a bit unstable and we tried many variations of the architecture, swapping FC layers by linear (fixed) projections (Hadamard), adding coulomb matrix as input, etc.
+
+While this worked OK and got us to -2.28200 LB (ensembling a few models) we felt that this architecture was limited by the extreme pooling/bottleneck operation so we decided to explore other architectures: meet the Atomic Transformer.
+
+Final architecture: meet the Atomic Transformer
+
+You may know that the recent NLP revolution is mostly due to the transformer architecture described in the Attention is all you need paper. The vanilla transformer architecture uses a very clever technique to add positional encodings that are needed for position-dependent input, such as language.
+
+Our input representation is a set, which means we can (and should) remove positional encoding. Prior to this competition we had no experience with transformers either but there's a section in Lex Fridman MIT podcast interviewing Orion Vinyals where he mentions the inherent position invariance of a barebone transformer encoder layer. This immediately triggered the idea of using transformer layers (encoders) stacked taking as an input x,y,z (normalized but otherwise as-is), and atom type and j-coupling type embeddings; just concatenated… nothing fancy.
+
+The dimension of the embeddings was such that the total dimension of the input vectors was d_model (as normally reference in transformer literature). We started with 256 and got immediately great results surpassing our pointnet-inspired architecture so we followed this path.
+
+We trained a total of 14 models, with varying dimensions from 512 to 2048 and layers from 6 to 24. Each model parameter size ranged from ~12M to ~100M (biggest model).
+
+We trained some models from scratch, others we fine-tuned. We also fine-tuned a few models on the troublesome j-couplings: reaching -2.12 CV on 1JHC on and -2.19 CV on 1JHN.
+
+Our best score is an ensemble of 14 models achieving private LB of -3.22349, and our best single model achieved private LB of -3.16234, again just with x,y,z, atom type and j-coupling type inputs (no QM9, etc.).
+
+What didn't work
+
+Many things! We tried:
+
+Multi-task learning using contributions and other organization provided values.
+Dropout: We tried multiple attempts to add dropout at various stages (embeddings, encoder layers, pre-decoder, etc.). None of them worked.
+Knock-out: We added a variation in which as input we deleted 10% of the input atoms, the idea being that the model would build an internal representation of the missing atoms. Surprisingly this worked in that the model still converged nicely but failed to reduce train ~ val gap.
+Rotations and TTA in Atomic Transformer: it didn't reduce train ~ val gap and didn't produce meaningful TTA gains.
+Deep decoder: Our decoder is just a projection of ~ the model dimension to 1 (scalar coupling). We tried adding more expressive power to the decoder but this didn't help.
+Fp16 training. This worked for models of dimensions 256 but as training evolved gave NaNs despite numerous attempts to fix it.
+
+Source code
+
+We will make source code available once we do clean up. It's a single jupyter notebook using FastAI. Be patient.
+
+Computational resources
+
+We had more ideas than computational resources, even if our computational resources were not tiny:
+
+3 x 2080 Ti + 128 Gb RAM + 16c32t processor
+2 x 1080 Ti + 64 Gb RAM + 8c16t processor
+Rented 8+ 2080 Ti + 64 Gb RAM + 16c32t processor (multiple machines rented as needed)
+
+Final thoughts
+
+This was our most fun and hardest competition so far:
+
+Challenging problem
+Most teams in top 5 had domain experts (although we went domainless as part of our strategy)
+Hungry computational resources.
+
+Even if we lost #1 position just a few hours before competition end we feel very excited we were able to achieve such useful results for the organizers. In retrospect we believe a single model of the Atomic Transformer may achieve ever better results with further training.
+
+Best - Pavel & Andres
+
+p.s. No graph NNs. We though graphs as manually engineered features that the model can infer by itself.
+
+Authors
+Andrés Miguel Torrubia Sáez
+
+antorsae
+
+Pavel Hanchar
+
+pavelgonchar
+
+arrow_drop_up
+176
+Share
+more_horiz
+Citation
+
+Andrés Miguel Torrubia Sáez, Pavel Hanchar. #2 solution 🤖 Quantum Uncertainty 🤖. https://www.kaggle.com/competitions/champs-scalar-coupling/writeups/quantum-uncertainty-2-solution-quantum-uncertainty. 2019. Kaggle
+
+comment
+49 Comments
+4 appreciation comments
+Hotness
+Jonathan Mailoa
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+I just want to say that your team's work is very impressive, and I certainly look forward to reading the implementation in more detail! For one, we also use transformer architecture, but it was a graph transformer. I think Zico will make a post about it sometime soon.
+
+reply
+Reply
+Andrés Miguel Torrubia Sáez
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! You made us sweat a lot in the final hours. It was fun tough and we learned a few lessons in those final hours.
+
+reply
+Reply
+Jonathan Mailoa
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+On the day before the last day, we were very excited to finally try surpassing you guys! But we were 0.001 short… and couldn't do anything about it until the next day. =)
+
+Since your transformer graph does not satisfy physics requirement of rotation/translation invariance by construction, can you comment on how much data augmentation you need to do to get good result, as well as the extra training resource / compute needed correspondingly? Your single model achieving -3.16 is really quite impressive considering that your architecture does not satisfy physics rules by construction!
+
+reply
+Reply
+whyvr
+
+Posted 7 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Hi Andres, very inspired by your approach. Is the notebook available for us to study, could you point me to it?
+
+reply
+Reply
+Michel ML
+
+Posted 7 years ago
+
+· 385th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Very impressive how having machine learning expertise and no domain knowledge can get you a podium, it truely amazes me. Congrats @antorsae
+
+reply
+Reply
+CPMP
+
+Posted 7 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks, very impressive solution. In a way my team mates approached the problem in a way similar to yours, by representing every atom position relative to the two atoms for which scaling is computed. But you way is a bit different as you keep the coordinates, while they worked with distances and angles. That using coordinates works that well is a bit of a surprise to me. If I were the organizers then i would have applied random rotations to the data… This said, again, congrats on the approach. I'll need to reread this to full grasp it.
+
+I forgot the most important: congrats on the end result and the incredible lead during the competition.
+
+reply
+Reply
+CPMP
+
+Posted 7 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+And thanks for citing my solution in Malware! ;)
+
+reply
+Reply
+Andrés Miguel Torrubia Sáez
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yeah! I liked the notion of alining distributions. In the IEEE fraud one I am trying to do the same automatically with deep learning instead of manual alignment. Not proven yet.
+
+reply
+Reply
+CPMP
+
+Posted 7 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I tried to code it, and it led to a second dataset, but it performed worse than the fully manual one I guess my pretrained NN (in my brain) worked better ;)
+
+reply
+Reply
+XiaokangWang
+
+Posted 7 years ago
+
+· 121st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! You are not using graph NN. Amazing ideas! I think it would be an excellent paper if you wrote it up your ideas.
+
+reply
+Reply
+CoreyJamesLevinson
+
+Posted 7 years ago
+
+· 39th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+looking forward to the code! Thanks for sharing
+
+reply
+Reply
+Patrick Chan
+
+Posted 7 years ago
+
+· 461st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Very impressive and the right way to go with AI discovery. Like the domainless approach! Congratulations!
+
+reply
+Reply
+guiferviz
+
+Posted 7 years ago
+
+· 401st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Looking forward to exploring your code, I'm very interested in solutions without domain knowledge. Btw, I just realized that we are form the same city lol
+
+reply
+Reply
+Robin N
+
+Posted 7 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Really impressed to see that you were able to push a pure Tranformer Encoder to such great performances. I tried using a straightforward Transformer model as well on a set of engineered features (no raw coordinates), but wasn't able to get results anywhere near as good as yours. Like you said, I think the key is your input representation creating the N sibling molecules.
+
+Congrats on second place and the beautiful approach.
+
+reply
+Reply
+JM
+
+Posted 7 years ago
+
+· 56th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great work, looking forward to seeing the notebook
+
+reply
+Reply
+Sean McConnell
+
+Posted 7 years ago
+
+· 779th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!
+
+reply
+Reply
+corochann
+
+Posted 7 years ago
+
+· 2115th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Impressed that not used graph NNs but used transformer based architectures to deal with set, together with the position translation for target atom.
+
+reply
+Reply
+Dondon2019
+
+Posted 7 years ago
+
+· 194th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi,
+
+Thanks a lot for sharing your solution and code. I was reading your code and I have a question: In your code atom-transfomer-good-norm-pytorch, the result under the line learner.summary() shows two emdedding layers and two dropout layers at the end. Where do they come from? I can't find them in the forward method of your AtomTorchTransformer. I apologize if the question is too detailed and thanks in advance.
+
+reply
+Reply
+Andrés Miguel Torrubia Sáez
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Check this code in the AtomTransformer constructor:
+
+        n_atom_embedding = d_model//2
+        n_type_embedding = d_model - n_atom_embedding - 3 #- 1 - 1 -1 
+        self.type_embedding = nn.Embedding(len(types)+1,n_type_embedding)
+        self.atom_embedding = nn.Embedding(len(atoms)+1,n_atom_embedding)
+        self.drop_type, self.drop_atom = nn.Dropout(embed_p), nn.Dropout(embed_p)
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Deep Chatterjee
+
+Posted 7 years ago
+
+· 1529th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @antorsae @pavelgonchar .Thank you for the approach and waiting for the notebook. The one thing that is inspirational for me is that though you don't have any domain expertise, you understand and solve the problem using DeepLearning techniques.
+
+reply
+Reply
+Sems Kurtoglu
+
+Posted 7 years ago
+
+· 2532nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, good job
+
+reply
+Reply
+Even
+
+Posted 7 years ago
+
+· 33rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Really looking forward to your solution, especially as a fellow fastai community member. Your team really inspired us to keep striving in the final weeks of the competition. Sub -3 didn't feel achievable until we saw you pull it off.
+
+reply
+Reply
+Pankaj Joshi
+
+Posted 7 years ago
+
+· 413th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, you guys are inspirations.
+
+reply
+Reply
+Murat Sarıbaş
+
+Posted 7 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!!
+
+reply
+Reply
+Xiao-Chuan
+
+Posted 7 years ago
+
+· 812th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+amazing work
+
+reply
+Reply
+Joel Hanson
+
+Posted 7 years ago
+
+· 595th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @antorsae and thanks for sharing.
+
+reply
+Reply
+FGPC
+
+Posted 7 years ago
+
+· 235th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Amazing solutions! :-)
+
+reply
+Reply
+Zhuang Jia
+
+Posted 7 years ago
+
+· 52nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I'm very excited to learn from your solutions.
+
+reply
+Reply
+Alexandre Sauvé
+
+Posted 7 years ago
+
+· 82nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I'm just impressed by the way of using xyz coordinates. Need to read more bout Trnasformer Encoders.
+
+Thank you @antorsae for sharing the solution and congratulation for your creativity!
+
+reply
+Reply
+Goran Rakocevic
+
+Posted 7 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing! When you say "The y (ground truth) is just an array of dimension 29 containing j-couplings located at target atom indices." Which atom index do you place the j-coupling values, as there are two atoms participating in a coupling?
+
+reply
+Reply
+Andrés Miguel Torrubia Sáez
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Say there are N source/reference atoms (atom_index_0 in the csv file) for a given molecule. We build N sibling molecules, and for each the GT is the array of 29 atoms (max) where we place valid j-couplings at target (atom_index_1 in the csv) indices.
+
+reply
+Reply
+Goran Rakocevic
+
+Posted 7 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Oh, so each coupling gets its own datapoint? We have one datapoint per molecule, that confused me.
+
+reply
+Reply
+Andrés Miguel Torrubia Sáez
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Yes.
+
+We started building a Molecule Transformer which had all couplings in one shot (diff input representation) but stopped it bc we focussed on training the Atomic Transformer instead.
+
+reply
+Reply
+Zhenlan
+
+Posted 7 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I am not sure that I understand your Input representation. Could you give a simply example, say for H2O? Thanks
+
+reply
+Reply

@@ -1,0 +1,181 @@
+- generic [ref=e2]:
+  - navigation "Main Kaggle page navigation" [ref=e3]:
+    - generic [ref=e5]:
+      - button "Navigation menu" [ref=e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=e12] [cursor=pointer]:
+      - paragraph [ref=e18]: Create
+    - generic [ref=e21]:
+      - list [ref=e22]:
+        - listitem "Home List Item" [ref=e23]:
+          - link "Home" [ref=e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=e31]: Home
+        - listitem "Competitions List Item" [ref=e32]:
+          - link "Competitions" [ref=e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=e41]:
+          - link "Benchmarks" [ref=e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=e50]:
+          - link "Arenas" [ref=e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=e58]: Arenas
+        - listitem "Game Arena List Item" [ref=e59]:
+          - link "Game Arena" [ref=e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=e67]: Game Arena
+      - list [ref=e68]:
+        - listitem "Data Hub List Item" [ref=e69]:
+          - generic [ref=e70]:
+            - link "Data Hub" [ref=e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=e77]: Data Hub
+            - button "Expand" [ref=e80] [cursor=pointer]
+      - list [ref=e82]:
+        - listitem "More on Kaggle List Item" [ref=e83]:
+          - generic [ref=e84]:
+            - link "More on Kaggle" [ref=e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=e91]: More
+            - button "Expand" [ref=e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=e97]:
+    - generic [ref=e98]:
+      - generic [ref=e102]:
+        - textbox "Search" [ref=e104]
+        - group [aria-hidden]
+      - generic [ref=e106]:
+        - link [ref=e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fkaggle-survey-2022%2Fdiscussion%2F374969
+          - button "Login" [ref=e108]
+        - link [ref=e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fkaggle-survey-2022%2Fdiscussion%2F374969
+          - button "Sign Up" [ref=e111]
+  - main [ref=e113]:
+    - generic [ref=e115]:
+      - generic [ref=e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=e117]:
+        - link "Learn more" [ref=e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=e123]:
+      - generic [ref=e125]:
+        - generic [ref=e126]:
+          - link "Kaggle's profile" [ref=e127] [cursor=pointer]:
+            - /url: /organizations/kaggle
+            - generic "Kaggle" [ref=e128]
+          - generic [ref=e132]:
+            - generic [ref=e133]: Kaggle
+            - generic [ref=e135]: · Analytics Competition · 4 years ago
+          - generic [ref=e136]:
+            - button "Late Submission" [disabled] [ref=e138]
+            - button "Competition options menu collapsed" [ref=e141] [cursor=pointer]: more_horiz
+        - generic [ref=e143]:
+          - heading "2022 Kaggle Machine Learning & Data Science Survey" [level=1] [ref=e144]
+          - paragraph [ref=e146]: The most comprehensive dataset available on the state of ML and data science
+      - generic [ref=e150]:
+        - tablist [ref=e157]:
+          - tab "Overview, 1 of 6" [ref=e158] [cursor=pointer]:
+            - generic [ref=e159]: Overview
+          - tab "Data, 2 of 6" [ref=e160] [cursor=pointer]:
+            - generic [ref=e161]: Data
+          - tab "Code, 3 of 6" [ref=e162] [cursor=pointer]:
+            - generic [ref=e163]: Code
+          - tab "Models, 4 of 6" [ref=e164] [cursor=pointer]:
+            - generic [ref=e165]: Models
+          - tab "Discussion, 5 of 6" [selected] [ref=e166] [cursor=pointer]:
+            - generic [ref=e167]: Discussion
+          - tab "Rules, 6 of 6" [ref=e168] [cursor=pointer]:
+            - generic [ref=e169]: Rules
+        - separator [ref=e171]
+      - generic [ref=e175]:
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - generic [ref=e178]:
+              - link "Michal Bogacz's profile" [ref=e179] [cursor=pointer]:
+                - /url: /michau96
+                - generic "Michal Bogacz" [ref=e180]
+              - generic [ref=e184]:
+                - link "Michal Bogacz" [ref=e185] [cursor=pointer]:
+                  - /url: /michau96
+                - text: ·
+                - generic [ref=e186]: Posted 4 years ago
+            - generic [ref=e187]:
+              - generic [ref=e188]:
+                - button "Upvote" [ref=e189] [cursor=pointer]:
+                  - generic [ref=e190]: arrow_drop_up
+                - button "12 votes" [ref=e191] [cursor=pointer]: "12"
+              - button "More Options for this Topic" [ref=e192] [cursor=pointer]: more_vert
+            - 'heading "1st place solution approach \"behind the scenes\" - part II: idea" [level=3] [ref=e193]'
+            - generic [ref=e196]:
+              - paragraph [ref=e197]: Hi, Today I will tell you a bit about the idea for my notebook, where it came from and why in this form.
+              - paragraph [ref=e198]:
+                - text: I have participated in this competition 2 times before and was not completely satisfied with my analysis. When we look at the data from this competition, or more broadly from the majority of surveys on the market, we can easily come to the conclusion that
+                - strong [ref=e199]: the result database contains columns in a qualitative form
+                - text: (or in a dummy form if it is a multi-choise or multi-category, e.g. in the case of a country, age, etc.).
+              - paragraph [ref=e200]: If we are well versed in descriptive statistics, we know that variables in a qualitative form are generally less interesting to analyze, because the number of metrics or ways to analyze them is much more limited than in the case of quantitative variables on a continuous scale.
+              - paragraph [ref=e201]:
+                - text: But we do not have to rely on competition data in an unchanged form,
+                - strong [ref=e202]: if there is no quantitative data, then why not come to it … after a few transformations?
+              - paragraph [ref=e203]:
+                - text: And so the idea to create "factors" was born.
+                - strong [ref=e204]: The factor works on the principle that we specify a grouping variable
+                - text: (in this case, country)
+                - strong [ref=e205]: to which we add a factor condition
+                - text: (e.g. the percentage of people under 30). In this way, using the classic "group by" and "summarise", it will obtain a table in which the rows contain different levels of the grouping variable (in my case, countries) and the columns contain the desired continuous variable whose values are in the range from 0 to 1.
+                - strong [ref=e206]: On such data, we can already use a whole range of methods that would be impossible without transformation
+                - text: (e.g. distribution analysis, regression, correlation using the perason coefficient, scatterplot… you can go on and on).
+              - paragraph [ref=e207]: "I focused on a comparative analysis between countries for two reasons:"
+              - list [ref=e208]:
+                - listitem [ref=e209]: Firstly, I was very curious about data science/kaggling in other countries 😃
+                - listitem [ref=e210]: Secondly, taking part in previous editions and looking through the work of other people, it is easy to see that the country of residence of the respondent really says a lot about him in every sphere (demographic, educational, technological professional), so I expected a lot of differences and interesting conclusions even before the data transformation.
+              - paragraph [ref=e211]:
+                - text: About factories, I came up with 15 different ones,
+                - strong [ref=e212]: looking through all the columns and choosing the most interesting ones
+                - text: in my opinion. What I wanted was for the columns to be different from each other and describe different spheres (demography, education/science, technology and professional work) to
+                - strong [ref=e213]: have a holistic view of the respondents from these countries
+                - text: .
+              - paragraph [ref=e214]: "This is an example of how it gives a unique character to the analysis that is not repeated later in other notebooks and at the same time greatly extends the analysis. The conclusion is simple: if the data in its pure form seems insufficient to us, it is worth thinking about transformations (filtering, grouping, aggregations) that will make the same input data more interesting."
+              - paragraph [ref=e215]: More from "behind the scenes" soon in the next posts. I hope you found the above information useful and/or inspiring. Let me know what you think in the commentary or if you have any suggestions on how you think it's worth working on such problems, share in the comment - I'd love to read it!
+          - separator [ref=e216]
+        - generic [ref=e217]:
+          - generic [ref=e218]:
+            - paragraph [ref=e221]:
+              - paragraph [ref=e222]:
+                - text: Please
+                - link "sign in opens in new window" [ref=e223] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=e224]
+          - generic [ref=e226]:
+            - generic [ref=e227]:
+              - generic [aria-hidden] [ref=e228]: comment
+              - heading "1 Comment" [level=2] [ref=e230]
+            - generic [ref=e233]:
+              - combobox "Select combobox. Hotness currently selected." [ref=e234] [cursor=pointer]:
+                - generic [ref=e235]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=e242]:
+            - link "Oscar Aguilar's profile" [ref=e243] [cursor=pointer]:
+              - /url: /oscarm524
+              - generic "Oscar Aguilar" [ref=e244]
+            - generic [ref=e250]:
+              - link [ref=e252] [cursor=pointer]:
+                - /url: /oscarm524
+                - heading "Oscar Aguilar" [level=3] [ref=e253]
+              - paragraph [ref=e255]: Posted 4 years ago
+            - generic [ref=e257]:
+              - generic [ref=e258]:
+                - button "Upvote" [ref=e259] [cursor=pointer]:
+                  - generic [ref=e260]: arrow_drop_up
+                - button "1 votes" [ref=e261] [cursor=pointer]: "1"
+              - button "More Options for this Comment" [ref=e262] [cursor=pointer]: more_vert
+            - paragraph [ref=e266]: Interesting. Again, thanks for sharing your journey on this competition👍🏻
+  - alert [ref=e269]

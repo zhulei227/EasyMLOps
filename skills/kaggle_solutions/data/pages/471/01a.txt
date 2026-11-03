@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/optiver-realized-volatility-prediction/discussion/302626
-fetched: 2026-10-27
-chars: 718
+fetched: 2026-11-03
+chars: 6470
 
 menu
 Skip to
@@ -42,11 +42,136 @@ Models
 Discussion
 Leaderboard
 Rules
+nyanp · 1st in this Competition · Posted 5 years ago
+arrow_drop_up
+54
+more_vert
+Ablation study on the 1st place solution: effect of ensemble, tick-size leak and normalization
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Hi!
 
-Failed to load the discussion topic
+For the past week, I've been running a few experiments with late submissions. Here, I share the results based on my final submission.
 
-error
+All experiments can be reproduced from my winning notebook (I have already published the solution, but I did some refactoring for the ablation study). For an overview of my solution, see my previous thread.
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Single Model vs Ensemble
+
+My final submission was an ensemble of 5xLightGBM, 3x1D CNN, and 3xMLP. What would be the score in the simpler model? The following table shows the comparison of RMSPE for different combinations of models: a single LightGBM is enough to win (0.19699), and an ensemble of three CNNs is the best RMSPE (0.19644) for a single type of model.
+
+Model	RMSPE (public)	RMSPE (private)	Rank
+1xLGBM	-	0.19699	#1
+5xLGBM	0.18506	0.19675	#1
+1xCNN	-	0.19817	#2
+3xCNN	0.18495	0.19644	#1
+1xMLP	-	0.19949	#6
+3xMLP	0.18523	0.19772	#2
+Ensemble	0.18324	0.19545	#1
+Type of nearest neighbors
+
+The key of my solution is the combination of 7 different nearest neighbors. In addition to the real price recovered from tick-size leak, I also used volatility and trade size as nearest neighbor measures. (Note that the volatility and trade size-based NN can be calculated without the tick-size leak.)
+
+No	Search Axis	Measure	Metrics	No. of neighbors
+1	time_id	Real Price	Canberra	[2, 3, 5, 10, 20, 40]
+2	time_id	Real Price	Mahalanobis	[2, 3, 5, 10, 20, 40]
+3	time_id	Volatility	Manhattan	[2, 3, 5, 10, 20, 40]
+4	time_id	Trade Size	Canberra	[2, 3, 5, 10, 20, 40]
+5	time_id	Trade Size	Mahalanobis	[2, 3, 5, 10, 20, 40]
+6	stock_id	Real Price	Manhattan	[10, 20, 40]
+7	stock_id	Volatility	Manhattan	[10, 20, 40]
+
+The following table shows the comparison of RMSPE w/ various combinations of nearest neighbor measures and CV (All scores are based on single LightGBM model).
+
+No	CV	Volatility NN	Trade Size NN	Real Price NN	RMSPE	Rank
+1	GKF				0.22492	#1358
+2	GKF	✓			0.21135	#12
+3	GKF		✓		0.20798	#10
+4	GKF			✓	0.19999	#7
+5	GKF	✓	✓		0.20367	#9
+6	GKF	✓	✓	✓	0.19734	#1
+7	Time-Series	✓	✓		0.20322	#9
+8	Time-Series	✓	✓	✓	0.19699	#1
+
+We can see that using any one of the three nearest neighbors yields gold-zone RMSPE, but the real price neighbors has the best predictive power (No.2, 3 and 4). The "tick-size leak-free" version, which uses only volatility and trade size neighbors with GroupKFold, has a score of 0.20367 RMSPE (No.5).
+
+We can also see using only real price NN is not enough to get 1st place RMSPE. From this, I think that the combination of various nearest neighbors other than real price contributed to my win.
+
+The following table shows the RMSPE for the combination of stock-id, time-id neighbors. Again, we can see that the combination of NN is important.
+
+No	CV	time-id NN	stock-id NN	RMSPE	Rank
+1	GKF		✓	0.22018	#197
+2	GKF	✓		0.19948	#5
+3	GKF	✓	✓	0.19734	#2
+Effect of rank normalization
+
+As I wrote in the solution, I tried to reduce the effect of covariate shift by applying rank normalization to some features. However, late submission shows that rank normalization has almost no effect on the private score.
+
+Model	RMSPE	Rank
+Baseline (single LGBM)	0.19699	#1
+without Rank Normalization	0.19708	#1
+
+This may be related to the fact that in my model, the top features were dominated by the short-term nearest neighbor features on realized volatility (=lag of target). Even if the relationship between the feature, such as trade size, and the target had shifted in the long-term, the nearest neighbor of volatility would itself have been very robust to shifts, since the neighbors of volatility with small number of neighbors would have already reflected the long-term shift.
+
+Conclusion
+
+While a single LightGBM was enough to win, reducing the variety of nearest neighbors degraded the RMSPE, so feature diversity was more important than model diversity in my solution.
+
+For the single model, the best score without using tick-size leak was 0.20367, and the best score without using the inter-time_id relationship was 0.22018. These are worse RMSPEs than the original solution, but they have a certain predictive power.
+
+I would like to thank the host for giving me the opportunity to do these experiments by enabling late submissions.
+
+Please sign in to reply to this topic.
+
+comment
+5 Comments
+Hotness
+Alex Lau
+
+Posted 5 years ago
+
+· 205th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This is a spectacularly comprehensive ablation study!
+
+Victor Cavalli
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+I'm learning a lot from your solutions, thank you so much for posting them for us, I plan on doing the same Feature Engineering and use a LinearRegression to see the results. However as a newbie it is hard to follow your many function calls and specially this section in make_book_feature: for time in [450, 300, 150]: d = book[book['seconds_in_bucket'] >= time].groupby('time_id').agg(features).reset_index(drop=False) d.columns = flatten_name(f'book_{time}', d.columns) agg = pd.merge(agg, d, on='time_id', how='left') If you ever feel like it maybe do a post explaining more of the feature making process? Thanks again @nyanpn !
+
+nyanp
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This code generates various aggregate features by aggregating the order book, excluding the data after the first 450, 300, and 150 seconds. In addition to reading the code, actually running the notebook will help you understand it better ;)
+
+This comment has been deleted.
+
+nyanp
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+The difference between the single model and the ensemble was small in public LB as well, so this result was not a big surprise for me. However, the contribution of Nearest Neighbors, which is not real price-based, was much larger than I had expected.

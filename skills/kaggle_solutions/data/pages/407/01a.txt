@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/lish-moa/discussion/200736
-fetched: 2026-10-27
-chars: 876
+fetched: 2026-11-03
+chars: 7471
 
 menu
 Skip to
@@ -42,15 +42,365 @@ Models
 Discussion
 Leaderboard
 Rules
+Nischay Dhankhar · 1st in this Competition · Posted 6 years ago
+arrow_drop_up
+90
+more_vert
+1st place solution-Summary
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+This competition was full of learning for me, I had really great experience with my teammates @markpeng @kibuna and @poteman. We didn't want to let you guys wait much for our approach, so I'm posting an overview of our final blend submissions during the final days. Mark will post the final original solution once we are done with recollecting all data and scripts. So, as mentioned by him earlier we chose two submissions based on the best Cv score and best leaderboard score. For maximizing cv score, @markpeng used optuna search and some other sklearn libraries, while for LB, I preferred choosing weights based on models correlation and leaderboard scores.
 
-error
+It seems like our cv - lb correlation was good, isn't much difference between the two submissions. These were based on the blend of 7 of our best scoring models, all with high diversity.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Best lb was based on the following models: 
 
-Failed to load the discussion topic
+While Best cv was based on these models:  There isn't much difference in the models except for using 10 folds model in optuna search for maximizing cv score w/o using one additional model which was based on @cdeotte split.
 
-error
+Score with / without CNN based models: 
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Because of high diversity and low correlation, Mark's CNN based models were surely a great addition to our final score. One of our main concerns about the competition was that we didn't use a drug_id split for our models, mainly the reason was lack of time and submission in the final days. So, we wanted to have a common cv split for all our models to get a better idea about improvement in cv scores. Decided to stick with the old cv scheme. Although, it did perform pretty well on the private leaderboard.
+
+Drugs and Medications
+
+Please sign in to reply to this topic.
+
+comment
+26 Comments
+Hotness
+Theo Viel
+
+Posted 6 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Looks like CNNs were indeed very powerful. Congratz on the win !
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes, they were indeed. Thanks @theoviel😄
+
+Mohammed Sabry
+
+Posted 6 years ago
+
+· 69th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+deserves gold and 1st place. congrats
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you.
+
+Yirun Zhang
+
+Posted 6 years ago
+
+· 551st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Heng and me hesitated whether to use CNNs or not and finally we didn’t. From Table 3, does it means adding CNN worsens both LB scores?
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Updated table. Actually, I entered opposite scores before.CNN improved LB as well as cv scores.😅
+
+Yirun Zhang
+
+Posted 6 years ago
+
+· 551st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I am looking forward to seeing how you train CNN models to that low score. Would you mind share a little bit more about this?😆
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Haha I didn't interfere much with this models during competition, we focused more on blending. Even I'm waiting for his CNN model's training code and approach. He'll reveal his code soon.😁
+
+SACKO MOUSSA
+
+Posted 6 years ago
+
+· 288th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations man, you did an excellent job. I think this competition was too hard. Now, i will be so pleased to have for full solution
+
+Markin
+
+Posted 6 years ago
+
+· 182nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations. Excellent works and waited for your full solution.
+
+weixian shi
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks very much! Looking forward to the full solution.😄
+
+KhanhVD
+
+Posted 6 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @nischaydnk and team!
+
+DeepUnderstanding
+
+Posted 6 years ago
+
+· 3040th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Amazing Work!!
+
+Kamal Das
+
+Posted 6 years ago
+
+· 244th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations @nischaydnk @markpeng @kibuna and @poteman! Looks like your "hunger for gold" is fulfilled 😄!!
+
+Thanks for sharing!! Interesting to see the impact of the CNNs! great job team!
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you @kmldas. 😊
+
+Jouini Ghada
+
+Posted 6 years ago
+
+· 631st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great job guys waiting to see your final writeup 👌
+
+Kouki
+
+Posted 6 years ago
+
+· 14th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I was seeing you the team name with 'hungry for gold'. Then you won even the first prize! Amazing job!!
+
+So the code will come. I'm really looking forward to it!
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hahhaha thank you @kokitanisaka 😁
+
+tarick.morty
+
+Posted 6 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations Nischay. Adding CNN based model was really the big differentiator. We were thinking about implementing it but we wasted two days in making our inference 100% reproducible and lost time to test it out. Our NN models with TabNet gave us 0.01605 private lb but it was more aggressive on weights so we went with simple mean which got 0.01606 on private LB (our 16 place solution). Should have trusted the power of CNN 😅
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Wow great scores @tarique7 with NN and tabnet. Thanks again.😉
+
+Shivam Mittal
+
+Posted 6 years ago
+
+· 213th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations..🔥💯Well deserved.. Waiting for your final writeup.. Kudos to you💪
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you 😃
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Visit https://www.kaggle.com/c/lish-moa/discussion/201510 for complete writeup and codes about our winning approach.
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you @prokaggler ;)
+
+Tolga
+
+Posted 6 years ago
+
+· 485th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+The LB difference for the CVs 0.01574 and 0.01576 is bizarre (0.01833 vs 0.01854)! This is another evidence why this competition was a lottery.
+
+Nischay Dhankhar
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you @tolgadincer, yeah cv-lb differs a lot for different models. Although, correlation between cv-lb for the same model was higher, except for 2 heads model.

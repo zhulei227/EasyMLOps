@@ -1,0 +1,479 @@
+- generic [ref=f6e2]:
+  - navigation "Main Kaggle page navigation" [ref=f6e3]:
+    - generic [ref=f6e5]:
+      - button "Navigation menu" [ref=f6e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f6e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f6e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f6e12] [cursor=pointer]:
+      - paragraph [ref=f6e18]: Create
+    - generic [ref=f6e21]:
+      - list [ref=f6e22]:
+        - listitem "Home List Item" [ref=f6e23]:
+          - link "Home" [ref=f6e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f6e31]: Home
+        - listitem "Competitions List Item" [ref=f6e32]:
+          - link "Competitions" [ref=f6e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f6e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f6e41]:
+          - link "Benchmarks" [ref=f6e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f6e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f6e50]:
+          - link "Arenas" [ref=f6e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f6e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f6e59]:
+          - link "Game Arena" [ref=f6e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f6e67]: Game Arena
+      - list [ref=f6e68]:
+        - listitem "Data Hub List Item" [ref=f6e69]:
+          - generic [ref=f6e70]:
+            - link "Data Hub" [ref=f6e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f6e77]: Data Hub
+            - button "Expand" [ref=f6e80] [cursor=pointer]
+      - list [ref=f6e82]:
+        - listitem "More on Kaggle List Item" [ref=f6e83]:
+          - generic [ref=f6e84]:
+            - link "More on Kaggle" [ref=f6e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f6e91]: More
+            - button "Expand" [ref=f6e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f6e97]:
+    - generic [ref=f6e98]:
+      - generic [ref=f6e102]:
+        - textbox "Search" [ref=f6e104]
+        - group [aria-hidden]
+      - generic [ref=f6e106]:
+        - link [ref=f6e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Foptiver-realized-volatility-prediction%2Fdiscussion%2F302626
+          - button "Login" [ref=f6e108]
+        - link [ref=f6e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Foptiver-realized-volatility-prediction%2Fdiscussion%2F302626
+          - button "Sign Up" [ref=f6e111]
+  - main [ref=f6e113]:
+    - generic [ref=f6e115]:
+      - generic [ref=f6e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f6e117]:
+        - link "Learn more" [ref=f6e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f6e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f6e123]:
+      - generic [ref=f6e125]:
+        - generic [ref=f6e126]:
+          - link "Optiver's profile" [ref=f6e127] [cursor=pointer]:
+            - /url: /organizations/optiver
+            - generic "Optiver" [ref=f6e128]
+          - generic [ref=f6e132]:
+            - generic [ref=f6e133]: Optiver
+            - generic [ref=f6e135]: · Featured Code Competition · 5 years ago
+          - generic [ref=f6e136]:
+            - button "Late Submission" [disabled] [ref=f6e138]
+            - button "Competition options menu collapsed" [ref=f6e141] [cursor=pointer]: more_horiz
+        - generic [ref=f6e143]:
+          - heading "Optiver Realized Volatility Prediction" [level=1] [ref=f6e144]
+          - paragraph [ref=f6e146]: Apply your data science skills to make financial markets better
+      - generic [ref=f6e150]:
+        - tablist [ref=f6e157]:
+          - tab "Overview, 1 of 7" [ref=f6e158] [cursor=pointer]:
+            - generic [ref=f6e159]: Overview
+          - tab "Data, 2 of 7" [ref=f6e160] [cursor=pointer]:
+            - generic [ref=f6e161]: Data
+          - tab "Code, 3 of 7" [ref=f6e162] [cursor=pointer]:
+            - generic [ref=f6e163]: Code
+          - tab "Models, 4 of 7" [ref=f6e164] [cursor=pointer]:
+            - generic [ref=f6e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f6e166] [cursor=pointer]:
+            - generic [ref=f6e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f6e168] [cursor=pointer]:
+            - generic [ref=f6e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f6e170] [cursor=pointer]:
+            - generic [ref=f6e171]: Rules
+        - separator [ref=f6e173]
+      - generic [ref=f6e177]:
+        - generic [ref=f6e178]:
+          - generic [ref=f6e179]:
+            - generic [ref=f6e180]:
+              - link "nyanp's profile" [ref=f6e181] [cursor=pointer]:
+                - /url: /nyanpn
+                - generic "nyanp" [ref=f6e182]
+              - generic [ref=f6e186]:
+                - link "nyanp" [ref=f6e187] [cursor=pointer]:
+                  - /url: /nyanpn
+                - text: ·
+                - generic [ref=f6e188]: 1st in this Competition
+                - text: ·
+                - generic [ref=f6e189]: Posted 5 years ago
+            - generic [ref=f6e190]:
+              - generic [ref=f6e191]:
+                - button "Upvote" [ref=f6e192] [cursor=pointer]:
+                  - generic [ref=f6e193]: arrow_drop_up
+                - button "54 votes" [ref=f6e194] [cursor=pointer]: "54"
+              - button "More Options for this Topic" [ref=f6e195] [cursor=pointer]: more_vert
+            - 'heading "Ablation study on the 1st place solution: effect of ensemble, tick-size leak and normalization" [level=3] [ref=f6e196]'
+            - generic [ref=f6e199]:
+              - paragraph [ref=f6e200]: Hi!
+              - paragraph [ref=f6e201]: For the past week, I've been running a few experiments with late submissions. Here, I share the results based on my final submission.
+              - paragraph [ref=f6e202]:
+                - text: All experiments can be reproduced from my
+                - link "winning notebook (opens in a new tab)" [ref=f6e203] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/nyanpn/1st-place-public-2nd-place-solution?scriptVersionId=85907908
+                  - text: winning notebook
+                - text: (I have already published the solution, but I did some refactoring for the ablation study). For an overview of my solution, see my previous
+                - link "thread (opens in a new tab)" [ref=f6e204] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/optiver-realized-volatility-prediction/discussion/274970
+                  - text: thread
+                - text: .
+              - heading "Single Model vs Ensemble" [level=2] [ref=f6e205]
+              - paragraph [ref=f6e206]:
+                - text: "My final submission was an ensemble of 5xLightGBM, 3x1D CNN, and 3xMLP. What would be the score in the simpler model? The following table shows the comparison of RMSPE for different combinations of models:"
+                - strong [ref=f6e207]: a single LightGBM is enough to win (0.19699)
+                - text: ", and an ensemble of three CNNs is the best RMSPE (0.19644) for a single type of model."
+              - table [ref=f6e208]:
+                - rowgroup [ref=f6e209]:
+                  - row [ref=f6e210]:
+                    - columnheader "Model" [ref=f6e211]
+                    - columnheader "RMSPE (public)" [ref=f6e212]
+                    - columnheader "RMSPE (private)" [ref=f6e213]
+                    - columnheader "Rank" [ref=f6e214]
+                - rowgroup [ref=f6e215]:
+                  - row [ref=f6e216]:
+                    - cell "1xLGBM" [ref=f6e217]
+                    - cell "-" [ref=f6e218]
+                    - cell "0.19699" [ref=f6e219]
+                    - cell "#1" [ref=f6e220]
+                  - row [ref=f6e221]:
+                    - cell "5xLGBM" [ref=f6e222]
+                    - cell "0.18506" [ref=f6e223]
+                    - cell "0.19675" [ref=f6e224]
+                    - cell "#1" [ref=f6e225]
+                  - row [ref=f6e226]:
+                    - cell "1xCNN" [ref=f6e227]
+                    - cell "-" [ref=f6e228]
+                    - cell "0.19817" [ref=f6e229]
+                    - cell "#2" [ref=f6e230]
+                  - row [ref=f6e231]:
+                    - cell "3xCNN" [ref=f6e232]
+                    - cell "0.18495" [ref=f6e233]
+                    - cell "0.19644" [ref=f6e234]
+                    - cell "#1" [ref=f6e235]
+                  - row [ref=f6e236]:
+                    - cell "1xMLP" [ref=f6e237]
+                    - cell "-" [ref=f6e238]
+                    - cell "0.19949" [ref=f6e239]
+                    - cell "#6" [ref=f6e240]
+                  - row [ref=f6e241]:
+                    - cell "3xMLP" [ref=f6e242]
+                    - cell "0.18523" [ref=f6e243]
+                    - cell "0.19772" [ref=f6e244]
+                    - cell "#2" [ref=f6e245]
+                  - row [ref=f6e246]:
+                    - cell "Ensemble" [ref=f6e247]
+                    - cell "0.18324" [ref=f6e248]
+                    - cell "0.19545" [ref=f6e249]
+                    - cell "#1" [ref=f6e250]
+              - heading "Type of nearest neighbors" [level=2] [ref=f6e251]
+              - paragraph [ref=f6e252]:
+                - text: The key of my solution is the combination of 7 different nearest neighbors. In addition to the real price recovered from tick-size leak, I also used volatility and trade size as nearest neighbor measures. (Note that the volatility and trade size-based NN can be calculated
+                - emphasis [ref=f6e253]: without the tick-size leak
+                - text: .)
+              - table [ref=f6e254]:
+                - rowgroup [ref=f6e255]:
+                  - row [ref=f6e256]:
+                    - columnheader "No" [ref=f6e257]
+                    - columnheader "Search Axis" [ref=f6e258]
+                    - columnheader "Measure" [ref=f6e259]
+                    - columnheader "Metrics" [ref=f6e260]
+                    - columnheader "No. of neighbors" [ref=f6e261]
+                - rowgroup [ref=f6e262]:
+                  - row [ref=f6e263]:
+                    - cell "1" [ref=f6e264]
+                    - cell "time_id" [ref=f6e265]
+                    - cell "Real Price" [ref=f6e266]
+                    - cell "Canberra" [ref=f6e267]
+                    - cell "[2, 3, 5, 10, 20, 40]" [ref=f6e268]
+                  - row [ref=f6e269]:
+                    - cell "2" [ref=f6e270]
+                    - cell "time_id" [ref=f6e271]
+                    - cell "Real Price" [ref=f6e272]
+                    - cell "Mahalanobis" [ref=f6e273]
+                    - cell "[2, 3, 5, 10, 20, 40]" [ref=f6e274]
+                  - row [ref=f6e275]:
+                    - cell "3" [ref=f6e276]
+                    - cell "time_id" [ref=f6e277]
+                    - cell "Volatility" [ref=f6e278]
+                    - cell "Manhattan" [ref=f6e279]
+                    - cell "[2, 3, 5, 10, 20, 40]" [ref=f6e280]
+                  - row [ref=f6e281]:
+                    - cell "4" [ref=f6e282]
+                    - cell "time_id" [ref=f6e283]
+                    - cell "Trade Size" [ref=f6e284]
+                    - cell "Canberra" [ref=f6e285]
+                    - cell "[2, 3, 5, 10, 20, 40]" [ref=f6e286]
+                  - row [ref=f6e287]:
+                    - cell "5" [ref=f6e288]
+                    - cell "time_id" [ref=f6e289]
+                    - cell "Trade Size" [ref=f6e290]
+                    - cell "Mahalanobis" [ref=f6e291]
+                    - cell "[2, 3, 5, 10, 20, 40]" [ref=f6e292]
+                  - row [ref=f6e293]:
+                    - cell "6" [ref=f6e294]
+                    - cell "stock_id" [ref=f6e295]
+                    - cell "Real Price" [ref=f6e296]
+                    - cell "Manhattan" [ref=f6e297]
+                    - cell "[10, 20, 40]" [ref=f6e298]
+                  - row [ref=f6e299]:
+                    - cell "7" [ref=f6e300]
+                    - cell "stock_id" [ref=f6e301]
+                    - cell "Volatility" [ref=f6e302]
+                    - cell "Manhattan" [ref=f6e303]
+                    - cell "[10, 20, 40]" [ref=f6e304]
+              - paragraph [ref=f6e305]: The following table shows the comparison of RMSPE w/ various combinations of nearest neighbor measures and CV (All scores are based on single LightGBM model).
+              - table [ref=f6e306]:
+                - rowgroup [ref=f6e307]:
+                  - row [ref=f6e308]:
+                    - columnheader "No" [ref=f6e309]
+                    - columnheader "CV" [ref=f6e310]
+                    - columnheader "Volatility NN" [ref=f6e311]
+                    - columnheader "Trade Size NN" [ref=f6e312]
+                    - columnheader "Real Price NN" [ref=f6e313]
+                    - columnheader "RMSPE" [ref=f6e314]
+                    - columnheader "Rank" [ref=f6e315]
+                - rowgroup [ref=f6e316]:
+                  - row [ref=f6e317]:
+                    - cell "1" [ref=f6e318]
+                    - cell "GKF" [ref=f6e319]
+                    - cell [ref=f6e320]
+                    - cell [ref=f6e321]
+                    - cell [ref=f6e322]
+                    - cell "0.22492" [ref=f6e323]
+                    - cell "#1358" [ref=f6e324]
+                  - row [ref=f6e325]:
+                    - cell "2" [ref=f6e326]
+                    - cell "GKF" [ref=f6e327]
+                    - cell "✓" [ref=f6e328]
+                    - cell [ref=f6e329]
+                    - cell [ref=f6e330]
+                    - cell "0.21135" [ref=f6e331]
+                    - cell "#12" [ref=f6e332]
+                  - row [ref=f6e333]:
+                    - cell "3" [ref=f6e334]
+                    - cell "GKF" [ref=f6e335]
+                    - cell [ref=f6e336]
+                    - cell "✓" [ref=f6e337]
+                    - cell [ref=f6e338]
+                    - cell "0.20798" [ref=f6e339]
+                    - cell "#10" [ref=f6e340]
+                  - row [ref=f6e341]:
+                    - cell "4" [ref=f6e342]
+                    - cell "GKF" [ref=f6e343]
+                    - cell [ref=f6e344]
+                    - cell [ref=f6e345]
+                    - cell "✓" [ref=f6e346]
+                    - cell "0.19999" [ref=f6e347]
+                    - cell "#7" [ref=f6e348]
+                  - row [ref=f6e349]:
+                    - cell "5" [ref=f6e350]
+                    - cell "GKF" [ref=f6e351]
+                    - cell "✓" [ref=f6e352]
+                    - cell "✓" [ref=f6e353]
+                    - cell [ref=f6e354]
+                    - cell "0.20367" [ref=f6e355]
+                    - cell "#9" [ref=f6e356]
+                  - row [ref=f6e357]:
+                    - cell "6" [ref=f6e358]
+                    - cell "GKF" [ref=f6e359]
+                    - cell "✓" [ref=f6e360]
+                    - cell "✓" [ref=f6e361]
+                    - cell "✓" [ref=f6e362]
+                    - cell "0.19734" [ref=f6e363]
+                    - cell "#1" [ref=f6e364]
+                  - row [ref=f6e365]:
+                    - cell "7" [ref=f6e366]
+                    - cell "Time-Series" [ref=f6e367]
+                    - cell "✓" [ref=f6e368]
+                    - cell "✓" [ref=f6e369]
+                    - cell [ref=f6e370]
+                    - cell "0.20322" [ref=f6e371]
+                    - cell "#9" [ref=f6e372]
+                  - row [ref=f6e373]:
+                    - cell "8" [ref=f6e374]
+                    - cell "Time-Series" [ref=f6e375]
+                    - cell "✓" [ref=f6e376]
+                    - cell "✓" [ref=f6e377]
+                    - cell "✓" [ref=f6e378]
+                    - cell "0.19699" [ref=f6e379]
+                    - cell "#1" [ref=f6e380]
+              - paragraph [ref=f6e381]:
+                - text: We can see that using any one of the three nearest neighbors yields gold-zone RMSPE, but the real price neighbors has the best predictive power (No.2, 3 and 4).
+                - strong [ref=f6e382]: The "tick-size leak-free" version, which uses only volatility and trade size neighbors with GroupKFold, has a score of 0.20367 RMSPE
+                - text: (No.5).
+              - paragraph [ref=f6e383]: We can also see using only real price NN is not enough to get 1st place RMSPE. From this, I think that the combination of various nearest neighbors other than real price contributed to my win.
+              - paragraph [ref=f6e384]: The following table shows the RMSPE for the combination of stock-id, time-id neighbors. Again, we can see that the combination of NN is important.
+              - table [ref=f6e385]:
+                - rowgroup [ref=f6e386]:
+                  - row [ref=f6e387]:
+                    - columnheader "No" [ref=f6e388]
+                    - columnheader "CV" [ref=f6e389]
+                    - columnheader "time-id NN" [ref=f6e390]
+                    - columnheader "stock-id NN" [ref=f6e391]
+                    - columnheader "RMSPE" [ref=f6e392]
+                    - columnheader "Rank" [ref=f6e393]
+                - rowgroup [ref=f6e394]:
+                  - row [ref=f6e395]:
+                    - cell "1" [ref=f6e396]
+                    - cell "GKF" [ref=f6e397]
+                    - cell [ref=f6e398]
+                    - cell "✓" [ref=f6e399]
+                    - cell "0.22018" [ref=f6e400]
+                    - cell "#197" [ref=f6e401]
+                  - row [ref=f6e402]:
+                    - cell "2" [ref=f6e403]
+                    - cell "GKF" [ref=f6e404]
+                    - cell "✓" [ref=f6e405]
+                    - cell [ref=f6e406]
+                    - cell "0.19948" [ref=f6e407]
+                    - cell "#5" [ref=f6e408]
+                  - row [ref=f6e409]:
+                    - cell "3" [ref=f6e410]
+                    - cell "GKF" [ref=f6e411]
+                    - cell "✓" [ref=f6e412]
+                    - cell "✓" [ref=f6e413]
+                    - cell "0.19734" [ref=f6e414]
+                    - cell "#2" [ref=f6e415]
+              - heading "Effect of rank normalization" [level=2] [ref=f6e416]
+              - paragraph [ref=f6e417]: As I wrote in the solution, I tried to reduce the effect of covariate shift by applying rank normalization to some features. However, late submission shows that rank normalization has almost no effect on the private score.
+              - table [ref=f6e418]:
+                - rowgroup [ref=f6e419]:
+                  - row [ref=f6e420]:
+                    - columnheader "Model" [ref=f6e421]
+                    - columnheader "RMSPE" [ref=f6e422]
+                    - columnheader "Rank" [ref=f6e423]
+                - rowgroup [ref=f6e424]:
+                  - row [ref=f6e425]:
+                    - cell "Baseline (single LGBM)" [ref=f6e426]
+                    - cell "0.19699" [ref=f6e427]
+                    - cell "#1" [ref=f6e428]
+                  - row [ref=f6e429]:
+                    - cell "without Rank Normalization" [ref=f6e430]
+                    - cell "0.19708" [ref=f6e431]
+                    - cell "#1" [ref=f6e432]
+              - paragraph [ref=f6e433]: This may be related to the fact that in my model, the top features were dominated by the short-term nearest neighbor features on realized volatility (=lag of target). Even if the relationship between the feature, such as trade size, and the target had shifted in the long-term, the nearest neighbor of volatility would itself have been very robust to shifts, since the neighbors of volatility with small number of neighbors would have already reflected the long-term shift.
+              - heading "Conclusion" [level=2] [ref=f6e434]
+              - paragraph [ref=f6e435]: While a single LightGBM was enough to win, reducing the variety of nearest neighbors degraded the RMSPE, so feature diversity was more important than model diversity in my solution.
+              - paragraph [ref=f6e436]: For the single model, the best score without using tick-size leak was 0.20367, and the best score without using the inter-time_id relationship was 0.22018. These are worse RMSPEs than the original solution, but they have a certain predictive power.
+              - paragraph [ref=f6e437]: I would like to thank the host for giving me the opportunity to do these experiments by enabling late submissions.
+          - separator [ref=f6e438]
+        - generic [ref=f6e439]:
+          - generic [ref=f6e440]:
+            - paragraph [ref=f6e443]:
+              - paragraph [ref=f6e444]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f6e445] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f6e446]
+          - generic [ref=f6e448]:
+            - generic [ref=f6e449]:
+              - generic [aria-hidden] [ref=f6e450]: comment
+              - heading "5 Comments" [level=2] [ref=f6e452]
+            - generic [ref=f6e455]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f6e456] [cursor=pointer]:
+                - generic [ref=f6e457]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f6e459]:
+            - generic [ref=f6e460]:
+              - generic [ref=f6e464]:
+                - link "Alex Lau's profile" [ref=f6e465] [cursor=pointer]:
+                  - /url: /alexlwh
+                  - generic "Alex Lau" [ref=f6e466]
+                - generic [ref=f6e472]:
+                  - link [ref=f6e474] [cursor=pointer]:
+                    - /url: /alexlwh
+                    - heading "Alex Lau" [level=3] [ref=f6e475]
+                  - generic [ref=f6e476]:
+                    - paragraph [ref=f6e477]: Posted 5 years ago
+                    - paragraph [ref=f6e479]: · 205th in this Competition
+                - generic [ref=f6e481]:
+                  - generic [ref=f6e482]:
+                    - button "Upvote" [ref=f6e483] [cursor=pointer]:
+                      - generic [ref=f6e484]: arrow_drop_up
+                    - button "1 votes" [ref=f6e485] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f6e486] [cursor=pointer]: more_vert
+                - paragraph [ref=f6e490]: This is a spectacularly comprehensive ablation study!
+              - separator [ref=f6e491]
+            - generic [ref=f6e492]:
+              - generic [ref=f6e496]:
+                - link "Victor Cavalli's profile" [ref=f6e497] [cursor=pointer]:
+                  - /url: /victoraugustocavalli
+                  - generic "Victor Cavalli" [ref=f6e498]
+                - generic [ref=f6e504]:
+                  - link [ref=f6e506] [cursor=pointer]:
+                    - /url: /victoraugustocavalli
+                    - heading "Victor Cavalli" [level=3] [ref=f6e507]
+                  - paragraph [ref=f6e509]: Posted 5 years ago
+                - generic [ref=f6e511]:
+                  - generic [ref=f6e512]:
+                    - button "Upvote" [ref=f6e513] [cursor=pointer]:
+                      - generic [ref=f6e514]: arrow_drop_up
+                    - button "1 votes" [ref=f6e515] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f6e516] [cursor=pointer]: more_vert
+                - paragraph [ref=f6e520]:
+                  - text: "I'm learning a lot from your solutions, thank you so much for posting them for us, I plan on doing the same Feature Engineering and use a LinearRegression to see the results. However as a newbie it is hard to follow your many function calls and specially this section in make_book_feature:"
+                  - code [ref=f6e521]: "for time in [450, 300, 150]: d = book[book['seconds_in_bucket'] >= time].groupby('time_id').agg(features).reset_index(drop=False) d.columns = flatten_name(f'book_{time}', d.columns) agg = pd.merge(agg, d, on='time_id', how='left')"
+                  - text: If you ever feel like it maybe do a post explaining more of the feature making process? Thanks again
+                  - link "@nyanpn (opens in a new tab)" [ref=f6e522] [cursor=pointer]:
+                    - /url: /nyanpn
+                    - text: "@nyanpn"
+                  - text: "!"
+                - generic [ref=f6e528]:
+                  - link "nyanp's profile" [ref=f6e529] [cursor=pointer]:
+                    - /url: /nyanpn
+                    - generic "nyanp" [ref=f6e530]
+                  - generic [ref=f6e536]:
+                    - generic [ref=f6e537]:
+                      - link [ref=f6e538] [cursor=pointer]:
+                        - /url: /nyanpn
+                        - heading "nyanp" [level=3] [ref=f6e539]
+                      - paragraph [ref=f6e542]: Topic Author
+                    - generic [ref=f6e543]:
+                      - paragraph [ref=f6e544]: Posted 5 years ago
+                      - paragraph [ref=f6e546]: · 1st in this Competition
+                  - generic [ref=f6e548]:
+                    - generic [ref=f6e549]:
+                      - button "Upvote" [ref=f6e550] [cursor=pointer]:
+                        - generic [ref=f6e551]: arrow_drop_up
+                      - button "2 votes" [ref=f6e552] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f6e553] [cursor=pointer]: more_vert
+                  - paragraph [ref=f6e557]: This code generates various aggregate features by aggregating the order book, excluding the data after the first 450, 300, and 150 seconds. In addition to reading the code, actually running the notebook will help you understand it better ;)
+              - separator [ref=f6e558]
+            - generic [ref=f6e563]:
+              - paragraph [ref=f6e565]: This comment has been deleted.
+              - generic [ref=f6e571]:
+                - link "nyanp's profile" [ref=f6e572] [cursor=pointer]:
+                  - /url: /nyanpn
+                  - generic "nyanp" [ref=f6e573]
+                - generic [ref=f6e579]:
+                  - generic [ref=f6e580]:
+                    - link [ref=f6e581] [cursor=pointer]:
+                      - /url: /nyanpn
+                      - heading "nyanp" [level=3] [ref=f6e582]
+                    - paragraph [ref=f6e585]: Topic Author
+                  - generic [ref=f6e586]:
+                    - paragraph [ref=f6e587]: Posted 5 years ago
+                    - paragraph [ref=f6e589]: · 1st in this Competition
+                - generic [ref=f6e591]:
+                  - generic [ref=f6e592]:
+                    - button "Upvote" [ref=f6e593] [cursor=pointer]:
+                      - generic [ref=f6e594]: arrow_drop_up
+                    - button "0 votes" [ref=f6e595] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f6e596] [cursor=pointer]: more_vert
+                - paragraph [ref=f6e600]: The difference between the single model and the ensemble was small in public LB as well, so this result was not a big surprise for me. However, the contribution of Nearest Neighbors, which is not real price-based, was much larger than I had expected.
+  - alert [ref=f6e603]

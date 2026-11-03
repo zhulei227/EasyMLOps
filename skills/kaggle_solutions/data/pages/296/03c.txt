@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75222
-fetched: 2026-10-27
-chars: 804
+fetched: 2026-11-03
+chars: 12238
 
 menu
 Skip to
@@ -42,15 +42,318 @@ Models
 Discussion
 Leaderboard
 Rules
+nyanp · 3rd in this Competition · Posted 8 years ago
+arrow_drop_up
+27
+more_vert
+3rd Place Part III - Pesudo Astronomer's Feature Engineering
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+First of all, thanks to the organizers and all participants in this competition! And thanks a lot to my great teammates, @mamasinkgs, and @yuval6967. I learn a lot from these 2 guys. And I'm very happy to get my first gold medal :)
 
-Failed to load the discussion topic
+In this part, I want to share my findings and feature engineering. Please refer to the following discussions to see the overall description of our solution.
 
-error
+3rd Place Part I - CNN
+3rd Place Part II - CatBoost, mamas feature, and class 99
+What I learned from astronomer's work
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+At the beginning of this competition, I tried to install domain knowledge and tried to be "pseudo astronomer". In addition to the data note provided by the organizers, I carefully read the following resources.
 
-error
+LSST science book
+Result from SNPCC challenge
+Photometric Supernova Classification With Machine Learning (slide)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+After reading these resources and exploring data a bit, I thought that this competition mainly consists of these 2 challenges:
+
+How to distinguish between various types of supernova classes?
+How to detect class99?
+
+I also tried to understand what each class really is. By 1) basic light curve characteristics 2) class frequency compared with expected LSST observation rate 3) redshift distribution, here is my assumption (order by confidence):
+
+class90: SN Ia
+class42: SN II
+class95: Superluminous Supernova
+class52/62: SN Ib/c
+class88: Strong Gravitational Lens (or AGN?)
+class67: TDE
+
+I hope the competition hosts will reveal the answer! I don't think this assumption helped us directly, but this gave us a very good interpretation of the result of our class99 probing (class99 is something similar to core-collapse supernova).
+
+Feature Engineering
+template fitting by sncosmo package - the golden feature for us
+
+sncosmo provides nice lc fitting API in python (link). I used a fitting parameter and it's chi-square value as a feature. I'm a bit surprised that no one except me uses this library because using template fitting is a major solution in the past competition.
+
+It took a bit long time to calculate (1~2 lines/sec), so I split light curves by object_id%30 and run 30 preemptible instances to finish calculating within 1 day. I repeated this process about 15 times to make various types of models to cover all variant of supernovae (salt-2, salt-2-extended, nugent-sn1bc, nugent-sn2, snana, sako,…), and use 8 of them in my final model. It was an exhausting process… really…
+
+But these bag of template features gave me a significant boost (~0.05 in intermediate, and 0.1+ in my final model). It helped Yuval's CNN as well (+0.04). 7 out of 10 my most important features (by LGBM gain) are these features. All template features were used only in an extragalactic model.
+
+Here is an example of a result of template fitting (SALT-2, object_id = 161521). y-band is ignored by its wavelength and estimated redshift. One may think that GP fitting gives better fitting, but it's robust to noise (in SALT-2, only 5 parameters used to generate this all 6-band curve). Probably combining our features with GP features of Kyle or CPMP's will give us another significant boost.
+
+UPDATED
+
+I've attached my template features. you can download, unzip and use:
+
+df = pd.read_feather('sncosmo_template_features.f')
+
+UPDATED2
+
+Kernel is available to see how did we use sncosmo: https://www.kaggle.com/nyanpn/salt-2-feature-part-of-3rd-place-solution
+
+hostgal-specz model
+
+Exactly same as 2nd and 4th place solution. This gave me a small boost (~0.004).
+
+luminosity
+
+As shared in the discussion, luminosity is an important intrinsic property of variable stars. I used the following fomla:
+
+luminosity = (max(flux) - min(flux)) * distance ** 2
+
+
+Distance (in MPc) is converted from estimated specz above. Astropy's luminosity_distance (link) function gives distance from redshift.
+
+I added these luminosity and luminosity difference between channels.
+
+time difference
+
+I made some features related to time-to-time difference. for example:
+
+(max(mjd) where detected == 1) - (mjd on peak flux)
+(mjd on peak flux) - (min(mjd) where detected == 1)
+(min(mjd) where detected == 1) - (mjd on previous observation)
+tried to capture information where the important signal is lost by its observation schedule
+(mjd on 50% tile after the peak flux) - (mjd no peak flux)
+LombScargle
+
+Adding power and frequency obtained from astropy.LombScargle.autopower() gave a small improvement.
+
+Pseudo Labelling
+
+I also tried to use pseudo-labeling in the early stage of the competition. I found that using pseudo-label only in class90 gave me a big boost (0.005 ~ 0.03, depends on the model), but using all classes didn't work. I think it's related class99 (if class99 is similar to class52/62, pseudo-label in these classes contains a lot of false signals). class90+class42 gave a good result too, but its difference from class90-only was very small.
+
+object_id_161521.png
+sncosmo_template_features.f.gz
+comparing-different-feature-set.png
+
+Please sign in to reply to this topic.
+
+comment
+17 Comments
+Hotness
+nyanp
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Ah I forgot to say that I majored in aerospace engineering and joined an astrometry satellite project as an engineer before. This is why I call myself as pseudo-astronomer. Anyway, learning about project background is really interesting for me, and motivated me a lot ;)
+
+nyanp
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+From late submission, I noticed (again) that combining all template features were much better than single SALT-2 template. Here is a single LGBM result:
+
+Baseline : 0.911 (public), 0.943 (private)
+Baseline + SALT-2: 0.860 (public), 0.886 (private)
+Baseline + All templates: 0.824 (public), 0.860 (private)
+Kyle Boone
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very interesting results! I'm very intrigued by the sncosmo fits. That package was developed by another Kyle who used to work in my group. I have typically found that the sncosmo fits require quite a bit of hand tuning to get them to converge properly. Did you have any issues with that? There is as nested sampler fitter that is supposed to be more robust. Did you use that?
+
+Another thing to think about is that the data used in this competition was probably generated using a lot of the same models that are in sncosmo. I'm not really sure what the impact of that is…
+
+nyanp
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+First of all, congratulations on your 1st!
+
+That package was developed by another Kyle who used to work in my group.
+
+
+Wow, so why didn't you use SALT-2 feature? ;) Please say thank you to another Kyle, I love this library by it's clean and well-documented API. I tried sncosmo.nest_lc and multinest package but it failed because both were too slow to converge (over 30 seconds/object). I thought nested sampling isn't feasible to this competition, but maybe I made a mistake.
+
+Did you have any issues with that?
+
+Sometimes I met SEGV while calculating salt-2 or salt-2-extended feature. I will try to reproduce it in this weekend.
+Its internal solver (iminuit2) does not scale with the number of CPUs. So I needed to run 30x 8-core preemptible instances to speedup whole process. It is nice if we can turn off its internal parallelism (data parallelism is a much better way in this competition).
+
+Another thing to think about is that the data used in this competition was probably generated using a lot of the same models that are in sncosmo. I'm not really sure what the impact of that is…
+
+Yes, probably is. Before selecting 15 sources, I tried over 30 types of built-in sources in sncosmo, and choose it by local CV and my intuition. Some sources improved my CV, but some didn't. My final feature set consists of:
+
+salt-2
+salt-2-extended
+hsiao
+nugent-sn1bc
+nugent-sn2n
+snana-2004fe
+snana-2007Y
+mamas
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks nyanp, your performance in this competition is really incredible! Without your template fitting features it's impossible to make suich a high-scored GBDT model, and without your ideas we wouldn't have noticed class99 handling :)
+
+nyanp
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot, too :) Your ambition, hard working and deep knowledge about GBDT drove me a lot!
+
+CPMP
+
+Posted 8 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing, and congrats on the result. You make me feel even worse than before for not having tried SALT2 harder. And for combining, I think it is way better to combine with Kyle's GP than with mine ;) But yes, I'm pretty sure combining SALT2 with what we have would give a significant boost. I can try submitting if you share these template feature values for test and train datasets.
+
+nyanp
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@cpmpml Thanks for your comment! And I appreciate your sharing in the competition, I learned a lot from you. I've attached all template features (in feather-format), now you can try our features :)
+
+3 more replies
+arrow_drop_down
+Blonde
+
+Posted 8 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you and congrats ! I'll try to add salt-2 features to our model, it's 0.815 (public) single model at the moment, so we'll see what it will be with the salt-2, will give you an update. I wanted to try it, but it just was not enough time for everything
+
+Tania J
+
+Posted 8 years ago
+
+· 58th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on your amazing result! I tried sncosmo too but was not able to get useful features out of it. However I only tried salt2 and salt2-extended models. Were either of these 2 models in the final 8 that you used? Can you share what values you used for zp and zpsys? Maybe that was my problem…
+
+nyanp
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@taniaj Thanks! :)
+
+Were either of these 2 models in the final 8 that you used?
+
+I used both, and also added average (weigted by square inverse of error) parameters of these 2 sources. I've attached full features and I've also published simple kernel here, so you can check the difference between us.
+
+One question from me: did you met SEGV while calculating salt2 and salt2-extended models? If so, how to deal with it?
+
+Tania J
+
+Posted 8 years ago
+
+· 58th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing the kernel! Now I can see the differences - you have a different zp from me and your method of setting bounds on z is better. I used photoz directly.
+
+I also got some exceptions (can't remember if it was SEGV or something else) and I just caught them and set all values for those objects to null (there were not many and I assume they were the ones that were not supernovae anyway), plus I wanted to get some rough results fast to figure out whether I should spend more time on sncosmo or not. I guess I gave up on it too soon.
+
+yuval reina
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks @nyanp we learned a lot from you. You also neglected to say it was your intuition that led us to improve our class99 prediction
+
+nyanp
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot, too :) I think class99 prediction is a result of our collaborative working! Combine my intuition with you and mamas's creative ideas on function engineering worked very well.

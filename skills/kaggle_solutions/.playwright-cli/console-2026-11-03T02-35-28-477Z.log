@@ -1,0 +1,25 @@
+[    2144ms] [LOG]  _                       _       
+| |    Welcome to       | |      
+| | __ ___   __ _  __ _ | | ___  
+| |/ /|__ \ / _` |/ _` || |/ _ \ 
+|   < / _  | (_| | (_| || |  __/ 
+|_|\_\\__,_|\__, |\__, ||_|\___| 
+             __/ | __/ |         
+            |___/ |___/          
+ @ https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:0
+[    2186ms] [WARNING] No `HydrateFallback` element provided to render during initial hydration @ https://www.kaggle.com/static/assets/vendor.js?v=3f0098e18ce0426a:248
+[    3142ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://www.kaggle.com/api/i/competitions.PageService/GetPage:0
+[    5904ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://apis.google.com/js/api.js:0
+[   14355ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6029/Mask_example.png:0
+[   14364ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6031/Training.png:0
+[   14364ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6037/Tensor_example_700px.png:0
+[   14364ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6038/model_700px.png:0
+[   14364ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6032/LB-Scores.png:0
+[   14364ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6033/Sliding%20Window.png:0
+[   14589ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6039/Masks_700px.png:0
+[   14593ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6040/vgg16_test_6060_3_2_cls_10_700px.png:0
+[   14593ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6048/6100_1_2_mask.png:0
+[   14593ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6049/6100_1_2_proj_700px.jpg:0
+[   14593ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://kaggle2.blob.core.windows.net/forum-message-attachments/166431/6036/Best-LB.png:0
+[   23055ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://accounts.google.com/gsi/client:0
+[   23372ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://www.google.com/recaptcha/enterprise.js?render=6LcVUOAUAAAAAP8nMSGuW46uJC5Zf6-PCYKN5xxv:0

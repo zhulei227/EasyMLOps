@@ -1,0 +1,595 @@
+- generic [ref=f17e2]:
+  - navigation "Main Kaggle page navigation" [ref=f17e3]:
+    - generic [ref=f17e5]:
+      - button "Navigation menu" [ref=f17e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f17e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f17e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f17e12] [cursor=pointer]:
+      - paragraph [ref=f17e18]: Create
+    - generic [ref=f17e21]:
+      - list [ref=f17e22]:
+        - listitem "Home List Item" [ref=f17e23]:
+          - link "Home" [ref=f17e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f17e31]: Home
+        - listitem "Competitions List Item" [ref=f17e32]:
+          - link "Competitions" [ref=f17e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f17e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f17e41]:
+          - link "Benchmarks" [ref=f17e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f17e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f17e50]:
+          - link "Arenas" [ref=f17e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f17e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f17e59]:
+          - link "Game Arena" [ref=f17e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f17e67]: Game Arena
+      - list [ref=f17e68]:
+        - listitem "Data Hub List Item" [ref=f17e69]:
+          - generic [ref=f17e70]:
+            - link "Data Hub" [ref=f17e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f17e77]: Data Hub
+            - button "Expand" [ref=f17e80] [cursor=pointer]
+      - list [ref=f17e82]:
+        - listitem "More on Kaggle List Item" [ref=f17e83]:
+          - generic [ref=f17e84]:
+            - link "More on Kaggle" [ref=f17e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f17e91]: More
+            - button "Expand" [ref=f17e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f17e97]:
+    - generic [ref=f17e98]:
+      - generic [ref=f17e102]:
+        - textbox "Search" [ref=f17e104]
+        - group [aria-hidden]
+      - generic [ref=f17e106]:
+        - link [ref=f17e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fjigsaw-multilingual-toxic-comment-classification%2Fdiscussion%2F160986
+          - button "Login" [ref=f17e108]
+        - link [ref=f17e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fjigsaw-multilingual-toxic-comment-classification%2Fdiscussion%2F160986
+          - button "Sign Up" [ref=f17e111]
+  - main [ref=f17e113]:
+    - generic [ref=f17e115]:
+      - generic [ref=f17e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f17e117]:
+        - link "Learn more" [ref=f17e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f17e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f17e123]:
+      - generic [ref=f17e125]:
+        - generic [ref=f17e126]:
+          - link "Jigsaw/Conversation AI's profile" [ref=f17e127] [cursor=pointer]:
+            - /url: /organizations/jigsaw-team
+            - generic "Jigsaw/Conversation AI" [ref=f17e128]
+          - generic [ref=f17e132]:
+            - generic [ref=f17e133]: Jigsaw/Conversation AI
+            - generic [ref=f17e135]: · Featured Code Competition · 6 years ago
+          - generic [ref=f17e136]:
+            - button "Late Submission" [disabled] [ref=f17e138]
+            - button "Competition options menu collapsed" [ref=f17e141] [cursor=pointer]: more_horiz
+        - generic [ref=f17e143]:
+          - heading "Jigsaw Multilingual Toxic Comment Classification" [level=1] [ref=f17e144]
+          - paragraph [ref=f17e146]: Use TPUs to identify toxicity comments across multiple languages
+      - generic [ref=f17e150]:
+        - tablist [ref=f17e157]:
+          - tab "Overview, 1 of 7" [ref=f17e158] [cursor=pointer]:
+            - generic [ref=f17e159]: Overview
+          - tab "Data, 2 of 7" [ref=f17e160] [cursor=pointer]:
+            - generic [ref=f17e161]: Data
+          - tab "Code, 3 of 7" [ref=f17e162] [cursor=pointer]:
+            - generic [ref=f17e163]: Code
+          - tab "Models, 4 of 7" [ref=f17e164] [cursor=pointer]:
+            - generic [ref=f17e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f17e166] [cursor=pointer]:
+            - generic [ref=f17e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f17e168] [cursor=pointer]:
+            - generic [ref=f17e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f17e170] [cursor=pointer]:
+            - generic [ref=f17e171]: Rules
+        - separator [ref=f17e173]
+      - generic [ref=f17e177]:
+        - generic [ref=f17e178]:
+          - generic [ref=f17e179]:
+            - generic [ref=f17e180]:
+              - link "Rafi Hai's profile" [ref=f17e181] [cursor=pointer]:
+                - /url: /rafiko1
+                - generic "Rafi Hai" [ref=f17e182]
+              - generic [ref=f17e186]:
+                - link "Rafi Hai" [ref=f17e187] [cursor=pointer]:
+                  - /url: /rafiko1
+                - text: ·
+                - generic [ref=f17e188]: 1st in this Competition
+                - text: ·
+                - generic [ref=f17e189]: Posted 6 years ago
+            - generic [ref=f17e190]:
+              - generic [ref=f17e191]:
+                - button "Upvote" [ref=f17e192] [cursor=pointer]:
+                  - generic [ref=f17e193]: arrow_drop_up
+                - button "58 votes" [ref=f17e194] [cursor=pointer]: "58"
+              - button "More Options for this Topic" [ref=f17e195] [cursor=pointer]: more_vert
+            - 'heading "1st place solution: post-processing" [level=3] [ref=f17e196]'
+            - generic [ref=f17e199]:
+              - paragraph [ref=f17e200]:
+                - text: Firstly, a big thanks to Kaggle for constantly delivering top-notch competitions. Competitions doesn't always end smooth (cf. Deepfakes 😄) but there is no other data science platform so rich in learning. Another thanks to Jigsaw for the interesting, multi-lingual, shakeup-free ride! Also congrats to the other medalists, and to my talented team-mate
+                - link "@leecming (opens in a new tab)" [ref=f17e201] [cursor=pointer]:
+                  - /url: /leecming
+                  - text: "@leecming"
+                - text: "!"
+              - paragraph [ref=f17e202]: Since other competitors were asking about our post-processing technique, I dedicate this post to explain it in more detail.
+              - paragraph [ref=f17e203]:
+                - text: To see the post-processing in action, have a look at the related
+                - link "notebook (opens in a new tab)" [ref=f17e204] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/rafiko1/1st-place-jigsaw-post-processing-example
+                  - text: notebook
+              - 'heading "Post-processing: intuition" [level=2] [ref=f17e205]'
+              - paragraph [ref=f17e206]:
+                - text: "The intuition of the post-processing is as following: we consider the"
+                - strong [ref=f17e207]:
+                  - emphasis [ref=f17e208]: trend
+                - text: of subsequent submissions of a specific language (e.g. Russian) for each example in the test dataset. If the trend of that example is positive i.e. going up, we
+                - strong [ref=f17e209]:
+                  - emphasis [ref=f17e210]: nudge
+                - text: the example further in the positive direction. And vice versa - if the trend is negative i.e. going down, we nudge the example further in the negative direction.
+              - paragraph [ref=f17e211]:
+                - text: We measure the trend by taking the differences of all subsequent submissions for the specific language and averaging those differences. The nudge that we then give to the new submission is based on a predefined
+                - strong [ref=f17e212]:
+                  - emphasis [ref=f17e213]: weight
+                - text: ", typically we choose a weight of 1 or 1.5."
+              - 'heading "Post-processing: pseudo-code" [level=2] [ref=f17e214]'
+              - paragraph [ref=f17e215]: "In an attempt to pseudo-code the technique, given:"
+              - code [ref=f17e217]: weight = predefined weight (typically 1 or 1.5) pred_best = current best predictions on LB diff_avg = average of differences of consecutive subs (trend)
+              - paragraph [ref=f17e218]: "Then for each example in test of the specific language (e.g. Turkish):"
+              - code [ref=f17e220]: "if diff_avg < 0: # negative trend pred_new = (1+weight*diff_avg)*pred_best # nudge downwards else: # positive trend pred_new = (1-weight*diff_avg)*pred_best + weight*diff_avg # nudge upwards"
+              - paragraph [ref=f17e221]: "Note: I'm not an expert on PP, so I assume this technique can be further optimized. The boost we got from it was relatively small (albeit significant) compared to the other methods we implemented."
+          - separator [ref=f17e222]
+        - generic [ref=f17e223]:
+          - generic [ref=f17e224]:
+            - paragraph [ref=f17e227]:
+              - paragraph [ref=f17e228]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f17e229] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f17e230]
+          - generic [ref=f17e232]:
+            - generic [ref=f17e233]:
+              - generic [aria-hidden] [ref=f17e234]: comment
+              - generic [ref=f17e235]:
+                - heading "19 Comments" [level=2] [ref=f17e236]
+                - link "Go To Appreciation Comments (1 total)" [ref=f17e237] [cursor=pointer]:
+                  - /url: /c/jigsaw-multilingual-toxic-comment-classification/discussion/160986#appreciation
+                  - text: 1 appreciation comment
+            - generic [ref=f17e240]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f17e241] [cursor=pointer]:
+                - generic [ref=f17e242]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f17e244]:
+            - generic [ref=f17e245]:
+              - generic [ref=f17e249]:
+                - link "YaGana Sheriff-Hussaini's profile" [ref=f17e250] [cursor=pointer]:
+                  - /url: /sheriytm
+                  - generic "YaGana Sheriff-Hussaini" [ref=f17e251]
+                - generic [ref=f17e257]:
+                  - link [ref=f17e259] [cursor=pointer]:
+                    - /url: /sheriytm
+                    - heading "YaGana Sheriff-Hussaini" [level=3] [ref=f17e260]
+                  - generic [ref=f17e261]:
+                    - paragraph [ref=f17e262]: Posted 6 years ago
+                    - paragraph [ref=f17e264]: · 37th in this Competition
+                - generic [ref=f17e266]:
+                  - generic [ref=f17e267]:
+                    - button "Upvote" [ref=f17e268] [cursor=pointer]:
+                      - generic [ref=f17e269]: arrow_drop_up
+                    - button "2 votes" [ref=f17e270] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f17e271] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e275]:
+                  - link "@rafiko1 (opens in a new tab)" [ref=f17e276] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - text: "@rafiko1"
+                  - text: congrats again and thanks for sharing.
+                - generic [ref=f17e282]:
+                  - link "Rafi Hai's profile" [ref=f17e283] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - generic "Rafi Hai" [ref=f17e284]
+                  - generic [ref=f17e290]:
+                    - generic [ref=f17e291]:
+                      - link [ref=f17e292] [cursor=pointer]:
+                        - /url: /rafiko1
+                        - heading "Rafi Hai" [level=3] [ref=f17e293]
+                      - paragraph [ref=f17e296]: Topic Author
+                    - generic [ref=f17e297]:
+                      - paragraph [ref=f17e298]: Posted 6 years ago
+                      - paragraph [ref=f17e300]: · 1st in this Competition
+                  - generic [ref=f17e302]:
+                    - generic [ref=f17e303]:
+                      - button "Upvote" [ref=f17e304] [cursor=pointer]:
+                        - generic [ref=f17e305]: arrow_drop_up
+                      - button "0 votes" [ref=f17e306] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f17e307] [cursor=pointer]: more_vert
+                  - paragraph [ref=f17e311]:
+                    - text: Thank you
+                    - link "@sheriytm (opens in a new tab)" [ref=f17e312] [cursor=pointer]:
+                      - /url: /sheriytm
+                      - text: "@sheriytm"
+                    - text: "!"
+              - separator [ref=f17e313]
+            - generic [ref=f17e314]:
+              - generic [ref=f17e318]:
+                - link "Rashidul Hasan Hridoy's profile" [ref=f17e319] [cursor=pointer]:
+                  - /url: /rashidulhasanhridoy
+                  - generic "Rashidul Hasan Hridoy" [ref=f17e320]
+                - generic [ref=f17e326]:
+                  - link [ref=f17e328] [cursor=pointer]:
+                    - /url: /rashidulhasanhridoy
+                    - heading "Rashidul Hasan Hridoy" [level=3] [ref=f17e329]
+                  - paragraph [ref=f17e331]: Posted 6 years ago
+                - generic [ref=f17e333]:
+                  - generic [ref=f17e334]:
+                    - button "Upvote" [ref=f17e335] [cursor=pointer]:
+                      - generic [ref=f17e336]: arrow_drop_up
+                    - button "1 votes" [ref=f17e337] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f17e338] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e342]: Great!
+              - separator [ref=f17e343]
+            - generic [ref=f17e344]:
+              - generic [ref=f17e348]:
+                - link "Dron Dronych's profile" [ref=f17e349] [cursor=pointer]:
+                  - /url: /dronych
+                  - generic "Dron Dronych" [ref=f17e350]
+                - generic [ref=f17e356]:
+                  - link [ref=f17e358] [cursor=pointer]:
+                    - /url: /dronych
+                    - heading "Dron Dronych" [level=3] [ref=f17e359]
+                  - generic [ref=f17e360]:
+                    - paragraph [ref=f17e361]: Posted 6 years ago
+                    - paragraph [ref=f17e363]: · 489th in this Competition
+                - generic [ref=f17e365]:
+                  - generic [ref=f17e366]:
+                    - button "Upvote" [ref=f17e367] [cursor=pointer]:
+                      - generic [ref=f17e368]: arrow_drop_up
+                    - button "1 votes" [ref=f17e369] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f17e370] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e374]: "Congrats on becoming # 1 in this competition. Any plans to share a kernel close to the best solution? Really interested in seeing these PP techniques applied in code"
+                - generic [ref=f17e380]:
+                  - link "Rafi Hai's profile" [ref=f17e381] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - generic "Rafi Hai" [ref=f17e382]
+                  - generic [ref=f17e388]:
+                    - generic [ref=f17e389]:
+                      - link [ref=f17e390] [cursor=pointer]:
+                        - /url: /rafiko1
+                        - heading "Rafi Hai" [level=3] [ref=f17e391]
+                      - paragraph [ref=f17e394]: Topic Author
+                    - generic [ref=f17e395]:
+                      - paragraph [ref=f17e396]: Posted 6 years ago
+                      - paragraph [ref=f17e398]: · 1st in this Competition
+                  - generic [ref=f17e400]:
+                    - generic [ref=f17e401]:
+                      - button "Upvote" [ref=f17e402] [cursor=pointer]:
+                        - generic [ref=f17e403]: arrow_drop_up
+                      - button "0 votes" [ref=f17e404] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f17e405] [cursor=pointer]: more_vert
+                  - paragraph [ref=f17e409]: Thanks! I'll discuss with my partner about what we'll share or not as kernels
+              - separator [ref=f17e410]
+            - generic [ref=f17e411]:
+              - generic [ref=f17e415]:
+                - link "'s profile" [ref=f17e416] [cursor=pointer]:
+                  - /url: /
+                - generic [ref=f17e423]:
+                  - generic:
+                    - link:
+                      - /url: /
+                      - heading [level=3]
+                  - paragraph [ref=f17e425]: Posted 6 years ago
+                - generic [ref=f17e427]:
+                  - generic [ref=f17e428]:
+                    - button "Upvote" [ref=f17e429] [cursor=pointer]:
+                      - generic [ref=f17e430]: arrow_drop_up
+                    - button "1 votes" [ref=f17e431] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f17e432] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e436]:
+                  - text: Congrats and thanks for sharing the PP technique! May I ask how the averaging was done? Is it like if you got the best prediction
+                  - code [ref=f17e437]: sub_best
+                  - text: and several former and weaker (lower in LB), let's say
+                  - code [ref=f17e438]: sub_a
+                  - text: ","
+                  - code [ref=f17e439]: sub_b
+                  - text: ", and"
+                  - code [ref=f17e440]: sub_c
+                  - text: ", then you calculated the diff between each weaker sub and the best one by data point/row (so in this case, there would be 3 diffs:"
+                  - code [ref=f17e441]: diff(sub_best, sub_a)
+                  - text: ","
+                  - code [ref=f17e442]: diff(sub_best, sub_b)
+                  - text: ", and"
+                  - code [ref=f17e443]: diff(sub_best, sub_c))
+                  - text: ", and then averaged the 3 diffs to get trend matrix in dim [63812, 1] that you discussed above, and plus since it looks like this PP was done row by row (each text has its own diff_avg) I guess the reason why you mentioned that you did it for a specific language is that you used one model for each language, isn‘t it? please kindly correct me if I am wrong, thanks again! Really loved your solution!!"
+                - generic [ref=f17e444]:
+                  - generic [ref=f17e449]:
+                    - link "Rafi Hai's profile" [ref=f17e450] [cursor=pointer]:
+                      - /url: /rafiko1
+                      - generic "Rafi Hai" [ref=f17e451]
+                    - generic [ref=f17e457]:
+                      - generic [ref=f17e458]:
+                        - link [ref=f17e459] [cursor=pointer]:
+                          - /url: /rafiko1
+                          - heading "Rafi Hai" [level=3] [ref=f17e460]
+                        - paragraph [ref=f17e463]: Topic Author
+                      - generic [ref=f17e464]:
+                        - paragraph [ref=f17e465]: Posted 6 years ago
+                        - paragraph [ref=f17e467]: · 1st in this Competition
+                    - generic [ref=f17e469]:
+                      - generic [ref=f17e470]:
+                        - button "Upvote" [ref=f17e471] [cursor=pointer]:
+                          - generic [ref=f17e472]: arrow_drop_up
+                        - button "1 votes" [ref=f17e473] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f17e474] [cursor=pointer]: more_vert
+                    - generic [ref=f17e477]:
+                      - paragraph [ref=f17e478]:
+                        - text: "Thanks, and good questions! The difference is done consecutively for each sub improvement on the LB, so not with the best sub:"
+                        - code [ref=f17e479]: For sub_a < sub_b < sub_c, ... we take diff(sub_a, sub_b) and diff(sub_b, sub_c),... and compute the average of those differences
+                        - text: We repeat the process for each language individually, mainly to account for our subs that are based on mono-lingual models. So in retrospect, we only change dim [N_test_language, 1] for the new sub, keeping all language other predictions as-is. We got a small improvement for es, tr, ru, fr.
+                      - paragraph [ref=f17e480]: Let me know if you have other questions :)
+                  - generic [ref=f17e485]:
+                    - link "'s profile" [ref=f17e486] [cursor=pointer]:
+                      - /url: /
+                    - generic [ref=f17e493]:
+                      - generic:
+                        - link:
+                          - /url: /
+                          - heading [level=3]
+                      - paragraph [ref=f17e495]: Posted 6 years ago
+                    - generic [ref=f17e497]:
+                      - generic [ref=f17e498]:
+                        - button "Upvote" [ref=f17e499] [cursor=pointer]:
+                          - generic [ref=f17e500]: arrow_drop_up
+                        - button "1 votes" [ref=f17e501] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f17e502] [cursor=pointer]: more_vert
+                    - paragraph [ref=f17e506]: thanks for the detailed answers! Nice practice as a PP for classification problem lol.
+                  - generic [ref=f17e511]:
+                    - link "Rafi Hai's profile" [ref=f17e512] [cursor=pointer]:
+                      - /url: /rafiko1
+                      - generic "Rafi Hai" [ref=f17e513]
+                    - generic [ref=f17e519]:
+                      - generic [ref=f17e520]:
+                        - link [ref=f17e521] [cursor=pointer]:
+                          - /url: /rafiko1
+                          - heading "Rafi Hai" [level=3] [ref=f17e522]
+                        - paragraph [ref=f17e525]: Topic Author
+                      - generic [ref=f17e526]:
+                        - paragraph [ref=f17e527]: Posted 6 years ago
+                        - paragraph [ref=f17e529]: · 1st in this Competition
+                    - generic [ref=f17e531]:
+                      - generic [ref=f17e532]:
+                        - button "Upvote" [ref=f17e533] [cursor=pointer]:
+                          - generic [ref=f17e534]: arrow_drop_up
+                        - button "0 votes" [ref=f17e535] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f17e536] [cursor=pointer]: more_vert
+                    - paragraph [ref=f17e540]: Sure thing! Might come in handy :D
+              - separator [ref=f17e541]
+            - generic [ref=f17e542]:
+              - generic [ref=f17e546]:
+                - link "Shubham Goel 1410's profile" [ref=f17e547] [cursor=pointer]:
+                  - /url: /shubhamgoel1410
+                  - generic "Shubham Goel 1410" [ref=f17e548]
+                - generic [ref=f17e554]:
+                  - link [ref=f17e556] [cursor=pointer]:
+                    - /url: /shubhamgoel1410
+                    - heading "Shubham Goel 1410" [level=3] [ref=f17e557]
+                  - paragraph [ref=f17e559]: Posted 6 years ago
+                - generic [ref=f17e561]:
+                  - generic [ref=f17e562]:
+                    - button "Upvote" [ref=f17e563] [cursor=pointer]:
+                      - generic [ref=f17e564]: arrow_drop_up
+                    - button "1 votes" [ref=f17e565] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f17e566] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e570]:
+                  - link "@rafiko1 (opens in a new tab)" [ref=f17e571] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - text: "@rafiko1"
+                  - text: congrats on being master
+                - generic [ref=f17e577]:
+                  - link "Rafi Hai's profile" [ref=f17e578] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - generic "Rafi Hai" [ref=f17e579]
+                  - generic [ref=f17e585]:
+                    - generic [ref=f17e586]:
+                      - link [ref=f17e587] [cursor=pointer]:
+                        - /url: /rafiko1
+                        - heading "Rafi Hai" [level=3] [ref=f17e588]
+                      - paragraph [ref=f17e591]: Topic Author
+                    - generic [ref=f17e592]:
+                      - paragraph [ref=f17e593]: Posted 6 years ago
+                      - paragraph [ref=f17e595]: · 1st in this Competition
+                  - generic [ref=f17e597]:
+                    - generic [ref=f17e598]:
+                      - button "Upvote" [ref=f17e599] [cursor=pointer]:
+                        - generic [ref=f17e600]: arrow_drop_up
+                      - button "0 votes" [ref=f17e601] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f17e602] [cursor=pointer]: more_vert
+                  - paragraph [ref=f17e606]: Thank you 🙏
+              - separator [ref=f17e607]
+            - generic [ref=f17e608]:
+              - generic [ref=f17e612]:
+                - link "Deep Chatterjee's profile" [ref=f17e613] [cursor=pointer]:
+                  - /url: /deepchatterjeevns
+                  - generic "Deep Chatterjee" [ref=f17e614]
+                - generic [ref=f17e620]:
+                  - link [ref=f17e622] [cursor=pointer]:
+                    - /url: /deepchatterjeevns
+                    - heading "Deep Chatterjee" [level=3] [ref=f17e623]
+                  - generic [ref=f17e624]:
+                    - paragraph [ref=f17e625]: Posted 6 years ago
+                    - paragraph [ref=f17e627]: · 291st in this Competition
+                - generic [ref=f17e629]:
+                  - generic [ref=f17e630]:
+                    - button "Upvote" [ref=f17e631] [cursor=pointer]:
+                      - generic [ref=f17e632]: arrow_drop_up
+                    - button "1 votes" [ref=f17e633] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f17e634] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e638]: Congratulations and thanks for sharing the technique.
+              - separator [ref=f17e639]
+            - generic [ref=f17e640]:
+              - generic [ref=f17e644]:
+                - link "Chris Deotte's profile" [ref=f17e645] [cursor=pointer]:
+                  - /url: /cdeotte
+                  - generic "Chris Deotte" [ref=f17e646]
+                - generic [ref=f17e652]:
+                  - link [ref=f17e654] [cursor=pointer]:
+                    - /url: /cdeotte
+                    - heading "Chris Deotte" [level=3] [ref=f17e655]
+                  - generic [ref=f17e656]:
+                    - paragraph [ref=f17e657]: Posted 6 years ago
+                    - paragraph [ref=f17e659]: · 61st in this Competition
+                - generic [ref=f17e661]:
+                  - generic [ref=f17e662]:
+                    - button "Upvote" [ref=f17e663] [cursor=pointer]:
+                      - generic [ref=f17e664]: arrow_drop_up
+                    - button "1 votes" [ref=f17e665] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f17e666] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e670]: Nice trick. How much did PP increase your public and private LB?
+                - generic [ref=f17e676]:
+                  - link "Rafi Hai's profile" [ref=f17e677] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - generic "Rafi Hai" [ref=f17e678]
+                  - generic [ref=f17e684]:
+                    - generic [ref=f17e685]:
+                      - link [ref=f17e686] [cursor=pointer]:
+                        - /url: /rafiko1
+                        - heading "Rafi Hai" [level=3] [ref=f17e687]
+                      - paragraph [ref=f17e690]: Topic Author
+                    - generic [ref=f17e691]:
+                      - paragraph [ref=f17e692]: Posted 6 years ago
+                      - paragraph [ref=f17e694]: · 1st in this Competition
+                  - generic [ref=f17e696]:
+                    - generic [ref=f17e697]:
+                      - button "Upvote" [ref=f17e698] [cursor=pointer]:
+                        - generic [ref=f17e699]: arrow_drop_up
+                      - button "1 votes" [ref=f17e700] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f17e701] [cursor=pointer]: more_vert
+                  - paragraph [ref=f17e705]: We were able to squeeze another ~0.001 on public (from 0.9546 to 0.9556) corresponding to 0.0006 on private (from 0.9530 to 0.9536). These are final results after using the new predictions as pseudolabels.
+              - separator [ref=f17e706]
+            - generic [ref=f17e707]:
+              - generic [ref=f17e711]:
+                - link "KhanhVD's profile" [ref=f17e712] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f17e713]
+                - generic [ref=f17e719]:
+                  - link [ref=f17e721] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f17e722]
+                  - generic [ref=f17e723]:
+                    - paragraph [ref=f17e724]: Posted 6 years ago
+                    - paragraph [ref=f17e726]: · 93rd in this Competition
+                - generic [ref=f17e728]:
+                  - generic [ref=f17e729]:
+                    - button "Upvote" [ref=f17e730] [cursor=pointer]:
+                      - generic [ref=f17e731]: arrow_drop_up
+                    - button "1 votes" [ref=f17e732] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f17e733] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e737]:
+                  - text: Congratulations on being a master
+                  - link "@rafiko1 (opens in a new tab)" [ref=f17e738] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - text: "@rafiko1"
+                  - text: "!"
+                - generic [ref=f17e744]:
+                  - link "Rafi Hai's profile" [ref=f17e745] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - generic "Rafi Hai" [ref=f17e746]
+                  - generic [ref=f17e752]:
+                    - generic [ref=f17e753]:
+                      - link [ref=f17e754] [cursor=pointer]:
+                        - /url: /rafiko1
+                        - heading "Rafi Hai" [level=3] [ref=f17e755]
+                      - paragraph [ref=f17e758]: Topic Author
+                    - generic [ref=f17e759]:
+                      - paragraph [ref=f17e760]: Posted 6 years ago
+                      - paragraph [ref=f17e762]: · 1st in this Competition
+                  - generic [ref=f17e764]:
+                    - generic [ref=f17e765]:
+                      - button "Upvote" [ref=f17e766] [cursor=pointer]:
+                        - generic [ref=f17e767]: arrow_drop_up
+                      - button "0 votes" [ref=f17e768] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f17e769] [cursor=pointer]: more_vert
+                  - paragraph [ref=f17e773]:
+                    - text: Thanks
+                    - link "@duykhanh99 (opens in a new tab)" [ref=f17e774] [cursor=pointer]:
+                      - /url: /duykhanh99
+                      - text: "@duykhanh99"
+                    - text: :)
+              - separator [ref=f17e775]
+            - generic [ref=f17e776]:
+              - generic [ref=f17e780]:
+                - link "Dron Dronych's profile" [ref=f17e781] [cursor=pointer]:
+                  - /url: /dronych
+                  - generic "Dron Dronych" [ref=f17e782]
+                - generic [ref=f17e788]:
+                  - link [ref=f17e790] [cursor=pointer]:
+                    - /url: /dronych
+                    - heading "Dron Dronych" [level=3] [ref=f17e791]
+                  - generic [ref=f17e792]:
+                    - paragraph [ref=f17e793]: Posted 6 years ago
+                    - paragraph [ref=f17e795]: · 489th in this Competition
+                - generic [ref=f17e797]:
+                  - generic [ref=f17e798]:
+                    - button "Upvote" [ref=f17e799] [cursor=pointer]:
+                      - generic [ref=f17e800]: arrow_drop_up
+                    - button "0 votes" [ref=f17e801] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f17e802] [cursor=pointer]: more_vert
+                - paragraph [ref=f17e806]:
+                  - link "@rafiko1 (opens in a new tab)" [ref=f17e807] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - text: "@rafiko1"
+                  - text: am I getting this right that you basically finetuned your predictions on the public leaderboard? and more submissions => more reliable trend direction
+                - generic [ref=f17e813]:
+                  - link "Rafi Hai's profile" [ref=f17e814] [cursor=pointer]:
+                    - /url: /rafiko1
+                    - generic "Rafi Hai" [ref=f17e815]
+                  - generic [ref=f17e821]:
+                    - generic [ref=f17e822]:
+                      - link [ref=f17e823] [cursor=pointer]:
+                        - /url: /rafiko1
+                        - heading "Rafi Hai" [level=3] [ref=f17e824]
+                      - paragraph [ref=f17e827]: Topic Author
+                    - generic [ref=f17e828]:
+                      - paragraph [ref=f17e829]: Posted 6 years ago
+                      - paragraph [ref=f17e831]: · 1st in this Competition
+                  - generic [ref=f17e833]:
+                    - generic [ref=f17e834]:
+                      - button "Upvote" [ref=f17e835] [cursor=pointer]:
+                        - generic [ref=f17e836]: arrow_drop_up
+                      - button "1 votes" [ref=f17e837] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f17e838] [cursor=pointer]: more_vert
+                  - paragraph [ref=f17e842]: That's exactly right. The more submissions you have, the more you can fine-tune it to public LB. Worth to mention is that even subs that give a degradation in score (i.e. sub_c < sub_b) can still be incorporated in a similar fashion
+              - separator [ref=f17e843]
+          - generic [ref=f17e844]:
+            - heading "Appreciation (1)" [level=2] [ref=f17e846]
+            - generic [ref=f17e851]:
+              - link "Md Selim Reza's profile" [ref=f17e852] [cursor=pointer]:
+                - /url: /mdselimreza
+                - generic "Md Selim Reza" [ref=f17e853]
+              - generic [ref=f17e859]:
+                - link [ref=f17e861] [cursor=pointer]:
+                  - /url: /mdselimreza
+                  - heading "Md Selim Reza" [level=3] [ref=f17e862]
+                - paragraph [ref=f17e864]: Posted 6 years ago
+              - generic [ref=f17e866]:
+                - generic [ref=f17e867]:
+                  - button "Upvote" [ref=f17e868] [cursor=pointer]:
+                    - generic [ref=f17e869]: arrow_drop_up
+                  - button "1 votes" [ref=f17e870] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f17e871] [cursor=pointer]: more_vert
+              - generic [ref=f17e874]:
+                - paragraph [ref=f17e875]: Congratulations!!
+                - paragraph [ref=f17e876]: Thank You
+  - alert [ref=f17e879]

@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/47722
-fetched: 2026-10-27
-chars: 832
+fetched: 2026-11-03
+chars: 7481
 
 menu
 Skip to
@@ -22,35 +22,337 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Google Brain · Featured Prediction Competition · 9 years ago
-Late Submission
-more_horiz
+3rd place solution — TensorFlow Speech Recognition Challenge
+3rd place solution
+
 TensorFlow Speech Recognition Challenge
 
-Can you build an algorithm that understands simple speech commands?
+Solution Writeup · 3rd place · Jan 18, 2018
 
-Overview
-Data
-Code
+I got sometime today to clean up my code and write the solution doc.
+
+Pushed them here https://github.com/xiaozhouwang/tensorflow_speech_recognition_solution
+
+My best single model was only 0.87 on public LB and ensemble of them could only barely enter 0.89. The boost came from two semi supervised learning techniques. You can refer to the code and doc but I also conveniently posted the key part below:
+
 Models
-Discussion
-Leaderboard
-Rules
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+10 main models were trained
 
-error
+Resnet with 9 layers on mfcc and mel (input reshaped to 128 * 128)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Senet18 on mfcc and mel (input reshaped to 128 * 128)
 
-Failed to load the discussion topic
+Densenet121 on mfcc and mel (input reshaped to 128 * 128)
 
-error
+VGG (with GlobalMaxPooling+GlobalAveragePooling in the end) on mfcc and mel (input reshaped to 128 * 128)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+VGG (with GlobalMaxPooling+GlobalAveragePooling in the end) on raw input
+
+VGG (with fully connected layers in the end) on mel where it only convs along the time axis
+
+Semi Supervised Learning
+
+Weighted average of previously trained 10 models was used as the “ground truth” labels for test data. Two semi supervised learning techniques were used:
+
+100% of training data + 20%-35% of test data selected per epoch were used as the new training data. Resnet (mfcc and mel), Senet (mfcc and mel) and VGG (mel and raw) were trained this way.
+
+100% of test data were used to train a “pretrained” model. And then the weights of the “pretrained” model were loaded as initial weights to train the same model with only training data (fine tuning with training data). It turned out that fine tuning with only one epoch was enough to “correct” the overfitted “pretrained” model.
+
+Both techniques were used with the hope that they could learn/approximate the test distribution better (instead of “overfitting” training data distribution). First one does it on the data level and second one does it on the model level.
+
+Thank you Kaggle and Google Brain team for this great competition and congrats to all top teams! This surely wasn't an easy competition and I had quite a lot of fun doing it!
+
+Update: uploaded my best private sub with pred scores (slightly better than my selected one, 0.91084).
+
+Author
+Little Boat
+
+xiaozhouwang
+
+arrow_drop_up
+51
+Share
+more_horiz
+Project Files
+table_chart
+semi_pred_scores_1226mfcc.csv.tar.gz
+get_app
+table_chart
+semi_sub_1226mfcc_e119.csv
+get_app
+Download All
+Citation
+
+Little Boat. 3rd place solution. https://www.kaggle.com/competitions/tensorflow-speech-recognition-challenge/writeups/little-boat-3rd-place-solution. 2018. Kaggle
+
+comment
+18 Comments
+6 appreciation comments
+Hotness
+Jiwei Liu
+
+Posted 9 years ago
+
+· 1051st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+给舟神疯狂打call ：D
+
+reply
+Reply
+Đào Nguyên Dương
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the idea. I used it for other ASR competition, it worked very well !
+
+reply
+Reply
+Marvin Lerousseau
+
+Posted 9 years ago
+
+· 487th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+First time seeing someone pretrain a model using semi-supervised learning on the full test set, thanks for sharing!
+
+Did you see significant improvement over supervised learning without pretraining ?
+
+reply
+Reply
+Andre Holzner
+
+Posted 9 years ago
+
+· 643rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations !
+
+Do you think you could turn your prediction .csv files into Kaggle datasets (so that we can use it from kernels) ?
+
+reply
+Reply
+Russ Wolfinger
+
+Posted 9 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great job Little Boat and thanks so much for sharing. Brilliant use of semi-supervised and congrats on a top finish!
+
+reply
+Reply
+hengck23
+
+Posted 9 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing! Semi supervised learning works!
+
+Do you mind posting your submission CSV file along with the raw probability values here? I can make a comparison between your results and mine. I posted mine at: https://www.kaggle.com/c/tensorflow-speech-recognition-challenge/discussion/47728
+
+reply
+Reply
+Little Boat
+
+Topic Author
+
+Posted 9 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+For sure but somehow it seems there is a limit for uploading files. So I could only attach one with predicted probabilities. The one attached has slightly better score than my selected one. (You can find the file in the main post)
+
+Also congrats!
+
+reply
+Reply
+FullySelfDrivingTang
+
+Posted 9 years ago
+
+· 187th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation and Thanks for your great sharing. Would you please explain a little more on the ensemble weight? Specifically, how did you come out 0.75, 0.25 and 0.4 (vgg1d_raw.as_matrix() * 0.75 + vgg1d_mel.as_matrix() * 0.25) * 0.4? I understand the formula is base on the public LB, just curious the detail steps.
+
+reply
+Reply
+Little Boat
+
+Topic Author
+
+Posted 9 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+sure. I just look at the correlation of the submission probabilities of each class, and then use the difference of the model/inputs as well as model score on public LB and then decide a weight and then submit, if it is better than any of the single model score, I just use that. I might try 2 - 3 times and then settle with the weights.
+
+reply
+Reply
+Bo Peng
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi Xiao Zhou,
+
+So for the test set pretrained model, you used the training data to train a model, and with the test set results, you used that to retrain a model and then use the trained weights as the initialization weights to retrain the training data?
+
+Does that help with the training model to converge faster or what is the point of that?
+
+Thanks.
+
+Best.
+
+reply
+Reply
+Little Boat
+
+Topic Author
+
+Posted 9 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+sorry if I was not clear. So say, you have a model that scores 0.89 on LB.
+
+You take the submission of that model, and use that as the labels for test data. Now this test data with 0.89 accurate labels become the new training data for the pretrained model. You train your pretrained model with only test data.
+
+And then you use the weights from the pretrained model to initialize one same model, and now, instead of training on test data, you train on training data. and then do prediction with this fine tuned model for test data.
+
+Hope it is clearer now.
+
+reply
+Reply
+Daniel Yang
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+great work!
+
+reply
+Reply
+Appreciation (6)
+yyll008
+
+Posted 9 years ago
+
+· 150th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing， 感谢舟神分享
+
+RodrigoVargas
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks mate o/
+
+Taka
+
+Posted 9 years ago
+
+· 54th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing， 感谢舟神分享+3
+
+AlaricKeuipo
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing， 感谢舟神分享+2
+
+Shujian Liu
+
+Posted 9 years ago
+
+· 602nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing， 感谢舟神分享 +1
+
+Ren
+
+Posted 9 years ago
+
+· 48th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing， 感谢舟神分享

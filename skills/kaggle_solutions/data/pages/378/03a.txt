@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/liverpool-ion-switching/discussion/153955
-fetched: 2026-10-27
-chars: 733
+fetched: 2026-11-03
+chars: 7920
 
 menu
 Skip to
@@ -42,11 +42,370 @@ Models
 Discussion
 Leaderboard
 Rules
+Gilles Vandewiele · 3rd in this Competition · Posted 6 years ago
+arrow_drop_up
+48
+more_vert
+3rd place solution: blog post
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+I finished the write-up of our solution that got us the third place in the Kaggle "Liverpool Ion Switching".
 
-Failed to load the discussion topic
+My goal was to explain our approach from end-to-end. If something is unclear, badly written, or anything else, then please feel free to leave a comment here. I would greatly appreciate it.
 
-error
+Also, I would like to thank my team mates @zidmie and @khahuras once again!
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Please sign in to reply to this topic.
+
+comment
+48 Comments
+1 appreciation comment
+Hotness
+Rob Mulla
+
+Posted 6 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Excellent writeup Gillies! Personally, I'll always consider this the 1st place solution.
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thanks Rob :) those are very kind words!
+
+Sxwat
+
+Posted 6 years ago
+
+· 495th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Maybe we should count it as the 1st place solution, cause you don't really use leak? Anyway excellent write-up with elegant and interesting math solution, very educative
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you @aybatov, greatly appreciated!
+
+Chris Deotte
+
+Posted 6 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Great blog post. Well written and fantastic solution! Congrats to you and your team!
+
+I like how your solution is so simple and elegant.
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks Chris. Means a lot coming from you.
+
+Indeed, I love the great simplicity of our solution as well (if I may say it myself).
+
+Zidmie
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I would also like to thank my great team mates for these nice moments all over the competition. It was great to race with all these teams on the top of the LB! After doing some post-competition submissions, I can notice that we overfitted the public LB more than I thought :) There's room for improvement here, I'll keep it in mind! Thanks to the Zoo for the tips here: LANL First place solution : this helped us in finding a good threshold adjustment in prediction postprocessing! Thanks also to the organizers for this great competition : low amount of data, and high scientific background, made it really fun. It would have been perfect without the leak, still it was a good moment.
+
+CPMP
+
+Posted 6 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing in a very well written blog entry. And congrats on the result.
+
+Chris Deotte
+
+Posted 6 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Just for fun, I ensembled your model 3rd place with 5th place and our 7th place here. I'm curious to see how much more we could have improved our models without leaks. The ensemble score public LB 0.94719 and private LB 0.94594. So appears that we could have all squeezed out a little more accuracy with our models.
+
+Kha Vo
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks Chris. I've uploaded our second best file: 0.94584 private / 0.94701 public here (sub0.94585.csv, the score in filename is not correct). We have 0.94585 file but public score is not good, so this file is more beautiful. It's gonna be better for the blend if you want to retry it with your model (let's try to reach 0.946 private!). Be noticed that this file maybe a little diverse to our previous best 0.94575 that you used (I'm not sure, but they seem), so you can use both our files in the blend, then you're gonna have 5 files, easier for median :)
+
+16 more replies
+arrow_drop_down
+Bram Steenwinckel
+
+Posted 6 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Excellent write-up Gilles, I hope you are not too disappointed (anymore). Keep providing us with these blogposts, please, and keep competing. It is due to people like you that this community, is still a community ;)
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you Bram! Looking forward to teaming up with your in another competition!
+
+corochann
+
+Posted 6 years ago
+
+· 1842nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing details, nice to learn.
+
+Marco Gorelli
+
+Posted 6 years ago
+
+· 385th in this Competition
+
+arrow_drop_up
+1
+more_vert
+# Fit our HMM
+hmm.fit(sub_signal.reshape(-1, 1), lengths=[100000]*10)
+
+
+This partlengths=[100000]*10 is because of
+
+Moreover, as it turns out, the batches of 500K in the training set actually consist of 5x 100K batches.
+
+and there are two 500k batches of category 2? If so, I think it's clear to someone who's spent some time on the competition, but perhaps not so clear to someone who's just reading the blog post
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Again a great remark Marco! These are greatly appreciated. I have added some more information to the caption of the code snippet (and also cited/referred to you for pointing this out). Do you think it is more clear now?
+
+5 more replies
+arrow_drop_down
+YaGana Sheriff-Hussaini
+
+Posted 6 years ago
+
+· 33rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @group16 and team. Thanks for sharing your solution.
+
+YaGana Sheriff-Hussaini
+
+Posted 6 years ago
+
+· 33rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@group16, I finally read the blog post of your elegant solution. I was so looking forward to this and it did not disappoint. I am eagerly waiting for the release of your code in full. Congratulations once again @khahuras, @zidmie, and @group16.
+
+Ertuğrul Demir
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Even though I didn't participate it was great read for me, thank you and your team!
+
+Rafi Hai
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Amazing write-up, will have to read it a couple of times more :D Congrats on the achievement!
+
+Andrés Miguel Torrubia Sáez
+
+Posted 6 years ago
+
+· 258th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Really interesting approach. Congratulations!
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you @antorsae!
+
+kss
+
+Posted 6 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Brilliant write-up
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you @l0glikelihood and congratulations on getting into the Master Tier!
+
+Marco Gorelli
+
+Posted 6 years ago
+
+· 385th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+This is really good, thanks!
+
+Just a small note - if you copy and paste the description directly from here, it'd be best to make it clear that it's a quote from Kaggle / the competition host, otherwise it looks like something you've written
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you @marcogorelli, a very correct remark. I have now explicitly stated that these are the organizers their words ;)
+
+Pratik Mukherjee
+
+Posted 6 years ago
+
+· 2605th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Amazing write-up.
+
+Appreciation (1)
+luyaxin
+
+Posted 6 years ago
+
+· 90th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great blog post, Thanks for sharing!

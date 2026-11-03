@@ -1,0 +1,981 @@
+- generic [ref=f18e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f18e3]:
+    - generic [ref=f18e5]:
+      - button "Navigation menu" [ref=f18e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f18e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f18e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f18e14]:
+      - link [ref=f18e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Ftweet-sentiment-extraction%2Fwriteups%2Fdark-of-the-moon-quick-1st-place-solution-overview
+        - button "Login" [ref=f18e16]
+      - link [ref=f18e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Ftweet-sentiment-extraction%2Fwriteups%2Fdark-of-the-moon-quick-1st-place-solution-overview
+        - button "Sign Up" [ref=f18e19]
+  - main [ref=f18e21]:
+    - generic [ref=f18e23]:
+      - generic [ref=f18e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f18e25]:
+        - link "Learn more" [ref=f18e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f18e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f18e29]:
+      - generic [ref=f18e31]: Quick 1st place solution overview before the night — Tweet Sentiment Extraction
+      - separator [ref=f18e32]
+      - generic [ref=f18e34]:
+        - generic [ref=f18e35]:
+          - heading "Quick 1st place solution overview before the night" [level=1] [ref=f18e36]
+          - generic [ref=f18e37]:
+            - link [ref=f18e38] [cursor=pointer]:
+              - /url: /competitions/tweet-sentiment-extraction
+              - paragraph [ref=f18e40]: Tweet Sentiment Extraction
+            - paragraph [ref=f18e41]: Solution Writeup · 1st place · Jun 17, 2020
+        - separator [ref=f18e43]
+        - generic [ref=f18e44]:
+          - generic [ref=f18e46]:
+            - heading "Update :" [level=2] [ref=f18e47]
+            - list [ref=f18e48]:
+              - listitem [ref=f18e49]:
+                - text: "Training notebook for our 2nd level models :"
+                - link "https://www.kaggle.com/theoviel/character-level-model-magic/ (opens in a new tab)" [ref=f18e50] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/theoviel/character-level-model-magic/
+                  - text: https://www.kaggle.com/theoviel/character-level-model-magic/
+              - listitem [ref=f18e51]:
+                - text: "More detailed write-up :"
+                - link "https://www.kaggle.com/c/tweet-sentiment-extraction/discussion/159477 (opens in a new tab)" [ref=f18e52] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/tweet-sentiment-extraction/discussion/159477
+                  - text: https://www.kaggle.com/c/tweet-sentiment-extraction/discussion/159477
+            - paragraph [ref=f18e53]: This is a short thread to rapidly present a solution, we will work on a more detailed one tomorrow.
+            - paragraph [ref=f18e54]:
+              - text: Huge thanks to my teammates
+              - link "@cl2ev1 (opens in a new tab)" [ref=f18e55] [cursor=pointer]:
+                - /url: /cl2ev1
+                - text: "@cl2ev1"
+              - text: ","
+              - link "@aruchomu (opens in a new tab)" [ref=f18e56] [cursor=pointer]:
+                - /url: /aruchomu
+                - text: "@aruchomu"
+              - text: and
+              - link "@wochidadonggua (opens in a new tab)" [ref=f18e57] [cursor=pointer]:
+                - /url: /wochidadonggua
+                - text: "@wochidadonggua"
+              - text: for the great work, we definitely wouldn't have gone this far if we were not together.
+            - paragraph [ref=f18e58]: Our whole solution can be illustrated in the following pipeline.
+            - paragraph [ref=f18e59]
+            - paragraph [ref=f18e60]: The idea is to use transformers to extract token level start and end probabilities. Using the offsets, we can retrieved the processed probabilities for the input text.
+            - paragraph [ref=f18e61]: We then feed these probabilities to a character level model.
+            - paragraph [ref=f18e62]:
+              - text: The tricky part is to concatenate everything correctly, such as explained
+              - link "here (opens in a new tab)" [ref=f18e63] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/tweet-sentiment-extraction/discussion/159254
+                - text: here
+            - paragraph [ref=f18e64]: And then… TADAM ! No post-processing. Just modeling.
+            - paragraph [ref=f18e65]: We selected two models that scored public LB 0.734 / CV 0.736+. They use 4 different character level model each, with a big variety of transformers. Final private scores are 0.735 and 0.736 :)
+            - paragraph [ref=f18e66]: Thanks for reading !
+          - generic [ref=f18e67]:
+            - generic [ref=f18e68]:
+              - text: Authors
+              - generic [ref=f18e69]:
+                - link "heartkilla's profile" [ref=f18e70] [cursor=pointer]:
+                  - /url: /aruchomu
+                  - generic "heartkilla" [ref=f18e71]
+                - generic [ref=f18e75]:
+                  - link "heartkilla" [ref=f18e76] [cursor=pointer]:
+                    - /url: /aruchomu
+                  - paragraph [ref=f18e77]: aruchomu
+              - generic [ref=f18e78]:
+                - link "Cl_ev's profile" [ref=f18e79] [cursor=pointer]:
+                  - /url: /cl2ev1
+                  - generic "Cl_ev" [ref=f18e80]
+                - generic [ref=f18e84]:
+                  - link "Cl_ev" [ref=f18e85] [cursor=pointer]:
+                    - /url: /cl2ev1
+                  - paragraph [ref=f18e86]: cl2ev1
+              - generic [ref=f18e87]:
+                - link "Theo Viel's profile" [ref=f18e88] [cursor=pointer]:
+                  - /url: /theoviel
+                  - generic "Theo Viel" [ref=f18e89]
+                - generic [ref=f18e93]:
+                  - link "Theo Viel" [ref=f18e94] [cursor=pointer]:
+                    - /url: /theoviel
+                  - paragraph [ref=f18e95]: theoviel
+              - generic [ref=f18e96]:
+                - link "Hikkiiiiiiiii's profile" [ref=f18e97] [cursor=pointer]:
+                  - /url: /wochidadonggua
+                  - generic "Hikkiiiiiiiii" [ref=f18e98]
+                - generic [ref=f18e102]:
+                  - link "Hikkiiiiiiiii" [ref=f18e103] [cursor=pointer]:
+                    - /url: /wochidadonggua
+                  - paragraph [ref=f18e104]: wochidadonggua
+            - separator [ref=f18e105]
+            - generic [ref=f18e106]:
+              - generic [ref=f18e107]:
+                - button "Upvote" [ref=f18e108] [cursor=pointer]:
+                  - generic [ref=f18e109]: arrow_drop_up
+                - button "123 votes" [ref=f18e110] [cursor=pointer]: "123"
+              - button "Share" [ref=f18e111] [cursor=pointer]
+              - button "Writeup actions" [ref=f18e113] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f18e114]
+        - paragraph [ref=f18e115]: heartkilla, Cl_ev, Theo Viel, Hikkiiiiiiiii. Quick 1st place solution overview before the night . https://www.kaggle.com/competitions/tweet-sentiment-extraction/writeups/dark-of-the-moon-quick-1st-place-solution-overview. 2020. Kaggle
+        - separator [ref=f18e116]
+        - generic [ref=f18e117]:
+          - generic [ref=f18e119]:
+            - generic [ref=f18e120]:
+              - generic [aria-hidden] [ref=f18e121]: comment
+              - heading "39 Comments" [level=2] [ref=f18e123]
+            - generic [ref=f18e126]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f18e127] [cursor=pointer]:
+                - generic [ref=f18e128]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f18e130]:
+            - generic [ref=f18e131]:
+              - generic [ref=f18e135]:
+                - link "Psi's profile" [ref=f18e136] [cursor=pointer]:
+                  - /url: /philippsinger
+                  - generic "Psi" [ref=f18e137]
+                - generic [ref=f18e143]:
+                  - link [ref=f18e145] [cursor=pointer]:
+                    - /url: /philippsinger
+                    - heading "Psi" [level=3] [ref=f18e146]
+                  - generic [ref=f18e147]:
+                    - paragraph [ref=f18e148]: Posted 6 years ago
+                    - paragraph [ref=f18e150]: · 11th in this Competition
+                - generic [ref=f18e152]:
+                  - generic [ref=f18e153]:
+                    - button "Upvote" [ref=f18e154] [cursor=pointer]:
+                      - generic [ref=f18e155]: arrow_drop_up
+                    - button "6 votes" [ref=f18e156] [cursor=pointer]: "6"
+                  - button "More Options for this Comment" [ref=f18e157] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e161]: Nice work! I tried to feed the selected text into a character transformer model but that did not improve. Using the probabilities and your structure is way smarter. Hope you will post more details.
+                - button "Reply" [ref=f18e163] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e164]: reply
+                - generic [ref=f18e171]:
+                  - link "heartkilla's profile" [ref=f18e172] [cursor=pointer]:
+                    - /url: /aruchomu
+                    - generic "heartkilla" [ref=f18e173]
+                  - generic [ref=f18e179]:
+                    - link [ref=f18e181] [cursor=pointer]:
+                      - /url: /aruchomu
+                      - heading "heartkilla" [level=3] [ref=f18e182]
+                    - generic [ref=f18e183]:
+                      - paragraph [ref=f18e184]: Posted 6 years ago
+                      - paragraph [ref=f18e186]: · 1st in this Competition
+                  - generic [ref=f18e188]:
+                    - generic [ref=f18e189]:
+                      - button "Upvote" [ref=f18e190] [cursor=pointer]:
+                        - generic [ref=f18e191]: arrow_drop_up
+                      - button "1 votes" [ref=f18e192] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f18e193] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e197]: We also tried to built a character level transformer as a 2nd level model, but this miserably is not learning at all :) Maybe my implementation was bad though.
+                  - button "Reply" [ref=f18e199] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e200]: reply
+              - separator [ref=f18e202]
+            - generic [ref=f18e203]:
+              - generic [ref=f18e207]:
+                - link "Mr_KnowNothing's profile" [ref=f18e208] [cursor=pointer]:
+                  - /url: /tanulsingh077
+                  - generic "Mr_KnowNothing" [ref=f18e209]
+                - generic [ref=f18e215]:
+                  - link [ref=f18e217] [cursor=pointer]:
+                    - /url: /tanulsingh077
+                    - heading "Mr_KnowNothing" [level=3] [ref=f18e218]
+                  - generic [ref=f18e219]:
+                    - paragraph [ref=f18e220]: Posted 6 years ago
+                    - paragraph [ref=f18e222]: · 44th in this Competition
+                - generic [ref=f18e224]:
+                  - generic [ref=f18e225]:
+                    - button "Upvote" [ref=f18e226] [cursor=pointer]:
+                      - generic [ref=f18e227]: arrow_drop_up
+                    - button "5 votes" [ref=f18e228] [cursor=pointer]: "5"
+                  - button "More Options for this Comment" [ref=f18e229] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e233]:
+                  - text: Congratulations on the win
+                  - link "@theoviel (opens in a new tab)" [ref=f18e234] [cursor=pointer]:
+                    - /url: /theoviel
+                    - text: "@theoviel"
+                  - text: and team, thanks for giving a sneak peak so early ,the idea is mind blowing, hoping to see the solution soon I thought to approach this as a character level machine translation problem where the text is the first language and the selected_text is the conversion to second language but then I though this is stupid and let it off, I would love to have inputs on this idea
+                - button "Reply" [ref=f18e236] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e237]: reply
+                - generic [ref=f18e244]:
+                  - link "Theo Viel's profile" [ref=f18e245] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e246]
+                  - generic [ref=f18e252]:
+                    - generic [ref=f18e253]:
+                      - link [ref=f18e254] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e255]
+                      - paragraph [ref=f18e258]: Topic Author
+                    - generic [ref=f18e259]:
+                      - paragraph [ref=f18e260]: Posted 6 years ago
+                      - paragraph [ref=f18e262]: · 1st in this Competition
+                  - generic [ref=f18e264]:
+                    - generic [ref=f18e265]:
+                      - button "Upvote" [ref=f18e266] [cursor=pointer]:
+                        - generic [ref=f18e267]: arrow_drop_up
+                      - button "0 votes" [ref=f18e268] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f18e269] [cursor=pointer]: more_vert
+                  - generic [ref=f18e272]:
+                    - paragraph [ref=f18e273]: Thanks !
+                    - paragraph [ref=f18e274]: I'm not sure I completely get your idea, but I would consider trying to translate the predicted label to the original noisy label, it makes sense.
+                  - button "Reply" [ref=f18e276] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e277]: reply
+              - separator [ref=f18e279]
+            - generic [ref=f18e280]:
+              - generic [ref=f18e284]:
+                - link "Shai's profile" [ref=f18e285] [cursor=pointer]:
+                  - /url: /sgalib
+                  - generic "Shai" [ref=f18e286]
+                - generic [ref=f18e292]:
+                  - link [ref=f18e294] [cursor=pointer]:
+                    - /url: /sgalib
+                    - heading "Shai" [level=3] [ref=f18e295]
+                  - generic [ref=f18e296]:
+                    - paragraph [ref=f18e297]: Posted 6 years ago
+                    - paragraph [ref=f18e299]: · 13th in this Competition
+                - generic [ref=f18e301]:
+                  - generic [ref=f18e302]:
+                    - button "Upvote" [ref=f18e303] [cursor=pointer]:
+                      - generic [ref=f18e304]: arrow_drop_up
+                    - button "2 votes" [ref=f18e305] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f18e306] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e310]: Very impressive. The SOTA transformer models were not so bad in extracting the "selected text". The main problem was to capture the noise in the dataset. Some used post-processing to replicate that. But predicting character level noise using ML models is way smarter! Great job!
+                - button "Reply" [ref=f18e312] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e313]: reply
+                - generic [ref=f18e320]:
+                  - link "Theo Viel's profile" [ref=f18e321] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e322]
+                  - generic [ref=f18e328]:
+                    - generic [ref=f18e329]:
+                      - link [ref=f18e330] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e331]
+                      - paragraph [ref=f18e334]: Topic Author
+                    - generic [ref=f18e335]:
+                      - paragraph [ref=f18e336]: Posted 6 years ago
+                      - paragraph [ref=f18e338]: · 1st in this Competition
+                  - generic [ref=f18e340]:
+                    - generic [ref=f18e341]:
+                      - button "Upvote" [ref=f18e342] [cursor=pointer]:
+                        - generic [ref=f18e343]: arrow_drop_up
+                      - button "3 votes" [ref=f18e344] [cursor=pointer]: "3"
+                    - button "More Options for this Comment" [ref=f18e345] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e349]: I agree, I have the feeling that 0.715 scoring models were already better than the labels at the task. The rest was just modeling the noise in the data, everybody found a different way to do so. Ours was a bit fancy, because we didn't spot the pattern initially aha Anyways, congratz on competition GM !
+                  - button "Reply" [ref=f18e351] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e352]: reply
+              - separator [ref=f18e354]
+            - generic [ref=f18e355]:
+              - generic [ref=f18e359]:
+                - link "Aditya Soni's profile" [ref=f18e360] [cursor=pointer]:
+                  - /url: /adityaecdrid
+                  - generic "Aditya Soni" [ref=f18e361]
+                - generic [ref=f18e367]:
+                  - link [ref=f18e369] [cursor=pointer]:
+                    - /url: /adityaecdrid
+                    - heading "Aditya Soni" [level=3] [ref=f18e370]
+                  - generic [ref=f18e371]:
+                    - paragraph [ref=f18e372]: Posted 6 years ago
+                    - paragraph [ref=f18e374]: · 1189th in this Competition
+                - generic [ref=f18e376]:
+                  - generic [ref=f18e377]:
+                    - button "Upvote" [ref=f18e378] [cursor=pointer]:
+                      - generic [ref=f18e379]: arrow_drop_up
+                    - button "2 votes" [ref=f18e380] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f18e381] [cursor=pointer]: more_vert
+                - generic [ref=f18e384]:
+                  - paragraph [ref=f18e385]: Thanks and Congratulations; Very Interesting Approach!
+                  - list [ref=f18e386]:
+                    - listitem [ref=f18e387]:
+                      - text: What's
+                      - code [ref=f18e388]: char_level_start_and_end proba
+                      - text: from token based using offsets?
+                    - listitem [ref=f18e389]: What's sentiment fts? (trained/pre-trained vector/features for sentiment-labels?)
+                    - listitem [ref=f18e390]: Also you use the subscript "*n", so you used top-k preds? (In concatenate) or N denotes the no. of models?
+                    - listitem [ref=f18e391]: Plus will the code be open-sourced for the concatenation of everything part especially? (Thanks)
+                  - paragraph [ref=f18e392]: Thanks;
+                - button "Reply" [ref=f18e394] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e395]: reply
+                - generic [ref=f18e397]:
+                  - generic [ref=f18e402]:
+                    - link "heartkilla's profile" [ref=f18e403] [cursor=pointer]:
+                      - /url: /aruchomu
+                      - generic "heartkilla" [ref=f18e404]
+                    - generic [ref=f18e410]:
+                      - link [ref=f18e412] [cursor=pointer]:
+                        - /url: /aruchomu
+                        - heading "heartkilla" [level=3] [ref=f18e413]
+                      - generic [ref=f18e414]:
+                        - paragraph [ref=f18e415]: Posted 6 years ago
+                        - paragraph [ref=f18e417]: · 1st in this Competition
+                    - generic [ref=f18e419]:
+                      - generic [ref=f18e420]:
+                        - button "Upvote" [ref=f18e421] [cursor=pointer]:
+                          - generic [ref=f18e422]: arrow_drop_up
+                        - button "3 votes" [ref=f18e423] [cursor=pointer]: "3"
+                      - button "More Options for this Comment" [ref=f18e424] [cursor=pointer]: more_vert
+                    - list [ref=f18e428]:
+                      - listitem [ref=f18e429]: Those are character level probabilities we got from transformers. You can simply calculate them by assigning each character the probability of the corresponding token.
+                      - listitem [ref=f18e430]: Sentiments fts is nothing but the output of a plain Embedding layer. Just like you would add any other categorical data to a neural net.
+                      - listitem [ref=f18e431]: "\"n\" means the number of 1st level transformer models we used. The char-level NN is then using their predictions in a form of stacking."
+                      - listitem [ref=f18e432]: Yes, I think we will open source everything hopefully.
+                    - button "Reply" [ref=f18e434] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f18e435]: reply
+                  - generic [ref=f18e437]:
+                    - button "4 more replies" [ref=f18e438] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f18e440]: arrow_drop_down
+                    - generic [ref=f18e441]:
+                      - img "Profile picture for Yu Kang" [ref=f18e443]
+                      - img "Profile picture for heartkilla" [ref=f18e445]
+              - separator [ref=f18e446]
+            - generic [ref=f18e447]:
+              - generic [ref=f18e451]:
+                - link "Jaseem C K's profile" [ref=f18e452] [cursor=pointer]:
+                  - /url: /jaseemck
+                  - generic "Jaseem C K" [ref=f18e453]
+                - generic [ref=f18e459]:
+                  - link [ref=f18e461] [cursor=pointer]:
+                    - /url: /jaseemck
+                    - heading "Jaseem C K" [level=3] [ref=f18e462]
+                  - paragraph [ref=f18e464]: Posted 6 years ago
+                - generic [ref=f18e466]:
+                  - generic [ref=f18e467]:
+                    - button "Upvote" [ref=f18e468] [cursor=pointer]:
+                      - generic [ref=f18e469]: arrow_drop_up
+                    - button "1 votes" [ref=f18e470] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e471] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e475]: Great work. The extended write-up was cool. Expecting more of such. It could really help beginners like me. If you can please make it more beginner-friendly next time (Maybe it is difficult for problems like this 😬 ). However, Congrats on the achievement!
+                - button "Reply" [ref=f18e477] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e478]: reply
+              - separator [ref=f18e480]
+            - generic [ref=f18e481]:
+              - generic [ref=f18e485]:
+                - link "Anthony Chan's profile" [ref=f18e486] [cursor=pointer]:
+                  - /url: /anthonymarcz
+                  - generic "Anthony Chan" [ref=f18e487]
+                - generic [ref=f18e493]:
+                  - link [ref=f18e495] [cursor=pointer]:
+                    - /url: /anthonymarcz
+                    - heading "Anthony Chan" [level=3] [ref=f18e496]
+                  - generic [ref=f18e497]:
+                    - paragraph [ref=f18e498]: Posted 6 years ago
+                    - paragraph [ref=f18e500]: · 1400th in this Competition
+                - generic [ref=f18e502]:
+                  - generic [ref=f18e503]:
+                    - button "Upvote" [ref=f18e504] [cursor=pointer]:
+                      - generic [ref=f18e505]: arrow_drop_up
+                    - button "1 votes" [ref=f18e506] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e507] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e511]: Very impressive architecture!!! Learned so much from your solution.
+                - button "Reply" [ref=f18e513] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e514]: reply
+              - separator [ref=f18e516]
+            - generic [ref=f18e517]:
+              - generic [ref=f18e521]:
+                - link "SrJ's profile" [ref=f18e522] [cursor=pointer]:
+                  - /url: /srjony
+                  - generic "SrJ" [ref=f18e523]
+                - generic [ref=f18e529]:
+                  - link [ref=f18e531] [cursor=pointer]:
+                    - /url: /srjony
+                    - heading "SrJ" [level=3] [ref=f18e532]
+                  - generic [ref=f18e533]:
+                    - paragraph [ref=f18e534]: Posted 6 years ago
+                    - paragraph [ref=f18e536]: · 548th in this Competition
+                - generic [ref=f18e538]:
+                  - generic [ref=f18e539]:
+                    - button "Upvote" [ref=f18e540] [cursor=pointer]:
+                      - generic [ref=f18e541]: arrow_drop_up
+                    - button "1 votes" [ref=f18e542] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e543] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e547]: Congratulations on winning. Which type of Embeddings did you use?
+                - button "Reply" [ref=f18e549] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e550]: reply
+                - generic [ref=f18e552]:
+                  - generic [ref=f18e557]:
+                    - link "heartkilla's profile" [ref=f18e558] [cursor=pointer]:
+                      - /url: /aruchomu
+                      - generic "heartkilla" [ref=f18e559]
+                    - generic [ref=f18e565]:
+                      - link [ref=f18e567] [cursor=pointer]:
+                        - /url: /aruchomu
+                        - heading "heartkilla" [level=3] [ref=f18e568]
+                      - generic [ref=f18e569]:
+                        - paragraph [ref=f18e570]: Posted 6 years ago
+                        - paragraph [ref=f18e572]: · 1st in this Competition
+                    - generic [ref=f18e574]:
+                      - generic [ref=f18e575]:
+                        - button "Upvote" [ref=f18e576] [cursor=pointer]:
+                          - generic [ref=f18e577]: arrow_drop_up
+                        - button "2 votes" [ref=f18e578] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f18e579] [cursor=pointer]: more_vert
+                    - paragraph [ref=f18e583]:
+                      - code [ref=f18e584]: torch.nn.Embedding
+                      - text: We train them from scratch.
+                    - button "Reply" [ref=f18e586] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f18e587]: reply
+                  - generic [ref=f18e593]:
+                    - link "Vikas Kumar's profile" [ref=f18e594] [cursor=pointer]:
+                      - /url: /vikasvikkie
+                      - generic "Vikas Kumar" [ref=f18e595]
+                    - generic [ref=f18e601]:
+                      - link [ref=f18e603] [cursor=pointer]:
+                        - /url: /vikasvikkie
+                        - heading "Vikas Kumar" [level=3] [ref=f18e604]
+                      - generic [ref=f18e605]:
+                        - paragraph [ref=f18e606]: Posted 6 years ago
+                        - paragraph [ref=f18e608]: · 1258th in this Competition
+                    - generic [ref=f18e610]:
+                      - generic [ref=f18e611]:
+                        - button "Upvote" [ref=f18e612] [cursor=pointer]:
+                          - generic [ref=f18e613]: arrow_drop_up
+                        - button "1 votes" [ref=f18e614] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f18e615] [cursor=pointer]: more_vert
+                    - paragraph [ref=f18e619]: thats just wow, looking forward to source code.
+                    - button "Reply" [ref=f18e621] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f18e622]: reply
+              - separator [ref=f18e624]
+            - generic [ref=f18e625]:
+              - generic [ref=f18e629]:
+                - link "Aftab Ali's profile" [ref=f18e630] [cursor=pointer]:
+                  - /url: /developeraftab
+                  - generic "Aftab Ali" [ref=f18e631]
+                - generic [ref=f18e637]:
+                  - link [ref=f18e639] [cursor=pointer]:
+                    - /url: /developeraftab
+                    - heading "Aftab Ali" [level=3] [ref=f18e640]
+                  - generic [ref=f18e641]:
+                    - paragraph [ref=f18e642]: Posted 6 years ago
+                    - paragraph [ref=f18e644]: · 1909th in this Competition
+                - generic [ref=f18e646]:
+                  - generic [ref=f18e647]:
+                    - button "Upvote" [ref=f18e648] [cursor=pointer]:
+                      - generic [ref=f18e649]: arrow_drop_up
+                    - button "1 votes" [ref=f18e650] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e651] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e655]: Congratulations! Great work hope to learn from your excellent work
+                - button "Reply" [ref=f18e657] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e658]: reply
+              - separator [ref=f18e660]
+            - generic [ref=f18e661]:
+              - generic [ref=f18e665]:
+                - link "m.y.'s profile" [ref=f18e666] [cursor=pointer]:
+                  - /url: /futureboykid
+                  - generic "m.y." [ref=f18e667]
+                - generic [ref=f18e673]:
+                  - link [ref=f18e675] [cursor=pointer]:
+                    - /url: /futureboykid
+                    - heading "m.y." [level=3] [ref=f18e676]
+                  - generic [ref=f18e677]:
+                    - paragraph [ref=f18e678]: Posted 6 years ago
+                    - paragraph [ref=f18e680]: · 2nd in this Competition
+                - generic [ref=f18e682]:
+                  - generic [ref=f18e683]:
+                    - button "Upvote" [ref=f18e684] [cursor=pointer]:
+                      - generic [ref=f18e685]: arrow_drop_up
+                    - button "1 votes" [ref=f18e686] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e687] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e691]: Thanks for sharing! Intuitively, I thought modeling "noise" is difficult, so we focus on developing post-processing. Your solution is very cool. Congratulations!!!
+                - button "Reply" [ref=f18e693] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e694]: reply
+                - generic [ref=f18e701]:
+                  - link "Theo Viel's profile" [ref=f18e702] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e703]
+                  - generic [ref=f18e709]:
+                    - generic [ref=f18e710]:
+                      - link [ref=f18e711] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e712]
+                      - paragraph [ref=f18e715]: Topic Author
+                    - generic [ref=f18e716]:
+                      - paragraph [ref=f18e717]: Posted 6 years ago
+                      - paragraph [ref=f18e719]: · 1st in this Competition
+                  - generic [ref=f18e721]:
+                    - generic [ref=f18e722]:
+                      - button "Upvote" [ref=f18e723] [cursor=pointer]:
+                        - generic [ref=f18e724]: arrow_drop_up
+                      - button "0 votes" [ref=f18e725] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f18e726] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e730]: Thanks, and once again congratulations to your team. I found your solution really interesting as well !
+                  - button "Reply" [ref=f18e732] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e733]: reply
+              - separator [ref=f18e735]
+            - generic [ref=f18e736]:
+              - generic [ref=f18e740]:
+                - link "Sharad Varshney's profile" [ref=f18e741] [cursor=pointer]:
+                  - /url: /varshnes
+                  - generic "Sharad Varshney" [ref=f18e742]
+                - generic [ref=f18e748]:
+                  - link [ref=f18e750] [cursor=pointer]:
+                    - /url: /varshnes
+                    - heading "Sharad Varshney" [level=3] [ref=f18e751]
+                  - paragraph [ref=f18e753]: Posted 6 years ago
+                - generic [ref=f18e755]:
+                  - generic [ref=f18e756]:
+                    - button "Upvote" [ref=f18e757] [cursor=pointer]:
+                      - generic [ref=f18e758]: arrow_drop_up
+                    - button "1 votes" [ref=f18e759] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e760] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e764]: Congratulations on the win..!
+                - button "Reply" [ref=f18e766] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e767]: reply
+              - separator [ref=f18e769]
+            - generic [ref=f18e770]:
+              - generic [ref=f18e774]:
+                - link "shiba's profile" [ref=f18e775] [cursor=pointer]:
+                  - /url: /changewow
+                  - generic "shiba" [ref=f18e776]
+                - generic [ref=f18e782]:
+                  - link [ref=f18e784] [cursor=pointer]:
+                    - /url: /changewow
+                    - heading "shiba" [level=3] [ref=f18e785]
+                  - generic [ref=f18e786]:
+                    - paragraph [ref=f18e787]: Posted 6 years ago
+                    - paragraph [ref=f18e789]: · 82nd in this Competition
+                - generic [ref=f18e791]:
+                  - generic [ref=f18e792]:
+                    - button "Upvote" [ref=f18e793] [cursor=pointer]:
+                      - generic [ref=f18e794]: arrow_drop_up
+                    - button "1 votes" [ref=f18e795] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e796] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e800]: Great work!Congratulations! Our method is almost the same as yours, but we cant find a good char NN to ensemble models😭 😭 😭 Hope to learn it from your excellent work
+                - button "Reply" [ref=f18e802] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e803]: reply
+                - generic [ref=f18e810]:
+                  - link "Theo Viel's profile" [ref=f18e811] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e812]
+                  - generic [ref=f18e818]:
+                    - generic [ref=f18e819]:
+                      - link [ref=f18e820] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e821]
+                      - paragraph [ref=f18e824]: Topic Author
+                    - generic [ref=f18e825]:
+                      - paragraph [ref=f18e826]: Posted 6 years ago
+                      - paragraph [ref=f18e828]: · 1st in this Competition
+                  - generic [ref=f18e830]:
+                    - generic [ref=f18e831]:
+                      - button "Upvote" [ref=f18e832] [cursor=pointer]:
+                        - generic [ref=f18e833]: arrow_drop_up
+                      - button "2 votes" [ref=f18e834] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f18e835] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e839]: Thanks ! The key was to correctly align characters with probabilities, otherwise it doesn't really work
+                  - button "Reply" [ref=f18e841] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e842]: reply
+              - separator [ref=f18e844]
+            - generic [ref=f18e845]:
+              - generic [ref=f18e849]:
+                - link "liuze's profile" [ref=f18e850] [cursor=pointer]:
+                  - /url: /jt120lz
+                  - generic "liuze" [ref=f18e851]
+                - generic [ref=f18e857]:
+                  - link [ref=f18e859] [cursor=pointer]:
+                    - /url: /jt120lz
+                    - heading "liuze" [level=3] [ref=f18e860]
+                  - generic [ref=f18e861]:
+                    - paragraph [ref=f18e862]: Posted 6 years ago
+                    - paragraph [ref=f18e864]: · 852nd in this Competition
+                - generic [ref=f18e866]:
+                  - generic [ref=f18e867]:
+                    - button "Upvote" [ref=f18e868] [cursor=pointer]:
+                      - generic [ref=f18e869]: arrow_drop_up
+                    - button "1 votes" [ref=f18e870] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e871] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e875]:
+                  - text: so you use original input, not
+                  - code [ref=f18e876]: "' '.join(x.split())"
+                - button "Reply" [ref=f18e878] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e879]: reply
+                - generic [ref=f18e886]:
+                  - link "Theo Viel's profile" [ref=f18e887] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e888]
+                  - generic [ref=f18e894]:
+                    - generic [ref=f18e895]:
+                      - link [ref=f18e896] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e897]
+                      - paragraph [ref=f18e900]: Topic Author
+                    - generic [ref=f18e901]:
+                      - paragraph [ref=f18e902]: Posted 6 years ago
+                      - paragraph [ref=f18e904]: · 1st in this Competition
+                  - generic [ref=f18e906]:
+                    - generic [ref=f18e907]:
+                      - button "Upvote" [ref=f18e908] [cursor=pointer]:
+                        - generic [ref=f18e909]: arrow_drop_up
+                      - button "0 votes" [ref=f18e910] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f18e911] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e915]:
+                    - text: For 2nd level models we use the original input. For 1st level models we use
+                    - code [ref=f18e916]: "' '.join(x.split())"
+                  - button "Reply" [ref=f18e918] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e919]: reply
+              - separator [ref=f18e921]
+            - generic [ref=f18e922]:
+              - generic [ref=f18e926]:
+                - link "DimitreOliveira's profile" [ref=f18e927] [cursor=pointer]:
+                  - /url: /dimitreoliveira
+                  - generic "DimitreOliveira" [ref=f18e928]
+                - generic [ref=f18e934]:
+                  - link [ref=f18e936] [cursor=pointer]:
+                    - /url: /dimitreoliveira
+                    - heading "DimitreOliveira" [level=3] [ref=f18e937]
+                  - generic [ref=f18e938]:
+                    - paragraph [ref=f18e939]: Posted 6 years ago
+                    - paragraph [ref=f18e941]: · 60th in this Competition
+                - generic [ref=f18e943]:
+                  - generic [ref=f18e944]:
+                    - button "Upvote" [ref=f18e945] [cursor=pointer]:
+                      - generic [ref=f18e946]: arrow_drop_up
+                    - button "1 votes" [ref=f18e947] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e948] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e952]: That char level NN on top was very clever, good work, and congratulation on the 1st place!
+                - button "Reply" [ref=f18e954] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e955]: reply
+                - generic [ref=f18e962]:
+                  - link "Theo Viel's profile" [ref=f18e963] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e964]
+                  - generic [ref=f18e970]:
+                    - generic [ref=f18e971]:
+                      - link [ref=f18e972] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e973]
+                      - paragraph [ref=f18e976]: Topic Author
+                    - generic [ref=f18e977]:
+                      - paragraph [ref=f18e978]: Posted 6 years ago
+                      - paragraph [ref=f18e980]: · 1st in this Competition
+                  - generic [ref=f18e982]:
+                    - generic [ref=f18e983]:
+                      - button "Upvote" [ref=f18e984] [cursor=pointer]:
+                        - generic [ref=f18e985]: arrow_drop_up
+                      - button "1 votes" [ref=f18e986] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f18e987] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e991]: Thanks, means a lot :)
+                  - button "Reply" [ref=f18e993] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e994]: reply
+              - separator [ref=f18e996]
+            - generic [ref=f18e997]:
+              - generic [ref=f18e1001]:
+                - link "bluetrain's profile" [ref=f18e1002] [cursor=pointer]:
+                  - /url: /stecasasso
+                  - generic "bluetrain" [ref=f18e1003]
+                - generic [ref=f18e1009]:
+                  - link [ref=f18e1011] [cursor=pointer]:
+                    - /url: /stecasasso
+                    - heading "bluetrain" [level=3] [ref=f18e1012]
+                  - generic [ref=f18e1013]:
+                    - paragraph [ref=f18e1014]: Posted 6 years ago
+                    - paragraph [ref=f18e1016]: · 48th in this Competition
+                - generic [ref=f18e1018]:
+                  - generic [ref=f18e1019]:
+                    - button "Upvote" [ref=f18e1020] [cursor=pointer]:
+                      - generic [ref=f18e1021]: arrow_drop_up
+                    - button "1 votes" [ref=f18e1022] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e1023] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1027]: Great work and congratulations on the victory!
+                - button "Reply" [ref=f18e1029] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1030]: reply
+                - generic [ref=f18e1037]:
+                  - link "Theo Viel's profile" [ref=f18e1038] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e1039]
+                  - generic [ref=f18e1045]:
+                    - generic [ref=f18e1046]:
+                      - link [ref=f18e1047] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e1048]
+                      - paragraph [ref=f18e1051]: Topic Author
+                    - generic [ref=f18e1052]:
+                      - paragraph [ref=f18e1053]: Posted 6 years ago
+                      - paragraph [ref=f18e1055]: · 1st in this Competition
+                  - generic [ref=f18e1057]:
+                    - generic [ref=f18e1058]:
+                      - button "Upvote" [ref=f18e1059] [cursor=pointer]:
+                        - generic [ref=f18e1060]: arrow_drop_up
+                      - button "0 votes" [ref=f18e1061] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f18e1062] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e1066]: Thanks a lot ! Congratz on the silver medal as well
+                  - button "Reply" [ref=f18e1068] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e1069]: reply
+              - separator [ref=f18e1071]
+            - generic [ref=f18e1072]:
+              - generic [ref=f18e1076]:
+                - link "Camaro's profile" [ref=f18e1077] [cursor=pointer]:
+                  - /url: /bamps53
+                  - generic "Camaro" [ref=f18e1078]
+                - generic [ref=f18e1084]:
+                  - link [ref=f18e1086] [cursor=pointer]:
+                    - /url: /bamps53
+                    - heading "Camaro" [level=3] [ref=f18e1087]
+                  - generic [ref=f18e1088]:
+                    - paragraph [ref=f18e1089]: Posted 6 years ago
+                    - paragraph [ref=f18e1091]: · 357th in this Competition
+                - generic [ref=f18e1093]:
+                  - generic [ref=f18e1094]:
+                    - button "Upvote" [ref=f18e1095] [cursor=pointer]:
+                      - generic [ref=f18e1096]: arrow_drop_up
+                    - button "1 votes" [ref=f18e1097] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f18e1098] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1102]: Awesome!! Really cool solution, congratulations!
+                - button "Reply" [ref=f18e1104] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1105]: reply
+                - generic [ref=f18e1112]:
+                  - link "Theo Viel's profile" [ref=f18e1113] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e1114]
+                  - generic [ref=f18e1120]:
+                    - generic [ref=f18e1121]:
+                      - link [ref=f18e1122] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e1123]
+                      - paragraph [ref=f18e1126]: Topic Author
+                    - generic [ref=f18e1127]:
+                      - paragraph [ref=f18e1128]: Posted 6 years ago
+                      - paragraph [ref=f18e1130]: · 1st in this Competition
+                  - generic [ref=f18e1132]:
+                    - generic [ref=f18e1133]:
+                      - button "Upvote" [ref=f18e1134] [cursor=pointer]:
+                        - generic [ref=f18e1135]: arrow_drop_up
+                      - button "0 votes" [ref=f18e1136] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f18e1137] [cursor=pointer]: more_vert
+                  - paragraph [ref=f18e1141]: Thanks !
+                  - button "Reply" [ref=f18e1143] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e1144]: reply
+              - separator [ref=f18e1146]
+            - generic [ref=f18e1147]:
+              - generic [ref=f18e1151]:
+                - link "KhanhVD's profile" [ref=f18e1152] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f18e1153]
+                - generic [ref=f18e1159]:
+                  - link [ref=f18e1161] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f18e1162]
+                  - generic [ref=f18e1163]:
+                    - paragraph [ref=f18e1164]: Posted 6 years ago
+                    - paragraph [ref=f18e1166]: · 732nd in this Competition
+                - generic [ref=f18e1168]:
+                  - generic [ref=f18e1169]:
+                    - button "Upvote" [ref=f18e1170] [cursor=pointer]:
+                      - generic [ref=f18e1171]: arrow_drop_up
+                    - button "0 votes" [ref=f18e1172] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f18e1173] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1177]: Congrats and thanks for sharing details solution!
+                - button "Reply" [ref=f18e1179] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1180]: reply
+              - separator [ref=f18e1182]
+            - generic [ref=f18e1183]:
+              - generic [ref=f18e1187]:
+                - link "A_Minor's profile" [ref=f18e1188] [cursor=pointer]:
+                  - /url: /yourbestfr1end
+                  - generic "A_Minor" [ref=f18e1189]
+                - generic [ref=f18e1195]:
+                  - link [ref=f18e1197] [cursor=pointer]:
+                    - /url: /yourbestfr1end
+                    - heading "A_Minor" [level=3] [ref=f18e1198]
+                  - paragraph [ref=f18e1200]: Posted 6 years ago
+                - generic [ref=f18e1202]:
+                  - generic [ref=f18e1203]:
+                    - button "Upvote" [ref=f18e1204] [cursor=pointer]:
+                      - generic [ref=f18e1205]: arrow_drop_up
+                    - button "-2 votes" [ref=f18e1206] [cursor=pointer]: "-2"
+                  - button "More Options for this Comment" [ref=f18e1207] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1211]: Ty, boomer
+                - button "Reply" [ref=f18e1213] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1214]: reply
+              - separator [ref=f18e1216]
+            - generic [ref=f18e1217]:
+              - generic [ref=f18e1221]:
+                - link "Zeyad Shahin's profile" [ref=f18e1222] [cursor=pointer]:
+                  - /url: /zeyadshahin
+                  - generic "Zeyad Shahin" [ref=f18e1223]
+                - generic [ref=f18e1229]:
+                  - link [ref=f18e1231] [cursor=pointer]:
+                    - /url: /zeyadshahin
+                    - heading "Zeyad Shahin" [level=3] [ref=f18e1232]
+                  - paragraph [ref=f18e1234]: Posted 2 years ago
+                - generic [ref=f18e1236]:
+                  - generic [ref=f18e1237]:
+                    - button "Upvote" [ref=f18e1238] [cursor=pointer]:
+                      - generic [ref=f18e1239]: arrow_drop_up
+                    - button "0 votes" [ref=f18e1240] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f18e1241] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1245]: Nice Work, I have learned a lot!
+                - button "Reply" [ref=f18e1247] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1248]: reply
+              - separator [ref=f18e1250]
+            - generic [ref=f18e1251]:
+              - generic [ref=f18e1255]:
+                - link "Julie Arnaud's profile" [ref=f18e1256] [cursor=pointer]:
+                  - /url: /juliearnaud
+                  - generic "Julie Arnaud" [ref=f18e1257]
+                - generic [ref=f18e1263]:
+                  - link [ref=f18e1265] [cursor=pointer]:
+                    - /url: /juliearnaud
+                    - heading "Julie Arnaud" [level=3] [ref=f18e1266]
+                  - paragraph [ref=f18e1268]: Posted 6 years ago
+                - generic [ref=f18e1270]:
+                  - generic [ref=f18e1271]:
+                    - button "Upvote" [ref=f18e1272] [cursor=pointer]:
+                      - generic [ref=f18e1273]: arrow_drop_up
+                    - button "0 votes" [ref=f18e1274] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f18e1275] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1279]: Congratulations and very informative. Thank you
+                - button "Reply" [ref=f18e1281] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1282]: reply
+              - separator [ref=f18e1284]
+            - generic [ref=f18e1285]:
+              - generic [ref=f18e1289]:
+                - link "Satya Muralidhar's profile" [ref=f18e1290] [cursor=pointer]:
+                  - /url: /muralidhar123
+                  - generic "Satya Muralidhar" [ref=f18e1291]
+                - generic [ref=f18e1297]:
+                  - link [ref=f18e1299] [cursor=pointer]:
+                    - /url: /muralidhar123
+                    - heading "Satya Muralidhar" [level=3] [ref=f18e1300]
+                  - paragraph [ref=f18e1302]: Posted 6 years ago
+                - generic [ref=f18e1304]:
+                  - generic [ref=f18e1305]:
+                    - button "Upvote" [ref=f18e1306] [cursor=pointer]:
+                      - generic [ref=f18e1307]: arrow_drop_up
+                    - button "0 votes" [ref=f18e1308] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f18e1309] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1313]: congrats
+                - button "Reply" [ref=f18e1315] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1316]: reply
+              - separator [ref=f18e1318]
+            - generic [ref=f18e1319]:
+              - generic [ref=f18e1323]:
+                - link "Yu Kang's profile" [ref=f18e1324] [cursor=pointer]:
+                  - /url: /karlyukang
+                  - generic "Yu Kang" [ref=f18e1325]
+                - generic [ref=f18e1331]:
+                  - link [ref=f18e1333] [cursor=pointer]:
+                    - /url: /karlyukang
+                    - heading "Yu Kang" [level=3] [ref=f18e1334]
+                  - generic [ref=f18e1335]:
+                    - paragraph [ref=f18e1336]: Posted 6 years ago
+                    - paragraph [ref=f18e1338]: · 290th in this Competition
+                - generic [ref=f18e1340]:
+                  - generic [ref=f18e1341]:
+                    - button "Upvote" [ref=f18e1342] [cursor=pointer]:
+                      - generic [ref=f18e1343]: arrow_drop_up
+                    - button "0 votes" [ref=f18e1344] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f18e1345] [cursor=pointer]: more_vert
+                - paragraph [ref=f18e1349]: Would you plan to release your training code later? that would be very kind.
+                - button "Reply" [ref=f18e1351] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f18e1352]: reply
+                - generic [ref=f18e1359]:
+                  - link "Theo Viel's profile" [ref=f18e1360] [cursor=pointer]:
+                    - /url: /theoviel
+                    - generic "Theo Viel" [ref=f18e1361]
+                  - generic [ref=f18e1367]:
+                    - generic [ref=f18e1368]:
+                      - link [ref=f18e1369] [cursor=pointer]:
+                        - /url: /theoviel
+                        - heading "Theo Viel" [level=3] [ref=f18e1370]
+                      - paragraph [ref=f18e1373]: Topic Author
+                    - generic [ref=f18e1374]:
+                      - paragraph [ref=f18e1375]: Posted 6 years ago
+                      - paragraph [ref=f18e1377]: · 1st in this Competition
+                  - generic [ref=f18e1379]:
+                    - generic [ref=f18e1380]:
+                      - button "Upvote" [ref=f18e1381] [cursor=pointer]:
+                        - generic [ref=f18e1382]: arrow_drop_up
+                      - button "2 votes" [ref=f18e1383] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f18e1384] [cursor=pointer]: more_vert
+                  - generic [ref=f18e1387]:
+                    - paragraph [ref=f18e1388]:
+                      - text: "Here's the training code for 2nd level models :"
+                      - link "https://www.kaggle.com/theoviel/character-level-model-magic (opens in a new tab)" [ref=f18e1389] [cursor=pointer]:
+                        - /url: https://www.kaggle.com/theoviel/character-level-model-magic
+                        - text: https://www.kaggle.com/theoviel/character-level-model-magic
+                    - paragraph [ref=f18e1390]: The rest is a bit less interesting and requires more cleaning :)
+                  - button "Reply" [ref=f18e1392] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f18e1393]: reply
+              - separator [ref=f18e1395]
+            - paragraph [ref=f18e1402]: This comment has been deleted.
+  - alert [ref=f18e1405]

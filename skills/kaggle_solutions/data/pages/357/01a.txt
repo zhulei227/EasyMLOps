@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/santa-2019-revenge-of-the-accountants/discussion/126380
-fetched: 2026-10-27
-chars: 553
+fetched: 2026-11-03
+chars: 11117
 
 menu
 Skip to
@@ -22,25 +22,859 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Kaggle · Playground Prediction Competition · 7 years ago
-Late Submission
-more_horiz
+Summary: how we found the optimal (?) solution — Santa 2019 - Revenge of the Accountants
+Summary: how we found the optimal (?) solution
+
 Santa 2019 - Revenge of the Accountants
 
-Oh what fun it is to revise . . .
+Solution Writeup · 1st place
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+This is a (short?) description of what we did to find the best known solution for this challenge. Well, since this and the original challenge are pretty similar, we actually describe both.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Our basic solution approach is very similar to the original Santa challenge and the same that many teams used. We linearized the objective function and solved the resulting MIP using Gurobi (actually the incredible Christmas elves at Gurobi released the latest version just before the challenge started, this cannot be a coincidence … ;)). For completeness we show the full model.
+
+First, the assignment of each family to each day is pretty straightforward. For each family 
+𝑓
+∈
+𝐹
+ and each day 
+𝑑
+∈
+𝐷
+ we introduce a binary variable
+
+𝑥
+𝑓
+,
+𝑑
+∈
+{
+0
+,
+1
+}
+,
+𝑓
+∈
+𝐹
+,
+𝑑
+∈
+𝐷
+
+representing the assignment of family 
+𝑓
+ to day 
+𝑑
+. Each family must be assigned exactly once
+
+∑
+𝑑
+∈
+𝐷
+𝑥
+𝑓
+,
+𝑑
+=
+1
+,
+𝑓
+∈
+𝐹
+
+The matching objective simply depends on the day each family is assigned to:
+
+matching: 
+∑
+𝑓
+∈
+𝐹
+∑
+𝑑
+∈
+𝐷
+𝑥
+𝑓
+,
+𝑑
+⋅
+𝑐
+𝑓
+,
+𝑑
+
+where 
+𝑐
+𝑓
+,
+𝑑
+, 
+𝑓
+∈
+𝐹
+, 
+𝑑
+∈
+𝐷
+, denotes the assignment cost for family 
+𝑓
+∈
+𝐹
+ to day 
+𝑑
+∈
+𝐷
+.
+
+Then we need the number of persons assigned to each day. Let 
+𝑝
+𝑓
+, 
+𝑓
+∈
+𝐹
+, denote the number of persons of family 
+𝑓
+∈
+𝐹
+, then the (integer) variable
+
+𝑛
+𝑑
+∈
+{
+125
+,
+…
+,
+300
+}
+,
+𝑑
+∈
+𝐷
+
+denotes the number of persons assigned to day 
+𝑑
+∈
+𝐷
+. The correct number is found using the following constraints:
+
+𝑛
+𝑑
+=
+∑
+𝑓
+∈
+𝐹
+𝑝
+𝑓
+⋅
+𝑥
+𝑓
+,
+𝑑
+,
+𝑑
+∈
+𝐷
+
+This was the easy part. Now we need to model the non-linear penalty. The basic observation is that each term of the penalty objective depends only on two values: 
+𝑁
+𝑑
+ and 
+𝑁
+𝑑
++
+𝑖
+ for 
+𝑖
+=
+1
+,
+…
+,
+5
+ (the original Santa challenge had only the terms for 
+𝑖
+=
+1
+) and each 
+𝑁
+𝑑
+ can only take the values 
+𝑉
+:=
+{
+125
+,
+…
+,
+300
+}
+. As many had realized, this can be linearized as follows:
+
+First we introduce binary variables 
+𝑛
+𝑑
+,
+𝑣
+, 
+𝑑
+∈
+𝐷
+, 
+𝑣
+∈
+𝑉
+ with 
+𝑛
+𝑑
+,
+𝑣
+=
+1
+ if and only if 
+𝑛
+𝑑
+=
+𝑣
+ (if exactly 
+𝑣
+ persons have been assigned to day 
+𝑑
+). Because 
+𝑛
+𝑑
+ has exactly one value we add the constraints
+
+∑
+𝑣
+∈
+𝑉
+𝑛
+𝑑
+,
+𝑣
+=
+1
+,
+𝑑
+∈
+𝐷
+.
+
+The 
+𝑛
+𝑑
+,
+𝑣
+ and the 
+𝑛
+𝑑
+ variables are then connected using
+
+𝑛
+𝑑
+=
+∑
+𝑣
+∈
+𝑉
+𝑣
+⋅
+𝑛
+𝑑
+,
+𝑣
+,
+𝑑
+∈
+𝐷
+
+As said before, each term of the penalty objective depends only on the value of two variables 
+𝑛
+𝑑
+ and 
+𝑛
+𝑑
++
+𝑖
+ or, equivalently, on 
+𝑛
+𝑑
+,
+𝑣
+ and 
+𝑛
+𝑑
++
+𝑖
+,
+𝑣
+′
+. Let 
+𝑐
+𝑚
+,
+𝑚
+′
+,
+𝑖
+ be the value of one penalty term if 
+𝑛
+𝑑
+=
+𝑚
+ and 
+𝑛
+𝑑
++
+𝑖
+=
+𝑚
+′
+ for some 
+𝑑
+∈
+𝐷
+. Then the penalty objective is
+
+∑
+𝑑
+∈
+𝐷
+∑
+𝑖
+=
+1
+5
+∑
+𝑚
+∈
+𝑉
+∑
+𝑚
+′
+∈
+𝑉
+𝑛
+𝑑
+,
+𝑚
+⋅
+𝑛
+𝑑
++
+𝑖
+,
+𝑚
+′
+⋅
+𝑐
+𝑚
+,
+𝑚
+′
+,
+𝑖
+
+(In the original problem only the terms for i=1 appeared). Of course, this is not a linear objective yet (because of 
+𝑛
+𝑑
+,
+𝑚
+⋅
+𝑛
+𝑑
++
+𝑖
+,
+𝑚
+′
+. The standard approach is to introduce a new binary variable representing each product
+
+𝑦
+𝑑
+,
+𝑖
+,
+𝑚
+,
+𝑚
+′
+=
+𝑛
+𝑑
+,
+𝑚
+⋅
+𝑛
+𝑑
++
+𝑖
+,
+𝑚
+′
+,
+𝑑
+∈
+𝐷
+,
+𝑖
+=
+1
+,
+…
+,
+5
+,
+𝑚
+,
+𝑚
+′
+∈
+𝑉
+
+This is still a non-linear constraint, but because exactly one of the 
+𝑛
+𝑑
+,
+⋅
+ and one of the 
+𝑛
+𝑑
++
+𝑖
+,
+⋅
+ is one, these constraints can be replaced by
+
+𝑛
+𝑑
+,
+𝑚
+=
+∑
+𝑚
+′
+∈
+𝑉
+𝑦
+𝑑
+,
+𝑖
+,
+𝑚
+,
+𝑚
+′
+,
+𝑑
+∈
+𝐷
+,
+𝑚
+∈
+𝑉
+,
+𝑖
+=
+1
+,
+…
+,
+5
+
+and
+
+𝑛
+𝑑
++
+𝑖
+,
+𝑚
+′
+=
+∑
+𝑚
+∈
+𝑉
+𝑦
+𝑑
+,
+𝑖
+,
+𝑚
+,
+𝑚
+′
+,
+𝑑
+∈
+𝐷
+,
+𝑚
+′
+∈
+𝑉
+,
+𝑖
+=
+1
+,
+…
+,
+5
+
+These constraints say that 
+𝑛
+𝑑
+,
+𝑚
+ is one if and only if one of the "product-variables" 
+𝑦
+𝑑
+,
+𝑖
+,
+𝑚
+,
+𝑚
+′
+ is one (and similar for 
+𝑛
+𝑑
++
+𝑖
+,
+𝑚
+′
+). The "true" penalty objective is now
+
+penalty: 
+∑
+𝑑
+∈
+𝐷
+∑
+𝑖
+=
+1
+5
+∑
+𝑚
+∈
+𝑉
+∑
+𝑚
+′
+∈
+𝑉
+𝑦
+𝑑
+,
+𝑖
+,
+𝑚
+,
+𝑚
+′
+⋅
+𝑐
+𝑚
+,
+𝑚
+′
+,
+𝑖
+
+That's basically all. For 
+𝑖
+ restricted to 1 the model solves the original problem in reasonable time. There are a few tricks to speed up the computation, but they seem to be required only for the revenge challenge (see below).
+
+The main difficulty for the second challenge was that the model gets much bigger (because of 
+𝑖
+=
+1
+,
+…
+,
+5
+ and not only 
+𝑖
+=
+1
+ we need much more variables for the linearized objective). Furthermore, IP solvers work by solving the LP relaxation of the model first and the larger model seems to be pretty challenging. In fact, Gurobi (and also Cplex) have big numerical trouble with solving the LP relaxation: the barrier algorithm stops with numerical problems, the simplex method takes forever.
+
+This seems to make the problem more difficult. However, looking at the changed objective this is not true, at least from a practical perspective: it seems to be much easier to find good solutions for the second challenge (finding an optimal one and proving that it is optimal is hard). As far as I can tell, the reason why the second challenge seems to be easier is as follows. In the original challenge the penalty objective had a "combinatorial" property. Typically you do not want to have "big jumps" in the number of persons assigned to successive days because a big difference between 
+𝑁
+𝑑
+ and 
+𝑁
+𝑑
++
+1
+ causes large penalty costs. However, if 
+𝑁
+𝑑
+ and 
+𝑁
+𝑑
++
+1
+ are close, then the penalty costs are very small. (This motivates a simple heuristic: forget about the penalty objective in the MIP and add constraints 
+−
+30
+≤
+𝑁
+𝑑
+−
+𝑁
+𝑑
++
+1
+≤
+30
+ for all d -- this gives you a quite good solution for the original challenge). There is one exception to this "rule": if 
+𝑁
+𝑑
+=
+125
+ for some 
+𝑑
+∈
+𝐷
+, then the penalty objective for the term for 
+𝑁
+𝑑
+ and 
+𝑁
+𝑑
++
+1
+ is zero, no matter what the value of 
+𝑁
+𝑑
++
+1
+ is. In fact, if you look at the optimal solution of the original problem you will see that the number of persons assigned to successive days typically decreases from 300 to 125 over a few days in relatively small steps and then immediately jumps to 300. In order to find a good (or optimal) solution it is therefore crucial to identify the days which have exactly 125 persons (indeed, these days can be identified quite accurately by just looking at the number of persons that prefer a certain day).
+
+The difference in the new challenge is that because not only 2 days but 6 days in a row are considered, having a single day down to 125 does not make the penalty cost to vanish. In fact, even if 
+𝑁
+𝑑
+=
+125
+ and 
+𝑁
+𝑑
++
+1
+=
+300
+ (which would cause zero penalty in the original problem), each possible value for 
+𝑁
+𝑑
+−
+1
+ except 
+𝑁
+𝑑
+−
+1
+=
+125
+ will cause large penalty costs for either 
+𝑁
+𝑑
+−
+1
+ and 
+𝑁
+𝑑
+ or 
+𝑁
+𝑑
+−
+1
+ and 
+𝑁
+𝑑
++
+1
+. One would need to have several days with 125 persons in a row in order to get the zero penalty, but given the large number of persons (there are even more than in the original challenge) this is very unlikely. In other words, the "combinatorial" property of the original problem has been wiped out by the new objective.
+
+Knowing this, how do we find a good solution? The key idea is to reduce the model size (by fixing many variables to 0). We did the following:
+
+find a reasonable solution by ignoring the penalty objective and restricting 
+|
+𝑁
+𝑑
+−
+𝑁
+𝑑
++
+1
+|
+ as illustrated above. Because the penalty costs are larger we forced the 
+𝑁
+𝑑
+ to be even closer (we used a difference of 10 if I remember correctly).
+
+Given a solution with assigned number of persons 
+𝑁
+𝑑
+∗
+ to each day 
+𝑑
+∈
+𝐷
+, look for a solution where the number of persons for each day does not deviate too much from the given solution. In particular, we added the constraints
+
+𝑛
+𝑑
+,
+𝑣
+=
+0
+ for all 
+𝑑
+∈
+𝐷
+,
+𝑣
+∈
+𝑉
+ with 
+|
+𝑣
+−
+𝑁
+𝑑
+∗
+|
+>
+20
+
+and
+
+𝑁
+𝑑
+∗
+−
+20
+≤
+𝑛
+𝑑
+≤
+𝑁
+𝑑
+∗
++
+20
+,
+𝑑
+∈
+𝐷
+
+Note that you do not have to actually remove variables or so, the preprocessor of your solver will eliminate them for you.
+
+The size of this model is much smaller and the LP relaxation becomes tractable. We solved the model until we found a better (integral) solution. Once a better solution had been found we repeated step 2 with the newly found solution as starting solution. Eventually we found the best solution that is known to us and that we submitted. Of course, this is no proof that our solution is optimal, but we know at least that it is a very deep local optimum (although we are pretty sure that you can come up with a "hand-written" branch & bound that scans the whole solution space and solves only restricted models that are actually tractable -- however this seemed not worth the effort ;))
+
+There are many more tricks that can be applied to reduce the model size. In fact, we used the very same approach for the original challenge, too, because we were too impatient to wait for our solver for more than 20 minutes or so, and once you identify the "125-days" correctly, the approach that we used in the second challenge can also be applied to the first challenge to find the optimal solution pretty quickly.
+
+That's all from us. Thanks for the nice challenge. We really enjoyed working on it during the holidays.
+
+Authors
+F. Fischer
+
+frankfisc
+
+A. Fischer
+
+lauanlo
+
+arrow_drop_up
+25
+Share
+more_horiz
+Citation
+
+F. Fischer, A. Fischer. Summary: how we found the optimal (?) solution. https://www.kaggle.com/competitions/santa-2019-revenge-of-the-accountants/writeups/fran-summary-how-we-found-the-optimal-solution. 2020. Kaggle
+
+comment
+5 Comments
+Hotness
+Phiesh7w
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I did more or less the same with the mistake to stop at 114958.91 assuming it was optimal after to a bad choice of the acceptable deviation… In the original challenge this approach got stuck in a deep local optimum at 68910.94 due to missing one of the early "125-days"… I managed to reduce the MIP to 2-3 mio variables by proving all others to be 0. After that gurobi dual simplex can break the root relaxation in <10 hours but the cut loop and the node throughput is way to bad to prove optimality within reasonable time. I'll write down the differences tomorrow.
+
+reply
+Reply
+cmougan
+
+Posted 7 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@lauanlo Would it be possible to see the code/implementation, perhaps in your github?
+
+reply
+Reply
+CPMP
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Seems we used the exact same approach in the original problem! I did try the full model here, and you said, solving the lp relaxation was hopeless. Congrats for moving one successfully!!
+
+reply
+Reply
+Gilles Vandewiele
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Interesting to read on the tricks you applied in order to make the model converge somewhat more decently. We used the same formulation approach, but without those tricks and only got to roughly 115000 in this competition. We never made a submission though.
+
+reply
+Reply
+A. Fischer
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+That is a summary of the approaches that worked. In the beginning we tested several variants to get a good start solution - limiting partially the difference of 6 successive days.
+
+reply
+Reply

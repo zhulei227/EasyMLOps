@@ -1,0 +1,515 @@
+- generic [ref=f67e2]:
+  - navigation "Main Kaggle page navigation" [ref=f67e3]:
+    - generic [ref=f67e5]:
+      - button "Navigation menu" [ref=f67e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f67e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f67e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f67e12] [cursor=pointer]:
+      - paragraph [ref=f67e18]: Create
+    - generic [ref=f67e21]:
+      - list [ref=f67e22]:
+        - listitem "Home List Item" [ref=f67e23]:
+          - link "Home" [ref=f67e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f67e31]: Home
+        - listitem "Competitions List Item" [ref=f67e32]:
+          - link "Competitions" [ref=f67e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f67e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f67e41]:
+          - link "Benchmarks" [ref=f67e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f67e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f67e50]:
+          - link "Arenas" [ref=f67e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f67e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f67e59]:
+          - link "Game Arena" [ref=f67e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f67e67]: Game Arena
+      - list [ref=f67e68]:
+        - listitem "Data Hub List Item" [ref=f67e69]:
+          - generic [ref=f67e70]:
+            - link "Data Hub" [ref=f67e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f67e77]: Data Hub
+            - button "Expand" [ref=f67e80] [cursor=pointer]
+      - list [ref=f67e82]:
+        - listitem "More on Kaggle List Item" [ref=f67e83]:
+          - generic [ref=f67e84]:
+            - link "More on Kaggle" [ref=f67e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f67e91]: More
+            - button "Expand" [ref=f67e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f67e97]:
+    - generic [ref=f67e98]:
+      - generic [ref=f67e102]:
+        - textbox "Search" [ref=f67e104]
+        - group [aria-hidden]
+      - generic [ref=f67e106]:
+        - link [ref=f67e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fchallenges-in-representation-learning-facial-expression-recognition-challenge%2Fdiscussion%2F4676
+          - button "Login" [ref=f67e108]
+        - link [ref=f67e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fchallenges-in-representation-learning-facial-expression-recognition-challenge%2Fdiscussion%2F4676
+          - button "Sign Up" [ref=f67e111]
+  - main [ref=f67e113]:
+    - generic [ref=f67e115]:
+      - generic [ref=f67e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f67e117]:
+        - link "Learn more" [ref=f67e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f67e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f67e123]:
+      - generic [ref=f67e125]:
+        - generic [ref=f67e126]:
+          - link "Dumitru's profile" [ref=f67e127] [cursor=pointer]:
+            - /url: /dumitru0
+            - generic "Dumitru" [ref=f67e128]
+          - generic [ref=f67e132]:
+            - generic [ref=f67e133]: Dumitru
+            - generic [ref=f67e135]: · Research Prediction Competition · 13 years ago
+        - generic [ref=f67e137]:
+          - 'heading "Challenges in Representation Learning: Facial Expression Recognition Challenge" [level=1] [ref=f67e138]'
+          - paragraph [ref=f67e140]: Learn facial expressions from an image
+      - generic [ref=f67e144]:
+        - generic [ref=f67e146]:
+          - generic [ref=f67e148]:
+            - 'heading "Challenges in Representation Learning: Facial Expression Recognition Challenge" [level=2] [ref=f67e149]'
+            - generic [ref=f67e151]:
+              - button "Late Submission" [disabled] [ref=f67e153]
+              - button "Competition options menu collapsed" [ref=f67e156] [cursor=pointer]: more_horiz
+          - tablist [ref=f67e161]:
+            - tab "Overview, 1 of 7" [ref=f67e162] [cursor=pointer]:
+              - generic [ref=f67e163]: Overview
+            - tab "Data, 2 of 7" [ref=f67e164] [cursor=pointer]:
+              - generic [ref=f67e165]: Data
+            - tab "Code, 3 of 7" [ref=f67e166] [cursor=pointer]:
+              - generic [ref=f67e167]: Code
+            - tab "Models, 4 of 7" [ref=f67e168] [cursor=pointer]:
+              - generic [ref=f67e169]: Models
+            - tab "Discussion, 5 of 7" [selected] [ref=f67e170] [cursor=pointer]:
+              - generic [ref=f67e171]: Discussion
+            - tab "Leaderboard, 6 of 7" [ref=f67e172] [cursor=pointer]:
+              - generic [ref=f67e173]: Leaderboard
+            - tab "Rules, 7 of 7" [ref=f67e174] [cursor=pointer]:
+              - generic [ref=f67e175]: Rules
+        - separator [ref=f67e177]
+      - generic [ref=f67e181]:
+        - generic [ref=f67e182]:
+          - generic [ref=f67e183]:
+            - generic [ref=f67e184]:
+              - link "Anil Thomas's profile" [ref=f67e185] [cursor=pointer]:
+                - /url: /anlthms
+                - generic "Anil Thomas" [ref=f67e186]
+              - generic [ref=f67e190]:
+                - link "Anil Thomas" [ref=f67e191] [cursor=pointer]:
+                  - /url: /anlthms
+                - text: ·
+                - generic [ref=f67e192]: 19th in this Competition
+                - text: ·
+                - generic [ref=f67e193]: Posted 13 years ago
+            - generic [ref=f67e194]:
+              - generic [ref=f67e195]:
+                - button "Upvote" [ref=f67e196] [cursor=pointer]:
+                  - generic [ref=f67e197]: arrow_drop_up
+                - button "3 votes" [ref=f67e198] [cursor=pointer]: "3"
+              - button "More Options for this Topic" [ref=f67e199] [cursor=pointer]: more_vert
+            - heading "Thanks!" [level=3] [ref=f67e200]
+            - generic [ref=f67e203]:
+              - paragraph [ref=f67e204]:
+                - text: Would like to thank the organizers for running this contest and especially
+                - strong [ref=f67e205]: Ian
+                - text: for doing such a fantastic job on pylearn2! This has been a great learning opportunity for many of us.
+              - paragraph
+              - paragraph [ref=f67e206]: I am awed by the high scores posted by many. Got my butt kicked on this one. Congratulations to Charlie Tang on his meteoric rise in Kaggle rankings. Looking forward to seeing the solution...
+          - separator [ref=f67e207]
+        - generic [ref=f67e208]:
+          - generic [ref=f67e209]:
+            - paragraph [ref=f67e212]:
+              - paragraph [ref=f67e213]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f67e214] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f67e215]
+          - generic [ref=f67e217]:
+            - generic [ref=f67e218]:
+              - generic [aria-hidden] [ref=f67e219]: comment
+              - heading "15 Comments" [level=2] [ref=f67e221]
+            - generic [ref=f67e224]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f67e225] [cursor=pointer]:
+                - generic [ref=f67e226]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f67e228]:
+            - generic [ref=f67e229]:
+              - generic [ref=f67e233]:
+                - link "Charlie Tang's profile" [ref=f67e234] [cursor=pointer]:
+                  - /url: /neocortex
+                  - generic "Charlie Tang" [ref=f67e235]
+                - generic [ref=f67e241]:
+                  - link [ref=f67e243] [cursor=pointer]:
+                    - /url: /neocortex
+                    - heading "Charlie Tang" [level=3] [ref=f67e244]
+                  - generic [ref=f67e245]:
+                    - paragraph [ref=f67e246]: Posted 13 years ago
+                    - paragraph [ref=f67e248]: · 1st in this Competition
+                - generic [ref=f67e250]:
+                  - generic [ref=f67e251]:
+                    - button "Upvote" [ref=f67e252] [cursor=pointer]:
+                      - generic [ref=f67e253]: arrow_drop_up
+                    - button "10 votes" [ref=f67e254] [cursor=pointer]: "10"
+                  - button "More Options for this Comment" [ref=f67e255] [cursor=pointer]: more_vert
+                - generic [ref=f67e258]:
+                  - paragraph [ref=f67e259]: I would like to also thank the organizers for the contest,
+                  - paragraph [ref=f67e260]: I also used convolutional nets but with svms, and with transformations to images generating more data.
+                  - paragraph [ref=f67e261]:
+                    - text: You will find my source code for the project at
+                    - link "http://code.google.com/p/deep-learning-faces/" [ref=f67e262] [cursor=pointer]:
+                      - /url: http://code.google.com/p/deep-learning-faces/
+                  - paragraph [ref=f67e263]:
+                    - text: "Additionally, I have a prelimary paper on the combination of deep learning and SVMs which some may find useful:"
+                    - link "www.cs.toronto.edu/~tang/papers/dlsvm.pdf" [ref=f67e264] [cursor=pointer]:
+                      - /url: http://www.cs.toronto.edu/~tang/papers/dlsvm.pdf
+                  - paragraph
+              - separator [ref=f67e265]
+            - generic [ref=f67e266]:
+              - generic [ref=f67e270]:
+                - link "Charlie Tang's profile" [ref=f67e271] [cursor=pointer]:
+                  - /url: /neocortex
+                  - generic "Charlie Tang" [ref=f67e272]
+                - generic [ref=f67e278]:
+                  - link [ref=f67e280] [cursor=pointer]:
+                    - /url: /neocortex
+                    - heading "Charlie Tang" [level=3] [ref=f67e281]
+                  - generic [ref=f67e282]:
+                    - paragraph [ref=f67e283]: Posted 13 years ago
+                    - paragraph [ref=f67e285]: · 1st in this Competition
+                - generic [ref=f67e287]:
+                  - generic [ref=f67e288]:
+                    - button "Upvote" [ref=f67e289] [cursor=pointer]:
+                      - generic [ref=f67e290]: arrow_drop_up
+                    - button "1 votes" [ref=f67e291] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f67e292] [cursor=pointer]: more_vert
+                - generic [ref=f67e295]:
+                  - paragraph [ref=f67e296]: "[quote=Maxim Milakov;25032]"
+                  - paragraph [ref=f67e297]: Hi Charlie,
+                  - paragraph [ref=f67e298]: Thanks for the answer! So you basically have 5x5x64x3072 weights in that fully connected layer with ~5,000,000 weights with 20% of output neuron dropout... Did you try running training set on a model trained? I tried it on my ANN and it did up to 95% (or even more), so I overfit even with ANN of much lesser size.
+                  - paragraph [ref=f67e299]: Thanks,
+                  - paragraph [ref=f67e300]: Max.
+                  - paragraph [ref=f67e301]: "[/quote]"
+                  - paragraph
+                  - paragraph [ref=f67e302]: I did not look at the training error, but i'd imagine it'd be similar to what you had. I take overfitting to mean when the validation error starts to go up, which i didn't notice when using softmax with 3072 nodes, i think this is due to the mirroring and transformation creating "infinite" amounts of data, else you would def have overfitting.
+                  - paragraph [ref=f67e303]: i also noticed that for this dataset and this particular model i used, dropout doesnt make too much difference. i had other submissions (out of the 5 total) which scored .71 and didn't use dropout.
+              - separator [ref=f67e304]
+            - generic [ref=f67e305]:
+              - generic [ref=f67e309]:
+                - link "Ian Goodfellow's profile" [ref=f67e310] [cursor=pointer]:
+                  - /url: /iangoodfellow
+                  - generic "Ian Goodfellow" [ref=f67e311]
+                - generic [ref=f67e317]:
+                  - generic [ref=f67e318]:
+                    - link [ref=f67e319] [cursor=pointer]:
+                      - /url: /iangoodfellow
+                      - heading "Ian Goodfellow" [level=3] [ref=f67e320]
+                    - paragraph [ref=f67e323]: Competition Host
+                  - paragraph [ref=f67e325]: Posted 13 years ago
+                - generic [ref=f67e327]:
+                  - generic [ref=f67e328]:
+                    - button "Upvote" [ref=f67e329] [cursor=pointer]:
+                      - generic [ref=f67e330]: arrow_drop_up
+                    - button "1 votes" [ref=f67e331] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f67e332] [cursor=pointer]: more_vert
+                - paragraph [ref=f67e336]: Interesting, thanks. With noise I see Salah only got down to 1.33%. I imagine the rest of the improvement was from using rectifiers instead of sigmoidal units?
+              - separator [ref=f67e337]
+            - generic [ref=f67e338]:
+              - generic [ref=f67e342]:
+                - link "xiaojun2013's profile" [ref=f67e343] [cursor=pointer]:
+                  - /url: /xiaojun2013
+                  - generic "xiaojun2013" [ref=f67e344]
+                - generic [ref=f67e350]:
+                  - link [ref=f67e352] [cursor=pointer]:
+                    - /url: /xiaojun2013
+                    - heading "xiaojun2013" [level=3] [ref=f67e353]
+                  - paragraph [ref=f67e355]: Posted 13 years ago
+                - generic [ref=f67e357]:
+                  - generic [ref=f67e358]:
+                    - button "Upvote" [ref=f67e359] [cursor=pointer]:
+                      - generic [ref=f67e360]: arrow_drop_up
+                    - button "0 votes" [ref=f67e361] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e362] [cursor=pointer]: more_vert
+                - generic [ref=f67e365]:
+                  - paragraph [ref=f67e366]: Hi lan,
+                  - paragraph [ref=f67e367]: Thanks for you doing such a fantastic job on pylearn2!
+                  - paragraph [ref=f67e368]: and I wonder to know wheather can we see the solution of the top five submissions,and where?
+              - separator [ref=f67e369]
+            - generic [ref=f67e370]:
+              - generic [ref=f67e374]:
+                - link "Huy Tho Ho's profile" [ref=f67e375] [cursor=pointer]:
+                  - /url: /huythoho
+                  - generic "Huy Tho Ho" [ref=f67e376]
+                - generic [ref=f67e382]:
+                  - link [ref=f67e384] [cursor=pointer]:
+                    - /url: /huythoho
+                    - heading "Huy Tho Ho" [level=3] [ref=f67e385]
+                  - paragraph [ref=f67e387]: Posted 13 years ago
+                - generic [ref=f67e389]:
+                  - generic [ref=f67e390]:
+                    - button "Upvote" [ref=f67e391] [cursor=pointer]:
+                      - generic [ref=f67e392]: arrow_drop_up
+                    - button "0 votes" [ref=f67e393] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e394] [cursor=pointer]: more_vert
+                - paragraph [ref=f67e398]: Do you have any idea when you will release the labels for the test set? I'm late to the competition but I would like to know how my algorithm performs. Thanks.
+              - separator [ref=f67e399]
+            - generic [ref=f67e400]:
+              - generic [ref=f67e404]:
+                - link "Ian Goodfellow's profile" [ref=f67e405] [cursor=pointer]:
+                  - /url: /iangoodfellow
+                  - generic "Ian Goodfellow" [ref=f67e406]
+                - generic [ref=f67e412]:
+                  - generic [ref=f67e413]:
+                    - link [ref=f67e414] [cursor=pointer]:
+                      - /url: /iangoodfellow
+                      - heading "Ian Goodfellow" [level=3] [ref=f67e415]
+                    - paragraph [ref=f67e418]: Competition Host
+                  - paragraph [ref=f67e420]: Posted 13 years ago
+                - generic [ref=f67e422]:
+                  - generic [ref=f67e423]:
+                    - button "Upvote" [ref=f67e424] [cursor=pointer]:
+                      - generic [ref=f67e425]: arrow_drop_up
+                    - button "0 votes" [ref=f67e426] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e427] [cursor=pointer]: more_vert
+                - paragraph [ref=f67e431]: Yes, we'll release everything once the workshop is over on Friday.
+              - separator [ref=f67e432]
+            - generic [ref=f67e433]:
+              - generic [ref=f67e437]:
+                - link "happy's profile" [ref=f67e438] [cursor=pointer]:
+                  - /url: /happy52242
+                  - generic "happy" [ref=f67e439]
+                - generic [ref=f67e445]:
+                  - link [ref=f67e447] [cursor=pointer]:
+                    - /url: /happy52242
+                    - heading "happy" [level=3] [ref=f67e448]
+                  - paragraph [ref=f67e450]: Posted 13 years ago
+                - generic [ref=f67e452]:
+                  - generic [ref=f67e453]:
+                    - button "Upvote" [ref=f67e454] [cursor=pointer]:
+                      - generic [ref=f67e455]: arrow_drop_up
+                    - button "0 votes" [ref=f67e456] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e457] [cursor=pointer]: more_vert
+                - generic [ref=f67e460]:
+                  - paragraph [ref=f67e461]: Hey Ian,
+                  - paragraph
+                  - paragraph [ref=f67e462]: Is it possible to release the labels 4 the test data? It provides the opportunities that we can find out what is wrong with our model to solve the problem and can be used 4 research purposes( we can locally check our model and calculate the accuracy)
+                  - paragraph [ref=f67e463]: Thanks
+              - separator [ref=f67e464]
+            - generic [ref=f67e465]:
+              - generic [ref=f67e469]:
+                - link "Maxim Milakov's profile" [ref=f67e470] [cursor=pointer]:
+                  - /url: /milakov
+                  - generic "Maxim Milakov" [ref=f67e471]
+                - generic [ref=f67e477]:
+                  - link [ref=f67e479] [cursor=pointer]:
+                    - /url: /milakov
+                    - heading "Maxim Milakov" [level=3] [ref=f67e480]
+                  - generic [ref=f67e481]:
+                    - paragraph [ref=f67e482]: Posted 13 years ago
+                    - paragraph [ref=f67e484]: · 3rd in this Competition
+                - generic [ref=f67e486]:
+                  - generic [ref=f67e487]:
+                    - button "Upvote" [ref=f67e488] [cursor=pointer]:
+                      - generic [ref=f67e489]: arrow_drop_up
+                    - button "0 votes" [ref=f67e490] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e491] [cursor=pointer]: more_vert
+                - paragraph [ref=f67e495]: Oh, yes, it perfectly makes sense. I didn't have validation error raising too. Thanks!
+              - separator [ref=f67e496]
+            - generic [ref=f67e497]:
+              - generic [ref=f67e501]:
+                - link "Maxim Milakov's profile" [ref=f67e502] [cursor=pointer]:
+                  - /url: /milakov
+                  - generic "Maxim Milakov" [ref=f67e503]
+                - generic [ref=f67e509]:
+                  - link [ref=f67e511] [cursor=pointer]:
+                    - /url: /milakov
+                    - heading "Maxim Milakov" [level=3] [ref=f67e512]
+                  - generic [ref=f67e513]:
+                    - paragraph [ref=f67e514]: Posted 13 years ago
+                    - paragraph [ref=f67e516]: · 3rd in this Competition
+                - generic [ref=f67e518]:
+                  - generic [ref=f67e519]:
+                    - button "Upvote" [ref=f67e520] [cursor=pointer]:
+                      - generic [ref=f67e521]: arrow_drop_up
+                    - button "0 votes" [ref=f67e522] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e523] [cursor=pointer]: more_vert
+                - generic [ref=f67e526]:
+                  - paragraph [ref=f67e527]: Hi Charlie,
+                  - paragraph [ref=f67e528]: Thanks for the answer! So you basically have 5x5x64x3072 weights in that fully connected layer with ~5,000,000 weights with 20% of output neuron dropout... Did you try running training set on a model trained? I tried it on my ANN and it did up to 95% (or even more), so I overfit even with ANN of much lesser size.
+                  - paragraph [ref=f67e529]: Thanks,
+                  - paragraph [ref=f67e530]: Max.
+              - separator [ref=f67e531]
+            - generic [ref=f67e532]:
+              - generic [ref=f67e536]:
+                - link "Charlie Tang's profile" [ref=f67e537] [cursor=pointer]:
+                  - /url: /neocortex
+                  - generic "Charlie Tang" [ref=f67e538]
+                - generic [ref=f67e544]:
+                  - link [ref=f67e546] [cursor=pointer]:
+                    - /url: /neocortex
+                    - heading "Charlie Tang" [level=3] [ref=f67e547]
+                  - generic [ref=f67e548]:
+                    - paragraph [ref=f67e549]: Posted 13 years ago
+                    - paragraph [ref=f67e551]: · 1st in this Competition
+                - generic [ref=f67e553]:
+                  - generic [ref=f67e554]:
+                    - button "Upvote" [ref=f67e555] [cursor=pointer]:
+                      - generic [ref=f67e556]: arrow_drop_up
+                    - button "0 votes" [ref=f67e557] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e558] [cursor=pointer]: more_vert
+                - generic [ref=f67e561]:
+                  - paragraph [ref=f67e562]: Ian,
+                  - paragraph [ref=f67e563]: i guess the noise detail was left out of the paper draft, but i used alot of input gaussian noise,
+                  - paragraph [ref=f67e564]: "idea from these papers:"
+                  - paragraph [ref=f67e565]:
+                    - link "http://arxiv.org/abs/1104.3250" [ref=f67e566] [cursor=pointer]:
+                      - /url: http://arxiv.org/abs/1104.3250
+                  - paragraph [ref=f67e567]:
+                    - link "http://users.ics.aalto.fi/praiko/papers/aistats_final.pdf" [ref=f67e568] [cursor=pointer]:
+                      - /url: http://users.ics.aalto.fi/praiko/papers/aistats_final.pdf
+                  - paragraph [ref=f67e569]: charlie
+                  - paragraph
+              - separator [ref=f67e570]
+            - generic [ref=f67e571]:
+              - generic [ref=f67e575]:
+                - link "Ian Goodfellow's profile" [ref=f67e576] [cursor=pointer]:
+                  - /url: /iangoodfellow
+                  - generic "Ian Goodfellow" [ref=f67e577]
+                - generic [ref=f67e583]:
+                  - generic [ref=f67e584]:
+                    - link [ref=f67e585] [cursor=pointer]:
+                      - /url: /iangoodfellow
+                      - heading "Ian Goodfellow" [level=3] [ref=f67e586]
+                    - paragraph [ref=f67e589]: Competition Host
+                  - paragraph [ref=f67e591]: Posted 13 years ago
+                - generic [ref=f67e593]:
+                  - generic [ref=f67e594]:
+                    - button "Upvote" [ref=f67e595] [cursor=pointer]:
+                      - generic [ref=f67e596]: arrow_drop_up
+                    - button "0 votes" [ref=f67e597] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e598] [cursor=pointer]: more_vert
+                - generic [ref=f67e601]:
+                  - paragraph [ref=f67e602]: Hi Charlie,
+                  - paragraph [ref=f67e603]: Exciting paper! I'm curious, why did the softmax NN on MNIST do so well? Usually without dropout or pretraining it's only possible to get 1.2% error or worse as far as I know. Is it the PCA that makes it work better?
+                  - paragraph [ref=f67e604]: Thanks,
+                  - paragraph [ref=f67e605]: Ian
+              - separator [ref=f67e606]
+            - generic [ref=f67e607]:
+              - generic [ref=f67e611]:
+                - link "Charlie Tang's profile" [ref=f67e612] [cursor=pointer]:
+                  - /url: /neocortex
+                  - generic "Charlie Tang" [ref=f67e613]
+                - generic [ref=f67e619]:
+                  - link [ref=f67e621] [cursor=pointer]:
+                    - /url: /neocortex
+                    - heading "Charlie Tang" [level=3] [ref=f67e622]
+                  - generic [ref=f67e623]:
+                    - paragraph [ref=f67e624]: Posted 13 years ago
+                    - paragraph [ref=f67e626]: · 1st in this Competition
+                - generic [ref=f67e628]:
+                  - generic [ref=f67e629]:
+                    - button "Upvote" [ref=f67e630] [cursor=pointer]:
+                      - generic [ref=f67e631]: arrow_drop_up
+                    - button "0 votes" [ref=f67e632] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e633] [cursor=pointer]: more_vert
+                - generic [ref=f67e636]:
+                  - paragraph [ref=f67e637]: Hi Max,
+                  - paragraph [ref=f67e638]: Yes, the net structure i used is exactly as you have described. In the paper i had 3072 units with the softmax and it worked pretty well, got to 70% on private set but not as good as SVM. So overfitting didn't seem to be problem. As with all neural nets, everything from data to learning rates to noise added to momentum can affect the error curve, it's really hard to draw any absolute conclusions from anything :(
+                  - paragraph [ref=f67e639]: Charlie
+              - separator [ref=f67e640]
+            - generic [ref=f67e641]:
+              - generic [ref=f67e645]:
+                - link "Maxim Milakov's profile" [ref=f67e646] [cursor=pointer]:
+                  - /url: /milakov
+                  - generic "Maxim Milakov" [ref=f67e647]
+                - generic [ref=f67e653]:
+                  - link [ref=f67e655] [cursor=pointer]:
+                    - /url: /milakov
+                    - heading "Maxim Milakov" [level=3] [ref=f67e656]
+                  - generic [ref=f67e657]:
+                    - paragraph [ref=f67e658]: Posted 13 years ago
+                    - paragraph [ref=f67e660]: · 3rd in this Competition
+                - generic [ref=f67e662]:
+                  - generic [ref=f67e663]:
+                    - button "Upvote" [ref=f67e664] [cursor=pointer]:
+                      - generic [ref=f67e665]: arrow_drop_up
+                    - button "0 votes" [ref=f67e666] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e667] [cursor=pointer]: more_vert
+                - generic [ref=f67e670]:
+                  - paragraph [ref=f67e671]: Hi Yichuan,
+                  - paragraph [ref=f67e672]: Thanks for publishing source code and a link to the paper! It is a very nice idea - to train SVM and NN simultaneously. I looked into the sources, did I get it right that the structure of NN is the following?
+                  - list [ref=f67e673]:
+                    - listitem [ref=f67e674]: 48x48x1fm
+                    - listitem [ref=f67e675]: Mirror image
+                    - listitem [ref=f67e676]: Rotation and scale (center +-3 in both directions, angle +-45 degree, scale 0.8-1.2), cropping result to 42x42x1fm
+                    - listitem [ref=f67e677]: Convolutional layer (fully connected wrt feature maps) with 5x5 weighting windows, 42x42x32fm, activation function - rectified linear
+                    - listitem [ref=f67e678]: Max subsampling layer, 21x21x32fm
+                    - listitem [ref=f67e679]: Convolutional layer (fully connected wrt feature maps) with 4x4 weighting windows, 20x20x32fm, activation function - rectified linear
+                    - listitem [ref=f67e680]: Average subsampling layer, 10x10x32fm
+                    - listitem [ref=f67e681]: Convolutional layer (fully connected wrt feature maps) with 5x5 weighting windows, 10x10x64fm, activation function - rectified linear
+                    - listitem [ref=f67e682]: Average subsampling layer, 5x5x64fm
+                    - listitem [ref=f67e683]: Fully connected with 20% dropout of output neurons, 3072 output neurons, activation function - rectified linear
+                    - listitem [ref=f67e684]: Fully connected, 7 output neurons, activation function - L2 SVM
+                  - paragraph [ref=f67e685]: "I had rather similar structure of NN, the major changes are:"
+                  - list [ref=f67e686]:
+                    - listitem [ref=f67e687]: I used hyperbolic tangent activation for the last layer
+                    - listitem [ref=f67e688]: All other layers had "hyperbolic tangent + rectification (absolute value)" activation applied (it seems it is time for me to stop being lazy and implement rectified linear).
+                    - listitem [ref=f67e689]: "The first fully connected layer in my NN was _much_ smaller than yours: just 128 neurons. That's a huge difference."
+                  - paragraph [ref=f67e690]: May I ask, did you introduce this 3072-neuron layer to have LinearSVM working fine? Or you had this layer even when softmax activation was applied to the last layer? I would expect serious overfitting in the second case even with dropout applied.
+                  - paragraph
+                  - paragraph [ref=f67e691]: Thanks,
+                  - paragraph [ref=f67e692]: Max.
+                  - paragraph
+              - separator [ref=f67e693]
+            - generic [ref=f67e694]:
+              - generic [ref=f67e698]:
+                - link "Maxim Milakov's profile" [ref=f67e699] [cursor=pointer]:
+                  - /url: /milakov
+                  - generic "Maxim Milakov" [ref=f67e700]
+                - generic [ref=f67e706]:
+                  - link [ref=f67e708] [cursor=pointer]:
+                    - /url: /milakov
+                    - heading "Maxim Milakov" [level=3] [ref=f67e709]
+                  - generic [ref=f67e710]:
+                    - paragraph [ref=f67e711]: Posted 13 years ago
+                    - paragraph [ref=f67e713]: · 3rd in this Competition
+                - generic [ref=f67e715]:
+                  - generic [ref=f67e716]:
+                    - button "Upvote" [ref=f67e717] [cursor=pointer]:
+                      - generic [ref=f67e718]: arrow_drop_up
+                    - button "0 votes" [ref=f67e719] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f67e720] [cursor=pointer]: more_vert
+                - paragraph [ref=f67e724]: I used convolutional neural nets and managed to finish 3rd only. It would beintetesting to see what winners applied. Congratulations to them!
+              - separator [ref=f67e725]
+            - generic [ref=f67e730]:
+              - link "Sudeep Juvekar's profile" [ref=f67e731] [cursor=pointer]:
+                - /url: /sjuvekar
+                - generic "Sudeep Juvekar" [ref=f67e732]
+              - generic [ref=f67e738]:
+                - link [ref=f67e740] [cursor=pointer]:
+                  - /url: /sjuvekar
+                  - heading "Sudeep Juvekar" [level=3] [ref=f67e741]
+                - generic [ref=f67e742]:
+                  - paragraph [ref=f67e743]: Posted 13 years ago
+                  - paragraph [ref=f67e745]: · 28th in this Competition
+              - generic [ref=f67e747]:
+                - generic [ref=f67e748]:
+                  - button "Upvote" [ref=f67e749] [cursor=pointer]:
+                    - generic [ref=f67e750]: arrow_drop_up
+                  - button "0 votes" [ref=f67e751] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f67e752] [cursor=pointer]: more_vert
+              - paragraph [ref=f67e756]: I second that. It was fun to try multiple deep learning algorithms on the problem. Has anyone applied code from http://deeplearning.net? Any success with DBN/RBM/SDA code posted on deep learning tutorials?
+  - alert [ref=f67e759]

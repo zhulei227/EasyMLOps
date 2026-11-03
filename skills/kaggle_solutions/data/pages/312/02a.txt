@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/petfinder-adoption-prediction/discussion/89042#latest-516326
-fetched: 2026-10-27
-chars: 790
+fetched: 2026-11-03
+chars: 6991
 
 menu
 Skip to
@@ -42,15 +42,237 @@ Models
 Discussion
 Leaderboard
 Rules
+takuoko · 1st in this Competition · Posted 8 years ago
+arrow_drop_up
+24
+more_vert
+2nd solution tyu part
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+First of all, thank you very much Petfinder.my and kaggle for hosting such a fantastic competition. And congrats winners and all kagglers :) And I would like to express my great thanks to teammates.
 
-error
+This post is mainly takuoko, ynktk, u++’s part. Here are our teams other parts.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+2nd Place Solution Summary 2nd Place Solution about k_features and LGBM2
+g_features + XGB (part of 2nd place solution)
 
-Failed to load the discussion topic
+Feature engineering
 
-error
+I made 4000～features. But because of 7200sec training time, I selected importance top 1000 features. Interesting thing is that CV improved with fewer features, but dropped LB. I think fewer features model tends not to overfit, but the result was opposite.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+n_feature	CV	LB
+all	0.460	0.472
+1000	0.462	0.470
+150	0.470	0.460
+Text
+
+I used different preprocessing pipeline for BOW features or embedding features.
+
+BOW features from description
+puncts. ex. what's?→what's ?
+misspell. ex. what's→what is
+stemming. ex. going→go
+number. ex. 3cats→3 cats
+BOW/tf-idf→SVD/NMF/BM25
+
+on 5, I used 3 methods. 1st default, 2nd 1-3 gram, 3rd character one. This idea comes from my avito solution. We can get diverse features from its.
+
+embedding features from description
+puncts.
+misspell
+number
+embedding with glove and fasttex. When loading embeddings, I used Quora 3rd solution.
+averaging embedding vectors per sentence.
+
+We checked percentage of embedded vocabulary ont by one. Finally, 93% words get embedding vectors. I tested other embeddings like elmo, bert, etc… But no improvement. I also tried scratch word2vec, fasttext or finetune fasttext like Quora 4th. These also had no gain. I think it is because of few training data.
+
+BOW features from meta. I used all json files but kaeru and gege used only 1st one. This caused some diversity.
+concat meta text. sentiment +annots_desc +breed
+same as BOW features from description. This part used only default one.
+image features
+
+I also used all image files but kaeru and gege used only 1st one.
+
+Features from densenet121, InceptionResnetV2. I made reference this benchmark and test some pretrained features like resnet152 pytorch, xception keras, densenet161 pytorch, etc… But this 2 combination had no problem.
+Aggregation
+
+simple aggregation
+
+ratio aggregation ex. Fee of data is 100. Fee of aggregation with Breed is 30. ratio = 100 / 30 = 3.3. This means the pet is expensive.
+
+diff aggregation ex. Fee of data is 100. Fee of aggregation with Breed is 30. diff = 100 - 30 = 30. This means the pet is expensive.
+
+The following features are importance top 15.
+
+diff var Sterilized groupby RescuerID State
+diff var Age groupby MaturitySize
+ratio sum Sterilized groupby State
+ratio count Age groupby RescuerID
+median Age groupby RescuerID
+ratio sum Age groupby State
+diff mean Age groupby MaturitySize
+simple aggregation for json files
+
+I used all json files, all features(maybe😉).
+
+external data
+emoji data
+State data.
+Breed data.
+Breed ranking data.
+
+External data was dirty. Some breeds name and states name are different from petfinder data. Mainly u++ cleaned these data. We also cleaned Breed1 Breed2. Some
+
+Matrix Factorization
+BOW->LDA/SVD I used all categorical feature combinations.
+interactions features
+
+Age * Quantity Age / Quantity PhotoAmt / Quantity
+
+Feature selection
+
+importance top 1000 features. There is some more imformation in other part
+
+validation strategy
+
+Group K fold. We tested Group K fold, Stratified K fold, Group Stratified K fold. We decided to use it because of following 4 reasons.
+
+LB score Stratified K fold=Group K fold>Group Stratified K fold
+CV score Stratified K fold>>Group K fold>Group Stratified K fold
+run time Stratified K fold>>Group K fold=Group Stratified K fold
+There are no RescuerID that is in train and test. I think Stratified K fold cause heavily overfitting for CV.
+model
+
+LGBM - CV(Group K fold)=0.462 , LB=0.470~ NN - CV(Group K fold)=0.435 , LB=??? Actually, I had better CV scored NN got CV=0.455. But I dropped it because of diversity and use scratch trained embeddings for 0.455NN. This NN got CV=0.447 and ensemble score improved well. But strangely, Public LB and Private LB was worse.
+
+NN model
+
+https://imgur.com/9THWht9.png
+
+imagehttps://imgur.com/1885bPT.png
+
+When training, I used following params.
+
+Cyclic LR
+epoch=20
+batch size=256
+optimizer=adam
+loss=RMSE
+embedding=not trainable
+
+CV=455 NN is different from above. It has following things.
+
+se module
+skip connection important top100 features
+RNN->self attention
+
+RNN Block also referenced Quora 3rd place solution. I tested 1st place solution model and other RNN architecture, but this one was best.
+
+I also tried following, but no gain.
+
+GRU or LSTM like talking data bestfitting
+libfm
+adabound
+scratch embedding
+other things that didn’t work
+gege adversarial validation trick
+other external data like cute image features, etc…
+nima
+A La Carte Embedding
+word2vec, doc2vec, SCDV
+target encoding, WOE
+preprocssing chinese text
+text static features like lenght, etc…
+image statistic features like width, whiteness, etc…
+catboost, xgboost, etc…
+classification models
+
+Please sign in to reply to this topic.
+
+comment
+7 Comments
+Hotness
+corochann
+
+Posted 8 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! and thank you for posting solution. I feel Top 1, 2 are exceptionally different in terms of score, and I could never imagine such a important feature can be made! Especially how to preprocess "text" and "aggregation" feature is impressive for me!
+
+takuoko
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats you too and thank you for your comments. I am looking forward to see you other competitions ;)
+
+Dieter
+
+Posted 7 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Seems like you are #1 on LB now
+
+fly
+
+Posted 8 years ago
+
+· 83rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations. Thank you for your detailed explanation. One question I have is what mina and A La Carte Embedding means in the other things that didn’t work part.
+
+takuoko
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! NIMA is this paper. A La Carte Embedding is this paper.
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thanks for your detailed post.
+
+takuoko
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you. Congratulations you too;)

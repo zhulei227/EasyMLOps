@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/feedback-prize-effectiveness/discussion/347371
-fetched: 2026-10-27
-chars: 800
+fetched: 2026-11-03
+chars: 5890
 
 menu
 Skip to
@@ -42,13 +42,350 @@ Models
 Discussion
 Leaderboard
 Rules
-Failed to load the discussion topic
-error
+Trushant Kalyanpur · 3rd in this Competition · Posted 4 years ago
+arrow_drop_up
+62
+more_vert
+3rd Place - Short Solution
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+First of all congratulations to my teammate @conjuring92 for becoming a Kaggle Competitions Master! Very well deserved!!
 
-error
+This a very brief writeup of our solution which was a team effort of team Darjeeling Tea: @harshit92 @conjuring92 and me.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Detailed writeup coming soon by @conjuring92 EDIT: Added here: https://www.kaggle.com/competitions/feedback-prize-effectiveness/discussion/347433
 
-Failed to load the discussion topic
+Things that worked:
+
+Span classification approach with LSTM head and multi-head attention
+Span MLM
+Data augmentation using T5
+AWP/Token Mask Augmentation/Multi-sample dropout
+Prompt based learning
+2nd level meta models - LSTM / LGB
+
+Things that did not work:
+
+Regular MLM
+Pseudo Labeling
+Mixout
+
+Our best single arch was 10fold deberta-large - Public LB 0.563 Private LB 0.566 (gold zone) Our most efficient sub was deberta-large trained on all train data + aug data - Public LB 0.565/ Private 0.569 in 10mins
+
+Please sign in to reply to this topic.
+
+comment
+30 Comments
+Hotness
+Raja Biswas
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Thanks @trushk 😊 it's been a real pleasure to work as team over the last 2 months, will surely miss that! Glad to finish at #3!
+
+KhanhVD
+
+Posted 4 years ago
+
+· 328th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats @trushk and team. Well done!
+
+Posted 4 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations! Nice work！
+
+chumajin
+
+Posted 4 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Congratulations!! I've been watching the leaderboard and cheering for you since the beginning of the competition. (Especially, @trushk and @harshit92 was my teammates on the past competition! ) This top 3 finish makes me very happy!
+
+Trushant Kalyanpur
+
+Topic Author
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @chumajin ! It was a roller coaster for us but glad to finish in top 3. Congratulations on your Amex Gold!
+
+HarshitMehta
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Nice work @trushk and @conjuring92. It was pleasure working with both of you!
+
+yao
+
+Posted 4 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Great solution and congratulations my friend! A lot to learn! Regular MLM (TAPT) work for me, it improve my score from CV/LB .633(.613) to 0.613(0.587).
+
+Trushant Kalyanpur
+
+Topic Author
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you friend. 😊 . Our approach was span based which is probably why span MLM helped. Awesome work finishing solo #20!!
+
+yao
+
+Posted 4 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! Looking forward to your detailed solution!
+
+kkiller
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats @trushk ! It was fun competing against your team on the public LB !
+
+Trushant Kalyanpur
+
+Topic Author
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Likewise. You guys kept us on our feet!
+
+4 more replies
+arrow_drop_down
+Zacchaeus
+
+Posted 4 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats and thanks for the writeup 🎊. I look forward to your elaboration on T5 augmentation and prompt-based learning. 👀
+
+Nischay Dhankhar
+
+Posted 4 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great Solution!! Congratulations @trushk and team for top 3 finish!! Waiting for full writeup. 🙌
+
+Tifo
+
+Posted 4 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! Looking forward to your 2nd level model~
+
+xbustc
+
+Posted 4 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats , very nice work
+
+The Devastator
+
+Posted 4 years ago
+
+· 206th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!
+
+feyyazyigit
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+Mike Mazurov
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Nice work, congratulations for 3rd place! Let me know if you used soft or hard pseudo labeling?
+
+Trushant Kalyanpur
+
+Topic Author
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We didn't use pseudo labeling at all. We did use synthetic data generated by T5 as described in our long solution
+
+Muhammad Anas Mahmood
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations Nice Work @trushk
+
+Minh Tri Phan
+
+Posted 4 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+Trushant Kalyanpur
+
+Topic Author
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you Tri! It was a great battle for the top! Congratulations to you and your team too!
+
+Prasad
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@trushk , good work
+
+Bishu5c6
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations, Nice work
+
+KKY
+
+Posted 4 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Greate single model！！！
+
+We tried many strategy as yours, but most of them not working for us … looking forward detail solution.
+
+Congratulations to you team TK! 🎉
+
+Trushant Kalyanpur
+
+Topic Author
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks buddy ! Good to see my old friends in the comp. Sorry that you guys missed the gold zone.

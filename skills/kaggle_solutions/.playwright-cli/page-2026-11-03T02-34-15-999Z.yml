@@ -1,0 +1,1091 @@
+- generic [ref=f38e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f38e3]:
+    - generic [ref=f38e5]:
+      - button "Navigation menu" [ref=f38e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f38e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f38e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f38e14]:
+      - link [ref=f38e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fchamps-scalar-coupling%2Fwriteups%2Fquantum-uncertainty-2-solution-quantum-uncertainty
+        - button "Login" [ref=f38e16]
+      - link [ref=f38e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fchamps-scalar-coupling%2Fwriteups%2Fquantum-uncertainty-2-solution-quantum-uncertainty
+        - button "Sign Up" [ref=f38e19]
+  - main [ref=f38e21]:
+    - generic [ref=f38e23]:
+      - generic [ref=f38e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f38e25]:
+        - link "Learn more" [ref=f38e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f38e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f38e29]:
+      - generic [ref=f38e31]: "#2 solution 🤖 Quantum Uncertainty 🤖 — Predicting Molecular Properties"
+      - separator [ref=f38e32]
+      - generic [ref=f38e34]:
+        - generic [ref=f38e35]:
+          - heading "#2 solution 🤖 Quantum Uncertainty 🤖" [level=1] [ref=f38e36]
+          - generic [ref=f38e37]:
+            - link [ref=f38e38] [cursor=pointer]:
+              - /url: /competitions/champs-scalar-coupling
+              - paragraph [ref=f38e40]: Predicting Molecular Properties
+            - paragraph [ref=f38e41]: Solution Writeup · 2nd place · Dec 11, 2019
+        - separator [ref=f38e43]
+        - generic [ref=f38e44]:
+          - generic [ref=f38e46]:
+            - paragraph [ref=f38e47]: "We want to thank Kaggle and CHAMPs for organizing such an awesome competition:"
+            - list [ref=f38e48]:
+              - listitem [ref=f38e49]: No leakage.
+              - listitem [ref=f38e50]:
+                - text: Same distribution in train, private and public test (very stable CV vs. LB, public LB vs. private LB). This is very relevant in other competitions given so many participants when the 3 distributions are different some winners (not all, e.g.
+                - link "CPMP approach to manually align test ~ train in the Microsoft malware comp (opens in a new tab)" [ref=f38e51] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/microsoft-malware-prediction/discussion/84069#latest-499864
+                  - text: CPMP approach to manually align test ~ train in the Microsoft malware comp
+                - text: ) are just lucky they fit private test distribution by chance; not the case here.
+              - listitem [ref=f38e52]: Inspiring and useful science problem hopefully used for good purposes as described in the context (new drugs, etc.).
+            - paragraph [ref=f38e53]:
+              - text: Neither my teammate
+              - link "@pavelgonchar (opens in a new tab)" [ref=f38e54] [cursor=pointer]:
+                - /url: /pavelgonchar
+                - text: "@pavelgonchar"
+              - text: "nor I had any previous domain expertise and we made the decision early on that we would tackle this problem using a very pure deep learning way: letting the model build the features for us, not the other way around (b/c obviously we were at a disadvantage if we tried to become quantum experts in 1 month… hence our team name 🤖Quantum Uncertainty🤖 we didn't know if our yet-to-be-developed approach was going to work)."
+            - paragraph [ref=f38e55]: "Our solution had two major parts: 1) the input representation and 2) deep learning architecture."
+            - paragraph [ref=f38e56]:
+              - strong [ref=f38e57]: Input representation
+            - paragraph [ref=f38e58]: "This is in our opinion the key part: we take a molecule and a source atom and move it so the source atom is @ (0,0,0). For each molecule we create N molecule siblings (N being as many source atoms are defined for that molecule), and each molecule sibling is translated so its source is at (0,0,0)."
+            - paragraph [ref=f38e59]:
+              - text: The
+              - code [ref=f38e60]: x
+              - text: "(input) are three arrays of dimension 29 (maximum number of atoms):"
+            - paragraph [ref=f38e61]:
+              - text: 1)
+              - code [ref=f38e62]: x,y,z
+              - text: position of each atom, 2)
+              - code [ref=f38e63]: atom type
+              - text: index (C=0, H=1, etc…) 3)
+              - code [ref=f38e64]: j-coupling type
+              - text: index (1JHC=0,'2JHH=1,etc.)
+            - paragraph [ref=f38e65]:
+              - text: Padding is done by placing -1 in
+              - code [ref=f38e66]: atom type
+              - text: index and
+              - code [ref=f38e67]: j-coupling type
+              - text: for molecules which have less than 29 atoms.
+            - paragraph [ref=f38e68]:
+              - text: The
+              - code [ref=f38e69]: "y"
+              - text: (ground truth) is just an array of dimension 29 containing j-couplings located at target atom indices.
+            - paragraph [ref=f38e70]: Note that there is no graph information nor any other manually engineered features.
+            - paragraph [ref=f38e71]:
+              - strong [ref=f38e72]: Data augmentation
+            - paragraph [ref=f38e73]: "We did two types of data augmentation:"
+            - list [ref=f38e74]:
+              - listitem [ref=f38e75]: "Rotations: which worked and were useful in our first attempt model: pointnet-based, but proved worthless in the final models (atomic transformer)."
+              - listitem [ref=f38e76]:
+                - text: "J-coupling symmetry: as described"
+                - link "in this discussion (opens in a new tab)" [ref=f38e77] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/champs-scalar-coupling/discussion/94706#latest-563148
+                  - text: in this discussion
+            - paragraph [ref=f38e78]:
+              - strong [ref=f38e79]: "First attempt: Pointnet-inspired architecture (got up to -2.28200 LB)"
+            - paragraph [ref=f38e80]:
+              - text: "Our input representation is basically a point cloud: an unordered set of elements with absolute positions"
+              - code [ref=f38e81]: x,y,z
+              - text: and two attributes
+              - code [ref=f38e82]: atom type
+              - text: and
+              - code [ref=f38e83]: j-coupling type
+              - text: . We modified the
+              - link "Pointnet (opens in a new tab)" [ref=f38e84] [cursor=pointer]:
+                - /url: https://arxiv.org/abs/1612.00593
+                - text: Pointnet
+              - text: architecture to regress j-couplings. Training was a bit unstable and we tried many variations of the architecture, swapping FC layers by linear (fixed) projections (Hadamard), adding coulomb matrix as input, etc.
+            - paragraph [ref=f38e85]: "While this worked OK and got us to -2.28200 LB (ensembling a few models) we felt that this architecture was limited by the extreme pooling/bottleneck operation so we decided to explore other architectures: meet the Atomic Transformer."
+            - paragraph [ref=f38e86]:
+              - strong [ref=f38e87]: "Final architecture: meet the Atomic Transformer"
+            - paragraph [ref=f38e88]:
+              - text: You may know that the recent NLP revolution is mostly due to the transformer architecture described in the
+              - link "Attention is all you need paper (opens in a new tab)" [ref=f38e89] [cursor=pointer]:
+                - /url: https://arxiv.org/abs/1706.03762
+                - text: Attention is all you need paper
+              - text: . The vanilla transformer architecture uses a very clever technique to add positional encodings that are needed for position-dependent input, such as language.
+            - paragraph [ref=f38e90]:
+              - text: Our input representation is a set, which means we can (and should) remove positional encoding. Prior to this competition we had no experience with transformers either but there's a section in
+              - link "Lex Fridman MIT podcast interviewing Orion Vinyals (opens in a new tab)" [ref=f38e91] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=Kedt2or9xlo
+                - text: Lex Fridman MIT podcast interviewing Orion Vinyals
+              - text: where he mentions the inherent position invariance of a barebone transformer encoder layer. This immediately triggered the idea of using transformer layers (encoders) stacked taking as an input
+              - code [ref=f38e92]: x,y,z
+              - text: (normalized but otherwise as-is), and
+              - code [ref=f38e93]: atom type
+              - text: and
+              - code [ref=f38e94]: j-coupling type
+              - text: embeddings; just concatenated… nothing fancy.
+            - paragraph [ref=f38e95]:
+              - text: The dimension of the embeddings was such that the total dimension of the input vectors was
+              - code [ref=f38e96]: d_model
+              - text: (as normally reference in transformer literature). We started with 256 and got immediately great results surpassing our pointnet-inspired architecture so we followed this path.
+            - paragraph [ref=f38e97]: We trained a total of 14 models, with varying dimensions from 512 to 2048 and layers from 6 to 24. Each model parameter size ranged from ~12M to ~100M (biggest model).
+            - paragraph [ref=f38e98]: "We trained some models from scratch, others we fine-tuned. We also fine-tuned a few models on the troublesome j-couplings: reaching -2.12 CV on 1JHC on and -2.19 CV on 1JHN."
+            - paragraph [ref=f38e99]:
+              - text: Our best score is an ensemble of 14 models achieving private LB of -3.22349, and our best single model achieved private LB of -3.16234, again just with
+              - code [ref=f38e100]: x,y,z
+              - text: ","
+              - code [ref=f38e101]: atom type
+              - text: and
+              - code [ref=f38e102]: j-coupling type
+              - text: inputs (no QM9, etc.).
+            - paragraph [ref=f38e103]:
+              - strong [ref=f38e104]: What didn't work
+            - paragraph [ref=f38e105]: "Many things! We tried:"
+            - list [ref=f38e106]:
+              - listitem [ref=f38e107]: Multi-task learning using contributions and other organization provided values.
+              - listitem [ref=f38e108]: "Dropout: We tried multiple attempts to add dropout at various stages (embeddings, encoder layers, pre-decoder, etc.). None of them worked."
+              - listitem [ref=f38e109]: "Knock-out: We added a variation in which as input we deleted 10% of the input atoms, the idea being that the model would build an internal representation of the missing atoms. Surprisingly this worked in that the model still converged nicely but failed to reduce train ~ val gap."
+              - listitem [ref=f38e110]: "Rotations and TTA in Atomic Transformer: it didn't reduce train ~ val gap and didn't produce meaningful TTA gains."
+              - listitem [ref=f38e111]: "Deep decoder: Our decoder is just a projection of ~ the model dimension to 1 (scalar coupling). We tried adding more expressive power to the decoder but this didn't help."
+              - listitem [ref=f38e112]:
+                - text: Fp16 training. This worked for models of dimensions 256 but as training evolved gave
+                - code [ref=f38e113]: NaN
+                - text: s despite numerous attempts to fix it.
+            - paragraph [ref=f38e114]:
+              - strong [ref=f38e115]: Source code
+            - paragraph [ref=f38e116]: We will make source code available once we do clean up. It's a single jupyter notebook using FastAI. Be patient.
+            - paragraph [ref=f38e117]:
+              - strong [ref=f38e118]: Computational resources
+            - paragraph [ref=f38e119]: "We had more ideas than computational resources, even if our computational resources were not tiny:"
+            - list [ref=f38e120]:
+              - listitem [ref=f38e121]: 3 x 2080 Ti + 128 Gb RAM + 16c32t processor
+              - listitem [ref=f38e122]: 2 x 1080 Ti + 64 Gb RAM + 8c16t processor
+              - listitem [ref=f38e123]: Rented 8+ 2080 Ti + 64 Gb RAM + 16c32t processor (multiple machines rented as needed)
+            - paragraph [ref=f38e124]:
+              - strong [ref=f38e125]: Final thoughts
+            - paragraph [ref=f38e126]: "This was our most fun and hardest competition so far:"
+            - list [ref=f38e127]:
+              - listitem [ref=f38e128]: Challenging problem
+              - listitem [ref=f38e129]:
+                - text: Most teams in top 5 had domain experts (although we went
+                - emphasis [ref=f38e130]: domainless
+                - text: as part of our strategy)
+              - listitem [ref=f38e131]: Hungry computational resources.
+            - paragraph [ref=f38e132]:
+              - text: "Even if we lost #1 position just a few hours before competition end we feel very excited we were able to achieve such"
+              - link "useful results for the organizers (opens in a new tab)" [ref=f38e133] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/champs-scalar-coupling/discussion/98375#latest-569312
+                - text: useful results for the organizers
+              - text: . In retrospect we believe a single model of the Atomic Transformer may achieve ever better results with further training.
+            - paragraph [ref=f38e134]: Best - Pavel & Andres
+            - paragraph [ref=f38e135]: p.s. No graph NNs. We though graphs as manually engineered features that the model can infer by itself.
+          - generic [ref=f38e136]:
+            - generic [ref=f38e137]:
+              - text: Authors
+              - generic [ref=f38e138]:
+                - link "Andrés Miguel Torrubia Sáez's profile" [ref=f38e139] [cursor=pointer]:
+                  - /url: /antorsae
+                  - generic "Andrés Miguel Torrubia Sáez" [ref=f38e140]
+                - generic [ref=f38e144]:
+                  - link "Andrés Miguel Torrubia Sáez" [ref=f38e145] [cursor=pointer]:
+                    - /url: /antorsae
+                  - paragraph [ref=f38e146]: antorsae
+              - generic [ref=f38e147]:
+                - link "Pavel Hanchar's profile" [ref=f38e148] [cursor=pointer]:
+                  - /url: /pavelgonchar
+                  - generic "Pavel Hanchar" [ref=f38e149]
+                - generic [ref=f38e153]:
+                  - link "Pavel Hanchar" [ref=f38e154] [cursor=pointer]:
+                    - /url: /pavelgonchar
+                  - paragraph [ref=f38e155]: pavelgonchar
+            - separator [ref=f38e156]
+            - generic [ref=f38e157]:
+              - generic [ref=f38e158]:
+                - button "Upvote" [ref=f38e159] [cursor=pointer]:
+                  - generic [ref=f38e160]: arrow_drop_up
+                - button "176 votes" [ref=f38e161] [cursor=pointer]: "176"
+              - button "Share" [ref=f38e162] [cursor=pointer]
+              - button "Writeup actions" [ref=f38e164] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f38e165]
+        - paragraph [ref=f38e166]: "Andrés Miguel Torrubia Sáez, Pavel Hanchar. #2 solution 🤖 Quantum Uncertainty 🤖. https://www.kaggle.com/competitions/champs-scalar-coupling/writeups/quantum-uncertainty-2-solution-quantum-uncertainty. 2019. Kaggle"
+        - separator [ref=f38e167]
+        - generic [ref=f38e168]:
+          - generic [ref=f38e170]:
+            - generic [ref=f38e171]:
+              - generic [aria-hidden] [ref=f38e172]: comment
+              - generic [ref=f38e173]:
+                - heading "49 Comments" [level=2] [ref=f38e174]
+                - link "Go To Appreciation Comments (4 total)" [ref=f38e175] [cursor=pointer]:
+                  - /url: /competitions/champs-scalar-coupling/writeups/quantum-uncertainty-2-solution-quantum-uncertainty#appreciation
+                  - text: 4 appreciation comments
+            - generic [ref=f38e178]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f38e179] [cursor=pointer]:
+                - generic [ref=f38e180]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f38e182]:
+            - generic [ref=f38e183]:
+              - generic [ref=f38e187]:
+                - link "Jonathan Mailoa's profile" [ref=f38e188] [cursor=pointer]:
+                  - /url: /jpmailoa
+                  - generic "Jonathan Mailoa" [ref=f38e189]
+                - generic [ref=f38e195]:
+                  - link [ref=f38e197] [cursor=pointer]:
+                    - /url: /jpmailoa
+                    - heading "Jonathan Mailoa" [level=3] [ref=f38e198]
+                  - generic [ref=f38e199]:
+                    - paragraph [ref=f38e200]: Posted 7 years ago
+                    - paragraph [ref=f38e202]: · 1st in this Competition
+                - generic [ref=f38e204]:
+                  - generic [ref=f38e205]:
+                    - button "Upvote" [ref=f38e206] [cursor=pointer]:
+                      - generic [ref=f38e207]: arrow_drop_up
+                    - button "4 votes" [ref=f38e208] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f38e209] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e213]: I just want to say that your team's work is very impressive, and I certainly look forward to reading the implementation in more detail! For one, we also use transformer architecture, but it was a graph transformer. I think Zico will make a post about it sometime soon.
+                - button "Reply" [ref=f38e215] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e216]: reply
+                - generic [ref=f38e218]:
+                  - generic [ref=f38e223]:
+                    - link "Andrés Miguel Torrubia Sáez's profile" [ref=f38e224] [cursor=pointer]:
+                      - /url: /antorsae
+                      - generic "Andrés Miguel Torrubia Sáez" [ref=f38e225]
+                    - generic [ref=f38e231]:
+                      - generic [ref=f38e232]:
+                        - link [ref=f38e233] [cursor=pointer]:
+                          - /url: /antorsae
+                          - heading "Andrés Miguel Torrubia Sáez" [level=3] [ref=f38e234]
+                        - paragraph [ref=f38e237]: Topic Author
+                      - generic [ref=f38e238]:
+                        - paragraph [ref=f38e239]: Posted 7 years ago
+                        - paragraph [ref=f38e241]: · 2nd in this Competition
+                    - generic [ref=f38e243]:
+                      - generic [ref=f38e244]:
+                        - button "Upvote" [ref=f38e245] [cursor=pointer]:
+                          - generic [ref=f38e246]: arrow_drop_up
+                        - button "1 votes" [ref=f38e247] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f38e248] [cursor=pointer]: more_vert
+                    - paragraph [ref=f38e252]: Thanks! You made us sweat a lot in the final hours. It was fun tough and we learned a few lessons in those final hours.
+                    - button "Reply" [ref=f38e254] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e255]: reply
+                  - generic [ref=f38e261]:
+                    - link "Jonathan Mailoa's profile" [ref=f38e262] [cursor=pointer]:
+                      - /url: /jpmailoa
+                      - generic "Jonathan Mailoa" [ref=f38e263]
+                    - generic [ref=f38e269]:
+                      - link [ref=f38e271] [cursor=pointer]:
+                        - /url: /jpmailoa
+                        - heading "Jonathan Mailoa" [level=3] [ref=f38e272]
+                      - generic [ref=f38e273]:
+                        - paragraph [ref=f38e274]: Posted 7 years ago
+                        - paragraph [ref=f38e276]: · 1st in this Competition
+                    - generic [ref=f38e278]:
+                      - generic [ref=f38e279]:
+                        - button "Upvote" [ref=f38e280] [cursor=pointer]:
+                          - generic [ref=f38e281]: arrow_drop_up
+                        - button "2 votes" [ref=f38e282] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f38e283] [cursor=pointer]: more_vert
+                    - generic [ref=f38e286]:
+                      - paragraph [ref=f38e287]: On the day before the last day, we were very excited to finally try surpassing you guys! But we were 0.001 short… and couldn't do anything about it until the next day. =)
+                      - paragraph [ref=f38e288]: Since your transformer graph does not satisfy physics requirement of rotation/translation invariance by construction, can you comment on how much data augmentation you need to do to get good result, as well as the extra training resource / compute needed correspondingly? Your single model achieving -3.16 is really quite impressive considering that your architecture does not satisfy physics rules by construction!
+                    - button "Reply" [ref=f38e290] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e291]: reply
+              - separator [ref=f38e293]
+            - generic [ref=f38e294]:
+              - generic [ref=f38e298]:
+                - link "whyvr's profile" [ref=f38e299] [cursor=pointer]:
+                  - /url: /vasantvr
+                  - generic "whyvr" [ref=f38e300]
+                - generic [ref=f38e306]:
+                  - link [ref=f38e308] [cursor=pointer]:
+                    - /url: /vasantvr
+                    - heading "whyvr" [level=3] [ref=f38e309]
+                  - paragraph [ref=f38e311]: Posted 7 years ago
+                - generic [ref=f38e313]:
+                  - generic [ref=f38e314]:
+                    - button "Upvote" [ref=f38e315] [cursor=pointer]:
+                      - generic [ref=f38e316]: arrow_drop_up
+                    - button "3 votes" [ref=f38e317] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f38e318] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e322]: Hi Andres, very inspired by your approach. Is the notebook available for us to study, could you point me to it?
+                - button "Reply" [ref=f38e324] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e325]: reply
+              - separator [ref=f38e327]
+            - generic [ref=f38e328]:
+              - generic [ref=f38e332]:
+                - link "Michel ML's profile" [ref=f38e333] [cursor=pointer]:
+                  - /url: /michelml
+                  - generic "Michel ML" [ref=f38e334]
+                - generic [ref=f38e340]:
+                  - link [ref=f38e342] [cursor=pointer]:
+                    - /url: /michelml
+                    - heading "Michel ML" [level=3] [ref=f38e343]
+                  - generic [ref=f38e344]:
+                    - paragraph [ref=f38e345]: Posted 7 years ago
+                    - paragraph [ref=f38e347]: · 385th in this Competition
+                - generic [ref=f38e349]:
+                  - generic [ref=f38e350]:
+                    - button "Upvote" [ref=f38e351] [cursor=pointer]:
+                      - generic [ref=f38e352]: arrow_drop_up
+                    - button "3 votes" [ref=f38e353] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f38e354] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e358]:
+                  - text: Very impressive how having machine learning expertise and no domain knowledge can get you a podium, it truely amazes me. Congrats
+                  - link "@antorsae (opens in a new tab)" [ref=f38e359] [cursor=pointer]:
+                    - /url: /antorsae
+                    - text: "@antorsae"
+                - button "Reply" [ref=f38e361] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e362]: reply
+              - separator [ref=f38e364]
+            - generic [ref=f38e365]:
+              - generic [ref=f38e369]:
+                - link "CPMP's profile" [ref=f38e370] [cursor=pointer]:
+                  - /url: /cpmpml
+                  - generic "CPMP" [ref=f38e371]
+                - generic [ref=f38e377]:
+                  - link [ref=f38e379] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - heading "CPMP" [level=3] [ref=f38e380]
+                  - generic [ref=f38e381]:
+                    - paragraph [ref=f38e382]: Posted 7 years ago
+                    - paragraph [ref=f38e384]: · 7th in this Competition
+                - generic [ref=f38e386]:
+                  - generic [ref=f38e387]:
+                    - button "Upvote" [ref=f38e388] [cursor=pointer]:
+                      - generic [ref=f38e389]: arrow_drop_up
+                    - button "3 votes" [ref=f38e390] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f38e391] [cursor=pointer]: more_vert
+                - generic [ref=f38e394]:
+                  - paragraph [ref=f38e395]: Thanks, very impressive solution. In a way my team mates approached the problem in a way similar to yours, by representing every atom position relative to the two atoms for which scaling is computed. But you way is a bit different as you keep the coordinates, while they worked with distances and angles. That using coordinates works that well is a bit of a surprise to me. If I were the organizers then i would have applied random rotations to the data… This said, again, congrats on the approach. I'll need to reread this to full grasp it.
+                  - paragraph [ref=f38e396]: "I forgot the most important: congrats on the end result and the incredible lead during the competition."
+                - button "Reply" [ref=f38e398] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e399]: reply
+                - generic [ref=f38e401]:
+                  - generic [ref=f38e406]:
+                    - link "CPMP's profile" [ref=f38e407] [cursor=pointer]:
+                      - /url: /cpmpml
+                      - generic "CPMP" [ref=f38e408]
+                    - generic [ref=f38e414]:
+                      - link [ref=f38e416] [cursor=pointer]:
+                        - /url: /cpmpml
+                        - heading "CPMP" [level=3] [ref=f38e417]
+                      - generic [ref=f38e418]:
+                        - paragraph [ref=f38e419]: Posted 7 years ago
+                        - paragraph [ref=f38e421]: · 7th in this Competition
+                    - generic [ref=f38e423]:
+                      - generic [ref=f38e424]:
+                        - button "Upvote" [ref=f38e425] [cursor=pointer]:
+                          - generic [ref=f38e426]: arrow_drop_up
+                        - button "2 votes" [ref=f38e427] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f38e428] [cursor=pointer]: more_vert
+                    - paragraph [ref=f38e432]: And thanks for citing my solution in Malware! ;)
+                    - button "Reply" [ref=f38e434] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e435]: reply
+                  - generic [ref=f38e441]:
+                    - link "Andrés Miguel Torrubia Sáez's profile" [ref=f38e442] [cursor=pointer]:
+                      - /url: /antorsae
+                      - generic "Andrés Miguel Torrubia Sáez" [ref=f38e443]
+                    - generic [ref=f38e449]:
+                      - generic [ref=f38e450]:
+                        - link [ref=f38e451] [cursor=pointer]:
+                          - /url: /antorsae
+                          - heading "Andrés Miguel Torrubia Sáez" [level=3] [ref=f38e452]
+                        - paragraph [ref=f38e455]: Topic Author
+                      - generic [ref=f38e456]:
+                        - paragraph [ref=f38e457]: Posted 7 years ago
+                        - paragraph [ref=f38e459]: · 2nd in this Competition
+                    - generic [ref=f38e461]:
+                      - generic [ref=f38e462]:
+                        - button "Upvote" [ref=f38e463] [cursor=pointer]:
+                          - generic [ref=f38e464]: arrow_drop_up
+                        - button "1 votes" [ref=f38e465] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f38e466] [cursor=pointer]: more_vert
+                    - paragraph [ref=f38e470]: Yeah! I liked the notion of alining distributions. In the IEEE fraud one I am trying to do the same automatically with deep learning instead of manual alignment. Not proven yet.
+                    - button "Reply" [ref=f38e472] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e473]: reply
+                  - generic [ref=f38e479]:
+                    - link "CPMP's profile" [ref=f38e480] [cursor=pointer]:
+                      - /url: /cpmpml
+                      - generic "CPMP" [ref=f38e481]
+                    - generic [ref=f38e487]:
+                      - link [ref=f38e489] [cursor=pointer]:
+                        - /url: /cpmpml
+                        - heading "CPMP" [level=3] [ref=f38e490]
+                      - generic [ref=f38e491]:
+                        - paragraph [ref=f38e492]: Posted 7 years ago
+                        - paragraph [ref=f38e494]: · 7th in this Competition
+                    - generic [ref=f38e496]:
+                      - generic [ref=f38e497]:
+                        - button "Upvote" [ref=f38e498] [cursor=pointer]:
+                          - generic [ref=f38e499]: arrow_drop_up
+                        - button "0 votes" [ref=f38e500] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f38e501] [cursor=pointer]: more_vert
+                    - paragraph [ref=f38e505]: I tried to code it, and it led to a second dataset, but it performed worse than the fully manual one I guess my pretrained NN (in my brain) worked better ;)
+                    - button "Reply" [ref=f38e507] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e508]: reply
+              - separator [ref=f38e510]
+            - generic [ref=f38e511]:
+              - generic [ref=f38e515]:
+                - link "XiaokangWang's profile" [ref=f38e516] [cursor=pointer]:
+                  - /url: /xiaokangwang
+                  - generic "XiaokangWang" [ref=f38e517]
+                - generic [ref=f38e523]:
+                  - link [ref=f38e525] [cursor=pointer]:
+                    - /url: /xiaokangwang
+                    - heading "XiaokangWang" [level=3] [ref=f38e526]
+                  - generic [ref=f38e527]:
+                    - paragraph [ref=f38e528]: Posted 7 years ago
+                    - paragraph [ref=f38e530]: · 121st in this Competition
+                - generic [ref=f38e532]:
+                  - generic [ref=f38e533]:
+                    - button "Upvote" [ref=f38e534] [cursor=pointer]:
+                      - generic [ref=f38e535]: arrow_drop_up
+                    - button "2 votes" [ref=f38e536] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f38e537] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e541]: Congratulations! You are not using graph NN. Amazing ideas! I think it would be an excellent paper if you wrote it up your ideas.
+                - button "Reply" [ref=f38e543] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e544]: reply
+              - separator [ref=f38e546]
+            - generic [ref=f38e547]:
+              - generic [ref=f38e551]:
+                - link "CoreyJamesLevinson's profile" [ref=f38e552] [cursor=pointer]:
+                  - /url: /returnofsputnik
+                  - generic "CoreyJamesLevinson" [ref=f38e553]
+                - generic [ref=f38e559]:
+                  - link [ref=f38e561] [cursor=pointer]:
+                    - /url: /returnofsputnik
+                    - heading "CoreyJamesLevinson" [level=3] [ref=f38e562]
+                  - generic [ref=f38e563]:
+                    - paragraph [ref=f38e564]: Posted 7 years ago
+                    - paragraph [ref=f38e566]: · 39th in this Competition
+                - generic [ref=f38e568]:
+                  - generic [ref=f38e569]:
+                    - button "Upvote" [ref=f38e570] [cursor=pointer]:
+                      - generic [ref=f38e571]: arrow_drop_up
+                    - button "2 votes" [ref=f38e572] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f38e573] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e577]: looking forward to the code! Thanks for sharing
+                - button "Reply" [ref=f38e579] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e580]: reply
+              - separator [ref=f38e582]
+            - generic [ref=f38e583]:
+              - generic [ref=f38e587]:
+                - link "Patrick Chan's profile" [ref=f38e588] [cursor=pointer]:
+                  - /url: /drpatrickchan
+                  - generic "Patrick Chan" [ref=f38e589]
+                - generic [ref=f38e595]:
+                  - link [ref=f38e597] [cursor=pointer]:
+                    - /url: /drpatrickchan
+                    - heading "Patrick Chan" [level=3] [ref=f38e598]
+                  - generic [ref=f38e599]:
+                    - paragraph [ref=f38e600]: Posted 7 years ago
+                    - paragraph [ref=f38e602]: · 461st in this Competition
+                - generic [ref=f38e604]:
+                  - generic [ref=f38e605]:
+                    - button "Upvote" [ref=f38e606] [cursor=pointer]:
+                      - generic [ref=f38e607]: arrow_drop_up
+                    - button "2 votes" [ref=f38e608] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f38e609] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e613]: Very impressive and the right way to go with AI discovery. Like the domainless approach! Congratulations!
+                - button "Reply" [ref=f38e615] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e616]: reply
+              - separator [ref=f38e618]
+            - generic [ref=f38e619]:
+              - generic [ref=f38e623]:
+                - link "guiferviz's profile" [ref=f38e624] [cursor=pointer]:
+                  - /url: /guiferviz
+                  - generic "guiferviz" [ref=f38e625]
+                - generic [ref=f38e631]:
+                  - link [ref=f38e633] [cursor=pointer]:
+                    - /url: /guiferviz
+                    - heading "guiferviz" [level=3] [ref=f38e634]
+                  - generic [ref=f38e635]:
+                    - paragraph [ref=f38e636]: Posted 7 years ago
+                    - paragraph [ref=f38e638]: · 401st in this Competition
+                - generic [ref=f38e640]:
+                  - generic [ref=f38e641]:
+                    - button "Upvote" [ref=f38e642] [cursor=pointer]:
+                      - generic [ref=f38e643]: arrow_drop_up
+                    - button "2 votes" [ref=f38e644] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f38e645] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e649]: Congratulations! Looking forward to exploring your code, I'm very interested in solutions without domain knowledge. Btw, I just realized that we are form the same city lol
+                - button "Reply" [ref=f38e651] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e652]: reply
+              - separator [ref=f38e654]
+            - generic [ref=f38e655]:
+              - generic [ref=f38e659]:
+                - link "Robin N's profile" [ref=f38e660] [cursor=pointer]:
+                  - /url: /robin111
+                  - generic "Robin N" [ref=f38e661]
+                - generic [ref=f38e667]:
+                  - link [ref=f38e669] [cursor=pointer]:
+                    - /url: /robin111
+                    - heading "Robin N" [level=3] [ref=f38e670]
+                  - generic [ref=f38e671]:
+                    - paragraph [ref=f38e672]: Posted 7 years ago
+                    - paragraph [ref=f38e674]: · 6th in this Competition
+                - generic [ref=f38e676]:
+                  - generic [ref=f38e677]:
+                    - button "Upvote" [ref=f38e678] [cursor=pointer]:
+                      - generic [ref=f38e679]: arrow_drop_up
+                    - button "2 votes" [ref=f38e680] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f38e681] [cursor=pointer]: more_vert
+                - generic [ref=f38e684]:
+                  - paragraph [ref=f38e685]: Really impressed to see that you were able to push a pure Tranformer Encoder to such great performances. I tried using a straightforward Transformer model as well on a set of engineered features (no raw coordinates), but wasn't able to get results anywhere near as good as yours. Like you said, I think the key is your input representation creating the N sibling molecules.
+                  - paragraph [ref=f38e686]: Congrats on second place and the beautiful approach.
+                - button "Reply" [ref=f38e688] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e689]: reply
+              - separator [ref=f38e691]
+            - generic [ref=f38e692]:
+              - generic [ref=f38e696]:
+                - link "JM's profile" [ref=f38e697] [cursor=pointer]:
+                  - /url: /julianmukaj
+                  - generic "JM" [ref=f38e698]
+                - generic [ref=f38e704]:
+                  - link [ref=f38e706] [cursor=pointer]:
+                    - /url: /julianmukaj
+                    - heading "JM" [level=3] [ref=f38e707]
+                  - generic [ref=f38e708]:
+                    - paragraph [ref=f38e709]: Posted 7 years ago
+                    - paragraph [ref=f38e711]: · 56th in this Competition
+                - generic [ref=f38e713]:
+                  - generic [ref=f38e714]:
+                    - button "Upvote" [ref=f38e715] [cursor=pointer]:
+                      - generic [ref=f38e716]: arrow_drop_up
+                    - button "1 votes" [ref=f38e717] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e718] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e722]: Great work, looking forward to seeing the notebook
+                - button "Reply" [ref=f38e724] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e725]: reply
+              - separator [ref=f38e727]
+            - generic [ref=f38e728]:
+              - generic [ref=f38e732]:
+                - link "Sean McConnell's profile" [ref=f38e733] [cursor=pointer]:
+                  - /url: /seerss
+                  - generic "Sean McConnell" [ref=f38e734]
+                - generic [ref=f38e740]:
+                  - link [ref=f38e742] [cursor=pointer]:
+                    - /url: /seerss
+                    - heading "Sean McConnell" [level=3] [ref=f38e743]
+                  - generic [ref=f38e744]:
+                    - paragraph [ref=f38e745]: Posted 7 years ago
+                    - paragraph [ref=f38e747]: · 779th in this Competition
+                - generic [ref=f38e749]:
+                  - generic [ref=f38e750]:
+                    - button "Upvote" [ref=f38e751] [cursor=pointer]:
+                      - generic [ref=f38e752]: arrow_drop_up
+                    - button "1 votes" [ref=f38e753] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e754] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e758]: Congrats!
+                - button "Reply" [ref=f38e760] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e761]: reply
+              - separator [ref=f38e763]
+            - generic [ref=f38e764]:
+              - generic [ref=f38e768]:
+                - link "corochann's profile" [ref=f38e769] [cursor=pointer]:
+                  - /url: /corochann
+                  - generic "corochann" [ref=f38e770]
+                - generic [ref=f38e776]:
+                  - link [ref=f38e778] [cursor=pointer]:
+                    - /url: /corochann
+                    - heading "corochann" [level=3] [ref=f38e779]
+                  - generic [ref=f38e780]:
+                    - paragraph [ref=f38e781]: Posted 7 years ago
+                    - paragraph [ref=f38e783]: · 2115th in this Competition
+                - generic [ref=f38e785]:
+                  - generic [ref=f38e786]:
+                    - button "Upvote" [ref=f38e787] [cursor=pointer]:
+                      - generic [ref=f38e788]: arrow_drop_up
+                    - button "1 votes" [ref=f38e789] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e790] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e794]: Congratulations! Impressed that not used graph NNs but used transformer based architectures to deal with set, together with the position translation for target atom.
+                - button "Reply" [ref=f38e796] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e797]: reply
+              - separator [ref=f38e799]
+            - generic [ref=f38e800]:
+              - generic [ref=f38e804]:
+                - link "Dondon2019's profile" [ref=f38e805] [cursor=pointer]:
+                  - /url: /dondon2019
+                  - generic "Dondon2019" [ref=f38e806]
+                - generic [ref=f38e812]:
+                  - link [ref=f38e814] [cursor=pointer]:
+                    - /url: /dondon2019
+                    - heading "Dondon2019" [level=3] [ref=f38e815]
+                  - generic [ref=f38e816]:
+                    - paragraph [ref=f38e817]: Posted 7 years ago
+                    - paragraph [ref=f38e819]: · 194th in this Competition
+                - generic [ref=f38e821]:
+                  - generic [ref=f38e822]:
+                    - button "Upvote" [ref=f38e823] [cursor=pointer]:
+                      - generic [ref=f38e824]: arrow_drop_up
+                    - button "1 votes" [ref=f38e825] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e826] [cursor=pointer]: more_vert
+                - generic [ref=f38e829]:
+                  - paragraph [ref=f38e830]: Hi,
+                  - paragraph [ref=f38e831]: "Thanks a lot for sharing your solution and code. I was reading your code and I have a question: In your code atom-transfomer-good-norm-pytorch, the result under the line learner.summary() shows two emdedding layers and two dropout layers at the end. Where do they come from? I can't find them in the forward method of your AtomTorchTransformer. I apologize if the question is too detailed and thanks in advance."
+                - button "Reply" [ref=f38e833] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e834]: reply
+                - generic [ref=f38e836]:
+                  - generic [ref=f38e841]:
+                    - link "Andrés Miguel Torrubia Sáez's profile" [ref=f38e842] [cursor=pointer]:
+                      - /url: /antorsae
+                      - generic "Andrés Miguel Torrubia Sáez" [ref=f38e843]
+                    - generic [ref=f38e849]:
+                      - generic [ref=f38e850]:
+                        - link [ref=f38e851] [cursor=pointer]:
+                          - /url: /antorsae
+                          - heading "Andrés Miguel Torrubia Sáez" [level=3] [ref=f38e852]
+                        - paragraph [ref=f38e855]: Topic Author
+                      - generic [ref=f38e856]:
+                        - paragraph [ref=f38e857]: Posted 7 years ago
+                        - paragraph [ref=f38e859]: · 2nd in this Competition
+                    - generic [ref=f38e861]:
+                      - generic [ref=f38e862]:
+                        - button "Upvote" [ref=f38e863] [cursor=pointer]:
+                          - generic [ref=f38e864]: arrow_drop_up
+                        - button "0 votes" [ref=f38e865] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f38e866] [cursor=pointer]: more_vert
+                    - generic [ref=f38e869]:
+                      - paragraph [ref=f38e870]:
+                        - text: Check this code in the
+                        - code [ref=f38e871]: AtomTransformer
+                        - text: "constructor:"
+                      - code [ref=f38e873]: "n_atom_embedding = d_model//2 n_type_embedding = d_model - n_atom_embedding - 3 #- 1 - 1 -1 self.type_embedding = nn.Embedding(len(types)+1,n_type_embedding) self.atom_embedding = nn.Embedding(len(atoms)+1,n_atom_embedding) self.drop_type, self.drop_atom = nn.Dropout(embed_p), nn.Dropout(embed_p)"
+                    - button "Reply" [ref=f38e875] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e876]: reply
+                  - generic [ref=f38e878]:
+                    - button "3 more replies" [ref=f38e879] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e881]: arrow_drop_down
+                    - generic [ref=f38e882]:
+                      - img "Profile picture for Dondon2019" [ref=f38e884]
+                      - img "Profile picture for Andrés Miguel Torrubia Sáez" [ref=f38e886]
+              - separator [ref=f38e887]
+            - generic [ref=f38e888]:
+              - generic [ref=f38e892]:
+                - link "Deep Chatterjee's profile" [ref=f38e893] [cursor=pointer]:
+                  - /url: /deepchatterjeevns
+                  - generic "Deep Chatterjee" [ref=f38e894]
+                - generic [ref=f38e900]:
+                  - link [ref=f38e902] [cursor=pointer]:
+                    - /url: /deepchatterjeevns
+                    - heading "Deep Chatterjee" [level=3] [ref=f38e903]
+                  - generic [ref=f38e904]:
+                    - paragraph [ref=f38e905]: Posted 7 years ago
+                    - paragraph [ref=f38e907]: · 1529th in this Competition
+                - generic [ref=f38e909]:
+                  - generic [ref=f38e910]:
+                    - button "Upvote" [ref=f38e911] [cursor=pointer]:
+                      - generic [ref=f38e912]: arrow_drop_up
+                    - button "1 votes" [ref=f38e913] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e914] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e918]:
+                  - text: Congratulations
+                  - link "@antorsae (opens in a new tab)" [ref=f38e919] [cursor=pointer]:
+                    - /url: /antorsae
+                    - text: "@antorsae"
+                  - link "@pavelgonchar (opens in a new tab)" [ref=f38e920] [cursor=pointer]:
+                    - /url: /pavelgonchar
+                    - text: "@pavelgonchar"
+                  - text: .Thank you for the approach and waiting for the notebook. The one thing that is inspirational for me is that though you don't have any domain expertise, you understand and solve the problem using DeepLearning techniques.
+                - button "Reply" [ref=f38e922] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e923]: reply
+              - separator [ref=f38e925]
+            - generic [ref=f38e926]:
+              - generic [ref=f38e930]:
+                - link "Sems Kurtoglu's profile" [ref=f38e931] [cursor=pointer]:
+                  - /url: /shemskurtoglu
+                  - generic "Sems Kurtoglu" [ref=f38e932]
+                - generic [ref=f38e938]:
+                  - link [ref=f38e940] [cursor=pointer]:
+                    - /url: /shemskurtoglu
+                    - heading "Sems Kurtoglu" [level=3] [ref=f38e941]
+                  - generic [ref=f38e942]:
+                    - paragraph [ref=f38e943]: Posted 7 years ago
+                    - paragraph [ref=f38e945]: · 2532nd in this Competition
+                - generic [ref=f38e947]:
+                  - generic [ref=f38e948]:
+                    - button "Upvote" [ref=f38e949] [cursor=pointer]:
+                      - generic [ref=f38e950]: arrow_drop_up
+                    - button "1 votes" [ref=f38e951] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e952] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e956]: Congratulations, good job
+                - button "Reply" [ref=f38e958] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e959]: reply
+              - separator [ref=f38e961]
+            - generic [ref=f38e962]:
+              - generic [ref=f38e966]:
+                - link "Even's profile" [ref=f38e967] [cursor=pointer]:
+                  - /url: /eoldridge
+                  - generic "Even" [ref=f38e968]
+                - generic [ref=f38e974]:
+                  - link [ref=f38e976] [cursor=pointer]:
+                    - /url: /eoldridge
+                    - heading "Even" [level=3] [ref=f38e977]
+                  - generic [ref=f38e978]:
+                    - paragraph [ref=f38e979]: Posted 7 years ago
+                    - paragraph [ref=f38e981]: · 33rd in this Competition
+                - generic [ref=f38e983]:
+                  - generic [ref=f38e984]:
+                    - button "Upvote" [ref=f38e985] [cursor=pointer]:
+                      - generic [ref=f38e986]: arrow_drop_up
+                    - button "1 votes" [ref=f38e987] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e988] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e992]: Really looking forward to your solution, especially as a fellow fastai community member. Your team really inspired us to keep striving in the final weeks of the competition. Sub -3 didn't feel achievable until we saw you pull it off.
+                - button "Reply" [ref=f38e994] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e995]: reply
+              - separator [ref=f38e997]
+            - generic [ref=f38e998]:
+              - generic [ref=f38e1002]:
+                - link "Pankaj Joshi's profile" [ref=f38e1003] [cursor=pointer]:
+                  - /url: /pjoshi
+                  - generic "Pankaj Joshi" [ref=f38e1004]
+                - generic [ref=f38e1010]:
+                  - link [ref=f38e1012] [cursor=pointer]:
+                    - /url: /pjoshi
+                    - heading "Pankaj Joshi" [level=3] [ref=f38e1013]
+                  - generic [ref=f38e1014]:
+                    - paragraph [ref=f38e1015]: Posted 7 years ago
+                    - paragraph [ref=f38e1017]: · 413th in this Competition
+                - generic [ref=f38e1019]:
+                  - generic [ref=f38e1020]:
+                    - button "Upvote" [ref=f38e1021] [cursor=pointer]:
+                      - generic [ref=f38e1022]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1023] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1024] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e1028]: Congratulations, you guys are inspirations.
+                - button "Reply" [ref=f38e1030] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1031]: reply
+              - separator [ref=f38e1033]
+            - generic [ref=f38e1034]:
+              - generic [ref=f38e1038]:
+                - link "Murat Sarıbaş's profile" [ref=f38e1039] [cursor=pointer]:
+                  - /url: /paragondefender
+                  - generic "Murat Sarıbaş" [ref=f38e1040]
+                - generic [ref=f38e1046]:
+                  - link [ref=f38e1048] [cursor=pointer]:
+                    - /url: /paragondefender
+                    - heading "Murat Sarıbaş" [level=3] [ref=f38e1049]
+                  - paragraph [ref=f38e1051]: Posted 7 years ago
+                - generic [ref=f38e1053]:
+                  - generic [ref=f38e1054]:
+                    - button "Upvote" [ref=f38e1055] [cursor=pointer]:
+                      - generic [ref=f38e1056]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1057] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1058] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e1062]: Congrats!!
+                - button "Reply" [ref=f38e1064] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1065]: reply
+              - separator [ref=f38e1067]
+            - generic [ref=f38e1068]:
+              - generic [ref=f38e1072]:
+                - link "Xiao-Chuan's profile" [ref=f38e1073] [cursor=pointer]:
+                  - /url: /zouxiaochuan
+                  - generic "Xiao-Chuan" [ref=f38e1074]
+                - generic [ref=f38e1080]:
+                  - link [ref=f38e1082] [cursor=pointer]:
+                    - /url: /zouxiaochuan
+                    - heading "Xiao-Chuan" [level=3] [ref=f38e1083]
+                  - generic [ref=f38e1084]:
+                    - paragraph [ref=f38e1085]: Posted 7 years ago
+                    - paragraph [ref=f38e1087]: · 812th in this Competition
+                - generic [ref=f38e1089]:
+                  - generic [ref=f38e1090]:
+                    - button "Upvote" [ref=f38e1091] [cursor=pointer]:
+                      - generic [ref=f38e1092]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1093] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1094] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e1098]: amazing work
+                - button "Reply" [ref=f38e1100] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1101]: reply
+              - separator [ref=f38e1103]
+            - generic [ref=f38e1104]:
+              - generic [ref=f38e1108]:
+                - link "Joel Hanson's profile" [ref=f38e1109] [cursor=pointer]:
+                  - /url: /joelhanson
+                  - generic "Joel Hanson" [ref=f38e1110]
+                - generic [ref=f38e1116]:
+                  - link [ref=f38e1118] [cursor=pointer]:
+                    - /url: /joelhanson
+                    - heading "Joel Hanson" [level=3] [ref=f38e1119]
+                  - generic [ref=f38e1120]:
+                    - paragraph [ref=f38e1121]: Posted 7 years ago
+                    - paragraph [ref=f38e1123]: · 595th in this Competition
+                - generic [ref=f38e1125]:
+                  - generic [ref=f38e1126]:
+                    - button "Upvote" [ref=f38e1127] [cursor=pointer]:
+                      - generic [ref=f38e1128]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1129] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1130] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e1134]:
+                  - text: Congrats
+                  - link "@antorsae (opens in a new tab)" [ref=f38e1135] [cursor=pointer]:
+                    - /url: /antorsae
+                    - text: "@antorsae"
+                  - text: and thanks for sharing.
+                - button "Reply" [ref=f38e1137] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1138]: reply
+              - separator [ref=f38e1140]
+            - generic [ref=f38e1141]:
+              - generic [ref=f38e1145]:
+                - link "FGPC's profile" [ref=f38e1146] [cursor=pointer]:
+                  - /url: /projdev
+                  - generic "FGPC" [ref=f38e1147]
+                - generic [ref=f38e1153]:
+                  - link [ref=f38e1155] [cursor=pointer]:
+                    - /url: /projdev
+                    - heading "FGPC" [level=3] [ref=f38e1156]
+                  - generic [ref=f38e1157]:
+                    - paragraph [ref=f38e1158]: Posted 7 years ago
+                    - paragraph [ref=f38e1160]: · 235th in this Competition
+                - generic [ref=f38e1162]:
+                  - generic [ref=f38e1163]:
+                    - button "Upvote" [ref=f38e1164] [cursor=pointer]:
+                      - generic [ref=f38e1165]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1166] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1167] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e1171]: Congratulations! Amazing solutions! :-)
+                - button "Reply" [ref=f38e1173] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1174]: reply
+              - separator [ref=f38e1176]
+            - generic [ref=f38e1177]:
+              - generic [ref=f38e1181]:
+                - link "Zhuang Jia's profile" [ref=f38e1182] [cursor=pointer]:
+                  - /url: /jiazhuang
+                  - generic "Zhuang Jia" [ref=f38e1183]
+                - generic [ref=f38e1189]:
+                  - link [ref=f38e1191] [cursor=pointer]:
+                    - /url: /jiazhuang
+                    - heading "Zhuang Jia" [level=3] [ref=f38e1192]
+                  - generic [ref=f38e1193]:
+                    - paragraph [ref=f38e1194]: Posted 7 years ago
+                    - paragraph [ref=f38e1196]: · 52nd in this Competition
+                - generic [ref=f38e1198]:
+                  - generic [ref=f38e1199]:
+                    - button "Upvote" [ref=f38e1200] [cursor=pointer]:
+                      - generic [ref=f38e1201]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1202] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1203] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e1207]: Congratulations! I'm very excited to learn from your solutions.
+                - button "Reply" [ref=f38e1209] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1210]: reply
+              - separator [ref=f38e1212]
+            - generic [ref=f38e1213]:
+              - generic [ref=f38e1217]:
+                - link "Alexandre Sauvé's profile" [ref=f38e1218] [cursor=pointer]:
+                  - /url: /asauve
+                  - generic "Alexandre Sauvé" [ref=f38e1219]
+                - generic [ref=f38e1225]:
+                  - link [ref=f38e1227] [cursor=pointer]:
+                    - /url: /asauve
+                    - heading "Alexandre Sauvé" [level=3] [ref=f38e1228]
+                  - generic [ref=f38e1229]:
+                    - paragraph [ref=f38e1230]: Posted 7 years ago
+                    - paragraph [ref=f38e1232]: · 82nd in this Competition
+                - generic [ref=f38e1234]:
+                  - generic [ref=f38e1235]:
+                    - button "Upvote" [ref=f38e1236] [cursor=pointer]:
+                      - generic [ref=f38e1237]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1238] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1239] [cursor=pointer]: more_vert
+                - generic [ref=f38e1242]:
+                  - paragraph [ref=f38e1243]: I'm just impressed by the way of using xyz coordinates. Need to read more bout Trnasformer Encoders.
+                  - paragraph [ref=f38e1244]:
+                    - text: Thank you
+                    - link "@antorsae (opens in a new tab)" [ref=f38e1245] [cursor=pointer]:
+                      - /url: /antorsae
+                      - text: "@antorsae"
+                    - text: for sharing the solution and congratulation for your creativity!
+                - button "Reply" [ref=f38e1247] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1248]: reply
+              - separator [ref=f38e1250]
+            - generic [ref=f38e1251]:
+              - generic [ref=f38e1255]:
+                - link "Goran Rakocevic's profile" [ref=f38e1256] [cursor=pointer]:
+                  - /url: /grakocevic
+                  - generic "Goran Rakocevic" [ref=f38e1257]
+                - generic [ref=f38e1263]:
+                  - link [ref=f38e1265] [cursor=pointer]:
+                    - /url: /grakocevic
+                    - heading "Goran Rakocevic" [level=3] [ref=f38e1266]
+                  - generic [ref=f38e1267]:
+                    - paragraph [ref=f38e1268]: Posted 7 years ago
+                    - paragraph [ref=f38e1270]: · 4th in this Competition
+                - generic [ref=f38e1272]:
+                  - generic [ref=f38e1273]:
+                    - button "Upvote" [ref=f38e1274] [cursor=pointer]:
+                      - generic [ref=f38e1275]: arrow_drop_up
+                    - button "1 votes" [ref=f38e1276] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f38e1277] [cursor=pointer]: more_vert
+                - paragraph [ref=f38e1281]: Thanks for sharing! When you say "The y (ground truth) is just an array of dimension 29 containing j-couplings located at target atom indices." Which atom index do you place the j-coupling values, as there are two atoms participating in a coupling?
+                - button "Reply" [ref=f38e1283] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f38e1284]: reply
+                - generic [ref=f38e1286]:
+                  - generic [ref=f38e1291]:
+                    - link "Andrés Miguel Torrubia Sáez's profile" [ref=f38e1292] [cursor=pointer]:
+                      - /url: /antorsae
+                      - generic "Andrés Miguel Torrubia Sáez" [ref=f38e1293]
+                    - generic [ref=f38e1299]:
+                      - generic [ref=f38e1300]:
+                        - link [ref=f38e1301] [cursor=pointer]:
+                          - /url: /antorsae
+                          - heading "Andrés Miguel Torrubia Sáez" [level=3] [ref=f38e1302]
+                        - paragraph [ref=f38e1305]: Topic Author
+                      - generic [ref=f38e1306]:
+                        - paragraph [ref=f38e1307]: Posted 7 years ago
+                        - paragraph [ref=f38e1309]: · 2nd in this Competition
+                    - generic [ref=f38e1311]:
+                      - generic [ref=f38e1312]:
+                        - button "Upvote" [ref=f38e1313] [cursor=pointer]:
+                          - generic [ref=f38e1314]: arrow_drop_up
+                        - button "0 votes" [ref=f38e1315] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f38e1316] [cursor=pointer]: more_vert
+                    - paragraph [ref=f38e1320]:
+                      - text: Say there are N source/reference atoms (
+                      - code [ref=f38e1321]: atom_index_0
+                      - text: in the csv file) for a given molecule. We build N sibling molecules, and for each the GT is the array of 29 atoms (max) where we place valid j-couplings at target (
+                      - code [ref=f38e1322]: atom_index_1
+                      - text: in the csv) indices.
+                    - button "Reply" [ref=f38e1324] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e1325]: reply
+                  - generic [ref=f38e1331]:
+                    - link "Goran Rakocevic's profile" [ref=f38e1332] [cursor=pointer]:
+                      - /url: /grakocevic
+                      - generic "Goran Rakocevic" [ref=f38e1333]
+                    - generic [ref=f38e1339]:
+                      - link [ref=f38e1341] [cursor=pointer]:
+                        - /url: /grakocevic
+                        - heading "Goran Rakocevic" [level=3] [ref=f38e1342]
+                      - generic [ref=f38e1343]:
+                        - paragraph [ref=f38e1344]: Posted 7 years ago
+                        - paragraph [ref=f38e1346]: · 4th in this Competition
+                    - generic [ref=f38e1348]:
+                      - generic [ref=f38e1349]:
+                        - button "Upvote" [ref=f38e1350] [cursor=pointer]:
+                          - generic [ref=f38e1351]: arrow_drop_up
+                        - button "0 votes" [ref=f38e1352] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f38e1353] [cursor=pointer]: more_vert
+                    - paragraph [ref=f38e1357]: Oh, so each coupling gets its own datapoint? We have one datapoint per molecule, that confused me.
+                    - button "Reply" [ref=f38e1359] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e1360]: reply
+                  - generic [ref=f38e1366]:
+                    - link "Andrés Miguel Torrubia Sáez's profile" [ref=f38e1367] [cursor=pointer]:
+                      - /url: /antorsae
+                      - generic "Andrés Miguel Torrubia Sáez" [ref=f38e1368]
+                    - generic [ref=f38e1374]:
+                      - generic [ref=f38e1375]:
+                        - link [ref=f38e1376] [cursor=pointer]:
+                          - /url: /antorsae
+                          - heading "Andrés Miguel Torrubia Sáez" [level=3] [ref=f38e1377]
+                        - paragraph [ref=f38e1380]: Topic Author
+                      - generic [ref=f38e1381]:
+                        - paragraph [ref=f38e1382]: Posted 7 years ago
+                        - paragraph [ref=f38e1384]: · 2nd in this Competition
+                    - generic [ref=f38e1386]:
+                      - generic [ref=f38e1387]:
+                        - button "Upvote" [ref=f38e1388] [cursor=pointer]:
+                          - generic [ref=f38e1389]: arrow_drop_up
+                        - button "0 votes" [ref=f38e1390] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f38e1391] [cursor=pointer]: more_vert
+                    - generic [ref=f38e1394]:
+                      - paragraph [ref=f38e1395]: Yes.
+                      - paragraph [ref=f38e1396]: We started building a Molecule Transformer which had all couplings in one shot (diff input representation) but stopped it bc we focussed on training the Atomic Transformer instead.
+                    - button "Reply" [ref=f38e1398] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f38e1399]: reply
+              - separator [ref=f38e1401]
+            - generic [ref=f38e1406]:
+              - link "Zhenlan's profile" [ref=f38e1407] [cursor=pointer]:
+                - /url: /zhenlanwang
+                - generic "Zhenlan" [ref=f38e1408]
+              - generic [ref=f38e1414]:
+                - link [ref=f38e1416] [cursor=pointer]:
+                  - /url: /zhenlanwang
+                  - heading "Zhenlan" [level=3] [ref=f38e1417]
+                - generic [ref=f38e1418]:
+                  - paragraph [ref=f38e1419]: Posted 7 years ago
+                  - paragraph [ref=f38e1421]: · 15th in this Competition
+              - generic [ref=f38e1423]:
+                - generic [ref=f38e1424]:
+                  - button "Upvote" [ref=f38e1425] [cursor=pointer]:
+                    - generic [ref=f38e1426]: arrow_drop_up
+                  - button "1 votes" [ref=f38e1427] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f38e1428] [cursor=pointer]: more_vert
+              - paragraph [ref=f38e1432]: I am not sure that I understand your Input representation. Could you give a simply example, say for H2O? Thanks
+              - button "Reply" [ref=f38e1434] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f38e1435]: reply
+  - alert [ref=f38e1439]

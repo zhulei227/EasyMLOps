@@ -1,0 +1,1037 @@
+- generic [ref=f64e2]:
+  - navigation "Main Kaggle page navigation" [ref=f64e3]:
+    - generic [ref=f64e5]:
+      - button "Navigation menu" [ref=f64e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f64e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f64e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f64e12] [cursor=pointer]:
+      - paragraph [ref=f64e18]: Create
+    - generic [ref=f64e21]:
+      - list [ref=f64e22]:
+        - listitem "Home List Item" [ref=f64e23]:
+          - link "Home" [ref=f64e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f64e31]: Home
+        - listitem "Competitions List Item" [ref=f64e32]:
+          - link "Competitions" [ref=f64e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f64e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f64e41]:
+          - link "Benchmarks" [ref=f64e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f64e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f64e50]:
+          - link "Arenas" [ref=f64e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f64e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f64e59]:
+          - link "Game Arena" [ref=f64e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f64e67]: Game Arena
+      - list [ref=f64e68]:
+        - listitem "Data Hub List Item" [ref=f64e69]:
+          - generic [ref=f64e70]:
+            - link "Data Hub" [ref=f64e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f64e77]: Data Hub
+            - button "Expand" [ref=f64e80] [cursor=pointer]
+      - list [ref=f64e82]:
+        - listitem "More on Kaggle List Item" [ref=f64e83]:
+          - generic [ref=f64e84]:
+            - link "More on Kaggle" [ref=f64e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f64e91]: More
+            - button "Expand" [ref=f64e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f64e97]:
+    - generic [ref=f64e98]:
+      - generic [ref=f64e102]:
+        - textbox "Search" [ref=f64e104]
+        - group [aria-hidden]
+      - generic [ref=f64e106]:
+        - link [ref=f64e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fhome-depot-product-search-relevance%2Fdiscussion%2F20427
+          - button "Login" [ref=f64e108]
+        - link [ref=f64e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fhome-depot-product-search-relevance%2Fdiscussion%2F20427
+          - button "Sign Up" [ref=f64e111]
+  - main [ref=f64e113]:
+    - generic [ref=f64e115]:
+      - generic [ref=f64e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f64e117]:
+        - link "Learn more" [ref=f64e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f64e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f64e123]:
+      - generic [ref=f64e125]:
+        - generic [ref=f64e126]:
+          - link "Ana Lina Morelia's profile" [ref=f64e127] [cursor=pointer]:
+            - /url: /annavictoria
+            - generic "Ana Lina Morelia" [ref=f64e128]
+          - generic [ref=f64e132]:
+            - generic [ref=f64e133]: Ana Lina Morelia
+            - generic [ref=f64e135]: · Featured Prediction Competition · 11 years ago
+        - generic [ref=f64e137]:
+          - heading "Home Depot Product Search Relevance" [level=1] [ref=f64e138]
+          - paragraph [ref=f64e140]: Predict the relevance of search results on homedepot.com
+      - generic [ref=f64e144]:
+        - generic [ref=f64e146]:
+          - generic [ref=f64e148]:
+            - heading "Home Depot Product Search Relevance" [level=2] [ref=f64e149]
+            - generic [ref=f64e151]:
+              - button "Late Submission" [disabled] [ref=f64e153]
+              - button "Competition options menu collapsed" [ref=f64e156] [cursor=pointer]: more_horiz
+          - tablist [ref=f64e161]:
+            - tab "Overview, 1 of 7" [ref=f64e162] [cursor=pointer]:
+              - generic [ref=f64e163]: Overview
+            - tab "Data, 2 of 7" [ref=f64e164] [cursor=pointer]:
+              - generic [ref=f64e165]: Data
+            - tab "Code, 3 of 7" [ref=f64e166] [cursor=pointer]:
+              - generic [ref=f64e167]: Code
+            - tab "Models, 4 of 7" [ref=f64e168] [cursor=pointer]:
+              - generic [ref=f64e169]: Models
+            - tab "Discussion, 5 of 7" [selected] [ref=f64e170] [cursor=pointer]:
+              - generic [ref=f64e171]: Discussion
+            - tab "Leaderboard, 6 of 7" [ref=f64e172] [cursor=pointer]:
+              - generic [ref=f64e173]: Leaderboard
+            - tab "Rules, 7 of 7" [ref=f64e174] [cursor=pointer]:
+              - generic [ref=f64e175]: Rules
+        - separator [ref=f64e177]
+      - generic [ref=f64e181]:
+        - generic [ref=f64e182]:
+          - generic [ref=f64e183]:
+            - generic [ref=f64e184]:
+              - link "Alejandro Simkievich's profile" [ref=f64e185] [cursor=pointer]:
+                - /url: /asimkievich
+                - generic "Alejandro Simkievich" [ref=f64e186]
+              - generic [ref=f64e190]:
+                - link "Alejandro Simkievich" [ref=f64e191] [cursor=pointer]:
+                  - /url: /asimkievich
+                - text: ·
+                - generic [ref=f64e192]: 98th in this Competition
+                - text: ·
+                - generic [ref=f64e193]: Posted 11 years ago
+            - generic [ref=f64e194]:
+              - generic [ref=f64e195]:
+                - button "Upvote" [ref=f64e196] [cursor=pointer]:
+                  - generic [ref=f64e197]: arrow_drop_up
+                - button "6 votes" [ref=f64e198] [cursor=pointer]: "6"
+              - button "More Options for this Topic" [ref=f64e199] [cursor=pointer]: more_vert
+            - heading "congrats to the winners" [level=3] [ref=f64e200]
+            - generic [ref=f64e203]:
+              - paragraph [ref=f64e204]: Hi folks,
+              - paragraph [ref=f64e205]: congrats to the winners, this was a very difficult competition. Very interested in learning more about the models of the folks in the top 10-20, especially the ones who scored below 0.45 or 0.44.
+              - paragraph [ref=f64e206]: Well deserved!
+          - separator [ref=f64e207]
+        - generic [ref=f64e208]:
+          - generic [ref=f64e209]:
+            - paragraph [ref=f64e212]:
+              - paragraph [ref=f64e213]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f64e214] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f64e215]
+          - generic [ref=f64e217]:
+            - generic [ref=f64e218]:
+              - generic [aria-hidden] [ref=f64e219]: comment
+              - heading "47 Comments" [level=2] [ref=f64e221]
+            - generic [ref=f64e224]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f64e225] [cursor=pointer]:
+                - generic [ref=f64e226]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f64e228]:
+            - generic [ref=f64e229]:
+              - generic [ref=f64e233]:
+                - link "Alexander Bauer's profile" [ref=f64e234] [cursor=pointer]:
+                  - /url: /allexius
+                  - generic "Alexander Bauer" [ref=f64e235]
+                - generic [ref=f64e241]:
+                  - link [ref=f64e243] [cursor=pointer]:
+                    - /url: /allexius
+                    - heading "Alexander Bauer" [level=3] [ref=f64e244]
+                  - generic [ref=f64e245]:
+                    - paragraph [ref=f64e246]: Posted 11 years ago
+                    - paragraph [ref=f64e248]: · 1st in this Competition
+                - generic [ref=f64e250]:
+                  - generic [ref=f64e251]:
+                    - button "Upvote" [ref=f64e252] [cursor=pointer]:
+                      - generic [ref=f64e253]: arrow_drop_up
+                    - button "34 votes" [ref=f64e254] [cursor=pointer]: "34"
+                  - button "More Options for this Comment" [ref=f64e255] [cursor=pointer]: more_vert
+                - generic [ref=f64e258]:
+                  - paragraph [ref=f64e259]: We also would like to share the basic concepts of our solution and share our experiences. First of all thanks to Homedepot for hosting this wonderful competition!
+                  - paragraph [ref=f64e260]: As many have noticed, this dataset rewards mixing of all kinds of features and modeling approaches which is most easily achieved in teams. No matter what exotic feature engineering and modeling we tried, there was hardly any case that negatively affected the CV score, so we kept on adding models and features until we ran out of time. Our CV strategy worked very well and gave us the confidence to create large L1 and L2 ensembles and adding a third layer of linear stacking.
+                  - paragraph [ref=f64e261]: We were quite surprised to end up on place 2 on private as we were only 5th place on public! We did not use productuid or id by itself as a feature, so maybe that helped. We noticed the trend and jump in average relevance for different id ranges, but we only accounted for it using a binary variable id>160,000.
+                  - paragraph [ref=f64e262]:
+                    - strong [ref=f64e263]: Data cleaning/Preprocessing
+                  - list [ref=f64e264]:
+                    - listitem [ref=f64e265]: Spell correction using posted Google corrections and using Norvig correction on corpus built from titles, descriptions and reddit comments.
+                    - listitem [ref=f64e266]: Spell correction of queries using manually created dictionaries published in the forum
+                    - listitem [ref=f64e267]: Removing all words in brackets from title (battery not included)
+                    - listitem [ref=f64e268]: Splitting of title and query by prepositions (in, for, with, etc.) and inversing order, to get important words to the end
+                    - listitem [ref=f64e269]: Normalizations of units
+                  - paragraph [ref=f64e270]:
+                    - strong [ref=f64e271]: Feature Groups
+                  - list [ref=f64e272]:
+                    - listitem [ref=f64e273]:
+                      - paragraph [ref=f64e274]: Word match counts and positions on Wordnet synonym, hyponym and hypernym expanded titles and queries
+                    - listitem [ref=f64e275]:
+                      - paragraph [ref=f64e276]: Attribute extraction and matching for product titles/attributes and queries
+                      - list [ref=f64e277]:
+                        - listitem [ref=f64e278]: Brand
+                        - listitem [ref=f64e279]: Color
+                        - listitem [ref=f64e280]: Material
+                        - listitem [ref=f64e281]: Sizes, volumes
+                        - listitem [ref=f64e282]: Power, voltage, current, btu
+                    - listitem [ref=f64e283]:
+                      - paragraph [ref=f64e284]: Jaccard and Dice distances between query, title, description
+                    - listitem [ref=f64e285]:
+                      - paragraph [ref=f64e286]: Char n-gram TF-IDF, SVD, NMF based cosine distance and total common term counts
+                    - listitem [ref=f64e287]:
+                      - paragraph [ref=f64e288]: Extraction of 1, 2 and 3 important nouns in queries, product titles (using noun position) and all nouns in product descriptions (using nltk pos tagger) and quantification of important noun similarities (L1, L2, cosine distances). Incorporated important and unimportant words dictionary published in the forum
+                    - listitem [ref=f64e289]:
+                      - paragraph [ref=f64e290]: Longest common subsequence between title, brand and query
+                    - listitem [ref=f64e291]:
+                      - paragraph [ref=f64e292]: Average query and product title, description, attribute, important noun, Wordnet expanded syn/hypo/hypernym similarities using pretrained word2vec models and GloVe word embeddings
+                    - listitem [ref=f64e293]:
+                      - paragraph [ref=f64e294]: Glove word embedding centroids and distances based on various corpora (pretrained, generated from query+title+description, enriched with Reddit DIY and Home Improvement comments, enriched with Wordnet synonyms)
+                      - list [ref=f64e295]:
+                        - listitem [ref=f64e296]: Relaxed word movers distance
+                        - listitem [ref=f64e297]: Relaxed word movers distance (weighted by query/title word position)
+                        - listitem [ref=f64e298]: Cosine distance
+                        - listitem [ref=f64e299]: Euclidean distance
+                        - listitem [ref=f64e300]: Centroid vectors of query, title, descriptions as features
+                    - listitem [ref=f64e301]:
+                      - paragraph [ref=f64e302]: BOW, TF-IDF, LSA based features
+                      - list [ref=f64e303]:
+                        - listitem [ref=f64e304]: Word N-gram TF-IDF cosine distances (N=1,2,3)
+                        - listitem [ref=f64e305]: SVD cosine distances (50 dim, 100 dim, 300 dim)
+                        - listitem [ref=f64e306]: NMF cosine distances
+                        - listitem [ref=f64e307]: Raw SVD vectors as features
+                    - listitem [ref=f64e308]:
+                      - paragraph [ref=f64e309]: Aggregates by query and product
+                      - list [ref=f64e310]:
+                        - listitem [ref=f64e311]: Standard deviations, rank transformations, percentiles of distance features
+                        - listitem [ref=f64e312]: L1,L2, cosine distances to query and product centroids of SVD/NMF/Glove
+                    - listitem [ref=f64e313]:
+                      - paragraph [ref=f64e314]: Statistics features
+                      - list [ref=f64e315]:
+                        - listitem [ref=f64e316]: Num occurrences of query in whole dataset
+                        - listitem [ref=f64e317]: Num occurrences of product in whole dataset
+                    - listitem [ref=f64e318]:
+                      - paragraph [ref=f64e319]: Exploiting the id anomaly
+                      - list [ref=f64e320]:
+                        - listitem [ref=f64e321]: Boolean indicator id>160,000
+                    - listitem [ref=f64e322]:
+                      - paragraph [ref=f64e323]: Feature interactions
+                      - list [ref=f64e324]:
+                        - listitem [ref=f64e325]: 2-way polynomial interactions between top ranking features
+                  - paragraph [ref=f64e326]:
+                    - strong [ref=f64e327]: Cross-Validation
+                  - paragraph [ref=f64e328]: "We used 3 runs of 3-fold cross validation: 2 runs with disjunctive queries (query does not occur in validation sets), 1 run with disjunctive product id, to roughly match the proportions of unseen queries and product ids between train and test."
+                  - paragraph [ref=f64e329]:
+                    - strong [ref=f64e330]: Modeling and Ensembling
+                  - list [ref=f64e331]:
+                    - listitem [ref=f64e332]: About 200 L1 models based on various feature subsets, trained with XGB, RFR, ETR, Neural Nets, Random Trees Embedding+Lasso/Ridge, ETC (Regression via Classification)
+                    - listitem [ref=f64e333]: L2 Stacking with Bayesian Ridge, 10X bagged Neural Net and 10X bagged ETR, trained for each L1 CV run
+                    - listitem [ref=f64e334]: L3 Stacking with ridge regression
+              - separator [ref=f64e335]
+            - generic [ref=f64e336]:
+              - generic [ref=f64e340]:
+                - link "Randombishop's profile" [ref=f64e341] [cursor=pointer]:
+                  - /url: /randombishop
+                  - generic "Randombishop" [ref=f64e342]
+                - generic [ref=f64e348]:
+                  - link [ref=f64e350] [cursor=pointer]:
+                    - /url: /randombishop
+                    - heading "Randombishop" [level=3] [ref=f64e351]
+                  - paragraph [ref=f64e353]: Posted 11 years ago
+                - generic [ref=f64e355]:
+                  - generic [ref=f64e356]:
+                    - button "Upvote" [ref=f64e357] [cursor=pointer]:
+                      - generic [ref=f64e358]: arrow_drop_up
+                    - button "19 votes" [ref=f64e359] [cursor=pointer]: "19"
+                  - button "More Options for this Comment" [ref=f64e360] [cursor=pointer]: more_vert
+                - generic [ref=f64e363]:
+                  - paragraph [ref=f64e364]: "So here's a brief summary of our solution :"
+                  - paragraph [ref=f64e365]:
+                    - strong [ref=f64e366]: 1) Cross validation
+                  - paragraph [ref=f64e367]: "To evaluate our models accurately, we used 5 validation sets generated with the following rules :"
+                  - list [ref=f64e368]:
+                    - listitem [ref=f64e369]: 57% of examples must have unseen queries in training part
+                    - listitem [ref=f64e370]: For the other queries (seen in training), 60% of examples go to training and 40% go to validation
+                    - listitem [ref=f64e371]: Each of the 5 validation samples contains between 25.000 and 30.000 examples
+                  - paragraph [ref=f64e372]:
+                    - strong [ref=f64e373]: 2) Feature engineering
+                  - paragraph [ref=f64e374]: "Combining all 4 team members' datasets, we had more than 4000 features :"
+                  - list [ref=f64e375]:
+                    - listitem [ref=f64e376]: Counts and metrics such as the ones in Chenglong Crowdflower solution
+                    - listitem [ref=f64e377]: Word2Vec/Gensim
+                    - listitem [ref=f64e378]: Glove
+                    - listitem [ref=f64e379]: Brands
+                    - listitem [ref=f64e380]: Measures
+                    - listitem [ref=f64e381]: Bullets
+                    - listitem [ref=f64e382]: Materials
+                    - listitem [ref=f64e383]: Signatures (Collection Name, Artist's name, Artwork name)
+                    - listitem [ref=f64e384]: Colors
+                    - listitem [ref=f64e385]: Query and title parsing and comparing
+                    - listitem [ref=f64e386]: Word features
+                    - listitem [ref=f64e387]: Word clustering
+                    - listitem [ref=f64e388]: Document clustering
+                  - paragraph [ref=f64e389]: With this feature engineering effort, single xgboosts score around 0.435 on public LB
+                  - paragraph [ref=f64e390]:
+                    - strong [ref=f64e391]: 3) Ensembling and stacking
+                  - paragraph [ref=f64e392]: The winning edge came from generating various predictions with xgboost, keras, linear models and others, then stacking them to gain around 0.004 on LB.
+                  - paragraph [ref=f64e393]: Cheers !
+              - separator [ref=f64e394]
+            - generic [ref=f64e395]:
+              - generic [ref=f64e399]:
+                - link "Igor Buinyi's profile" [ref=f64e400] [cursor=pointer]:
+                  - /url: /buinyi
+                  - generic "Igor Buinyi" [ref=f64e401]
+                - generic [ref=f64e407]:
+                  - link [ref=f64e409] [cursor=pointer]:
+                    - /url: /buinyi
+                    - heading "Igor Buinyi" [level=3] [ref=f64e410]
+                  - generic [ref=f64e411]:
+                    - paragraph [ref=f64e412]: Posted 11 years ago
+                    - paragraph [ref=f64e414]: · 3rd in this Competition
+                - generic [ref=f64e416]:
+                  - generic [ref=f64e417]:
+                    - button "Upvote" [ref=f64e418] [cursor=pointer]:
+                      - generic [ref=f64e419]: arrow_drop_up
+                    - button "15 votes" [ref=f64e420] [cursor=pointer]: "15"
+                  - button "More Options for this Comment" [ref=f64e421] [cursor=pointer]: more_vert
+                - generic [ref=f64e423]:
+                  - generic [ref=f64e424]:
+                    - paragraph [ref=f64e425]: Here we would like to briefly describe our approach and main findings.
+                    - paragraph [ref=f64e426]: "Our solution is actually a mix of two solutions: one coming from Chenglong and the other from me and Kostia."
+                    - paragraph [ref=f64e427]: To a large extent, our approaches are similar to CrowdFlower winning solutions.
+                    - paragraph [ref=f64e428]:
+                      - strong [ref=f64e429]: "Text processing:"
+                    - paragraph [ref=f64e430]:
+                      - emphasis [ref=f64e431]: "Igor& Kostia:"
+                      - text: using the Google replacements from the forum, some manual replacements plus automated spell-checker which uses product title as a vocabulary and difflib.SequenceMatcher() to get a measure of similarity between ‘misspelled’ word (i.e. not found in product title) and a potential correction. To generate some features we removed punctuation, removed stopwords (without ‘can’ which might mean ‘a container’) and stemmed the words. However, punctuation was important for tagging words in sentences and extracting the most meaningful parts from query and product title.
+                    - paragraph [ref=f64e432]: We needed to make some words uniform. For example, both variants ‘mailbox’ and ‘mail box’ occurred in product title, query and other text information. In all text we made replacements for ~100 such words which can be spelled differently.
+                    - paragraph [ref=f64e433]:
+                      - text: "All words were tagged using NTLK.pos_tagger(), which was used for two purposes: 1) to separate nouns, verbs, adjectives, etc. and 2) to found the most important words in query and title. For example, in query ‘23.5 shower door nickel’ important words are ‘shower door’ and the most important word is ‘door’. We noticed a structure in product title which helped us separate the product and its attributes. For example, in product title ‘Husky 52 in. 10-Drawer Mobile Workbench with Solid Wood Top, Black’ the product is workbench, not wood top. I and Kostia started this work by observing irregularities in model predictions, but actually we come to something similar to"
+                      - link "extracting the top trigram (opens in a new tab)" [ref=f64e434] [cursor=pointer]:
+                        - /url: http://blog.kaggle.com/2015/07/22/crowdflower-winners-interview-3rd-place-team-quartet/
+                        - text: extracting the top trigram
+                      - text: .
+                    - paragraph [ref=f64e435]: From attributes.csv we mostly worked with bullets (containing the text similar to product description), brand and material, but also used other information as well.
+                    - paragraph [ref=f64e436]: We also extracted brands and materials from all text field and then used separate parts of the string (e.g. whole string, string without brand or material, only brand or material) to generate count features and other features.
+                    - paragraph [ref=f64e437]:
+                      - emphasis [ref=f64e438]: "Chenglong:"
+                      - text: a separate, but similar processing. We believe that
+                      - strong [ref=f64e439]: different
+                      - text: text processing within one team was a key to getting a high score in this competition.
+                    - paragraph [ref=f64e440]:
+                      - strong [ref=f64e441]: "Features:"
+                    - paragraph [ref=f64e442]: Largely the same as in CrowdFlower winning solutions. To avoiding repeating, here I just note some of key findings. The text with and without initial preprocessing was used to generate features. We also processed separately the words after ‘with’,’for’,’without’.
+                    - list [ref=f64e443]:
+                      - listitem [ref=f64e444]:
+                        - paragraph [ref=f64e445]: "Each time we wanted to generate a count feature, we actually generated a bundle of up to 5 features: number of distinct words in intersection, number of total words in intersection, number of letters in distinct words in intersection, ratio of words in intersection to the number of words query, ratio of letters in intersection words to the number of letters in query. I believe this was helpful to capture the information from the data. In fact, one of the most predictive our features was share of letters in intersection between query and product title."
+                      - listitem [ref=f64e446]:
+                        - paragraph [ref=f64e447]: Distance features included or incorporated Jaccard coefficients, Damerau–Levenshtein distances and sequence comparison (in terms of chars) with the help of difflib.SequenceMatcher(). The latter gave us two features in the top10.
+                      - listitem [ref=f64e448]:
+                        - paragraph [ref=f64e449]: TFIDF features in different combinations. One of the most valuable are those where we used title or bullets for generate feature weights, then multiply them by the number of letters in the corresponding words, then calculate the sum of weights for words in query. In general, we observed that in this competition not only the word as a unit of information matters, but also the number of letters in the word is very important. To be precise, I must say we used stemmed words for TFIDF.
+                      - listitem [ref=f64e450]:
+                        - paragraph [ref=f64e451]: Another important group of features are TFIDF (and some other features) calculated directly for products related to each unique search term.
+                      - listitem [ref=f64e452]:
+                        - paragraph [ref=f64e453]: "Word2vec: I and Kostia trained models on available text, Chenglong used pretrained models as well. These features proved to be very informative. Chenglong also used doc2vec."
+                      - listitem [ref=f64e454]:
+                        - paragraph [ref=f64e455]:
+                          - text: WordNet similarities between the different pairs of words from the most important trigrams for query and product title. We used
+                          - link "path similarity, Leacock-Chodorow similarity and Resnik similarity (opens in a new tab)" [ref=f64e456] [cursor=pointer]:
+                            - /url: http://www.nltk.org/howto/wordnet.html
+                            - text: path similarity, Leacock-Chodorow similarity and Resnik similarity
+                          - text: . It gave us a few top20 features.
+                      - listitem [ref=f64e457]:
+                        - paragraph [ref=f64e458]: "Query expansion: queries grouped by the two last words in the top trigram, then we assume that the majority of relevances are closer to 3 than to 1. Then we find 20 the most frequent words in product description and calculate the percentage of how many of these words are in the product description for the matched product. This is one of our top10 features."
+                      - listitem [ref=f64e459]:
+                        - paragraph [ref=f64e460]: Chenglong used LSA.
+                      - listitem [ref=f64e461]:
+                        - paragraph [ref=f64e462]: Dummies for some brands and product names from the top trigrams.
+                      - listitem [ref=f64e463]:
+                        - paragraph [ref=f64e464]: Me and Kostia ended up using dummy for id in part2 (see attached pdf).
+                    - paragraph [ref=f64e465]:
+                      - strong [ref=f64e466]: "Models:"
+                    - paragraph [ref=f64e467]: Xgboost, gradient boost, random forest, SVR, extratrees.
+                    - paragraph [ref=f64e468]: Although SVR model 0.01 higher RMSE than the best model, it was beneficial for the ensemble due to low correlation with other models.
+                    - paragraph [ref=f64e469]:
+                      - strong [ref=f64e470]: "Cross-validation:"
+                    - paragraph [ref=f64e471]: Chenglong used an advanced split to be described separately. His CV was the same public and ~0.002 worse than private.
+                    - paragraph [ref=f64e472]: I and Kostia used StratifiedShuffleSplit. Our CV was 0.002 lower (better) than public and 0.001 higher than private.
+                    - paragraph [ref=f64e473]:
+                      - strong [ref=f64e474]: Ensembling
+                      - text: "We prepared two separate ensembles. A better one from Chenglong who also employed our features. I and Kostia did not use features from Chenglong and get an ensemble with, as we thought, significantly different behaviour in different parts of the dataset (part1: id<=163700, part2: 163700221473). Since we observed regular patterns in the data as well (please see the attached pdf), we thought that one of the ensembles might be especially prone to overfitting in some parts. So, while blending our ensembles for final submissions, we actually made different bets assuming that in some parts one of the models would behave much worse in private than in public. In fact, we observed no major differences in our models performance in public and private."
+                    - paragraph [ref=f64e475]:
+                      - strong [ref=f64e476]: Text processing is the key
+                    - paragraph [ref=f64e477]: During this competition I and Kostia tried different approaches to text processing and then generated the same features using the different input. The public RMSE was improving at a constant pace. Then, at some point we realized that we have chances to win and have to properly document our work and adhere to the requirements of the winning solutions. So we started recalculating features according to a unified text processing algorithm and observed only minor (if any) advances in the public score.
+                    - paragraph [ref=f64e478]: We now realize that one of the key reasons was that different preprocessing introduced variation in our features which resulted in the better model performance. When we streamline our feature generation, we lost some variance and, therefore, performance. I believed that we could produce a better model, but we failed to catch the lost variation
+                    - paragraph [ref=f64e479]: Actually, if our team had submitted our top leaderboard model (a blend of Chenglong’s model + old model from me and Kostia), we would have won the 2nd (or 1st) place with private RMSE 0.43188. We did not submit it because we neither posted our old replacement dict to the forum, nor had chances to reproduce the old results step-by-step (that ensemble consists of tens of models produced in different times of the competition). And to say the truth, I expected a major leaderboard shakeup because of the patterns in the data (see the attached pdf) and believed the new models would be much more robust to that shakeup.
+                    - paragraph [ref=f64e480]:
+                      - strong [ref=f64e481]: Final remarks
+                    - paragraph [ref=f64e482]: At first, when I saw the 4th place, I was disappointed. Then I realized that not only the place matters. We have done a great work and I learned tremendous amount of knowledge from this competition, so I must be very happy with this experience. I and Kostia started the competition with the goal to enter in the top 10% and learn something new, but actually we competed on the same level with the top Kagglers. I am excited and confident that the future holds many machine learning successes for us.
+                    - paragraph [ref=f64e483]: It is also an honor for us to have Chenglong as a team member. We are very proud that he joined our team and we enjoyed our collaboration much. I feel a little bit sorry that we failed to contribute to another 1st place for him.
+                    - paragraph [ref=f64e484]: We would like to thank all Kagglers and organizers for the wonderful experience in this competition.
+                    - paragraph [ref=f64e485]: PS. Chenglong will soon share the full solution on behalf of our team on his github.
+                  - link "Turing_test_charts.pdf opens in new window" [ref=f64e488] [cursor=pointer]:
+                    - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/117082/4129/Turing_test_charts.pdf
+                    - text: Turing_test_charts.pdf
+              - separator [ref=f64e489]
+            - generic [ref=f64e490]:
+              - generic [ref=f64e494]:
+                - link "Randombishop's profile" [ref=f64e495] [cursor=pointer]:
+                  - /url: /randombishop
+                  - generic "Randombishop" [ref=f64e496]
+                - generic [ref=f64e502]:
+                  - link [ref=f64e504] [cursor=pointer]:
+                    - /url: /randombishop
+                    - heading "Randombishop" [level=3] [ref=f64e505]
+                  - paragraph [ref=f64e507]: Posted 11 years ago
+                - generic [ref=f64e509]:
+                  - generic [ref=f64e510]:
+                    - button "Upvote" [ref=f64e511] [cursor=pointer]:
+                      - generic [ref=f64e512]: arrow_drop_up
+                    - button "6 votes" [ref=f64e513] [cursor=pointer]: "6"
+                  - button "More Options for this Comment" [ref=f64e514] [cursor=pointer]: more_vert
+                - generic [ref=f64e517]:
+                  - paragraph [ref=f64e518]: Thank you all Kaggle mates !
+                  - paragraph [ref=f64e519]: "First, a warm thaught for Lucas Eustaquio, his family and friends, I didn't know him personally, but everytime i saw Leustagos in a leaderboard, he was in top 10, if not #1, such an inspiring man !"
+                  - paragraph [ref=f64e520]: And big thanks to my team mates for this great learn & fun experience, to my wife for the stolen week ends, and all admins, sponsors and Kagglers for keeping this site cool and so enjoyable.
+                  - paragraph [ref=f64e521]: Cheers !
+              - separator [ref=f64e522]
+            - generic [ref=f64e523]:
+              - generic [ref=f64e527]:
+                - link "ChenglongChen's profile" [ref=f64e528] [cursor=pointer]:
+                  - /url: /chenglongchen
+                  - generic "ChenglongChen" [ref=f64e529]
+                - generic [ref=f64e535]:
+                  - link [ref=f64e537] [cursor=pointer]:
+                    - /url: /chenglongchen
+                    - heading "ChenglongChen" [level=3] [ref=f64e538]
+                  - generic [ref=f64e539]:
+                    - paragraph [ref=f64e540]: Posted 11 years ago
+                    - paragraph [ref=f64e542]: · 3rd in this Competition
+                - generic [ref=f64e544]:
+                  - generic [ref=f64e545]:
+                    - button "Upvote" [ref=f64e546] [cursor=pointer]:
+                      - generic [ref=f64e547]: arrow_drop_up
+                    - button "2 votes" [ref=f64e548] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f64e549] [cursor=pointer]: more_vert
+                - generic [ref=f64e552]:
+                  - blockquote [ref=f64e553]:
+                    - blockquote [ref=f64e554]:
+                      - paragraph [ref=f64e555]:
+                        - link "@Alexander (opens in a new tab)" [ref=f64e556] [cursor=pointer]:
+                          - /url: /Alexander
+                          - text: "@Alexander"
+                        - text: Bauer
+                        - link "@Andreas (opens in a new tab)" [ref=f64e557] [cursor=pointer]:
+                          - /url: /Andreas
+                          - text: "@Andreas"
+                        - text: Merentitis,
+                  - paragraph [ref=f64e558]:
+                    - text: "Congrats to your team's winning and your guys excellent work. I saw you have used WMD, can you share to what extent it helps the model? I haven't tried it (both in CrowdFlower) as I figured it would be quite computation intense. Can you also share the implementation you have been using? (Maybe this:"
+                    - link "https://github.com/mkusner/wmd (opens in a new tab)" [ref=f64e559] [cursor=pointer]:
+                      - /url: https://github.com/mkusner/wmd
+                      - text: https://github.com/mkusner/wmd
+                    - text: "?) I would love to have it in my toolbox."
+                  - paragraph [ref=f64e560]:
+                    - text: Because of the computational complexity, we didn't use the original WMD definition but one of the lower bound approximations that are proposed in the original paper (section 4.1 in
+                    - link "http://jmlr.org/proceedings/papers/v37/kusnerb15.pdf (opens in a new tab)" [ref=f64e561] [cursor=pointer]:
+                      - /url: http://jmlr.org/proceedings/papers/v37/kusnerb15.pdf
+                      - text: http://jmlr.org/proceedings/papers/v37/kusnerb15.pdf
+                    - text: ) under "relaxed word movers distance". It is basically a nearest neighborhood search to find the closest word in doc B for each word in doc A and then take sum of all minimum distances. The feature was especially effective when we added weighting of the words by position. We used an exponential weighting of the words in the queries by position, to emphasize the importance of the last 2-3 words in the query.
+                  - paragraph [ref=f64e562]: Our implementation is just a nested for loop to calculate the distance matrix, which is not very efficient but works for those small documents. I guess the nearest neighborhood search could be done more efficiently, e.g. with scikits kd-tree implementation. Wow. Seems we did a similar thing. I aggregate the distance between each word in doc A and each word in doc B using double aggregation, e.g., maximum of the minimum distance.
+                  - paragraph [ref=f64e563]: Double aggregation is used to capture the similarity/distance from both word level and doc level. Take maximum of the minimum distance for example. In word level and for each word in doc A, we have a list of the distance between it and each word in doc B, we use minimum to aggregate this list. Then in doc level, for doc A, we aggregate the minimum distance of each word using maximum to generate the features. You can use different similarity/distance measures, e.g., cosine sim of word2vec, wordnet synsets path/lch/wup similarity, edit distance, compression distance, char distribution KL divergence etc , and different aggregation methods, e.g., maximum and minimum, to capture the similarity from different perspectives.
+                  - paragraph [ref=f64e564]: I also used for-loop which is quite computation intense, but such features computed with cosine sim of word2vec are very useful and have the highest correlation with the target relevance. I haven't used weighting (e.g., IDF, position weighting) in such features as you, but I should really try to combine them according to your results!!
+                  - paragraph [ref=f64e565]: Chenglong
+              - separator [ref=f64e566]
+            - generic [ref=f64e567]:
+              - generic [ref=f64e571]:
+                - link "Alexander Bauer's profile" [ref=f64e572] [cursor=pointer]:
+                  - /url: /allexius
+                  - generic "Alexander Bauer" [ref=f64e573]
+                - generic [ref=f64e579]:
+                  - link [ref=f64e581] [cursor=pointer]:
+                    - /url: /allexius
+                    - heading "Alexander Bauer" [level=3] [ref=f64e582]
+                  - generic [ref=f64e583]:
+                    - paragraph [ref=f64e584]: Posted 11 years ago
+                    - paragraph [ref=f64e586]: · 1st in this Competition
+                - generic [ref=f64e588]:
+                  - generic [ref=f64e589]:
+                    - button "Upvote" [ref=f64e590] [cursor=pointer]:
+                      - generic [ref=f64e591]: arrow_drop_up
+                    - button "2 votes" [ref=f64e592] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f64e593] [cursor=pointer]: more_vert
+                - generic [ref=f64e596]:
+                  - blockquote [ref=f64e597]:
+                    - paragraph [ref=f64e598]:
+                      - link "@Alexander (opens in a new tab)" [ref=f64e599] [cursor=pointer]:
+                        - /url: /Alexander
+                        - text: "@Alexander"
+                      - text: "Bauer: Thanks for you explanation. This is extremely informative. I have a few basic questions though:"
+                  - list [ref=f64e600]:
+                    - listitem [ref=f64e601]: Which neural net library did you use? Neuralnet and mxnet didn't work (mxnet has a bug and neuralnet was very slow), so finally i used nnet in R (for final ensemble)
+                    - listitem [ref=f64e602]: "Splitting of title and query by prepositions: Can you please provide some intuition behind doing this? Is it based on the fact that the first half is main clause, second half is subordinate?"
+                    - listitem [ref=f64e603]:
+                      - text: "Quantification of important noun similarities (L1, L2, cosine distances): L1 = Manhattan distance, L2=Euclidean. Is this the correct interpretation? Also did these features help you? I tried POS tagging but resulting features were not important."
+                      - link "@Sameh (opens in a new tab)" [ref=f64e604] [cursor=pointer]:
+                        - /url: /Sameh
+                        - text: "@Sameh"
+                      - text: Faidi mentioned the same.
+                  - paragraph [ref=f64e605]: For neural nets, we used Keras with Theano backend. One hidden layer with 1024 hidden nodes and relu activation, a second 3-node hidden layer with sigmoid activation to stabilize the predictions and a final linear output layer and RMSE objective. Dropout for regularization and early-stopping to determine number of epochs. With a single hidden layer and linear output I was not able to get it converge. Training was quite fast with GPU support, so I used 3-10 bags of models with same parameters and different seed.
+                  - paragraph [ref=f64e606]: "To explain the splitting by prepositions, take for example the title \"Window Cleaning Robot for Framed Window\". When we split by preposition (for, with, between, etc.) we get two substrings in this case: ['Window Cleaning Robot','Framed Window']. We then reversed the order of this list and concatenated the substrings, to get \"Framed Window Window Cleaning Robot\". With this transformation, the important words (\"cleaning robot\" in this case) are much more likely in the last position, which improved all our position-sensitive features."
+                  - paragraph [ref=f64e607]: Regarding question 3, I suggest Nurlan covers this part as he worked on those features.
+              - separator [ref=f64e608]
+            - generic [ref=f64e609]:
+              - generic [ref=f64e613]:
+                - link "Alexander Bauer's profile" [ref=f64e614] [cursor=pointer]:
+                  - /url: /allexius
+                  - generic "Alexander Bauer" [ref=f64e615]
+                - generic [ref=f64e621]:
+                  - link [ref=f64e623] [cursor=pointer]:
+                    - /url: /allexius
+                    - heading "Alexander Bauer" [level=3] [ref=f64e624]
+                  - generic [ref=f64e625]:
+                    - paragraph [ref=f64e626]: Posted 11 years ago
+                    - paragraph [ref=f64e628]: · 1st in this Competition
+                - generic [ref=f64e630]:
+                  - generic [ref=f64e631]:
+                    - button "Upvote" [ref=f64e632] [cursor=pointer]:
+                      - generic [ref=f64e633]: arrow_drop_up
+                    - button "2 votes" [ref=f64e634] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f64e635] [cursor=pointer]: more_vert
+                - generic [ref=f64e638]:
+                  - blockquote [ref=f64e639]:
+                    - paragraph [ref=f64e640]:
+                      - link "@Alexander (opens in a new tab)" [ref=f64e641] [cursor=pointer]:
+                        - /url: /Alexander
+                        - text: "@Alexander"
+                      - text: Bauer
+                      - link "@Andreas (opens in a new tab)" [ref=f64e642] [cursor=pointer]:
+                        - /url: /Andreas
+                        - text: "@Andreas"
+                      - text: Merentitis,
+                  - paragraph [ref=f64e643]:
+                    - text: "Congrats to your team's winning and your guys excellent work. I saw you have used WMD, can you share to what extent it helps the model? I haven't tried it (both in CrowdFlower) as I figured it would be quite computation intense. Can you also share the implementation you have been using? (Maybe this:"
+                    - link "https://github.com/mkusner/wmd (opens in a new tab)" [ref=f64e644] [cursor=pointer]:
+                      - /url: https://github.com/mkusner/wmd
+                      - text: https://github.com/mkusner/wmd
+                    - text: "?) I would love to have it in my toolbox."
+                  - paragraph [ref=f64e645]:
+                    - text: Because of the computational complexity, we didn't use the original WMD definition but one of the lower bound approximations that are proposed in the original paper (section 4.1 in
+                    - link "http://jmlr.org/proceedings/papers/v37/kusnerb15.pdf (opens in a new tab)" [ref=f64e646] [cursor=pointer]:
+                      - /url: http://jmlr.org/proceedings/papers/v37/kusnerb15.pdf
+                      - text: http://jmlr.org/proceedings/papers/v37/kusnerb15.pdf
+                    - text: ) under "relaxed word movers distance". It is basically a nearest neighborhood search to find the closest word in doc B for each word in doc A and then take sum of all minimum distances. The feature was especially effective when we added weighting of the words by position. We used an exponential weighting of the words in the queries by position, to emphasize the importance of the last 2-3 words in the query.
+                  - paragraph [ref=f64e647]: Our implementation is just a nested for loop to calculate the distance matrix, which is not very efficient but works for those small documents. I guess the nearest neighborhood search could be done more efficiently, e.g. with scikits kd-tree implementation.
+              - separator [ref=f64e648]
+            - generic [ref=f64e649]:
+              - generic [ref=f64e653]:
+                - link "Andrii Cherednychenko's profile" [ref=f64e654] [cursor=pointer]:
+                  - /url: /cherednychenko
+                  - generic "Andrii Cherednychenko" [ref=f64e655]
+                - generic [ref=f64e661]:
+                  - link [ref=f64e663] [cursor=pointer]:
+                    - /url: /cherednychenko
+                    - heading "Andrii Cherednychenko" [level=3] [ref=f64e664]
+                  - generic [ref=f64e665]:
+                    - paragraph [ref=f64e666]: Posted 11 years ago
+                    - paragraph [ref=f64e668]: · 24th in this Competition
+                - generic [ref=f64e670]:
+                  - generic [ref=f64e671]:
+                    - button "Upvote" [ref=f64e672] [cursor=pointer]:
+                      - generic [ref=f64e673]: arrow_drop_up
+                    - button "2 votes" [ref=f64e674] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f64e675] [cursor=pointer]: more_vert
+                - generic [ref=f64e678]:
+                  - blockquote [ref=f64e679]:
+                    - paragraph [ref=f64e680]:
+                      - text: Hi Andrii! What is "post traineden1000"? (google is
+                      - link "not very helpful (opens in a new tab)" [ref=f64e681] [cursor=pointer]:
+                        - /url: https://www.google.de/search?q=post%20traineden1000
+                        - text: not very helpful
+                      - text: )
+                  - paragraph [ref=f64e682]:
+                    - text: Hey, sorry for not being clear on this - I meant I used one of the models listed on
+                    - link "https://github.com/3Top/word2vec-api (opens in a new tab)" [ref=f64e683] [cursor=pointer]:
+                      - /url: https://github.com/3Top/word2vec-api
+                      - text: https://github.com/3Top/word2vec-api
+                    - text: and did 5 more iterations of training on corpus (title + description + query where relevance is > 2.65).
+                  - paragraph [ref=f64e684]: That post training improved prediction on produced feature group (not mixed with other features) by 0.015 or something like that. Model name was en1000.
+              - separator [ref=f64e685]
+            - generic [ref=f64e686]:
+              - generic [ref=f64e690]:
+                - link "Silogram's profile" [ref=f64e691] [cursor=pointer]:
+                  - /url: /psilogram
+                  - generic "Silogram" [ref=f64e692]
+                - generic [ref=f64e698]:
+                  - link [ref=f64e700] [cursor=pointer]:
+                    - /url: /psilogram
+                    - heading "Silogram" [level=3] [ref=f64e701]
+                  - generic [ref=f64e702]:
+                    - paragraph [ref=f64e703]: Posted 11 years ago
+                    - paragraph [ref=f64e705]: · 4th in this Competition
+                - generic [ref=f64e707]:
+                  - generic [ref=f64e708]:
+                    - button "Upvote" [ref=f64e709] [cursor=pointer]:
+                      - generic [ref=f64e710]: arrow_drop_up
+                    - button "2 votes" [ref=f64e711] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f64e712] [cursor=pointer]: more_vert
+                - generic [ref=f64e715]:
+                  - paragraph [ref=f64e716]:
+                    - link "@randombishop (opens in a new tab)" [ref=f64e717] [cursor=pointer]:
+                      - /url: /randombishop
+                      - text: "@randombishop"
+                    - text: ": ;-)"
+                  - paragraph [ref=f64e718]:
+                    - link "@sky (opens in a new tab)" [ref=f64e719] [cursor=pointer]:
+                      - /url: /sky
+                      - text: "@sky"
+                    - text: ": Thanks for the MS link. interesting. At the end of the competition, we were getting about a 0.003 boost from our L2 ensemble. One problem we had was that the longer we collaborated as a team, the more similar our models became. So there's a delicate balance to merging early to share ideas vs. merging late to get maximum diversity for the ensemble."
+              - separator [ref=f64e720]
+            - generic [ref=f64e721]:
+              - generic [ref=f64e725]:
+                - link "sky's profile" [ref=f64e726] [cursor=pointer]:
+                  - /url: /skyjiao
+                  - generic "sky" [ref=f64e727]
+                - generic [ref=f64e733]:
+                  - link [ref=f64e735] [cursor=pointer]:
+                    - /url: /skyjiao
+                    - heading "sky" [level=3] [ref=f64e736]
+                  - paragraph [ref=f64e738]: Posted 11 years ago
+                - generic [ref=f64e740]:
+                  - generic [ref=f64e741]:
+                    - button "Upvote" [ref=f64e742] [cursor=pointer]:
+                      - generic [ref=f64e743]: arrow_drop_up
+                    - button "2 votes" [ref=f64e744] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f64e745] [cursor=pointer]: more_vert
+                - generic [ref=f64e748]:
+                  - paragraph [ref=f64e749]:
+                    - link "@Silogram (opens in a new tab)" [ref=f64e750] [cursor=pointer]:
+                      - /url: /Silogram
+                      - text: "@Silogram"
+                    - text: ", I'm not a kaggle expert but since this competition happens to be my research area, some papers I read really helped. For example this feature list was my starting point:"
+                    - link "http://research.microsoft.com/en-us/projects/mslr/feature.aspx (opens in a new tab)" [ref=f64e751] [cursor=pointer]:
+                      - /url: http://research.microsoft.com/en-us/projects/mslr/feature.aspx
+                      - text: http://research.microsoft.com/en-us/projects/mslr/feature.aspx
+                    - text: . Then the "learning to rank" challenge held by Yahoo some years ago also have a detailed description of its feature engineering. But after all, as what Sameh said, the diversity of each member's feature set is really the key. We luckily didn't have the same vision on the data.
+                  - paragraph [ref=f64e752]: btw, I'm wondering the same question as Randombishop, how many improvements you guys made from single model to ensemble in this competition?
+              - separator [ref=f64e753]
+            - generic [ref=f64e754]:
+              - generic [ref=f64e758]:
+                - link "sky's profile" [ref=f64e759] [cursor=pointer]:
+                  - /url: /skyjiao
+                  - generic "sky" [ref=f64e760]
+                - generic [ref=f64e766]:
+                  - link [ref=f64e768] [cursor=pointer]:
+                    - /url: /skyjiao
+                    - heading "sky" [level=3] [ref=f64e769]
+                  - paragraph [ref=f64e771]: Posted 11 years ago
+                - generic [ref=f64e773]:
+                  - generic [ref=f64e774]:
+                    - button "Upvote" [ref=f64e775] [cursor=pointer]:
+                      - generic [ref=f64e776]: arrow_drop_up
+                    - button "2 votes" [ref=f64e777] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f64e778] [cursor=pointer]: more_vert
+                - paragraph [ref=f64e782]: There is really no better place to learn machine learning than Kaggle :)
+              - separator [ref=f64e783]
+            - generic [ref=f64e784]:
+              - generic [ref=f64e788]:
+                - link "Run2's profile" [ref=f64e789] [cursor=pointer]:
+                  - /url: /rightfit
+                  - generic "Run2" [ref=f64e790]
+                - generic [ref=f64e796]:
+                  - link [ref=f64e798] [cursor=pointer]:
+                    - /url: /rightfit
+                    - heading "Run2" [level=3] [ref=f64e799]
+                  - generic [ref=f64e800]:
+                    - paragraph [ref=f64e801]: Posted 10 years ago
+                    - paragraph [ref=f64e803]: · 10th in this Competition
+                - generic [ref=f64e805]:
+                  - generic [ref=f64e806]:
+                    - button "Upvote" [ref=f64e807] [cursor=pointer]:
+                      - generic [ref=f64e808]: arrow_drop_up
+                    - button "1 votes" [ref=f64e809] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e810] [cursor=pointer]: more_vert
+                - generic [ref=f64e812]:
+                  - generic [ref=f64e813]:
+                    - paragraph [ref=f64e814]: I will first mention few lines about the way I cleaned and corrected the text. I worked on it for a month (an hour a day) I guess :) and then there was the google solution :). But - I think my approach was better so I did not use the google one. The reason being my cleaning used a "benefit of doubt" approach - which cleans and corrects with reference to what is it being evaluated against. I guess this is how a human would do too when ranking.
+                    - paragraph [ref=f64e815]: Here was my approach .
+                    - paragraph [ref=f64e816]: Prelude - I used multithreading heavily to do these processing. Specifically pool.map from multiprocessing.
+                    - paragraph [ref=f64e817]: Create a func (say "clean") to do (see attached)
+                    - paragraph [ref=f64e818]: a) regex replacements
+                    - paragraph [ref=f64e819]: b) segment a word if it has a wordnet synset and more than one segments (using wordsegment). E.g Rainproof gets segmented to rain proof. Some errors do creep in in this step but that is "favourably" corrected later
+                    - paragraph [ref=f64e820]: c) check for words which seem like they got stitched together wrongly and split them after checking that the splits result in a good word (from synsets)
+                    - paragraph [ref=f64e821]: Level 1
+                    - paragraph [ref=f64e822]: "-> Use clean to convert bullets (will call it functionality henceforth), description,brand,material,title,search term"
+                    - paragraph [ref=f64e823]: "-> Use words from cleaned title, description,functionality,brand and material to train norvig"
+                    - paragraph [ref=f64e824]: Level 2
+                    - paragraph [ref=f64e825]: "-> Create a new column by concatenating brand material functionality description and title. Say \"ref\""
+                    - paragraph [ref=f64e826]: "-> Check all search terms against its ref and concatenate words which were split in the search. E.g \"deck over\" becomes \"deckover\". This also corrects wrongly segmented words - again with a \"benefit of doubt\""
+                    - paragraph [ref=f64e827]: Level 3.
+                    - paragraph [ref=f64e828]: "-> Correct the search terms again - this time using ref and the following logic"
+                    - paragraph [ref=f64e829]: a) Correct words which are not all Uppercase and alpha and not in enchant dict (used enchant.Dict("en_US"))
+                    - paragraph [ref=f64e830]: b) For each such word use norvig to provide list of closest matching words (candidates) for replacement
+                    - paragraph [ref=f64e831]: c) Then for each such word use res_similarity and path_similarity to give a preference to candidate words based on neighbouring good words in the search term. This went as we correct. So say you have a search term "dcek paint dor". First I will get all closest words for dcek and then check their similarity to paint and then once I have corrected that to deck , deck paint are neighbouring words when correcting dor and so on.
+                    - paragraph [ref=f64e832]: d) Also for each such word use ref to check if any of the candidates words are present in ref and give a preference to be the chosen as the replacement word based on the weight of that word in ref. Weight means the number of times in occurs in ref. This means if there is a word repeated multiple times in ref then that will get more preference being a replaced word than another found only once in ref.
+                    - paragraph [ref=f64e833]: e) Some adjustment between c) and d) preferences to sort the candidate words according to preference and chose one replacement word
+                    - paragraph [ref=f64e834]: So essentially words in search terms were being corrected based on their "ref" and their neighbouring words.
+                    - paragraph [ref=f64e835]: Once I had corrected the fields using this approach, wordvec models, tf models, tf-idf models, tf (char) models, tf-idf (char) models gave me very strong features.
+                  - link "replacements.txt opens in new window" [ref=f64e838] [cursor=pointer]:
+                    - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/118581/4172/replacements.txt
+                    - text: replacements.txt
+              - separator [ref=f64e839]
+            - generic [ref=f64e840]:
+              - generic [ref=f64e844]:
+                - link "Alexander Bauer's profile" [ref=f64e845] [cursor=pointer]:
+                  - /url: /allexius
+                  - generic "Alexander Bauer" [ref=f64e846]
+                - generic [ref=f64e852]:
+                  - link [ref=f64e854] [cursor=pointer]:
+                    - /url: /allexius
+                    - heading "Alexander Bauer" [level=3] [ref=f64e855]
+                  - generic [ref=f64e856]:
+                    - paragraph [ref=f64e857]: Posted 11 years ago
+                    - paragraph [ref=f64e859]: · 1st in this Competition
+                - generic [ref=f64e861]:
+                  - generic [ref=f64e862]:
+                    - button "Upvote" [ref=f64e863] [cursor=pointer]:
+                      - generic [ref=f64e864]: arrow_drop_up
+                    - button "1 votes" [ref=f64e865] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e866] [cursor=pointer]: more_vert
+                - generic [ref=f64e869]:
+                  - blockquote [ref=f64e870]:
+                    - blockquote [ref=f64e871]:
+                      - blockquote [ref=f64e872]:
+                        - paragraph [ref=f64e873]:
+                          - link "@Alexander (opens in a new tab)" [ref=f64e874] [cursor=pointer]:
+                            - /url: /Alexander
+                            - text: "@Alexander"
+                          - text: ", I am curious specifically how you used cosine as the merge mode. I saw that option but wasnt sure what it did. Below, if you merge two word embedding matrices, and use 'cos' the result is a single scalar?"
+                  - paragraph [ref=f64e875]: Yes, the output of cosine merge mode is a single scalar, like in the example code you posted. I put another sigmoid hidden layer with 16 nodes on top and a final single linear node as output layer for relevance.
+                  - paragraph [ref=f64e876]: The idea is that the LSTMs build an enhanced "sentence" vector from the individual word embedding vectors. During learning, the relevance is propagated back through the cosine merge layer into the LSTM cells. In the paper I mentioned the authors showed that the LSTM is able to learn which words are important and which are not, and take into account word position and order.
+                  - paragraph [ref=f64e877]: I have not had a chance to try and understand the paper yet so maybe it would be clearer to me, but are you saying that you had word embeddings exactly like in my example for query and title (or whatever you used for the "document"), merged them with cos and this went into LSTM and after the LSTM was another hidden dense layer (16 units) and finally the dense output?
+                  - paragraph [ref=f64e878]: "No, I use the LSTM instead of embedding layers, below the cosine merge. With embeddings I mean the word2vec or glove vectors. I use the sequence of glove word vectors from query and title as input to LSTM. See below the code for generating the model in Keras:"
+                  - code [ref=f64e880]: "def generate_lang_model(max_len): model = Sequential() if num_lstm_hidden_layers == 1: model.add(LSTM(output_dim=num_lstm_hidden_units, return_sequences=False, input_shape=(max_len, glove_vec_dim))) else: model.add(LSTM(output_dim=num_lstm_hidden_units, return_sequences=True, input_shape=(max_len, glove_vec_dim))) for k in range(num_lstm_hidden_layers-2): model.add(LSTM(output_dim=num_lstm_hidden_units, return_sequences=True)) model.add(Dropout(lstm_dropout)) model.add(LSTM(num_lstm_hidden_units, return_sequences=False)) return model query_model = generate_lang_model(max_len_query) title_model = generate_lang_model(max_len_title) model = Sequential() model.add(Merge([query_model, title_model], mode='cos', dot_axes=[[1], [1]])) model.add(Dense(16, activation='sigmoid', init='glorot_uniform')) model.add(Dense(1, init='uniform')) model.compile(loss='mean_squared_error', optimizer='adam')"
+              - separator [ref=f64e881]
+            - generic [ref=f64e882]:
+              - generic [ref=f64e886]:
+                - link "Nurlanbek Duishoev's profile" [ref=f64e887] [cursor=pointer]:
+                  - /url: /nurlan
+                  - generic "Nurlanbek Duishoev" [ref=f64e888]
+                - generic [ref=f64e894]:
+                  - link [ref=f64e896] [cursor=pointer]:
+                    - /url: /nurlan
+                    - heading "Nurlanbek Duishoev" [level=3] [ref=f64e897]
+                  - generic [ref=f64e898]:
+                    - paragraph [ref=f64e899]: Posted 11 years ago
+                    - paragraph [ref=f64e901]: · 1st in this Competition
+                - generic [ref=f64e903]:
+                  - generic [ref=f64e904]:
+                    - button "Upvote" [ref=f64e905] [cursor=pointer]:
+                      - generic [ref=f64e906]: arrow_drop_up
+                    - button "1 votes" [ref=f64e907] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e908] [cursor=pointer]: more_vert
+                - generic [ref=f64e911]:
+                  - blockquote [ref=f64e912]:
+                    - list [ref=f64e913]:
+                      - listitem [ref=f64e914]:
+                        - text: "Quantification of important noun similarities (L1, L2, cosine distances): L1 = Manhattan distance, L2=Euclidean. Is this the correct interpretation? Also did these features help you? I tried POS tagging but resulting features were not important."
+                        - link "@Sameh (opens in a new tab)" [ref=f64e915] [cursor=pointer]:
+                          - /url: /Sameh
+                          - text: "@Sameh"
+                        - text: Faidi mentioned the same.
+                  - paragraph [ref=f64e916]: Hi,
+                  - paragraph [ref=f64e917]: yes the main motivation behind was to extract main entities being searched and being described in the queries and product titles respectively. Our primary approach was to include positional information of the matched terms but oob error analysis revealed that it was not enough. We also experimented with POS tagging but we noticed that many of the terms that represent entity attributes and specifications were also captured as nouns and there was no obvious pattern to distinguish them from the the main entity terms. Instead, we decided to extract last N terms as potential main entities after reversing the order of the terms whenever we see prepositions such as "for", "with", "in", etc., which were usually followed by entity attributes/specifications. Last approach did help!
+                  - paragraph [ref=f64e918]: Yes by 'L1' we mean Manhattan distance and by 'L2' Euclidean distances.
+              - separator [ref=f64e919]
+            - generic [ref=f64e920]:
+              - generic [ref=f64e924]:
+                - link "Alexander Bauer's profile" [ref=f64e925] [cursor=pointer]:
+                  - /url: /allexius
+                  - generic "Alexander Bauer" [ref=f64e926]
+                - generic [ref=f64e932]:
+                  - link [ref=f64e934] [cursor=pointer]:
+                    - /url: /allexius
+                    - heading "Alexander Bauer" [level=3] [ref=f64e935]
+                  - generic [ref=f64e936]:
+                    - paragraph [ref=f64e937]: Posted 11 years ago
+                    - paragraph [ref=f64e939]: · 1st in this Competition
+                - generic [ref=f64e941]:
+                  - generic [ref=f64e942]:
+                    - button "Upvote" [ref=f64e943] [cursor=pointer]:
+                      - generic [ref=f64e944]: arrow_drop_up
+                    - button "1 votes" [ref=f64e945] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e946] [cursor=pointer]: more_vert
+                - generic [ref=f64e949]:
+                  - paragraph [ref=f64e950]:
+                    - text: "Did anyone try recurrent neural networks like LSTM? There is a recent and \"relevant\" paper on document retrieval with LSTM:"
+                    - link "http://arxiv.org/pdf/1502.06922v3.pdf (opens in a new tab)" [ref=f64e951] [cursor=pointer]:
+                      - /url: http://arxiv.org/pdf/1502.06922v3.pdf
+                      - text: http://arxiv.org/pdf/1502.06922v3.pdf
+                  - paragraph [ref=f64e952]: I have tried with a network topology similar to the one in the paper (Separate LSTM networks for query and title, then a merging layer using cosine or just concatenating the vectors , glove word vectors as input sequences. I built it with the Keras layer elements, so I could not exactly reproduce the same configuration, but very similar. I got it close to 0.47 CV but then could not improve if further, so I didn't bother integrating it into our ensemble. I was hoping it would catch some of the typical title and query syntax and find out the important words automatically. I would be very interested if someone with more experience in neural nets tried something similar and got better results.
+              - separator [ref=f64e953]
+            - generic [ref=f64e954]:
+              - generic [ref=f64e958]:
+                - link "ChenglongChen's profile" [ref=f64e959] [cursor=pointer]:
+                  - /url: /chenglongchen
+                  - generic "ChenglongChen" [ref=f64e960]
+                - generic [ref=f64e966]:
+                  - link [ref=f64e968] [cursor=pointer]:
+                    - /url: /chenglongchen
+                    - heading "ChenglongChen" [level=3] [ref=f64e969]
+                  - generic [ref=f64e970]:
+                    - paragraph [ref=f64e971]: Posted 11 years ago
+                    - paragraph [ref=f64e973]: · 3rd in this Competition
+                - generic [ref=f64e975]:
+                  - generic [ref=f64e976]:
+                    - button "Upvote" [ref=f64e977] [cursor=pointer]:
+                      - generic [ref=f64e978]: arrow_drop_up
+                    - button "1 votes" [ref=f64e979] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e980] [cursor=pointer]: more_vert
+                - generic [ref=f64e983]:
+                  - paragraph [ref=f64e984]:
+                    - link "@Alexander (opens in a new tab)" [ref=f64e985] [cursor=pointer]:
+                      - /url: /Alexander
+                      - text: "@Alexander"
+                    - text: Bauer
+                    - link "@Andreas (opens in a new tab)" [ref=f64e986] [cursor=pointer]:
+                      - /url: /Andreas
+                      - text: "@Andreas"
+                    - text: Merentitis,
+                  - paragraph [ref=f64e987]:
+                    - text: "Congrats to your team's winning and your guys excellent work. I saw you have used WMD, can you share to what extent it helps the model? I haven't tried it (both in CrowdFlower) as I figured it would be quite computation intense. Can you also share the implementation you have been using? (Maybe this:"
+                    - link "https://github.com/mkusner/wmd (opens in a new tab)" [ref=f64e988] [cursor=pointer]:
+                      - /url: https://github.com/mkusner/wmd
+                      - text: https://github.com/mkusner/wmd
+                    - text: "?) I would love to have it in my toolbox."
+              - separator [ref=f64e989]
+            - generic [ref=f64e990]:
+              - generic [ref=f64e994]:
+                - link "Andreas Merentitis's profile" [ref=f64e995] [cursor=pointer]:
+                  - /url: /andreasmerentitis
+                  - generic "Andreas Merentitis" [ref=f64e996]
+                - generic [ref=f64e1002]:
+                  - link [ref=f64e1004] [cursor=pointer]:
+                    - /url: /andreasmerentitis
+                    - heading "Andreas Merentitis" [level=3] [ref=f64e1005]
+                  - generic [ref=f64e1006]:
+                    - paragraph [ref=f64e1007]: Posted 11 years ago
+                    - paragraph [ref=f64e1009]: · 1st in this Competition
+                - generic [ref=f64e1011]:
+                  - generic [ref=f64e1012]:
+                    - button "Upvote" [ref=f64e1013] [cursor=pointer]:
+                      - generic [ref=f64e1014]: arrow_drop_up
+                    - button "1 votes" [ref=f64e1015] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e1016] [cursor=pointer]: more_vert
+                - paragraph [ref=f64e1020]: Just to add perhaps a couple of lines to what Alex already mentioned above, we actively tried to get models with high ensambling potential, which means reasonably good on their own but at the same time as little correlated as possible. Having a broad and diverse feature set was one key to that, combining a lot of different algorithms on L1 was another. Using these models with some different sets of hyperparameters, feature reduction/projection/embedding techniques was a third. We even mixed some of the weaker feature subsets on the L1 to get combinations that are on par with the stronger ones. Finally, having a good cross-validation strategy was key, as is most of the time of course.
+              - separator [ref=f64e1021]
+            - generic [ref=f64e1022]:
+              - generic [ref=f64e1026]:
+                - link "Faron's profile" [ref=f64e1027] [cursor=pointer]:
+                  - /url: /mmueller
+                  - generic "Faron" [ref=f64e1028]
+                - generic [ref=f64e1034]:
+                  - link [ref=f64e1036] [cursor=pointer]:
+                    - /url: /mmueller
+                    - heading "Faron" [level=3] [ref=f64e1037]
+                  - generic [ref=f64e1038]:
+                    - paragraph [ref=f64e1039]: Posted 11 years ago
+                    - paragraph [ref=f64e1041]: · 8th in this Competition
+                - generic [ref=f64e1043]:
+                  - generic [ref=f64e1044]:
+                    - button "Upvote" [ref=f64e1045] [cursor=pointer]:
+                      - generic [ref=f64e1046]: arrow_drop_up
+                    - button "1 votes" [ref=f64e1047] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e1048] [cursor=pointer]: more_vert
+                - paragraph [ref=f64e1052]: well done, congratz & thx for sharing your solution!
+              - separator [ref=f64e1053]
+            - generic [ref=f64e1054]:
+              - generic [ref=f64e1058]:
+                - link "Andrii Cherednychenko's profile" [ref=f64e1059] [cursor=pointer]:
+                  - /url: /cherednychenko
+                  - generic "Andrii Cherednychenko" [ref=f64e1060]
+                - generic [ref=f64e1066]:
+                  - link [ref=f64e1068] [cursor=pointer]:
+                    - /url: /cherednychenko
+                    - heading "Andrii Cherednychenko" [level=3] [ref=f64e1069]
+                  - generic [ref=f64e1070]:
+                    - paragraph [ref=f64e1071]: Posted 11 years ago
+                    - paragraph [ref=f64e1073]: · 24th in this Competition
+                - generic [ref=f64e1075]:
+                  - generic [ref=f64e1076]:
+                    - button "Upvote" [ref=f64e1077] [cursor=pointer]:
+                      - generic [ref=f64e1078]: arrow_drop_up
+                    - button "1 votes" [ref=f64e1079] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e1080] [cursor=pointer]: more_vert
+                - generic [ref=f64e1083]:
+                  - paragraph [ref=f64e1084]:
+                    - link "@Sameh (opens in a new tab)" [ref=f64e1085] [cursor=pointer]:
+                      - /url: /Sameh
+                      - text: "@Sameh"
+                    - text: and
+                    - link "@RandomBishop (opens in a new tab)" [ref=f64e1086] [cursor=pointer]:
+                      - /url: /RandomBishop
+                      - text: "@RandomBishop"
+                    - text: "- congrats with 1st place. after you did 5fold cv, have you used those 5 models to predict test set and averaged results or used same params to train on whole training set?"
+                  - paragraph [ref=f64e1087]: I have also got around 0.004 boost with stacking and ensembling. My strategy was to split train set randomly into 4 parts, so I could have up to 4 layers of models - 1st layer had 1/4 in training set and 3/4 in validation, 2nd 1/4 in training and 1/2 in validation and so forth. Then, I had 25 those splits (kind of bagging?) and averaged test set predictions.
+                  - paragraph [ref=f64e1088]: had around 800 features, build models on all of them and also for 1st layer created separate predictions for grouped features.
+                  - paragraph [ref=f64e1089]: regarding word2vec - that also was really useful for me, used self trained gensim's word2vec, doc2vec. also, used post traineden1000
+              - separator [ref=f64e1090]
+            - generic [ref=f64e1091]:
+              - generic [ref=f64e1095]:
+                - link "Sameh Faidi's profile" [ref=f64e1096] [cursor=pointer]:
+                  - /url: /samehif
+                  - generic "Sameh Faidi" [ref=f64e1097]
+                - generic [ref=f64e1103]:
+                  - link [ref=f64e1105] [cursor=pointer]:
+                    - /url: /samehif
+                    - heading "Sameh Faidi" [level=3] [ref=f64e1106]
+                  - paragraph [ref=f64e1108]: Posted 11 years ago
+                - generic [ref=f64e1110]:
+                  - generic [ref=f64e1111]:
+                    - button "Upvote" [ref=f64e1112] [cursor=pointer]:
+                      - generic [ref=f64e1113]: arrow_drop_up
+                    - button "1 votes" [ref=f64e1114] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e1115] [cursor=pointer]: more_vert
+                - generic [ref=f64e1118]:
+                  - paragraph [ref=f64e1119]:
+                    - link "@Advanced (opens in a new tab)" [ref=f64e1120] [cursor=pointer]:
+                      - /url: /Advanced
+                      - text: "@Advanced"
+                    - text: "Research and Analytics: i have also used POS tagging related features but dropped them after a while as i couldn't make them to improve the score."
+                  - paragraph [ref=f64e1121]: regarding word2vec. I think in our team we have used it in different ways as we joined the team at different points of time. As for my model, i have just constructed a basic word2vec model from local vocabulary in query, title, description with some filtering and cleaning and then used the model to create a handful of similarity and ratio features. If i remember correct, those features has made significant improvement to the local and public score.
+                  - paragraph [ref=f64e1122]: I think the biggest advantage we got was the diversity in our individual features and models. So, by combining the features in few different ways we got a huge boost to our score and position in the LB.
+              - separator [ref=f64e1123]
+            - generic [ref=f64e1124]:
+              - generic [ref=f64e1128]:
+                - link "Run2's profile" [ref=f64e1129] [cursor=pointer]:
+                  - /url: /rightfit
+                  - generic "Run2" [ref=f64e1130]
+                - generic [ref=f64e1136]:
+                  - link [ref=f64e1138] [cursor=pointer]:
+                    - /url: /rightfit
+                    - heading "Run2" [level=3] [ref=f64e1139]
+                  - generic [ref=f64e1140]:
+                    - paragraph [ref=f64e1141]: Posted 11 years ago
+                    - paragraph [ref=f64e1143]: · 10th in this Competition
+                - generic [ref=f64e1145]:
+                  - generic [ref=f64e1146]:
+                    - button "Upvote" [ref=f64e1147] [cursor=pointer]:
+                      - generic [ref=f64e1148]: arrow_drop_up
+                    - button "1 votes" [ref=f64e1149] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f64e1150] [cursor=pointer]: more_vert
+                - generic [ref=f64e1153]:
+                  - paragraph [ref=f64e1154]: Thanks for that post
+                  - paragraph [ref=f64e1155]: "\"57% of examples must have unseen queries in training part\" How did you determine unseen queries ? does that mean any word in the search term (across all the search terms in validation) was unseen ? or does that mean any whole search term in validation was unseen ? and why did you not do it based on unseen product ids (rather than un seen search terms) ? I guess I am trying to understand the logic behind the rules - if that is OK to share."
+                  - paragraph [ref=f64e1156]: Signatures Colors and Bullets - very cool. What is the Bullets feature ?
+              - separator [ref=f64e1157]
+            - generic [ref=f64e1158]:
+              - generic [ref=f64e1162]:
+                - link "qianqian's profile" [ref=f64e1163] [cursor=pointer]:
+                  - /url: /qqgeogor
+                  - generic "qianqian" [ref=f64e1164]
+                - generic [ref=f64e1170]:
+                  - link [ref=f64e1172] [cursor=pointer]:
+                    - /url: /qqgeogor
+                    - heading "qianqian" [level=3] [ref=f64e1173]
+                  - generic [ref=f64e1174]:
+                    - paragraph [ref=f64e1175]: Posted 11 years ago
+                    - paragraph [ref=f64e1177]: · 15th in this Competition
+                - generic [ref=f64e1179]:
+                  - generic [ref=f64e1180]:
+                    - button "Upvote" [ref=f64e1181] [cursor=pointer]:
+                      - generic [ref=f64e1182]: arrow_drop_up
+                    - button "0 votes" [ref=f64e1183] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f64e1184] [cursor=pointer]: more_vert
+                - paragraph [ref=f64e1188]: Congratulations to all winners and hope to see some solution share.
+              - separator [ref=f64e1189]
+            - generic [ref=f64e1190]:
+              - generic [ref=f64e1194]:
+                - link "slysy's profile" [ref=f64e1195] [cursor=pointer]:
+                  - /url: /slysyy
+                  - generic "slysy" [ref=f64e1196]
+                - generic [ref=f64e1202]:
+                  - link [ref=f64e1204] [cursor=pointer]:
+                    - /url: /slysyy
+                    - heading "slysy" [level=3] [ref=f64e1205]
+                  - paragraph [ref=f64e1207]: Posted 10 years ago
+                - generic [ref=f64e1209]:
+                  - generic [ref=f64e1210]:
+                    - button "Upvote" [ref=f64e1211] [cursor=pointer]:
+                      - generic [ref=f64e1212]: arrow_drop_up
+                    - button "0 votes" [ref=f64e1213] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f64e1214] [cursor=pointer]: more_vert
+                - generic [ref=f64e1217]:
+                  - paragraph [ref=f64e1218]: with multipe trigrams in a search term
+                  - paragraph [ref=f64e1219]: "\"hello how are you today\" ---> top trigram \"how are you\" ---> last two \"are you\""
+                  - paragraph [ref=f64e1220]: "\"did I see you today\" ---> top tri gram was \"see you today\" ---> last two \"you today\" ( this second example the trigram is really \"I see you\" therefore last two is \"see you\""
+                  - paragraph [ref=f64e1221]: "\"I see you\" & \"how are you\" are the core words, core intent of the search terms."
+                  - paragraph [ref=f64e1222]: "\"see you\" is the main actions. just like \"how are you\" is the core intent or desire of this search term"
+                  - paragraph [ref=f64e1223]: "\"how\" should be removed from being a core word as it is really a question words"
+                  - paragraph [ref=f64e1224]: so it leaves us with "see you" & "are you" as the core words in both
+                  - paragraph [ref=f64e1225]: But don't assume the last two words are the best two words to use in the search term to ref the product title / description. even within the core you must determine the [core, specific core, exact core]. Each have it's own weight of importance. "you" would be consider the [core], whereas "see" and "are" is the specific core. but "are" is really a questions and not a core attribute (product or service).
+                  - paragraph [ref=f64e1226]: so the product of interest from your two example is "you". the customer desire to purchase this core product.
+              - separator [ref=f64e1227]
+            - generic [ref=f64e1228]:
+              - generic [ref=f64e1232]:
+                - link "Run2's profile" [ref=f64e1233] [cursor=pointer]:
+                  - /url: /rightfit
+                  - generic "Run2" [ref=f64e1234]
+                - generic [ref=f64e1240]:
+                  - link [ref=f64e1242] [cursor=pointer]:
+                    - /url: /rightfit
+                    - heading "Run2" [level=3] [ref=f64e1243]
+                  - generic [ref=f64e1244]:
+                    - paragraph [ref=f64e1245]: Posted 10 years ago
+                    - paragraph [ref=f64e1247]: · 10th in this Competition
+                - generic [ref=f64e1249]:
+                  - generic [ref=f64e1250]:
+                    - button "Upvote" [ref=f64e1251] [cursor=pointer]:
+                      - generic [ref=f64e1252]: arrow_drop_up
+                    - button "0 votes" [ref=f64e1253] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f64e1254] [cursor=pointer]: more_vert
+                - generic [ref=f64e1257]:
+                  - blockquote [ref=f64e1258]:
+                    - paragraph [ref=f64e1259]:
+                      - link "@Run2 (opens in a new tab)" [ref=f64e1260] [cursor=pointer]:
+                        - /url: /Run2
+                        - text: "@Run2"
+                      - text: ", yes, the top trigram here stands for the top trigram in the search term. For example, for search term \"andersen sliding right hand doors with blinds\" the top trigram is \"right hand doors\" or \"right hand door\" after stemming. Therefore, the two last words are \"hand door\". Then we work only with those rows where the last two words in the top trigram in search term are \"hand door\". We first find the most common words in product description and then find the similarity of product description within a particular row with the list of the most common words found on the previous step. The same procedure is repeated for all groups of search terms based on the two words from the most important trigram."
+                  - paragraph [ref=f64e1261]: Cool - this is amazing. So if I got it right, first you get all trigrams (and their counts) from all search terms. Then for an individual search term you get the trigram with the best overall count (*) and then get the last two words of that trigram and then the rest…
+                  - paragraph [ref=f64e1262]: Few queries - what if you have multiple trigrams in a search term which have the same overall count. How do you fix the "top" trigram?. Or am I understanding it wrongly ?
+                  - paragraph [ref=f64e1263]: Is it possible that a search term like "hello how are you today" will have a top trigram "how are you" and hence last two words as "are you" and yet, it can be part of a group which came from a different search term "did I see you today" where the top tri gram was "see you today" - because it has the words "you today". ? So - I mean - a single search term can be part of different groups created from its own and other search terms ?
+              - separator [ref=f64e1264]
+            - generic [ref=f64e1269]:
+              - link "Igor Buinyi's profile" [ref=f64e1270] [cursor=pointer]:
+                - /url: /buinyi
+                - generic "Igor Buinyi" [ref=f64e1271]
+              - generic [ref=f64e1277]:
+                - link [ref=f64e1279] [cursor=pointer]:
+                  - /url: /buinyi
+                  - heading "Igor Buinyi" [level=3] [ref=f64e1280]
+                - generic [ref=f64e1281]:
+                  - paragraph [ref=f64e1282]: Posted 10 years ago
+                  - paragraph [ref=f64e1284]: · 3rd in this Competition
+              - generic [ref=f64e1286]:
+                - generic [ref=f64e1287]:
+                  - button "Upvote" [ref=f64e1288] [cursor=pointer]:
+                    - generic [ref=f64e1289]: arrow_drop_up
+                  - button "0 votes" [ref=f64e1290] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f64e1291] [cursor=pointer]: more_vert
+              - paragraph [ref=f64e1295]:
+                - link "@Run2 (opens in a new tab)" [ref=f64e1296] [cursor=pointer]:
+                  - /url: /Run2
+                  - text: "@Run2"
+                - text: ", yes, the top trigram here stands for the top trigram in the search term. For example, for search term \"andersen sliding right hand doors with blinds\" the top trigram is \"right hand doors\" or \"right hand door\" after stemming. Therefore, the two last words are \"hand door\". Then we work only with those rows where the last two words in the top trigram in search term are \"hand door\". We first find the most common words in product description and then find the similarity of product description within a particular row with the list of the most common words found on the previous step. The same procedure is repeated for all groups of search terms based on the two words from the most important trigram."
+  - alert [ref=f64e1299]

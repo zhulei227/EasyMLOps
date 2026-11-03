@@ -1,0 +1,329 @@
+- generic [ref=f25e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f25e3]:
+    - generic [ref=f25e5]:
+      - button "Navigation menu" [ref=f25e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f25e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f25e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f25e14]:
+      - link [ref=f25e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fnvidia-nemotron-model-reasoning-challenge%2Fwriteups%2F2nd-public-6th-private-place-solution
+        - button "Login" [ref=f25e16]
+      - link [ref=f25e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fnvidia-nemotron-model-reasoning-challenge%2Fwriteups%2F2nd-public-6th-private-place-solution
+        - button "Sign Up" [ref=f25e19]
+  - main [ref=f25e21]:
+    - generic [ref=f25e23]:
+      - generic [ref=f25e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f25e25]:
+        - link "Learn more" [ref=f25e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f25e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f25e29]:
+      - generic [ref=f25e31]: "[2nd public / 6th private] place solution — NVIDIA Nemotron Model Reasoning Challenge"
+      - separator [ref=f25e32]
+      - generic [ref=f25e34]:
+        - generic [ref=f25e35]:
+          - heading "[2nd public / 6th private] place solution" [level=1] [ref=f25e36]
+          - paragraph [ref=f25e37]: by Alehandreus & Yurnero
+          - generic [ref=f25e38]:
+            - link [ref=f25e39] [cursor=pointer]:
+              - /url: /competitions/nvidia-nemotron-model-reasoning-challenge
+              - paragraph [ref=f25e41]: NVIDIA Nemotron Model Reasoning Challenge
+            - paragraph [ref=f25e42]: Solution Writeup · 6th place · Jun 19, 2026
+        - separator [ref=f25e44]
+        - generic [ref=f25e45]:
+          - generic [ref=f25e47]:
+            - paragraph [ref=f25e48]: Thanks to Kaggle and NVIDIA for hosting such a unique competition.
+            - heading "Brief summary" [level=2] [ref=f25e49]
+            - paragraph [ref=f25e50]:
+              - text: The key elements of our
+              - strong [ref=f25e51]: 2nd public
+              - text: /
+              - strong [ref=f25e52]: 6th private
+              - text: "solutions were:"
+            - list [ref=f25e53]:
+              - listitem [ref=f25e54]: Validation strategy.
+              - listitem [ref=f25e55]: Bit-manipulation and cryparithemtic algorithmic solvers.
+              - listitem [ref=f25e56]: Training on a massive synthetic dataset.
+            - heading "Overall summary and a training routine" [level=2] [ref=f25e57]
+            - paragraph [ref=f25e58]:
+              - text: We started to build our work on a
+              - link "@huikang (opens in a new tab)" [ref=f25e59] [cursor=pointer]:
+                - /url: /huikang
+                - text: "@huikang"
+              - link "OPP write-up (opens in a new tab)" [ref=f25e60] [cursor=pointer]:
+                - /url: https://www.kaggle.com/competitions/nvidia-nemotron-model-reasoning-challenge/discussion/689915
+                - text: OPP write-up
+              - text: . It was well aligned with our initial understanding of the problem and provided a great baseline with good algorithmic solvers.
+            - paragraph [ref=f25e61]: Most of our hypotheses were tested using Unsloth in Kaggle/Google Cloud G4 enviroments. Our standard setup used a 32 BS, 3.5e-4 LR, 32 lora_rank, 32 lora_alpha and 1 epoch. In order to train the adapters much faster in the late stages, we used Tinker.
+            - heading "1. Validation scheme" [level=2] [ref=f25e62]
+            - paragraph [ref=f25e63]: Most of the public validation strategies were quite simple — a 10% holdout set consisting of 950 samples was used. However, this is not reliable enough, since even some of the training samples are not learned well with LoRA adapters. Therefore, we decided to use the full training data as validation, effectively increasing the validation set size by x10. In order to do so, we had to create synthetic problems that match the training distribution (see synthetic data section below).
+            - heading "Per domain public checks aka LB probing" [level=3] [ref=f25e64]
+            - paragraph [ref=f25e65]: Considering the inference time, the public score distribution, and a common sense, it was natural to assume that the test set consisted of 500 problems split 250/250 between public/private. From that we basically understood that each 0.01 on the LB corresponded to 3 solved problems. So we used -0, -1, -2 notation for our submission scores to track progress more easily.
+            - paragraph [ref=f25e66]: "250/250 problems is a small sample and the train distirbution could have been skewed a bit between public/private. Moreover, making changes to a single domain CoTs could negatively affect the other domains. That's why it was important to understand per-domain quality of the algorithmic solver / other improvements. We came up with the following procedure:"
+            - list [ref=f25e67]:
+              - listitem [ref=f25e68]: For the selected domain, we used algorithmic CoTs.
+              - listitem [ref=f25e69]:
+                - text: For all other domains, we trained the model to output
+                - code [ref=f25e70]: "I will ignore this problem\\n\\boxed{DUMMY}"
+                - text: for the input prompt.
+            - paragraph [ref=f25e71]: "This allowed us to retrieve a pure per-domain signal from the public LB. Below are the results for some bit-manipulation solver tests when using 5k (OPP algorithm) vs 12.6k (ours algorithm) training samples:"
+            - paragraph [ref=f25e72]
+            - heading "2. Algorithmic solvers" [level=2] [ref=f25e73]
+            - paragraph [ref=f25e74]: "As mentioned earlier, most of the OPP solvers were already good enough: numeral, unit conversion, gravity, and cipher. We made little to no changes to them. In this write-up, we will focus on the novel bit-manipulation and cryparithmetic / equation numeric solvers."
+            - separator [ref=f25e75]
+            - heading "Bit-manipulation solver" [level=3] [ref=f25e76]
+            - paragraph [ref=f25e77]:
+              - text: Through
+              - code [ref=f25e78]: train.csv
+              - text: analysis, we came up with a small set of templates that solve all
+              - code [ref=f25e79]: train.csv
+              - text: "problems:"
+            - code [ref=f25e81]: Formula Problems solved shl 18 shr 42 rotr 89 shl XOR shr 368 rotr AND NOT shl 86 rotr OR shr 71 rotr XOR shl 70 rotr AND shl 54 rotr OR shl 53 rotr XOR shr 51 rotr AND shr 51 (shr OR NOT shl) AND rotr 28 (not used in final sub, small gain) (rotr AND NOT shr) XOR NOT shl 20 (not used in final sub, small gain) (shl XOR NOT rotr) OR shr 303 (shl OR shr) AND rotr 143 MAJ(shl, shr, rotr) 54 CH(shl, shr, rotr) 48 NOT CH(shr, shl AND rotr, shl XOR rotr) 53 (not used in final sub, too much training needed)
+            - paragraph [ref=f25e82]: Here e.g. shl is applied directly to the input with some nonzero shift.
+            - paragraph [ref=f25e83]:
+              - text: For each template, the reasoner iterates over all possible shift values to find the matching formula. An example of our reasoning trace can be found in the attachments (or
+              - link "here (opens in a new tab)" [ref=f25e84] [cursor=pointer]:
+                - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/3474219/45743/bit.txt
+                - text: here
+              - text: ).
+            - heading "Results" [level=3] [ref=f25e85]
+            - paragraph [ref=f25e86]: Our final submission reasoner solves 1508 / 1602 problems from train.csv. The LLM solves 1480 train.csv problems after training on lots of synthetic data.
+            - heading "Optimizations" [level=3] [ref=f25e87]
+            - list [ref=f25e88]:
+              - listitem [ref=f25e89]:
+                - strong [ref=f25e90]: Skips
+                - text: . For example, for (shl(x, a) XOR NOT rotr(x, b)) OR shr(x, c) we can skip iteration over c if (shl(x, a) XOR NOT rotr(x, b)) is less than result (same for AND since both are monotonic).
+              - listitem [ref=f25e91]:
+                - strong [ref=f25e92]: Hex
+                - text: . We trained LLM to do calculations exclusively in hex digits. This includes doing <= in hex. To aid LLM, we first print a cheatsheet with all hex multiplication tables.
+              - listitem [ref=f25e93]: For NOT CH, we developed a unique approach that is learnable and does not take a lot of tokens. Still, it is the hardest formula to check and we did not include it in our final training.
+            - separator [ref=f25e94]
+            - heading "Cryparithmetic solver" [level=3] [ref=f25e95]
+            - paragraph [ref=f25e96]: "In cryptarithm, we must map each symbol to a digit or an operation. For both cryptarithm and equation_numeric, we used the following set of operations:"
+            - code [ref=f25e98]: "add family sub family mul family maxmodmin ------------------------------------------------------------------------------------------------------ add: a + b sub: a - b mul: a * b max_mod_min: max(a, b) % min(a, b) add_p1: a + b + 1 sub_ba: b - a mul_p1: a * b + 1 add_m1: a + b - 1 abs_diff: |a - b| mul_m1: a * b - 1 neg_abs_diff: -|a - b|"
+            - paragraph [ref=f25e99]: "The algorithm is a depth-first tree search, where depth is a number of fully mapped equations:"
+            - list [ref=f25e100]:
+              - listitem [ref=f25e101]: Start with an empty mapping
+              - listitem [ref=f25e102]: Pick a new equation
+              - listitem [ref=f25e103]: Start / continue the search over all unmapped symbols (both digits and operation)
+              - listitem [ref=f25e104]: As soon as symbols are mapped into a correct equation, go to 2
+              - listitem [ref=f25e105]: If no correct mapping is found for current equation, abandon last accepted equation and go to 3.
+              - listitem [ref=f25e106]: If all equations are mapped, try to calculate the answer
+            - paragraph [ref=f25e107]: Additionally, we check the possibility of all numbers being inverted. If forward search fails, we start anew the reversed search. Approximately 40% of solved problems are solved in reversed mode.
+            - paragraph [ref=f25e108]:
+              - text: A representative example of our reasoning trace can be found in the attachments (or
+              - link "here (opens in a new tab)" [ref=f25e109] [cursor=pointer]:
+                - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/3474219/45742/crypt.txt
+                - text: here
+              - text: ).
+            - heading "Results" [level=3] [ref=f25e110]
+            - paragraph [ref=f25e111]: Our best version solves 240 / 654 cryptarithm_deduce problems from train.csv under limit after training on ~100M tokens.
+            - paragraph [ref=f25e112]: We also finalized a ligher version that solves 170 problems under limit and poses less threat to other categories. We used this algorithm for the final selected submission (more on that later).
+            - heading "Optimizations" [level=3] [ref=f25e113]
+            - list [ref=f25e114]:
+              - listitem [ref=f25e115]:
+                - strong [ref=f25e116]: Operation deduction
+                - text: . Before the search, we restrict each operation symbol usually 2-3 possible operations based on result lengths, whether result is positive or negative, and the fact that no more than one operation from each family can be in a problem.
+              - listitem [ref=f25e117]:
+                - strong [ref=f25e118]: Leading zero
+                - text: . For first digits in operands and results, we remove zero from the set of possible digits.
+              - listitem [ref=f25e119]:
+                - strong [ref=f25e120]: Leading one
+                - text: . If possible mappings for an operation is reduced to add family only and result is three-digit, we auto deduce the first digit to be 1.
+              - listitem [ref=f25e121]:
+                - strong [ref=f25e122]: Equation sorting
+                - text: . First, we search equations with as few unique unknown digits as possible.
+            - separator [ref=f25e123]
+            - heading "Equation numeric solver" [level=3] [ref=f25e124]
+            - paragraph [ref=f25e125]:
+              - text: Same as
+              - code [ref=f25e126]: cryptarithm
+              - text: ", but much easier since all digits are known. Solves 550 / 594"
+              - code [ref=f25e127]: equation_numeric_guess
+              - text: problems from
+              - code [ref=f25e128]: train.csv
+              - text: .
+            - heading "3. Synthetic data" [level=2] [ref=f25e129]
+            - paragraph [ref=f25e130]: Since our validation scheme did not allow us to use the training data to obtain clean metrics, we focused on creating a synthetic dataset instead.
+            - heading "3.1. Cipher, gravity, unit conversion" [level=3] [ref=f25e131]
+            - paragraph [ref=f25e132]: "To create synthetic data matching the training distribution, we used the distribution of the number of examples per prompt for all domains. In addition, for each domain specifically, we considered the following:"
+            - list [ref=f25e133]:
+              - listitem [ref=f25e134]:
+                - paragraph [ref=f25e135]:
+                  - strong [ref=f25e136]: Gravity and unit conversion
+                  - text: ": calculated empirical distribution of example parameters, query parameters, answers. Then, we simply sampled numbers from these distributions."
+              - listitem [ref=f25e137]:
+                - paragraph [ref=f25e138]:
+                  - strong [ref=f25e139]: Ciphers
+                  - text: ": number of unseen characters, words distribution, sentence structure."
+            - list [ref=f25e140]:
+              - listitem [ref=f25e141]: "During validation, we found several problematic patterns for our adapters. For example, the following hallucinations occurred quite often:"
+            - code [ref=f25e143]: "*LoRA adapter output* s-t-u-d-e-n-t->「sent」"
+            - code [ref=f25e145]:
+              - text: "*LoRA adapter output*"
+              - generic [ref=f25e146]: c-l-e-v-e-r->
+              - text: 「letter」
+            - paragraph [ref=f25e147]: To directly mitigate this issue, we created a targeted subset focused on these and other common failure cases. Adding that subset solved that issue.
+            - list [ref=f25e148]:
+              - listitem [ref=f25e149]: One more common failure pattern was a repeatness. We are sure that it is poissble to mitigate this by choosing another algorithmiс solver, but we didn't have time to find a proper one.
+            - heading "3.2. Bit manipulation" [level=3] [ref=f25e150]
+            - paragraph [ref=f25e151]: For each formula template, we generate samples with different shift values, number of equations and inputs. For training, we increased rate of complex three-atom problems to learn them better.
+            - heading "3.3. Cryparithmetic, equation numeric" [level=3] [ref=f25e152]
+            - paragraph [ref=f25e153]: We collected stats from train.csv on the number of equations, unique digits, unique operations, reversals, etc. Our cryptarithm synthetic generator fixes key properties of a problem (set of operation, reversal) and keeps rerolling digit mappings until the reasoner solves this problem correctly under token limit.
+            - heading "Some numbers and final decisions." [level=2] [ref=f25e154]
+            - paragraph [ref=f25e155]: On the last day of the competition, we trained on two datasets of different sizes.
+            - paragraph [ref=f25e156]: We noticed that adding synthetic data for any single domain improved that domain and almost did not hurt the others, except for the bit-manipulation domain. Even small percentage changes in the amount of data for different domains hurt bit-manipulation performance. This trade-off required us to add much more data for the bit-manipulation domain. As a result, 69%/66% of the tokens in both of our final datasets came from bit-manipulation problems.
+            - heading "~0.25B tokens 6th private place dataset" [level=3] [ref=f25e157]
+            - paragraph [ref=f25e158]
+            - paragraph [ref=f25e159]: That was our best CV dataset perfecting gravity, unit conversion, numeral. We also had ~98.5% for cipher, ~92% for bit-manipulation and equation numeric and ~17% for cryparithmetic.
+            - heading "~0.5B tokens 2nd-3rd private place dataset" [level=3] [ref=f25e160]
+            - paragraph [ref=f25e161]
+            - paragraph [ref=f25e162]: This dataset was created to significantly improve amount of solved validaiton cryparithmetic problems. We effectively doubled the number of problems in the cryptarithmetic domain and added some additional gravity/cipher/unit conversion/equation numeric problems. According to our internal calculations, we assumed that we had to double the size of the bit-manipulation domain to keep the same CV score. The number of solved cryptarithmetic train problems increased from 150 to 241, while other domains did not change much. However, our estimate was slightly off, and the bit-manipulation CV score dropped more than expected.
+            - paragraph [ref=f25e163]: That is why we decided to use two seeds of the 0.25B adapter above, which cost us 2nd or 3rd place in the final ranking.
+          - generic [ref=f25e164]:
+            - generic [ref=f25e165]:
+              - text: Authors
+              - generic [ref=f25e166]:
+                - link "Yurnero's profile" [ref=f25e167] [cursor=pointer]:
+                  - /url: /samson8
+                  - generic "Yurnero" [ref=f25e168]
+                - generic [ref=f25e172]:
+                  - link "Yurnero" [ref=f25e173] [cursor=pointer]:
+                    - /url: /samson8
+                  - paragraph [ref=f25e174]: samson8
+              - generic [ref=f25e175]:
+                - link "Alehandreus's profile" [ref=f25e176] [cursor=pointer]:
+                  - /url: /alehandreus
+                  - generic "Alehandreus" [ref=f25e177]
+                - generic [ref=f25e181]:
+                  - link "Alehandreus" [ref=f25e182] [cursor=pointer]:
+                    - /url: /alehandreus
+                  - paragraph [ref=f25e183]: alehandreus
+            - separator [ref=f25e184]
+            - generic [ref=f25e185]:
+              - generic [ref=f25e186]:
+                - button "Upvote" [ref=f25e187] [cursor=pointer]:
+                  - generic [ref=f25e188]: arrow_drop_up
+                - button "13 votes" [ref=f25e189] [cursor=pointer]: "13"
+              - button "Share" [ref=f25e190] [cursor=pointer]
+              - button "Writeup actions" [ref=f25e192] [cursor=pointer]: more_horiz
+        - heading "Project Files" [level=2] [ref=f25e193]
+        - generic [ref=f25e194]:
+          - separator [ref=f25e195]
+          - list [ref=f25e196]:
+            - listitem "crypt.txt List Item" [ref=f25e197]:
+              - generic [ref=f25e198]:
+                - link "crypt.txt" [ref=f25e199] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/3474219/45742/crypt.txt
+                  - generic [ref=f25e200]:
+                    - generic [ref=f25e201]: table_chart
+                    - generic [ref=f25e204]: crypt.txt
+                - link "Download crypt.txt" [ref=f25e206] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/3474219/45742/crypt.txt
+                  - generic "Download crypt.txt" [ref=f25e207]: get_app
+            - listitem "bit.txt List Item" [ref=f25e208]:
+              - generic [ref=f25e209]:
+                - link "bit.txt" [ref=f25e210] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/3474219/45743/bit.txt
+                  - generic [ref=f25e211]:
+                    - generic [ref=f25e212]: table_chart
+                    - generic [ref=f25e215]: bit.txt
+                - link "Download bit.txt" [ref=f25e217] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/3474219/45743/bit.txt
+                  - generic "Download bit.txt" [ref=f25e218]: get_app
+          - separator [ref=f25e219]
+        - button "Download All" [ref=f25e220] [cursor=pointer]
+        - heading "Citation" [level=2] [ref=f25e222]
+        - paragraph [ref=f25e223]: Yurnero, Alehandreus. [2nd public / 6th private] place solution. https://www.kaggle.com/competitions/nvidia-nemotron-model-reasoning-challenge/writeups/2nd-public-6th-private-place-solution. 2026. Kaggle
+        - separator [ref=f25e224]
+        - generic [ref=f25e227]:
+          - generic [ref=f25e228]:
+            - generic [aria-hidden] [ref=f25e229]: comment
+            - heading "0 Comments" [level=2] [ref=f25e231]
+          - generic [ref=f25e234]:
+            - combobox "Select combobox. Hotness currently selected." [ref=f25e235] [cursor=pointer]:
+              - generic [ref=f25e236]: Hotness
+            - textbox [aria-hidden]: Hotness
+  - alert [ref=f25e240]

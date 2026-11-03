@@ -1,0 +1,948 @@
+- generic [ref=f47e2]:
+  - navigation "Main Kaggle page navigation" [ref=f47e3]:
+    - generic [ref=f47e5]:
+      - button "Navigation menu" [ref=f47e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f47e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f47e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f47e12] [cursor=pointer]:
+      - paragraph [ref=f47e18]: Create
+    - generic [ref=f47e21]:
+      - list [ref=f47e22]:
+        - listitem "Home List Item" [ref=f47e23]:
+          - link "Home" [ref=f47e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f47e31]: Home
+        - listitem "Competitions List Item" [ref=f47e32]:
+          - link "Competitions" [ref=f47e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f47e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f47e41]:
+          - link "Benchmarks" [ref=f47e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f47e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f47e50]:
+          - link "Arenas" [ref=f47e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f47e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f47e59]:
+          - link "Game Arena" [ref=f47e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f47e67]: Game Arena
+      - list [ref=f47e68]:
+        - listitem "Data Hub List Item" [ref=f47e69]:
+          - generic [ref=f47e70]:
+            - link "Data Hub" [ref=f47e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f47e77]: Data Hub
+            - button "Expand" [ref=f47e80] [cursor=pointer]
+      - list [ref=f47e82]:
+        - listitem "More on Kaggle List Item" [ref=f47e83]:
+          - generic [ref=f47e84]:
+            - link "More on Kaggle" [ref=f47e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f47e91]: More
+            - button "Expand" [ref=f47e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f47e97]:
+    - generic [ref=f47e98]:
+      - generic [ref=f47e102]:
+        - textbox "Search" [ref=f47e104]
+        - group [aria-hidden]
+      - generic [ref=f47e106]:
+        - link [ref=f47e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fsartorius-cell-instance-segmentation%2Fdiscussion%2F297984
+          - button "Login" [ref=f47e108]
+        - link [ref=f47e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fsartorius-cell-instance-segmentation%2Fdiscussion%2F297984
+          - button "Sign Up" [ref=f47e111]
+  - main [ref=f47e113]:
+    - generic [ref=f47e115]:
+      - generic [ref=f47e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f47e117]:
+        - link "Learn more" [ref=f47e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f47e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f47e123]:
+      - generic [ref=f47e125]:
+        - generic [ref=f47e126]:
+          - link "Sartorius's profile" [ref=f47e127] [cursor=pointer]:
+            - /url: /organizations/sartorius
+            - generic "Sartorius" [ref=f47e128]
+          - generic [ref=f47e132]:
+            - generic [ref=f47e133]: Sartorius
+            - generic [ref=f47e135]: · Featured Code Competition · 5 years ago
+          - generic [ref=f47e136]:
+            - button "Late Submission" [disabled] [ref=f47e138]
+            - button "Competition options menu collapsed" [ref=f47e141] [cursor=pointer]: more_horiz
+        - generic [ref=f47e143]:
+          - heading "Sartorius - Cell Instance Segmentation" [level=1] [ref=f47e144]
+          - paragraph [ref=f47e146]: Detect single neuronal cells in microscopy images
+      - generic [ref=f47e150]:
+        - tablist [ref=f47e157]:
+          - tab "Overview, 1 of 7" [ref=f47e158] [cursor=pointer]:
+            - generic [ref=f47e159]: Overview
+          - tab "Data, 2 of 7" [ref=f47e160] [cursor=pointer]:
+            - generic [ref=f47e161]: Data
+          - tab "Code, 3 of 7" [ref=f47e162] [cursor=pointer]:
+            - generic [ref=f47e163]: Code
+          - tab "Models, 4 of 7" [ref=f47e164] [cursor=pointer]:
+            - generic [ref=f47e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f47e166] [cursor=pointer]:
+            - generic [ref=f47e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f47e168] [cursor=pointer]:
+            - generic [ref=f47e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f47e170] [cursor=pointer]:
+            - generic [ref=f47e171]: Rules
+        - separator [ref=f47e173]
+      - generic [ref=f47e177]:
+        - generic [ref=f47e178]:
+          - generic [ref=f47e179]:
+            - generic [ref=f47e180]:
+              - link "Slawek Biel's profile" [ref=f47e181] [cursor=pointer]:
+                - /url: /slawekbiel
+                - generic "Slawek Biel" [ref=f47e182]
+              - generic [ref=f47e186]:
+                - link "Slawek Biel" [ref=f47e187] [cursor=pointer]:
+                  - /url: /slawekbiel
+                - text: ·
+                - generic [ref=f47e188]: 3rd in this Competition
+                - text: ·
+                - generic [ref=f47e189]: Posted 5 years ago
+            - generic [ref=f47e190]:
+              - generic [ref=f47e191]:
+                - button "Upvote" [ref=f47e192] [cursor=pointer]:
+                  - generic [ref=f47e193]: arrow_drop_up
+                - button "124 votes" [ref=f47e194] [cursor=pointer]: "124"
+              - button "More Options for this Topic" [ref=f47e195] [cursor=pointer]: more_vert
+            - heading "Go with the flow (3rd place)" [level=3] [ref=f47e196]
+            - generic [ref=f47e199]:
+              - paragraph [ref=f47e200]:
+                - emphasis [ref=f47e201]:
+                  - text: This post describes part of the 3rd place solution that's based on
+                  - strong [ref=f47e202]: cellpose
+              - heading "Backstory" [level=1] [ref=f47e203]
+              - paragraph [ref=f47e204]:
+                - text: Going into this competition I had no experience with image segmentation. I knew a library called Detectron exists so I started with reading tutorials and learning to use that and it gave me good early LB results. Taking the pretrained model from the LiveCell repo and finetuning it on the competition data was good enough to put me in the top 10 for a while during the first month. Meanwhile I've seen many people trying U-net in public notebooks and on the forum but all the shared results were far bellow mask-rcnn scores so I discarded it as an inferior approach. That is until start of December when I stumbled upon a mention of
+                - link "cellpose (opens in a new tab)" [ref=f47e205] [cursor=pointer]:
+                  - /url: http://www.cellpose.org/
+                  - text: cellpose
+                - text: on the forum - the example images they show on their site looked promissing and the paper claims
+                - emphasis [ref=f47e206]: "\"significantly outperforming Stardist and Mask R-CNN\""
+                - text: so I've decided to try to run it myself.
+              - paragraph [ref=f47e207]: Imagine my excitement when the very first model I trained scored 0.307 on the LB. No training code written, no postprocessing, just saved annotations into png files and run the train script. Comparable out of the box detectron model, without any tuning, was scoring around 0.28 so I started to realize that U-net might not be an inferior architecture after all. I battled with myself whether to share the finding. On the one hand I found it very cool, but I also felt I could be giving a powerful tool into hands of my competitors with only few weeks go. In the end I shared the initial experiment and then conciously refrained from any more comments or mentions of it :)
+              - paragraph [ref=f47e208]: From there I followed the same game plan that worked with mask rcnn
+              - list [ref=f47e209]:
+                - listitem [ref=f47e210]: pretrain on livecell
+                - listitem [ref=f47e211]: tune postprocessing on different cell types
+                - listitem [ref=f47e212]: ensemble mutliple models
+                - listitem [ref=f47e213]: add unlabled data annotated by a larger ensamble (inconclusive)
+              - paragraph [ref=f47e214]: "With all that I managed to push it into the public score with single model: 0.333, and best 5 models ensemble: 0.335. This didn't end up as the strongest model in our team submissions (@alexandrecc mask r-cnn claimed that) but I think it provided helpful diversity in the ensemble."
+              - heading "How it works" [level=1] [ref=f47e215]
+              - paragraph [ref=f47e216]: The key idea is that rather than train U-net directly on the binary masks it first creates an intermediate representation of "flow mask". To generate that first it calculates the center of mass of each mask. And then all the other points represent an angle to flow from that point towards the center. This makes it easier to disentangle touching or overlapping masks - which is the main issue a regular U-Net faces.
+              - paragraph [ref=f47e217]: "The model itself is fairly simple, 20 conv layers on both down and up paths. Total of 6 million paramters which is less than resnet18. After the training the model output on the same image looks like this: You can see many of the centers identified correctly and how it's able to separate even tightly packed cells. (this image still only scores 0.155 showing how difficult a high astro score is)"
+              - paragraph [ref=f47e218]:
+                - text: From this output they follow the flows from each pixel to it's center to go back to binary masks. I must admit I don't understand the exact details of this. The paper says
+                - emphasis [ref=f47e219]: "\"the predicted flow fields are used to construct a dynamical system with fixed points whose basins of attraction represent the predicted masks.\""
+              - heading "The gory details" [level=1] [ref=f47e220]
+              - paragraph [ref=f47e221]: What I said earlier about how easy it was to get a baseline solution unfortunately didn't translate into ease of further refinement. I have spent a lot of time on experimenting and digging through their code in the last four weeks.
+              - paragraph [ref=f47e222]: I hit the first wall when trying to train it on LiveCell. The library insists on loading all the images and masks into the memory before the training even starts -this is not a good idea when working with ten thousand of 520x704 images. I ended up pulling the relevant bits out of the library and writing a fast.ai dataloader and training script.
+              - paragraph [ref=f47e223]: Even though the model itself is small the training utilzes heavy augmentations and high zooms on small areas of an image. So you need to train for a lot of epochs to fully cover all the data. (I was using 300-500 epochs). When I started training LiveCell with my new dataloaders I've noticed that now the disk IO is the bottleneck - spinning at 100% while GPU waits idly. I had to rearange stuff on my system to free enough SSD space and only then I got a smooth training fully utilizing the GPU.
+              - paragraph [ref=f47e224]:
+                - text: A key detail in cellpose training is that it tries to maintain the pixel size of cells within a fixed range. At train time it's fairly simple - just look at the ground truth sizes and resize the image accordingly. At inference that's harder as you need to guess what the cell sizes are. That's the dreaded
+                - strong [ref=f47e225]: diameter
+                - text: "discussed in a couple of threads here on the forum. Setting this correctly has a huge impact on models performance and I've spent so much time fiddling with it. What I have tried:"
+              - list [ref=f47e226]:
+                - listitem [ref=f47e227]: setting a constant value per cell type
+                - listitem [ref=f47e228]: setting a range of values and use that as TTA,
+                - listitem [ref=f47e229]: using cellpose's "size models" - which are linear regressions run on the U-net innermost activations
+                - listitem [ref=f47e230]: using output of a detectron model and taking sizes from there.
+              - paragraph [ref=f47e231]: In my final submission I have an ensamble of 10 models, use the first one with the "size model" and then pass the diamater to the following models. At each step recalculating it on the predicted masks to improve the estimate. This works ok, but I feel like this a weakness of this model that would require more exploring.
+          - separator [ref=f47e232]
+        - generic [ref=f47e233]:
+          - generic [ref=f47e234]:
+            - paragraph [ref=f47e237]:
+              - paragraph [ref=f47e238]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f47e239] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f47e240]
+          - generic [ref=f47e242]:
+            - generic [ref=f47e243]:
+              - generic [aria-hidden] [ref=f47e244]: comment
+              - generic [ref=f47e245]:
+                - heading "38 Comments" [level=2] [ref=f47e246]
+                - link "Go To Appreciation Comments (2 total)" [ref=f47e247] [cursor=pointer]:
+                  - /url: /c/sartorius-cell-instance-segmentation/discussion/297984#appreciation
+                  - text: 2 appreciation comments
+            - generic [ref=f47e250]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f47e251] [cursor=pointer]:
+                - generic [ref=f47e252]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f47e254]:
+            - generic [ref=f47e255]:
+              - generic [ref=f47e259]:
+                - link "Faisal Alsrheed's profile" [ref=f47e260] [cursor=pointer]:
+                  - /url: /faisalalsrheed
+                  - generic "Faisal Alsrheed" [ref=f47e261]
+                - generic [ref=f47e267]:
+                  - link [ref=f47e269] [cursor=pointer]:
+                    - /url: /faisalalsrheed
+                    - heading "Faisal Alsrheed" [level=3] [ref=f47e270]
+                  - generic [ref=f47e271]:
+                    - paragraph [ref=f47e272]: Posted 5 years ago
+                    - paragraph [ref=f47e274]: · 178th in this Competition
+                - generic [ref=f47e276]:
+                  - generic [ref=f47e277]:
+                    - button "Upvote" [ref=f47e278] [cursor=pointer]:
+                      - generic [ref=f47e279]: arrow_drop_up
+                    - button "6 votes" [ref=f47e280] [cursor=pointer]: "6"
+                  - button "More Options for this Comment" [ref=f47e281] [cursor=pointer]: more_vert
+                - generic [ref=f47e284]:
+                  - paragraph [ref=f47e285]:
+                    - text: I have to say thank you
+                    - link "@slawekbiel (opens in a new tab)" [ref=f47e286] [cursor=pointer]:
+                      - /url: /slawekbiel
+                      - text: "@slawekbiel"
+                  - paragraph [ref=f47e287]: You are the star of this competition.
+                  - paragraph [ref=f47e288]: It is impressive that you had no experience with image segmentation before this competition.
+                  - paragraph [ref=f47e289]: This is really motivating.
+                  - paragraph [ref=f47e290]: Wishing you happy new year.
+                - generic [ref=f47e296]:
+                  - link "Slawek Biel's profile" [ref=f47e297] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e298]
+                  - generic [ref=f47e304]:
+                    - generic [ref=f47e305]:
+                      - link [ref=f47e306] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e307]
+                      - paragraph [ref=f47e310]: Topic Author
+                    - generic [ref=f47e311]:
+                      - paragraph [ref=f47e312]: Posted 5 years ago
+                      - paragraph [ref=f47e314]: · 3rd in this Competition
+                  - generic [ref=f47e316]:
+                    - generic [ref=f47e317]:
+                      - button "Upvote" [ref=f47e318] [cursor=pointer]:
+                        - generic [ref=f47e319]: arrow_drop_up
+                      - button "1 votes" [ref=f47e320] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f47e321] [cursor=pointer]: more_vert
+                  - paragraph [ref=f47e325]:
+                    - text: Thank you
+                    - link "@faisalalsrheed (opens in a new tab)" [ref=f47e326] [cursor=pointer]:
+                      - /url: /faisalalsrheed
+                      - text: "@faisalalsrheed"
+                    - text: "! That's very kind"
+              - separator [ref=f47e327]
+            - generic [ref=f47e328]:
+              - generic [ref=f47e332]:
+                - link "Ali's profile" [ref=f47e333] [cursor=pointer]:
+                  - /url: /asalhi
+                  - generic "Ali" [ref=f47e334]
+                - generic [ref=f47e340]:
+                  - link [ref=f47e342] [cursor=pointer]:
+                    - /url: /asalhi
+                    - heading "Ali" [level=3] [ref=f47e343]
+                  - generic [ref=f47e344]:
+                    - paragraph [ref=f47e345]: Posted 5 years ago
+                    - paragraph [ref=f47e347]: · 131st in this Competition
+                - generic [ref=f47e349]:
+                  - generic [ref=f47e350]:
+                    - button "Upvote" [ref=f47e351] [cursor=pointer]:
+                      - generic [ref=f47e352]: arrow_drop_up
+                    - button "4 votes" [ref=f47e353] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f47e354] [cursor=pointer]: more_vert
+                - generic [ref=f47e357]:
+                  - paragraph [ref=f47e358]: Great work and congratulations 🎉
+                  - paragraph [ref=f47e359]: This is my first time also with image processing , 90% of the keywords ( roughly) I never heard about before the competition 😅 plus i spent more time fixing python related issues ( I am new to python also)
+                  - paragraph [ref=f47e360]: I ended up with detectron and cellpose and this competition brought me my first competition based medal (bronze) 🎉
+              - separator [ref=f47e361]
+            - generic [ref=f47e362]:
+              - generic [ref=f47e366]:
+                - link "Hoda's profile" [ref=f47e367] [cursor=pointer]:
+                  - /url: /hsadeghian
+                  - generic "Hoda" [ref=f47e368]
+                - generic [ref=f47e374]:
+                  - link [ref=f47e376] [cursor=pointer]:
+                    - /url: /hsadeghian
+                    - heading "Hoda" [level=3] [ref=f47e377]
+                  - generic [ref=f47e378]:
+                    - paragraph [ref=f47e379]: Posted 5 years ago
+                    - paragraph [ref=f47e381]: · 82nd in this Competition
+                - generic [ref=f47e383]:
+                  - generic [ref=f47e384]:
+                    - button "Upvote" [ref=f47e385] [cursor=pointer]:
+                      - generic [ref=f47e386]: arrow_drop_up
+                    - button "2 votes" [ref=f47e387] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f47e388] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e392]: I really want to thank you for the wonderful codes that you have shared during the competition. It gave me a lot of ideas. Congrats on 3rd place.
+                - generic [ref=f47e398]:
+                  - link "Slawek Biel's profile" [ref=f47e399] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e400]
+                  - generic [ref=f47e406]:
+                    - generic [ref=f47e407]:
+                      - link [ref=f47e408] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e409]
+                      - paragraph [ref=f47e412]: Topic Author
+                    - generic [ref=f47e413]:
+                      - paragraph [ref=f47e414]: Posted 5 years ago
+                      - paragraph [ref=f47e416]: · 3rd in this Competition
+                  - generic [ref=f47e418]:
+                    - generic [ref=f47e419]:
+                      - button "Upvote" [ref=f47e420] [cursor=pointer]:
+                        - generic [ref=f47e421]: arrow_drop_up
+                      - button "1 votes" [ref=f47e422] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f47e423] [cursor=pointer]: more_vert
+                  - paragraph [ref=f47e427]:
+                    - text: I appreciate you saying that
+                    - link "@hsadeghian (opens in a new tab)" [ref=f47e428] [cursor=pointer]:
+                      - /url: /hsadeghian
+                      - text: "@hsadeghian"
+                    - text: feedback like that is what motivates me to continue trying to improve and sharing things I’ve learned along the way.
+              - separator [ref=f47e429]
+            - generic [ref=f47e430]:
+              - generic [ref=f47e434]:
+                - link "Niek van der Zwaag's profile" [ref=f47e435] [cursor=pointer]:
+                  - /url: /niekvanderzwaag
+                  - generic "Niek van der Zwaag" [ref=f47e436]
+                - generic [ref=f47e442]:
+                  - link [ref=f47e444] [cursor=pointer]:
+                    - /url: /niekvanderzwaag
+                    - heading "Niek van der Zwaag" [level=3] [ref=f47e445]
+                  - paragraph [ref=f47e447]: Posted 5 years ago
+                - generic [ref=f47e449]:
+                  - generic [ref=f47e450]:
+                    - button "Upvote" [ref=f47e451] [cursor=pointer]:
+                      - generic [ref=f47e452]: arrow_drop_up
+                    - button "2 votes" [ref=f47e453] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f47e454] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e458]: Inspirational and fascinating, congrats on 3rd place! 🙌
+              - separator [ref=f47e459]
+            - generic [ref=f47e460]:
+              - generic [ref=f47e464]:
+                - link "Luca Massaron's profile" [ref=f47e465] [cursor=pointer]:
+                  - /url: /lucamassaron
+                  - generic "Luca Massaron" [ref=f47e466]
+                - generic [ref=f47e472]:
+                  - link [ref=f47e474] [cursor=pointer]:
+                    - /url: /lucamassaron
+                    - heading "Luca Massaron" [level=3] [ref=f47e475]
+                  - paragraph [ref=f47e477]: Posted 5 years ago
+                - generic [ref=f47e479]:
+                  - generic [ref=f47e480]:
+                    - button "Upvote" [ref=f47e481] [cursor=pointer]:
+                      - generic [ref=f47e482]: arrow_drop_up
+                    - button "2 votes" [ref=f47e483] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f47e484] [cursor=pointer]: more_vert
+                - generic [ref=f47e487]:
+                  - paragraph [ref=f47e488]: "\"Going into this competition I had no experience with image segmentation\""
+                  - paragraph [ref=f47e489]:
+                    - link "@slawekbiel (opens in a new tab)" [ref=f47e490] [cursor=pointer]:
+                      - /url: /slawekbiel
+                      - text: "@slawekbiel"
+                    - text: ": this is an inspiration for everyone wanting to take a challenge in a competition but they think that they don't have the necessary previous experience."
+                  - paragraph [ref=f47e491]: Great work! All my compliments for your achievement!
+                - generic [ref=f47e497]:
+                  - link "Slawek Biel's profile" [ref=f47e498] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e499]
+                  - generic [ref=f47e505]:
+                    - generic [ref=f47e506]:
+                      - link [ref=f47e507] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e508]
+                      - paragraph [ref=f47e511]: Topic Author
+                    - generic [ref=f47e512]:
+                      - paragraph [ref=f47e513]: Posted 5 years ago
+                      - paragraph [ref=f47e515]: · 3rd in this Competition
+                  - generic [ref=f47e517]:
+                    - generic [ref=f47e518]:
+                      - button "Upvote" [ref=f47e519] [cursor=pointer]:
+                        - generic [ref=f47e520]: arrow_drop_up
+                      - button "4 votes" [ref=f47e521] [cursor=pointer]: "4"
+                    - button "More Options for this Comment" [ref=f47e522] [cursor=pointer]: more_vert
+                  - generic [ref=f47e525]:
+                    - paragraph [ref=f47e526]: Thanks Luca! My experience with kaggle so far has been that you can learn a lot in three months if you fully commit to it.
+                    - paragraph [ref=f47e527]: Also while competing in various competitions you acquire meta skills that translate from one to another, even if the problem domains are completely different. I definitely feel I’ve done much better than I would have a year ago by experience in approaching competition, using tools, having my work environment streamlined, taking advantage of forum and public notebooks, etc.
+              - separator [ref=f47e528]
+            - generic [ref=f47e529]:
+              - generic [ref=f47e533]:
+                - link "KhanhVD's profile" [ref=f47e534] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f47e535]
+                - generic [ref=f47e541]:
+                  - link [ref=f47e543] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f47e544]
+                  - generic [ref=f47e545]:
+                    - paragraph [ref=f47e546]: Posted 5 years ago
+                    - paragraph [ref=f47e548]: · 7th in this Competition
+                - generic [ref=f47e550]:
+                  - generic [ref=f47e551]:
+                    - button "Upvote" [ref=f47e552] [cursor=pointer]:
+                      - generic [ref=f47e553]: arrow_drop_up
+                    - button "2 votes" [ref=f47e554] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f47e555] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e559]:
+                  - text: Congrats
+                  - link "@slawekbiel (opens in a new tab)" [ref=f47e560] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - text: "@slawekbiel"
+                  - text: and team on 3rd place and thanks for sharing solution. Our Cellpose model can get 0.332 LB score but we not use for ensemble final.
+              - separator [ref=f47e561]
+            - generic [ref=f47e562]:
+              - generic [ref=f47e566]:
+                - link "Woprime's profile" [ref=f47e567] [cursor=pointer]:
+                  - /url: /woprime
+                  - generic "Woprime" [ref=f47e568]
+                - generic [ref=f47e574]:
+                  - link [ref=f47e576] [cursor=pointer]:
+                    - /url: /woprime
+                    - heading "Woprime" [level=3] [ref=f47e577]
+                  - generic [ref=f47e578]:
+                    - paragraph [ref=f47e579]: Posted 5 years ago
+                    - paragraph [ref=f47e581]: · 50th in this Competition
+                - generic [ref=f47e583]:
+                  - generic [ref=f47e584]:
+                    - button "Upvote" [ref=f47e585] [cursor=pointer]:
+                      - generic [ref=f47e586]: arrow_drop_up
+                    - button "2 votes" [ref=f47e587] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f47e588] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e592]: Congrats and thank you for all the great insight you've provided along the way! A very well deserved prize.
+              - separator [ref=f47e593]
+            - generic [ref=f47e594]:
+              - generic [ref=f47e598]:
+                - link "Swikwislkdjc's profile" [ref=f47e599] [cursor=pointer]:
+                  - /url: /lililycai
+                  - generic "Swikwislkdjc" [ref=f47e600]
+                - generic [ref=f47e606]:
+                  - link [ref=f47e608] [cursor=pointer]:
+                    - /url: /lililycai
+                    - heading "Swikwislkdjc" [level=3] [ref=f47e609]
+                  - generic [ref=f47e610]:
+                    - paragraph [ref=f47e611]: Posted 5 years ago
+                    - paragraph [ref=f47e613]: · 188th in this Competition
+                - generic [ref=f47e615]:
+                  - generic [ref=f47e616]:
+                    - button "Upvote" [ref=f47e617] [cursor=pointer]:
+                      - generic [ref=f47e618]: arrow_drop_up
+                    - button "1 votes" [ref=f47e619] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e620] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e624]: Amazing work!! Congratulations! Thank you so much for sharing this!!
+              - separator [ref=f47e625]
+            - generic [ref=f47e626]:
+              - generic [ref=f47e630]:
+                - link "alami robbi 7121's profile" [ref=f47e631] [cursor=pointer]:
+                  - /url: /alamirobbi7121
+                  - generic "alami robbi 7121" [ref=f47e632]
+                - generic [ref=f47e638]:
+                  - link [ref=f47e640] [cursor=pointer]:
+                    - /url: /alamirobbi7121
+                    - heading "alami robbi 7121" [level=3] [ref=f47e641]
+                  - paragraph [ref=f47e643]: Posted 5 years ago
+                - generic [ref=f47e645]:
+                  - generic [ref=f47e646]:
+                    - button "Upvote" [ref=f47e647] [cursor=pointer]:
+                      - generic [ref=f47e648]: arrow_drop_up
+                    - button "1 votes" [ref=f47e649] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e650] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e654]: nice sir, excellent job!
+              - separator [ref=f47e655]
+            - generic [ref=f47e656]:
+              - generic [ref=f47e660]:
+                - link "eagle4's profile" [ref=f47e661] [cursor=pointer]:
+                  - /url: /chabir
+                  - generic "eagle4" [ref=f47e662]
+                - generic [ref=f47e668]:
+                  - link [ref=f47e670] [cursor=pointer]:
+                    - /url: /chabir
+                    - heading "eagle4" [level=3] [ref=f47e671]
+                  - generic [ref=f47e672]:
+                    - paragraph [ref=f47e673]: Posted 5 years ago
+                    - paragraph [ref=f47e675]: · 169th in this Competition
+                - generic [ref=f47e677]:
+                  - generic [ref=f47e678]:
+                    - button "Upvote" [ref=f47e679] [cursor=pointer]:
+                      - generic [ref=f47e680]: arrow_drop_up
+                    - button "1 votes" [ref=f47e681] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e682] [cursor=pointer]: more_vert
+                - generic [ref=f47e685]:
+                  - paragraph [ref=f47e686]: "Slawek, excellent job! One night towards the end, I also tried to take pieces of the interesting part of the cellpose repo: it trained but the predictions were an awful fail…"
+                  - paragraph [ref=f47e687]: "I have a question: when you generate the \"flows\", are you generating on the fly in the batch generator or are you generating first on disk and then you load them in your batch generator?"
+                - generic [ref=f47e693]:
+                  - link "Slawek Biel's profile" [ref=f47e694] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e695]
+                  - generic [ref=f47e701]:
+                    - generic [ref=f47e702]:
+                      - link [ref=f47e703] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e704]
+                      - paragraph [ref=f47e707]: Topic Author
+                    - generic [ref=f47e708]:
+                      - paragraph [ref=f47e709]: Posted 5 years ago
+                      - paragraph [ref=f47e711]: · 3rd in this Competition
+                  - generic [ref=f47e713]:
+                    - generic [ref=f47e714]:
+                      - button "Upvote" [ref=f47e715] [cursor=pointer]:
+                        - generic [ref=f47e716]: arrow_drop_up
+                      - button "1 votes" [ref=f47e717] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f47e718] [cursor=pointer]: more_vert
+                  - paragraph [ref=f47e722]: I generate it before I start training and read tiff files in my DataLoader.
+              - separator [ref=f47e723]
+            - generic [ref=f47e724]:
+              - generic [ref=f47e728]:
+                - link "Aiswarya Sivakumar's profile" [ref=f47e729] [cursor=pointer]:
+                  - /url: /aiswaryasivakumar
+                  - generic "Aiswarya Sivakumar" [ref=f47e730]
+                - generic [ref=f47e736]:
+                  - link [ref=f47e738] [cursor=pointer]:
+                    - /url: /aiswaryasivakumar
+                    - heading "Aiswarya Sivakumar" [level=3] [ref=f47e739]
+                  - paragraph [ref=f47e741]: Posted 5 years ago
+                - generic [ref=f47e743]:
+                  - generic [ref=f47e744]:
+                    - button "Upvote" [ref=f47e745] [cursor=pointer]:
+                      - generic [ref=f47e746]: arrow_drop_up
+                    - button "1 votes" [ref=f47e747] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e748] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e752]: congratulations and thanks for sharing the code
+              - separator [ref=f47e753]
+            - generic [ref=f47e754]:
+              - generic [ref=f47e758]:
+                - link "Ichimaru Gin's profile" [ref=f47e759] [cursor=pointer]:
+                  - /url: /ichimarugin
+                  - generic "Ichimaru Gin" [ref=f47e760]
+                - generic [ref=f47e766]:
+                  - link [ref=f47e768] [cursor=pointer]:
+                    - /url: /ichimarugin
+                    - heading "Ichimaru Gin" [level=3] [ref=f47e769]
+                  - generic [ref=f47e770]:
+                    - paragraph [ref=f47e771]: Posted 5 years ago
+                    - paragraph [ref=f47e773]: · 112th in this Competition
+                - generic [ref=f47e775]:
+                  - generic [ref=f47e776]:
+                    - button "Upvote" [ref=f47e777] [cursor=pointer]:
+                      - generic [ref=f47e778]: arrow_drop_up
+                    - button "1 votes" [ref=f47e779] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e780] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e784]: Great work and congrats on 3rd place🎉
+              - separator [ref=f47e785]
+            - generic [ref=f47e786]:
+              - generic [ref=f47e790]:
+                - link "oliver's profile" [ref=f47e791] [cursor=pointer]:
+                  - /url: /ollibolli
+                  - generic "oliver" [ref=f47e792]
+                - generic [ref=f47e798]:
+                  - link [ref=f47e800] [cursor=pointer]:
+                    - /url: /ollibolli
+                    - heading "oliver" [level=3] [ref=f47e801]
+                  - generic [ref=f47e802]:
+                    - paragraph [ref=f47e803]: Posted 5 years ago
+                    - paragraph [ref=f47e805]: · 662nd in this Competition
+                - generic [ref=f47e807]:
+                  - generic [ref=f47e808]:
+                    - button "Upvote" [ref=f47e809] [cursor=pointer]:
+                      - generic [ref=f47e810]: arrow_drop_up
+                    - button "1 votes" [ref=f47e811] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e812] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e816]: Congratulations! Thanks for sharing your solution and all the great work you put out during the competition, I learned so much from you and I am very happy that you get rewarded for your hard work. Cheers!
+              - separator [ref=f47e817]
+            - generic [ref=f47e818]:
+              - generic [ref=f47e822]:
+                - link "Cicilia's profile" [ref=f47e823] [cursor=pointer]:
+                  - /url: /clavinharris
+                  - generic "Cicilia" [ref=f47e824]
+                - generic [ref=f47e830]:
+                  - link [ref=f47e832] [cursor=pointer]:
+                    - /url: /clavinharris
+                    - heading "Cicilia" [level=3] [ref=f47e833]
+                  - generic [ref=f47e834]:
+                    - paragraph [ref=f47e835]: Posted 5 years ago
+                    - paragraph [ref=f47e837]: · 171st in this Competition
+                - generic [ref=f47e839]:
+                  - generic [ref=f47e840]:
+                    - button "Upvote" [ref=f47e841] [cursor=pointer]:
+                      - generic [ref=f47e842]: arrow_drop_up
+                    - button "1 votes" [ref=f47e843] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e844] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e848]: my notebook is cellpose and 0.318 ，thanks for your work
+              - separator [ref=f47e849]
+            - generic [ref=f47e850]:
+              - generic [ref=f47e854]:
+                - link "Raghawendra Singh's profile" [ref=f47e855] [cursor=pointer]:
+                  - /url: /raghaw
+                  - generic "Raghawendra Singh" [ref=f47e856]
+                - generic [ref=f47e862]:
+                  - link [ref=f47e864] [cursor=pointer]:
+                    - /url: /raghaw
+                    - heading "Raghawendra Singh" [level=3] [ref=f47e865]
+                  - paragraph [ref=f47e867]: Posted 5 years ago
+                - generic [ref=f47e869]:
+                  - generic [ref=f47e870]:
+                    - button "Upvote" [ref=f47e871] [cursor=pointer]:
+                      - generic [ref=f47e872]: arrow_drop_up
+                    - button "1 votes" [ref=f47e873] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e874] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e878]: congrats for gold!!! I learned a lot from your notebooks and discussions … thanks
+              - separator [ref=f47e879]
+            - generic [ref=f47e880]:
+              - generic [ref=f47e884]:
+                - link "Lupin's profile" [ref=f47e885] [cursor=pointer]:
+                  - /url: /yichenwang1988
+                  - generic "Lupin" [ref=f47e886]
+                - generic [ref=f47e892]:
+                  - link [ref=f47e894] [cursor=pointer]:
+                    - /url: /yichenwang1988
+                    - heading "Lupin" [level=3] [ref=f47e895]
+                  - generic [ref=f47e896]:
+                    - paragraph [ref=f47e897]: Posted 5 years ago
+                    - paragraph [ref=f47e899]: · 107th in this Competition
+                - generic [ref=f47e901]:
+                  - generic [ref=f47e902]:
+                    - button "Upvote" [ref=f47e903] [cursor=pointer]:
+                      - generic [ref=f47e904]: arrow_drop_up
+                    - button "1 votes" [ref=f47e905] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e906] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e910]: Congrats and thank you for sharing about cellpose. I was stuck at maskrcnn(mmdetection) for a long time and then get better result with cellpose instantly. I got only a 100+ bronze in the end but there are some similar exprience with you. It's weird cellpose trys load all images into memory. Perhaps it was desighed for much smaller dataset. I'm on win pc and train with setting 128gb virtual memory at second ssd. I train only 150 epoch until the loss seems to stop decreasing. I also pick some livecell cell type for base model train with regard of sartorius cell type. But using all dataset give better performance. Fine tuning is not hard but it's difficult to find the right diameter for interfence. The sartorius cells sizes are way too various. I use a simple decision tree model to classify the image into cell types and use fixed diameter for 3 type of images. However I think the idle performance should utilize various diameters in every portion of a image. An additionl test diameter is the drawback of cellpose though. IMO the building size predicted model performance poor. I tried to predict the size with my own resnet model it performance just the same with the cellpose one. I was too stupid not using maskrcnn as a good size predicter though it's not a decent segmentation model here. Maybe the mmdeteciton is not friendly to use that I don't want to use it laterly.
+                - generic [ref=f47e916]:
+                  - link "Slawek Biel's profile" [ref=f47e917] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e918]
+                  - generic [ref=f47e924]:
+                    - generic [ref=f47e925]:
+                      - link [ref=f47e926] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e927]
+                      - paragraph [ref=f47e930]: Topic Author
+                    - generic [ref=f47e931]:
+                      - paragraph [ref=f47e932]: Posted 5 years ago
+                      - paragraph [ref=f47e934]: · 3rd in this Competition
+                  - generic [ref=f47e936]:
+                    - generic [ref=f47e937]:
+                      - button "Upvote" [ref=f47e938] [cursor=pointer]:
+                        - generic [ref=f47e939]: arrow_drop_up
+                      - button "0 votes" [ref=f47e940] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f47e941] [cursor=pointer]: more_vert
+                  - generic [ref=f47e944]:
+                    - paragraph [ref=f47e945]: "You are right that loading all the images into memory is weird. Maybe they did work only on smaller datasets but I've also found code like this:"
+                    - code [ref=f47e947]: "#again, attempt to deal with memory overuse yf, style = None, None gc.collect() torch.cuda.empty_cache()"
+                    - paragraph [ref=f47e948]: So they were aware of high memory consumption, just didn't think "Hey lets not keep all of the dataset in RAM all the time" 🤔
+              - separator [ref=f47e949]
+            - generic [ref=f47e950]:
+              - generic [ref=f47e954]:
+                - link "Meena M's profile" [ref=f47e955] [cursor=pointer]:
+                  - /url: /shir0mani
+                  - generic "Meena M" [ref=f47e956]
+                - generic [ref=f47e962]:
+                  - link [ref=f47e964] [cursor=pointer]:
+                    - /url: /shir0mani
+                    - heading "Meena M" [level=3] [ref=f47e965]
+                  - generic [ref=f47e966]:
+                    - paragraph [ref=f47e967]: Posted 5 years ago
+                    - paragraph [ref=f47e969]: · 420th in this Competition
+                - generic [ref=f47e971]:
+                  - generic [ref=f47e972]:
+                    - button "Upvote" [ref=f47e973] [cursor=pointer]:
+                      - generic [ref=f47e974]: arrow_drop_up
+                    - button "1 votes" [ref=f47e975] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e976] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e980]: Well deserved win and thanks for your community contributions. I learned about Cellpose for the first time here. Didn't use it because of the computational resources needed.
+              - separator [ref=f47e981]
+            - generic [ref=f47e982]:
+              - generic [ref=f47e986]:
+                - link "Mintwater's profile" [ref=f47e987] [cursor=pointer]:
+                  - /url: /charonwangg
+                  - generic "Mintwater" [ref=f47e988]
+                - generic [ref=f47e994]:
+                  - link [ref=f47e996] [cursor=pointer]:
+                    - /url: /charonwangg
+                    - heading "Mintwater" [level=3] [ref=f47e997]
+                  - generic [ref=f47e998]:
+                    - paragraph [ref=f47e999]: Posted 5 years ago
+                    - paragraph [ref=f47e1001]: · 17th in this Competition
+                - generic [ref=f47e1003]:
+                  - generic [ref=f47e1004]:
+                    - button "Upvote" [ref=f47e1005] [cursor=pointer]:
+                      - generic [ref=f47e1006]: arrow_drop_up
+                    - button "1 votes" [ref=f47e1007] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e1008] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e1012]: Congrats! Thanks for your amazing solution and meaningful notebooks published in this competition!
+              - separator [ref=f47e1013]
+            - generic [ref=f47e1014]:
+              - generic [ref=f47e1018]:
+                - link "joejeo1's profile" [ref=f47e1019] [cursor=pointer]:
+                  - /url: /joejeo1
+                  - generic "joejeo1" [ref=f47e1020]
+                - generic [ref=f47e1026]:
+                  - link [ref=f47e1028] [cursor=pointer]:
+                    - /url: /joejeo1
+                    - heading "joejeo1" [level=3] [ref=f47e1029]
+                  - generic [ref=f47e1030]:
+                    - paragraph [ref=f47e1031]: Posted 5 years ago
+                    - paragraph [ref=f47e1033]: · 766th in this Competition
+                - generic [ref=f47e1035]:
+                  - generic [ref=f47e1036]:
+                    - button "Upvote" [ref=f47e1037] [cursor=pointer]:
+                      - generic [ref=f47e1038]: arrow_drop_up
+                    - button "1 votes" [ref=f47e1039] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e1040] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e1044]: Your approach is very interesting. "size prediction" is great idea. Wonder if you can write "size prediction branch" into the cellpose model instead of running as a separate model. Thanks for writing up the summary, I difinitely learned a lot. I saw your post a few days ago. Didn't have time to experiment with cellpose. I will go through your notebooks and the original paper in next few days to learn more about cellpose.
+                - generic [ref=f47e1045]:
+                  - generic [ref=f47e1050]:
+                    - link "Slawek Biel's profile" [ref=f47e1051] [cursor=pointer]:
+                      - /url: /slawekbiel
+                      - generic "Slawek Biel" [ref=f47e1052]
+                    - generic [ref=f47e1058]:
+                      - generic [ref=f47e1059]:
+                        - link [ref=f47e1060] [cursor=pointer]:
+                          - /url: /slawekbiel
+                          - heading "Slawek Biel" [level=3] [ref=f47e1061]
+                        - paragraph [ref=f47e1064]: Topic Author
+                      - generic [ref=f47e1065]:
+                        - paragraph [ref=f47e1066]: Posted 5 years ago
+                        - paragraph [ref=f47e1068]: · 3rd in this Competition
+                    - generic [ref=f47e1070]:
+                      - generic [ref=f47e1071]:
+                        - button "Upvote" [ref=f47e1072] [cursor=pointer]:
+                          - generic [ref=f47e1073]: arrow_drop_up
+                        - button "1 votes" [ref=f47e1074] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f47e1075] [cursor=pointer]: more_vert
+                    - paragraph [ref=f47e1079]: Honestly I did think about adding an extra head to the model for just that - but the issue is we resize the image to it's desired resolution before passing it to the model. So it would have to be some two stage approach that takes the original image. Too complicated to attempt in the limited time I had.
+                  - generic [ref=f47e1084]:
+                    - link "joejeo1's profile" [ref=f47e1085] [cursor=pointer]:
+                      - /url: /joejeo1
+                      - generic "joejeo1" [ref=f47e1086]
+                    - generic [ref=f47e1092]:
+                      - link [ref=f47e1094] [cursor=pointer]:
+                        - /url: /joejeo1
+                        - heading "joejeo1" [level=3] [ref=f47e1095]
+                      - generic [ref=f47e1096]:
+                        - paragraph [ref=f47e1097]: Posted 5 years ago
+                        - paragraph [ref=f47e1099]: · 766th in this Competition
+                    - generic [ref=f47e1101]:
+                      - generic [ref=f47e1102]:
+                        - button "Upvote" [ref=f47e1103] [cursor=pointer]:
+                          - generic [ref=f47e1104]: arrow_drop_up
+                        - button "0 votes" [ref=f47e1105] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f47e1106] [cursor=pointer]: more_vert
+                    - paragraph [ref=f47e1110]: Thanks for the replay. Two stages make more sense. Otherwise, it would be too complicated like you said.
+              - separator [ref=f47e1111]
+            - generic [ref=f47e1112]:
+              - generic [ref=f47e1116]:
+                - link "Patrick Chan's profile" [ref=f47e1117] [cursor=pointer]:
+                  - /url: /drpatrickchan
+                  - generic "Patrick Chan" [ref=f47e1118]
+                - generic [ref=f47e1124]:
+                  - link [ref=f47e1126] [cursor=pointer]:
+                    - /url: /drpatrickchan
+                    - heading "Patrick Chan" [level=3] [ref=f47e1127]
+                  - generic [ref=f47e1128]:
+                    - paragraph [ref=f47e1129]: Posted 5 years ago
+                    - paragraph [ref=f47e1131]: · 207th in this Competition
+                - generic [ref=f47e1133]:
+                  - generic [ref=f47e1134]:
+                    - button "Upvote" [ref=f47e1135] [cursor=pointer]:
+                      - generic [ref=f47e1136]: arrow_drop_up
+                    - button "1 votes" [ref=f47e1137] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e1138] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e1142]: Congratulations Slawek and thanks for sharing.
+              - separator [ref=f47e1143]
+            - generic [ref=f47e1144]:
+              - generic [ref=f47e1148]:
+                - link "Eslam Omar mohamed's profile" [ref=f47e1149] [cursor=pointer]:
+                  - /url: /eslamomar
+                  - generic "Eslam Omar mohamed" [ref=f47e1150]
+                - generic [ref=f47e1156]:
+                  - link [ref=f47e1158] [cursor=pointer]:
+                    - /url: /eslamomar
+                    - heading "Eslam Omar mohamed" [level=3] [ref=f47e1159]
+                  - paragraph [ref=f47e1161]: Posted 5 years ago
+                - generic [ref=f47e1163]:
+                  - generic [ref=f47e1164]:
+                    - button "Upvote" [ref=f47e1165] [cursor=pointer]:
+                      - generic [ref=f47e1166]: arrow_drop_up
+                    - button "1 votes" [ref=f47e1167] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e1168] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e1172]: Great job 🙌
+              - separator [ref=f47e1173]
+            - generic [ref=f47e1174]:
+              - generic [ref=f47e1178]:
+                - link "Cicilia's profile" [ref=f47e1179] [cursor=pointer]:
+                  - /url: /clavinharris
+                  - generic "Cicilia" [ref=f47e1180]
+                - generic [ref=f47e1186]:
+                  - link [ref=f47e1188] [cursor=pointer]:
+                    - /url: /clavinharris
+                    - heading "Cicilia" [level=3] [ref=f47e1189]
+                  - generic [ref=f47e1190]:
+                    - paragraph [ref=f47e1191]: Posted 5 years ago
+                    - paragraph [ref=f47e1193]: · 171st in this Competition
+                - generic [ref=f47e1195]:
+                  - generic [ref=f47e1196]:
+                    - button "Upvote" [ref=f47e1197] [cursor=pointer]:
+                      - generic [ref=f47e1198]: arrow_drop_up
+                    - button "0 votes" [ref=f47e1199] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f47e1200] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e1204]: would u like to share you notebook？ i apply cellpose too，but My PB is 0.318 ,I want learn something from your netobook,thx,thanks for your work and ideas
+                - generic [ref=f47e1210]:
+                  - link "Slawek Biel's profile" [ref=f47e1211] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e1212]
+                  - generic [ref=f47e1218]:
+                    - generic [ref=f47e1219]:
+                      - link [ref=f47e1220] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e1221]
+                      - paragraph [ref=f47e1224]: Topic Author
+                    - generic [ref=f47e1225]:
+                      - paragraph [ref=f47e1226]: Posted 5 years ago
+                      - paragraph [ref=f47e1228]: · 3rd in this Competition
+                  - generic [ref=f47e1230]:
+                    - generic [ref=f47e1231]:
+                      - button "Upvote" [ref=f47e1232] [cursor=pointer]:
+                        - generic [ref=f47e1233]: arrow_drop_up
+                      - button "1 votes" [ref=f47e1234] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f47e1235] [cursor=pointer]: more_vert
+                  - paragraph [ref=f47e1239]: I need some time to clean it up and make presentable.
+              - separator [ref=f47e1240]
+            - generic [ref=f47e1241]:
+              - generic [ref=f47e1245]:
+                - link "Drzhuzhe's profile" [ref=f47e1246] [cursor=pointer]:
+                  - /url: /drzhuzhe
+                  - generic "Drzhuzhe" [ref=f47e1247]
+                - generic [ref=f47e1253]:
+                  - link [ref=f47e1255] [cursor=pointer]:
+                    - /url: /drzhuzhe
+                    - heading "Drzhuzhe" [level=3] [ref=f47e1256]
+                  - generic [ref=f47e1257]:
+                    - paragraph [ref=f47e1258]: Posted 5 years ago
+                    - paragraph [ref=f47e1260]: · 97th in this Competition
+                - generic [ref=f47e1262]:
+                  - generic [ref=f47e1263]:
+                    - button "Upvote" [ref=f47e1264] [cursor=pointer]:
+                      - generic [ref=f47e1265]: arrow_drop_up
+                    - button "0 votes" [ref=f47e1266] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f47e1267] [cursor=pointer]: more_vert
+                - generic [ref=f47e1270]:
+                  - paragraph [ref=f47e1271]:
+                    - code [ref=f47e1272]: disk IO is the bottleneck - spinning at 100% while GPU waits idly. I had to rearange stuff on my system to free enough SSD space and only then I got a smooth training fully utilizing the GPU.
+                  - paragraph [ref=f47e1273]: Does it mean we just need to copy file that place model and dataset on SSD rather than mech hard disk ? then traning will be faster ???
+                - generic [ref=f47e1279]:
+                  - link "Slawek Biel's profile" [ref=f47e1280] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e1281]
+                  - generic [ref=f47e1287]:
+                    - generic [ref=f47e1288]:
+                      - link [ref=f47e1289] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e1290]
+                      - paragraph [ref=f47e1293]: Topic Author
+                    - generic [ref=f47e1294]:
+                      - paragraph [ref=f47e1295]: Posted 5 years ago
+                      - paragraph [ref=f47e1297]: · 3rd in this Competition
+                  - generic [ref=f47e1299]:
+                    - generic [ref=f47e1300]:
+                      - button "Upvote" [ref=f47e1301] [cursor=pointer]:
+                        - generic [ref=f47e1302]: arrow_drop_up
+                      - button "1 votes" [ref=f47e1303] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f47e1304] [cursor=pointer]: more_vert
+                  - paragraph [ref=f47e1308]: You always need to look at the resources consumption in your specific setup. In this particular case where the model is small and there are more files disk cache can handle - Yes, moving files to SSD helped me a lot with my training time.
+              - separator [ref=f47e1309]
+            - generic [ref=f47e1310]:
+              - generic [ref=f47e1314]:
+                - link "kagglerz's profile" [ref=f47e1315] [cursor=pointer]:
+                  - /url: /kagglerz
+                  - generic "kagglerz" [ref=f47e1316]
+                - generic [ref=f47e1322]:
+                  - link [ref=f47e1324] [cursor=pointer]:
+                    - /url: /kagglerz
+                    - heading "kagglerz" [level=3] [ref=f47e1325]
+                  - generic [ref=f47e1326]:
+                    - paragraph [ref=f47e1327]: Posted 5 years ago
+                    - paragraph [ref=f47e1329]: · 378th in this Competition
+                - generic [ref=f47e1331]:
+                  - generic [ref=f47e1332]:
+                    - button "Upvote" [ref=f47e1333] [cursor=pointer]:
+                      - generic [ref=f47e1334]: arrow_drop_up
+                    - button "0 votes" [ref=f47e1335] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f47e1336] [cursor=pointer]: more_vert
+                - paragraph [ref=f47e1340]: Congratulations! Can I ask more about how you did the pretraining? E.g. Is there a library that you used or did you design the pretraining tasks yourself?
+                - generic [ref=f47e1346]:
+                  - link "Slawek Biel's profile" [ref=f47e1347] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - generic "Slawek Biel" [ref=f47e1348]
+                  - generic [ref=f47e1354]:
+                    - generic [ref=f47e1355]:
+                      - link [ref=f47e1356] [cursor=pointer]:
+                        - /url: /slawekbiel
+                        - heading "Slawek Biel" [level=3] [ref=f47e1357]
+                      - paragraph [ref=f47e1360]: Topic Author
+                    - generic [ref=f47e1361]:
+                      - paragraph [ref=f47e1362]: Posted 5 years ago
+                      - paragraph [ref=f47e1364]: · 3rd in this Competition
+                  - generic [ref=f47e1366]:
+                    - generic [ref=f47e1367]:
+                      - button "Upvote" [ref=f47e1368] [cursor=pointer]:
+                        - generic [ref=f47e1369]: arrow_drop_up
+                      - button "0 votes" [ref=f47e1370] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f47e1371] [cursor=pointer]: more_vert
+                  - paragraph [ref=f47e1375]: I used the same code to first train on the LiveCell data and then finetune on the competition data.
+              - separator [ref=f47e1376]
+            - generic [ref=f47e1381]:
+              - link "Yousef Rabi's profile" [ref=f47e1382] [cursor=pointer]:
+                - /url: /yousof9
+                - generic "Yousef Rabi" [ref=f47e1383]
+              - generic [ref=f47e1389]:
+                - link [ref=f47e1391] [cursor=pointer]:
+                  - /url: /yousof9
+                  - heading "Yousef Rabi" [level=3] [ref=f47e1392]
+                - generic [ref=f47e1393]:
+                  - paragraph [ref=f47e1394]: Posted 5 years ago
+                  - paragraph [ref=f47e1396]: · 45th in this Competition
+              - generic [ref=f47e1398]:
+                - generic [ref=f47e1399]:
+                  - button "Upvote" [ref=f47e1400] [cursor=pointer]:
+                    - generic [ref=f47e1401]: arrow_drop_up
+                  - button "0 votes" [ref=f47e1402] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f47e1403] [cursor=pointer]: more_vert
+              - generic [ref=f47e1406]:
+                - paragraph [ref=f47e1407]:
+                  - text: Congratulations
+                  - link "@slawekbiel (opens in a new tab)" [ref=f47e1408] [cursor=pointer]:
+                    - /url: /slawekbiel
+                    - text: "@slawekbiel"
+                  - text: on an awesome finish and thanks for your sharing throughout the competition.
+                - paragraph [ref=f47e1409]: I have some questions regarding finetuning the model from the LIVECell repo.
+                - list [ref=f47e1410]:
+                  - listitem [ref=f47e1411]: Did you successfully finetune the resnest200 cascade model on this comp's data?
+                  - listitem [ref=f47e1412]: Did you use the exact same hyperparameters provided by the authors?
+                  - listitem [ref=f47e1413]: What was the compute used?
+              - generic [ref=f47e1419]:
+                - link "Slawek Biel's profile" [ref=f47e1420] [cursor=pointer]:
+                  - /url: /slawekbiel
+                  - generic "Slawek Biel" [ref=f47e1421]
+                - generic [ref=f47e1427]:
+                  - generic [ref=f47e1428]:
+                    - link [ref=f47e1429] [cursor=pointer]:
+                      - /url: /slawekbiel
+                      - heading "Slawek Biel" [level=3] [ref=f47e1430]
+                    - paragraph [ref=f47e1433]: Topic Author
+                  - generic [ref=f47e1434]:
+                    - paragraph [ref=f47e1435]: Posted 5 years ago
+                    - paragraph [ref=f47e1437]: · 3rd in this Competition
+                - generic [ref=f47e1439]:
+                  - generic [ref=f47e1440]:
+                    - button "Upvote" [ref=f47e1441] [cursor=pointer]:
+                      - generic [ref=f47e1442]: arrow_drop_up
+                    - button "1 votes" [ref=f47e1443] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f47e1444] [cursor=pointer]: more_vert
+                - generic [ref=f47e1447]:
+                  - paragraph [ref=f47e1448]: Yes I did. The best score I got with it was .324 public so not phenomenal but less effort and time than training on LiveCell from scratch. I kept mostly the config from the repo, set BS to 2 for a single GPU and did some trial and error on lr scheduling.
+                  - paragraph [ref=f47e1449]: The training takes around 2.5hrs on a RTX3090
+  - alert [ref=f47e1452]

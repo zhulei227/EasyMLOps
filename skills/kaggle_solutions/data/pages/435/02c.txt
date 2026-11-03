@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/indoor-location-navigation/discussion/240025
-fetched: 2026-10-27
-chars: 816
+fetched: 2026-11-03
+chars: 4154
 
 menu
 Skip to
@@ -42,15 +42,79 @@ Models
 Discussion
 Leaderboard
 Rules
+superkjelle · 2nd in this Competition · Posted 5 years ago
+arrow_drop_up
+17
+more_vert
+[2nd] place solution (for the C in MYRCJ)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Thank you everyone for a great competition, and I am very happy to reach the 2nd place in my first Kaggle competition together with a great team!
 
-error
+I will provide an overview of my original solution and some code which was then incorporated into the MYRCJ team submission. The main parts of my work used in the final team submission were the prediction of relative position and the postprocessing strategy.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+1. Absolute position and floor estimation In this part I trained a single custom NN (one for each building with identical settings) for floor estimation and positioning where each one is split in two MLPs, one for positioning and one for floor classification. The input is a single measurement of RSSI, and the models are trained by using augmentations and other common NN techniques. It was trained on improved positions for RSSI measurements by interpolating between waypoints. The team had at least three independent identical floor classification results, of which mine was one. My floor prediction MLP is based on ordinal regression similar to what is proposed here: https://www.ethanrosenthal.com/2018/12/06/spacecutter-ordinal-regression/. A single positioning MLP with this approach resulted in public LB 6.71 and CV 7.84.
 
-Failed to load the discussion topic
+2. Delta position estimation For this task I implemented a many-to-one LSTM which by using a sliding window on IMU sequences of arbitrary length predicts the displacement between two waypoints. The input used was the orientation (3d array based on TYPE_ROTATION_VECTOR) and accelerometer. I have uploaded a general model definition and training function in https://github.com/ckjellson/MTO_SW_LSTM. A single version of this model resulted in a mean delta positioning error of 1.83 m on tracks in our validation dataset for which the PDR code results in a mean error of 2.55 m.
 
-error
+3. Postprocessing My postprocessing was based on iterating between moving points into the corridor geometry and cost minimization. This was originally done for 50 iterations, and after this using the snap-to-grid once to get the final result.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+These three steps resulted in my original public LB 3.256, but some steps were improved later for use in the team ensemble. @mamasinkgs will publish the complete approach.
+
+Thanks for great kernels: https://www.kaggle.com/robikscube/indoor-navigation-snap-to-grid-post-processing by @robikscube https://www.kaggle.com/saitodevel01/indoor-post-processing-by-cost-minimization by @saitodevel01 https://www.kaggle.com/rafaelcartenet/scaled-floors-geojsons-new-dataset by @rafaelcartenet
+
+Please sign in to reply to this topic.
+
+comment
+4 Comments
+Hotness
+mamas
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks Christoffer, your contribution to the team was really big and I couldn't believe it is your first competition!
+
+superkjelle
+
+Topic Author
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Well I had a lot of time to dedicate to the problem, so it is not that unbelievable 😉 And I will tell you again that we would not be nearly as good without mamas amazing work!
+
+Rob Mulla
+
+Posted 5 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great solution and awesome results! I'm reading up the link you shared about ordinal regression and learning a lot. I'm sure it could be applicable in many situations.
+
+superkjelle
+
+Topic Author
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you! Yes, it was new to me as well, I think it was very useful here and also quite elegant.

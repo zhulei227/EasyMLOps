@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/outbrain-click-prediction/discussion/27923
-fetched: 2026-10-27
-chars: 811
+fetched: 2026-11-03
+chars: 13447
 
 menu
 Skip to
@@ -22,35 +22,450 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Outbrain · Featured Prediction Competition · 10 years ago
-Late Submission
-more_horiz
+3rd place solution — Outbrain Click Prediction
+3rd place solution
+
 Outbrain Click Prediction
 
-Can you predict which recommended content each user will click?
+Solution Writeup · 3rd place · Jan 20, 2017
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+Congratulations to code monkey, brain-afk and everyone!
+And I’d like to thank my teammates carl and Little Boat. I could learn lots of things from them.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+As Little Boat explained, our model is ffm models + xgboost models as first layer, and xgboost as second layer.
 
-error
+I would like to explain our first layer models here.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Feature extraction
 
-Failed to load the discussion topic
+Following is the list of unobvious features we used.
+We made lots of other features which turned out to be useless.
+But analyzing large scale user behavior was very interesting to me.
 
-error
+page view counts of each user.
+page view counts of ad landing page.
+impression counts for each ad_id, landing document_id, campaign_id and advertiser_id.
+landing page confidence vector, where confidence vector is defined as a vector which element is composed of confidence level from documents_*.csv. This feature is used only for ffm as numeric data.
+user confidence vector - this is the average of document confidence vector which is viewed by each user. This feature is used only for ffm as numeric data.
+inner dot product of document confidence vectors of ad impression page and ad landing page .
+inner dot product of user confidence vector and ad landing page document confidence vector
+XGB leaf for ffm feature.
+immediate document viewed after click event.
+Modeling and Training
+FFM
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+In addition to carl’s light-ffm, we used another customized libffm which has pair-wise rank and can take sample weight.
+Best public LB score is 0.6974.
+
+XGB
+
+We used xgboost with rank:pairwise objective.
+Best public LB score is 0.6885.
+
+Leak Row Excluding
+
+We trained ffm models without leak row by removing them from training data first, then blend/merge leak information later.
+This improved single model score.
+
+Present/Future split
+
+We split test data into ‘present’ data (in time samples) and ‘future’ data (out time samples), then built models for each data.
+Here, Features and hyper parameters for each model are optimized independently.
+For example we used timestamp feature for ‘present’ model, but did not used it for ‘future’ model. And we used sample weight of training data for ‘future’ model to add higher weight to last day than first day.
+
+Please feel free to ask any questions.
+
+Authors
+Little Boat
+
+xiaozhouwang
+
+Jiwei Liu
+
+jiweiliu
+
+tito
+
+its7171
+
+arrow_drop_up
+21
+Share
+more_horiz
+Citation
+
+Little Boat, Jiwei Liu, tito. 3rd place solution. https://www.kaggle.com/competitions/outbrain-click-prediction/writeups/three-data-points-3rd-place-solution. 2017. Kaggle
+
+comment
+17 Comments
+Hotness
+Gabriel Moreira
+
+Posted 10 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Good job @CuteChibiko - I took a look in your implementation and saw it really deserved a try. I've run today a benchmark using some of my datasets in FFM format comparing standard LibFFM and your fork with custom pairwise rank customization.
+I just run the models with the same FFM hyperparameters (without tunning for MAP ranking) and weight 1 for all samples. The environment was a Google Compute Engine instance with 32 CPUs, 256 GB RAM and FFM data in a SSD disk.
+
+1) Dataset with categorical fields and some binned numeric fields
+Parameters: -l 0.0001 -k 6 -t 20 -r 0.2 -s 28 --auto-stop
+Rounds: 20
+
+LibFFM - Cross-validation MAP = 0.65911
+LibFFM - Cross-validation MAP + leak = 0.67795
+LibFFM - Training time = 291m
+
+LibFFM pairwise - Cross-validation MAP = 0.66040
+LibFFM pairwise - Cross-validation MAP + leak = 0.67792
+LibFFM pairwise - Training time = 631m
+
+2) Dataset with only categorical fields
+Parameters: -l 0.00002 -k 6 -t 50 -r 0.1 -s 28 --auto-stop
+
+LibFFM - Training rounds = 13 (auto-stop on validation logloss)
+LibFFM - Cross-validation MAP = 0.66428
+LibFFM - Cross-validation MAP + leak = 0.67859
+LibFFM - Training time = 27m
+
+LibFFM - Training rounds = 26 (auto-stop on validation MAP)
+LibFFM pairwise - Cross-validation MAP = 0.66552
+LibFFM pairwise - Cross-validation MAP + leak = 0.67973
+LibFFM pairwise - Training time = 211m
+
+I noticed a diff of around 0.001 in CV MAP by for two datasets. Was this the order of difference you could find in your experiments with your FFM with ranking optimization?
+Ps. I also noticed a great increase in training logloss (from 0.41009 to 0.56855), but this is expected as the optimization is now driven by MAP and not logloss), right?
+
+I am worried only about accuracy at this time, but I could notice that training time of your implementation is very slow compared to standard FFM, and that during most of the processing it is using only 1 CPU. Is that because you had not time to parallelize MAP evaluation?
+
+Which sample weight strategy have you used? More weight on recent samples / clicked samples / display_ids with more ads?
+
+Thanks again!
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@Gabriel Moreira,
+
+I uploaded this source code. You can find pairwise rank customization around here.
+
+if(param.use_default_train){
+  # default libffm training
+} else {
+  # pairwise rank training
+}
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@Sameh Faidi,
+
+I meant impression count as how many times the ad is shown.
+Explanation of impression in the context of online advertising can be found wikipedia.
+
+For example, impression counts for advertiser_id means how many times ads from the advertiser is shown.
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you, Sangzia,
+
+Page 9 of this presentation by 3 idiots is very good explanation of XGB leaf feature.
+Document confidence vectors are not normalized, but user confidence vectors are normalized.
+reply
+Reply
+Gabriel Moreira
+
+Posted 10 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great @CuteChibiko ! Thanks for sharing!
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you Yuriy Makarov,
+
+Yes, we tried CTR with some impression threshold. If impression threshold was low, CTR caused overfit. And if impression threshold was high, CTR did not contribute to score. So We did not use CTR in the end.
+
+"immediate document viewed after click event." means the first document that was seen by a user after the user clicked an ad.
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@Gabriel Moreira,
+
+Your CV score drop, from CV=0.679 to 0.670, is very big, so I think something should be happening.
+I'm not sure why, but maybe you are right. We made XGB models for test and validation respectively, so this may cause the difference.
+
+BTW, our best single score did not improved with GBDT leaves, but it worked for ensemble model.
+
+Our best single CV score without GBDT leaves was 0.69586 and score with GBDT leaves was 0.69588 when we tested GBDT leaves. And weighted average of them scored 0.6971.So even single model score was not improved, GBDT leaves feature was very important.
+
+reply
+Reply
+Gabriel Moreira
+
+Posted 10 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@CuteChibiko I also tried the 3 idiots approach to add GBDT leaves nodes as features to FFM, but did not succeeded improving the score using standard LibFFM, (actually they made my FFM CV score worse). I tried 30 trees with 64 and 128 leaves, using XGBoost and LightGBM.
+Do you think my GBDT model may not have being accurate enought (CV=0.670), while my FFM model was (0.679)?
+Other aspect is that I used a fixed validation set following test set days distribution. So, I trained GBDT on full train set and used the model to predict both the train set and validation set. Maybe that could cause some overfit on FFM model, even with using leaf nodes?
+
+reply
+Reply
+Sameh Faidi
+
+Posted 10 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+"impression counts for each ad_id, landing document_id, campaign_id and advertiser_id."
+
+what do you mean by impression counts?
+
+reply
+Reply
+Sangxia
+
+Posted 10 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I have 2 questions:
+
+Could you explain what XGB leaf feature is?
+Do you normalize the confidence vectors for documents?
+
+Thanks and congrats!
+
+reply
+Reply
+nomo
+
+Posted 10 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for your kindly share@CuteChibiko . It is really impressive and interesting. I have several questoins about gbdt leaf node as feature.
+
+1). Does the gbdt feature contain label information? like click/ctr. Or if not contain, like impression/pageview count etc.
+
+2). Does the gbdt training data have overlap with ffm training data, If yes, does it suffer from overfitting at first due to label twice used and do you use some method to avoid overfitting?
+
+3). Your weighted average with gbdt leaf's gain is large. Have you compared with ffm containing the gbdt's count feature in some transformation like log without gbdt leafnode, or use gbdt and ffm pctr prediction score together feeded into stacking model. I'm curious that the gain is from gbdt leaf node transformation method or the count/statistics feature itself.
+
+4). Ususallly gbdt training has several hundred or thousand trees, and the cost is large for ffm. How many trees you have used and do you have some hyper-paramter or feature tuning for the less tree numbers?
+
+Thanks a lot.
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@nomo,
+
+1) The gbdt feature dose not contain label information but contains impression/pageview count. This is almost same as what I listed in the first post of this topic.
+
+2) Yes, it dose. The gbdt training data was same as ffm training data. But it did not suffer from overfitting.
+
+3) I'm not sure I could understand your question correctly, but we only tried xgb leafnode information itself as feature and did not compared with any variations.
+
+4) We used ntrees=39 and maxDepth=15. Almost all features and hyper-paramters of this model are the same as values of best xgb single model. But only eta was tuned for this model to reduce ntrees.
+
+reply
+Reply
+nomo
+
+Posted 10 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@CuteChibiko thank you very much for your detailed explain. It is interesting:-)
+
+I have also tried split data as present/future for xgb stacking training, but the result is neutral to not split one, and am interested in the different and your success trying reason.
+
+1). For a.single model ffm / b.single model xgb / c. stacking model, your present/future split has gains on all of these three models or some of these models?
+
+2). How much gain do your solution has compared with not split modeling? Is it mainly from present part or future part?
+
+3). The future model process is interesting. Does the sample weight use exponent decay, like DecayFactor ^ (LastDay - SampleDay) as sample weight?
+
+4). I have also used timestamp feature for split modeling present part, but use same hyper-parameter for the present/future part, and the result is neutral. Do your different parameters for these two part influence a lot? Or some other feature or model method also make a difference, like weighted average of present/future split modeling and not split model.
+
+thanks a lot!
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@nomo,
+
+1) Splitting data worked for a and b. And It seemed to work for validation data set of stacking model, but LB score decreased. We did not have enough time to find the reason, so we did not use splitting for stacking model.
+
+2) The single model gain is 0.001 for ffm future model with sample weight, 0.002 for ffm present model with timestamp feature and 0.002 for xgb present model with timestamp.
+
+3) Exactly. We used this formula:
+
+sample weight = 1 + 2 * 0.5 ^ ((max_timestamp - timestamp)/86400000.0)
+
+
+4) Timestamp feature for present data made big gain without any special method. We used almost same hyper-parameters for split model. Only tuned hyper-parameter is iterations/ntrees.
+
+reply
+Reply
+tito
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@Gabriel Moreira, thank you for your feedback.
+
+The difference was 0.0015 ~ 0.002 for our models.
+Relatively bigger ETA for LibFFM pairwise made better results.
+
+You are right. It is using only 1 CPU to calculate validation score.
+I don't remember why I commented out here and did not use omp. :(
+
+We added higher weights to recent samples for ‘future’ model. This improved 'future' model score about 0.001.
+
+reply
+Reply
+Gabriel Moreira
+
+Posted 10 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing @CuteChibiko ! You've told you used a customized libffm supporting pairwise rank.
+I am really interested in how the FFM optimization works when using pairwise ranking for libffm…. could you share something about that?
+
+reply
+Reply
+
+This comment has been deleted.

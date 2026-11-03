@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/tweet-sentiment-extraction/discussion/159264
-fetched: 2026-10-27
-chars: 788
+fetched: 2026-11-03
+chars: 9737
 
 menu
 Skip to
@@ -22,35 +22,566 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Kaggle · Featured Code Competition · 6 years ago
-Late Submission
-more_horiz
+Quick 1st place solution overview before the night — Tweet Sentiment Extraction
+Quick 1st place solution overview before the night
+
 Tweet Sentiment Extraction
 
-Extract support phrases for sentiment labels
+Solution Writeup · 1st place · Jun 17, 2020
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+Update :
+Training notebook for our 2nd level models : https://www.kaggle.com/theoviel/character-level-model-magic/
+More detailed write-up : https://www.kaggle.com/c/tweet-sentiment-extraction/discussion/159477
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+This is a short thread to rapidly present a solution, we will work on a more detailed one tomorrow.
 
-error
+Huge thanks to my teammates @cl2ev1, @aruchomu and @wochidadonggua for the great work, we definitely wouldn't have gone this far if we were not together.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Our whole solution can be illustrated in the following pipeline.
 
-Failed to load the discussion topic
+The idea is to use transformers to extract token level start and end probabilities. Using the offsets, we can retrieved the processed probabilities for the input text.
 
-error
+We then feed these probabilities to a character level model.
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+The tricky part is to concatenate everything correctly, such as explained here
+
+And then… TADAM ! No post-processing. Just modeling.
+
+We selected two models that scored public LB 0.734 / CV 0.736+. They use 4 different character level model each, with a big variety of transformers. Final private scores are 0.735 and 0.736 :)
+
+Thanks for reading !
+
+Authors
+heartkilla
+
+aruchomu
+
+Cl_ev
+
+cl2ev1
+
+Theo Viel
+
+theoviel
+
+Hikkiiiiiiiii
+
+wochidadonggua
+
+arrow_drop_up
+123
+Share
+more_horiz
+Citation
+
+heartkilla, Cl_ev, Theo Viel, Hikkiiiiiiiii. Quick 1st place solution overview before the night . https://www.kaggle.com/competitions/tweet-sentiment-extraction/writeups/dark-of-the-moon-quick-1st-place-solution-overview. 2020. Kaggle
+
+comment
+39 Comments
+Hotness
+Psi
+
+Posted 6 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Nice work! I tried to feed the selected text into a character transformer model but that did not improve. Using the probabilities and your structure is way smarter. Hope you will post more details.
+
+reply
+Reply
+heartkilla
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We also tried to built a character level transformer as a 2nd level model, but this miserably is not learning at all :) Maybe my implementation was bad though.
+
+reply
+Reply
+Mr_KnowNothing
+
+Posted 6 years ago
+
+· 44th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Congratulations on the win @theoviel and team, thanks for giving a sneak peak so early ,the idea is mind blowing, hoping to see the solution soon I thought to approach this as a character level machine translation problem where the text is the first language and the selected_text is the conversion to second language but then I though this is stupid and let it off, I would love to have inputs on this idea
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks !
+
+I'm not sure I completely get your idea, but I would consider trying to translate the predicted label to the original noisy label, it makes sense.
+
+reply
+Reply
+Shai
+
+Posted 6 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Very impressive. The SOTA transformer models were not so bad in extracting the "selected text". The main problem was to capture the noise in the dataset. Some used post-processing to replicate that. But predicting character level noise using ML models is way smarter! Great job!
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I agree, I have the feeling that 0.715 scoring models were already better than the labels at the task. The rest was just modeling the noise in the data, everybody found a different way to do so. Ours was a bit fancy, because we didn't spot the pattern initially aha Anyways, congratz on competition GM !
+
+reply
+Reply
+Aditya Soni
+
+Posted 6 years ago
+
+· 1189th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks and Congratulations; Very Interesting Approach!
+
+What's char_level_start_and_end proba from token based using offsets?
+What's sentiment fts? (trained/pre-trained vector/features for sentiment-labels?)
+Also you use the subscript "*n", so you used top-k preds? (In concatenate) or N denotes the no. of models?
+Plus will the code be open-sourced for the concatenation of everything part especially? (Thanks)
+
+Thanks;
+
+reply
+Reply
+heartkilla
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+Those are character level probabilities we got from transformers. You can simply calculate them by assigning each character the probability of the corresponding token.
+Sentiments fts is nothing but the output of a plain Embedding layer. Just like you would add any other categorical data to a neural net.
+"n" means the number of 1st level transformer models we used. The char-level NN is then using their predictions in a form of stacking.
+Yes, I think we will open source everything hopefully.
+reply
+Reply
+4 more replies
+arrow_drop_down
+Jaseem C K
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great work. The extended write-up was cool. Expecting more of such. It could really help beginners like me. If you can please make it more beginner-friendly next time (Maybe it is difficult for problems like this 😬 ). However, Congrats on the achievement!
+
+reply
+Reply
+Anthony Chan
+
+Posted 6 years ago
+
+· 1400th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very impressive architecture!!! Learned so much from your solution.
+
+reply
+Reply
+SrJ
+
+Posted 6 years ago
+
+· 548th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on winning. Which type of Embeddings did you use?
+
+reply
+Reply
+heartkilla
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+torch.nn.Embedding We train them from scratch.
+
+reply
+Reply
+Vikas Kumar
+
+Posted 6 years ago
+
+· 1258th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thats just wow, looking forward to source code.
+
+reply
+Reply
+Aftab Ali
+
+Posted 6 years ago
+
+· 1909th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! Great work hope to learn from your excellent work
+
+reply
+Reply
+m.y.
+
+Posted 6 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing! Intuitively, I thought modeling "noise" is difficult, so we focus on developing post-processing. Your solution is very cool. Congratulations!!!
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, and once again congratulations to your team. I found your solution really interesting as well !
+
+reply
+Reply
+Sharad Varshney
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on the win..!
+
+reply
+Reply
+shiba
+
+Posted 6 years ago
+
+· 82nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great work!Congratulations! Our method is almost the same as yours, but we cant find a good char NN to ensemble models😭 😭 😭 Hope to learn it from your excellent work
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks ! The key was to correctly align characters with probabilities, otherwise it doesn't really work
+
+reply
+Reply
+liuze
+
+Posted 6 years ago
+
+· 852nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+so you use original input, not ' '.join(x.split())
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+For 2nd level models we use the original input. For 1st level models we use ' '.join(x.split())
+
+reply
+Reply
+DimitreOliveira
+
+Posted 6 years ago
+
+· 60th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That char level NN on top was very clever, good work, and congratulation on the 1st place!
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, means a lot :)
+
+reply
+Reply
+bluetrain
+
+Posted 6 years ago
+
+· 48th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great work and congratulations on the victory!
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks a lot ! Congratz on the silver medal as well
+
+reply
+Reply
+Camaro
+
+Posted 6 years ago
+
+· 357th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Awesome!! Really cool solution, congratulations!
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks !
+
+reply
+Reply
+KhanhVD
+
+Posted 6 years ago
+
+· 732nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thanks for sharing details solution!
+
+reply
+Reply
+A_Minor
+
+Posted 6 years ago
+
+arrow_drop_up
+-2
+more_vert
+
+Ty, boomer
+
+reply
+Reply
+Zeyad Shahin
+
+Posted 2 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice Work, I have learned a lot!
+
+reply
+Reply
+Julie Arnaud
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and very informative. Thank you
+
+reply
+Reply
+Satya Muralidhar
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congrats
+
+reply
+Reply
+Yu Kang
+
+Posted 6 years ago
+
+· 290th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Would you plan to release your training code later? that would be very kind.
+
+reply
+Reply
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Here's the training code for 2nd level models : https://www.kaggle.com/theoviel/character-level-model-magic
+
+The rest is a bit less interesting and requires more cleaning :)
+
+reply
+Reply
+
+This comment has been deleted.

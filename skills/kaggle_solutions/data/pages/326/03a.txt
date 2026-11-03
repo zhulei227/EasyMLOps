@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/imaterialist-fashion-2019-FGVC6/discussion/91536#latest-547636
-fetched: 2026-10-27
-chars: 838
+fetched: 2026-11-03
+chars: 4449
 
 menu
 Skip to
@@ -42,15 +42,175 @@ Models
 Discussion
 Leaderboard
 Rules
+Konstantin Lopukhin · 3rd in this Competition · Posted 7 years ago
+arrow_drop_up
+19
+more_vert
+Which approach works best?
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I'm using Mask-RCNN so far (https://github.com/facebookresearch/maskrcnn-benchmark) and it seems to work OK, and the code is quite easy to modify. Looks like current top-2 are also using Mask-RCNN? Another possible approach would be to do segmentation with something UNet-alike, and segment into instances (should be easy here). And maybe also have a separate classification step to determine attributes. Main difference is that for Mask-RCNN, segmentation and classification are more explicitly separated, while for pure segmentation tasks, they are performed jointly. Although it seems that Mask-RCNN is likely to have worse quality masks, due to fixed per-object mask size and resampling. Also attributes seem really hard to predict to me so far.
 
-error
+What do you think?
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Please sign in to reply to this topic.
 
-Failed to load the discussion topic
+comment
+20 Comments
+Hotness
+sunxiaotao
 
-error
+Posted 7 years ago
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+· 173rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for your idea, I have tried mask-rcnn，then I have a baseline now. I'm confused about the direction of optimization, specifically about how to predict the attributes, or classificate Finer-grained，can you have a share about it ?
+
+JohnM
+
+Posted 7 years ago
+
+· 169th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I'm also using Mask-RCNN, but in Keras. Still working on a trainable model adapted from Matterport's Mask_RCNN.
+
+interneuron
+
+Posted 7 years ago
+
+· 51st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Are you guys stacking the masks such that all masks associated with one image id are together? So the number of images and masks = unique image ids? Or take each row in train.csv as one image-mask pair so have number of samples = rows?
+
+Konstantin Lopukhin
+
+Topic Author
+
+Posted 7 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think you need to take each row in train.csv as one image-mask pair so have number of samples = rows.
+
+3 more replies
+arrow_drop_down
+donglee
+
+Posted 7 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+How did you generate an instance?Just each row generate an instance ,or generate a mask for each class firstly, and then find the envelope in the figure？(cv2.findContours), thank you for your sharing！
+
+Konstantin Lopukhin
+
+Topic Author
+
+Posted 7 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+It's one instance from one row.
+
+donglee
+
+Posted 7 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Resize 512*512 this process loses much precision，I wonder if there is any need to pay attention to post-processing.
+
+sunxiaotao
+
+Posted 7 years ago
+
+· 173rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+test
+
+Abhishek Thakur
+
+Posted 7 years ago
+
+· 33rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+how much time does mask rcnn take for you? its taking nearly 30hrs for one epoch on my gpu. :/
+
+Peiyuan Liao
+
+Posted 7 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+For me it's around 6 hours.
+
+4 more replies
+arrow_drop_down
+Peiyuan Liao
+
+Posted 7 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Another possible approach would be to do segmentation with something UNet-alike, and segment into instances (should be easy here)
+
+This part is not easy: e.g., how do you differentiate between two shoes and two patches of one shoe (where occlusion occurs in between)? cv2.connectedComponents cannot solve this problem directly.
+
+Konstantin Lopukhin
+
+Topic Author
+
+Posted 7 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+I agree, "easy" is not the right word here, but it's still possible, for example in 2018 Data Science Bow the task was to separate cells which were really close, and 1st place used watershed to separate instances: https://www.kaggle.com/c/data-science-bowl-2018/discussion/54741
+
+This comment has been deleted.

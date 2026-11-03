@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/ventilator-pressure-prediction/discussion/285965
-fetched: 2026-10-27
-chars: 567
+fetched: 2026-11-03
+chars: 2767
 
 menu
 Skip to
@@ -22,26 +22,136 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Google Brain · Research Prediction Competition · 5 years ago
-Late Submission
-more_horiz
+[#1 Solution] The code — Google Brain - Ventilator Pressure Prediction
+[#1 Solution] The code
+
 Google Brain - Ventilator Pressure Prediction
 
-Simulate a ventilator connected to a sedated patient's lung
+Solution Writeup · 1st place · Nov 13, 2021
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
-Failed to load the discussion topic
+We have uploaded a big chunk of our code required to reproduce our solution as notebooks on Kaggle.
 
-Failed to load the discussion topic
+LSTM CNN transformer The code required to run a single fold of our LSTM + CNN Transformer model. Running multiple folds of this and taking a median ensemble should result in a significant boost of LB scores.
+
+PID Controller Matching The code & intuition behind the PID controller matching. The current code is a preliminary version that still introduces some errors. Newer versions will be uploaded shortly.
+
+Github repos:
+
+PID Controller Matching
+LSTM+CNN Transformer
+LSTM on Raw data
+
+Pretrained models:
+
+https://www.kaggle.com/shujun717/googlebrainventilator1stshujun
+
+In case there are any questions, feel free to leave a comment on the corresponding notebook or here!
+
+Our LSTM model will soon be uploaded as a notebook as well so that people can play around with that one too (I will update this topic once it is published). Moreover, I have started writing the blog post with a more elaborate explanation of our solution, I will make a new topic with a link once this is finished!
+
+Authors
+Shujun
+
+shujun717
+
+Zidmie
+
+zidmie
+
+Gilles Vandewiele
+
+group16
+
+Kha Vo
+
+khahuras
+
+Riccardo
+
+callmeb
+
+arrow_drop_up
+74
+Share
+more_horiz
+Citation
+
+Shujun, Zidmie, Gilles Vandewiele, Kha Vo, Riccardo. [#1 Solution] The code. https://www.kaggle.com/competitions/ventilator-pressure-prediction/writeups/shujun-kha-zidmie-gilles-b-1-solution-the-code. 2021. Kaggle
+
+2
+comment
+5 Comments
+3 appreciation comments
+Hotness
+Ctrl_CV
+
+Posted 5 years ago
+
+· 62nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Good job! hope to see the completely code!
+
+reply
+Reply
+Gilles Vandewiele
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I have just updated this topic to include our 3 github repositories which can be used to fully reproduce our solution. A blog post will be published later today as well, I will make a separate topic to announce this.
+
+reply
+Reply
+Appreciation (3)
+CMan9292
+
+Posted 5 years ago
+
+· 308th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the code!
+
+Benny Fung
+
+Posted 5 years ago
+
+· 811th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Nice! Thanks for your sharing.
+
+Md Hassan
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great! Thanks for the code.

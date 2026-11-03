@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/231511
-fetched: 2026-10-27
-chars: 729
+fetched: 2026-11-03
+chars: 9822
 
 menu
 Skip to
@@ -22,29 +22,219 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Vingroup Big Data Institute · Featured Prediction Competition · 6 years ago
-Late Submission
-more_horiz
+1st Place Solution — VinBigData Chest X-ray Abnormalities Detection
+1st Place Solution
+
 VinBigData Chest X-ray Abnormalities Detection
 
-Automatically localize and classify thoracic abnormalities from chest radiographs
+Solution Writeup · 1st place · Jan 27, 2022
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+Thanks to Kaggle and hosts for this very interesting competition with a too challenging dataset. This has been a great collaborative effort. Please give your upvotes to @fatihozturk @socom20 @avsanjay Congrats to The Winners.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+TLDR
 
-error
+@fatihozturk explained in his post how was his path through this competition, this post is intended as an overall view of our final solution which achieved 0.354/0..314 PublicLB/PrivateLB. It is worth mentioning that we also had a better solution with 0.330/0.321 PublicLB/PrivateLB (which unfortunately we didn't select). As you all already know the main magic we have used for this competition was our Ensembling procedure, also there were lots of other important findings that we mention in this post.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+CV strategy: This was our main challenge, we didn't have a unique validation scheme. Since we started the competition as different teams, we all were using different CV splits to train our models and to build our separated best ensembles. To overcome this difficulty we finally ended up using the public LB as an extra validation dataset. We felt that this strategy was a bit risky, so we also retrained some of our best models using a common validation split and then we ensemble them (this last approach didn't have the best score on the private LB by itself). We think that our last ensemble, using the public LB as a validation source, helped out our final solution to fit better the consensus method used to build the test dataset.
+
+Our Validation Strategy
+
+Our strategy for the final submission can be divided into 3 stages :
+
+Fully Validated Stage
+Partially Validated Stage
+Not validated Stage (Just validated using the Public LB)
+Models, we used for Ensembling
+
+Fully Validated Stage:
+
+Detectron2 Resnet101 (notebook by @corochann, Thanks)
+YoloV5
+EffDetD2
+
+Partially Validated Stage:
+
+YoloV5 5Folds
+
+Not Validated Stage:
+
+2 EffdetD2 model
+3 YoloV5 (1x w/ TTA , 2x w/o TTA)
+16 Classes Yolo model
+5 Folds YoloV5 by @awsaf49
+New Anchor Yolo
+Detectron2 Resnet50 (notebook by @corochann, Thanks)
+YoloV5 @nxhong93 (https://www.kaggle.com/nxhong93/yolov5-chest-512)
+Yolov5 with image size (640)
+Ensembling Strategy
+
+To ensemble all the partial models we mainly used @zfturbo's ensembling repository https://github.com/ZFTurbo/Weighted-Boxes-Fusion. Our ensemble technic is shown in the following figure:
+
+As you can see at the end of the Not Validated Stage, we use WBF+p_sum. This last blending method is a variant of WBF proposed by @socom20 and was intended to simulate the consensus of radiologists used in this particular test dataset. By using WBF+p_sum improved our Not Validated stage from 0.319 to 0.331 in the PublicLB.
+
+Modified WBF: It has more flexibility than WBF, it has 4 bbox blending technics, we found that only 2 of them were useful in this competition:
+
+"p_det_weight_pmean", has a behaviour similar to WBF, it finds the set of bboxes with iou > thr, and then weights them using their detection probabilities (detection confidences). The new p_det (detection confidence) is an average over the detection probabilities of detections with iou > thr.
+"p_det_weight_psum": does the same with the bboxes. In this case, the new p_det is a sum over the detection probability of bboxes with iou > thr. Because of the sum of the p_dets, "p_det_weight_psum" needs a final normalization step. The idea behind psum is to try to replicate "the consensus of radiologists" using the partial models. When adding the probabilities of detection, we weigh more those boxes in which more models/radiologists agree.
+
+In our final submission, the not validated stage had a high weighting, which lead to an overfitted problem in our final ensemble we got 0.354/0.314 Public/Private. If we had reduced the weighting for this not validated stage, the LB score would have become 0.330/0.321 Public/Private as we previously have mentioned in the post.
+
+Some Interesting Findings
+After spending more time understanding the competition metric, we realized that there is No Penalty For Adding More Bbox as @cdeotte explains clearly here: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/229637. Having more confident boxes is good but, at the same time, having many low confidence bboxes improves the Recall and can improve the mAP as well. We tested this approach by using two models, a Model A with a good mAP, and a Model B with a good Recall for all the classes. The following figure shows on the left the Precision vs Recall curves of Model A. It can be seen that many class tails end with a maximum recall = 0.7. We managed to add to Model A all the bboxes predicted for Model B which doesn't overlap with any bbox of predicted for Model A, the result is in the plot of the right. It can be seen that the main shape of the PvsR curves is still the same, but the tails now reach over recall=0.8. We didn't use this approach in our final model because the final ensemble already had a very good recall for all the classes.
+
+Last competition days, we spent analyzing the predictions made for the ensemble both by submitting and also visually inspecting predicted bboxes. We found that our improved submissions were indeed improving for almost all classes including the easy and the rare ones.
+
+Things didn't work
+Multi-Label Classifier: We trained a multilabel classifier using as output the 14 classes. We used sigmoid as activation because we needed the probability of each disease and many images have more than one disease. The idea was to remove from the ensemble all the bboxes not predicted by this classifier model, This approach led to a reduction in performance. We also tried to switch the pooling layer and to use PCAM pooling (it is an attention pooling layer used in the Top1 Solution of CheXpert), but it didn't work either.
+Bbox Filter: We trained an EfficientNetB6 which classifies whether the detected bboxes belong to a selected class or not just by seeing the crop selected by the ensemble. The model couldn't understand the difference between each disease, perhaps it needed more information on the whole image.
+Usage of External Dataset: We tried to use the NIH dataset. We first trained a backbone as a Multi-Label Classifier using NIH classes, and then we transfer its weights to the detector's backbone. Finally, we trained only the detection heads using this competition's dataset. We couldn't detect any appreciable improvement in the particular detector score.
+ClassWise Model: we trained different models, one for each detection class. We used clsX + cls14 as each model's dataset. In this case, each model had its own set of anchors prepared for detecting the class of interest. Some classes improved their CV performance but others didn't. Joining all the models we got a very good model, unfortunately, the validation split used in this model was different from the others and it was unreliable to add it to the Validated Stage so we decided to include it in the Partially Validated Stage, but still, didn't give any improvements. We had a final ensemble using this model, which wasn't finally selected, but it had the same score as our winning submission.
+Models we choose.
+Best at local validation (around 0.47+ mAP on CV), Public: 0.300, private: 0.287
+Best at LB. Public: 0.354, private: 0.314
+Our best submission in private was 0.321 which was 0.330 in Public
+Hardware we used
+4x Quadro GV100
+4x Geforce GTX 1080
+4x Titan X
+Ryzen 9 3950x
+Nvidia RTX 3080
+Quadro RTX 6000 EDIT 1: The solution is reproducible by one GPU itself.
+Authors
+Sergio Manuel Papadakis
+
+socom20
+
+Mohammed Rizin V K
+
+morizin
+
+avsanjay
+
+avsanjay
+
+Fatih Öztürk
+
+fatihozturk
+
+arrow_drop_up
+62
+Share
+more_horiz
+Citation
+
+Sergio Manuel Papadakis, Mohammed Rizin V K, avsanjay, Fatih Öztürk. 1st Place Solution. https://www.kaggle.com/competitions/vinbigdata-chest-xray-abnormalities-detection/writeups/s-1st-place-solution. 2021. Kaggle
+
+comment
+7 Comments
+Hotness
+Chanran Kim
+
+Posted 6 years ago
+
+· 193rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing! And you deserve it :) Congrats!
+
+reply
+Reply
+Mohammed Rizin V K
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Sorry for being so late. We were busy in preparing the codes.
+
+reply
+Reply
+Piotr Czarnecki
+
+Posted 5 years ago
+
+· 882nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+hi, is it possible so you could share predictions of your final model made on 15k samples trainset? with my colleagues we would like to analyze your model deeper to learn more from the winner:) e.g. how model performed on different classes, and so on.
+
+reply
+Reply
+Mohammed Rizin V K
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Do you need the final prediction file or what else ? i am confused
+
+reply
+Reply
+Piotr Czarnecki
+
+Posted 5 years ago
+
+· 882nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+if possible, we would need file containing predictions performed on trainset (data which model saw during training), not final predicitons.
+
+reply
+Reply
+xuzhaocheng
+
+Posted 6 years ago
+
+· 174th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+the pic in Ensembling Strategy is so small, can you please give me another more clear one
+
+reply
+Reply
+Mohammed Rizin V K
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+reply
+Reply

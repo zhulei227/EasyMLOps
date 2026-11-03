@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/talkingdata-adtracking-fraud-detection/discussion/56475
-fetched: 2026-10-27
-chars: 832
+fetched: 2026-11-03
+chars: 13423
 
 menu
 Skip to
@@ -22,35 +22,605 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-TalkingData · Featured Prediction Competition · 8 years ago
-Late Submission
-more_horiz
+1st place solution — TalkingData AdTracking Fraud Detection Challenge
+1st place solution
+
 TalkingData AdTracking Fraud Detection Challenge
 
-Can you detect fraudulent click traffic for mobile app ads?
+Solution Writeup · 1st place · May 19, 2018
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+We'd like to thank TalkingData and Kaggle for organizing this exciting competition. This competition gave us a fantastic opportunity to learn how to deal with very large table data.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Here is our solution.
 
-error
+Strategy:
+Our solution heavily depends on negative down-sampling [1, 2], which means we use all positive examples (i.e., is_attributed == 1) and down-sampled negative examples on model training. We down-sampled negative examples such that their size becomes equal to the number of positive ones. It discards about 99.8% of negative examples, but we didn't see much performance deterioration when we tested with our initial features. Moreover, we could get better performance when creating a submission by bagging five predictors trained on five sampled datasets created from different random seeds. This technique allowed us to use hundreds of features while keeping LGB training time less than 30 minutes.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Features:
+First, we started from features from Kernels. On Thanks pranav84 and other Kagglers for sharing their awesome insights! We did feature engineerings using all the data examples instead of the down-sampled ones.
 
-Failed to load the discussion topic
 
-error
+five raw categorical features (ip, os, app, channel, device)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+time categorical features (day, hour)
+
+some count features
+Then, we created a bunch of features in a brute-force way. For each combination of five raw categorical features (ip, os, app, channel, and device), we created the following click series-based feature sets (i.e., each feature set consists of 31 (=(2^5) - 1) features):
+
+click count within next one/six hours
+
+forward/backward click time delta
+
+average attributed ratio of past clicks
+We didn't do feature selection. We just added all of them to our model. At that point, our LGB model's score was 0.9808.
+
+Next, we tried categorical feature embedding by using LDA/NMF/LSA. Here is the pseudo code to compute LDA topics of IPs related to app. (LDA is latent Dirichlet allocation)
+
+apps_of_ip = {}
+for sample in data_samples:
+  apps_of_ip.setdefault(sample['ip'], []).append(str(sample['app']))
+ips = list(apps_of_ip.keys())
+apps_as_sentence = [' '.join(apps_of_ip[ip]) for ip in ips]
+apps_as_matrix = CountTokenizer().fit_transform(apps_as_sentence)
+topics_of_ips = LDA(n_components=5).fit_transform(apps_as_matrix)
+
+
+We computed this feature for all the 20 (=5*(5-1)) combinations of 5 raw features and set the topic size to 5. This ended up with 100 new features. We also computed similar features using NMF and PCA, in total 300 new features. 0.9821 with a single LGB.
+
+After that, we removed all raw categorical features except app since we supposed embedding features cover information available from them. Surprisingly, this minor change made our public LB score jump up from 0.9821 to 0.9828. Actually, we don't know what causes this significant score improvement.
+Besides features mentioned here, we created higher dimensional LDA features and features that try to address the duplicate sample problem. These features somewhat improve our public LB score.
+
+Models:
+We used day 7 & 8 for training and day 9 for validation, and chose the best number of iterations of LGB. Then, we trained a model on day 7 & 8 & 9 with the obtained number of iterations for creating submission. After we finished feature engineering, flowlight's five-bagged LGB model reached 0.98333 on public LB (and 0.98420 on private LB), which was trained on 646 features. As far as we remember, the memory usage for training this model was less than 100GB (<64GB will be possible with minor code modification).
+I implemented a simple three layer NN model as some kernels do. It scored worse than LGB models by 0.0013 points with 0.005 down-sampling rate at first. Then, I realized it should be trained with more negative data samples, probably. However, we didn't afford to use so many examples because of the massive amount of our features (and my bad implementation, disk space, no GPU, close deadline, etc…). The final three-bagged NN model scored 0.98258 on public LB.
+We made our final submission with a rank-based weighted averaging. It is composed of seven bagged LGB models and a single bagged NN It scored 0.98343 on public LB.
+
+
+[1] Practical Lessons from Predicting Clicks on Ads at Facebook
+[2] Ad Click Prediction: a View from the Trenches
+
+EDIT: Added some extra explanations based on frequently asked questions in comments.
+
+Authors
+flowlight
+
+flowlight
+
+Komaki
+
+ckomaki
+
+arrow_drop_up
+270
+Share
+more_horiz
+Citation
+
+flowlight, Komaki. 1st place solution. https://www.kaggle.com/competitions/talkingdata-adtracking-fraud-detection/writeups/flowlight-komaki-shuffle-1st-place-solution. 2018. Kaggle
+
+comment
+95 Comments
+6 appreciation comments
+Hotness
+bestfitting
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+Congrats,a very good solution,your 1st place is well deserved,thanks for sharing. I think if we can combine the top teams' solutions ,we will get a very high score.
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+I am not sure I qualify as one of the top teams, but I shared my 0.98379 private solution here. Maybe others could do the same so that we can blend?
+
+reply
+Reply
+bestfitting
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Absolutely should include you :)
+To get top 50 is not so easy in this competition.
+
+
+reply
+Reply
+Feiyang Pan
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+I feel the same. I am very impressed to see so many wonderful ideas that I have never thought of.
+
+reply
+Reply
+Pranav Pandya
+
+Posted 8 years ago
+
+· 376th in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Congratulations @ckomaki and @flowlight. Excellent approach and very well deserved win. And a big thank you for the mention :) This actually made my day!
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@Pranav, It is a pity to see how Dirk share impacted you. Most people reused your shared kernels.
+
+reply
+Reply
+Pranav Pandya
+
+Posted 8 years ago
+
+· 376th in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+That's alrite @CPMP. Though Dirk impacted me too but I also blame myself for making stupid selections on judgement day :) But honestly, this competition was really a great learning experience for me specifically in feature engineering part.
+
+Shared learning from community actually helped me a lot and I'm sure that this will contribute positively for me in next competitions :)
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+I must say that I feel stupid for not having tested downsampling of negative. I usually try it on very imbalanced datasets. Well done!
+
+Are you computing your lsa models on downsampled data or on the original one?
+
+reply
+Reply
+Komaki
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+LSA features were computed on the original data :)
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Yifan Xie
+
+Posted 8 years ago
+
+· 50th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+fantastic solution, thank you very much for sharing - Matrix factorization for feature interaction will be a main take away for me from this competition
+
+reply
+Reply
+FredGu
+
+Posted 8 years ago
+
+arrow_drop_up
+2
+more_vert
+
+The feature engineering by LDA is brilliant . Thanks for sharing.
+
+reply
+Reply
+seaguII
+
+Posted 8 years ago
+
+· 96th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi there, just a quick question. What is a bagged LGB model? And did you use different random seeds for k-fold or not when creating seven LGB models? Many thanks!
+
+reply
+Reply
+Fujii Hironori
+
+Posted 8 years ago
+
+· 267th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@flowlight's repository: https://github.com/flowlight0/talkingdata-adtracking-fraud-detection
+
+reply
+Reply
+flowlight
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for attaching this link. I have forgotten to post a comment about my repo.
+
+reply
+Reply
+Fujii Hironori
+
+Posted 8 years ago
+
+· 267th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing your repository. Your creative solution is valuable not only for current but also for future data scientists, researchers and machine learning engineers. Providing its repository makes it more informative and helpful.
+
+reply
+Reply
+Fujii Hironori
+
+Posted 8 years ago
+
+· 267th in this Competition
+
+arrow_drop_up
+2
+more_vert
+average attributed ratio of past clicks
+
+Doesn't this feature cause over-fit? Do you confirm or are you sure this feature really improve the score? Could you provide the feature importance of your trained model?
+
+reply
+Reply
+Fujii Hironori
+
+Posted 8 years ago
+
+· 267th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Maybe I don't understand the sentence at all. What does "past clicks" mean? Could you show a pseudo code like following?:
+
+test_and_train_df.groupby(group)['is_attributed'].mean()
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+xuan
+
+Posted 8 years ago
+
+· 849th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Do you use sklearn.decomposition.LatentDirichletAllocation ? or others? It's very slow. How to train it quickly?
+
+reply
+Reply
+flowlight
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Yes, we used sklearn.decomposition.LatentDirichletAllocation. If my memory is correct, it takes about one hour for calculation on an (ip, app) pair. It was acceptable because we stored each feature in a file once we computed it and we don't have to run LDA for each training.
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+plantsgo
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!Thanks for sharing.Also want to know why "removed all raw categorical features except app" work….
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Removing all but app and os worked for me. Don't know why either.
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+Kirill Semenov
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Very good and clear guidelines indeed!)
+
+reply
+Reply
+Ievgen Ishchuk
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+damn, that's something I have been looking for. Perfect for a rookie. Thank you
+
+reply
+Reply
+dgg32
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+The LDA move is ingenious. Hope I can get the idea and use it somewhere else too.
+
+reply
+Reply
+datasmith
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Insightful solution, thanks for sharing!
+
+reply
+Reply
+Jordi Villar
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! A noob and stupid question, why the down-sampling makes such a difference? Are you using the raw model trained with the balanced dataset? Or are you performing some adjustment to take into account this down-sampling (weighting examples, adjusting the trained model, etc)?
+
+reply
+Reply
+dean1977
+
+Posted 8 years ago
+
+· 318th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats. Great work.
+
+reply
+Reply
+TaoL
+
+Posted 8 years ago
+
+· 364th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing. It's a great learning experience!
+
+reply
+Reply
+Shawn Xiao
+
+Posted 8 years ago
+
+· 84th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing! Learn a lot from negative down-sampling and categorical feature embedding! Cool jobs!
+
+reply
+Reply
+AmanSrivastava
+
+Posted 8 years ago
+
+· 1598th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats. Great work. Well deserved.
+
+reply
+Reply
+joejiong
+
+Posted 8 years ago
+
+· 536th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+great solution
+
+reply
+Reply
+Hang
+
+Posted 8 years ago
+
+· 711th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing. Few questions
+
+To calculate "click count within next one/six hours" feature, did you use test_supplement.csv.zip file?
+For LDA/NMF/LSA related features, could you specify which raw feature is treated as word? I would guess in most cases "ip" will be treated as document?
+reply
+Reply
+Kevin Liao
+
+Posted 8 years ago
+
+· 584th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I am glad I saw this post and learn something I haven't even thought of before. Great work. Congrats!!
+
+reply
+Reply
+Ajit Singh
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice work
+
+reply
+Reply
+tiopon
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats！ and thanks for sharing your brilliant solutions.
+
+I am a little confused about when you said “we created higher dimensional LDA features and features that try to address the duplicate sample problem”.
+
+by saying "higher dimensional", do you mean some matrix factoraization over combined categorical features or sth else?
+i dont quite understand “duplicate sample problem” and how it would negatively effect the model.
+
+Enjoy the wins and i am looking forwards to your reply!
+
+reply
+Reply
+Tom Skrovan
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Cool stuff lad
+
+reply
+Reply

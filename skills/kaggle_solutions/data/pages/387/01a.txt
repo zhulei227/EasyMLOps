@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/jigsaw-multilingual-toxic-comment-classification/discussion/160986
-fetched: 2026-10-27
-chars: 844
+fetched: 2026-11-03
+chars: 7059
 
 menu
 Skip to
@@ -42,15 +42,281 @@ Models
 Discussion
 Leaderboard
 Rules
+Rafi Hai · 1st in this Competition · Posted 6 years ago
+arrow_drop_up
+58
+more_vert
+1st place solution: post-processing
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Firstly, a big thanks to Kaggle for constantly delivering top-notch competitions. Competitions doesn't always end smooth (cf. Deepfakes 😄) but there is no other data science platform so rich in learning. Another thanks to Jigsaw for the interesting, multi-lingual, shakeup-free ride!
+Also congrats to the other medalists, and to my talented team-mate @leecming!
 
-Failed to load the discussion topic
+Since other competitors were asking about our post-processing technique, I dedicate this post to explain it in more detail.
 
-error
+To see the post-processing in action, have a look at the related notebook
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Post-processing: intuition
 
-error
+The intuition of the post-processing is as following: we consider the trend of subsequent submissions of a specific language (e.g. Russian) for each example in the test dataset. If the trend of that example is positive i.e. going up, we nudge the example further in the positive direction. And vice versa - if the trend is negative i.e. going down, we nudge the example further in the negative direction.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+We measure the trend by taking the differences of all subsequent submissions for the specific language and averaging those differences. The nudge that we then give to the new submission is based on a predefined weight, typically we choose a weight of 1 or 1.5.
+
+Post-processing: pseudo-code
+
+In an attempt to pseudo-code the technique, given:
+
+weight = predefined weight (typically 1 or 1.5)
+pred_best = current best predictions on LB
+diff_avg = average of differences of consecutive subs (trend)
+
+
+Then for each example in test of the specific language (e.g. Turkish):
+
+if diff_avg < 0: # negative trend
+    pred_new = (1+weight*diff_avg)*pred_best  # nudge downwards
+else: # positive trend
+    pred_new = (1-weight*diff_avg)*pred_best + weight*diff_avg # nudge upwards
+
+
+Note: I'm not an expert on PP, so I assume this technique can be further optimized. The boost we got from it was relatively small (albeit significant) compared to the other methods we implemented.
+
+Please sign in to reply to this topic.
+
+comment
+19 Comments
+1 appreciation comment
+Hotness
+YaGana Sheriff-Hussaini
+
+Posted 6 years ago
+
+· 37th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@rafiko1 congrats again and thanks for sharing.
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you @sheriytm!
+
+Rashidul Hasan Hridoy
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Great!
+
+Dron Dronych
+
+Posted 6 years ago
+
+· 489th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on becoming # 1 in this competition. Any plans to share a kernel close to the best solution? Really interested in seeing these PP techniques applied in code
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! I'll discuss with my partner about what we'll share or not as kernels
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats and thanks for sharing the PP technique! May I ask how the averaging was done? Is it like if you got the best prediction sub_best and several former and weaker (lower in LB), let's say sub_a, sub_b, and sub_c, then you calculated the diff between each weaker sub and the best one by data point/row (so in this case, there would be 3 diffs: diff(sub_best, sub_a), diff(sub_best, sub_b), and diff(sub_best, sub_c)), and then averaged the 3 diffs to get trend matrix in dim [63812, 1] that you discussed above, and plus since it looks like this PP was done row by row (each text has its own diff_avg) I guess the reason why you mentioned that you did it for a specific language is that you used one model for each language, isn‘t it? please kindly correct me if I am wrong, thanks again! Really loved your solution!!
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, and good questions! The difference is done consecutively for each sub improvement on the LB, so not with the best sub: For sub_a < sub_b < sub_c, ... we take diff(sub_a, sub_b) and diff(sub_b, sub_c),... and compute the average of those differences We repeat the process for each language individually, mainly to account for our subs that are based on mono-lingual models. So in retrospect, we only change dim [N_test_language, 1] for the new sub, keeping all language other predictions as-is. We got a small improvement for es, tr, ru, fr.
+
+Let me know if you have other questions :)
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+thanks for the detailed answers! Nice practice as a PP for classification problem lol.
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Sure thing! Might come in handy :D
+
+Shubham Goel 1410
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+@rafiko1 congrats on being master
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you 🙏
+
+Deep Chatterjee
+
+Posted 6 years ago
+
+· 291st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thanks for sharing the technique.
+
+Chris Deotte
+
+Posted 6 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Nice trick. How much did PP increase your public and private LB?
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We were able to squeeze another ~0.001 on public (from 0.9546 to 0.9556) corresponding to 0.0006 on private (from 0.9530 to 0.9536). These are final results after using the new predictions as pseudolabels.
+
+KhanhVD
+
+Posted 6 years ago
+
+· 93rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations on being a master @rafiko1!
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks @duykhanh99 :)
+
+Dron Dronych
+
+Posted 6 years ago
+
+· 489th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@rafiko1 am I getting this right that you basically finetuned your predictions on the public leaderboard? and more submissions => more reliable trend direction
+
+Rafi Hai
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+That's exactly right. The more submissions you have, the more you can fine-tune it to public LB. Worth to mention is that even subs that give a degradation in score (i.e. sub_c < sub_b) can still be incorporated in a similar fashion
+
+Appreciation (1)
+Md Selim Reza
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!!
+
+Thank You

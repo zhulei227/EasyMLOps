@@ -1,0 +1,756 @@
+- generic [ref=f44e2]:
+  - navigation "Main Kaggle page navigation" [ref=f44e3]:
+    - generic [ref=f44e5]:
+      - button "Navigation menu" [ref=f44e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f44e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f44e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f44e12] [cursor=pointer]:
+      - paragraph [ref=f44e18]: Create
+    - generic [ref=f44e21]:
+      - list [ref=f44e22]:
+        - listitem "Home List Item" [ref=f44e23]:
+          - link "Home" [ref=f44e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f44e31]: Home
+        - listitem "Competitions List Item" [ref=f44e32]:
+          - link "Competitions" [ref=f44e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f44e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f44e41]:
+          - link "Benchmarks" [ref=f44e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f44e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f44e50]:
+          - link "Arenas" [ref=f44e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f44e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f44e59]:
+          - link "Game Arena" [ref=f44e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f44e67]: Game Arena
+      - list [ref=f44e68]:
+        - listitem "Data Hub List Item" [ref=f44e69]:
+          - generic [ref=f44e70]:
+            - link "Data Hub" [ref=f44e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f44e77]: Data Hub
+            - button "Expand" [ref=f44e80] [cursor=pointer]
+      - list [ref=f44e82]:
+        - listitem "More on Kaggle List Item" [ref=f44e83]:
+          - generic [ref=f44e84]:
+            - link "More on Kaggle" [ref=f44e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f44e91]: More
+            - button "Expand" [ref=f44e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f44e97]:
+    - generic [ref=f44e98]:
+      - generic [ref=f44e102]:
+        - textbox "Search" [ref=f44e104]
+        - group [aria-hidden]
+      - generic [ref=f44e106]:
+        - link [ref=f44e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Ffeedback-prize-effectiveness%2Fdiscussion%2F347371
+          - button "Login" [ref=f44e108]
+        - link [ref=f44e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Ffeedback-prize-effectiveness%2Fdiscussion%2F347371
+          - button "Sign Up" [ref=f44e111]
+  - main [ref=f44e113]:
+    - generic [ref=f44e115]:
+      - generic [ref=f44e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f44e117]:
+        - link "Learn more" [ref=f44e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f44e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f44e123]:
+      - generic [ref=f44e125]:
+        - generic [ref=f44e126]:
+          - link "Georgia State University's profile" [ref=f44e127] [cursor=pointer]:
+            - /url: /organizations/GeorgiaStateUniv
+            - generic "Georgia State University" [ref=f44e128]
+          - generic [ref=f44e132]:
+            - generic [ref=f44e133]: Georgia State University
+            - generic [ref=f44e135]: · Featured Code Competition · 4 years ago
+          - generic [ref=f44e136]:
+            - button "Late Submission" [disabled] [ref=f44e138]
+            - button "Competition options menu collapsed" [ref=f44e141] [cursor=pointer]: more_horiz
+        - generic [ref=f44e143]:
+          - heading "Feedback Prize - Predicting Effective Arguments" [level=1] [ref=f44e144]
+          - paragraph [ref=f44e146]: Rate the effectiveness of argumentative writing elements from students grade 6-12
+      - generic [ref=f44e150]:
+        - tablist [ref=f44e157]:
+          - tab "Overview, 1 of 7" [ref=f44e158] [cursor=pointer]:
+            - generic [ref=f44e159]: Overview
+          - tab "Data, 2 of 7" [ref=f44e160] [cursor=pointer]:
+            - generic [ref=f44e161]: Data
+          - tab "Code, 3 of 7" [ref=f44e162] [cursor=pointer]:
+            - generic [ref=f44e163]: Code
+          - tab "Models, 4 of 7" [ref=f44e164] [cursor=pointer]:
+            - generic [ref=f44e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f44e166] [cursor=pointer]:
+            - generic [ref=f44e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f44e168] [cursor=pointer]:
+            - generic [ref=f44e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f44e170] [cursor=pointer]:
+            - generic [ref=f44e171]: Rules
+        - separator [ref=f44e173]
+      - generic [ref=f44e177]:
+        - generic [ref=f44e178]:
+          - generic [ref=f44e179]:
+            - generic [ref=f44e180]:
+              - link "Trushant Kalyanpur's profile" [ref=f44e181] [cursor=pointer]:
+                - /url: /trushk
+                - generic "Trushant Kalyanpur" [ref=f44e182]
+              - generic [ref=f44e186]:
+                - link "Trushant Kalyanpur" [ref=f44e187] [cursor=pointer]:
+                  - /url: /trushk
+                - text: ·
+                - generic [ref=f44e188]: 3rd in this Competition
+                - text: ·
+                - generic [ref=f44e189]: Posted 4 years ago
+            - generic [ref=f44e190]:
+              - generic [ref=f44e191]:
+                - button "Upvote" [ref=f44e192] [cursor=pointer]:
+                  - generic [ref=f44e193]: arrow_drop_up
+                - button "62 votes" [ref=f44e194] [cursor=pointer]: "62"
+              - button "More Options for this Topic" [ref=f44e195] [cursor=pointer]: more_vert
+            - heading "3rd Place - Short Solution" [level=3] [ref=f44e196]
+            - generic [ref=f44e199]:
+              - paragraph [ref=f44e200]:
+                - text: First of all congratulations to my teammate
+                - link "@conjuring92 (opens in a new tab)" [ref=f44e201] [cursor=pointer]:
+                  - /url: /conjuring92
+                  - text: "@conjuring92"
+                - text: for becoming a Kaggle Competitions Master! Very well deserved!!
+              - paragraph [ref=f44e202]:
+                - text: This a very brief writeup of our solution which was a team effort of team
+                - strong [ref=f44e203]: Darjeeling Tea
+                - text: ":"
+                - link "@harshit92 (opens in a new tab)" [ref=f44e204] [cursor=pointer]:
+                  - /url: /harshit92
+                  - text: "@harshit92"
+                - link "@conjuring92 (opens in a new tab)" [ref=f44e205] [cursor=pointer]:
+                  - /url: /conjuring92
+                  - text: "@conjuring92"
+                - text: and me.
+              - paragraph [ref=f44e206]:
+                - text: Detailed writeup coming soon by
+                - link "@conjuring92 (opens in a new tab)" [ref=f44e207] [cursor=pointer]:
+                  - /url: /conjuring92
+                  - text: "@conjuring92"
+                - text: "EDIT: Added here:"
+                - link "https://www.kaggle.com/competitions/feedback-prize-effectiveness/discussion/347433 (opens in a new tab)" [ref=f44e208] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/competitions/feedback-prize-effectiveness/discussion/347433
+                  - text: https://www.kaggle.com/competitions/feedback-prize-effectiveness/discussion/347433
+              - paragraph [ref=f44e209]:
+                - strong [ref=f44e210]: "Things that worked:"
+              - list [ref=f44e211]:
+                - listitem [ref=f44e212]: Span classification approach with LSTM head and multi-head attention
+                - listitem [ref=f44e213]: Span MLM
+                - listitem [ref=f44e214]: Data augmentation using T5
+                - listitem [ref=f44e215]: AWP/Token Mask Augmentation/Multi-sample dropout
+                - listitem [ref=f44e216]: Prompt based learning
+                - listitem [ref=f44e217]: 2nd level meta models - LSTM / LGB
+              - paragraph [ref=f44e218]:
+                - strong [ref=f44e219]: "Things that did not work:"
+              - list [ref=f44e220]:
+                - listitem [ref=f44e221]: Regular MLM
+                - listitem [ref=f44e222]: Pseudo Labeling
+                - listitem [ref=f44e223]: Mixout
+              - paragraph [ref=f44e224]:
+                - text: Our best single arch was 10fold deberta-large - Public LB
+                - strong [ref=f44e225]: "0.563"
+                - text: Private LB
+                - strong [ref=f44e226]: "0.566"
+                - text: (gold zone) Our most efficient sub was deberta-large trained on all train data + aug data - Public LB
+                - strong [ref=f44e227]: "0.565"
+                - text: / Private
+                - strong [ref=f44e228]: "0.569"
+                - text: in 10mins
+          - separator [ref=f44e229]
+        - generic [ref=f44e230]:
+          - generic [ref=f44e231]:
+            - paragraph [ref=f44e234]:
+              - paragraph [ref=f44e235]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f44e236] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f44e237]
+          - generic [ref=f44e239]:
+            - generic [ref=f44e240]:
+              - generic [aria-hidden] [ref=f44e241]: comment
+              - heading "30 Comments" [level=2] [ref=f44e243]
+            - generic [ref=f44e246]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f44e247] [cursor=pointer]:
+                - generic [ref=f44e248]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f44e250]:
+            - generic [ref=f44e251]:
+              - generic [ref=f44e255]:
+                - link "Raja Biswas's profile" [ref=f44e256] [cursor=pointer]:
+                  - /url: /conjuring92
+                  - generic "Raja Biswas" [ref=f44e257]
+                - generic [ref=f44e263]:
+                  - link [ref=f44e265] [cursor=pointer]:
+                    - /url: /conjuring92
+                    - heading "Raja Biswas" [level=3] [ref=f44e266]
+                  - generic [ref=f44e267]:
+                    - paragraph [ref=f44e268]: Posted 4 years ago
+                    - paragraph [ref=f44e270]: · 3rd in this Competition
+                - generic [ref=f44e272]:
+                  - generic [ref=f44e273]:
+                    - button "Upvote" [ref=f44e274] [cursor=pointer]:
+                      - generic [ref=f44e275]: arrow_drop_up
+                    - button "5 votes" [ref=f44e276] [cursor=pointer]: "5"
+                  - button "More Options for this Comment" [ref=f44e277] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e281]:
+                  - text: Thanks
+                  - link "@trushk (opens in a new tab)" [ref=f44e282] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+                  - text: "😊 it's been a real pleasure to work as team over the last 2 months, will surely miss that! Glad to finish at #3!"
+              - separator [ref=f44e283]
+            - generic [ref=f44e284]:
+              - generic [ref=f44e288]:
+                - link "KhanhVD's profile" [ref=f44e289] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f44e290]
+                - generic [ref=f44e296]:
+                  - link [ref=f44e298] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f44e299]
+                  - generic [ref=f44e300]:
+                    - paragraph [ref=f44e301]: Posted 4 years ago
+                    - paragraph [ref=f44e303]: · 328th in this Competition
+                - generic [ref=f44e305]:
+                  - generic [ref=f44e306]:
+                    - button "Upvote" [ref=f44e307] [cursor=pointer]:
+                      - generic [ref=f44e308]: arrow_drop_up
+                    - button "4 votes" [ref=f44e309] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f44e310] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e314]:
+                  - text: Congrats
+                  - link "@trushk (opens in a new tab)" [ref=f44e315] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+                  - text: and team. Well done!
+              - separator [ref=f44e316]
+            - generic [ref=f44e317]:
+              - generic [ref=f44e321]:
+                - link "'s profile" [ref=f44e322] [cursor=pointer]:
+                  - /url: /
+                - generic [ref=f44e329]:
+                  - generic:
+                    - link:
+                      - /url: /
+                      - heading [level=3]
+                  - paragraph [ref=f44e331]: Posted 4 years ago
+                - generic [ref=f44e333]:
+                  - generic [ref=f44e334]:
+                    - button "Upvote" [ref=f44e335] [cursor=pointer]:
+                      - generic [ref=f44e336]: arrow_drop_up
+                    - button "3 votes" [ref=f44e337] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f44e338] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e342]: Congratulations! Nice work！
+              - separator [ref=f44e343]
+            - generic [ref=f44e344]:
+              - generic [ref=f44e348]:
+                - link "chumajin's profile" [ref=f44e349] [cursor=pointer]:
+                  - /url: /chumajin
+                  - generic "chumajin" [ref=f44e350]
+                - generic [ref=f44e356]:
+                  - link [ref=f44e358] [cursor=pointer]:
+                    - /url: /chumajin
+                    - heading "chumajin" [level=3] [ref=f44e359]
+                  - paragraph [ref=f44e361]: Posted 4 years ago
+                - generic [ref=f44e363]:
+                  - generic [ref=f44e364]:
+                    - button "Upvote" [ref=f44e365] [cursor=pointer]:
+                      - generic [ref=f44e366]: arrow_drop_up
+                    - button "3 votes" [ref=f44e367] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f44e368] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e372]:
+                  - text: Congratulations!! I've been watching the leaderboard and cheering for you since the beginning of the competition. (Especially,
+                  - link "@trushk (opens in a new tab)" [ref=f44e373] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+                  - text: and
+                  - link "@harshit92 (opens in a new tab)" [ref=f44e374] [cursor=pointer]:
+                    - /url: /harshit92
+                    - text: "@harshit92"
+                  - text: was my teammates on the past competition! ) This top 3 finish makes me very happy!
+                - generic [ref=f44e380]:
+                  - link "Trushant Kalyanpur's profile" [ref=f44e381] [cursor=pointer]:
+                    - /url: /trushk
+                    - generic "Trushant Kalyanpur" [ref=f44e382]
+                  - generic [ref=f44e388]:
+                    - generic [ref=f44e389]:
+                      - link [ref=f44e390] [cursor=pointer]:
+                        - /url: /trushk
+                        - heading "Trushant Kalyanpur" [level=3] [ref=f44e391]
+                      - paragraph [ref=f44e394]: Topic Author
+                    - generic [ref=f44e395]:
+                      - paragraph [ref=f44e396]: Posted 4 years ago
+                      - paragraph [ref=f44e398]: · 3rd in this Competition
+                  - generic [ref=f44e400]:
+                    - generic [ref=f44e401]:
+                      - button "Upvote" [ref=f44e402] [cursor=pointer]:
+                        - generic [ref=f44e403]: arrow_drop_up
+                      - button "1 votes" [ref=f44e404] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f44e405] [cursor=pointer]: more_vert
+                  - paragraph [ref=f44e409]:
+                    - text: Thanks
+                    - link "@chumajin (opens in a new tab)" [ref=f44e410] [cursor=pointer]:
+                      - /url: /chumajin
+                      - text: "@chumajin"
+                    - text: "! It was a roller coaster for us but glad to finish in top 3. Congratulations on your Amex Gold!"
+              - separator [ref=f44e411]
+            - generic [ref=f44e412]:
+              - generic [ref=f44e416]:
+                - link "HarshitMehta's profile" [ref=f44e417] [cursor=pointer]:
+                  - /url: /harshit92
+                  - generic "HarshitMehta" [ref=f44e418]
+                - generic [ref=f44e424]:
+                  - link [ref=f44e426] [cursor=pointer]:
+                    - /url: /harshit92
+                    - heading "HarshitMehta" [level=3] [ref=f44e427]
+                  - generic [ref=f44e428]:
+                    - paragraph [ref=f44e429]: Posted 4 years ago
+                    - paragraph [ref=f44e431]: · 3rd in this Competition
+                - generic [ref=f44e433]:
+                  - generic [ref=f44e434]:
+                    - button "Upvote" [ref=f44e435] [cursor=pointer]:
+                      - generic [ref=f44e436]: arrow_drop_up
+                    - button "3 votes" [ref=f44e437] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f44e438] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e442]:
+                  - text: Nice work
+                  - link "@trushk (opens in a new tab)" [ref=f44e443] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+                  - text: and
+                  - link "@conjuring92 (opens in a new tab)" [ref=f44e444] [cursor=pointer]:
+                    - /url: /conjuring92
+                    - text: "@conjuring92"
+                  - text: . It was pleasure working with both of you!
+              - separator [ref=f44e445]
+            - generic [ref=f44e446]:
+              - generic [ref=f44e450]:
+                - link "yao's profile" [ref=f44e451] [cursor=pointer]:
+                  - /url: /syhens
+                  - generic "yao" [ref=f44e452]
+                - generic [ref=f44e458]:
+                  - link [ref=f44e460] [cursor=pointer]:
+                    - /url: /syhens
+                    - heading "yao" [level=3] [ref=f44e461]
+                  - generic [ref=f44e462]:
+                    - paragraph [ref=f44e463]: Posted 4 years ago
+                    - paragraph [ref=f44e465]: · 20th in this Competition
+                - generic [ref=f44e467]:
+                  - generic [ref=f44e468]:
+                    - button "Upvote" [ref=f44e469] [cursor=pointer]:
+                      - generic [ref=f44e470]: arrow_drop_up
+                    - button "3 votes" [ref=f44e471] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f44e472] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e476]: Great solution and congratulations my friend! A lot to learn! Regular MLM (TAPT) work for me, it improve my score from CV/LB .633(.613) to 0.613(0.587).
+                - generic [ref=f44e477]:
+                  - generic [ref=f44e482]:
+                    - link "Trushant Kalyanpur's profile" [ref=f44e483] [cursor=pointer]:
+                      - /url: /trushk
+                      - generic "Trushant Kalyanpur" [ref=f44e484]
+                    - generic [ref=f44e490]:
+                      - generic [ref=f44e491]:
+                        - link [ref=f44e492] [cursor=pointer]:
+                          - /url: /trushk
+                          - heading "Trushant Kalyanpur" [level=3] [ref=f44e493]
+                        - paragraph [ref=f44e496]: Topic Author
+                      - generic [ref=f44e497]:
+                        - paragraph [ref=f44e498]: Posted 4 years ago
+                        - paragraph [ref=f44e500]: · 3rd in this Competition
+                    - generic [ref=f44e502]:
+                      - generic [ref=f44e503]:
+                        - button "Upvote" [ref=f44e504] [cursor=pointer]:
+                          - generic [ref=f44e505]: arrow_drop_up
+                        - button "1 votes" [ref=f44e506] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f44e507] [cursor=pointer]: more_vert
+                    - paragraph [ref=f44e511]: "Thank you friend. 😊 . Our approach was span based which is probably why span MLM helped. Awesome work finishing solo #20!!"
+                  - generic [ref=f44e516]:
+                    - link "yao's profile" [ref=f44e517] [cursor=pointer]:
+                      - /url: /syhens
+                      - generic "yao" [ref=f44e518]
+                    - generic [ref=f44e524]:
+                      - link [ref=f44e526] [cursor=pointer]:
+                        - /url: /syhens
+                        - heading "yao" [level=3] [ref=f44e527]
+                      - generic [ref=f44e528]:
+                        - paragraph [ref=f44e529]: Posted 4 years ago
+                        - paragraph [ref=f44e531]: · 20th in this Competition
+                    - generic [ref=f44e533]:
+                      - generic [ref=f44e534]:
+                        - button "Upvote" [ref=f44e535] [cursor=pointer]:
+                          - generic [ref=f44e536]: arrow_drop_up
+                        - button "1 votes" [ref=f44e537] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f44e538] [cursor=pointer]: more_vert
+                    - paragraph [ref=f44e542]: Thank you! Looking forward to your detailed solution!
+              - separator [ref=f44e543]
+            - generic [ref=f44e544]:
+              - generic [ref=f44e548]:
+                - link "kkiller's profile" [ref=f44e549] [cursor=pointer]:
+                  - /url: /kneroma
+                  - generic "kkiller" [ref=f44e550]
+                - generic [ref=f44e556]:
+                  - link [ref=f44e558] [cursor=pointer]:
+                    - /url: /kneroma
+                    - heading "kkiller" [level=3] [ref=f44e559]
+                  - generic [ref=f44e560]:
+                    - paragraph [ref=f44e561]: Posted 4 years ago
+                    - paragraph [ref=f44e563]: · 2nd in this Competition
+                - generic [ref=f44e565]:
+                  - generic [ref=f44e566]:
+                    - button "Upvote" [ref=f44e567] [cursor=pointer]:
+                      - generic [ref=f44e568]: arrow_drop_up
+                    - button "3 votes" [ref=f44e569] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f44e570] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e574]:
+                  - text: Congrats
+                  - link "@trushk (opens in a new tab)" [ref=f44e575] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+                  - text: "! It was fun competing against your team on the public LB !"
+                - generic [ref=f44e576]:
+                  - generic [ref=f44e581]:
+                    - link "Trushant Kalyanpur's profile" [ref=f44e582] [cursor=pointer]:
+                      - /url: /trushk
+                      - generic "Trushant Kalyanpur" [ref=f44e583]
+                    - generic [ref=f44e589]:
+                      - generic [ref=f44e590]:
+                        - link [ref=f44e591] [cursor=pointer]:
+                          - /url: /trushk
+                          - heading "Trushant Kalyanpur" [level=3] [ref=f44e592]
+                        - paragraph [ref=f44e595]: Topic Author
+                      - generic [ref=f44e596]:
+                        - paragraph [ref=f44e597]: Posted 4 years ago
+                        - paragraph [ref=f44e599]: · 3rd in this Competition
+                    - generic [ref=f44e601]:
+                      - generic [ref=f44e602]:
+                        - button "Upvote" [ref=f44e603] [cursor=pointer]:
+                          - generic [ref=f44e604]: arrow_drop_up
+                        - button "1 votes" [ref=f44e605] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f44e606] [cursor=pointer]: more_vert
+                    - paragraph [ref=f44e610]: Likewise. You guys kept us on our feet!
+                  - generic [ref=f44e611]:
+                    - button "4 more replies" [ref=f44e612] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f44e614]: arrow_drop_down
+                    - generic [ref=f44e615]:
+                      - img "Profile picture for Raja Biswas" [ref=f44e617]
+                      - img "Profile picture for kkiller" [ref=f44e619]
+              - separator [ref=f44e620]
+            - generic [ref=f44e621]:
+              - generic [ref=f44e625]:
+                - link "Zacchaeus's profile" [ref=f44e626] [cursor=pointer]:
+                  - /url: /zacchaeus
+                  - generic "Zacchaeus" [ref=f44e627]
+                - generic [ref=f44e633]:
+                  - link [ref=f44e635] [cursor=pointer]:
+                    - /url: /zacchaeus
+                    - heading "Zacchaeus" [level=3] [ref=f44e636]
+                  - generic [ref=f44e637]:
+                    - paragraph [ref=f44e638]: Posted 4 years ago
+                    - paragraph [ref=f44e640]: · 12th in this Competition
+                - generic [ref=f44e642]:
+                  - generic [ref=f44e643]:
+                    - button "Upvote" [ref=f44e644] [cursor=pointer]:
+                      - generic [ref=f44e645]: arrow_drop_up
+                    - button "3 votes" [ref=f44e646] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f44e647] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e651]: Congrats and thanks for the writeup 🎊. I look forward to your elaboration on T5 augmentation and prompt-based learning. 👀
+              - separator [ref=f44e652]
+            - generic [ref=f44e653]:
+              - generic [ref=f44e657]:
+                - link "Nischay Dhankhar's profile" [ref=f44e658] [cursor=pointer]:
+                  - /url: /nischaydnk
+                  - generic "Nischay Dhankhar" [ref=f44e659]
+                - generic [ref=f44e665]:
+                  - link [ref=f44e667] [cursor=pointer]:
+                    - /url: /nischaydnk
+                    - heading "Nischay Dhankhar" [level=3] [ref=f44e668]
+                  - generic [ref=f44e669]:
+                    - paragraph [ref=f44e670]: Posted 4 years ago
+                    - paragraph [ref=f44e672]: · 22nd in this Competition
+                - generic [ref=f44e674]:
+                  - generic [ref=f44e675]:
+                    - button "Upvote" [ref=f44e676] [cursor=pointer]:
+                      - generic [ref=f44e677]: arrow_drop_up
+                    - button "2 votes" [ref=f44e678] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f44e679] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e683]:
+                  - text: Great Solution!! Congratulations
+                  - link "@trushk (opens in a new tab)" [ref=f44e684] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+                  - text: and team for top 3 finish!! Waiting for full writeup. 🙌
+              - separator [ref=f44e685]
+            - generic [ref=f44e686]:
+              - generic [ref=f44e690]:
+                - link "Tifo's profile" [ref=f44e691] [cursor=pointer]:
+                  - /url: /fankaixie
+                  - generic "Tifo" [ref=f44e692]
+                - generic [ref=f44e698]:
+                  - link [ref=f44e700] [cursor=pointer]:
+                    - /url: /fankaixie
+                    - heading "Tifo" [level=3] [ref=f44e701]
+                  - generic [ref=f44e702]:
+                    - paragraph [ref=f44e703]: Posted 4 years ago
+                    - paragraph [ref=f44e705]: · 11th in this Competition
+                - generic [ref=f44e707]:
+                  - generic [ref=f44e708]:
+                    - button "Upvote" [ref=f44e709] [cursor=pointer]:
+                      - generic [ref=f44e710]: arrow_drop_up
+                    - button "2 votes" [ref=f44e711] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f44e712] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e716]: Congratulations! Looking forward to your 2nd level model~
+              - separator [ref=f44e717]
+            - generic [ref=f44e718]:
+              - generic [ref=f44e722]:
+                - link "xbustc's profile" [ref=f44e723] [cursor=pointer]:
+                  - /url: /xbustc
+                  - generic "xbustc" [ref=f44e724]
+                - generic [ref=f44e730]:
+                  - link [ref=f44e732] [cursor=pointer]:
+                    - /url: /xbustc
+                    - heading "xbustc" [level=3] [ref=f44e733]
+                  - generic [ref=f44e734]:
+                    - paragraph [ref=f44e735]: Posted 4 years ago
+                    - paragraph [ref=f44e737]: · 15th in this Competition
+                - generic [ref=f44e739]:
+                  - generic [ref=f44e740]:
+                    - button "Upvote" [ref=f44e741] [cursor=pointer]:
+                      - generic [ref=f44e742]: arrow_drop_up
+                    - button "2 votes" [ref=f44e743] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f44e744] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e748]: Congrats , very nice work
+              - separator [ref=f44e749]
+            - generic [ref=f44e750]:
+              - generic [ref=f44e754]:
+                - link "The Devastator's profile" [ref=f44e755] [cursor=pointer]:
+                  - /url: /thedevastator
+                  - generic "The Devastator" [ref=f44e756]
+                - generic [ref=f44e762]:
+                  - link [ref=f44e764] [cursor=pointer]:
+                    - /url: /thedevastator
+                    - heading "The Devastator" [level=3] [ref=f44e765]
+                  - generic [ref=f44e766]:
+                    - paragraph [ref=f44e767]: Posted 4 years ago
+                    - paragraph [ref=f44e769]: · 206th in this Competition
+                - generic [ref=f44e771]:
+                  - generic [ref=f44e772]:
+                    - button "Upvote" [ref=f44e773] [cursor=pointer]:
+                      - generic [ref=f44e774]: arrow_drop_up
+                    - button "1 votes" [ref=f44e775] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f44e776] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e780]: Congrats!
+              - separator [ref=f44e781]
+            - generic [ref=f44e782]:
+              - generic [ref=f44e786]:
+                - link "feyyazyigit's profile" [ref=f44e787] [cursor=pointer]:
+                  - /url: /feyyazyigit
+                  - generic "feyyazyigit" [ref=f44e788]
+                - generic [ref=f44e794]:
+                  - link [ref=f44e796] [cursor=pointer]:
+                    - /url: /feyyazyigit
+                    - heading "feyyazyigit" [level=3] [ref=f44e797]
+                  - paragraph [ref=f44e799]: Posted 4 years ago
+                - generic [ref=f44e801]:
+                  - generic [ref=f44e802]:
+                    - button "Upvote" [ref=f44e803] [cursor=pointer]:
+                      - generic [ref=f44e804]: arrow_drop_up
+                    - button "1 votes" [ref=f44e805] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f44e806] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e810]: Congratulations!
+              - separator [ref=f44e811]
+            - generic [ref=f44e812]:
+              - generic [ref=f44e816]:
+                - link "Mike Mazurov's profile" [ref=f44e817] [cursor=pointer]:
+                  - /url: /mikhailma
+                  - generic "Mike Mazurov" [ref=f44e818]
+                - generic [ref=f44e824]:
+                  - link [ref=f44e826] [cursor=pointer]:
+                    - /url: /mikhailma
+                    - heading "Mike Mazurov" [level=3] [ref=f44e827]
+                  - paragraph [ref=f44e829]: Posted 4 years ago
+                - generic [ref=f44e831]:
+                  - generic [ref=f44e832]:
+                    - button "Upvote" [ref=f44e833] [cursor=pointer]:
+                      - generic [ref=f44e834]: arrow_drop_up
+                    - button "1 votes" [ref=f44e835] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f44e836] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e840]: Nice work, congratulations for 3rd place! Let me know if you used soft or hard pseudo labeling?
+                - generic [ref=f44e846]:
+                  - link "Trushant Kalyanpur's profile" [ref=f44e847] [cursor=pointer]:
+                    - /url: /trushk
+                    - generic "Trushant Kalyanpur" [ref=f44e848]
+                  - generic [ref=f44e854]:
+                    - generic [ref=f44e855]:
+                      - link [ref=f44e856] [cursor=pointer]:
+                        - /url: /trushk
+                        - heading "Trushant Kalyanpur" [level=3] [ref=f44e857]
+                      - paragraph [ref=f44e860]: Topic Author
+                    - generic [ref=f44e861]:
+                      - paragraph [ref=f44e862]: Posted 4 years ago
+                      - paragraph [ref=f44e864]: · 3rd in this Competition
+                  - generic [ref=f44e866]:
+                    - generic [ref=f44e867]:
+                      - button "Upvote" [ref=f44e868] [cursor=pointer]:
+                        - generic [ref=f44e869]: arrow_drop_up
+                      - button "1 votes" [ref=f44e870] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f44e871] [cursor=pointer]: more_vert
+                  - paragraph [ref=f44e875]: We didn't use pseudo labeling at all. We did use synthetic data generated by T5 as described in our long solution
+              - separator [ref=f44e876]
+            - generic [ref=f44e877]:
+              - generic [ref=f44e881]:
+                - link "Muhammad Anas Mahmood's profile" [ref=f44e882] [cursor=pointer]:
+                  - /url: /muhammadanasmahmood
+                  - generic "Muhammad Anas Mahmood" [ref=f44e883]
+                - generic [ref=f44e889]:
+                  - link [ref=f44e891] [cursor=pointer]:
+                    - /url: /muhammadanasmahmood
+                    - heading "Muhammad Anas Mahmood" [level=3] [ref=f44e892]
+                  - paragraph [ref=f44e894]: Posted 4 years ago
+                - generic [ref=f44e896]:
+                  - generic [ref=f44e897]:
+                    - button "Upvote" [ref=f44e898] [cursor=pointer]:
+                      - generic [ref=f44e899]: arrow_drop_up
+                    - button "1 votes" [ref=f44e900] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f44e901] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e905]:
+                  - text: Congratulations Nice Work
+                  - link "@trushk (opens in a new tab)" [ref=f44e906] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+              - separator [ref=f44e907]
+            - generic [ref=f44e908]:
+              - generic [ref=f44e912]:
+                - link "Minh Tri Phan's profile" [ref=f44e913] [cursor=pointer]:
+                  - /url: /shinomoriaoshi
+                  - generic "Minh Tri Phan" [ref=f44e914]
+                - generic [ref=f44e920]:
+                  - link [ref=f44e922] [cursor=pointer]:
+                    - /url: /shinomoriaoshi
+                    - heading "Minh Tri Phan" [level=3] [ref=f44e923]
+                  - generic [ref=f44e924]:
+                    - paragraph [ref=f44e925]: Posted 4 years ago
+                    - paragraph [ref=f44e927]: · 5th in this Competition
+                - generic [ref=f44e929]:
+                  - generic [ref=f44e930]:
+                    - button "Upvote" [ref=f44e931] [cursor=pointer]:
+                      - generic [ref=f44e932]: arrow_drop_up
+                    - button "1 votes" [ref=f44e933] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f44e934] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e938]: Congratulations!
+                - generic [ref=f44e944]:
+                  - link "Trushant Kalyanpur's profile" [ref=f44e945] [cursor=pointer]:
+                    - /url: /trushk
+                    - generic "Trushant Kalyanpur" [ref=f44e946]
+                  - generic [ref=f44e952]:
+                    - generic [ref=f44e953]:
+                      - link [ref=f44e954] [cursor=pointer]:
+                        - /url: /trushk
+                        - heading "Trushant Kalyanpur" [level=3] [ref=f44e955]
+                      - paragraph [ref=f44e958]: Topic Author
+                    - generic [ref=f44e959]:
+                      - paragraph [ref=f44e960]: Posted 4 years ago
+                      - paragraph [ref=f44e962]: · 3rd in this Competition
+                  - generic [ref=f44e964]:
+                    - generic [ref=f44e965]:
+                      - button "Upvote" [ref=f44e966] [cursor=pointer]:
+                        - generic [ref=f44e967]: arrow_drop_up
+                      - button "1 votes" [ref=f44e968] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f44e969] [cursor=pointer]: more_vert
+                  - paragraph [ref=f44e973]: Thank you Tri! It was a great battle for the top! Congratulations to you and your team too!
+              - separator [ref=f44e974]
+            - generic [ref=f44e975]:
+              - generic [ref=f44e979]:
+                - link "Prasad's profile" [ref=f44e980] [cursor=pointer]:
+                  - /url: /prasad789
+                  - generic "Prasad" [ref=f44e981]
+                - generic [ref=f44e987]:
+                  - link [ref=f44e989] [cursor=pointer]:
+                    - /url: /prasad789
+                    - heading "Prasad" [level=3] [ref=f44e990]
+                  - paragraph [ref=f44e992]: Posted 4 years ago
+                - generic [ref=f44e994]:
+                  - generic [ref=f44e995]:
+                    - button "Upvote" [ref=f44e996] [cursor=pointer]:
+                      - generic [ref=f44e997]: arrow_drop_up
+                    - button "1 votes" [ref=f44e998] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f44e999] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e1003]:
+                  - link "@trushk (opens in a new tab)" [ref=f44e1004] [cursor=pointer]:
+                    - /url: /trushk
+                    - text: "@trushk"
+                  - text: ", good work"
+              - separator [ref=f44e1005]
+            - generic [ref=f44e1006]:
+              - generic [ref=f44e1010]:
+                - link "Bishu5c6's profile" [ref=f44e1011] [cursor=pointer]:
+                  - /url: /bishu5c6
+                  - generic "Bishu5c6" [ref=f44e1012]
+                - generic [ref=f44e1018]:
+                  - link [ref=f44e1020] [cursor=pointer]:
+                    - /url: /bishu5c6
+                    - heading "Bishu5c6" [level=3] [ref=f44e1021]
+                  - paragraph [ref=f44e1023]: Posted 4 years ago
+                - generic [ref=f44e1025]:
+                  - generic [ref=f44e1026]:
+                    - button "Upvote" [ref=f44e1027] [cursor=pointer]:
+                      - generic [ref=f44e1028]: arrow_drop_up
+                    - button "1 votes" [ref=f44e1029] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f44e1030] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e1034]: Congratulations, Nice work
+              - separator [ref=f44e1035]
+            - generic [ref=f44e1040]:
+              - link "KKY's profile" [ref=f44e1041] [cursor=pointer]:
+                - /url: /evilpsycho42
+                - generic "KKY" [ref=f44e1042]
+              - generic [ref=f44e1048]:
+                - link [ref=f44e1050] [cursor=pointer]:
+                  - /url: /evilpsycho42
+                  - heading "KKY" [level=3] [ref=f44e1051]
+                - generic [ref=f44e1052]:
+                  - paragraph [ref=f44e1053]: Posted 4 years ago
+                  - paragraph [ref=f44e1055]: · 15th in this Competition
+              - generic [ref=f44e1057]:
+                - generic [ref=f44e1058]:
+                  - button "Upvote" [ref=f44e1059] [cursor=pointer]:
+                    - generic [ref=f44e1060]: arrow_drop_up
+                  - button "1 votes" [ref=f44e1061] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f44e1062] [cursor=pointer]: more_vert
+              - generic [ref=f44e1065]:
+                - paragraph [ref=f44e1066]: Greate single model！！！
+                - paragraph [ref=f44e1067]: We tried many strategy as yours, but most of them not working for us … looking forward detail solution.
+                - paragraph [ref=f44e1068]: Congratulations to you team TK! 🎉
+              - generic [ref=f44e1074]:
+                - link "Trushant Kalyanpur's profile" [ref=f44e1075] [cursor=pointer]:
+                  - /url: /trushk
+                  - generic "Trushant Kalyanpur" [ref=f44e1076]
+                - generic [ref=f44e1082]:
+                  - generic [ref=f44e1083]:
+                    - link [ref=f44e1084] [cursor=pointer]:
+                      - /url: /trushk
+                      - heading "Trushant Kalyanpur" [level=3] [ref=f44e1085]
+                    - paragraph [ref=f44e1088]: Topic Author
+                  - generic [ref=f44e1089]:
+                    - paragraph [ref=f44e1090]: Posted 4 years ago
+                    - paragraph [ref=f44e1092]: · 3rd in this Competition
+                - generic [ref=f44e1094]:
+                  - generic [ref=f44e1095]:
+                    - button "Upvote" [ref=f44e1096] [cursor=pointer]:
+                      - generic [ref=f44e1097]: arrow_drop_up
+                    - button "0 votes" [ref=f44e1098] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f44e1099] [cursor=pointer]: more_vert
+                - paragraph [ref=f44e1103]: Thanks buddy ! Good to see my old friends in the comp. Sorry that you guys missed the gold zone.
+  - alert [ref=f44e1106]

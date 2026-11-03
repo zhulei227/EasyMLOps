@@ -1,0 +1,328 @@
+- generic [ref=f7e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f7e3]:
+    - generic [ref=f7e5]:
+      - button "Navigation menu" [ref=f7e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f7e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f7e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f7e14]:
+      - link [ref=f7e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fventilator-pressure-prediction%2Fwriteups%2Fshujun-kha-zidmie-gilles-b-1-solution-the-code
+        - button "Login" [ref=f7e16]
+      - link [ref=f7e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fventilator-pressure-prediction%2Fwriteups%2Fshujun-kha-zidmie-gilles-b-1-solution-the-code
+        - button "Sign Up" [ref=f7e19]
+  - main [ref=f7e21]:
+    - generic [ref=f7e23]:
+      - generic [ref=f7e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f7e25]:
+        - link "Learn more" [ref=f7e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f7e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f7e29]:
+      - generic [ref=f7e31]: "[#1 Solution] The code — Google Brain - Ventilator Pressure Prediction"
+      - separator [ref=f7e32]
+      - generic [ref=f7e34]:
+        - generic [ref=f7e35]:
+          - heading "[#1 Solution] The code" [level=1] [ref=f7e36]
+          - generic [ref=f7e37]:
+            - link [ref=f7e38] [cursor=pointer]:
+              - /url: /competitions/ventilator-pressure-prediction
+              - paragraph [ref=f7e40]: Google Brain - Ventilator Pressure Prediction
+            - paragraph [ref=f7e41]: Solution Writeup · 1st place · Nov 13, 2021
+        - separator [ref=f7e43]
+        - generic [ref=f7e44]:
+          - generic [ref=f7e46]:
+            - paragraph [ref=f7e47]: We have uploaded a big chunk of our code required to reproduce our solution as notebooks on Kaggle.
+            - list [ref=f7e48]:
+              - listitem [ref=f7e49]:
+                - paragraph [ref=f7e50]:
+                  - link "LSTM CNN transformer (opens in a new tab)" [ref=f7e51] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/shujun717/1-solution-lstm-cnn-transformer-1-fold
+                    - text: LSTM CNN transformer
+                  - text: The code required to run a single fold of our LSTM + CNN Transformer model. Running multiple folds of this and taking a median ensemble should result in a significant boost of LB scores.
+              - listitem [ref=f7e52]:
+                - paragraph [ref=f7e53]:
+                  - link "PID Controller Matching (opens in a new tab)" [ref=f7e54] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/group16/1-solution-pid-controller-matching-v1
+                    - text: PID Controller Matching
+                  - text: The code & intuition behind the PID controller matching. The current code is a preliminary version that still introduces some errors. Newer versions will be uploaded shortly.
+            - paragraph [ref=f7e55]: "Github repos:"
+            - list [ref=f7e56]:
+              - listitem [ref=f7e57]:
+                - link "PID Controller Matching (opens in a new tab)" [ref=f7e58] [cursor=pointer]:
+                  - /url: https://github.com/GillesVandewiele/google-brain-ventilator
+                  - text: PID Controller Matching
+              - listitem [ref=f7e59]:
+                - link "LSTM+CNN Transformer (opens in a new tab)" [ref=f7e60] [cursor=pointer]:
+                  - /url: https://github.com/Shujun-He/Google-Brain-Ventilator
+                  - text: LSTM+CNN Transformer
+              - listitem [ref=f7e61]:
+                - link "LSTM on Raw data (opens in a new tab)" [ref=f7e62] [cursor=pointer]:
+                  - /url: https://github.com/whoknowsB/google-brain-ventilator-pressure-prediction/tree/9b62366274d9ffcc1eada4dc56d3ccd672c81dc3
+                  - text: LSTM on Raw data
+            - paragraph [ref=f7e63]: "Pretrained models:"
+            - list [ref=f7e64]:
+              - listitem [ref=f7e65]:
+                - link "https://www.kaggle.com/shujun717/googlebrainventilator1stshujun (opens in a new tab)" [ref=f7e66] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/shujun717/googlebrainventilator1stshujun
+                  - text: https://www.kaggle.com/shujun717/googlebrainventilator1stshujun
+            - paragraph [ref=f7e67]: In case there are any questions, feel free to leave a comment on the corresponding notebook or here!
+            - paragraph [ref=f7e68]: Our LSTM model will soon be uploaded as a notebook as well so that people can play around with that one too (I will update this topic once it is published). Moreover, I have started writing the blog post with a more elaborate explanation of our solution, I will make a new topic with a link once this is finished!
+          - generic [ref=f7e69]:
+            - generic [ref=f7e70]:
+              - text: Authors
+              - generic [ref=f7e71]:
+                - link "Shujun's profile" [ref=f7e72] [cursor=pointer]:
+                  - /url: /shujun717
+                  - generic "Shujun" [ref=f7e73]
+                - generic [ref=f7e77]:
+                  - link "Shujun" [ref=f7e78] [cursor=pointer]:
+                    - /url: /shujun717
+                  - paragraph [ref=f7e79]: shujun717
+              - generic [ref=f7e80]:
+                - link "Zidmie's profile" [ref=f7e81] [cursor=pointer]:
+                  - /url: /zidmie
+                  - generic "Zidmie" [ref=f7e82]
+                - generic [ref=f7e86]:
+                  - link "Zidmie" [ref=f7e87] [cursor=pointer]:
+                    - /url: /zidmie
+                  - paragraph [ref=f7e88]: zidmie
+              - generic [ref=f7e89]:
+                - link "Gilles Vandewiele's profile" [ref=f7e90] [cursor=pointer]:
+                  - /url: /group16
+                  - generic "Gilles Vandewiele" [ref=f7e91]
+                - generic [ref=f7e95]:
+                  - link "Gilles Vandewiele" [ref=f7e96] [cursor=pointer]:
+                    - /url: /group16
+                  - paragraph [ref=f7e97]: group16
+              - generic [ref=f7e98]:
+                - link "Kha Vo's profile" [ref=f7e99] [cursor=pointer]:
+                  - /url: /khahuras
+                  - generic "Kha Vo" [ref=f7e100]
+                - generic [ref=f7e104]:
+                  - link "Kha Vo" [ref=f7e105] [cursor=pointer]:
+                    - /url: /khahuras
+                  - paragraph [ref=f7e106]: khahuras
+              - generic [ref=f7e107]:
+                - link "Riccardo's profile" [ref=f7e108] [cursor=pointer]:
+                  - /url: /callmeb
+                  - generic "Riccardo" [ref=f7e109]
+                - generic [ref=f7e113]:
+                  - link "Riccardo" [ref=f7e114] [cursor=pointer]:
+                    - /url: /callmeb
+                  - paragraph [ref=f7e115]: callmeb
+            - separator [ref=f7e116]
+            - generic [ref=f7e117]:
+              - generic [ref=f7e118]:
+                - button "Upvote" [ref=f7e119] [cursor=pointer]:
+                  - generic [ref=f7e120]: arrow_drop_up
+                - button "74 votes" [ref=f7e121] [cursor=pointer]: "74"
+              - button "Share" [ref=f7e122] [cursor=pointer]
+              - button "Writeup actions" [ref=f7e124] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f7e125]
+        - paragraph [ref=f7e126]: Shujun, Zidmie, Gilles Vandewiele, Kha Vo, Riccardo. [#1 Solution] The code. https://www.kaggle.com/competitions/ventilator-pressure-prediction/writeups/shujun-kha-zidmie-gilles-b-1-solution-the-code. 2021. Kaggle
+        - separator [ref=f7e127]
+        - generic [ref=f7e130]:
+          - img "love" [ref=f7e132]
+          - generic [ref=f7e133]: "2"
+        - separator [ref=f7e134]
+        - generic [ref=f7e135]:
+          - generic [ref=f7e137]:
+            - generic [ref=f7e138]:
+              - generic [aria-hidden] [ref=f7e139]: comment
+              - generic [ref=f7e140]:
+                - heading "5 Comments" [level=2] [ref=f7e141]
+                - link "Go To Appreciation Comments (3 total)" [ref=f7e142] [cursor=pointer]:
+                  - /url: /competitions/ventilator-pressure-prediction/writeups/shujun-kha-zidmie-gilles-b-1-solution-the-code#appreciation
+                  - text: 3 appreciation comments
+            - generic [ref=f7e145]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f7e146] [cursor=pointer]:
+                - generic [ref=f7e147]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f7e149]:
+            - generic [ref=f7e150]:
+              - generic [ref=f7e154]:
+                - link "Ctrl_CV's profile" [ref=f7e155] [cursor=pointer]:
+                  - /url: /guohey
+                  - generic "Ctrl_CV" [ref=f7e156]
+                - generic [ref=f7e162]:
+                  - link [ref=f7e164] [cursor=pointer]:
+                    - /url: /guohey
+                    - heading "Ctrl_CV" [level=3] [ref=f7e165]
+                  - generic [ref=f7e166]:
+                    - paragraph [ref=f7e167]: Posted 5 years ago
+                    - paragraph [ref=f7e169]: · 62nd in this Competition
+                - generic [ref=f7e171]:
+                  - generic [ref=f7e172]:
+                    - button "Upvote" [ref=f7e173] [cursor=pointer]:
+                      - generic [ref=f7e174]: arrow_drop_up
+                    - button "2 votes" [ref=f7e175] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f7e176] [cursor=pointer]: more_vert
+                - paragraph [ref=f7e180]: Good job! hope to see the completely code!
+                - button "Reply" [ref=f7e182] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f7e183]: reply
+              - separator [ref=f7e185]
+            - generic [ref=f7e186]:
+              - generic [ref=f7e190]:
+                - link "Gilles Vandewiele's profile" [ref=f7e191] [cursor=pointer]:
+                  - /url: /group16
+                  - generic "Gilles Vandewiele" [ref=f7e192]
+                - generic [ref=f7e198]:
+                  - generic [ref=f7e199]:
+                    - link [ref=f7e200] [cursor=pointer]:
+                      - /url: /group16
+                      - heading "Gilles Vandewiele" [level=3] [ref=f7e201]
+                    - paragraph [ref=f7e204]: Topic Author
+                  - generic [ref=f7e205]:
+                    - paragraph [ref=f7e206]: Posted 5 years ago
+                    - paragraph [ref=f7e208]: · 1st in this Competition
+                - generic [ref=f7e210]:
+                  - generic [ref=f7e211]:
+                    - button "Upvote" [ref=f7e212] [cursor=pointer]:
+                      - generic [ref=f7e213]: arrow_drop_up
+                    - button "1 votes" [ref=f7e214] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f7e215] [cursor=pointer]: more_vert
+                - paragraph [ref=f7e219]: I have just updated this topic to include our 3 github repositories which can be used to fully reproduce our solution. A blog post will be published later today as well, I will make a separate topic to announce this.
+                - button "Reply" [ref=f7e221] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f7e222]: reply
+              - separator [ref=f7e224]
+          - generic [ref=f7e225]:
+            - heading "Appreciation (3)" [level=2] [ref=f7e227]
+            - generic [ref=f7e228]:
+              - generic [ref=f7e232]:
+                - link "CMan9292's profile" [ref=f7e233] [cursor=pointer]:
+                  - /url: /mozhiwenmzw
+                  - generic "CMan9292" [ref=f7e234]
+                - generic [ref=f7e240]:
+                  - link [ref=f7e242] [cursor=pointer]:
+                    - /url: /mozhiwenmzw
+                    - heading "CMan9292" [level=3] [ref=f7e243]
+                  - generic [ref=f7e244]:
+                    - paragraph [ref=f7e245]: Posted 5 years ago
+                    - paragraph [ref=f7e247]: · 308th in this Competition
+                - generic [ref=f7e249]:
+                  - generic [ref=f7e250]:
+                    - button "Upvote" [ref=f7e251] [cursor=pointer]:
+                      - generic [ref=f7e252]: arrow_drop_up
+                    - button "1 votes" [ref=f7e253] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f7e254] [cursor=pointer]: more_vert
+                - paragraph [ref=f7e258]: Thanks for the code!
+              - separator [ref=f7e259]
+            - generic [ref=f7e260]:
+              - generic [ref=f7e264]:
+                - link "Benny Fung's profile" [ref=f7e265] [cursor=pointer]:
+                  - /url: /bennyfung
+                  - generic "Benny Fung" [ref=f7e266]
+                - generic [ref=f7e272]:
+                  - link [ref=f7e274] [cursor=pointer]:
+                    - /url: /bennyfung
+                    - heading "Benny Fung" [level=3] [ref=f7e275]
+                  - generic [ref=f7e276]:
+                    - paragraph [ref=f7e277]: Posted 5 years ago
+                    - paragraph [ref=f7e279]: · 811th in this Competition
+                - generic [ref=f7e281]:
+                  - generic [ref=f7e282]:
+                    - button "Upvote" [ref=f7e283] [cursor=pointer]:
+                      - generic [ref=f7e284]: arrow_drop_up
+                    - button "0 votes" [ref=f7e285] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f7e286] [cursor=pointer]: more_vert
+                - paragraph [ref=f7e290]: Nice! Thanks for your sharing.
+              - separator [ref=f7e291]
+            - generic [ref=f7e296]:
+              - link "Md Hassan's profile" [ref=f7e297] [cursor=pointer]:
+                - /url: /mdmohsin
+                - generic "Md Hassan" [ref=f7e298]
+              - generic [ref=f7e304]:
+                - link [ref=f7e306] [cursor=pointer]:
+                  - /url: /mdmohsin
+                  - heading "Md Hassan" [level=3] [ref=f7e307]
+                - paragraph [ref=f7e309]: Posted 5 years ago
+              - generic [ref=f7e311]:
+                - generic [ref=f7e312]:
+                  - button "Upvote" [ref=f7e313] [cursor=pointer]:
+                    - generic [ref=f7e314]: arrow_drop_up
+                  - button "0 votes" [ref=f7e315] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f7e316] [cursor=pointer]: more_vert
+              - paragraph [ref=f7e320]: Great! Thanks for the code.
+  - alert [ref=f7e323]

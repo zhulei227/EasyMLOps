@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/talkingdata-mobile-user-demographics/discussion/23465
-fetched: 2026-10-27
-chars: 805
+fetched: 2026-11-03
+chars: 6609
 
 menu
 Skip to
@@ -22,35 +22,134 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-TalkingData · Featured Prediction Competition · 10 years ago
-Late Submission
-more_horiz
+Some of the 3rd place solution history (Danijel|Matias) — TalkingData Mobile User Demographics
+Some of the 3rd place solution history (Danijel|Matias)
+
 TalkingData Mobile User Demographics
 
-Get to know millions of mobile device users
+Solution Writeup · 3rd place · Sep 8, 2016
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+Hello, here I would like to share what we were doing all those weeks, and specially the last and leaky end of the last week. I'll give my view point and Danijel may add his viewpoint as well.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+As usual in any competition, I started doing some exploratory analysis and my initial assumptions were that the ratio of usage of different apps would be predictive for age and gender. For example if the user has a lot of events associated to PokemonGo, war craft and other games, it's very likely that he is one of my coworkers! I even built this Kaggle script where I try to analyze ratio of apps type usage: https://www.kaggle.com/chechir/talkingdata-mobile-user-demographics/only-another-exploratory-analysis
 
-error
+At the same time I saw the great script of Yibo: (https://www.kaggle.com/yibochen/talkingdata-mobile-user-demographics/xgboost-in-r-2-27217) and I copied his way to encode everything to 1/0 (event the ratios). Then I started to use a bunch of xgb models as well as a glmnet model, blending them all using multivariate regression (nnet package in R). I was doing reasonable well (around 20-30 place on the LB) when I saw the dune_dweller script (don't need to add the link!). At that time I was trying to learn Keras, so I used her feature engineering and plugged a keras model.. It had a great performance and boosted my score around the 17th position! For some reason I decided to share it on the Kaggle scripts: https://www.kaggle.com/chechir/talkingdata-mobile-user-demographics/keras-on-labels-and-brands. And our best model single model for devices with events is just that model with some new features and a more layers and regularization. It scored 2.23452 on the LB.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+The additional features to this model were:
 
-Failed to load the discussion topic
+TF-IDF of brand and model (for devices without events)
+TF-IDF of brand, model and labels (for devices with events)
+Frequency of brands and model names (that one produced a small but clear improvement)
 
-error
+And the parameters were:
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+model = Sequential()
+model.add(Dropout(0.4, input_shape=(num_columns,)))
+model.add(Dense(n))
+model.add(PReLU())
+model.add(Dropout(0.30))
+model.add(Dense(50, init='normal', activation='tanh'))
+model.add(PReLU())
+model.add(Dropout(0.20))
+model.add(Dense(12, init='normal', activation='softmax'))
+
+
+Using the average test predictions for each fold model helped a lot here (I was using 10 folds)
+
+Then we merged our teams with Danijel who was doing a very creative xgboost combination besides other things that he would explain much better than me. Together we started retraining some of our models on CV10 and then switched back to CV5 because of processing time reasons. For the ensemble weights we used the optim package in R (iterated 3 times) and also built differen ensembles for devices with events and devices without events (that was another great idea from Danijel).
+
+When the leak issue raised we were around 11th to 13th on the LB and we started to look where it was. My team mate Danijel was the man how built a clever matching script that combined with our best submission allowed us to fight for the top places in those crazy 3 last days. We found also that devices with events weren't taking advantage from the leak, so we only used leak models on non-events devices.
+
+To me this competition was a great experience, I learned a lot from my team mate Danijel, and also from Dune_Dweller, Yibo and from fakeplastictrees and the dam leak!
+
+Authors
+Matias Thayer
+
+chechir
+
+Danijel Kivaranovic
+
+danijelk
+
+arrow_drop_up
+20
+Share
+more_horiz
+Citation
+
+Matias Thayer, Danijel Kivaranovic. Some of the 3rd place solution history (Danijel|Matias) . https://www.kaggle.com/competitions/talkingdata-mobile-user-demographics/writeups/utc-1-3-some-of-the-3rd-place-solution-history-dan. 2016. Kaggle
+
+comment
+3 Comments
+Hotness
+Danijel Kivaranovic
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Thank you Matias for the nice summary. I'll give some notes on the "creative" xgboost model that Matias mentioned. My main motivation was that training on the group variable might not be the best approach to minimize the mlogloss. So I build a 2-stage model:
+
+Predict the probability of gender
+Use gender as additional feature and predict the probability of age groups
+
+The clue is that we do not need the gender in the test set to make the prediction because we have to make two predictions for each ID in the test set anyway. First, we assume that the user is female and predict, then we assume that the user is male and predict again.
+
+Using the definition of conditional probability, we can combine the predictions for gender and age groups.
+
+P(A_i, F) = P(A_i| F) * P(F) for i = 1,…,6 and
+
+P(A_i, M) = P(A_i| M) * P(M) for i = 1,…,6.
+
+where A_i are the age groups 1 to 6, and F and M are female and male, respectively.
+
+At least for me, this approach worked much better than optimizing group probabilities alone. I got 2.25037 on public LB and 2.25484 on private LB with a "single" xgb model.
+
+I tried to build this 2-stage model for keras, too. However, it gave me little (if any) boost on my cv, so I did not spend much time on it. But this does not mean that it does not work for keras.
+
+reply
+Reply
+Matias Thayer
+
+Topic Author
+
+Posted 10 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you Matias. Great work. Are you planing to post the files in github anytime? Would be great help if you could.
+
+Hi Anon, by now I can share my best "single" model not using the leak (at least not explicitly) https://www.kaggle.com/chechir/talkingdata-mobile-user-demographics/keras-cv10-with-bags5-wevents-alldata (the code won't run in Kaggle because of the missing folds split file, and also because of time/memory limitations) Notice that the final prediction was built with a logistic regression for devices without events, and the keras only is used for the devices with events. Cheers!
+
+reply
+Reply
+Anon
+
+Posted 10 years ago
+
+· 554th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you Matias. Great work. Are you planing to post the files in github anytime? Would be great help if you could.
+
+reply
+Reply

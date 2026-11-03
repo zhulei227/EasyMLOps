@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/229740
-fetched: 2026-10-27
-chars: 810
+fetched: 2026-11-03
+chars: 6117
 
 menu
 Skip to
@@ -42,13 +42,158 @@ Models
 Discussion
 Leaderboard
 Rules
-Failed to load the discussion topic
-error
+Ivan Panshin · 2nd in this Competition · Posted 6 years ago
+arrow_drop_up
+41
+more_vert
+2nd place solution (addition about MMDetection)
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+I would like to add a little bit of information to the great topic by @zfturbo. In this one, I want to talk about MMDetection pipelines that we used.
 
-error
+Part 1: Grid Search
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+MMDetection is great in terms of the amount of models/tricks. However, that also brings some difficulties, like what approaches to use. I started running some tests with ATSS, Cascade_RFP, GFL, RetinaNet, UniverseNet. Based on initial validation scores + LB, I decided to settle on the following approaches and tune them more carefully:
 
-Failed to load the discussion topic
+Cascade_RFP_R50
+GFL_R101
+GFL_X101
+RetinaNet_X101
+Part 2: Training tricks
+Add albumentations for validation: ShiftScaleRotate, IAAAffine, Blur/GaussianBlur/MedianBlur, RandomBrightnessContrast, IAAAdditiveGaussianNoise/GaussNoise, HorizontalFlip.
+Use 1024x1024 for all models, and tune a couple of them (GFL_R101, GFL_X101) with 2048x2048 in order to catch small bboxes.
+Apply FP16 to all models except Cascade_RFP in order to increase batch size and speed-up the training. In my experience, FP16 currently doesn't work with Cascade_RFP.
+Train with empty images in order to get rid of classifier. But not all empty images (there are too many of them), treat empty just like any other class, and add N random empty images, where N = average amount of samples for all classes
+CosineAnnealing with linear warm-up instead of classic StepLP.
+Tried to use sampler so that the amount of bboxes for each class is more or less the same. Had to patch ClassBalancedDataset (with oversample_thr) in order to do that, but that didn't boost the performance (perhaps due to the fact that it's not about class imbalance, but radiologists imbalance).
+Part 3: 2-step training
+
+Like @zfturbo noticed, it's profitable to train with rare radiologists (all but R8, R9, R10). Btw, my greatest thanks and respects for this idea. I'm not sure I would have been able to come up with that on my own.
+
+1-step: pre-train with all data for 30 epochs. Select the best checkpoints based on AP@0.4 (wanted to try selecting checkpoints for each class, or using SWA on different checkpoints, but eventually didn't have time for this).
+2-step: take only rare radiologists (again, with empty images. In this case, I added about 50 images. Moreover, I didn't apply WBF to bboxes. Instead, I created 3 versions of each image with the corresponding set of bboxes. This idea belongs to @sergeyzlobin, I appreciate it!). It's also important to handle folds correctly. What I mean by that: data for 2-step is a subset of data for the 1-step. So take rare + empty images from the same folds. In other words, do not introduce leakage. Start training from the best weights from 1-step. I trained with the same augs and optimizer. Moreover, taking the same LR as in the beginning of the 1-step worked the best.
+Part 4: Models scores (public / private)
+
+GFL_R101_rare_with_empty_2step_1024 - 0.239 / 0.248
+
+GFL_X101_rare_with_empty_2step_1024 - 0.264 / 0.255
+
+Cascade_RFP_R50_rare_with_empty_2step_1024 - 0.251 / 0.243
+
+Retina_rare_2step_1024 (no empty) - 0.228 / 0.239
+
+GFL_R101_rare_with_empty_2step_2048 - 0.248 / 0.235
+
+GFL_X101_rare_with_empty_2step_2048 - 0.256 / 0.238
+
+In the last days of the competition I also decided to add VFNet to the mix, so:
+
+VFNet_X101_rare_with_empty_2step_1024 - 0.259 / 0.252
+
+All models are 5 folds.
+
+Conclusion
+
+This competition is one of the most difficult things that I've done. We've worked for a couple of months pretty much non-stop, and it was awesome. Thanks so much to the organizers, and my team @zfturbo, @sergeyzlobin, you're insanely good and I hope to work again on something else.
+
+Please sign in to reply to this topic.
+
+comment
+8 Comments
+Hotness
+KhanhVD
+
+Posted 6 years ago
+
+· 29th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing some information from your team solution, congrats on 2nd place @ivanpan
+
+Wonjun Park
+
+Posted 6 years ago
+
+· 193rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+Betty
+
+Posted 6 years ago
+
+· 158th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+hi, congrats, and thanks for your sharing!! I'm a little confuse with your part 3: the sentence "I didn't apply WBF to bboxes. Instead, I created 3 versions of each image with the corresponding set of bboxes. "If don't mind, could you explain more about how you created 3 version of each image, such as in the image, there are class2 with 3 boxes and class7 with one box, How did you separate these boxes into 3 version. Congrats again
+
+Ivan Panshin
+
+Topic Author
+
+Posted 6 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks! It actually depends on the radiologists. Each image was annotated by 3 radiologists (in train). So I created the 3 versions of the same image as following: image i + annotations only from 1st RAD; image i + annotations only from 2nd RAD; image i + annotations only form 3rd RAD.
+
+Betty
+
+Posted 6 years ago
+
+· 158th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thanks for your replay!
+
+( ͡° ͜ʖ ͡°)
+
+Posted 6 years ago
+
+· 41st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the second place, the new competitions master @ivanpan
+
+Charlie Craine
+
+Posted 6 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@ivanpan Thank you for sharing. Really great insight. Congrats!
+
+Tensor Girl
+
+Posted 6 years ago
+
+· 350th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@ivanpan Congratulations on second place Finish and Thanks for sharing the approach

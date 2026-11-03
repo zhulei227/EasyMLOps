@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/coleridgeinitiative-show-us-the-data/discussion/248253
-fetched: 2026-10-27
-chars: 710
+fetched: 2026-11-03
+chars: 7319
 
 menu
 Skip to
@@ -42,11 +42,310 @@ Models
 Discussion
 Leaderboard
 Rules
+Nguyen Quan Anh Minh · 1st in this Competition · Posted 5 years ago
+arrow_drop_up
+80
+more_vert
+1st solution: Matching the <MASK>: Context Similarity via Deep Metric Learning and Beyond
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Thanks Kaggle for this exciting competition and our team (@suicaokhoailang). Congrats to me to become Kaggle Master and @suicaokhoailang to become Kaggle GM. Congratulate all winners -- we have learned a lot from this competition and all winners’ solutions !!.
 
-Failed to load the discussion topic
+Here Is a summary of my solution:
 
-error
+A shared Bert model for extract Context Embedding and Sequence Tokens Embedding.
+An ArcFace Loss for training Mask/NoMask Embedding.
+A BCE loss for training NER model to detect dataset citation in the input string.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Bellow is the most important question that we should answer for ourselves before deciding on an approach.
+
+Do we need a context?
+
+Yes, a semantic context is very important for this kind of problem. As you can see, there are some solutions that don’t need semantic context and only needs dataset title. But those solutions are only suitable for this contest data since almost the dataset title includes keywords such as Study, Survey, Database, Dataset, … then the dataset title itself is good enough to classify if it’s a real dataset title or not. In this competition, we aim for a general solution that uses a semantic context to detect a dataset citation.
+
+How my model was trained?
+An input text is randomly split into Support Set and Query Set.
+In Support Set, we use a MASK token to replace all dataset titles in an input text.
+Pass all input text from Support Set into a BertModel and extract MASK/NoMASK embedding.
+In Query Set, we pass a raw input into a shared BertModel used for Support Set to extract a sequence tokens embedding.
+MASK and NoMask embedding from Support/Query Set is passed into an ArcFace Metric Learning layer.
+A MASK embedding from the Support Set contains only a semantic context feature is used to calculate l2 norm cosine similarity with every token feature from the input text in the Query Set.
+A l2 norm cosine similarity will range from (-1, 1), we scale it into a range (-10, 10) then apply sigmoid activation before use it for training the NER model via BCE loss.
+How to use my trained model for the inference?
+Pre-extract all MASK embedding from the given training set.
+Random selection K MASK embedding then average them to obtain the semantic context vector and perform step (6), (7) from the above training process.
+Post-Processing
+
+As @leecming said in his solution, a dataset is probably referenced by multiple documents so the more frequently they’re referenced, the more likely they’re a hit and not a spurious find. We use a threshold frequency of 2, which means if our model can detect that dataset title twice, we will get that dataset. We choose 2 because, in training data, there are many dataset titles mentioned only 1-2 times, we are afraid in the private dataset, such dataset titles will be many but we seem to be wrong, a higher threshold frequency gives better results on public and private leaderboards.
+
+Here is a summary of my solution, there are a few string rules-based that were used but did not affect the final result too much. The final submission is based on an ensemble of allenai/scibert and allenai/biomed_roberta. The code is done on Tensorflow 2.4 with V100 16gb version in AWS EC2.
+
+Inference Kernel: https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base
+
+Thanks for reading !
+
+Please sign in to reply to this topic.
+
+comment
+22 Comments
+1 appreciation comment
+Hotness
+laxman kusuma
+
+Posted 5 years ago
+
+· 322nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Nice, congratulations…
+
+Samarth Gupta
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Nice solution, Congratulations!!
+
+Antonio
+
+Posted 5 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Interesting solution, congrats!
+
+caochanhduong
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Nice solution!
+
+MaChaogong
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats and nice solution !
+
+InnerVoice
+
+Posted 5 years ago
+
+· 530th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Just to understand few things: Is purpose of ARcFace loss is to ensure that embeddings for mask and statement from same document should be similar. What is the shape of Mask/No mask embeddings? Trying to understand. Any description around intuition will help. Your solution is quite innovative.
+
+Nguyen Quan Anh Minh
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Hi @adityakumarsinha , the purpose of Arcface loss is to ensure that the embeddings for the MASK from all positive samples are similar. The shape of Mask/NoMask Embedding is [B, F], which is an average feature of all MASK/NoMASK token in the input text.
+
+Nguyen Duc Dung
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+great work. hope to collaborate with you again soon ^^
+
+KhanhVD
+
+Posted 5 years ago
+
+· 262nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Wow amazing solution! Thanks for sharing!
+
+KhanhVD
+
+Posted 5 years ago
+
+· 262nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Nghỉ mấy hôm rồi quay lại nhanh nha :))
+
+Nguyen Quan Anh Minh
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Update: Surprisingly, remove the label from scispacy got a better result (0.588 on private), we should trust only our model :D. https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base
+
+Ramesh Makwana
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+Theo Viel
+
+Posted 5 years ago
+
+· 44th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Very cool solution @dathudeptrai, congratz on the win !
+
+Nguyen Quan Anh Minh
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @theoviel, hope to work with you again soon :D
+
+rin2401
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats 💪
+
+Quan Nguyen
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Amazing work 😍! Congrats P/s: rep me idol Anh Minh
+
+Nguyen Quan Anh Minh
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@quanbk Thanks, hope we can work together in the future :)))
+
+youzi
+
+Posted 5 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to the 1st place.
+
+( ͡° ͜ʖ ͡°)
+
+Posted 5 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats ✊
+
+Chun Ming Lee
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats on your hardwork paying off!
+
+Khuong T G Hieu
+
+Posted 5 years ago
+
+· 629th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! Cố lên anh ơi!
+
+Appreciation (1)
+Nguyen Quan Anh Minh
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks @suicaokhoailang :D.

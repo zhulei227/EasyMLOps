@@ -1,0 +1,887 @@
+url: https://www.kaggle.com/c/facebook-recruiting-iv-human-or-bot/discussion/14628#81396
+fetched: 2026-11-03
+chars: 32644
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+share your secret sauce — Facebook Recruiting IV: Human or Robot?
+share your secret sauce
+
+Facebook Recruiting IV: Human or Robot?
+
+Solution Writeup · 2nd place · Jun 10, 2015
+
+Here's a little blurb about how I approached feature generation and cross-validation for this problem:
+
+http://small-yellow-duck.github.io/auction.html
+
+code: https://github.com/small-yellow-duck/facebook_auction
+
+I used sklearn's RandomForestClassifier. The most useful features I identified were:
+
+the median time between a user's bid and that user's previous bid
+the mean number of bids a user made per auction
+the entropy for how many bids a user placed on each day of the week
+the means of the per-auction URL entropy and IP entropy for each user
+the maximum number of bids in a 20 min span
+the total number of bids placed by the user
+the average number of bids a user placed per referring URL
+the number of bids placed by the user on each of the three weekdays in the data
+the minimum and median times between a user's bid and the previous bid by another user in the same auction.
+the fraction of IPs used by a bidder which were also used by another user which was a bot
+
+Cross-validation was a bit tricky: I did CV 100 times on different 80-20 splits. My mean CV score was almost the same (+/- 0.003) as my final leaderboard score.
+
+edit to answer some further questions:
+
+In order to convert the time scale to hours, I made a bids/unit time histogram and looked at the periodicity - bidding volumes cycled with a period of one day. There are pretty graphs and more details on my github page.
+
+A concrete example of the entropy is the IP entropy: N!/(N_{IP1}! N{IP2}!... N{IPn}!). N is the total number of bids and N_{IPn} is the total number of bids placed from the nth IP. (Because the entropy is a large number, I used the log of the entropy.) The entropy is a measure of how both randomly distributed the bids are, how many IPs there are and how many bids there are. A bidder that places all their bids from the same IP has an entropy of N!/N! = 1.
+
+I used the simple average of five RandomForestClassifiers (each with a different value for the initialization parameter, random_state) to generate the predictions.
+
+Thanks to everyone else who shared their approaches! I thought that leaving out the bots with only one bid was a clever idea. And I was surprised to see that people got mileage out of the device type.
+
+Author
+small yellow duck
+
+smallyellowduck
+
+arrow_drop_up
+74
+Share
+more_horiz
+Citation
+
+small yellow duck. share your secret sauce. https://www.kaggle.com/competitions/facebook-recruiting-iv-human-or-bot/writeups/small-yellow-duck-share-your-secret-sauce. 2015. Kaggle
+
+comment
+38 Comments
+Hotness
+fakeplastictrees
+
+Posted 11 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+23
+more_vert
+
+Well, that was an unexpected surprise this morning. I was just hoping to stay in the top 10%.
+Congratulations to small yellow duck and the other top scorers.
+
+My approach seems similar to a number of the ones posted above. I used scikit-learn GradientBoostingClassifier (thanks to the authors!).
+
+Early on I saw that CV was going to be relatively inaccurate so I ended up choosing 500 resamples of different 2/3 – 1/3 splits. This took the standard error on my CV AUC calculation down to about 0.0007 so that I could reasonably have an idea of whether each feature I tested was making a positive or negative difference. The inaccuracy on a single CV fold and the helpful post by T. Scharf, https://www.kaggle.com/c/facebook-recruiting-iv-human-or-bot/forums/t/14394/a-basic-look-at-lb-scores
+suggested that public LB scores were not going to be particularly useful so I only made 3 submissions to avoid any temptation to overfit the public LB - I find this a very difficult thing to do…
+
+
+Some of my most helpful features were:
+
+- The proportion of each bidder’s bids that were in each day ( I believe there were 9 days of bid data).
+- The proportion of each bidder’s bids that were in each of 8 3-hour time slots.
+- The mean time of day for the bids of each bidder.
+- The total number of bids for each bidder.
+- The frequency of each final part of the IP address averaged for each bidder – the first three parts had no positive effect.
+- The average proportion of bots associated with each device code. NB – (difficult to put into CV without data leakage – a slightly different data set for each fold!)
+- Same as above for each country code.
+- The total number of bids made in each auction averaged for each bidder. (i.e. did the bidder tend to bid in popular auctions or less popular ones)
+- The maximum number of auctions a bidder has participated in, in one hour.
+
+Hopefully, this gives a flavour of what I was trying. Some of the features are quite hard to put into words!
+
+One final trick that may have made the difference is that I looked at the histogram of the number of bids made by each bot in the training set. There were 5 bots that made just one bid, which looked anomalous to my eye. I wondered if this might not help to predict on a different data set so I submitted an entry which was just my main model but trained on the training set without these five bots. I think this one was the winner, but I’ll confirm when I can see all my submission private scores.
+
+I’ll post in greater detail when I have written my model up. Apologies, as was not expecting to win!
+
+reply
+Reply
+Michael Wallin
+
+Posted 11 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+Congratulations to all the winners.
+
+My approach is outlined in this Jupyter notebook.
+
+I used somewhat of a text classification approach. I concatenated the bid entries into one long space-delimited string, and then performed tfidf-vectorization on these text features. The idea was that bots would exhibit certain sequential patterns in their behavior that could be discovered with this type of a text mining approach.
+
+In addition to the text features, I also computed some descriptive statistics (median, max, min, range, deciles) for the time differences between bids, along with counts of unique entries for the columns.
+
+In CV, the numeric features stood for the majority of the auc-gain, but the text-features definitely helped a bit.
+
+reply
+Reply
+Thomas ROBERT
+
+Posted 11 years ago
+
+· 32nd in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Hi all, congrats to everyone. I've seen people doing incredible work here!
+
+I was ranked 32nd on private LB (but could have been 17th if I had sent my submission using the most-frequent-URL-of-bidder feature :( ). My work on feature and modeling is actually pretty simple. You can find my blog post which is basically a dump of my IPython notebook (so code + comments) here: http://www.thomas-robert.fr/en/kaggles-human-or-robot-competition-feedback/
+
+reply
+Reply
+( ͡° ͜ʖ ͡°)
+
+Posted 11 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Congrats smallyellowduck, and awesome writeup!
+
+I also used the 'everything but the kitchen sink' approach lol.
+
+7862 total features were used. (Most of these are just useless device counts)
+
+Simple stats (mean, std, min, max) were computed over the following features:
+
+* Diversity
+  * # unique counties, devices, ips, (countries, devices), (countries, ips), (devices, ips) per auction
+
+* Streaks
+  * longest streak of the same device, ip, (device, ip) per auction
+
+* Peak
+  * for overlapping time windows:
+  * # of bids in a given window
+  * # of auctions in a given window
+  * # unique auctions in the argmax window
+
+* Count-Vectors
+  * count vectors for each unique device, country, merch
+
+* First Last
+  * # instances a bidder submitted the first, last bid of an auction
+
+* Consecutive
+  * # instances that a bidder has 0, 1, 2, ..., 10 bids in between their bids
+
+* Wavelets
+  * 3-level db4 wavelet decomposition for 3 overlapping windowed histograms of # of bids
+    * |mean|, std of coefficients
+    * differences in |mean|, std of coefficients between windows
+
+* Time Difference
+  * time since previous bid
+
+* Position
+  * # of bids in windows relative to auction life
+
+Model
+=====
+Simple average of extra-trees, gradient boosted trees, neural net. For the neural net, I used the top 1000 features as prioritized by the extra-trees classifier.
+
+Other
+=====
+I always try semi-supervised learning... and it never helps my CV or LB score. =[
+
+Score
+=====
+* CV: ~0.92, 0.93, 0.91 (for the respective models)
+* Public: 0.91503 (138)
+* Private: 0.93649 (20)
+
+reply
+Reply
+Sushant Tripathy
+
+Posted 11 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Congratulations to the winners, this was a really fun contest!
+
+For classification I used a two-stage meta-learner approach with RF, XGBoost and NN as base learners and a combination of those three as meta learners.
+
+The final features I used are as follows:
+
+1. Fraction of auctions won by member (out of total number of auctions member participated in).
+
+2. Mean fraction of bids made by member (in auctions member participated in).
+
+3. Mean fraction of bids made by member within first 10% of bids (in auctions member participated in).
+
+4. Mean fraction of bids made by member within last 25% of bids (in auctions member participated in).
+
+5. Mean fraction of bids made by member (in auctions member won).
+
+6. Mean fraction of bids made by member within first 10% of bids (in auctions member won).
+
+7. Mean fraction of bids made by member within last 25% of bids (in auctions member won).
+
+8. , 9. , 10. Max, Mean and Standard Deviation of number of auctions member is active in per minute.
+
+11., 12., 13. Max, Mean and Standard Deviation of number of auctions member is active in per hour.
+
+14.,15.,16. Probability of bot given Country, Merchandise search category, and device
+
+17., 18., 19. Max, Mean and Standard Deviation of number of ips used per minute.
+
+20., 21., 22. Max, Mean and Standard Deviation of number of ips used per hour.
+
+23. Probabilty of being referred by url : 'vasstdc27m7nks3'
+
+24. Probability of being a Bot given you belong to a cluster of Payment Accounts (Clustered using Hamming Distance, with a Ward Linkage)
+
+25. Probability of being a Bot given you belong to a cluster of Addresses (Clustered using Hamming Distance, with a Ward Linkage)
+
+26., 27., 28.  Mean, Standard Deviation and Sarle's bimodality coefficient of auction bid value (assuming first bid has a value of 10 cents and each subsequent bid increases it by one cent)
+
+29., 30. Mean  and Standard Deviation of length of continuous bid streaks by member.
+
+31., 32. Mean and Standard Deviation of time between Member's bid streaks and previous bidders' bid.
+
+I used a Random Forest classifier with Recursive Feature Elimination + Cross Validation to select these features, my 5-fold cross-validation score was similar to the public LB score with -0.003 difference, and it did not change much on the private LB either. :)
+
+reply
+Reply
+Dmitry Ignatovich
+
+Posted 11 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Congrats to all the winners!
+I used scikit learn RandomForestClassifier algorithm.
+List of decent features according to cross-validation feature selection method I used:
+1. absolute number of bids per user.
+2. num uniq devices, auctions, ips and urls
+3. avg and first-non-zero time diffs between user bids
+4. percentage of bids made with favorite(most common) device
+5. percentage of bids made from favorite country
+6. max number of bids in a single auction
+7. number of simultaneous bids
+8. number of device switches, numer of auctions switches, number of ips switches, number of countries switches
+e.g. this sequence corresponds to 3 'switches' (with 2 devices): [dev1, dev1, dev2, dev2, dev2, dev2, dev1]
+9. percentage of user bids made in first/last 5% of auction observed timeline
+(observed timeline doesn't correspond to real auction timeline, but in my opinion still helps to understand if user prefers to bid at the beginning or end of an auction)
+10. average number of transaction in the same country in 1-hour window with various normalizations
+(in my opinion this feature roughly reflects user favorite bidding time of the day)
+11. two categ->response transformations features. average response for country and device.
+the same idea as discussed here: https://www.kaggle.com/forums/f/15/kaggle-forum/t/8005/replacing-categorical-variables-with-historic-response-rate
+
+there were also a few other trivial features
+
+For cross validation I calculated average AUC for 10 different but fixed 10-fold splits, so totaly it's 10*10 algorithm trains for a single feature check.
+
+reply
+Reply
+Liam
+
+Posted 11 years ago
+
+· 17th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Hey guys
+
+I did a bit of a write-up on my approach that got me to first place on the public leaderboard, but 17th on the private leaderboard. Given I'm still fairly new to all this, I'd be interested to hear people's thoughts on how this might have happened. I suppose I just hill-climbed on the public leaderboard a bit...
+
+reply
+Reply
+MihirGada
+
+Posted 10 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Link doesn't seem to work.
+
+reply
+Reply
+José María Mateos
+
+Posted 11 years ago
+
+· 180th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Beat me by 3 minutes :D
+
+Well, here is my code and here is a brief blog entry I wrote about this competition.
+
+reply
+Reply
+Abhishek
+
+Posted 11 years ago
+
+· 53rd in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats to the winners! This was a pretty fun competition; figuring out whether my CV scores were lying or not was interesting to say the least.
+
+I used the following features:
+
+number of bids made at the absolute minimum time delta for each bidder
+number of bids made at one single time stamp (essentially counting how many simultaneous bids were made, either in one auction, or across multiple auctions)
+number of bids per bidder in each quarter of the auction
+number of devices, countries, urls, auctions, ip addresses per bidder 
+changes in ip, url, country, device per bidder
+average of the time delta between a bidder beating a previous bidder's bid
+average time delta between the times each bidder places a bid
+Features 1-5 were divided by the total number of bids made by each bidder
+
+I realized my best scores with XGBoost and 10 fold stratified CV 10 times. My best single model score came as a result of using about half the features listed above. I then used the unused features with the first half to create an ensemble which put me near the top 10% on the public leader board. After which I hit a wall and couldn't really see any ways of improving my score. I am very happy to see that my ensemble moved me closer to the top 5% on the private leader board however!
+
+I just want to add one interesting note, K nearest neighbours (using 30 neighbours, and a distance based weight per neighbour) worked surprisingly well with only 5 features. Using the log transformed number of bids, devices, countries, auctions and urls per bidder, I was able to get a score of 0.885 on the public leader board (0.90559 on the private). Not bad for about 15 minutes of effort :)
+
+reply
+Reply
+Artem Golubin
+
+Posted 11 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+My solution.
+
+Scored 0.93939, 7th place on private leaderboard
+
+I just combined 8 similar models to prevent overfitting.
+
+I used average of XGBoost logistic regression, Vowpal Wabbit , GraphLab boosted trees, sk-l Randomforest, sk-l GradientBoosting, sk-l RandomForest+AdaBoost, sk-l RandomForest + CalibratedClassifier, sk-l RandomForest + BaggingClassifier.
+
+reply
+Reply
+Triskelion
+
+Posted 11 years ago
+
+· 174th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+1) Kitchensink-approach
+
+Payment account and Adress hash features
+Number of bids
+Average, max, min bids per auction
+Number of uniques in "merchandise"
+Most common "merchandise" used
+Number of unique phones used
+Most common phone used
+Number of unique referals
+Most common referal used
+Number of unique countries used
+Most common country used
+Number of unique IPs used
+Ranking first bid registrered on site (account activity age)
+Ranking last bid registrered on site (account activity recency)
+Ranking peak bids on site (account activity peak)
+The number of bid timestamps ending in "00000" (eg: precisely at 12:00)
+The number of times that substracting previous bid timestamp from current bid timestamp results in a round number (eg: precisely 4 seconds)
+The number of bids at the same time
+The number of bids at the same time normalized to the number of bids for user.
+Log( average time between bids )
+
+2) Thinking for the model-model
+
+Payment account and Adress hash features
+Number of bids
+Fraud score for country (calculated from train)
+Fraud score for merchandise
+Fraud score for referal
+Fraud score for phone
+Fraud score for ip
+Fraud score for auction
+Year joined
+Years active
+Last year active
+
+3) Bad IP Model
+
+IP Blacklist (IPs used only by the bots in train set, for numerous times, and only used once by a test set user)
+
+4) Simple stats
+
+Payment account and Adress hash features
+
+Min, Max, Average, Unique:
+
+userid
+category
+device
+auction
+country
+ref
+time
+time between bids
+
+5) Final submission
+
+Weighted rank average of models.
+
+---
+
+For modeling 1-4 I mostly used trees and stacked ensembling of feature sets.
+
+Model 4, though with a modest feature set, did best on LB.
+
+reply
+Reply
+Mike Kim
+
+Posted 11 years ago
+
+· 62nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+The code fbHomeBag35.R obtains: 0.90607 0.93256
+
+The code fbHomeBag16.R obtains: 0.90811 0.93419
+
+I didn't select either.
+
+To overfit is only human.
+
+fbHomeBag35.R
+fbHomeBag16.R
+reply
+Reply
+mtutek
+
+Posted 11 years ago
+
+· 472nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+[quote=fakeplastictrees;81331]
+
+One final trick that may have made the difference is that I looked at the histogram of the number of bids made by each bot in the training set. There were 5 bots that made just one bid, which looked anomalous to my eye. I wondered if this might not help to predict on a different data set so I submitted an entry which was just my main model but trained on the training set without these five bots. I think this one was the winner, but I’ll confirm when I can see all my submission private scores.
+
+[/quote]
+
+Even though my final score is dreadful due to starting the competition really late, I can add to this.
+
+Removing the 5 bots that made just one bid increased my CV auc by ~0.03, however adding another step at postprocessing increased the public leaderboard score by about 0.02 aswell.
+
+I searched for the "signatures" of the bids of the five bots that were banned just after one bid in the bid dataset, and it appeared that each one of them had the same signature as a detected bot with a number of bids > 1.
+The signatures were the auction, referral site, time, device, ip and (obviously) country of the bids. If there were two bids that had equal information, and one bid belonged to a bot bidder, the other bid was also flagged as a bot bidder.
+So I added a post-processing step which searched for all the matches (test set bid - train set flagged bot bid) after classification, and flagged them as a highly probable bot.
+
+Unfortunately, since I had only three submissions to use, I couldn't experiment with searching for matches in the test set as well (same signature as a highly probable bot from the test set), and then copying the probabilities to the max of the two.
+
+reply
+Reply
+leecy
+
+Posted 11 years ago
+
+· 74th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Interesting, and thanks for sharing. I tried several of the same statistics as you, e.g., total bids, mean, sd, median, min interbid time, etc., plus some other far out and crazy ideas. Regarding the model, I tried a bunch of different models too, but random forests seem to work the best for this problem.
+
+BTW, what is meant by entropy of the number of bids per user, or of URL/IP? Also, how did you know how long 1 day is? Or one week? Or if it's a weekday?
+
+reply
+Reply
+Pierre Gutierrez
+
+Posted 11 years ago
+
+· 121st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I detailed my feature engineering in this blog post (120 + features, hope this helps). I tested a lot of things after that, mostly blend of GBT and random forests by I ended up overfitting my training data even though my private and public leaderboard score are pretty close. 
+
+reply
+Reply
+ranjitha
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Can you share me the link of your code? Your blog looks very impressive. I am a beginner and I want to learn.
+
+reply
+Reply
+MikeyG
+
+Posted 11 years ago
+
+· 46th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Fun contest! Congrats to everyone who participated.
+
+Here's my model and description.
+
+I used sklearn's RandomForestClassifier and LogisticRegression models (an 80-20 mix of the two). Most of my features were the same as what others have mentioned (total # bids, total # auctions, average response time, etc.) One interesting feature that may have helped me out slightly was the mean number of known bots in each auction of participation (not including the bidder we're trying to classify).
+
+The CV was difficult for me too - I averaged my performance over 500 trials with a random 80-20 split of the training data. This showed around a 0.93 performance on the CV data (closer to what I got on the private leaderboard) but on the public leaderboard the best I could get was 0.915.
+
+reply
+Reply
+YcdoiT
+
+Posted 11 years ago
+
+· 77th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for the sharing.. My first time to know using entropy to generate features(instead of var).
+
+reply
+Reply
+SkyLibrary
+
+Posted 11 years ago
+
+· 54th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing your approach so fast!
+
+Quick question: how do you average your five RF models, just arithmetric average or average the rank? I didn't got the chance to try different averaging approach, a ranking average of four single models :one from xgboost, three from sklearn(randomforest, gradient boost, extra tree) boost my score by 0.002, is there better ways to ensemble?
+
+I was working with entropy all the time in my research, never thought of using it to generate features for this competition...shame on me...
+
+For me, besides the obvious counting features and their ratios(number of bids, number of auctions, number of ip, number of country...),
+
+I also calculated the changing frequency of ip, country, auction, the density of bidding time in all auctions and in a single auctions(calculate the mean and std variance) 
+
+For bidding pattern in an auction, I count how often people make continuous bids; the portions of bids in first 10%,30%50%, last 10% 30% 50% of an auction; the maximum number of bids made in an auction(average over all auctions by the bidder and calculate the difference between maximum and mean) ...
+
+I also split the ip, address and account into two parts and take the first part as feature, but I don't think it help the performance.
+
+One thing bothers me is that there are 5 instances in the training data marked as bots but only have one bids, so I though their account, address or ip are in some kind of blacklist, so I build a blacklist of account, address and ip, but it doesn't help at all.
+
+About validation and LB, no matter how I add or reduce features(pca, extra tree importance), even though sometimes my validation score gets higher, my LB score remains the same or get even worse, it's really frustrating, which discouraged me from spending more time to generate new features, guess I didn't find the features that make the public and private LB consistent. 
+
+reply
+Reply
+LY
+
+Posted 11 years ago
+
+· 100th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+thanks for sharing, and nice job! I had 48 features, thought I had enough features, but turns out you have some features that I don't have which might explain our difference in score.
+
+[quote=small yellow duck;81297]
+
+Here's a little blurb about how I approached feature generation and cross-validation for this problem:
+
+http://small-yellow-duck.github.io/auction.html
+
+I used sklearn's RandomForestClassifier. The most useful features I identified were:
+
+- the median time between a user's bid and that user's previous bid
+
+- the mean number of bids a user made per auction
+
+- the entropy for how many bids a user placed on each day of the week
+
+- the means of the per-auction URL entropy and IP entropy for each user
+
+- the maximum number of bids in a 20 min span
+
+- the total number of bids placed by the user
+
+- the average number of bids a user placed per referring URL
+
+- the number of bids placed by the user on each of the three weekdays in the data
+
+- the minimum and median times between a user's bid and the previous bid by another user in the same auction.
+
+Cross-validation was a bit tricky: I did CV 100 times on different 80-20 splits. My mean CV score was almost the same (+/- 0.003) as my final leaderboard score.
+
+[/quote]
+
+reply
+Reply
+Eugene Chuvyrov
+
+Posted 11 years ago
+
+· 160th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing, this is great! Quick question: how were you able to parse the time into 20-minute intervals and also days of the week? Was that intuition or did I miss an explanation somewhere?
+
+Thanks again, this is extremely helpful!
+
+reply
+Reply
+Mark Conway
+
+Posted 11 years ago
+
+· 216th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Nice feature engineering... well done. Pushed the random forest and deep learning models as far as possible but could not get above 0.90, as I principally relied on ratios among the various counts per bidder. Thanks for sharing!
+
+reply
+Reply
+Ana Lina Morelia
+
+Kaggle Staff
+
+Posted 11 years ago
+
+arrow_drop_up
+1
+more_vert
+
+small yellow duck's approach, background, and interesting ideas on Kaggle and ML in medicine can now be found in this competition write-up on no free hunch.
+
+Thanks for again for putting together such a great post!
+
+reply
+Reply
+Sushant Tripathy
+
+Posted 11 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi Dario,
+
+The feature calculation consists of two parts one is to determine what is the probability of bots using the "search category" and then to determine what is the weighted probability of a member being a bot based on the number of bids of that member that originated with certain "search categories".
+
+To make it a little clear, I have provided an example below: 
+
+User ID     Bot    Search Category    Bids
+u1             Yes    s1                           5
+u1             Yes    s2                           4
+u1            Yes     s3                           5
+u1            Yes     s4                           1
+u2             No     s1                            10
+u2             No     s2                            8
+u2             No     s3                            9
+u2             No     s4                            7
+u3             No     s3                            11
+u3             No     s4                            12
+
+Now Step 1:
+
+Search Category      Humans Using It      Bots Using It         p(Bot Use|Search Category)
+s1                             1                               1                            0.5
+s2                             1                               1                            0.5
+s3                             2                               1                            0.33
+s4                             2                               1                            0.33
+
+Now Step 2 (calculation of bid weighted probabiliies):
+
+User ID          Bot           Search Category           Bids                    p(Bot Use| Search Category )   Bid Weighted Probabilities 
+u1                 Yes            s1                                  5                         0.5                                             2.5 
+
+
+u1                 Yes            s2                                  4                         0.5                                                2
+
+
+u1                 Yes            s3                                  5                         0.33                                         1.65
+
+
+u1                 Yes            s4                                  1                         0.33                                        0.33
+
+
+u2                  No             s1                                 10                        0.5                                               5 
+
+
+u2                  No             s2                                  8                         0.5                                               4
+
+
+u2                  No             s3                                  9                         0.33                                        2.97
+
+
+u2                  No             s4                                  7                         0.33                                          2.31
+
+
+u3                  No            s3                                 11                         0.33                                           3.63 
+
+
+u3                  No            s4                                 12                         0.33                                             3.96
+
+Now finally to calculate P(Bot|Search Usage) (Bids weighted average of P(Bot usage|Search Categories):
+
+For u1 = (2.5 + 2 + 1.65 + 0.33)/(5 + 4 + 5 + 1) = 0.432
+
+For u2 = (5 + 4 + 2.97 + 2.31)/(10 + 8 + 9 + 7) =  0.42
+
+For u3 = (3.63 + 3.96)/(11+12) = 0.33
+
+Now these values are Feature 15. Hopefully, I could explain the calculations a bit more clearly this time around! :) Some members do have similar values, but never the same, there is always some difference (unless of course two members had the exact same number of bids within the exact same search categories and used the same search categories [rarely happens]). That being said, I did not try any extensive dummification approaches, and have no idea how dummification would have fared. :)  I would love to hear about it, when you have had time to compare the approaches.
+
+Discussions are always welcome on Kaggle forums (in my opinion :D ), and of course I would be happy to discuss feature construction with you further. I have a lot to learn as well. :) 
+
+reply
+Reply
+mario86
+
+Posted 11 years ago
+
+· 310th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Please find my aftermath blog post here http://podlipensky.com/2015/06/kaggle-competition-aftermath/
+
+Here is my best feature set:
+
+['ip_rank', 'auction_rank', 'auction/increments', 'avg_unique_ips',
+'ip/increments', 'std_inc_per_auction', 'product/won_auctions',
+'payment_type=0875307e1731af94b3b64725ad0deb7d', 'device/increments',
+'country_rank', 'avg_inc_per_auction', 'ip/ref', 'avg_ips_per_increment',
+'true_bids_count', 'increments/sim_auctions', 'increments/won_auctions',
+'country/increments', 'ip_change', 'ip/sim_auctions', 'price_mean',
+'sim_auctions', 'frequent_ip=8.116', 'std_ips_per_auction', 'device/ip',
+'product/increments', 'device/ref', 'product/ip', 'product/sim_auctions',
+'referral_change', 'product/ref', 'ref/auction', 'device/auction',
+'avg_referrals_per_auction', 'ref/sim_auctions', 'avg_ips_per_auction',
+'median_inc_per_auction', 'ref/increments', 'price_avg', 'auctions_count',
+'unique_ips', 'country/ip', 'won_auctions/sim_auctions',
+'unique_countries_count', 'robot_price_rmse', 'avg_devices_per_auction',
+'std_referrals_per_auction', 'std_devices_per_auction',
+'device/sim_auctions', 'ip/auction', 'ref/won_auctions']
+
+(it is kind of cryptic - please find better description of those in my blog post)
+
+reply
+Reply
+Hassan Boutkhourst
+
+Posted 11 years ago
+
+· 669th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Two ideas:
+
+1- removing the last 5 characters from both address and payment_account
+
+2- grouping time to 3 categories (First, Middle, Last)
+
+then, i guess this is not good, i trained a Robot Bid detector (instead of a Robot detector).
+
+and then i used a aggregation function to detect the Robots based on their RobotsBid probabilities; i tried many ones, but MAX is the better one i found (MAX of probability of all RoboticBids that the bidder made; Median or Mean performs poorly).
+
+for this i tried AzureML with some light code of R
+
+i used CV of a SVM (single parameter)
+
+i didn't have enough time to try more:
+
+idea 2 was not a good one, i guess
+
+i liked the ideas of Small Yellow Duck
+
+thanks for sharing your ideas
+
+reply
+Reply

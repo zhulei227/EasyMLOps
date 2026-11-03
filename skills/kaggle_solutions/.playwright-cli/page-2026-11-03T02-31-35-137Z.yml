@@ -1,0 +1,373 @@
+- generic [ref=f26e2]:
+  - navigation "Main Kaggle page navigation" [ref=f26e3]:
+    - generic [ref=f26e5]:
+      - button "Navigation menu" [ref=f26e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f26e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f26e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f26e12] [cursor=pointer]:
+      - paragraph [ref=f26e18]: Create
+    - generic [ref=f26e21]:
+      - list [ref=f26e22]:
+        - listitem "Home List Item" [ref=f26e23]:
+          - link "Home" [ref=f26e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f26e31]: Home
+        - listitem "Competitions List Item" [ref=f26e32]:
+          - link "Competitions" [ref=f26e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f26e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f26e41]:
+          - link "Benchmarks" [ref=f26e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f26e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f26e50]:
+          - link "Arenas" [ref=f26e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f26e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f26e59]:
+          - link "Game Arena" [ref=f26e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f26e67]: Game Arena
+      - list [ref=f26e68]:
+        - listitem "Data Hub List Item" [ref=f26e69]:
+          - generic [ref=f26e70]:
+            - link "Data Hub" [ref=f26e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f26e77]: Data Hub
+            - button "Expand" [ref=f26e80] [cursor=pointer]
+      - list [ref=f26e82]:
+        - listitem "More on Kaggle List Item" [ref=f26e83]:
+          - generic [ref=f26e84]:
+            - link "More on Kaggle" [ref=f26e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f26e91]: More
+            - button "Expand" [ref=f26e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f26e97]:
+    - generic [ref=f26e98]:
+      - generic [ref=f26e102]:
+        - textbox "Search" [ref=f26e104]
+        - group [aria-hidden]
+      - generic [ref=f26e106]:
+        - link [ref=f26e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Ffoursquare-location-matching%2Fdiscussion%2F336072
+          - button "Login" [ref=f26e108]
+        - link [ref=f26e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Ffoursquare-location-matching%2Fdiscussion%2F336072
+          - button "Sign Up" [ref=f26e111]
+  - main [ref=f26e113]:
+    - generic [ref=f26e115]:
+      - generic [ref=f26e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f26e117]:
+        - link "Learn more" [ref=f26e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f26e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f26e123]:
+      - generic [ref=f26e125]:
+        - generic [ref=f26e126]:
+          - link "Foursquare's profile" [ref=f26e127] [cursor=pointer]:
+            - /url: /organizations/foursquare
+            - generic "Foursquare" [ref=f26e128]
+          - generic [ref=f26e132]:
+            - generic [ref=f26e133]: Foursquare
+            - generic [ref=f26e135]: · Featured Code Competition · 4 years ago
+          - generic [ref=f26e136]:
+            - button "Late Submission" [disabled] [ref=f26e138]
+            - button "Competition options menu collapsed" [ref=f26e141] [cursor=pointer]: more_horiz
+        - generic [ref=f26e143]:
+          - heading "Foursquare - Location Matching" [level=1] [ref=f26e144]
+          - paragraph [ref=f26e146]: Match point of interest data across datasets
+      - generic [ref=f26e150]:
+        - tablist [ref=f26e157]:
+          - tab "Overview, 1 of 7" [ref=f26e158] [cursor=pointer]:
+            - generic [ref=f26e159]: Overview
+          - tab "Data, 2 of 7" [ref=f26e160] [cursor=pointer]:
+            - generic [ref=f26e161]: Data
+          - tab "Code, 3 of 7" [ref=f26e162] [cursor=pointer]:
+            - generic [ref=f26e163]: Code
+          - tab "Models, 4 of 7" [ref=f26e164] [cursor=pointer]:
+            - generic [ref=f26e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f26e166] [cursor=pointer]:
+            - generic [ref=f26e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f26e168] [cursor=pointer]:
+            - generic [ref=f26e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f26e170] [cursor=pointer]:
+            - generic [ref=f26e171]: Rules
+        - separator [ref=f26e173]
+      - generic [ref=f26e177]:
+        - generic [ref=f26e178]:
+          - generic [ref=f26e179]:
+            - generic [ref=f26e180]:
+              - link "T0m's profile" [ref=f26e181] [cursor=pointer]:
+                - /url: /tomyanabe
+                - generic "T0m" [ref=f26e182]
+              - generic [ref=f26e186]:
+                - link "T0m" [ref=f26e187] [cursor=pointer]:
+                  - /url: /tomyanabe
+                - text: ·
+                - generic [ref=f26e188]: 2nd in this Competition
+                - text: ·
+                - generic [ref=f26e189]: Posted 4 years ago
+            - generic [ref=f26e190]:
+              - generic [ref=f26e191]:
+                - button "Upvote" [ref=f26e192] [cursor=pointer]:
+                  - generic [ref=f26e193]: arrow_drop_up
+                - button "24 votes" [ref=f26e194] [cursor=pointer]: "24"
+              - button "More Options for this Topic" [ref=f26e195] [cursor=pointer]: more_vert
+            - heading "2nd place solution - T0m Part" [level=3] [ref=f26e196]
+            - generic [ref=f26e199]:
+              - paragraph [ref=f26e200]: This post is part of the 2nd place solution.
+              - paragraph [ref=f26e201]: Brief Summary
+              - list [ref=f26e202]:
+                - listitem [ref=f26e203]:
+                  - link "https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336062 (opens in a new tab)" [ref=f26e204] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336062
+                    - text: https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336062
+              - paragraph [ref=f26e205]: Other part
+              - list [ref=f26e206]:
+                - listitem [ref=f26e207]:
+                  - link "https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336090 (opens in a new tab)" [ref=f26e208] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336090
+                    - text: https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336090
+              - separator [ref=f26e209]
+              - heading "Candidate Generation" [level=1] [ref=f26e210]
+              - paragraph [ref=f26e211]: We picked up 128 candidates id for each of the following two ways.
+              - list [ref=f26e212]:
+                - listitem [ref=f26e213]: lat, lon base distance nearest ids
+                - listitem [ref=f26e214]: name tfidf vector base cosine similarity nearest ids
+              - paragraph [ref=f26e215]: and then, select a total of 128 from both with country-specific optimized ratios. Max IoU 0.9895
+              - separator [ref=f26e216]
+              - heading "Transformer Candidate Blocking" [level=1] [ref=f26e217]
+              - paragraph [ref=f26e218]
+              - heading "Absolute Features" [level=4] [ref=f26e219]
+              - list [ref=f26e220]:
+                - listitem [ref=f26e221]: Lat, Lon
+                - listitem [ref=f26e222]: Country embedding
+                - listitem [ref=f26e223]: Categories embedding
+                - listitem [ref=f26e224]: xlm-romerta-base name embedding
+                - listitem [ref=f26e225]: tfidf-svd vector (name, all)
+              - heading "Relative Features" [level=4] [ref=f26e226]
+              - list [ref=f26e227]:
+                - listitem [ref=f26e228]: edit-distance (name, address, zipcode, phone, url, categories)
+                - listitem [ref=f26e229]: tfidf-svd vector (name, all) cosine similarity
+              - paragraph [ref=f26e230]: "single LB: 0.918"
+              - heading "Blocking" [level=4] [ref=f26e231]
+              - paragraph [ref=f26e232]: threshold=0.005, and union find post process average candidates per id 4.1
+              - paragraph [ref=f26e233]: Max IoU 0.986
+          - separator [ref=f26e234]
+        - generic [ref=f26e235]:
+          - generic [ref=f26e236]:
+            - paragraph [ref=f26e239]:
+              - paragraph [ref=f26e240]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f26e241] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f26e242]
+          - generic [ref=f26e244]:
+            - generic [ref=f26e245]:
+              - generic [aria-hidden] [ref=f26e246]: comment
+              - heading "8 Comments" [level=2] [ref=f26e248]
+            - generic [ref=f26e251]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f26e252] [cursor=pointer]:
+                - generic [ref=f26e253]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f26e255]:
+            - generic [ref=f26e256]:
+              - generic [ref=f26e260]:
+                - link "pao's profile" [ref=f26e261] [cursor=pointer]:
+                  - /url: /go5kuramubon
+                  - generic "pao" [ref=f26e262]
+                - generic [ref=f26e268]:
+                  - link [ref=f26e270] [cursor=pointer]:
+                    - /url: /go5kuramubon
+                    - heading "pao" [level=3] [ref=f26e271]
+                  - generic [ref=f26e272]:
+                    - paragraph [ref=f26e273]: Posted 4 years ago
+                    - paragraph [ref=f26e275]: · 1st in this Competition
+                - generic [ref=f26e277]:
+                  - generic [ref=f26e278]:
+                    - button "Upvote" [ref=f26e279] [cursor=pointer]:
+                      - generic [ref=f26e280]: arrow_drop_up
+                    - button "1 votes" [ref=f26e281] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f26e282] [cursor=pointer]: more_vert
+                - paragraph [ref=f26e286]: End to end transformer approach is interesting!! It can be cosnsidered to relationship which is not contained in pair training!
+                - generic [ref=f26e292]:
+                  - link "T0m's profile" [ref=f26e293] [cursor=pointer]:
+                    - /url: /tomyanabe
+                    - generic "T0m" [ref=f26e294]
+                  - generic [ref=f26e300]:
+                    - generic [ref=f26e301]:
+                      - link [ref=f26e302] [cursor=pointer]:
+                        - /url: /tomyanabe
+                        - heading "T0m" [level=3] [ref=f26e303]
+                      - paragraph [ref=f26e306]: Topic Author
+                    - generic [ref=f26e307]:
+                      - paragraph [ref=f26e308]: Posted 4 years ago
+                      - paragraph [ref=f26e310]: · 2nd in this Competition
+                  - generic [ref=f26e312]:
+                    - generic [ref=f26e313]:
+                      - button "Upvote" [ref=f26e314] [cursor=pointer]:
+                        - generic [ref=f26e315]: arrow_drop_up
+                      - button "2 votes" [ref=f26e316] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f26e317] [cursor=pointer]: more_vert
+                  - generic [ref=f26e320]:
+                    - paragraph [ref=f26e321]:
+                      - link "@go5kuramubon (opens in a new tab)" [ref=f26e322] [cursor=pointer]:
+                        - /url: /go5kuramubon
+                        - text: "@go5kuramubon"
+                    - paragraph [ref=f26e323]: Thanks for your comment, and congratulations on your win!!
+                    - paragraph [ref=f26e324]: It was quite powerful for a 1st stage model. I was hoping that the model would interpolate the missing features from the surrounding samples. Also tried other things, such as optimizing the IoU directly, but not successed.
+              - separator [ref=f26e325]
+            - generic [ref=f26e326]:
+              - generic [ref=f26e330]:
+                - link "Bilzard's profile" [ref=f26e331] [cursor=pointer]:
+                  - /url: /tatamikenn
+                  - generic "Bilzard" [ref=f26e332]
+                - generic [ref=f26e338]:
+                  - link [ref=f26e340] [cursor=pointer]:
+                    - /url: /tatamikenn
+                    - heading "Bilzard" [level=3] [ref=f26e341]
+                  - paragraph [ref=f26e343]: Posted 4 years ago
+                - generic [ref=f26e345]:
+                  - generic [ref=f26e346]:
+                    - button "Upvote" [ref=f26e347] [cursor=pointer]:
+                      - generic [ref=f26e348]: arrow_drop_up
+                    - button "1 votes" [ref=f26e349] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f26e350] [cursor=pointer]: more_vert
+                - generic [ref=f26e353]:
+                  - paragraph [ref=f26e354]:
+                    - link "@tomyanabe (opens in a new tab)" [ref=f26e355] [cursor=pointer]:
+                      - /url: /tomyanabe
+                      - text: "@tomyanabe"
+                  - paragraph [ref=f26e356]: Awesome work.
+                  - paragraph [ref=f26e357]: Did you design the architecture of Transformer blocker by yourself? Or, do you have any references to other people's work or papers?
+                - generic [ref=f26e363]:
+                  - link "T0m's profile" [ref=f26e364] [cursor=pointer]:
+                    - /url: /tomyanabe
+                    - generic "T0m" [ref=f26e365]
+                  - generic [ref=f26e371]:
+                    - generic [ref=f26e372]:
+                      - link [ref=f26e373] [cursor=pointer]:
+                        - /url: /tomyanabe
+                        - heading "T0m" [level=3] [ref=f26e374]
+                      - paragraph [ref=f26e377]: Topic Author
+                    - generic [ref=f26e378]:
+                      - paragraph [ref=f26e379]: Posted 4 years ago
+                      - paragraph [ref=f26e381]: · 2nd in this Competition
+                  - generic [ref=f26e383]:
+                    - generic [ref=f26e384]:
+                      - button "Upvote" [ref=f26e385] [cursor=pointer]:
+                        - generic [ref=f26e386]: arrow_drop_up
+                      - button "2 votes" [ref=f26e387] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f26e388] [cursor=pointer]: more_vert
+                  - generic [ref=f26e391]:
+                    - paragraph [ref=f26e392]:
+                      - link "@tatamikenn (opens in a new tab)" [ref=f26e393] [cursor=pointer]:
+                        - /url: /tatamikenn
+                        - text: "@tatamikenn"
+                    - paragraph [ref=f26e394]: Thanks for your comment!
+                    - paragraph [ref=f26e395]: I built this Transformer-based model myself. And it was my first choice on this competition.
+              - separator [ref=f26e396]
+            - generic [ref=f26e401]:
+              - link "DeepUnderstanding's profile" [ref=f26e402] [cursor=pointer]:
+                - /url: /mrinath
+                - generic "DeepUnderstanding" [ref=f26e403]
+              - generic [ref=f26e409]:
+                - link [ref=f26e411] [cursor=pointer]:
+                  - /url: /mrinath
+                  - heading "DeepUnderstanding" [level=3] [ref=f26e412]
+                - paragraph [ref=f26e414]: Posted 4 years ago
+              - generic [ref=f26e416]:
+                - generic [ref=f26e417]:
+                  - button "Upvote" [ref=f26e418] [cursor=pointer]:
+                    - generic [ref=f26e419]: arrow_drop_up
+                  - button "1 votes" [ref=f26e420] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f26e421] [cursor=pointer]: more_vert
+              - paragraph [ref=f26e425]: I am beginner here, can you briefly explain what 'Candidate Blocking' is actually doing
+              - generic [ref=f26e426]:
+                - generic [ref=f26e431]:
+                  - link "Bilzard's profile" [ref=f26e432] [cursor=pointer]:
+                    - /url: /tatamikenn
+                    - generic "Bilzard" [ref=f26e433]
+                  - generic [ref=f26e439]:
+                    - link [ref=f26e441] [cursor=pointer]:
+                      - /url: /tatamikenn
+                      - heading "Bilzard" [level=3] [ref=f26e442]
+                    - paragraph [ref=f26e444]: Posted 4 years ago
+                  - generic [ref=f26e446]:
+                    - generic [ref=f26e447]:
+                      - button "Upvote" [ref=f26e448] [cursor=pointer]:
+                        - generic [ref=f26e449]: arrow_drop_up
+                      - button "1 votes" [ref=f26e450] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f26e451] [cursor=pointer]: more_vert
+                  - generic [ref=f26e454]:
+                    - paragraph [ref=f26e455]:
+                      - link "@mrinath (opens in a new tab)" [ref=f26e456] [cursor=pointer]:
+                        - /url: /mrinath
+                        - text: "@mrinath"
+                    - paragraph [ref=f26e457]: "\"Blocking\" here means narrowing candidate pairs in oder for efficiency in later stages."
+                    - blockquote [ref=f26e458]:
+                      - paragraph [ref=f26e459]: Because this can be a very computationally demanding task, particularly for large data sets, a technique known as blocking is often used to improve efficiency. Blocking attempts to restrict comparisons to just those records for which one or more particularly discriminating identifiers agree, which has the effect of increasing the positive predictive value (precision) at the expense of sensitivity (recall).
+                    - paragraph [ref=f26e460]:
+                      - link "https://en.wikipedia.org/wiki/Record_linkage (opens in a new tab)" [ref=f26e461] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/Record_linkage
+                        - text: https://en.wikipedia.org/wiki/Record_linkage
+                - generic [ref=f26e466]:
+                  - link "T0m's profile" [ref=f26e467] [cursor=pointer]:
+                    - /url: /tomyanabe
+                    - generic "T0m" [ref=f26e468]
+                  - generic [ref=f26e474]:
+                    - generic [ref=f26e475]:
+                      - link [ref=f26e476] [cursor=pointer]:
+                        - /url: /tomyanabe
+                        - heading "T0m" [level=3] [ref=f26e477]
+                      - paragraph [ref=f26e480]: Topic Author
+                    - generic [ref=f26e481]:
+                      - paragraph [ref=f26e482]: Posted 4 years ago
+                      - paragraph [ref=f26e484]: · 2nd in this Competition
+                  - generic [ref=f26e486]:
+                    - generic [ref=f26e487]:
+                      - button "Upvote" [ref=f26e488] [cursor=pointer]:
+                        - generic [ref=f26e489]: arrow_drop_up
+                      - button "0 votes" [ref=f26e490] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f26e491] [cursor=pointer]: more_vert
+                  - generic [ref=f26e494]:
+                    - paragraph [ref=f26e495]:
+                      - link "@mrinath (opens in a new tab)" [ref=f26e496] [cursor=pointer]:
+                        - /url: /mrinath
+                        - text: "@mrinath"
+                    - paragraph [ref=f26e497]: Thanks for your comment and sorry for the delay in reply! What bilzard has answered is correct.
+                    - paragraph [ref=f26e498]:
+                      - link "@tatamikenn (opens in a new tab)" [ref=f26e499] [cursor=pointer]:
+                        - /url: /tatamikenn
+                        - text: "@tatamikenn"
+                    - paragraph [ref=f26e500]: Thank you for answering on my behalf!
+                - generic [ref=f26e505]:
+                  - link "DeepUnderstanding's profile" [ref=f26e506] [cursor=pointer]:
+                    - /url: /mrinath
+                    - generic "DeepUnderstanding" [ref=f26e507]
+                  - generic [ref=f26e513]:
+                    - link [ref=f26e515] [cursor=pointer]:
+                      - /url: /mrinath
+                      - heading "DeepUnderstanding" [level=3] [ref=f26e516]
+                    - paragraph [ref=f26e518]: Posted 4 years ago
+                  - generic [ref=f26e520]:
+                    - generic [ref=f26e521]:
+                      - button "Upvote" [ref=f26e522] [cursor=pointer]:
+                        - generic [ref=f26e523]: arrow_drop_up
+                      - button "1 votes" [ref=f26e524] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f26e525] [cursor=pointer]: more_vert
+                  - paragraph [ref=f26e529]:
+                    - text: Thanks
+                    - link "@tomyanabe (opens in a new tab)" [ref=f26e530] [cursor=pointer]:
+                      - /url: /tomyanabe
+                      - text: "@tomyanabe"
+                    - link "@tatamikenn (opens in a new tab)" [ref=f26e531] [cursor=pointer]:
+                      - /url: /tatamikenn
+                      - text: "@tatamikenn"
+                    - text: Anyway really impressive how you thought about using a transformer!
+  - alert [ref=f26e534]

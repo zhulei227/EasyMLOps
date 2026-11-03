@@ -1,0 +1,616 @@
+- generic [ref=f59e2]:
+  - navigation "Main Kaggle page navigation" [ref=f59e3]:
+    - generic [ref=f59e5]:
+      - button "Navigation menu" [ref=f59e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f59e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f59e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f59e12] [cursor=pointer]:
+      - paragraph [ref=f59e18]: Create
+    - generic [ref=f59e21]:
+      - list [ref=f59e22]:
+        - listitem "Home List Item" [ref=f59e23]:
+          - link "Home" [ref=f59e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f59e31]: Home
+        - listitem "Competitions List Item" [ref=f59e32]:
+          - link "Competitions" [ref=f59e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f59e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f59e41]:
+          - link "Benchmarks" [ref=f59e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f59e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f59e50]:
+          - link "Arenas" [ref=f59e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f59e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f59e59]:
+          - link "Game Arena" [ref=f59e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f59e67]: Game Arena
+      - list [ref=f59e68]:
+        - listitem "Data Hub List Item" [ref=f59e69]:
+          - generic [ref=f59e70]:
+            - link "Data Hub" [ref=f59e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f59e77]: Data Hub
+            - button "Expand" [ref=f59e80] [cursor=pointer]
+      - list [ref=f59e82]:
+        - listitem "More on Kaggle List Item" [ref=f59e83]:
+          - generic [ref=f59e84]:
+            - link "More on Kaggle" [ref=f59e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f59e91]: More
+            - button "Expand" [ref=f59e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f59e97]:
+    - generic [ref=f59e98]:
+      - generic [ref=f59e102]:
+        - textbox "Search" [ref=f59e104]
+        - group [aria-hidden]
+      - generic [ref=f59e106]:
+        - link [ref=f59e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2FPLAsTiCC-2018%2Fdiscussion%2F75222
+          - button "Login" [ref=f59e108]
+        - link [ref=f59e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2FPLAsTiCC-2018%2Fdiscussion%2F75222
+          - button "Sign Up" [ref=f59e111]
+  - main [ref=f59e113]:
+    - generic [ref=f59e115]:
+      - generic [ref=f59e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f59e117]:
+        - link "Learn more" [ref=f59e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f59e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f59e123]:
+      - generic [ref=f59e125]:
+        - generic [ref=f59e126]:
+          - link "LSST Project's profile" [ref=f59e127] [cursor=pointer]:
+            - /url: /organizations/lsstproject
+            - generic "LSST Project" [ref=f59e128]
+          - generic [ref=f59e132]:
+            - generic [ref=f59e133]: LSST Project
+            - generic [ref=f59e135]: · Featured Prediction Competition · 8 years ago
+          - generic [ref=f59e136]:
+            - button "Late Submission" [disabled] [ref=f59e138]
+            - button "Competition options menu collapsed" [ref=f59e141] [cursor=pointer]: more_horiz
+        - generic [ref=f59e143]:
+          - heading "PLAsTiCC Astronomical Classification" [level=1] [ref=f59e144]
+          - paragraph [ref=f59e146]: Can you help make sense of the Universe?
+      - generic [ref=f59e150]:
+        - tablist [ref=f59e157]:
+          - tab "Overview, 1 of 7" [ref=f59e158] [cursor=pointer]:
+            - generic [ref=f59e159]: Overview
+          - tab "Data, 2 of 7" [ref=f59e160] [cursor=pointer]:
+            - generic [ref=f59e161]: Data
+          - tab "Code, 3 of 7" [ref=f59e162] [cursor=pointer]:
+            - generic [ref=f59e163]: Code
+          - tab "Models, 4 of 7" [ref=f59e164] [cursor=pointer]:
+            - generic [ref=f59e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f59e166] [cursor=pointer]:
+            - generic [ref=f59e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f59e168] [cursor=pointer]:
+            - generic [ref=f59e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f59e170] [cursor=pointer]:
+            - generic [ref=f59e171]: Rules
+        - separator [ref=f59e173]
+      - generic [ref=f59e177]:
+        - generic [ref=f59e178]:
+          - generic [ref=f59e179]:
+            - generic [ref=f59e180]:
+              - link "nyanp's profile" [ref=f59e181] [cursor=pointer]:
+                - /url: /nyanpn
+                - generic "nyanp" [ref=f59e182]
+              - generic [ref=f59e186]:
+                - link "nyanp" [ref=f59e187] [cursor=pointer]:
+                  - /url: /nyanpn
+                - text: ·
+                - generic [ref=f59e188]: 3rd in this Competition
+                - text: ·
+                - generic [ref=f59e189]: Posted 8 years ago
+            - generic [ref=f59e190]:
+              - generic [ref=f59e191]:
+                - button "Upvote" [ref=f59e192] [cursor=pointer]:
+                  - generic [ref=f59e193]: arrow_drop_up
+                - button "27 votes" [ref=f59e194] [cursor=pointer]: "27"
+              - button "More Options for this Topic" [ref=f59e195] [cursor=pointer]: more_vert
+            - heading "3rd Place Part III - Pesudo Astronomer's Feature Engineering" [level=3] [ref=f59e196]
+            - generic [ref=f59e198]:
+              - generic [ref=f59e199]:
+                - paragraph [ref=f59e200]:
+                  - text: First of all, thanks to the organizers and all participants in this competition! And thanks a lot to my great teammates,
+                  - link "@mamasinkgs (opens in a new tab)" [ref=f59e201] [cursor=pointer]:
+                    - /url: /mamasinkgs
+                    - text: "@mamasinkgs"
+                  - text: ", and"
+                  - link "@yuval6967 (opens in a new tab)" [ref=f59e202] [cursor=pointer]:
+                    - /url: /yuval6967
+                    - text: "@yuval6967"
+                  - text: . I learn a lot from these 2 guys. And I'm very happy to get my first gold medal :)
+                - paragraph [ref=f59e203]: In this part, I want to share my findings and feature engineering. Please refer to the following discussions to see the overall description of our solution.
+                - list [ref=f59e204]:
+                  - listitem [ref=f59e205]:
+                    - link "3rd Place Part I - CNN (opens in a new tab)" [ref=f59e206] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75116
+                      - text: 3rd Place Part I - CNN
+                  - listitem [ref=f59e207]:
+                    - link "3rd Place Part II - CatBoost, mamas feature, and class 99 (opens in a new tab)" [ref=f59e208] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75131
+                      - text: 3rd Place Part II - CatBoost, mamas feature, and class 99
+                - heading "What I learned from astronomer's work" [level=2] [ref=f59e209]
+                - paragraph [ref=f59e210]: At the beginning of this competition, I tried to install domain knowledge and tried to be "pseudo astronomer". In addition to the data note provided by the organizers, I carefully read the following resources.
+                - list [ref=f59e211]:
+                  - listitem [ref=f59e212]:
+                    - link "LSST science book (opens in a new tab)" [ref=f59e213] [cursor=pointer]:
+                      - /url: https://www.lsst.org/scientists/scibook
+                      - text: LSST science book
+                  - listitem [ref=f59e214]:
+                    - link "Result from SNPCC challenge (opens in a new tab)" [ref=f59e215] [cursor=pointer]:
+                      - /url: https://arxiv.org/abs/1008.1024
+                      - text: Result from SNPCC challenge
+                  - listitem [ref=f59e216]:
+                    - link "Photometric Supernova Classification With Machine Learning (opens in a new tab)" [ref=f59e217] [cursor=pointer]:
+                      - /url: https://arxiv.org/abs/1603.00882
+                      - text: Photometric Supernova Classification With Machine Learning
+                    - text: (
+                    - link "slide (opens in a new tab)" [ref=f59e218] [cursor=pointer]:
+                      - /url: https://kicp-workshops.uchicago.edu/SNClassification_2016/depot/talk-lochner-michelle.pdf
+                      - text: slide
+                    - text: )
+                - paragraph [ref=f59e219]: "After reading these resources and exploring data a bit, I thought that this competition mainly consists of these 2 challenges:"
+                - list [ref=f59e220]:
+                  - listitem [ref=f59e221]: How to distinguish between various types of supernova classes?
+                  - listitem [ref=f59e222]: How to detect class99?
+                - paragraph [ref=f59e223]: "I also tried to understand what each class really is. By 1) basic light curve characteristics 2) class frequency compared with expected LSST observation rate 3) redshift distribution, here is my assumption (order by confidence):"
+                - list [ref=f59e224]:
+                  - listitem [ref=f59e225]: "class90: SN Ia"
+                  - listitem [ref=f59e226]: "class42: SN II"
+                  - listitem [ref=f59e227]: "class95: Superluminous Supernova"
+                  - listitem [ref=f59e228]: "class52/62: SN Ib/c"
+                  - listitem [ref=f59e229]: "class88: Strong Gravitational Lens (or AGN?)"
+                  - listitem [ref=f59e230]: "class67: TDE"
+                - paragraph [ref=f59e231]:
+                  - text: I hope the competition hosts will reveal the answer!
+                  - emphasis [ref=f59e232]: I don't think this assumption helped us directly
+                  - text: ", but this gave us a very good interpretation of the result of our class99 probing (class99 is something similar to core-collapse supernova)."
+                - heading "Feature Engineering" [level=2] [ref=f59e233]
+                - heading "template fitting by sncosmo package - the golden feature for us" [level=3] [ref=f59e234]
+                - paragraph [ref=f59e235]:
+                  - text: sncosmo provides nice lc fitting API in python (
+                  - link "link (opens in a new tab)" [ref=f59e236] [cursor=pointer]:
+                    - /url: https://sncosmo.readthedocs.io/en/v1.6.x/examples/plot_lc_fit.html#sphx-glr-examples-plot-lc-fit-py
+                    - text: link
+                  - text: ). I used a fitting parameter and it's chi-square value as a feature. I'm a bit surprised that no one except me uses this library because using template fitting is a major solution in the past competition.
+                - paragraph [ref=f59e237]: It took a bit long time to calculate (1~2 lines/sec), so I split light curves by object_id%30 and run 30 preemptible instances to finish calculating within 1 day. I repeated this process about 15 times to make various types of models to cover all variant of supernovae (salt-2, salt-2-extended, nugent-sn1bc, nugent-sn2, snana, sako,…), and use 8 of them in my final model. It was an exhausting process… really…
+                - paragraph [ref=f59e238]: But these bag of template features gave me a significant boost (~0.05 in intermediate, and 0.1+ in my final model). It helped Yuval's CNN as well (+0.04). 7 out of 10 my most important features (by LGBM gain) are these features. All template features were used only in an extragalactic model.
+                - paragraph [ref=f59e239]:
+                  - img "example of template fitting result" [ref=f59e240]
+                - paragraph [ref=f59e241]: Here is an example of a result of template fitting (SALT-2, object_id = 161521). y-band is ignored by its wavelength and estimated redshift. One may think that GP fitting gives better fitting, but it's robust to noise (in SALT-2, only 5 parameters used to generate this all 6-band curve). Probably combining our features with GP features of Kyle or CPMP's will give us another significant boost.
+                - heading [level=4] [ref=f59e242]:
+                  - emphasis [ref=f59e243]: UPDATED
+                - paragraph [ref=f59e244]: "I've attached my template features. you can download, unzip and use:"
+                - code [ref=f59e246]: df = pd.read_feather('sncosmo_template_features.f')
+                - heading [level=4] [ref=f59e247]:
+                  - emphasis [ref=f59e248]: UPDATED2
+                - paragraph [ref=f59e249]:
+                  - text: "Kernel is available to see how did we use sncosmo:"
+                  - link "https://www.kaggle.com/nyanpn/salt-2-feature-part-of-3rd-place-solution (opens in a new tab)" [ref=f59e250] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/nyanpn/salt-2-feature-part-of-3rd-place-solution
+                    - text: https://www.kaggle.com/nyanpn/salt-2-feature-part-of-3rd-place-solution
+                - heading "hostgal-specz model" [level=3] [ref=f59e251]
+                - paragraph [ref=f59e252]: Exactly same as 2nd and 4th place solution. This gave me a small boost (~0.004).
+                - heading "luminosity" [level=3] [ref=f59e253]
+                - paragraph [ref=f59e254]: "As shared in the discussion, luminosity is an important intrinsic property of variable stars. I used the following fomla:"
+                - code [ref=f59e256]: luminosity = (max(flux) - min(flux)) * distance ** 2
+                - paragraph [ref=f59e257]:
+                  - text: Distance (in MPc) is converted from estimated specz above. Astropy's luminosity_distance (
+                  - link "link (opens in a new tab)" [ref=f59e258] [cursor=pointer]:
+                    - /url: http://docs.astropy.org/en/stable/cosmology/index.html?highlight=luminosity#using-astropy-cosmology
+                    - text: link
+                  - text: ) function gives distance from redshift.
+                - paragraph [ref=f59e259]: I added these luminosity and luminosity difference between channels.
+                - heading "time difference" [level=3] [ref=f59e260]
+                - paragraph [ref=f59e261]: "I made some features related to time-to-time difference. for example:"
+                - list [ref=f59e262]:
+                  - listitem [ref=f59e263]: (max(mjd) where detected == 1) - (mjd on peak flux)
+                  - listitem [ref=f59e264]: (mjd on peak flux) - (min(mjd) where detected == 1)
+                  - listitem [ref=f59e265]:
+                    - text: (min(mjd) where detected == 1) - (mjd on previous observation)
+                    - list [ref=f59e266]:
+                      - listitem [ref=f59e267]: tried to capture information where the important signal is lost by its observation schedule
+                  - listitem [ref=f59e268]: (mjd on 50% tile after the peak flux) - (mjd no peak flux)
+                - heading "LombScargle" [level=3] [ref=f59e269]
+                - paragraph [ref=f59e270]:
+                  - text: Adding power and frequency obtained from
+                  - code [ref=f59e271]: astropy.LombScargle.autopower()
+                  - text: gave a small improvement.
+                - heading "Pseudo Labelling" [level=2] [ref=f59e272]
+                - paragraph [ref=f59e273]: I also tried to use pseudo-labeling in the early stage of the competition. I found that using pseudo-label only in class90 gave me a big boost (0.005 ~ 0.03, depends on the model), but using all classes didn't work. I think it's related class99 (if class99 is similar to class52/62, pseudo-label in these classes contains a lot of false signals). class90+class42 gave a good result too, but its difference from class90-only was very small.
+              - generic [ref=f59e274]:
+                - link "object_id_161521.png opens in new window" [ref=f59e276] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/442200/10905/object_id_161521.png
+                  - text: object_id_161521.png
+                - link "sncosmo_template_features.f.gz opens in new window" [ref=f59e278] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/442200/10912/sncosmo_template_features.f.gz
+                  - text: sncosmo_template_features.f.gz
+                - link "comparing-different-feature-set.png opens in new window" [ref=f59e280] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/442200/10914/comparing-different-feature-set.png
+                  - text: comparing-different-feature-set.png
+          - separator [ref=f59e281]
+        - generic [ref=f59e282]:
+          - generic [ref=f59e283]:
+            - paragraph [ref=f59e286]:
+              - paragraph [ref=f59e287]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f59e288] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f59e289]
+          - generic [ref=f59e291]:
+            - generic [ref=f59e292]:
+              - generic [aria-hidden] [ref=f59e293]: comment
+              - heading "17 Comments" [level=2] [ref=f59e295]
+            - generic [ref=f59e298]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f59e299] [cursor=pointer]:
+                - generic [ref=f59e300]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f59e302]:
+            - generic [ref=f59e303]:
+              - generic [ref=f59e307]:
+                - link "nyanp's profile" [ref=f59e308] [cursor=pointer]:
+                  - /url: /nyanpn
+                  - generic "nyanp" [ref=f59e309]
+                - generic [ref=f59e315]:
+                  - generic [ref=f59e316]:
+                    - link [ref=f59e317] [cursor=pointer]:
+                      - /url: /nyanpn
+                      - heading "nyanp" [level=3] [ref=f59e318]
+                    - paragraph [ref=f59e321]: Topic Author
+                  - generic [ref=f59e322]:
+                    - paragraph [ref=f59e323]: Posted 8 years ago
+                    - paragraph [ref=f59e325]: · 3rd in this Competition
+                - generic [ref=f59e327]:
+                  - generic [ref=f59e328]:
+                    - button "Upvote" [ref=f59e329] [cursor=pointer]:
+                      - generic [ref=f59e330]: arrow_drop_up
+                    - button "4 votes" [ref=f59e331] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f59e332] [cursor=pointer]: more_vert
+                - paragraph [ref=f59e336]: Ah I forgot to say that I majored in aerospace engineering and joined an astrometry satellite project as an engineer before. This is why I call myself as pseudo-astronomer. Anyway, learning about project background is really interesting for me, and motivated me a lot ;)
+              - separator [ref=f59e337]
+            - generic [ref=f59e338]:
+              - generic [ref=f59e342]:
+                - link "nyanp's profile" [ref=f59e343] [cursor=pointer]:
+                  - /url: /nyanpn
+                  - generic "nyanp" [ref=f59e344]
+                - generic [ref=f59e350]:
+                  - generic [ref=f59e351]:
+                    - link [ref=f59e352] [cursor=pointer]:
+                      - /url: /nyanpn
+                      - heading "nyanp" [level=3] [ref=f59e353]
+                    - paragraph [ref=f59e356]: Topic Author
+                  - generic [ref=f59e357]:
+                    - paragraph [ref=f59e358]: Posted 8 years ago
+                    - paragraph [ref=f59e360]: · 3rd in this Competition
+                - generic [ref=f59e362]:
+                  - generic [ref=f59e363]:
+                    - button "Upvote" [ref=f59e364] [cursor=pointer]:
+                      - generic [ref=f59e365]: arrow_drop_up
+                    - button "1 votes" [ref=f59e366] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f59e367] [cursor=pointer]: more_vert
+                - generic [ref=f59e370]:
+                  - paragraph [ref=f59e371]:
+                    - text: From late submission, I noticed (again) that
+                    - strong [ref=f59e372]: combining all template features were much better than single SALT-2 template
+                    - text: ". Here is a single LGBM result:"
+                  - list [ref=f59e373]:
+                    - listitem [ref=f59e374]: "Baseline : 0.911 (public), 0.943 (private)"
+                    - listitem [ref=f59e375]:
+                      - text: "Baseline + SALT-2:"
+                      - strong [ref=f59e376]: "0.860"
+                      - text: (public),
+                      - strong [ref=f59e377]: "0.886"
+                      - text: (private)
+                    - listitem [ref=f59e378]:
+                      - text: "Baseline + All templates:"
+                      - strong [ref=f59e379]: "0.824"
+                      - text: (public),
+                      - strong [ref=f59e380]: "0.860"
+                      - text: (private)
+              - separator [ref=f59e381]
+            - generic [ref=f59e382]:
+              - generic [ref=f59e386]:
+                - link "Kyle Boone's profile" [ref=f59e387] [cursor=pointer]:
+                  - /url: /kyleboone
+                  - generic "Kyle Boone" [ref=f59e388]
+                - generic [ref=f59e394]:
+                  - link [ref=f59e396] [cursor=pointer]:
+                    - /url: /kyleboone
+                    - heading "Kyle Boone" [level=3] [ref=f59e397]
+                  - generic [ref=f59e398]:
+                    - paragraph [ref=f59e399]: Posted 8 years ago
+                    - paragraph [ref=f59e401]: · 1st in this Competition
+                - generic [ref=f59e403]:
+                  - generic [ref=f59e404]:
+                    - button "Upvote" [ref=f59e405] [cursor=pointer]:
+                      - generic [ref=f59e406]: arrow_drop_up
+                    - button "1 votes" [ref=f59e407] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f59e408] [cursor=pointer]: more_vert
+                - generic [ref=f59e411]:
+                  - paragraph [ref=f59e412]: Very interesting results! I'm very intrigued by the sncosmo fits. That package was developed by another Kyle who used to work in my group. I have typically found that the sncosmo fits require quite a bit of hand tuning to get them to converge properly. Did you have any issues with that? There is as nested sampler fitter that is supposed to be more robust. Did you use that?
+                  - paragraph [ref=f59e413]: Another thing to think about is that the data used in this competition was probably generated using a lot of the same models that are in sncosmo. I'm not really sure what the impact of that is…
+                - generic [ref=f59e419]:
+                  - link "nyanp's profile" [ref=f59e420] [cursor=pointer]:
+                    - /url: /nyanpn
+                    - generic "nyanp" [ref=f59e421]
+                  - generic [ref=f59e427]:
+                    - generic [ref=f59e428]:
+                      - link [ref=f59e429] [cursor=pointer]:
+                        - /url: /nyanpn
+                        - heading "nyanp" [level=3] [ref=f59e430]
+                      - paragraph [ref=f59e433]: Topic Author
+                    - generic [ref=f59e434]:
+                      - paragraph [ref=f59e435]: Posted 8 years ago
+                      - paragraph [ref=f59e437]: · 3rd in this Competition
+                  - generic [ref=f59e439]:
+                    - generic [ref=f59e440]:
+                      - button "Upvote" [ref=f59e441] [cursor=pointer]:
+                        - generic [ref=f59e442]: arrow_drop_up
+                      - button "0 votes" [ref=f59e443] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f59e444] [cursor=pointer]: more_vert
+                  - generic [ref=f59e447]:
+                    - paragraph [ref=f59e448]: First of all, congratulations on your 1st!
+                    - code [ref=f59e450]: That package was developed by another Kyle who used to work in my group.
+                    - paragraph [ref=f59e451]:
+                      - text: Wow, so why didn't you use SALT-2 feature? ;) Please say thank you to another Kyle, I love this library by it's clean and well-documented API. I tried
+                      - code [ref=f59e452]: sncosmo.nest_lc
+                      - text: and multinest package but it failed because both were too slow to converge (over 30 seconds/object). I thought nested sampling isn't feasible to this competition, but maybe I made a mistake.
+                    - blockquote [ref=f59e453]:
+                      - paragraph [ref=f59e454]: Did you have any issues with that?
+                    - list [ref=f59e455]:
+                      - listitem [ref=f59e456]: Sometimes I met SEGV while calculating salt-2 or salt-2-extended feature. I will try to reproduce it in this weekend.
+                      - listitem [ref=f59e457]: Its internal solver (iminuit2) does not scale with the number of CPUs. So I needed to run 30x 8-core preemptible instances to speedup whole process. It is nice if we can turn off its internal parallelism (data parallelism is a much better way in this competition).
+                    - blockquote [ref=f59e458]:
+                      - paragraph [ref=f59e459]: Another thing to think about is that the data used in this competition was probably generated using a lot of the same models that are in sncosmo. I'm not really sure what the impact of that is…
+                    - paragraph [ref=f59e460]: "Yes, probably is. Before selecting 15 sources, I tried over 30 types of built-in sources in sncosmo, and choose it by local CV and my intuition. Some sources improved my CV, but some didn't. My final feature set consists of:"
+                    - list [ref=f59e461]:
+                      - listitem [ref=f59e462]: salt-2
+                      - listitem [ref=f59e463]: salt-2-extended
+                      - listitem [ref=f59e464]: hsiao
+                      - listitem [ref=f59e465]: nugent-sn1bc
+                      - listitem [ref=f59e466]: nugent-sn2n
+                      - listitem [ref=f59e467]: snana-2004fe
+                      - listitem [ref=f59e468]: snana-2007Y
+              - separator [ref=f59e469]
+            - generic [ref=f59e470]:
+              - generic [ref=f59e474]:
+                - link "mamas's profile" [ref=f59e475] [cursor=pointer]:
+                  - /url: /mamasinkgs
+                  - generic "mamas" [ref=f59e476]
+                - generic [ref=f59e482]:
+                  - link [ref=f59e484] [cursor=pointer]:
+                    - /url: /mamasinkgs
+                    - heading "mamas" [level=3] [ref=f59e485]
+                  - generic [ref=f59e486]:
+                    - paragraph [ref=f59e487]: Posted 8 years ago
+                    - paragraph [ref=f59e489]: · 3rd in this Competition
+                - generic [ref=f59e491]:
+                  - generic [ref=f59e492]:
+                    - button "Upvote" [ref=f59e493] [cursor=pointer]:
+                      - generic [ref=f59e494]: arrow_drop_up
+                    - button "1 votes" [ref=f59e495] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f59e496] [cursor=pointer]: more_vert
+                - paragraph [ref=f59e500]: Thanks nyanp, your performance in this competition is really incredible! Without your template fitting features it's impossible to make suich a high-scored GBDT model, and without your ideas we wouldn't have noticed class99 handling :)
+                - generic [ref=f59e506]:
+                  - link "nyanp's profile" [ref=f59e507] [cursor=pointer]:
+                    - /url: /nyanpn
+                    - generic "nyanp" [ref=f59e508]
+                  - generic [ref=f59e514]:
+                    - generic [ref=f59e515]:
+                      - link [ref=f59e516] [cursor=pointer]:
+                        - /url: /nyanpn
+                        - heading "nyanp" [level=3] [ref=f59e517]
+                      - paragraph [ref=f59e520]: Topic Author
+                    - generic [ref=f59e521]:
+                      - paragraph [ref=f59e522]: Posted 8 years ago
+                      - paragraph [ref=f59e524]: · 3rd in this Competition
+                  - generic [ref=f59e526]:
+                    - generic [ref=f59e527]:
+                      - button "Upvote" [ref=f59e528] [cursor=pointer]:
+                        - generic [ref=f59e529]: arrow_drop_up
+                      - button "1 votes" [ref=f59e530] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f59e531] [cursor=pointer]: more_vert
+                  - paragraph [ref=f59e535]: Thanks a lot, too :) Your ambition, hard working and deep knowledge about GBDT drove me a lot!
+              - separator [ref=f59e536]
+            - generic [ref=f59e537]:
+              - generic [ref=f59e541]:
+                - link "CPMP's profile" [ref=f59e542] [cursor=pointer]:
+                  - /url: /cpmpml
+                  - generic "CPMP" [ref=f59e543]
+                - generic [ref=f59e549]:
+                  - link [ref=f59e551] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - heading "CPMP" [level=3] [ref=f59e552]
+                  - generic [ref=f59e553]:
+                    - paragraph [ref=f59e554]: Posted 8 years ago
+                    - paragraph [ref=f59e556]: · 5th in this Competition
+                - generic [ref=f59e558]:
+                  - generic [ref=f59e559]:
+                    - button "Upvote" [ref=f59e560] [cursor=pointer]:
+                      - generic [ref=f59e561]: arrow_drop_up
+                    - button "1 votes" [ref=f59e562] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f59e563] [cursor=pointer]: more_vert
+                - paragraph [ref=f59e567]: Thanks for sharing, and congrats on the result. You make me feel even worse than before for not having tried SALT2 harder. And for combining, I think it is way better to combine with Kyle's GP than with mine ;) But yes, I'm pretty sure combining SALT2 with what we have would give a significant boost. I can try submitting if you share these template feature values for test and train datasets.
+                - generic [ref=f59e568]:
+                  - generic [ref=f59e573]:
+                    - link "nyanp's profile" [ref=f59e574] [cursor=pointer]:
+                      - /url: /nyanpn
+                      - generic "nyanp" [ref=f59e575]
+                    - generic [ref=f59e581]:
+                      - generic [ref=f59e582]:
+                        - link [ref=f59e583] [cursor=pointer]:
+                          - /url: /nyanpn
+                          - heading "nyanp" [level=3] [ref=f59e584]
+                        - paragraph [ref=f59e587]: Topic Author
+                      - generic [ref=f59e588]:
+                        - paragraph [ref=f59e589]: Posted 8 years ago
+                        - paragraph [ref=f59e591]: · 3rd in this Competition
+                    - generic [ref=f59e593]:
+                      - generic [ref=f59e594]:
+                        - button "Upvote" [ref=f59e595] [cursor=pointer]:
+                          - generic [ref=f59e596]: arrow_drop_up
+                        - button "3 votes" [ref=f59e597] [cursor=pointer]: "3"
+                      - button "More Options for this Comment" [ref=f59e598] [cursor=pointer]: more_vert
+                    - paragraph [ref=f59e602]:
+                      - link "@cpmpml (opens in a new tab)" [ref=f59e603] [cursor=pointer]:
+                        - /url: /cpmpml
+                        - text: "@cpmpml"
+                      - text: Thanks for your comment! And I appreciate your sharing in the competition, I learned a lot from you. I've attached all template features (in feather-format), now you can try our features :)
+                  - generic [ref=f59e604]:
+                    - button "3 more replies" [ref=f59e605] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f59e607]: arrow_drop_down
+                    - generic [ref=f59e608]:
+                      - img "Profile picture for CPMP" [ref=f59e610]
+                      - img "Profile picture for nyanp" [ref=f59e612]
+              - separator [ref=f59e613]
+            - generic [ref=f59e614]:
+              - generic [ref=f59e618]:
+                - link "Blonde's profile" [ref=f59e619] [cursor=pointer]:
+                  - /url: /blondinka
+                  - generic "Blonde" [ref=f59e620]
+                - generic [ref=f59e626]:
+                  - link [ref=f59e628] [cursor=pointer]:
+                    - /url: /blondinka
+                    - heading "Blonde" [level=3] [ref=f59e629]
+                  - generic [ref=f59e630]:
+                    - paragraph [ref=f59e631]: Posted 8 years ago
+                    - paragraph [ref=f59e633]: · 13th in this Competition
+                - generic [ref=f59e635]:
+                  - generic [ref=f59e636]:
+                    - button "Upvote" [ref=f59e637] [cursor=pointer]:
+                      - generic [ref=f59e638]: arrow_drop_up
+                    - button "0 votes" [ref=f59e639] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f59e640] [cursor=pointer]: more_vert
+                - paragraph [ref=f59e644]: Thank you and congrats ! I'll try to add salt-2 features to our model, it's 0.815 (public) single model at the moment, so we'll see what it will be with the salt-2, will give you an update. I wanted to try it, but it just was not enough time for everything
+              - separator [ref=f59e645]
+            - generic [ref=f59e646]:
+              - generic [ref=f59e650]:
+                - link "Tania J's profile" [ref=f59e651] [cursor=pointer]:
+                  - /url: /taniaj
+                  - generic "Tania J" [ref=f59e652]
+                - generic [ref=f59e658]:
+                  - link [ref=f59e660] [cursor=pointer]:
+                    - /url: /taniaj
+                    - heading "Tania J" [level=3] [ref=f59e661]
+                  - generic [ref=f59e662]:
+                    - paragraph [ref=f59e663]: Posted 8 years ago
+                    - paragraph [ref=f59e665]: · 58th in this Competition
+                - generic [ref=f59e667]:
+                  - generic [ref=f59e668]:
+                    - button "Upvote" [ref=f59e669] [cursor=pointer]:
+                      - generic [ref=f59e670]: arrow_drop_up
+                    - button "0 votes" [ref=f59e671] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f59e672] [cursor=pointer]: more_vert
+                - paragraph [ref=f59e676]: Congratulations on your amazing result! I tried sncosmo too but was not able to get useful features out of it. However I only tried salt2 and salt2-extended models. Were either of these 2 models in the final 8 that you used? Can you share what values you used for zp and zpsys? Maybe that was my problem…
+                - generic [ref=f59e677]:
+                  - generic [ref=f59e682]:
+                    - link "nyanp's profile" [ref=f59e683] [cursor=pointer]:
+                      - /url: /nyanpn
+                      - generic "nyanp" [ref=f59e684]
+                    - generic [ref=f59e690]:
+                      - generic [ref=f59e691]:
+                        - link [ref=f59e692] [cursor=pointer]:
+                          - /url: /nyanpn
+                          - heading "nyanp" [level=3] [ref=f59e693]
+                        - paragraph [ref=f59e696]: Topic Author
+                      - generic [ref=f59e697]:
+                        - paragraph [ref=f59e698]: Posted 8 years ago
+                        - paragraph [ref=f59e700]: · 3rd in this Competition
+                    - generic [ref=f59e702]:
+                      - generic [ref=f59e703]:
+                        - button "Upvote" [ref=f59e704] [cursor=pointer]:
+                          - generic [ref=f59e705]: arrow_drop_up
+                        - button "1 votes" [ref=f59e706] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f59e707] [cursor=pointer]: more_vert
+                    - generic [ref=f59e710]:
+                      - paragraph [ref=f59e711]:
+                        - link "@taniaj (opens in a new tab)" [ref=f59e712] [cursor=pointer]:
+                          - /url: /taniaj
+                          - text: "@taniaj"
+                        - text: Thanks! :)
+                      - blockquote [ref=f59e713]:
+                        - paragraph [ref=f59e714]: Were either of these 2 models in the final 8 that you used?
+                      - paragraph [ref=f59e715]:
+                        - text: I used both, and also added average (weigted by square inverse of error) parameters of these 2 sources. I've attached full features and I've also published simple kernel
+                        - link "here (opens in a new tab)" [ref=f59e716] [cursor=pointer]:
+                          - /url: https://www.kaggle.com/nyanpn/salt-2-feature-part-of-3rd-place-solution
+                          - text: here
+                        - text: ", so you can check the difference between us."
+                      - paragraph [ref=f59e717]: "One question from me: did you met SEGV while calculating salt2 and salt2-extended models? If so, how to deal with it?"
+                  - generic [ref=f59e722]:
+                    - link "Tania J's profile" [ref=f59e723] [cursor=pointer]:
+                      - /url: /taniaj
+                      - generic "Tania J" [ref=f59e724]
+                    - generic [ref=f59e730]:
+                      - link [ref=f59e732] [cursor=pointer]:
+                        - /url: /taniaj
+                        - heading "Tania J" [level=3] [ref=f59e733]
+                      - generic [ref=f59e734]:
+                        - paragraph [ref=f59e735]: Posted 8 years ago
+                        - paragraph [ref=f59e737]: · 58th in this Competition
+                    - generic [ref=f59e739]:
+                      - generic [ref=f59e740]:
+                        - button "Upvote" [ref=f59e741] [cursor=pointer]:
+                          - generic [ref=f59e742]: arrow_drop_up
+                        - button "0 votes" [ref=f59e743] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f59e744] [cursor=pointer]: more_vert
+                    - generic [ref=f59e747]:
+                      - paragraph [ref=f59e748]: Thanks for sharing the kernel! Now I can see the differences - you have a different zp from me and your method of setting bounds on z is better. I used photoz directly.
+                      - paragraph [ref=f59e749]: I also got some exceptions (can't remember if it was SEGV or something else) and I just caught them and set all values for those objects to null (there were not many and I assume they were the ones that were not supernovae anyway), plus I wanted to get some rough results fast to figure out whether I should spend more time on sncosmo or not. I guess I gave up on it too soon.
+              - separator [ref=f59e750]
+            - generic [ref=f59e755]:
+              - link "yuval reina's profile" [ref=f59e756] [cursor=pointer]:
+                - /url: /yuval6967
+                - generic "yuval reina" [ref=f59e757]
+              - generic [ref=f59e763]:
+                - link [ref=f59e765] [cursor=pointer]:
+                  - /url: /yuval6967
+                  - heading "yuval reina" [level=3] [ref=f59e766]
+                - generic [ref=f59e767]:
+                  - paragraph [ref=f59e768]: Posted 8 years ago
+                  - paragraph [ref=f59e770]: · 3rd in this Competition
+              - generic [ref=f59e772]:
+                - generic [ref=f59e773]:
+                  - button "Upvote" [ref=f59e774] [cursor=pointer]:
+                    - generic [ref=f59e775]: arrow_drop_up
+                  - button "0 votes" [ref=f59e776] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f59e777] [cursor=pointer]: more_vert
+              - paragraph [ref=f59e781]:
+                - text: Thanks
+                - link "@nyanp (opens in a new tab)" [ref=f59e782] [cursor=pointer]:
+                  - /url: /nyanp
+                  - text: "@nyanp"
+                - text: we learned a lot from you. You also neglected to say it was your intuition that led us to improve our class99 prediction
+              - generic [ref=f59e788]:
+                - link "nyanp's profile" [ref=f59e789] [cursor=pointer]:
+                  - /url: /nyanpn
+                  - generic "nyanp" [ref=f59e790]
+                - generic [ref=f59e796]:
+                  - generic [ref=f59e797]:
+                    - link [ref=f59e798] [cursor=pointer]:
+                      - /url: /nyanpn
+                      - heading "nyanp" [level=3] [ref=f59e799]
+                    - paragraph [ref=f59e802]: Topic Author
+                  - generic [ref=f59e803]:
+                    - paragraph [ref=f59e804]: Posted 8 years ago
+                    - paragraph [ref=f59e806]: · 3rd in this Competition
+                - generic [ref=f59e808]:
+                  - generic [ref=f59e809]:
+                    - button "Upvote" [ref=f59e810] [cursor=pointer]:
+                      - generic [ref=f59e811]: arrow_drop_up
+                    - button "1 votes" [ref=f59e812] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f59e813] [cursor=pointer]: more_vert
+                - paragraph [ref=f59e817]: Thanks a lot, too :) I think class99 prediction is a result of our collaborative working! Combine my intuition with you and mamas's creative ideas on function engineering worked very well.
+  - alert [ref=f59e820]

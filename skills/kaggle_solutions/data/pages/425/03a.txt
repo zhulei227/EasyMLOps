@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/229636
-fetched: 2026-10-27
-chars: 868
+fetched: 2026-11-03
+chars: 7223
 
 menu
 Skip to
@@ -42,15 +42,188 @@ Models
 Discussion
 Leaderboard
 Rules
+ShinSiang · 3rd in this Competition · Posted 6 years ago
+arrow_drop_up
+39
+more_vert
+Part of 3rd Place Sol: Multi-label Classifier-based PP
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Codes: https://github.com/shinsiangchoong/kaggle_vinbigdata_classifierPP_2021
 
-error
+We would like to thank the competition host(s) and Kaggle for organizing the competition, and congratulate all the winners, and anyone who benefited in some way from the competition. Special thanks to my teammates @erniechiew, @scusywxy, @zehuigong, and @stephkua who carried me in the competition especially for the detector part.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+This is a summary of our Multi-label Classifier-based Post-Processing (PP). Another part of the solution (for the detector etc.) can be found here.
 
-Failed to load the discussion topic
+PP Suggested in Public Notebooks
 
-error
+I believe most participants are using 2-class classifier(s) for PP. In most public notebooks (e.g. this notebook), when the 2-class classifier confidence is below a certain threshold, the predicted boxes are removed.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Multiplication of Classifier and Detector Confidences
+
+We tried a different way instead of just removing the boxes, i.e. if the classifier is confident that the image is a normal image, we scale down the box confidences by multiplying them with the classifier confidence.
+
+Our 2-Class Classifier
+Model: EfficientNet-B6, 5 folds
+Image Size: 512 x 512
+Augmentation:
+HorizontalFlip(p = 0.5)
+ShiftScaleRotate(rotate_limit = 10),
+RandomBrightnessContrast(p = 0.2),
+CLAHE(clip_limit=4.0, tile_grid_size=(8, 8), p = 0.5),
+Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+Optimizer: Adam, BS = 4, BCE loss, LR=0.001, ReduceLROnPlateau + EarlyStopping
+Val AUC: 0.9868
+
+We found out that this classifier actually performs worse than this notebook on the public LB. We did not further try another 2-class classifier model. By applying the notebook’s classifier predictions on our final detector (also following its threshold), the scores are as follows: Remove Predicted Boxes: Public=0.315, Private=0.292 Multiplication with 2-class-filter score: Public=0.319, Private=0.295
+
+Our Multi-label Classifiers
+
+We also tested a multi-label classifier. The Intuitions are as follows:
+
+All these classes interact with each other, a multi-label classifier may be able to capture their interactions and learn better.
+Is it better if we could do class-independent PP for each class?
+
+Model Details:
+
+Model: EfficientNet-B4, 5 folds
+Labels: 15 classes, A class of an image is labelled 1/0.67/0.33 if 3/2/1 radiologists annotated the class on the image.
+Image Size: 1024x1024, 1024x1024_with_fixed_aspect_ratio, 1280x1280_with_fixed_aspect_ratio (weighted average of 3 models)
+Augmentation:
+HorizontalFlip(p=0.5),
+ShiftScaleRotate(scale_limit = 0.15, rotate_limit = 10, p = 0.5),
+RandomBrightnessContrast(p=0.5),
+Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+Optimizer: SGD(momentum=0.9), BS = 2, BCE loss for each class, LR=0.001, ReduceLROnPlateau + EarlyStopping
+Class14 AUC: 1024x1024: 0.9923 1024x1024_with_fixed_aspect_ratio: 0.9937 1280x1280_with_fixed_aspect_ratio: 0.9940
+
+Worthy mentioning that training with multi labels could also improve class14 AUC. We tried 2 multiplication-based PP methods using this classifier:
+
+Multiplication with classifier score of respective class: If the classifier score of the class is less than a threshold, the box confidences of the class are scaled down by multiplying the classifier score of the class. We also implemented class-independent thresholds based on the validation AUCs of the classes, i.e. classifier scores of classes with higher validation AUC are allowed to multiply the box confidences of more images.
+Multiplication with class14 score only: This is similar to the 2-class classifier but note that the multi-label training has also improved the class14 performance.
+
+Results: Multiplication with classifier score of respective class: Public=0.348, Private=0.305 Multiplication with class14 score only: Public=0.332, Private=0.305
+
+“Multiplication with classifier score of respective class” improved public LB by a lot, hence we used it in a final submission. Unfortunately, the improvement does not generalize to the private LB. We are lucky that our rank remains without that improvement :D
+
+Please sign in to reply to this topic.
+
+comment
+14 Comments
+Hotness
+KhanhVD
+
+Posted 6 years ago
+
+· 29th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats on 3rd place @css919 and team and thanks for sharing details solution
+
+Liam Nguyen
+
+Posted 6 years ago
+
+· 26th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Nice, we did try the multilabel classification post-processing and the way we applied was pretty much similar to yours. But we got confused when it came to choosing the threshold for each class to decide whether to multiply the classifier score, we used hyperopt for tuning on validsets but it did not seem to have the unified results between my CV OOF and also the PB. Yours was at least having an improvement on PB. It was very nice hearing the similar idea
+
+ShinSiang
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+The optimal thresholds for CV and Public LB are pretty far off in our case too. In the end we decided to follow the public notebook I mentioned above. Its threshold covers 1912/3000 images, we used this number as a base.
+
+5 more replies
+arrow_drop_down
+HungNT
+
+Posted 6 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations for 3rd place! I am expecting detection part of you and thanks for sharing your solution <3
+
+Wonho Song
+
+Posted 6 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing. I like your pp idea.
+
+I have a question here.
+
+About 15 classes, if 3 radiologists annotates that the image has a "class a", then the image's "class a" become active as 1? For example, in an image, when 3 doctors annotate "class 0" and 2 doctors annotate "class 1", is the class of the image as follows "1, 0.67, 0, 0, 0, 0, …, 0"?
+
+Thanks.
+
+ShinSiang
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes, this is exactly what we did.
+
+Binh Nguyen
+
+Posted 6 years ago
+
+· 45th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats for your 3rd finish. It's was so fun to know your approaches
+
+Tensor Girl
+
+Posted 6 years ago
+
+· 350th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@css919 Congratulations on 3 rd Place and Thanks for sharing the approach
+
+Mohammed Rizin V K
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations for 3rd place who were our Worth Competitor! We trained a Multi Label Classification Network . But i didn't improved our score , I decreased in our case. 😄

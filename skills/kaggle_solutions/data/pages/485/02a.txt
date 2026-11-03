@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/nbme-score-clinical-patient-notes/discussion/322893
-fetched: 2026-10-27
-chars: 844
+fetched: 2026-11-03
+chars: 2916
 
 menu
 Skip to
@@ -42,15 +42,119 @@ Models
 Discussion
 Leaderboard
 Rules
+CPMP · 2nd in this Competition · Posted 4 years ago
+arrow_drop_up
+46
+more_vert
+2nd rank solution (inference code)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I'd like to thank host and kaggle for this challenge. I learned a lot in this competition (foremost insight is that debertav3 has replaced roberta as the baseline for NLP models that can fit on a single GPU.)
 
-error
+I will describe my solution in detail today but I shared my best selected inference notebook: https://www.kaggle.com/code/cpmpml/sub-ensemble-010/notebook?scriptVersionId=94177123 It scored 0.893 on public LB (my best public score) and 0.894 on private LB.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+It is 4 times 4 fold model model. The 4 models are the same model with a choice of backbone (deberta-large or deberta-v3-large) and a choice of rnn (LSTM or GRU). Each model is trained on 4 folds and also 4 times on full train data.
 
-Failed to load the discussion topic
+Edit: My solution is described in this post: https://www.kaggle.com/competitions/nbme-score-clinical-patient-notes/discussion/323085
 
-error
+Please sign in to reply to this topic.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+comment
+9 Comments
+Hotness
+Giba
+
+Posted 4 years ago
+
+· 633rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+congrats @cpmpml! And thanks for sharing the notebook. Waiting for your full solution ;)
+
+cloudscomputes
+
+Posted 4 years ago
+
+· 115th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+What trigers you to use rnn here? I mean what feature or character of the problem make you believe RNN is still applicable in it?
+
+CPMP
+
+Topic Author
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I'll answer that in my solution writeup.
+
+biubiubiu~
+
+Posted 4 years ago
+
+· 654th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats !!! I looking forward to learn trainning detail for your solution detail!!👍👍
+
+Zacchaeus
+
+Posted 4 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! May I ask if you have 2 (backbone) * 2 (head) * 4 (fold) * 2 (w/ or w/o full data) = 32 models?
+
+CPMP
+
+Topic Author
+
+Posted 4 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+yes, 32 checkpoints. Scoring one checkpoint takes14 minutes or so.
+
+NotQuiteZero
+
+Posted 4 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Well done. Congratulations.
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+This is an great solution. The author has clearly done a lot of research and put in a lot of hard work to get this score. Well done!
+
+This comment has been deleted.

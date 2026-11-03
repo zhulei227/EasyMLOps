@@ -1,0 +1,383 @@
+- generic [ref=f34e2]:
+  - navigation "Main Kaggle page navigation" [ref=f34e3]:
+    - generic [ref=f34e5]:
+      - button "Navigation menu" [ref=f34e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f34e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f34e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f34e12] [cursor=pointer]:
+      - paragraph [ref=f34e18]: Create
+    - generic [ref=f34e21]:
+      - list [ref=f34e22]:
+        - listitem "Home List Item" [ref=f34e23]:
+          - link "Home" [ref=f34e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f34e31]: Home
+        - listitem "Competitions List Item" [ref=f34e32]:
+          - link "Competitions" [ref=f34e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f34e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f34e41]:
+          - link "Benchmarks" [ref=f34e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f34e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f34e50]:
+          - link "Arenas" [ref=f34e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f34e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f34e59]:
+          - link "Game Arena" [ref=f34e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f34e67]: Game Arena
+      - list [ref=f34e68]:
+        - listitem "Data Hub List Item" [ref=f34e69]:
+          - generic [ref=f34e70]:
+            - link "Data Hub" [ref=f34e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f34e77]: Data Hub
+            - button "Expand" [ref=f34e80] [cursor=pointer]
+      - list [ref=f34e82]:
+        - listitem "More on Kaggle List Item" [ref=f34e83]:
+          - generic [ref=f34e84]:
+            - link "More on Kaggle" [ref=f34e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f34e91]: More
+            - button "Expand" [ref=f34e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f34e97]:
+    - generic [ref=f34e98]:
+      - generic [ref=f34e102]:
+        - textbox "Search" [ref=f34e104]
+        - group [aria-hidden]
+      - generic [ref=f34e106]:
+        - link [ref=f34e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fvinbigdata-chest-xray-abnormalities-detection%2Fdiscussion%2F229740
+          - button "Login" [ref=f34e108]
+        - link [ref=f34e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fvinbigdata-chest-xray-abnormalities-detection%2Fdiscussion%2F229740
+          - button "Sign Up" [ref=f34e111]
+  - main [ref=f34e113]:
+    - generic [ref=f34e115]:
+      - generic [ref=f34e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f34e117]:
+        - link "Learn more" [ref=f34e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f34e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f34e123]:
+      - generic [ref=f34e125]:
+        - generic [ref=f34e126]:
+          - link "Vingroup Big Data Institute's profile" [ref=f34e127] [cursor=pointer]:
+            - /url: /organizations/vinbigdata
+            - generic "Vingroup Big Data Institute" [ref=f34e128]
+          - generic [ref=f34e132]:
+            - generic [ref=f34e133]: Vingroup Big Data Institute
+            - generic [ref=f34e135]: · Featured Prediction Competition · 6 years ago
+          - generic [ref=f34e136]:
+            - button "Late Submission" [disabled] [ref=f34e138]
+            - button "Competition options menu collapsed" [ref=f34e141] [cursor=pointer]: more_horiz
+        - generic [ref=f34e143]:
+          - heading "VinBigData Chest X-ray Abnormalities Detection" [level=1] [ref=f34e144]
+          - paragraph [ref=f34e146]: Automatically localize and classify thoracic abnormalities from chest radiographs
+      - generic [ref=f34e150]:
+        - tablist [ref=f34e157]:
+          - tab "Overview, 1 of 7" [ref=f34e158] [cursor=pointer]:
+            - generic [ref=f34e159]: Overview
+          - tab "Data, 2 of 7" [ref=f34e160] [cursor=pointer]:
+            - generic [ref=f34e161]: Data
+          - tab "Code, 3 of 7" [ref=f34e162] [cursor=pointer]:
+            - generic [ref=f34e163]: Code
+          - tab "Models, 4 of 7" [ref=f34e164] [cursor=pointer]:
+            - generic [ref=f34e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f34e166] [cursor=pointer]:
+            - generic [ref=f34e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f34e168] [cursor=pointer]:
+            - generic [ref=f34e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f34e170] [cursor=pointer]:
+            - generic [ref=f34e171]: Rules
+        - separator [ref=f34e173]
+      - generic [ref=f34e177]:
+        - generic [ref=f34e178]:
+          - generic [ref=f34e179]:
+            - generic [ref=f34e180]:
+              - link "Ivan Panshin's profile" [ref=f34e181] [cursor=pointer]:
+                - /url: /ivanpan
+                - generic "Ivan Panshin" [ref=f34e182]
+              - generic [ref=f34e186]:
+                - link "Ivan Panshin" [ref=f34e187] [cursor=pointer]:
+                  - /url: /ivanpan
+                - text: ·
+                - generic [ref=f34e188]: 2nd in this Competition
+                - text: ·
+                - generic [ref=f34e189]: Posted 6 years ago
+            - generic [ref=f34e190]:
+              - generic [ref=f34e191]:
+                - button "Upvote" [ref=f34e192] [cursor=pointer]:
+                  - generic [ref=f34e193]: arrow_drop_up
+                - button "41 votes" [ref=f34e194] [cursor=pointer]: "41"
+              - button "More Options for this Topic" [ref=f34e195] [cursor=pointer]: more_vert
+            - heading "2nd place solution (addition about MMDetection)" [level=3] [ref=f34e196]
+            - generic [ref=f34e199]:
+              - paragraph [ref=f34e200]:
+                - text: I would like to add a little bit of information to the great
+                - link "topic (opens in a new tab)" [ref=f34e201] [cursor=pointer]:
+                  - /url: url
+                  - text: topic
+                - text: by
+                - link "@zfturbo (opens in a new tab)" [ref=f34e202] [cursor=pointer]:
+                  - /url: /zfturbo
+                  - text: "@zfturbo"
+                - text: . In this one, I want to talk about MMDetection pipelines that we used.
+              - 'heading "Part 1: Grid Search" [level=2] [ref=f34e203]'
+              - paragraph [ref=f34e204]: "MMDetection is great in terms of the amount of models/tricks. However, that also brings some difficulties, like what approaches to use. I started running some tests with ATSS, Cascade_RFP, GFL, RetinaNet, UniverseNet. Based on initial validation scores + LB, I decided to settle on the following approaches and tune them more carefully:"
+              - list [ref=f34e205]:
+                - listitem [ref=f34e206]: Cascade_RFP_R50
+                - listitem [ref=f34e207]: GFL_R101
+                - listitem [ref=f34e208]: GFL_X101
+                - listitem [ref=f34e209]: RetinaNet_X101
+              - 'heading "Part 2: Training tricks" [level=2] [ref=f34e210]'
+              - list [ref=f34e211]:
+                - listitem [ref=f34e212]: "Add albumentations for validation: ShiftScaleRotate, IAAAffine, Blur/GaussianBlur/MedianBlur, RandomBrightnessContrast, IAAAdditiveGaussianNoise/GaussNoise, HorizontalFlip."
+                - listitem [ref=f34e213]: Use 1024x1024 for all models, and tune a couple of them (GFL_R101, GFL_X101) with 2048x2048 in order to catch small bboxes.
+                - listitem [ref=f34e214]: Apply FP16 to all models except Cascade_RFP in order to increase batch size and speed-up the training. In my experience, FP16 currently doesn't work with Cascade_RFP.
+                - listitem [ref=f34e215]: Train with empty images in order to get rid of classifier. But not all empty images (there are too many of them), treat empty just like any other class, and add N random empty images, where N = average amount of samples for all classes
+                - listitem [ref=f34e216]: CosineAnnealing with linear warm-up instead of classic StepLP.
+                - listitem [ref=f34e217]: Tried to use sampler so that the amount of bboxes for each class is more or less the same. Had to patch ClassBalancedDataset (with oversample_thr) in order to do that, but that didn't boost the performance (perhaps due to the fact that it's not about class imbalance, but radiologists imbalance).
+              - 'heading "Part 3: 2-step training" [level=2] [ref=f34e218]'
+              - paragraph [ref=f34e219]:
+                - text: Like
+                - link "@zfturbo (opens in a new tab)" [ref=f34e220] [cursor=pointer]:
+                  - /url: /zfturbo
+                  - text: "@zfturbo"
+                - text: noticed, it's profitable to train with rare radiologists (all but R8, R9, R10). Btw, my greatest thanks and respects for this idea. I'm not sure I would have been able to come up with that on my own.
+              - list [ref=f34e221]:
+                - listitem [ref=f34e222]: "1-step: pre-train with all data for 30 epochs. Select the best checkpoints based on AP@0.4 (wanted to try selecting checkpoints for each class, or using SWA on different checkpoints, but eventually didn't have time for this)."
+                - listitem [ref=f34e223]:
+                  - text: "2-step: take only rare radiologists (again, with empty images. In this case, I added about 50 images. Moreover, I didn't apply WBF to bboxes. Instead, I created 3 versions of each image with the corresponding set of bboxes. This idea belongs to"
+                  - link "@sergeyzlobin (opens in a new tab)" [ref=f34e224] [cursor=pointer]:
+                    - /url: /sergeyzlobin
+                    - text: "@sergeyzlobin"
+                  - text: ", I appreciate it!). It's also important to handle folds correctly. What I mean by that: data for 2-step is a subset of data for the 1-step. So take rare + empty images from the same folds. In other words, do not introduce leakage. Start training from the best weights from 1-step. I trained with the same augs and optimizer. Moreover, taking the same LR as in the beginning of the 1-step worked the best."
+              - 'heading "Part 4: Models scores (public / private)" [level=2] [ref=f34e225]'
+              - list [ref=f34e226]:
+                - listitem [ref=f34e227]:
+                  - paragraph [ref=f34e228]: GFL_R101_rare_with_empty_2step_1024 - 0.239 / 0.248
+                - listitem [ref=f34e229]:
+                  - paragraph [ref=f34e230]: GFL_X101_rare_with_empty_2step_1024 - 0.264 / 0.255
+                - listitem [ref=f34e231]:
+                  - paragraph [ref=f34e232]: Cascade_RFP_R50_rare_with_empty_2step_1024 - 0.251 / 0.243
+                - listitem [ref=f34e233]:
+                  - paragraph [ref=f34e234]: Retina_rare_2step_1024 (no empty) - 0.228 / 0.239
+                - listitem [ref=f34e235]:
+                  - paragraph [ref=f34e236]: GFL_R101_rare_with_empty_2step_2048 - 0.248 / 0.235
+                - listitem [ref=f34e237]:
+                  - paragraph [ref=f34e238]: GFL_X101_rare_with_empty_2step_2048 - 0.256 / 0.238
+              - paragraph [ref=f34e239]: "In the last days of the competition I also decided to add VFNet to the mix, so:"
+              - list [ref=f34e240]:
+                - listitem [ref=f34e241]: VFNet_X101_rare_with_empty_2step_1024 - 0.259 / 0.252
+              - paragraph [ref=f34e242]: All models are 5 folds.
+              - heading "Conclusion" [level=2] [ref=f34e243]
+              - paragraph [ref=f34e244]:
+                - text: This competition is one of the most difficult things that I've done. We've worked for a couple of months pretty much non-stop, and it was awesome. Thanks so much to the organizers, and my team
+                - link "@zfturbo (opens in a new tab)" [ref=f34e245] [cursor=pointer]:
+                  - /url: /zfturbo
+                  - text: "@zfturbo"
+                - text: ","
+                - link "@sergeyzlobin (opens in a new tab)" [ref=f34e246] [cursor=pointer]:
+                  - /url: /sergeyzlobin
+                  - text: "@sergeyzlobin"
+                - text: ", you're insanely good and I hope to work again on something else."
+          - separator [ref=f34e247]
+        - generic [ref=f34e248]:
+          - generic [ref=f34e249]:
+            - paragraph [ref=f34e252]:
+              - paragraph [ref=f34e253]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f34e254] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f34e255]
+          - generic [ref=f34e257]:
+            - generic [ref=f34e258]:
+              - generic [aria-hidden] [ref=f34e259]: comment
+              - heading "8 Comments" [level=2] [ref=f34e261]
+            - generic [ref=f34e264]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f34e265] [cursor=pointer]:
+                - generic [ref=f34e266]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f34e268]:
+            - generic [ref=f34e269]:
+              - generic [ref=f34e273]:
+                - link "KhanhVD's profile" [ref=f34e274] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f34e275]
+                - generic [ref=f34e281]:
+                  - link [ref=f34e283] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f34e284]
+                  - generic [ref=f34e285]:
+                    - paragraph [ref=f34e286]: Posted 6 years ago
+                    - paragraph [ref=f34e288]: · 29th in this Competition
+                - generic [ref=f34e290]:
+                  - generic [ref=f34e291]:
+                    - button "Upvote" [ref=f34e292] [cursor=pointer]:
+                      - generic [ref=f34e293]: arrow_drop_up
+                    - button "2 votes" [ref=f34e294] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f34e295] [cursor=pointer]: more_vert
+                - paragraph [ref=f34e299]:
+                  - text: Thanks for sharing some information from your team solution, congrats on 2nd place
+                  - link "@ivanpan (opens in a new tab)" [ref=f34e300] [cursor=pointer]:
+                    - /url: /ivanpan
+                    - text: "@ivanpan"
+              - separator [ref=f34e301]
+            - generic [ref=f34e302]:
+              - generic [ref=f34e306]:
+                - link "Wonjun Park's profile" [ref=f34e307] [cursor=pointer]:
+                  - /url: /wonjunpark
+                  - generic "Wonjun Park" [ref=f34e308]
+                - generic [ref=f34e314]:
+                  - link [ref=f34e316] [cursor=pointer]:
+                    - /url: /wonjunpark
+                    - heading "Wonjun Park" [level=3] [ref=f34e317]
+                  - generic [ref=f34e318]:
+                    - paragraph [ref=f34e319]: Posted 6 years ago
+                    - paragraph [ref=f34e321]: · 193rd in this Competition
+                - generic [ref=f34e323]:
+                  - generic [ref=f34e324]:
+                    - button "Upvote" [ref=f34e325] [cursor=pointer]:
+                      - generic [ref=f34e326]: arrow_drop_up
+                    - button "1 votes" [ref=f34e327] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f34e328] [cursor=pointer]: more_vert
+                - paragraph [ref=f34e332]: Congratulations!
+              - separator [ref=f34e333]
+            - generic [ref=f34e334]:
+              - generic [ref=f34e338]:
+                - link "Betty's profile" [ref=f34e339] [cursor=pointer]:
+                  - /url: /weidadeyaqhhya
+                  - generic "Betty" [ref=f34e340]
+                - generic [ref=f34e346]:
+                  - link [ref=f34e348] [cursor=pointer]:
+                    - /url: /weidadeyaqhhya
+                    - heading "Betty" [level=3] [ref=f34e349]
+                  - generic [ref=f34e350]:
+                    - paragraph [ref=f34e351]: Posted 6 years ago
+                    - paragraph [ref=f34e353]: · 158th in this Competition
+                - generic [ref=f34e355]:
+                  - generic [ref=f34e356]:
+                    - button "Upvote" [ref=f34e357] [cursor=pointer]:
+                      - generic [ref=f34e358]: arrow_drop_up
+                    - button "1 votes" [ref=f34e359] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f34e360] [cursor=pointer]: more_vert
+                - paragraph [ref=f34e364]: "hi, congrats, and thanks for your sharing!! I'm a little confuse with your part 3: the sentence \"I didn't apply WBF to bboxes. Instead, I created 3 versions of each image with the corresponding set of bboxes. \"If don't mind, could you explain more about how you created 3 version of each image, such as in the image, there are class2 with 3 boxes and class7 with one box, How did you separate these boxes into 3 version. Congrats again"
+                - generic [ref=f34e365]:
+                  - generic [ref=f34e370]:
+                    - link "Ivan Panshin's profile" [ref=f34e371] [cursor=pointer]:
+                      - /url: /ivanpan
+                      - generic "Ivan Panshin" [ref=f34e372]
+                    - generic [ref=f34e378]:
+                      - generic [ref=f34e379]:
+                        - link [ref=f34e380] [cursor=pointer]:
+                          - /url: /ivanpan
+                          - heading "Ivan Panshin" [level=3] [ref=f34e381]
+                        - paragraph [ref=f34e384]: Topic Author
+                      - generic [ref=f34e385]:
+                        - paragraph [ref=f34e386]: Posted 6 years ago
+                        - paragraph [ref=f34e388]: · 2nd in this Competition
+                    - generic [ref=f34e390]:
+                      - generic [ref=f34e391]:
+                        - button "Upvote" [ref=f34e392] [cursor=pointer]:
+                          - generic [ref=f34e393]: arrow_drop_up
+                        - button "1 votes" [ref=f34e394] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f34e395] [cursor=pointer]: more_vert
+                    - paragraph [ref=f34e399]: "Thanks! It actually depends on the radiologists. Each image was annotated by 3 radiologists (in train). So I created the 3 versions of the same image as following: image i + annotations only from 1st RAD; image i + annotations only from 2nd RAD; image i + annotations only form 3rd RAD."
+                  - generic [ref=f34e404]:
+                    - link "Betty's profile" [ref=f34e405] [cursor=pointer]:
+                      - /url: /weidadeyaqhhya
+                      - generic "Betty" [ref=f34e406]
+                    - generic [ref=f34e412]:
+                      - link [ref=f34e414] [cursor=pointer]:
+                        - /url: /weidadeyaqhhya
+                        - heading "Betty" [level=3] [ref=f34e415]
+                      - generic [ref=f34e416]:
+                        - paragraph [ref=f34e417]: Posted 6 years ago
+                        - paragraph [ref=f34e419]: · 158th in this Competition
+                    - generic [ref=f34e421]:
+                      - generic [ref=f34e422]:
+                        - button "Upvote" [ref=f34e423] [cursor=pointer]:
+                          - generic [ref=f34e424]: arrow_drop_up
+                        - button "1 votes" [ref=f34e425] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f34e426] [cursor=pointer]: more_vert
+                    - paragraph [ref=f34e430]: thanks for your replay!
+              - separator [ref=f34e431]
+            - generic [ref=f34e432]:
+              - generic [ref=f34e436]:
+                - link "( ͡° ͜ʖ ͡°)'s profile" [ref=f34e437] [cursor=pointer]:
+                  - /url: /truonghoang
+                  - generic "( ͡° ͜ʖ ͡°)" [ref=f34e438]
+                - generic [ref=f34e444]:
+                  - link [ref=f34e446] [cursor=pointer]:
+                    - /url: /truonghoang
+                    - heading "( ͡° ͜ʖ ͡°)" [level=3] [ref=f34e447]
+                  - generic [ref=f34e448]:
+                    - paragraph [ref=f34e449]: Posted 6 years ago
+                    - paragraph [ref=f34e451]: · 41st in this Competition
+                - generic [ref=f34e453]:
+                  - generic [ref=f34e454]:
+                    - button "Upvote" [ref=f34e455] [cursor=pointer]:
+                      - generic [ref=f34e456]: arrow_drop_up
+                    - button "1 votes" [ref=f34e457] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f34e458] [cursor=pointer]: more_vert
+                - paragraph [ref=f34e462]:
+                  - text: Congrats on the second place, the new competitions master
+                  - link "@ivanpan (opens in a new tab)" [ref=f34e463] [cursor=pointer]:
+                    - /url: /ivanpan
+                    - text: "@ivanpan"
+              - separator [ref=f34e464]
+            - generic [ref=f34e465]:
+              - generic [ref=f34e469]:
+                - link "Charlie Craine's profile" [ref=f34e470] [cursor=pointer]:
+                  - /url: /crained
+                  - generic "Charlie Craine" [ref=f34e471]
+                - generic [ref=f34e477]:
+                  - link [ref=f34e479] [cursor=pointer]:
+                    - /url: /crained
+                    - heading "Charlie Craine" [level=3] [ref=f34e480]
+                  - generic [ref=f34e481]:
+                    - paragraph [ref=f34e482]: Posted 6 years ago
+                    - paragraph [ref=f34e484]: · 53rd in this Competition
+                - generic [ref=f34e486]:
+                  - generic [ref=f34e487]:
+                    - button "Upvote" [ref=f34e488] [cursor=pointer]:
+                      - generic [ref=f34e489]: arrow_drop_up
+                    - button "1 votes" [ref=f34e490] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f34e491] [cursor=pointer]: more_vert
+                - paragraph [ref=f34e495]:
+                  - link "@ivanpan (opens in a new tab)" [ref=f34e496] [cursor=pointer]:
+                    - /url: /ivanpan
+                    - text: "@ivanpan"
+                  - text: Thank you for sharing. Really great insight. Congrats!
+              - separator [ref=f34e497]
+            - generic [ref=f34e502]:
+              - link "Tensor Girl's profile" [ref=f34e503] [cursor=pointer]:
+                - /url: /usharengaraju
+                - generic "Tensor Girl" [ref=f34e504]
+              - generic [ref=f34e510]:
+                - link [ref=f34e512] [cursor=pointer]:
+                  - /url: /usharengaraju
+                  - heading "Tensor Girl" [level=3] [ref=f34e513]
+                - generic [ref=f34e514]:
+                  - paragraph [ref=f34e515]: Posted 6 years ago
+                  - paragraph [ref=f34e517]: · 350th in this Competition
+              - generic [ref=f34e519]:
+                - generic [ref=f34e520]:
+                  - button "Upvote" [ref=f34e521] [cursor=pointer]:
+                    - generic [ref=f34e522]: arrow_drop_up
+                  - button "0 votes" [ref=f34e523] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f34e524] [cursor=pointer]: more_vert
+              - paragraph [ref=f34e528]:
+                - link "@ivanpan (opens in a new tab)" [ref=f34e529] [cursor=pointer]:
+                  - /url: /ivanpan
+                  - text: "@ivanpan"
+                - text: Congratulations on second place Finish and Thanks for sharing the approach
+  - alert [ref=f34e532]

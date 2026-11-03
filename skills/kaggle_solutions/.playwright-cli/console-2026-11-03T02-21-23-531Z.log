@@ -1,0 +1,24 @@
+[     598ms] [LOG]  _                       _       
+| |    Welcome to       | |      
+| | __ ___   __ _  __ _ | | ___  
+| |/ /|__ \ / _` |/ _` || |/ _ \ 
+|   < / _  | (_| | (_| || |  __/ 
+|_|\_\\__,_|\__, |\__, ||_|\___| 
+             __/ | __/ |         
+            |___/ |___/          
+ @ https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:0
+[     644ms] [WARNING] No `HydrateFallback` element provided to render during initial hydration @ https://www.kaggle.com/static/assets/vendor.js?v=3f0098e18ce0426a:248
+[    1326ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://apis.google.com/js/api.js:0
+[    1642ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://www.kaggle.com/api/i/competitions.PageService/GetPage:0
+[    2080ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://www.kaggle.com/api/i/discussions.WriteUpsService/GetWriteUpByTopicId:0
+[    2081ms] t: Not found
+    at E (https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:1:1824585)
+    at https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:1:2767560
+    at Object.<anonymous> (https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:1:2766235)
+    at D (https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:1:2763985)
+    at i (https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:1:2764182)
+[    5852ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://www.googleapis.com/download/storage/v1/b/kaggle-forum-message-attachments/o/inbox%2F4712534%2Fbad4b533ce388bc71da92ef8a5312478%2FScreenshot%202020-12-01%20215258.png?generation=1606839813879211&alt=media:0
+[    5852ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://www.googleapis.com/download/storage/v1/b/kaggle-forum-message-attachments/o/inbox%2F4712534%2Fb136b492c0790a8e537a99551fd7017b%2F599%20soln.png?generation=1606840064316905&alt=media:0
+[    6102ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://www.googleapis.com/download/storage/v1/b/kaggle-forum-message-attachments/o/inbox%2F4712534%2F923a95cff621161eb9f5384810d38be0%2Fcv2.png?generation=1606847486880303&alt=media:0
+[    8487ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://accounts.google.com/gsi/client:0
+[    8801ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://www.google.com/recaptcha/enterprise.js?render=6LcVUOAUAAAAAP8nMSGuW46uJC5Zf6-PCYKN5xxv:0

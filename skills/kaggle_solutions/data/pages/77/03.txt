@@ -1,0 +1,313 @@
+url: https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/discussion/4676#25022
+fetched: 2026-11-03
+chars: 7928
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+​
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Dumitru · Research Prediction Competition · 13 years ago
+Challenges in Representation Learning: Facial Expression Recognition Challenge
+
+Learn facial expressions from an image
+
+Challenges in Representation Learning: Facial Expression Recognition Challenge
+Late Submission
+more_horiz
+Overview
+Data
+Code
+Models
+Discussion
+Leaderboard
+Rules
+Anil Thomas · 19th in this Competition · Posted 13 years ago
+arrow_drop_up
+3
+more_vert
+Thanks!
+
+Would like to thank the organizers for running this contest and especially Ian for doing such a fantastic job on pylearn2! This has been a great learning opportunity for many of us.
+
+I am awed by the high scores posted by many. Got my butt kicked on this one. Congratulations to Charlie Tang on his meteoric rise in Kaggle rankings. Looking forward to seeing the solution...
+
+Please sign in to reply to this topic.
+
+comment
+15 Comments
+Hotness
+Charlie Tang
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+10
+more_vert
+
+I would like to also thank the organizers for the contest,
+
+I also used convolutional nets but with svms, and with transformations to images generating more data.
+
+You will find my source code for the project at http://code.google.com/p/deep-learning-faces/
+
+Additionally, I have a prelimary paper on the combination of deep learning and SVMs which some may find useful: www.cs.toronto.edu/~tang/papers/dlsvm.pdf
+
+Charlie Tang
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+[quote=Maxim Milakov;25032]
+
+Hi Charlie,
+
+Thanks for the answer! So you basically have 5x5x64x3072 weights in that fully connected layer with ~5,000,000 weights with 20% of output neuron dropout... Did you try running training set on a model trained? I tried it on my ANN and it did up to 95% (or even more), so I overfit even with ANN of much lesser size.
+
+Thanks,
+
+Max.
+
+[/quote]
+
+I did not look at the training error, but i'd imagine it'd be similar to what you had. I take overfitting to mean when the validation error starts to go up, which i didn't notice when using softmax with 3072 nodes, i think this is due to the mirroring and transformation creating "infinite" amounts of data, else you would def have overfitting.
+
+i also noticed that for this dataset and this particular model i used, dropout doesnt make too much difference. i had other submissions (out of the 5 total) which scored .71 and didn't use dropout.
+
+Ian Goodfellow
+
+Competition Host
+
+Posted 13 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Interesting, thanks. With noise I see Salah only got down to 1.33%. I imagine the rest of the improvement was from using rectifiers instead of sigmoidal units?
+
+xiaojun2013
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi lan,
+
+Thanks for you doing such a fantastic job on pylearn2! 
+
+and I wonder to know wheather can we see the solution of the top five submissions,and where?
+
+Huy Tho Ho
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Do you have any idea when you will release the labels for the test set? I'm late to the competition but I would like to know how my algorithm performs. Thanks.
+
+Ian Goodfellow
+
+Competition Host
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Yes, we'll release everything once the workshop is over on Friday.
+
+happy
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hey Ian,
+
+Is it possible to release the labels 4 the test data? It provides the opportunities that we can find out what is wrong with our model to solve the problem and can be used 4 research purposes( we can locally  check our model and calculate the accuracy)
+
+ Thanks
+
+Maxim Milakov
+
+Posted 13 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Oh, yes, it perfectly makes sense. I didn't have validation error raising too. Thanks!
+
+Maxim Milakov
+
+Posted 13 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Charlie,
+
+Thanks for the answer! So you basically have 5x5x64x3072 weights in that fully connected layer with ~5,000,000 weights with 20% of output neuron dropout... Did you try running training set on a model trained? I tried it on my ANN and it did up to 95% (or even more), so I overfit even with ANN of much lesser size.
+
+Thanks,
+
+Max.
+
+Charlie Tang
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Ian,
+
+i guess the noise detail was left out of the paper draft, but i used alot of input gaussian noise,
+
+idea from these papers:
+
+http://arxiv.org/abs/1104.3250
+
+http://users.ics.aalto.fi/praiko/papers/aistats_final.pdf
+
+charlie
+
+Ian Goodfellow
+
+Competition Host
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi Charlie,
+
+Exciting paper! I'm curious, why did the softmax NN on MNIST do so well? Usually without dropout or pretraining it's only possible to get 1.2% error or worse as far as I know. Is it the PCA that makes it work better?
+
+Thanks,
+
+Ian
+
+Charlie Tang
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Max,
+
+Yes, the net structure i used is exactly as you have described. In the paper i had 3072 units with the softmax and it worked pretty well, got to 70% on private set but not as good as SVM. So overfitting didn't seem to be problem. As with all neural nets, everything from data to learning rates to noise added to momentum can affect the error curve, it's really hard to draw any absolute conclusions from anything :(
+
+Charlie
+
+Maxim Milakov
+
+Posted 13 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Yichuan,
+
+Thanks for publishing source code and a link to the paper! It is a very nice idea - to train SVM and NN simultaneously. I looked into the sources, did I get it right that the structure of NN is the following?
+
+48x48x1fm
+Mirror image
+Rotation and scale (center +-3 in both directions, angle +-45 degree, scale 0.8-1.2), cropping result to 42x42x1fm
+Convolutional layer (fully connected wrt feature maps) with 5x5 weighting windows, 42x42x32fm, activation function - rectified linear
+Max subsampling layer, 21x21x32fm
+Convolutional layer (fully connected wrt feature maps) with 4x4 weighting windows, 20x20x32fm, activation function - rectified linear
+Average subsampling layer, 10x10x32fm
+Convolutional layer (fully connected wrt feature maps) with 5x5 weighting windows, 10x10x64fm, activation function - rectified linear
+Average subsampling layer, 5x5x64fm
+Fully connected with 20% dropout of output neurons, 3072 output neurons, activation function - rectified linear
+Fully connected, 7 output neurons, activation function - L2 SVM
+
+I had rather similar structure of NN, the major changes are:
+
+I used hyperbolic tangent activation for the last layer
+All other layers had "hyperbolic tangent + rectification (absolute value)" activation applied (it seems it is time for me to stop being lazy and implement rectified linear).
+The first fully connected layer in my NN was _much_ smaller than yours: just 128 neurons. That's a huge difference.
+
+May I ask, did you introduce this 3072-neuron layer to have LinearSVM working fine? Or you had this layer even when softmax activation was applied to the last layer? I would expect serious overfitting in the second case even with dropout applied.
+
+Thanks,
+
+Max.
+
+Maxim Milakov
+
+Posted 13 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I used convolutional neural nets and managed to finish 3rd only. It would beintetesting to see what winners applied. Congratulations to them!
+
+Sudeep Juvekar
+
+Posted 13 years ago
+
+· 28th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I second that. It was fun to try multiple deep learning algorithms on the problem. Has anyone applied code from http://deeplearning.net? Any success with DBN/RBM/SDA code posted on deep learning tutorials?

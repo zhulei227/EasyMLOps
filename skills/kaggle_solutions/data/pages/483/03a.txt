@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/happy-whale-and-dolphin/discussion/319896
-fetched: 2026-10-27
-chars: 582
+fetched: 2026-11-03
+chars: 7890
 
 menu
 Skip to
@@ -42,5 +42,162 @@ Models
 Discussion
 Leaderboard
 Rules
+lafe · 3rd in this Competition · Posted 5 years ago
+arrow_drop_up
+63
+more_vert
+3rd solution
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Congratulations to all the winners. Thanks Happywhale and Kaggle for hosting this interesting competition.
+
+Dataset:
+
+ Figure 1: Training set generation pipeline
+
+As shown in Figure 1, we first randomly labeled around 5000 whale bodies. Next, we used labeled bodies to train a salient whale body detector using YOLOv5, with mosaic=0, degrees=0, and mixup=0. Next, we used the trained detector to predict on the entire training set and labeled images that either their box score is less than 0.4 or their number of boxes is not equal to one. Finally, the well-labeled training set was used to train the whale body detector again.
+
+Embedding extractor training set generation pipeline: We used the whale body detector mentioned above to predict the test set. If the number of boxes is not equal to one, we adjusted the detector's score threshold and the image's resolution (we used different resolutions for inference). For images that contain multiple bboxes, we first cropped those boxes and get their embeddings, and then computed the cosine similarity with training set. If the cosine distance is greater than 0.5, we chose the closest box as the salient target, else, we chose the target that has the highest detection score. So far, we completed the salient detection by making each image in the training set got only one corresponding whale body bbox. Finally, we can use those bboxes to get our cropped whale body training set.
+
+Models
+EfficientNet
+framework: pytorch
+backbone: tf_efficientnet_b7_ns/tf_efficientnet_b6_ns imagenet pretrained
+image size: 768
+embedding size: 512
+hyperparameter: 20 epoch, Adam, lr=5e-4, cosine, warmup 4 epoch During training, we found that train_loss is very low and the val_loss is much higher. In order to alleviate the over-fitting, optimization is carried out from the perspective of data enhancement and features space.
+feature space constraint backbone -> gempooling -> bnn-neck -> arcface(s=30, m=0.3) or adaface(m=0.3, h=0.333,s=30, t_alpha=0.01)  ref: https://arxiv.org/abs/1903.07071 Because Arcface only measures cosine Angle, the feature space does not carry on the distance constraint. Therefore, we use BNNeck to shape the feature space and increase the difficulty of feature distinction, as result alleviating the over-fitting.
+NFNet
+backbone: eca_nfnet_l2, imagenet pretrained
+image size: 1024
+embedding size: 512
+hyperparameter: 25epoch, 4epoch warmup, 1e-3lr, adam Others are the same as EfficientNet We found that the training speed of nfnet_l2 1024 is as fast as effb6 768
+Augmentation
+
+mixup: 0.5prob, 0.5 alpha
+
+aug8p3 = A.OneOf([
+            A.Sharpen(p=0.3),
+            A.ToGray(p=0.3),
+            A.CLAHE(p=0.3),
+        ], p=0.5)
+
+args['transform'] = {
+    'train': A.Compose([
+        A.ShiftScaleRotate(rotate_limit=15, scale_limit=0.1, border_mode=cv2.BORDER_REFLECT, p=0.5),
+        A.Resize(size, size),
+        aug8p3,
+        A.HorizontalFlip(p=0.5),
+        A.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
+        A.Normalize()
+    ]),
+
+    'val': A.Compose([
+        A.Resize(size, size),
+        A.Normalize()
+    ])
+}
+
+
+Through the dataset analysis, we found that many individual distinctions highly rely on texture differences. Therefore, we believe that sharpening and grayscaling can make the model increases the impact of texture and reduce the dependence on color.
+
+Tricks
+
+Due to the excessive number of pictures, tricks were trained by a small model with a low resolution, and then the large model was trained with a high resolution.
+
+Base small model
+
+tf_efficientnet_b5_ns, 512, backbone -> AdaptiveAvgPool2d -> linear -> arcface(s=30, m=0.3)
+
+Different trick effects on new_id, not_new_id, and cv
+	FALSE	TRUE	cv
+base			
+aug8p3	0.6	-0.92	0.45
+bnn	0.38	2.9	0.63
+bnn+aug8p3	0.97	2.46	1.12
+neckD+aug8p3	0.74	2.65	0.93
+aug8p3_neckbnn_freebn	1.5	1.64	1.51
+aug8p3_neckbnn_gem	2.19	2.94	2.26
+mixup	1.18	0.39	1.1
+
+In the table above, FALSE represents not_new_id, and TURE represents new_id. By balancing the effects on False and True, the final tricks combination is mixup + aug8p3 + neckbnn +gem + freeze_backbone_bn. freeze_backbone_bn is not used in NFNetL2.
+
+Improvements on LB
+name	img size	fold0 lb	3fold lb
+efb6	768	0.784	
+efb6 + tricks	768	0.817	0.834
+nfnl2 + tricks	768	0.811	0.824
+Pseudo-label
+
+Since a high threshold will reduce the precision of True, we use a gradual iteration method to gradually add pseudo labels as shown in Figure 3.
+
+ Figure 3: Pseudo-label pipelines. Above is pipeline 1, below is pipeline 2.
+
+The method to generate pseudo labels is to use different similarity thresholds to generate submission results and remove the category whose top1 is new_id from the submission results. As there is a certain intersection between pseudo labels and validation sets, we compute the similarity of pseudo labels and validation sets, and the images of validation sets with high similarity scores are removed to ensure the offline scores are aligned with the online score.
+
+Step 1: 'body' data is used to train the model. After multi-fold model stacking, pseudo labels are obtained on the test set with the high threshold value. Train the 'body' again and iterated twice.
+Step 2: We further use the pseudo-labels from step 1 to train part and body models, then do the stacking ensemble. The ensembled model is then used to get new pseudo labels by setting a relatively low threshold. part reference: Part
+name	img size	pseudo	fold0 lb	3fold
+efb6	768		0.784	
+efb6 + tricks	768		0.817	0.834
+nfnl2 + tricks	768		0.811	0.824
+nfnl2 + tricks	768	824pse thre0.5		0.845
+step1_1 :merge b6, nfn		824pse thre0.5		0.858
+step1_2 :merge b6, nfn		858pse thre0.46		0.864
+step1_2: multi merge		858pse thre0.46		0.875
+step2_1: multi body part merge		875pse thre0.42		0.883
+step2_1: body merge		0.883 pseu thre 0.43		0.886
+Ensemble
+
+We use ckpt merge for the same fold ensembling, and use submit merge for diff fold ensembling. The weight of submit merge is determined by LB.
+
+ckpt merge For same fold, we get embeddings by backbone -> gempooling -> bnn-neck -> norm(feature), then different model' embs are concated channelwise ([batchsize, 512] -> [batchsize, n*512]). After that, we search the threshold and get single fold submits
+submit merge By following simple-ensemble, we ensemble and rerank different folds.
+
+[b6_aug8p3_mixup8prob_neckbnn_gem_freezebn_878pseu0-42_768, b6_aug8p3_mixup8prob_neckbnn_gem_freezebn_881pseu0-44_768,
+
+b7_aug8p3__mixup_neckbnn_gem_freezebn_858pseu0-5_768, b7_aug8p3_mix8p_pool2_neckbnn_gem_freezebn_884pseu_768,
+
+nfnet_l2_aug8p3_mixup_neckbnn_25e_883pseu0-43_1024, nfnet_l2_aug8p3_mixup_neckbnn_25e_885pseu_adaface_1024]
+
+Note:
+Pseudo labels make submit merge have little improvement (0.001-0.002).
+We found that the new_id in the training set is 11%. By analyzing submit results, we believe that new_id in the test set is 16%, thus we use 0.15True +0.85False as our threshold search setup.
+
+Please sign in to reply to this topic.
+
+comment
+3 Comments
+2 appreciation comments
+Hotness
+Jean
+
+Posted 5 years ago
+
+· 56th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation and thanks for your work!
+
+Appreciation (2)
+UrwLee
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing
+
+Humayun Kayesh
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing

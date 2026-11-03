@@ -1,0 +1,343 @@
+- generic [ref=f35e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f35e3]:
+    - generic [ref=f35e5]:
+      - button "Navigation menu" [ref=f35e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f35e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f35e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f35e14]:
+      - link [ref=f35e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fconways-reverse-game-of-life-2020%2Fwriteups%2Funder-a-penny-2nd-place-solution-write-up-team-und
+        - button "Login" [ref=f35e16]
+      - link [ref=f35e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fconways-reverse-game-of-life-2020%2Fwriteups%2Funder-a-penny-2nd-place-solution-write-up-team-und
+        - button "Sign Up" [ref=f35e19]
+  - main [ref=f35e21]:
+    - generic [ref=f35e23]:
+      - generic [ref=f35e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f35e25]:
+        - link "Learn more" [ref=f35e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f35e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f35e29]:
+      - generic [ref=f35e31]: 2nd place solution write-up,Team "Under a penny", ebouteillon part 🔥 — Conway's Reverse Game of Life 2020
+      - separator [ref=f35e32]
+      - generic [ref=f35e34]:
+        - generic [ref=f35e35]:
+          - heading "2nd place solution write-up,Team \"Under a penny\", ebouteillon part 🔥" [level=1] [ref=f35e36]
+          - generic [ref=f35e37]:
+            - link [ref=f35e38] [cursor=pointer]:
+              - /url: /competitions/conways-reverse-game-of-life-2020
+              - paragraph [ref=f35e40]: Conway's Reverse Game of Life 2020
+            - paragraph [ref=f35e41]: Solution Writeup · 2nd place · Dec 1, 2020
+        - separator [ref=f35e43]
+        - generic [ref=f35e44]:
+          - generic [ref=f35e45]:
+            - generic [ref=f35e46]:
+              - paragraph [ref=f35e47]:
+                - text: First, I would like to thank my teammates
+                - link "@knstqq (opens in a new tab)" [ref=f35e48] [cursor=pointer]:
+                  - /url: /knstqq
+                  - text: "@knstqq"
+                - text: ","
+                - link "@maximim (opens in a new tab)" [ref=f35e49] [cursor=pointer]:
+                  - /url: /maximim
+                  - text: "@maximim"
+                - text: ","
+                - link "@robertjohncannell (opens in a new tab)" [ref=f35e50] [cursor=pointer]:
+                  - /url: /robertjohncannell
+                  - text: "@robertjohncannell"
+                - text: (alphabetical order) for their ideas and work. It was really amazing to work with you guys!
+              - paragraph [ref=f35e51]: "During this competition, I tried a lot of different approaches. Here are those giving best results:"
+              - heading "Genetic algorithm using pytorch 🔥" [level=2] [ref=f35e52]
+              - paragraph [ref=f35e53]: I looked up existing Kaggle notebooks using Genetic Algorithm, but none of them were using a GPU accelerator (sorry if I am wrong and missed one). So I implemented one.
+              - paragraph [ref=f35e54]: Implementing this genetic algorithm from scratch using pytorch was hard but I learned a lot in the process about genetic algorithm (first purpose), but also on pytorch and how to optimize using NVIDIA Nsight.
+              - paragraph [ref=f35e55]: This solution performed very well during this competition as the below notebook alone scores in the top-10 leaderboard. This new approach helped improving final solution of our team "Under a Penny".
+              - paragraph [ref=f35e56]:
+                - text: "Notebook with GA on GPU :"
+                - link "Top 10 with First Genetic Algorithm on GPU! 🔥 (opens in a new tab)" [ref=f35e57] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/ebouteillon/top-10-with-first-genetic-algorithm-on-gpu
+                  - text: Top 10 with First Genetic Algorithm on GPU! 🔥
+                - text: (version 1 runs 9 hours and scores 0.0450)
+              - heading "Kissat SAT solver for perfect solution" [level=2] [ref=f35e58]
+              - paragraph [ref=f35e59]: Kaggle's Conway's Reverse Game of Life 2020 can be viewed as a boolean satisfiability problem. I used the kissat SAT solver, which won first place in the main track of the SAT Competition 2020 and first place on unsatisfiable instances.
+              - paragraph [ref=f35e60]: The tricky part might be to turn the problem into an efficient CNF form, but it was pretty easy in fact using sympy.
+              - paragraph [ref=f35e61]:
+                - text: "Following notebook solves 9532 puzzles (delta=1) in 25 minutes:"
+                - link "Perfect Solve of Puzzles using a SAT solver (opens in a new tab)" [ref=f35e62] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/ebouteillon/perfect-solve-of-puzzles-using-a-sat-solver
+                  - text: Perfect Solve of Puzzles using a SAT solver
+              - paragraph [ref=f35e63]: The drawback of this approach is, it may takes a loooong time for solving some puzzle and bigger the delta, the harder.
+              - heading "Google OR-tools constraints solver" [level=2] [ref=f35e64]
+              - paragraph [ref=f35e65]: It is also possible to express the problem as a constraints problem. You will find an iterative approach using OR-tool in section "Notebooks Prize attempt" below.
+              - paragraph [ref=f35e66]: The iterative approach consists in solving the puzzle with delta = 1, then solve again this solution with delta=1 until we did it delta times. It is much faster than solving the problem end-to-end, but it does not always find a solution.
+              - heading "Notebooks Prize attempt" [level=2] [ref=f35e67]
+              - paragraph [ref=f35e68]: "In this competition there is a \"Notebooks Prize\":"
+              - blockquote [ref=f35e69]:
+                - paragraph [ref=f35e70]: Highest scoring Kaggle Notebook (as determined by Leaderboard submission score). To be eligible for this prize, the Notebook must do the entirety of its computation within the Notebook.
+              - paragraph [ref=f35e71]: "My solution for this was to use the genetic algorithm running on 1-GPU + 1-CPU (pytorch uses a CPU at 100% even if all the work is on GPU) and an iterative solution using OR-tool on 1-CPU. The drawback of this approach is: we only have 2 hours and 2 CPU for a GPU notebook versus 9 hours and 4 CPU for CPU notebooks."
+              - paragraph [ref=f35e72]:
+                - text: "2 hours score: : 0.05353"
+                - link "GA on GPU + OR-tools on CPU2 (opens in a new tab)" [ref=f35e73] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/ebouteillon/ga-on-gpu-or-tools-on-cpu2
+                  - text: GA on GPU + OR-tools on CPU2
+                - text: "9 hours score: : 0.0433 (cannot submit due to code limit)"
+              - heading "Solution ensembling" [level=2] [ref=f35e74]
+              - paragraph [ref=f35e75]: Ensembling of solutions was pretty easy. We compute the score for each solution found for a puzzle and then we take the solution scoring the lowest.
+              - heading "Team-up" [level=2] [ref=f35e76]
+              - paragraph [ref=f35e77]:
+                - text: Teaming with
+                - link "@knstqq (opens in a new tab)" [ref=f35e78] [cursor=pointer]:
+                  - /url: /knstqq
+                  - text: "@knstqq"
+                - text: ","
+                - link "@maximim (opens in a new tab)" [ref=f35e79] [cursor=pointer]:
+                  - /url: /maximim
+                  - text: "@maximim"
+                - text: ","
+                - link "@robertjohncannell (opens in a new tab)" [ref=f35e80] [cursor=pointer]:
+                  - /url: /robertjohncannell
+                  - text: "@robertjohncannell"
+                - text: was a great experience, all keeping the motivation in the team and their solutions to this problem are really amazing. In the end, merging together really is the secret ingredient to get to this position.
+              - heading "Final notes" [level=2] [ref=f35e81]
+              - paragraph [ref=f35e82]:
+                - text: Team name comes when the team was only
+                - link "@maximim (opens in a new tab)" [ref=f35e83] [cursor=pointer]:
+                  - /url: /maximim
+                  - text: "@maximim"
+                - text: and I .We had the objective to get under the score .01 what we called "a penny".
+              - paragraph [ref=f35e84]: Thanks for reading. 😄
+              - paragraph [ref=f35e85]: "My teammates write-ups:"
+              - list [ref=f35e86]:
+                - listitem [ref=f35e87]:
+                  - link "write-up of <a href=" [ref=f35e88] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/c/conways-reverse-game-of-life-2020/discussion/200539
+                    - text: "@knstqq (opens in a new tab)\">write-up of"
+                  - link "@knstqq" [ref=f35e89] [cursor=pointer]:
+                    - /url: /knstqq
+                - listitem [ref=f35e90]:
+                  - text: write-up of
+                  - link "@maximim (opens in a new tab)" [ref=f35e91] [cursor=pointer]:
+                    - /url: /maximim
+                    - text: "@maximim"
+                  - text: ": TBD"
+                - listitem [ref=f35e92]:
+                  - text: write-up of
+                  - link "@robertjohncannell (opens in a new tab)" [ref=f35e93] [cursor=pointer]:
+                    - /url: /robertjohncannell
+                    - text: "@robertjohncannell"
+                  - text: ": TBD"
+            - generic [ref=f35e94]:
+              - generic [ref=f35e95]: Tagged
+              - group "Tags" [ref=f35e96]:
+                - link "GPU opens in new window" [ref=f35e97] [cursor=pointer]:
+                  - /url: /search?q=gpu+tag%3A%22gpu%22
+                  - generic [ref=f35e98]: GPU
+          - generic [ref=f35e99]:
+            - generic [ref=f35e100]:
+              - text: Authors
+              - generic [ref=f35e101]:
+                - link "Eric Bouteillon's profile" [ref=f35e102] [cursor=pointer]:
+                  - /url: /ebouteillon
+                  - generic "Eric Bouteillon" [ref=f35e103]
+                - generic [ref=f35e107]:
+                  - link "Eric Bouteillon" [ref=f35e108] [cursor=pointer]:
+                    - /url: /ebouteillon
+                  - paragraph [ref=f35e109]: ebouteillon
+              - generic [ref=f35e110]:
+                - link "Maximiliano's profile" [ref=f35e111] [cursor=pointer]:
+                  - /url: /maximim
+                  - generic "Maximiliano" [ref=f35e112]
+                - generic [ref=f35e116]:
+                  - link "Maximiliano" [ref=f35e117] [cursor=pointer]:
+                    - /url: /maximim
+                  - paragraph [ref=f35e118]: maximim
+              - generic [ref=f35e119]:
+                - link "Konstantin's profile" [ref=f35e120] [cursor=pointer]:
+                  - /url: /knstqq
+                  - generic "Konstantin" [ref=f35e121]
+                - generic [ref=f35e125]:
+                  - link "Konstantin" [ref=f35e126] [cursor=pointer]:
+                    - /url: /knstqq
+                  - paragraph [ref=f35e127]: knstqq
+              - generic [ref=f35e128]:
+                - link "Robert C's profile" [ref=f35e129] [cursor=pointer]:
+                  - /url: /robertjohncannell
+                  - generic "Robert C" [ref=f35e130]
+                - generic [ref=f35e134]:
+                  - link "Robert C" [ref=f35e135] [cursor=pointer]:
+                    - /url: /robertjohncannell
+                  - paragraph [ref=f35e136]: robertjohncannell
+            - separator [ref=f35e137]
+            - generic [ref=f35e138]:
+              - generic [ref=f35e139]:
+                - button "Upvote" [ref=f35e140] [cursor=pointer]:
+                  - generic [ref=f35e141]: arrow_drop_up
+                - button "10 votes" [ref=f35e142] [cursor=pointer]: "10"
+              - button "Share" [ref=f35e143] [cursor=pointer]
+              - button "Writeup actions" [ref=f35e145] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f35e146]
+        - paragraph [ref=f35e147]: Eric Bouteillon, Maximiliano, Konstantin, Robert C. 2nd place solution write-up,Team "Under a penny", ebouteillon part 🔥. https://www.kaggle.com/competitions/conways-reverse-game-of-life-2020/writeups/under-a-penny-2nd-place-solution-write-up-team-und. 2020. Kaggle
+        - separator [ref=f35e148]
+        - generic [ref=f35e149]:
+          - generic [ref=f35e151]:
+            - generic [ref=f35e152]:
+              - generic [aria-hidden] [ref=f35e153]: comment
+              - heading "3 Comments" [level=2] [ref=f35e155]
+            - generic [ref=f35e158]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f35e159] [cursor=pointer]:
+                - generic [ref=f35e160]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f35e162]:
+            - generic [ref=f35e163]:
+              - generic [ref=f35e167]:
+                - link "Eric Bouteillon's profile" [ref=f35e168] [cursor=pointer]:
+                  - /url: /ebouteillon
+                  - generic "Eric Bouteillon" [ref=f35e169]
+                - generic [ref=f35e175]:
+                  - generic [ref=f35e176]:
+                    - link [ref=f35e177] [cursor=pointer]:
+                      - /url: /ebouteillon
+                      - heading "Eric Bouteillon" [level=3] [ref=f35e178]
+                    - paragraph [ref=f35e181]: Topic Author
+                  - generic [ref=f35e182]:
+                    - paragraph [ref=f35e183]: Posted 6 years ago
+                    - paragraph [ref=f35e185]: · 2nd in this Competition
+                - generic [ref=f35e187]:
+                  - generic [ref=f35e188]:
+                    - button "Upvote" [ref=f35e189] [cursor=pointer]:
+                      - generic [ref=f35e190]: arrow_drop_up
+                    - button "0 votes" [ref=f35e191] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f35e192] [cursor=pointer]: more_vert
+                - paragraph [ref=f35e196]:
+                  - text: "Hi, You can have a look to my blog post in \"Towards Data Science\" where I explain the Genetic Algorithm solution:"
+                  - link "https://towardsdatascience.com/reverse-arrow-of-time-with-genetic-algorithm-and-gpu-1871a7b4fff8 (opens in a new tab)" [ref=f35e197] [cursor=pointer]:
+                    - /url: https://towardsdatascience.com/reverse-arrow-of-time-with-genetic-algorithm-and-gpu-1871a7b4fff8
+                    - text: https://towardsdatascience.com/reverse-arrow-of-time-with-genetic-algorithm-and-gpu-1871a7b4fff8
+                - button "Reply" [ref=f35e199] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f35e200]: reply
+              - separator [ref=f35e202]
+            - generic [ref=f35e207]:
+              - link "Konstantin's profile" [ref=f35e208] [cursor=pointer]:
+                - /url: /knstqq
+                - generic "Konstantin" [ref=f35e209]
+              - generic [ref=f35e215]:
+                - link [ref=f35e217] [cursor=pointer]:
+                  - /url: /knstqq
+                  - heading "Konstantin" [level=3] [ref=f35e218]
+                - generic [ref=f35e219]:
+                  - paragraph [ref=f35e220]: Posted 6 years ago
+                  - paragraph [ref=f35e222]: · 2nd in this Competition
+              - generic [ref=f35e224]:
+                - generic [ref=f35e225]:
+                  - button "Upvote" [ref=f35e226] [cursor=pointer]:
+                    - generic [ref=f35e227]: arrow_drop_up
+                  - button "0 votes" [ref=f35e228] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f35e229] [cursor=pointer]: more_vert
+              - blockquote [ref=f35e233]:
+                - paragraph [ref=f35e234]: "9 hours score: : 0.433 (cannot submit due to code limit) 0.0433 may be?"
+              - button "Reply" [ref=f35e236] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f35e237]: reply
+              - generic [ref=f35e244]:
+                - link "Eric Bouteillon's profile" [ref=f35e245] [cursor=pointer]:
+                  - /url: /ebouteillon
+                  - generic "Eric Bouteillon" [ref=f35e246]
+                - generic [ref=f35e252]:
+                  - generic [ref=f35e253]:
+                    - link [ref=f35e254] [cursor=pointer]:
+                      - /url: /ebouteillon
+                      - heading "Eric Bouteillon" [level=3] [ref=f35e255]
+                    - paragraph [ref=f35e258]: Topic Author
+                  - generic [ref=f35e259]:
+                    - paragraph [ref=f35e260]: Posted 6 years ago
+                    - paragraph [ref=f35e262]: · 2nd in this Competition
+                - generic [ref=f35e264]:
+                  - generic [ref=f35e265]:
+                    - button "Upvote" [ref=f35e266] [cursor=pointer]:
+                      - generic [ref=f35e267]: arrow_drop_up
+                    - button "0 votes" [ref=f35e268] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f35e269] [cursor=pointer]: more_vert
+                - paragraph [ref=f35e273]: Thanks. Fixed.
+                - button "Reply" [ref=f35e275] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f35e276]: reply
+  - alert [ref=f35e280]

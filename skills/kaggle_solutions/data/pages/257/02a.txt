@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/sp-society-camera-model-identification/discussion/49299
-fetched: 2026-10-27
-chars: 551
+fetched: 2026-11-03
+chars: 8306
 
 menu
 Skip to
@@ -22,24 +22,384 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-IEEE Signal Processing Society · Featured Prediction Competition · 9 years ago
-Late Submission
-more_horiz
+2nd place solution with GPU muscles — IEEE's Signal Processing Society - Camera Model Identification
+2nd place solution with GPU muscles
+
 IEEE's Signal Processing Society - Camera Model Identification
 
-Identify from which camera an image was taken
+Solution Writeup · 2nd place
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
-Failed to load the discussion topic
+tldr: We downloaded a about 500+ GB photos, trained 9+ imagenet-like models with 3 version of the pipeline. Finally, we averaged 27 checkpoints with geometric mean.
+
+Key components of a good solution, by priorities:
+
+Large and clean external dataset
+Consistant local validation
+Classic competitive approach to learning models
+Diverse models
+
+Data mining: We downloaded 500+ Gb photos from various resources: Flickr, Yandex.Fotki, Wikipedia Commons, mobile reviews. In addition, on the last night we downloaded 22k more photos with urls from Flickr gathered by Andres Torrubia.
+
+Filtering data: Lightroom/photoshop/etc processing could eliminate all the information about the camera. We filtered on: model, resolution, quality of jpeg compression, software of processing. After filtering of the training and validation, the datasets looked like this:  We took the validation from Gleb’s post, but replaced iPhone 6 plus pictures in it by iPhone 6 ones.
+
+Training models: Our code is based on pytorch version of Andres solution. For all the models, the binary flag is_manip was used as an additional feature for the classifier of a net. All models had an input of 480. For the majority of our models, five crops + flip photo orientation (10TTA) was applied to the pictures, for D4 models five crops + the whole group of D4 were applied (40TTA); then geometric mean was applied to the predictions. Useful tricks:
+
+Adam, reducing LR on plateau with patience 2-4
+Cyclic LR with SGD
+Pseudo-labeling
+Averaging 3 checkpoints with the best loss for validation
+
+Also on the last day we trained several models with D4 augmentations, finetune from best checkpoint of previous pipeline. We didn’t have submit to check all models on LB, but the result on one was impressive.
+
+The final ensemble of models looked like this:  Logging models:  Averaging: We tried different approaches with class balancing and dropping the missing classes according to the probabilities. But in the end geometric average of 27 checkpoints of different models is the best.
+
+What did not work? Demosizing  Cameras fix on the matrix in a particular pixel the intensity of only one color, and the rest of the colors are restored to neighboring pixels, and the recovery algorithm for different camera manufacturers is different. The idea was to calculate the difference between the original image and the image obtained by one of the standard demosayzingov. The inertia of the differences is to train the neural network.
+
+Hardware:
+
+i7 7700k, 64gb, 2x 1080 (just for development)
+i7 6700k, 32gb, 2x Titan X (Maxwell)
+i7 5930K, 32GB, 3x1080Ti
+Xeon 2696v3, 64gb, 4x1080Ti
+i7 3770k, 16gb, 2x 1080Ti
+Authors
+Ilya Kibardin
+
+ikibardin
+
+n01z3
+
+drn01z3
+
+Artur Fattakhov (MIPT DIHT)
+
+fartuk1
+
+ValeriyBabushkin
+
+venheads
+
+Andrey Kiselev
+
+andreykiselev
+
+arrow_drop_up
+70
+Share
+more_horiz
+Citation
+
+Ilya Kibardin, n01z3, Artur Fattakhov (MIPT DIHT), ValeriyBabushkin, Andrey Kiselev. 2nd place solution with GPU muscles. https://www.kaggle.com/competitions/sp-society-camera-model-identification/writeups/ods-ai-gpu-muscles-spcup-eligible-2nd-place-soluti. 2018. Kaggle
+
+comment
+25 Comments
+Hotness
+Emil Kayumov
+
+Posted 8 years ago
+
+arrow_drop_up
+4
+more_vert
+
+We have published a video with 1st and 2nd places solutions with English subtitles from Moscow ML trainings meetup. https://youtu.be/ETh8bJ_xKGA
+
+reply
+Reply
+IdhamHalim
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+cool !
+
+reply
+Reply
+Matt Kleinsmith
+
+Posted 9 years ago
+
+· 154th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Thank you. This was fun to read as someone new to Kaggle.
+
+All models had an input of 480.
+
+Did you crop from the 512x512 center region or from the entire image?
+
+D4 augmentations
+
+Does this refer to compression, resizing, gamma correction, and transpose? Where does the term "D4" come from?
+
+reply
+Reply
+Artur Fattakhov (MIPT DIHT)
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+We crop from entire image. Term D4 comes from group theory. It means all rotation on 90 and flips.
+
+reply
+Reply
+n01z3
+
+Topic Author
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+About D4: https://en.wikipedia.org/wiki/Dihedral_group
+
+reply
+Reply
+Matt Kleinsmith
+
+Posted 9 years ago
+
+· 154th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you. Here's an image from wikipedia that explains D8 (not D4) visually:
+
+https://en.wikipedia.org/wiki/Dihedral_group#/media/File:Dihedral8.png
+
+reply
+Reply
+A0198918E_MaZhaoyang
+
+Posted 9 years ago
+
+· 119th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!
+
+The hardware is powerful!
+
+Why most the loss curves are periodically jumping very high?
+
+The validation score is not too high. Is it because the curve are only part of all? But the epic seems already goes beyond 60.
+
+For DenseNet201, what is the batch size used? It does not run in my computer even with a batch size of 1. :(
+
+Have you tried other ensembling methods instead of only geometric mean?
+
+How is dual path network in terms of accuracy, performance and memory consumption comparing to DenseNet or other networks?
+
+Two more questions: what is D4 and what is demosizing?
+
+Quite a few questions. But these are something I am curious to know. :)
+
+reply
+Reply
+n01z3
+
+Topic Author
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+Loss curves seems jumpy due to scale and little amount of sample in validation set.
+Almost all validation accuracy is about 0.98. Pretty high for me.
+As far as I remember typically batch size is 24-40 for 4x 1080ti.
+We tried weighted mean, small class sorting. Doesn't work for us.
+DPN is fantastic! Our best single model: dpn92 with pseudo labeling, TTA, 3 checkpoints TTA: 0.987 (private) and 0.984 (public).
+About D4 answered above
+reply
+Reply
+5 more replies
+arrow_drop_down
+Vlad Golubev
+
+Posted 9 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Amazing work!
+
+reply
+Reply
+yyll008
+
+Posted 9 years ago
+
+· 145th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Wow! Congratulation!
+
+reply
+Reply
+Yuzhe Mao
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Why some images in HTC directory appears to be of Nexus o(╥﹏╥)o
+
+reply
+Reply
+Yuzhe Mao
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+anyway thanks for sharing QAQ
+
+reply
+Reply
+TzeSing
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+nice
+
+reply
+Reply
+Pratip Khandelwal
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Amazing .. Congrats !!
+
+reply
+Reply
+Matt Kleinsmith
+
+Posted 9 years ago
+
+· 154th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Did you use the official manipulations (compression, gamma correction, and resizing) for training? I would guess yes, so you could bring the training set closer to the test set, and because you mentioned using Ivan's PyTorch version of Andres's code which has them turned on by default.
+
+reply
+Reply
+Ilya Kibardin
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Yes. We did not change augmentations from Ivan's code, except adding D4 transforms after them for some models.
+
+reply
+Reply
+pengpengyang
+
+Posted 9 years ago
+
+· 112th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! what is your input of your reported models? the original image with 480x480 or the difference between the original image and the image obtained by one of the standard demosayzingov? If the difference was used, which one standard demosayzingov?
+
+reply
+Reply
+Matt Kleinsmith
+
+Posted 9 years ago
+
+· 154th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+n01z3 said demosaicing didn't work for them.
+
+reply
+Reply
+alside
+
+Posted 9 years ago
+
+· 96th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Much data! so Wow!
+
+reply
+Reply
+Zaporozhan Stanislav
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+It's fantastic!
+
+reply
+Reply

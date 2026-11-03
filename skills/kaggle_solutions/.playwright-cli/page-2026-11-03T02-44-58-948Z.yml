@@ -1,0 +1,339 @@
+- generic [ref=f48e2]:
+  - navigation "Main Kaggle page navigation" [ref=f48e3]:
+    - generic [ref=f48e5]:
+      - button "Navigation menu" [ref=f48e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f48e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f48e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f48e12] [cursor=pointer]:
+      - paragraph [ref=f48e18]: Create
+    - generic [ref=f48e21]:
+      - list [ref=f48e22]:
+        - listitem "Home List Item" [ref=f48e23]:
+          - link "Home" [ref=f48e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f48e31]: Home
+        - listitem "Competitions List Item" [ref=f48e32]:
+          - link "Competitions" [ref=f48e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f48e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f48e41]:
+          - link "Benchmarks" [ref=f48e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f48e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f48e50]:
+          - link "Arenas" [ref=f48e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f48e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f48e59]:
+          - link "Game Arena" [ref=f48e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f48e67]: Game Arena
+      - list [ref=f48e68]:
+        - listitem "Data Hub List Item" [ref=f48e69]:
+          - generic [ref=f48e70]:
+            - link "Data Hub" [ref=f48e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f48e77]: Data Hub
+            - button "Expand" [ref=f48e80] [cursor=pointer]
+      - list [ref=f48e82]:
+        - listitem "More on Kaggle List Item" [ref=f48e83]:
+          - generic [ref=f48e84]:
+            - link "More on Kaggle" [ref=f48e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f48e91]: More
+            - button "Expand" [ref=f48e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f48e97]:
+    - generic [ref=f48e98]:
+      - generic [ref=f48e102]:
+        - textbox "Search" [ref=f48e104]
+        - group [aria-hidden]
+      - generic [ref=f48e106]:
+        - link [ref=f48e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fhpa-single-cell-image-classification%2Fdiscussion%2F238898
+          - button "Login" [ref=f48e108]
+        - link [ref=f48e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fhpa-single-cell-image-classification%2Fdiscussion%2F238898
+          - button "Sign Up" [ref=f48e111]
+  - main [ref=f48e113]:
+    - generic [ref=f48e115]:
+      - generic [ref=f48e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f48e117]:
+        - link "Learn more" [ref=f48e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f48e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f48e123]:
+      - generic [ref=f48e125]:
+        - generic [ref=f48e126]:
+          - link "Human Protein Atlas's profile" [ref=f48e127] [cursor=pointer]:
+            - /url: /organizations/human-protein-atlas
+            - generic "Human Protein Atlas" [ref=f48e128]
+          - generic [ref=f48e132]:
+            - generic [ref=f48e133]: Human Protein Atlas
+            - generic [ref=f48e135]: · Featured Code Competition · 5 years ago
+          - generic [ref=f48e136]:
+            - button "Late Submission" [disabled] [ref=f48e138]
+            - button "Competition options menu collapsed" [ref=f48e141] [cursor=pointer]: more_horiz
+        - generic [ref=f48e143]:
+          - heading "Human Protein Atlas - Single Cell Classification" [level=1] [ref=f48e144]
+          - paragraph [ref=f48e146]: Find individual human cell differences in microscope images
+      - generic [ref=f48e150]:
+        - tablist [ref=f48e157]:
+          - tab "Overview, 1 of 7" [ref=f48e158] [cursor=pointer]:
+            - generic [ref=f48e159]: Overview
+          - tab "Data, 2 of 7" [ref=f48e160] [cursor=pointer]:
+            - generic [ref=f48e161]: Data
+          - tab "Code, 3 of 7" [ref=f48e162] [cursor=pointer]:
+            - generic [ref=f48e163]: Code
+          - tab "Models, 4 of 7" [ref=f48e164] [cursor=pointer]:
+            - generic [ref=f48e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f48e166] [cursor=pointer]:
+            - generic [ref=f48e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f48e168] [cursor=pointer]:
+            - generic [ref=f48e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f48e170] [cursor=pointer]:
+            - generic [ref=f48e171]: Rules
+        - separator [ref=f48e173]
+      - generic [ref=f48e177]:
+        - generic [ref=f48e178]:
+          - generic [ref=f48e179]:
+            - generic [ref=f48e180]:
+              - link "Dieter's profile" [ref=f48e181] [cursor=pointer]:
+                - /url: /christofhenkel
+                - generic "Dieter" [ref=f48e182]
+              - generic [ref=f48e186]:
+                - link "Dieter" [ref=f48e187] [cursor=pointer]:
+                  - /url: /christofhenkel
+                - text: ·
+                - generic [ref=f48e188]: 3rd in this Competition
+                - text: ·
+                - generic [ref=f48e189]: Posted 5 years ago
+            - generic [ref=f48e190]:
+              - generic [ref=f48e191]:
+                - button "Upvote" [ref=f48e192] [cursor=pointer]:
+                  - generic [ref=f48e193]: arrow_drop_up
+                - button "41 votes" [ref=f48e194] [cursor=pointer]: "41"
+              - button "More Options for this Topic" [ref=f48e195] [cursor=pointer]: more_vert
+            - heading "3rd place Dieter part" [level=3] [ref=f48e196]
+            - generic [ref=f48e199]:
+              - paragraph [ref=f48e200]:
+                - text: Thanks to Kaggle and hosts for this very interesting competition with a tricky setup. Also huge props to my team mates
+                - link "@zfturbo (opens in a new tab)" [ref=f48e201] [cursor=pointer]:
+                  - /url: /zfturbo
+                  - text: "@zfturbo"
+                - text: and
+                - link "@mpware (opens in a new tab)" [ref=f48e202] [cursor=pointer]:
+                  - /url: /mpware
+                  - text: "@mpware"
+                - text: who carried me to 3rd place. Since we worked quite independently on the models we thought it helps readability to split the work in 3 posts. In the following, I want to give a rough overview of my part of our solution.
+              - heading "TLDR" [level=3] [ref=f48e203]
+              - paragraph [ref=f48e204]: I did an ensemble of several ideas to tackle the weak label problem. The first model type works on cropped single cells which are weighted using trainable attention to derive a bag-of-cell prediction on which the loss wrt to the weak image label is calculated. The second model type is on image level. Here cell masks derived using HPA Cell segmentor are used to extract local features and derive a single cell feature vector. All single cell feature vectors are weighted to derive with an image level label. The third model type is an image level model which does not account for single cells, but helps the overall prediction ranking.
+              - heading "Data setup & CV" [level=3] [ref=f48e205]
+              - paragraph [ref=f48e206]: I settled early on the hyperparameters for the HPA cell segmenter, which I slightly modified to run faster. I generated masks for all images and used those and fixed single cell ids through the competition. For cross-validation I identified clusters of similar/ duplicate images and used GroupKfold to create a robust validation scheme. I used Public HPA data and images from the first HPA competition, which were not included here.
+              - heading "Models" [level=3] [ref=f48e207]
+              - heading "Single Cell Model" [level=4] [ref=f48e208]
+              - paragraph [ref=f48e209]:
+                - text: I tried different ways how to create a bag-of-cell model to leverage the weak labels. The following worked very well and is quite similar to
+                - link "@wowfattie (opens in a new tab)" [ref=f48e210] [cursor=pointer]:
+                  - /url: /wowfattie
+                  - text: "@wowfattie"
+                - text: "solution:"
+              - list [ref=f48e211]:
+                - listitem [ref=f48e212]: Use HPA Cell Segmenter to crop single cells
+                - listitem [ref=f48e213]: Feed batches x n_cells into the model
+                - listitem [ref=f48e214]: Use attention pooling to train weighting of cells within a bag and derive bag-prediction
+                - listitem [ref=f48e215]: BCE loss between image label and bag-predictiction
+              - paragraph [ref=f48e216]: "The following gives a brief illustration (e.g. bs =1):"
+              - paragraph [ref=f48e217]:
+                - img "model1"
+              - paragraph [ref=f48e218]: I want to note that the single cell model turned out to be especially robust on private LB as it can better handle high SCV.
+              - heading "Image model with aggregated local features" [level=4] [ref=f48e219]
+              - paragraph [ref=f48e220]: The second architecture uses the complete image but selects local features using a previously generated cell mask
+              - paragraph [ref=f48e221]: Cell mask is resized to 16x16 to map local feature vectors of backbone output (which has size (bs,1024,16,16)) to single cells and hence create an embedding vector for each cell. I weight the embedding vectors using trainable attention to derive the image level label.
+              - paragraph [ref=f48e222]:
+                - img "model2"
+              - paragraph [ref=f48e223]: I used backbones SE-ResNeXt26 and SE-ResNeXt101 from timm repository for these 2 model types.
+              - paragraph [ref=f48e224]: The third model is an efficientnet-b7 trained on image level and predicts the same label for each cell within an image.
+              - heading "Compressing into one" [level=4] [ref=f48e225]
+              - paragraph [ref=f48e226]: I want to note that by generating single cell out-of-fold predictions using this ensemble and training a single cell model with that results in a good but lightweight single model (Public LB 0.524)
+              - paragraph [ref=f48e227]: Thanks for reading. Happy to answer any questions.
+          - separator [ref=f48e228]
+        - generic [ref=f48e229]:
+          - generic [ref=f48e230]:
+            - paragraph [ref=f48e233]:
+              - paragraph [ref=f48e234]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f48e235] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f48e236]
+          - generic [ref=f48e238]:
+            - generic [ref=f48e239]:
+              - generic [aria-hidden] [ref=f48e240]: comment
+              - generic [ref=f48e241]:
+                - heading "7 Comments" [level=2] [ref=f48e242]
+                - link "Go To Appreciation Comments (1 total)" [ref=f48e243] [cursor=pointer]:
+                  - /url: /c/hpa-single-cell-image-classification/discussion/238898#appreciation
+                  - text: 1 appreciation comment
+            - generic [ref=f48e246]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f48e247] [cursor=pointer]:
+                - generic [ref=f48e248]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f48e250]:
+            - generic [ref=f48e251]:
+              - generic [ref=f48e255]:
+                - link "Chris Deotte's profile" [ref=f48e256] [cursor=pointer]:
+                  - /url: /cdeotte
+                  - generic "Chris Deotte" [ref=f48e257]
+                - generic [ref=f48e263]:
+                  - link [ref=f48e265] [cursor=pointer]:
+                    - /url: /cdeotte
+                    - heading "Chris Deotte" [level=3] [ref=f48e266]
+                  - paragraph [ref=f48e268]: Posted 5 years ago
+                - generic [ref=f48e270]:
+                  - generic [ref=f48e271]:
+                    - button "Upvote" [ref=f48e272] [cursor=pointer]:
+                      - generic [ref=f48e273]: arrow_drop_up
+                    - button "1 votes" [ref=f48e274] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f48e275] [cursor=pointer]: more_vert
+                - paragraph [ref=f48e279]: Congratulations Dieter and team. Well done!
+              - separator [ref=f48e280]
+            - generic [ref=f48e281]:
+              - generic [ref=f48e285]:
+                - link "DeepUnderstanding's profile" [ref=f48e286] [cursor=pointer]:
+                  - /url: /mrinath
+                  - generic "DeepUnderstanding" [ref=f48e287]
+                - generic [ref=f48e293]:
+                  - link [ref=f48e295] [cursor=pointer]:
+                    - /url: /mrinath
+                    - heading "DeepUnderstanding" [level=3] [ref=f48e296]
+                  - paragraph [ref=f48e298]: Posted 5 years ago
+                - generic [ref=f48e300]:
+                  - generic [ref=f48e301]:
+                    - button "Upvote" [ref=f48e302] [cursor=pointer]:
+                      - generic [ref=f48e303]: arrow_drop_up
+                    - button "0 votes" [ref=f48e304] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f48e305] [cursor=pointer]: more_vert
+                - paragraph [ref=f48e309]: Congratulations on your 3rd position, Can you share any code or paper referencing the " attention pooling" layer you have used? (I never heard of this type of pooling before) Thanks
+                - generic [ref=f48e315]:
+                  - link "Dieter's profile" [ref=f48e316] [cursor=pointer]:
+                    - /url: /christofhenkel
+                    - generic "Dieter" [ref=f48e317]
+                  - generic [ref=f48e323]:
+                    - generic [ref=f48e324]:
+                      - link [ref=f48e325] [cursor=pointer]:
+                        - /url: /christofhenkel
+                        - heading "Dieter" [level=3] [ref=f48e326]
+                      - paragraph [ref=f48e329]: Topic Author
+                    - generic [ref=f48e330]:
+                      - paragraph [ref=f48e331]: Posted 5 years ago
+                      - paragraph [ref=f48e333]: · 3rd in this Competition
+                  - generic [ref=f48e335]:
+                    - generic [ref=f48e336]:
+                      - button "Upvote" [ref=f48e337] [cursor=pointer]:
+                        - generic [ref=f48e338]: arrow_drop_up
+                      - button "6 votes" [ref=f48e339] [cursor=pointer]: "6"
+                    - button "More Options for this Comment" [ref=f48e340] [cursor=pointer]: more_vert
+                  - generic [ref=f48e343]:
+                    - code [ref=f48e345]: "from torch import nn import torch class AttentionPool(nn.Module): def __init__(self, in_units, hidden = 512): super(AttentionPool, self).__init__() self.att = nn.Sequential(nn.Linear(in_units, hidden), nn.ReLU(), nn.Linear(hidden, 1)) def forward(self, x): # x has shape (batch_size, n_cell, feats) att_weights = torch.softmax(self.att(x),dim=1) x_pooled = (x * att_weights).sum(1) return x_pooled"
+                    - paragraph [ref=f48e346]: What I used here is a trainable layer which outputs weights for each cell. You then pool by weighted sum.
+              - separator [ref=f48e347]
+            - generic [ref=f48e348]:
+              - generic [ref=f48e352]:
+                - link "Raman's profile" [ref=f48e353] [cursor=pointer]:
+                  - /url: /samusram
+                  - generic "Raman" [ref=f48e354]
+                - generic [ref=f48e360]:
+                  - link [ref=f48e362] [cursor=pointer]:
+                    - /url: /samusram
+                    - heading "Raman" [level=3] [ref=f48e363]
+                  - generic [ref=f48e364]:
+                    - paragraph [ref=f48e365]: Posted 5 years ago
+                    - paragraph [ref=f48e367]: · 23rd in this Competition
+                - generic [ref=f48e369]:
+                  - generic [ref=f48e370]:
+                    - button "Upvote" [ref=f48e371] [cursor=pointer]:
+                      - generic [ref=f48e372]: arrow_drop_up
+                    - button "0 votes" [ref=f48e373] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f48e374] [cursor=pointer]: more_vert
+                - generic [ref=f48e377]:
+                  - paragraph [ref=f48e378]:
+                    - link "@christofhenkel (opens in a new tab)" [ref=f48e379] [cursor=pointer]:
+                      - /url: /christofhenkel
+                      - text: "@christofhenkel"
+                    - text: ", congrats on your amazing performance! Mainly, thank you so much for this write-up! Reading about your image model with aggregated local features made my day! Such an elegant idea!"
+                  - paragraph [ref=f48e380]:
+                    - text: "*p.s. the bag-of-cells model is amazing, I was blown away by it when reading the"
+                    - link "@wowfattie (opens in a new tab)" [ref=f48e381] [cursor=pointer]:
+                      - /url: /wowfattie
+                      - text: "@wowfattie"
+                    - text: "'s solution. May I have a quick technical question, please? For images containing less than n_cells, did you somehow mask out the padded (empty) cells in the attention pool, or what was your approach? I'd be also grateful if you can briefly comment on handling different numbers of cells when pooling by attention in the image model with aggregated local features. Thank you!"
+                - generic [ref=f48e382]:
+                  - generic [ref=f48e387]:
+                    - link "Dieter's profile" [ref=f48e388] [cursor=pointer]:
+                      - /url: /christofhenkel
+                      - generic "Dieter" [ref=f48e389]
+                    - generic [ref=f48e395]:
+                      - generic [ref=f48e396]:
+                        - link [ref=f48e397] [cursor=pointer]:
+                          - /url: /christofhenkel
+                          - heading "Dieter" [level=3] [ref=f48e398]
+                        - paragraph [ref=f48e401]: Topic Author
+                      - generic [ref=f48e402]:
+                        - paragraph [ref=f48e403]: Posted 5 years ago
+                        - paragraph [ref=f48e405]: · 3rd in this Competition
+                    - generic [ref=f48e407]:
+                      - generic [ref=f48e408]:
+                        - button "Upvote" [ref=f48e409] [cursor=pointer]:
+                          - generic [ref=f48e410]: arrow_drop_up
+                        - button "1 votes" [ref=f48e411] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f48e412] [cursor=pointer]: more_vert
+                    - generic [ref=f48e415]:
+                      - blockquote [ref=f48e416]:
+                        - paragraph [ref=f48e417]: handling different numbers of cells when pooling by attention in the image model with aggregated local features.
+                      - paragraph [ref=f48e418]: I predefine a max_len and then take randomly max_len number of cell vectors. If an image has less than max_len, I pad with zero-vectors
+                  - generic [ref=f48e423]:
+                    - link "Raman's profile" [ref=f48e424] [cursor=pointer]:
+                      - /url: /samusram
+                      - generic "Raman" [ref=f48e425]
+                    - generic [ref=f48e431]:
+                      - link [ref=f48e433] [cursor=pointer]:
+                        - /url: /samusram
+                        - heading "Raman" [level=3] [ref=f48e434]
+                      - generic [ref=f48e435]:
+                        - paragraph [ref=f48e436]: Posted 5 years ago
+                        - paragraph [ref=f48e438]: · 23rd in this Competition
+                    - generic [ref=f48e440]:
+                      - generic [ref=f48e441]:
+                        - button "Upvote" [ref=f48e442] [cursor=pointer]:
+                          - generic [ref=f48e443]: arrow_drop_up
+                        - button "1 votes" [ref=f48e444] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f48e445] [cursor=pointer]: more_vert
+                    - generic [ref=f48e448]:
+                      - paragraph [ref=f48e449]: Thank you for the prompt detailed reply!
+                      - paragraph [ref=f48e450]: It's a privilege to learn from you.
+              - separator [ref=f48e451]
+          - generic [ref=f48e452]:
+            - heading "Appreciation (1)" [level=2] [ref=f48e454]
+            - generic [ref=f48e459]:
+              - link "corochann's profile" [ref=f48e460] [cursor=pointer]:
+                - /url: /corochann
+                - generic "corochann" [ref=f48e461]
+              - generic [ref=f48e467]:
+                - link [ref=f48e469] [cursor=pointer]:
+                  - /url: /corochann
+                  - heading "corochann" [level=3] [ref=f48e470]
+                - generic [ref=f48e471]:
+                  - paragraph [ref=f48e472]: Posted 5 years ago
+                  - paragraph [ref=f48e474]: · 7th in this Competition
+              - generic [ref=f48e476]:
+                - generic [ref=f48e477]:
+                  - button "Upvote" [ref=f48e478] [cursor=pointer]:
+                    - generic [ref=f48e479]: arrow_drop_up
+                  - button "0 votes" [ref=f48e480] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f48e481] [cursor=pointer]: more_vert
+              - paragraph [ref=f48e485]: Congrats! Thank you for sharing.
+  - alert [ref=f48e488]

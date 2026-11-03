@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/vinbigdata-chest-xray-abnormalities-detection/discussion/232393
-fetched: 2026-10-27
-chars: 868
+fetched: 2026-11-03
+chars: 1778
 
 menu
 Skip to
@@ -42,15 +42,81 @@ Models
 Discussion
 Leaderboard
 Rules
+Mohammed Rizin V K · 1st in this Competition · Posted 6 years ago
+arrow_drop_up
+27
+more_vert
+1st Place Solution Kernels Released!
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Hi all,
 
-error
+I would like to congrat to all winners, and thank my wonderful teammates @fatihozturk @socom20 @avsanjay.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Here is the Code for ensemble and some models training and inference: https://www.kaggle.com/fatihozturk/ms2f-vinbig-final-pipeline-2
 
-Failed to load the discussion topic
+We have some extra code:
 
-error
+EffDet:
+Training: https://www.kaggle.com/socom20/effdet-v2
+Inference: https://www.kaggle.com/socom20/effdet-inference
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Please sign in to reply to this topic.
+
+comment
+5 Comments
+2 appreciation comments
+Hotness
+Correlation
+
+Posted 6 years ago
+
+arrow_drop_up
+3
+more_vert
+
+I think @ boliu0 @garybios are not your teammates😂
+
+Mohammed Rizin V K
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Apologise
+
+Jaideep
+
+Posted 5 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@morizin thanks for your solution. in your kernel nbk there are on D2 weights give . Do you have repo for other model weights also usedin ensemble ?
+
+Appreciation (2)
+Dr. Amritpal Singh
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing @morizin
+
+tensor choko
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+thanks good code

@@ -1,0 +1,1414 @@
+- generic [ref=f40e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f40e3]:
+    - generic [ref=f40e5]:
+      - button "Navigation menu" [ref=f40e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f40e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f40e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f40e14]:
+      - link [ref=f40e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fhome-credit-default-risk%2Fwriteups%2Fikiri-ds-2nd-place-solution-team-ikiri-ds
+        - button "Login" [ref=f40e16]
+      - link [ref=f40e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fhome-credit-default-risk%2Fwriteups%2Fikiri-ds-2nd-place-solution-team-ikiri-ds
+        - button "Sign Up" [ref=f40e19]
+  - main [ref=f40e21]:
+    - generic [ref=f40e23]:
+      - generic [ref=f40e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f40e25]:
+        - link "Learn more" [ref=f40e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f40e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f40e29]:
+      - generic [ref=f40e31]: 2nd place solution ( team ikiri_DS ) — Home Credit Default Risk
+      - separator [ref=f40e32]
+      - generic [ref=f40e34]:
+        - generic [ref=f40e35]:
+          - heading "2nd place solution ( team ikiri_DS )" [level=1] [ref=f40e36]
+          - generic [ref=f40e37]:
+            - link [ref=f40e38] [cursor=pointer]:
+              - /url: /competitions/home-credit-default-risk
+              - paragraph [ref=f40e40]: Home Credit Default Risk
+            - paragraph [ref=f40e41]: Solution Writeup · 2nd place · Sep 6, 2018
+        - separator [ref=f40e43]
+        - generic [ref=f40e44]:
+          - generic [ref=f40e46]:
+            - paragraph [ref=f40e47]: Congratulations to the winner Home Aloan and to all participants in this competition!
+            - paragraph [ref=f40e48]: This competition was very tough for us and the biggest competition ever. Thank you Home Credit and kaggle for organizing this great competition.
+            - paragraph [ref=f40e49]: ikiri_DS consists of 12 kagglers and we can not write up detail of each solution at once. So we decided to post our model pipeline and short description of individual approaches at first. We will add more descriptions with requests in your comments of this discussion. Please feel free to ask us questions and comments, thanks.
+            - separator [ref=f40e50]
+            - paragraph [ref=f40e51]:
+              - strong [ref=f40e52]: Member comments
+            - list [ref=f40e53]:
+              - listitem [ref=f40e54]:
+                - paragraph [ref=f40e55]:
+                  - strong [ref=f40e56]:
+                    - link "ONODERA (opens in a new tab)" [ref=f40e57] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/onodera
+                      - text: ONODERA
+                  - text: I'm in charge of feature engineering. I don't have any my models. Here is my
+                  - link "git (opens in a new tab)" [ref=f40e58] [cursor=pointer]:
+                    - /url: https://github.com/KazukiOnodera/Home-Credit-Default-Risk
+                    - text: git
+                  - text: .
+              - listitem [ref=f40e59]:
+                - paragraph [ref=f40e60]:
+                  - strong [ref=f40e61]:
+                    - link "RK (opens in a new tab)" [ref=f40e62] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/ryuichi0704
+                      - text: RK
+                  - text: Feature ・Various dimension reductions (PCA, UMAP, T-SNE, LDA…) ・Genetic programming application (from kernel) ・Brute force feature search from ~1TB feature pools Model ・Algorithm comparison (Catboost, LightGBM with dart, and so on) ・Parameter tuning Blending ・Algorithm comparison (Direct AUC maximization with modified Powell algorithm is good for making my 2nd level model)
+              - listitem [ref=f40e63]:
+                - paragraph [ref=f40e64]:
+                  - strong [ref=f40e65]:
+                    - link "Yuya Yamamoto (opens in a new tab)" [ref=f40e66] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/nejumi
+                      - text: Yuya Yamamoto
+                  - text: Interest rate feature, finding about difference between train and test data and residual correction of Neural Network predictions. I have posted my finding and others in
+                  - link "https://www.kaggle.com/c/home-credit-default-risk/discussion/64784 (opens in a new tab)" [ref=f40e67] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64784
+                    - text: https://www.kaggle.com/c/home-credit-default-risk/discussion/64784
+                  - text: .
+              - listitem [ref=f40e68]:
+                - paragraph [ref=f40e69]:
+                  - strong [ref=f40e70]:
+                    - link "tosh (opens in a new tab)" [ref=f40e71] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/ktts1031
+                      - text: tosh
+                  - text: I'm in charge of Neural Network(NN) in this competiton.
+                  - link "https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#380224 (opens in a new tab)" [ref=f40e72] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#380224
+                    - text: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#380224
+              - listitem [ref=f40e73]:
+                - paragraph [ref=f40e74]:
+                  - strong [ref=f40e75]:
+                    - link "ireko8 (opens in a new tab)" [ref=f40e76] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/ireko8
+                      - text: ireko8
+                  - text: DAE based on porto seguro 1st solution
+                  - link "https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379891 (opens in a new tab)" [ref=f40e77] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379891
+                    - text: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379891
+              - listitem [ref=f40e78]:
+                - paragraph [ref=f40e79]:
+                  - strong [ref=f40e80]:
+                    - link "tereka (opens in a new tab)" [ref=f40e81] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/tereka
+                      - text: tereka
+                  - text: CNN and RNN models.
+                  - link "https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379880 (opens in a new tab)" [ref=f40e82] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379880
+                    - text: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379880
+              - listitem [ref=f40e83]:
+                - paragraph [ref=f40e84]:
+                  - strong [ref=f40e85]:
+                    - link "branden (opens in a new tab)" [ref=f40e86] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/brandenkmurray
+                      - text: branden
+              - listitem [ref=f40e87]:
+                - paragraph [ref=f40e88]:
+                  - strong [ref=f40e89]:
+                    - link "takuoko (opens in a new tab)" [ref=f40e90] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/takuok
+                      - text: takuoko
+                  - text: I worked with angus and branden. Our task in team ikiri_DS is to generate diversity, and we could do it! I made LGBM ( private 0.79966 / public 0.80328 ).
+              - listitem [ref=f40e91]:
+                - paragraph [ref=f40e92]:
+                  - strong [ref=f40e93]:
+                    - link "Angus (opens in a new tab)" [ref=f40e94] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/andrew60909
+                      - text: Angus
+                  - text: Hello ~ I am Shuo-Jen, Chang - a kaggler from Taiwan. you can just call me Angus. My job in ikiri_DS is to generate diversity by modeling with my feature set. see the attachment below ( HC - Brief solution from Shuo-Jen, Chang.html )!
+              - listitem [ref=f40e95]:
+                - paragraph [ref=f40e96]:
+                  - strong [ref=f40e97]:
+                    - link "Tam (opens in a new tab)" [ref=f40e98] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/nthanhtam
+                      - text: Tam
+              - listitem [ref=f40e99]:
+                - paragraph [ref=f40e100]:
+                  - strong [ref=f40e101]:
+                    - link "Giba (opens in a new tab)" [ref=f40e102] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/titericz
+                      - text: Giba
+                  - text: Post Processing discussion
+                  - link "https://www.kaggle.com/c/home-credit-default-risk/discussion/64485 (opens in a new tab)" [ref=f40e103] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64485
+                    - text: https://www.kaggle.com/c/home-credit-default-risk/discussion/64485
+                  - text: kernel
+                  - link "https://www.kaggle.com/titericz/giba-post-processing-user-id-boost (opens in a new tab)" [ref=f40e104] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/titericz/giba-post-processing-user-id-boost
+                    - text: https://www.kaggle.com/titericz/giba-post-processing-user-id-boost
+              - listitem [ref=f40e105]:
+                - paragraph [ref=f40e106]:
+                  - strong [ref=f40e107]: Maxwell
+                  - text: "Meta features on train_app and bureau( gain : public +0.002 / private +0.003 ), some models( LGBM, ExtraTree ) for model diversity and blending using adversarial validation( gain : private +0.0002 )"
+            - paragraph [ref=f40e108]:
+              - img "model pipeline of team ikiri_DS"
+          - generic [ref=f40e109]:
+            - generic [ref=f40e110]:
+              - text: Authors
+              - generic [ref=f40e111]:
+                - link "RK's profile" [ref=f40e112] [cursor=pointer]:
+                  - /url: /ryuichi0704
+                  - generic "RK" [ref=f40e113]
+                - generic [ref=f40e117]:
+                  - link "RK" [ref=f40e118] [cursor=pointer]:
+                    - /url: /ryuichi0704
+                  - paragraph [ref=f40e119]: ryuichi0704
+              - generic [ref=f40e120]:
+                - link "Maxwell's profile" [ref=f40e121] [cursor=pointer]:
+                  - /url: /maxwell110
+                  - generic "Maxwell" [ref=f40e122]
+                - generic [ref=f40e126]:
+                  - link "Maxwell" [ref=f40e127] [cursor=pointer]:
+                    - /url: /maxwell110
+                  - paragraph [ref=f40e128]: maxwell110
+              - generic [ref=f40e129]:
+                - link "ONODERA's profile" [ref=f40e130] [cursor=pointer]:
+                  - /url: /onodera
+                  - generic "ONODERA" [ref=f40e131]
+                - generic [ref=f40e135]:
+                  - link "ONODERA" [ref=f40e136] [cursor=pointer]:
+                    - /url: /onodera
+                  - paragraph [ref=f40e137]: onodera
+              - generic [ref=f40e138]:
+                - link "tosh's profile" [ref=f40e139] [cursor=pointer]:
+                  - /url: /ktts1031
+                  - generic "tosh" [ref=f40e140]
+                - generic [ref=f40e144]:
+                  - link "tosh" [ref=f40e145] [cursor=pointer]:
+                    - /url: /ktts1031
+                  - paragraph [ref=f40e146]: ktts1031
+              - generic [ref=f40e147]:
+                - link "Tam T. Nguyen's profile" [ref=f40e148] [cursor=pointer]:
+                  - /url: /nthanhtam
+                  - generic "Tam T. Nguyen" [ref=f40e149]
+                - generic [ref=f40e153]:
+                  - link "Tam T. Nguyen" [ref=f40e154] [cursor=pointer]:
+                    - /url: /nthanhtam
+                  - paragraph [ref=f40e155]: nthanhtam
+              - generic [ref=f40e156]:
+                - link "YuyaYamamoto's profile" [ref=f40e157] [cursor=pointer]:
+                  - /url: /nejumi
+                  - generic "YuyaYamamoto" [ref=f40e158]
+                - generic [ref=f40e162]:
+                  - link "YuyaYamamoto" [ref=f40e163] [cursor=pointer]:
+                    - /url: /nejumi
+                  - paragraph [ref=f40e164]: nejumi
+              - generic [ref=f40e165]:
+                - link "Ireko8's profile" [ref=f40e166] [cursor=pointer]:
+                  - /url: /ireko8
+                  - generic "Ireko8" [ref=f40e167]
+                - generic [ref=f40e171]:
+                  - link "Ireko8" [ref=f40e172] [cursor=pointer]:
+                    - /url: /ireko8
+                  - paragraph [ref=f40e173]: ireko8
+              - generic [ref=f40e174]:
+                - link "tereka's profile" [ref=f40e175] [cursor=pointer]:
+                  - /url: /tereka
+                  - generic "tereka" [ref=f40e176]
+                - generic [ref=f40e180]:
+                  - link "tereka" [ref=f40e181] [cursor=pointer]:
+                    - /url: /tereka
+                  - paragraph [ref=f40e182]: tereka
+              - generic [ref=f40e183]:
+                - link "Branden Murray's profile" [ref=f40e184] [cursor=pointer]:
+                  - /url: /brandenkmurray
+                  - generic "Branden Murray" [ref=f40e185]
+                - generic [ref=f40e189]:
+                  - link "Branden Murray" [ref=f40e190] [cursor=pointer]:
+                    - /url: /brandenkmurray
+                  - paragraph [ref=f40e191]: brandenkmurray
+              - generic [ref=f40e192]:
+                - link "Angus Chang's profile" [ref=f40e193] [cursor=pointer]:
+                  - /url: /andrew60909
+                  - generic "Angus Chang" [ref=f40e194]
+                - generic [ref=f40e198]:
+                  - link "Angus Chang" [ref=f40e199] [cursor=pointer]:
+                    - /url: /andrew60909
+                  - paragraph [ref=f40e200]: andrew60909
+              - generic [ref=f40e201]:
+                - link "takuoko's profile" [ref=f40e202] [cursor=pointer]:
+                  - /url: /takuok
+                  - generic "takuoko" [ref=f40e203]
+                - generic [ref=f40e207]:
+                  - link "takuoko" [ref=f40e208] [cursor=pointer]:
+                    - /url: /takuok
+                  - paragraph [ref=f40e209]: takuok
+              - generic [ref=f40e210]:
+                - link "Giba's profile" [ref=f40e211] [cursor=pointer]:
+                  - /url: /titericz
+                  - generic "Giba" [ref=f40e212]
+                - generic [ref=f40e216]:
+                  - link "Giba" [ref=f40e217] [cursor=pointer]:
+                    - /url: /titericz
+                  - paragraph [ref=f40e218]: titericz
+            - separator [ref=f40e219]
+            - generic [ref=f40e220]:
+              - generic [ref=f40e221]:
+                - button "Upvote" [ref=f40e222] [cursor=pointer]:
+                  - generic [ref=f40e223]: arrow_drop_up
+                - button "122 votes" [ref=f40e224] [cursor=pointer]: "122"
+              - button "Share" [ref=f40e225] [cursor=pointer]
+              - button "Writeup actions" [ref=f40e227] [cursor=pointer]: more_horiz
+        - heading "Project Files" [level=2] [ref=f40e228]
+        - generic [ref=f40e229]:
+          - separator [ref=f40e230]
+          - list [ref=f40e231]:
+            - listitem "model_structure_v8_blending.png List Item" [ref=f40e232]:
+              - generic [ref=f40e233]:
+                - link "model_structure_v8_blending.png" [ref=f40e234] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/379776/10230/model_structure_v8_blending.png
+                  - generic [ref=f40e235]:
+                    - generic [ref=f40e236]: table_chart
+                    - generic [ref=f40e239]: model_structure_v8_blending.png
+                - link "Download model_structure_v8_blending.png" [ref=f40e241] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/379776/10230/model_structure_v8_blending.png
+                  - generic "Download model_structure_v8_blending.png" [ref=f40e242]: get_app
+            - listitem "HC - Brief solution from Shuo-Jen Chang.html List Item" [ref=f40e243]:
+              - generic [ref=f40e244]:
+                - link "HC - Brief solution from Shuo-Jen Chang.html" [ref=f40e245] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/379776/10237/HC - Brief solution from Shuo-Jen Chang.html
+                  - generic [ref=f40e246]:
+                    - generic [ref=f40e247]: table_chart
+                    - generic [ref=f40e250]: HC - Brief solution from Shuo-Jen Chang.html
+                - link "Download HC - Brief solution from Shuo-Jen Chang.html" [ref=f40e252] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/379776/10237/HC - Brief solution from Shuo-Jen Chang.html
+                  - generic "Download HC - Brief solution from Shuo-Jen Chang.html" [ref=f40e253]: get_app
+          - separator [ref=f40e254]
+        - button "Download All" [ref=f40e255] [cursor=pointer]
+        - heading "Citation" [level=2] [ref=f40e257]
+        - paragraph [ref=f40e258]: RK, Maxwell, ONODERA, tosh, Tam T. Nguyen, YuyaYamamoto, Ireko8, tereka, Branden Murray, Angus Chang, takuoko, Giba. 2nd place solution ( team ikiri_DS ). https://www.kaggle.com/competitions/home-credit-default-risk/writeups/ikiri-ds-2nd-place-solution-team-ikiri-ds. 2018. Kaggle
+        - separator [ref=f40e259]
+        - generic [ref=f40e260]:
+          - generic [ref=f40e262]:
+            - generic [ref=f40e263]:
+              - generic [aria-hidden] [ref=f40e264]: comment
+              - heading "56 Comments" [level=2] [ref=f40e266]
+            - generic [ref=f40e269]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f40e270] [cursor=pointer]:
+                - generic [ref=f40e271]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f40e273]:
+            - generic [ref=f40e274]:
+              - generic [ref=f40e278]:
+                - link "tosh's profile" [ref=f40e279] [cursor=pointer]:
+                  - /url: /ktts1031
+                  - generic "tosh" [ref=f40e280]
+                - generic [ref=f40e286]:
+                  - link [ref=f40e288] [cursor=pointer]:
+                    - /url: /ktts1031
+                    - heading "tosh" [level=3] [ref=f40e289]
+                  - generic [ref=f40e290]:
+                    - paragraph [ref=f40e291]: Posted 8 years ago
+                    - paragraph [ref=f40e293]: · 2nd in this Competition
+                - generic [ref=f40e295]:
+                  - generic [ref=f40e296]:
+                    - button "Upvote" [ref=f40e297] [cursor=pointer]:
+                      - generic [ref=f40e298]: arrow_drop_up
+                    - button "16 votes" [ref=f40e299] [cursor=pointer]: "16"
+                  - button "More Options for this Comment" [ref=f40e300] [cursor=pointer]: more_vert
+                - generic [ref=f40e303]:
+                  - paragraph [ref=f40e304]:
+                    - text: Thanks
+                    - link "@Fenglv (opens in a new tab)" [ref=f40e305] [cursor=pointer]:
+                      - /url: /Fenglv
+                      - text: "@Fenglv"
+                  - paragraph [ref=f40e306]: Hi, This is tosh. I'm in charge of Neural Network(NN) in this competiton. I'm glad you are interested in our solutions.
+                  - paragraph [ref=f40e307]: My Solutions are simple NN.
+                  - paragraph [ref=f40e308]: "I apply dense layer by tables(app, prev.. etc) and DAE then, concatenate dense layers. Finally, apply dense layer. NN: CV/Public/Private LB: 0.799/0.804/0.796"
+                  - paragraph [ref=f40e309]: I also attached a simple architecture.
+                  - paragraph [ref=f40e310]:
+                    - img "enter image description here"
+                - button "Reply" [ref=f40e312] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e313]: reply
+                - generic [ref=f40e315]:
+                  - generic [ref=f40e320]:
+                    - link "Adams's profile" [ref=f40e321] [cursor=pointer]:
+                      - /url: /adamsfei
+                      - generic "Adams" [ref=f40e322]
+                    - generic [ref=f40e328]:
+                      - link [ref=f40e330] [cursor=pointer]:
+                        - /url: /adamsfei
+                        - heading "Adams" [level=3] [ref=f40e331]
+                      - generic [ref=f40e332]:
+                        - paragraph [ref=f40e333]: Posted 8 years ago
+                        - paragraph [ref=f40e335]: · 179th in this Competition
+                    - generic [ref=f40e337]:
+                      - generic [ref=f40e338]:
+                        - button "Upvote" [ref=f40e339] [cursor=pointer]:
+                          - generic [ref=f40e340]: arrow_drop_up
+                        - button "4 votes" [ref=f40e341] [cursor=pointer]: "4"
+                      - button "More Options for this Comment" [ref=f40e342] [cursor=pointer]: more_vert
+                    - paragraph [ref=f40e346]: Tosh that is spectacular - i haven't seen anything like it before. Could you link aby kernel/code that demonstrates how to actually code something like this in pytorch/keras?
+                    - button "Reply" [ref=f40e348] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e349]: reply
+                  - generic [ref=f40e355]:
+                    - link "Fenglv's profile" [ref=f40e356] [cursor=pointer]:
+                      - /url: /yongfenglia
+                      - generic "Fenglv" [ref=f40e357]
+                    - generic [ref=f40e363]:
+                      - link [ref=f40e365] [cursor=pointer]:
+                        - /url: /yongfenglia
+                        - heading "Fenglv" [level=3] [ref=f40e366]
+                      - generic [ref=f40e367]:
+                        - paragraph [ref=f40e368]: Posted 8 years ago
+                        - paragraph [ref=f40e370]: · 350th in this Competition
+                    - generic [ref=f40e372]:
+                      - generic [ref=f40e373]:
+                        - button "Upvote" [ref=f40e374] [cursor=pointer]:
+                          - generic [ref=f40e375]: arrow_drop_up
+                        - button "3 votes" [ref=f40e376] [cursor=pointer]: "3"
+                      - button "More Options for this Comment" [ref=f40e377] [cursor=pointer]: more_vert
+                    - generic [ref=f40e380]:
+                      - paragraph [ref=f40e381]: Thanks your great share, tosh! Some question about your NN network I want to konw.
+                      - list [ref=f40e382]:
+                        - listitem [ref=f40e383]: In your NN network the inputs of tables(prev, bureau… ), is it groupby 'SK_ID_CURR' of application table to input in the nn network?
+                        - listitem [ref=f40e384]: What is your inputs for DAE? Thanks tosh, I learn much from your reply!
+                    - button "Reply" [ref=f40e386] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e387]: reply
+              - separator [ref=f40e389]
+            - generic [ref=f40e390]:
+              - generic [ref=f40e394]:
+                - link "pocket's profile" [ref=f40e395] [cursor=pointer]:
+                  - /url: /pocketsuteado
+                  - generic "pocket" [ref=f40e396]
+                - generic [ref=f40e402]:
+                  - link [ref=f40e404] [cursor=pointer]:
+                    - /url: /pocketsuteado
+                    - heading "pocket" [level=3] [ref=f40e405]
+                  - paragraph [ref=f40e407]: Posted 8 years ago
+                - generic [ref=f40e409]:
+                  - generic [ref=f40e410]:
+                    - button "Upvote" [ref=f40e411] [cursor=pointer]:
+                      - generic [ref=f40e412]: arrow_drop_up
+                    - button "8 votes" [ref=f40e413] [cursor=pointer]: "8"
+                  - button "More Options for this Comment" [ref=f40e414] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e418]: Congratulations IkiriDS! I Hope you will win the next competition :) While we wait for each writeup, I have a few questions about your pipeline 1) What is "stochastic adversarial blending"? 2) Did you all share the features for each of your models? 3) What features did you use for the final blend? 4) Were you looking at the CV score to tune your blend? 5) Did you all choose the same cv-split for the blend?
+                - button "Reply" [ref=f40e420] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e421]: reply
+                - generic [ref=f40e423]:
+                  - generic [ref=f40e428]:
+                    - link "Maxwell's profile" [ref=f40e429] [cursor=pointer]:
+                      - /url: /maxwell110
+                      - generic "Maxwell" [ref=f40e430]
+                    - generic [ref=f40e436]:
+                      - generic [ref=f40e437]:
+                        - link [ref=f40e438] [cursor=pointer]:
+                          - /url: /maxwell110
+                          - heading "Maxwell" [level=3] [ref=f40e439]
+                        - paragraph [ref=f40e442]: Topic Author
+                      - generic [ref=f40e443]:
+                        - paragraph [ref=f40e444]: Posted 8 years ago
+                        - paragraph [ref=f40e446]: · 2nd in this Competition
+                    - generic [ref=f40e448]:
+                      - generic [ref=f40e449]:
+                        - button "Upvote" [ref=f40e450] [cursor=pointer]:
+                          - generic [ref=f40e451]: arrow_drop_up
+                        - button "9 votes" [ref=f40e452] [cursor=pointer]: "9"
+                      - button "More Options for this Comment" [ref=f40e453] [cursor=pointer]: more_vert
+                    - generic [ref=f40e456]:
+                      - paragraph [ref=f40e457]:
+                        - link "@pocket (opens in a new tab)" [ref=f40e458] [cursor=pointer]:
+                          - /url: /pocket
+                          - text: "@pocket"
+                        - text: thanks for many questions.
+                      - paragraph [ref=f40e459]:
+                        - strong [ref=f40e460]: 1) What is "stochastic adversarial blending"?
+                        - text: As
+                        - link "@andy (opens in a new tab)" [ref=f40e461] [cursor=pointer]:
+                          - /url: /andy
+                          - text: "@andy"
+                        - text: refered in
+                        - link "this post (opens in a new tab)" [ref=f40e462] [cursor=pointer]:
+                          - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/61273
+                          - text: this post
+                        - text: ", we can build a model which can distinguish train or test data. We use that prediction ( adversarial validation ) when blending. The process is as follows,"
+                      - list [ref=f40e463]:
+                        - listitem [ref=f40e464]: Sample data with a sampling ratio by using adversarial validation as a sampling weight.
+                        - listitem [ref=f40e465]: Optimize the weights with train prediction.
+                        - listitem [ref=f40e466]: Iterate 1~2 process to get converged weights.
+                      - paragraph [ref=f40e467]: This technique propelled our score about 0.0002.
+                      - paragraph [ref=f40e468]:
+                        - strong [ref=f40e469]: 2) Did you all share the features for each of your models?
+                        - text: Some were shared, others were not.
+                      - paragraph [ref=f40e470]:
+                        - strong [ref=f40e471]: 3) What features did you use for the final blend?
+                        - text: For the final blend, we did not use any features. Attached image shows the features used in each model. ( Cardinal numbers were allocated in each feature. )
+                      - paragraph [ref=f40e472]:
+                        - strong [ref=f40e473]: 4) Were you looking at the CV score to tune your blend?
+                        - text: Yes. We monitored both CV and Public LB. We submitted the predictions which have nice score in CV and public LB, both.
+                      - paragraph [ref=f40e474]:
+                        - strong [ref=f40e475]: 5) Did you all choose the same cv-split for the blend?
+                        - text: Actually at first we tried to keep same cv-split. But after some experiments of stacking we did not care cv-split any more. ( Stacking tended to overfit. CV >> LB. So we decided to use only blending. )
+                    - button "Reply" [ref=f40e477] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e478]: reply
+                  - generic [ref=f40e480]:
+                    - button "5 more replies" [ref=f40e481] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e483]: arrow_drop_down
+                    - generic [ref=f40e484]:
+                      - img "Profile picture for pocket" [ref=f40e486]
+                      - img "Profile picture for Maxwell" [ref=f40e488]
+                      - img "Profile picture for ONODERA" [ref=f40e490]
+                      - img "Profile picture for takuoko" [ref=f40e492]
+              - separator [ref=f40e493]
+            - generic [ref=f40e494]:
+              - generic [ref=f40e498]:
+                - link "Anthony Chiu's profile" [ref=f40e499] [cursor=pointer]:
+                  - /url: /kingychiu
+                  - generic "Anthony Chiu" [ref=f40e500]
+                - generic [ref=f40e506]:
+                  - link [ref=f40e508] [cursor=pointer]:
+                    - /url: /kingychiu
+                    - heading "Anthony Chiu" [level=3] [ref=f40e509]
+                  - generic [ref=f40e510]:
+                    - paragraph [ref=f40e511]: Posted 8 years ago
+                    - paragraph [ref=f40e513]: · 10th in this Competition
+                - generic [ref=f40e515]:
+                  - generic [ref=f40e516]:
+                    - button "Upvote" [ref=f40e517] [cursor=pointer]:
+                      - generic [ref=f40e518]: arrow_drop_up
+                    - button "4 votes" [ref=f40e519] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f40e520] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e524]: Nice image!
+                - button "Reply" [ref=f40e526] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e527]: reply
+                - generic [ref=f40e534]:
+                  - link "Maxwell's profile" [ref=f40e535] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e536]
+                  - generic [ref=f40e542]:
+                    - generic [ref=f40e543]:
+                      - link [ref=f40e544] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e545]
+                      - paragraph [ref=f40e548]: Topic Author
+                    - generic [ref=f40e549]:
+                      - paragraph [ref=f40e550]: Posted 8 years ago
+                      - paragraph [ref=f40e552]: · 2nd in this Competition
+                  - generic [ref=f40e554]:
+                    - generic [ref=f40e555]:
+                      - button "Upvote" [ref=f40e556] [cursor=pointer]:
+                        - generic [ref=f40e557]: arrow_drop_up
+                      - button "2 votes" [ref=f40e558] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f40e559] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e563]:
+                    - link "@nlgn (opens in a new tab)" [ref=f40e564] [cursor=pointer]:
+                      - /url: /nlgn
+                      - text: "@nlgn"
+                    - text: Thanks ! Huge team, a lot of models, a lot of features.
+                  - button "Reply" [ref=f40e566] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e567]: reply
+              - separator [ref=f40e569]
+            - generic [ref=f40e570]:
+              - generic [ref=f40e574]:
+                - link "Fenglv's profile" [ref=f40e575] [cursor=pointer]:
+                  - /url: /yongfenglia
+                  - generic "Fenglv" [ref=f40e576]
+                - generic [ref=f40e582]:
+                  - link [ref=f40e584] [cursor=pointer]:
+                    - /url: /yongfenglia
+                    - heading "Fenglv" [level=3] [ref=f40e585]
+                  - generic [ref=f40e586]:
+                    - paragraph [ref=f40e587]: Posted 8 years ago
+                    - paragraph [ref=f40e589]: · 350th in this Competition
+                - generic [ref=f40e591]:
+                  - generic [ref=f40e592]:
+                    - button "Upvote" [ref=f40e593] [cursor=pointer]:
+                      - generic [ref=f40e594]: arrow_drop_up
+                    - button "2 votes" [ref=f40e595] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f40e596] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e600]: Thank you for sharing! There some quesiton I want to ask you. Thanks! 1.What kind of NN module do you use? Can you tell us what tricks in your NN modlue? 2.In your picture , I see "Residual " 1 from 3, what is this in your model? And why use this? 3.In 13 of features, I see you use DAE. Is there any reference DAE code you use? Thank you!
+                - button "Reply" [ref=f40e602] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e603]: reply
+                - generic [ref=f40e605]:
+                  - generic [ref=f40e610]:
+                    - link "tereka's profile" [ref=f40e611] [cursor=pointer]:
+                      - /url: /tereka
+                      - generic "tereka" [ref=f40e612]
+                    - generic [ref=f40e618]:
+                      - link [ref=f40e620] [cursor=pointer]:
+                        - /url: /tereka
+                        - heading "tereka" [level=3] [ref=f40e621]
+                      - generic [ref=f40e622]:
+                        - paragraph [ref=f40e623]: Posted 8 years ago
+                        - paragraph [ref=f40e625]: · 2nd in this Competition
+                    - generic [ref=f40e627]:
+                      - generic [ref=f40e628]:
+                        - button "Upvote" [ref=f40e629] [cursor=pointer]:
+                          - generic [ref=f40e630]: arrow_drop_up
+                        - button "14 votes" [ref=f40e631] [cursor=pointer]: "14"
+                      - button "More Options for this Comment" [ref=f40e632] [cursor=pointer]: more_vert
+                    - generic [ref=f40e635]:
+                      - paragraph [ref=f40e636]: Hi, This is tereka. I'm in charge of Neural Network(CNN,RNN) in this competiton. That is interesting competiton! I only reply your first question, Maybe other member reply additional 1 answer and others
+                      - heading "Solution" [level=2] [ref=f40e637]
+                      - paragraph [ref=f40e638]: My Solutions are End to End CNN and RNN. Purpose is getting time series features from tables. Prev, ins, pos_cash bbureu, credit tables have days columns. So I wanna get *** time series features ***.
+                      - list [ref=f40e639]:
+                        - listitem [ref=f40e640]: I sort tables by days(e.g. instalment is DAYS_INSTALMENT)
+                        - listitem [ref=f40e641]: apply convolution or rnn to tables
+                        - listitem [ref=f40e642]: concatenate convolutional features and onodera's feature.(when CNN exclude onodera's feature)
+                        - listitem [ref=f40e643]: apply dense layer to 3
+                      - paragraph [ref=f40e644]: "CNN: Public/Private LB: 0.785/0.782 RNN: Public/Private LB: 0.795/0.791"
+                      - heading "Network Structure" [level=2] [ref=f40e645]
+                      - paragraph [ref=f40e646]:
+                        - text: CNN Keras Network Structure Picture(output of Keras)
+                        - img "CNN Keras Image"
+                      - paragraph [ref=f40e647]:
+                        - text: RNN Network Structure Picture(output of Keras)
+                        - img "RNN Keras Image"
+                    - button "Reply" [ref=f40e649] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e650]: reply
+                  - generic [ref=f40e652]:
+                    - button "7 more replies" [ref=f40e653] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e655]: arrow_drop_down
+                    - generic [ref=f40e656]:
+                      - img "Profile picture for Fenglv" [ref=f40e658]
+                      - img "Profile picture for Ireko8" [ref=f40e660]
+                      - img "Profile picture for tereka" [ref=f40e662]
+                      - img "Profile picture for YuyaYamamoto" [ref=f40e664]
+              - separator [ref=f40e665]
+            - generic [ref=f40e666]:
+              - generic [ref=f40e670]:
+                - link "AL's profile" [ref=f40e671] [cursor=pointer]:
+                  - /url: /jiananarthurli
+                  - generic "AL" [ref=f40e672]
+                - generic [ref=f40e678]:
+                  - link [ref=f40e680] [cursor=pointer]:
+                    - /url: /jiananarthurli
+                    - heading "AL" [level=3] [ref=f40e681]
+                  - generic [ref=f40e682]:
+                    - paragraph [ref=f40e683]: Posted 8 years ago
+                    - paragraph [ref=f40e685]: · 1000th in this Competition
+                - generic [ref=f40e687]:
+                  - generic [ref=f40e688]:
+                    - button "Upvote" [ref=f40e689] [cursor=pointer]:
+                      - generic [ref=f40e690]: arrow_drop_up
+                    - button "2 votes" [ref=f40e691] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f40e692] [cursor=pointer]: more_vert
+                - generic [ref=f40e695]:
+                  - paragraph [ref=f40e696]: Thank you for sharing Maxwell!! This is really great. I included your write in a summary post if you don't mind!
+                  - paragraph [ref=f40e697]:
+                    - link "https://www.kaggle.com/c/home-credit-default-risk/discussion/64510 (opens in a new tab)" [ref=f40e698] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64510
+                      - text: https://www.kaggle.com/c/home-credit-default-risk/discussion/64510
+                - button "Reply" [ref=f40e700] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e701]: reply
+                - generic [ref=f40e708]:
+                  - link "Maxwell's profile" [ref=f40e709] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e710]
+                  - generic [ref=f40e716]:
+                    - generic [ref=f40e717]:
+                      - link [ref=f40e718] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e719]
+                      - paragraph [ref=f40e722]: Topic Author
+                    - generic [ref=f40e723]:
+                      - paragraph [ref=f40e724]: Posted 8 years ago
+                      - paragraph [ref=f40e726]: · 2nd in this Competition
+                  - generic [ref=f40e728]:
+                    - generic [ref=f40e729]:
+                      - button "Upvote" [ref=f40e730] [cursor=pointer]:
+                        - generic [ref=f40e731]: arrow_drop_up
+                      - button "2 votes" [ref=f40e732] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f40e733] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e737]:
+                    - link "@Arthur (opens in a new tab)" [ref=f40e738] [cursor=pointer]:
+                      - /url: /Arthur
+                      - text: "@Arthur"
+                    - text: Thank you for letting me know. Sure, go ahead.
+                  - button "Reply" [ref=f40e740] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e741]: reply
+              - separator [ref=f40e743]
+            - generic [ref=f40e744]:
+              - generic [ref=f40e748]:
+                - link "pacificactuary's profile" [ref=f40e749] [cursor=pointer]:
+                  - /url: /pacificactuary
+                  - generic "pacificactuary" [ref=f40e750]
+                - generic [ref=f40e756]:
+                  - link [ref=f40e758] [cursor=pointer]:
+                    - /url: /pacificactuary
+                    - heading "pacificactuary" [level=3] [ref=f40e759]
+                  - generic [ref=f40e760]:
+                    - paragraph [ref=f40e761]: Posted 8 years ago
+                    - paragraph [ref=f40e763]: · 541st in this Competition
+                - generic [ref=f40e765]:
+                  - generic [ref=f40e766]:
+                    - button "Upvote" [ref=f40e767] [cursor=pointer]:
+                      - generic [ref=f40e768]: arrow_drop_up
+                    - button "2 votes" [ref=f40e769] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f40e770] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e774]: Congrats Maxwell and ikiri_DS team!
+                - button "Reply" [ref=f40e776] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e777]: reply
+                - generic [ref=f40e784]:
+                  - link "Maxwell's profile" [ref=f40e785] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e786]
+                  - generic [ref=f40e792]:
+                    - generic [ref=f40e793]:
+                      - link [ref=f40e794] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e795]
+                      - paragraph [ref=f40e798]: Topic Author
+                    - generic [ref=f40e799]:
+                      - paragraph [ref=f40e800]: Posted 8 years ago
+                      - paragraph [ref=f40e802]: · 2nd in this Competition
+                  - generic [ref=f40e804]:
+                    - generic [ref=f40e805]:
+                      - button "Upvote" [ref=f40e806] [cursor=pointer]:
+                        - generic [ref=f40e807]: arrow_drop_up
+                      - button "1 votes" [ref=f40e808] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f40e809] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e813]:
+                    - link "@pacificactuary (opens in a new tab)" [ref=f40e814] [cursor=pointer]:
+                      - /url: /pacificactuary
+                      - text: "@pacificactuary"
+                    - text: thanks!
+                  - button "Reply" [ref=f40e816] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e817]: reply
+              - separator [ref=f40e819]
+            - generic [ref=f40e820]:
+              - generic [ref=f40e824]:
+                - link "Wate Soyan's profile" [ref=f40e825] [cursor=pointer]:
+                  - /url: /watesoyan
+                  - generic "Wate Soyan" [ref=f40e826]
+                - generic [ref=f40e832]:
+                  - link [ref=f40e834] [cursor=pointer]:
+                    - /url: /watesoyan
+                    - heading "Wate Soyan" [level=3] [ref=f40e835]
+                  - generic [ref=f40e836]:
+                    - paragraph [ref=f40e837]: Posted 8 years ago
+                    - paragraph [ref=f40e839]: · 1338th in this Competition
+                - generic [ref=f40e841]:
+                  - generic [ref=f40e842]:
+                    - button "Upvote" [ref=f40e843] [cursor=pointer]:
+                      - generic [ref=f40e844]: arrow_drop_up
+                    - button "2 votes" [ref=f40e845] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f40e846] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e850]: Clear image shows well cooperative team. Nice! Deserve me to study.
+                - button "Reply" [ref=f40e852] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e853]: reply
+                - generic [ref=f40e860]:
+                  - link "Maxwell's profile" [ref=f40e861] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e862]
+                  - generic [ref=f40e868]:
+                    - generic [ref=f40e869]:
+                      - link [ref=f40e870] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e871]
+                      - paragraph [ref=f40e874]: Topic Author
+                    - generic [ref=f40e875]:
+                      - paragraph [ref=f40e876]: Posted 8 years ago
+                      - paragraph [ref=f40e878]: · 2nd in this Competition
+                  - generic [ref=f40e880]:
+                    - generic [ref=f40e881]:
+                      - button "Upvote" [ref=f40e882] [cursor=pointer]:
+                        - generic [ref=f40e883]: arrow_drop_up
+                      - button "2 votes" [ref=f40e884] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f40e885] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e889]:
+                    - link "@Soyan (opens in a new tab)" [ref=f40e890] [cursor=pointer]:
+                      - /url: /Soyan
+                      - text: "@Soyan"
+                    - text: Many thanks. For blender, to get the picture of this complex model pipeline was the first task.
+                  - button "Reply" [ref=f40e892] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e893]: reply
+              - separator [ref=f40e895]
+            - generic [ref=f40e896]:
+              - generic [ref=f40e900]:
+                - link "KAMLESH's profile" [ref=f40e901] [cursor=pointer]:
+                  - /url: /konkii
+                  - generic "KAMLESH" [ref=f40e902]
+                - generic [ref=f40e908]:
+                  - link [ref=f40e910] [cursor=pointer]:
+                    - /url: /konkii
+                    - heading "KAMLESH" [level=3] [ref=f40e911]
+                  - paragraph [ref=f40e913]: Posted 8 years ago
+                - generic [ref=f40e915]:
+                  - generic [ref=f40e916]:
+                    - button "Upvote" [ref=f40e917] [cursor=pointer]:
+                      - generic [ref=f40e918]: arrow_drop_up
+                    - button "1 votes" [ref=f40e919] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e920] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e924]: Thanks everyone, for sharing the approach.
+                - button "Reply" [ref=f40e926] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e927]: reply
+              - separator [ref=f40e929]
+            - generic [ref=f40e930]:
+              - generic [ref=f40e934]:
+                - link "Janmejaya's profile" [ref=f40e935] [cursor=pointer]:
+                  - /url: /janmejaya
+                  - generic "Janmejaya" [ref=f40e936]
+                - generic [ref=f40e942]:
+                  - link [ref=f40e944] [cursor=pointer]:
+                    - /url: /janmejaya
+                    - heading "Janmejaya" [level=3] [ref=f40e945]
+                  - generic [ref=f40e946]:
+                    - paragraph [ref=f40e947]: Posted 8 years ago
+                    - paragraph [ref=f40e949]: · 1722nd in this Competition
+                - generic [ref=f40e951]:
+                  - generic [ref=f40e952]:
+                    - button "Upvote" [ref=f40e953] [cursor=pointer]:
+                      - generic [ref=f40e954]: arrow_drop_up
+                    - button "1 votes" [ref=f40e955] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e956] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e960]: Thanks a lot guys. There are a tons of features and models present in your solution. I have couple of questions. Is there reason/thought process behind using CNN and RNN? And How does they behave individually on this data? Thanks
+                - button "Reply" [ref=f40e962] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e963]: reply
+                - generic [ref=f40e965]:
+                  - generic [ref=f40e970]:
+                    - link "Maxwell's profile" [ref=f40e971] [cursor=pointer]:
+                      - /url: /maxwell110
+                      - generic "Maxwell" [ref=f40e972]
+                    - generic [ref=f40e978]:
+                      - generic [ref=f40e979]:
+                        - link [ref=f40e980] [cursor=pointer]:
+                          - /url: /maxwell110
+                          - heading "Maxwell" [level=3] [ref=f40e981]
+                        - paragraph [ref=f40e984]: Topic Author
+                      - generic [ref=f40e985]:
+                        - paragraph [ref=f40e986]: Posted 8 years ago
+                        - paragraph [ref=f40e988]: · 2nd in this Competition
+                    - generic [ref=f40e990]:
+                      - generic [ref=f40e991]:
+                        - button "Upvote" [ref=f40e992] [cursor=pointer]:
+                          - generic [ref=f40e993]: arrow_drop_up
+                        - button "1 votes" [ref=f40e994] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f40e995] [cursor=pointer]: more_vert
+                    - generic [ref=f40e998]:
+                      - paragraph [ref=f40e999]:
+                        - link "@janmejaya (opens in a new tab)" [ref=f40e1000] [cursor=pointer]:
+                          - /url: /janmejaya
+                          - text: "@janmejaya"
+                        - text: Thanks for your some questions.
+                      - separator [ref=f40e1001]
+                      - blockquote [ref=f40e1002]:
+                        - paragraph [ref=f40e1003]: Is there reason/thought process behind using CNN and RNN?
+                      - paragraph [ref=f40e1004]:
+                        - text: A good question. Some tables (e.i. bureau_balance, POS_CASH_balance, .. ) have
+                        - code [ref=f40e1005]: time series
+                        - text: information. So
+                        - link "@tereka (opens in a new tab)" [ref=f40e1006] [cursor=pointer]:
+                          - /url: /tereka
+                          - text: "@tereka"
+                        - text: tried to catch those information via both RNN and CNN.
+                      - separator [ref=f40e1007]
+                      - blockquote [ref=f40e1008]:
+                        - paragraph [ref=f40e1009]: And How does they behave individually on this data?
+                      - paragraph [ref=f40e1010]:
+                        - text: Could you check the below link ? Thanks.
+                        - link "tereka solution (opens in a new tab)" [ref=f40e1011] [cursor=pointer]:
+                          - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379880
+                          - text: tereka solution
+                    - button "Reply" [ref=f40e1013] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e1014]: reply
+                  - generic [ref=f40e1020]:
+                    - link "Janmejaya's profile" [ref=f40e1021] [cursor=pointer]:
+                      - /url: /janmejaya
+                      - generic "Janmejaya" [ref=f40e1022]
+                    - generic [ref=f40e1028]:
+                      - link [ref=f40e1030] [cursor=pointer]:
+                        - /url: /janmejaya
+                        - heading "Janmejaya" [level=3] [ref=f40e1031]
+                      - generic [ref=f40e1032]:
+                        - paragraph [ref=f40e1033]: Posted 8 years ago
+                        - paragraph [ref=f40e1035]: · 1722nd in this Competition
+                    - generic [ref=f40e1037]:
+                      - generic [ref=f40e1038]:
+                        - button "Upvote" [ref=f40e1039] [cursor=pointer]:
+                          - generic [ref=f40e1040]: arrow_drop_up
+                        - button "0 votes" [ref=f40e1041] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f40e1042] [cursor=pointer]: more_vert
+                    - paragraph [ref=f40e1046]:
+                      - text: thanks
+                      - link "@Maxwell (opens in a new tab)" [ref=f40e1047] [cursor=pointer]:
+                        - /url: /Maxwell
+                        - text: "@Maxwell"
+                    - button "Reply" [ref=f40e1049] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e1050]: reply
+              - separator [ref=f40e1052]
+            - generic [ref=f40e1053]:
+              - generic [ref=f40e1057]:
+                - link "Ali Osman's profile" [ref=f40e1058] [cursor=pointer]:
+                  - /url: /alosmn
+                  - generic "Ali Osman" [ref=f40e1059]
+                - generic [ref=f40e1065]:
+                  - link [ref=f40e1067] [cursor=pointer]:
+                    - /url: /alosmn
+                    - heading "Ali Osman" [level=3] [ref=f40e1068]
+                  - generic [ref=f40e1069]:
+                    - paragraph [ref=f40e1070]: Posted 8 years ago
+                    - paragraph [ref=f40e1072]: · 135th in this Competition
+                - generic [ref=f40e1074]:
+                  - generic [ref=f40e1075]:
+                    - button "Upvote" [ref=f40e1076] [cursor=pointer]:
+                      - generic [ref=f40e1077]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1078] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1079] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e1083]: Congrats!
+                - button "Reply" [ref=f40e1085] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1086]: reply
+                - generic [ref=f40e1093]:
+                  - link "Maxwell's profile" [ref=f40e1094] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e1095]
+                  - generic [ref=f40e1101]:
+                    - generic [ref=f40e1102]:
+                      - link [ref=f40e1103] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e1104]
+                      - paragraph [ref=f40e1107]: Topic Author
+                    - generic [ref=f40e1108]:
+                      - paragraph [ref=f40e1109]: Posted 8 years ago
+                      - paragraph [ref=f40e1111]: · 2nd in this Competition
+                  - generic [ref=f40e1113]:
+                    - generic [ref=f40e1114]:
+                      - button "Upvote" [ref=f40e1115] [cursor=pointer]:
+                        - generic [ref=f40e1116]: arrow_drop_up
+                      - button "0 votes" [ref=f40e1117] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f40e1118] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e1122]:
+                    - link "@alosmn (opens in a new tab)" [ref=f40e1123] [cursor=pointer]:
+                      - /url: /alosmn
+                      - text: "@alosmn"
+                    - text: Thanks and congrats for your silver medal !
+                  - button "Reply" [ref=f40e1125] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e1126]: reply
+              - separator [ref=f40e1128]
+            - generic [ref=f40e1129]:
+              - generic [ref=f40e1133]:
+                - link "Pragyan Subedi's profile" [ref=f40e1134] [cursor=pointer]:
+                  - /url: /pragyanbo
+                  - generic "Pragyan Subedi" [ref=f40e1135]
+                - generic [ref=f40e1141]:
+                  - link [ref=f40e1143] [cursor=pointer]:
+                    - /url: /pragyanbo
+                    - heading "Pragyan Subedi" [level=3] [ref=f40e1144]
+                  - generic [ref=f40e1145]:
+                    - paragraph [ref=f40e1146]: Posted 8 years ago
+                    - paragraph [ref=f40e1148]: · 1242nd in this Competition
+                - generic [ref=f40e1150]:
+                  - generic [ref=f40e1151]:
+                    - button "Upvote" [ref=f40e1152] [cursor=pointer]:
+                      - generic [ref=f40e1153]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1154] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1155] [cursor=pointer]: more_vert
+                - generic [ref=f40e1158]:
+                  - paragraph [ref=f40e1159]: Hey! Congratulations and thanks for sharing. I was trying to dig deeper into how you guys made the features through ONODERA's git but there are a lot of files there. Could you suggest some specific ones to look at for someone who wants to go over financial feature engineering?
+                  - paragraph [ref=f40e1160]: Btw the image is real nice!
+                - button "Reply" [ref=f40e1162] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1163]: reply
+                - generic [ref=f40e1170]:
+                  - link "Maxwell's profile" [ref=f40e1171] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e1172]
+                  - generic [ref=f40e1178]:
+                    - generic [ref=f40e1179]:
+                      - link [ref=f40e1180] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e1181]
+                      - paragraph [ref=f40e1184]: Topic Author
+                    - generic [ref=f40e1185]:
+                      - paragraph [ref=f40e1186]: Posted 8 years ago
+                      - paragraph [ref=f40e1188]: · 2nd in this Competition
+                  - generic [ref=f40e1190]:
+                    - generic [ref=f40e1191]:
+                      - button "Upvote" [ref=f40e1192] [cursor=pointer]:
+                        - generic [ref=f40e1193]: arrow_drop_up
+                      - button "0 votes" [ref=f40e1194] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f40e1195] [cursor=pointer]: more_vert
+                  - generic [ref=f40e1198]:
+                    - paragraph [ref=f40e1199]:
+                      - link "@pragyanbo (opens in a new tab)" [ref=f40e1200] [cursor=pointer]:
+                        - /url: /pragyanbo
+                        - text: "@pragyanbo"
+                    - paragraph [ref=f40e1201]:
+                      - text: Thnaks for your comments. For example,
+                      - link "@nejumi (opens in a new tab)" [ref=f40e1202] [cursor=pointer]:
+                        - /url: /nejumi
+                        - text: "@nejumi"
+                      - text: made some interesting features. He explained about his fe in following link.
+                      - link "nejumi's findings (opens in a new tab)" [ref=f40e1203] [cursor=pointer]:
+                        - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64784
+                        - text: nejumi's findings
+                  - button "Reply" [ref=f40e1205] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e1206]: reply
+              - separator [ref=f40e1208]
+            - generic [ref=f40e1209]:
+              - generic [ref=f40e1213]:
+                - link "banzhuchihu's profile" [ref=f40e1214] [cursor=pointer]:
+                  - /url: /ziychen
+                  - generic "banzhuchihu" [ref=f40e1215]
+                - generic [ref=f40e1221]:
+                  - link [ref=f40e1223] [cursor=pointer]:
+                    - /url: /ziychen
+                    - heading "banzhuchihu" [level=3] [ref=f40e1224]
+                  - generic [ref=f40e1225]:
+                    - paragraph [ref=f40e1226]: Posted 8 years ago
+                    - paragraph [ref=f40e1228]: · 25th in this Competition
+                - generic [ref=f40e1230]:
+                  - generic [ref=f40e1231]:
+                    - button "Upvote" [ref=f40e1232] [cursor=pointer]:
+                      - generic [ref=f40e1233]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1234] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1235] [cursor=pointer]: more_vert
+                - generic [ref=f40e1238]:
+                  - paragraph [ref=f40e1239]: Congrats ikiri_DS, and thanks for your post, Maxwell.
+                  - paragraph [ref=f40e1240]: May I ask two questions on the Adversarial Stochastic Blending?
+                  - paragraph [ref=f40e1241]: If I understand correctly, the new test-like feature is only used as sampling weight to blend multiples models. Repeat sampling-blending procedures k times then take the average. I am curious how this Adversarial Stochastic Blending improves your results. Do you have some comparison result on simple blending and Adversarial Stochastic Blending?
+                  - paragraph [ref=f40e1242]: I am also curious is it possible to use this test-like feature directly into those classifiers. For example in lightgbm, instead of uniformly sampling with bagging_fraction to grow each tree, use the test-like feature as the sampling weight .
+                - button "Reply" [ref=f40e1244] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1245]: reply
+                - generic [ref=f40e1247]:
+                  - generic [ref=f40e1252]:
+                    - link "Maxwell's profile" [ref=f40e1253] [cursor=pointer]:
+                      - /url: /maxwell110
+                      - generic "Maxwell" [ref=f40e1254]
+                    - generic [ref=f40e1260]:
+                      - generic [ref=f40e1261]:
+                        - link [ref=f40e1262] [cursor=pointer]:
+                          - /url: /maxwell110
+                          - heading "Maxwell" [level=3] [ref=f40e1263]
+                        - paragraph [ref=f40e1266]: Topic Author
+                      - generic [ref=f40e1267]:
+                        - paragraph [ref=f40e1268]: Posted 8 years ago
+                        - paragraph [ref=f40e1270]: · 2nd in this Competition
+                    - generic [ref=f40e1272]:
+                      - generic [ref=f40e1273]:
+                        - button "Upvote" [ref=f40e1274] [cursor=pointer]:
+                          - generic [ref=f40e1275]: arrow_drop_up
+                        - button "1 votes" [ref=f40e1276] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f40e1277] [cursor=pointer]: more_vert
+                    - generic [ref=f40e1280]:
+                      - paragraph [ref=f40e1281]:
+                        - link "@ziychen (opens in a new tab)" [ref=f40e1282] [cursor=pointer]:
+                          - /url: /ziychen
+                          - text: "@ziychen"
+                        - text: Thank you for your questions.
+                      - separator [ref=f40e1283]
+                      - blockquote [ref=f40e1284]:
+                        - paragraph [ref=f40e1285]: If I understand correctly, the new test-like feature is only used as sampling weight to blend multiples models. Repeat sampling-blending procedures k times then take the average. I am curious how this Adversarial Stochastic Blending improves your results. Do you have some comparison result on simple blending and Adversarial Stochastic Blending?
+                      - paragraph [ref=f40e1286]:
+                        - text: Yes. I used
+                        - code [ref=f40e1287]: 30%
+                        - text: sampling ratio in the result of simple experiment.
+                        - code [ref=f40e1288]: 30%
+                        - text: sampling improve blended score by about 0.0002 (Not so much) in comparison to 100% sampling. Improvement could be observed on both public and private. I have also tested 20%. But score became worse.
+                      - blockquote [ref=f40e1289]:
+                        - paragraph [ref=f40e1290]: I am also curious is it possible to use this test-like feature directly into those classifiers. For example in lightgbm, instead of uniformly sampling with bagging_fraction to grow each tree, use the test-like feature as the sampling weight .
+                      - paragraph [ref=f40e1291]: To be honest, at first I tried to use test-like feature as you said. But my trials went in failure. So at that point I changed my mind to use test-like feature in model, I hit on using it in blending.
+                      - paragraph [ref=f40e1292]: Thanks.
+                    - button "Reply" [ref=f40e1294] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e1295]: reply
+                  - generic [ref=f40e1301]:
+                    - link "banzhuchihu's profile" [ref=f40e1302] [cursor=pointer]:
+                      - /url: /ziychen
+                      - generic "banzhuchihu" [ref=f40e1303]
+                    - generic [ref=f40e1309]:
+                      - link [ref=f40e1311] [cursor=pointer]:
+                        - /url: /ziychen
+                        - heading "banzhuchihu" [level=3] [ref=f40e1312]
+                      - generic [ref=f40e1313]:
+                        - paragraph [ref=f40e1314]: Posted 8 years ago
+                        - paragraph [ref=f40e1316]: · 25th in this Competition
+                    - generic [ref=f40e1318]:
+                      - generic [ref=f40e1319]:
+                        - button "Upvote" [ref=f40e1320] [cursor=pointer]:
+                          - generic [ref=f40e1321]: arrow_drop_up
+                        - button "0 votes" [ref=f40e1322] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f40e1323] [cursor=pointer]: more_vert
+                    - paragraph [ref=f40e1327]: Thanks for your response!
+                    - button "Reply" [ref=f40e1329] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e1330]: reply
+              - separator [ref=f40e1332]
+            - generic [ref=f40e1333]:
+              - generic [ref=f40e1337]:
+                - link "Adams's profile" [ref=f40e1338] [cursor=pointer]:
+                  - /url: /adamsfei
+                  - generic "Adams" [ref=f40e1339]
+                - generic [ref=f40e1345]:
+                  - link [ref=f40e1347] [cursor=pointer]:
+                    - /url: /adamsfei
+                    - heading "Adams" [level=3] [ref=f40e1348]
+                  - generic [ref=f40e1349]:
+                    - paragraph [ref=f40e1350]: Posted 8 years ago
+                    - paragraph [ref=f40e1352]: · 179th in this Competition
+                - generic [ref=f40e1354]:
+                  - generic [ref=f40e1355]:
+                    - button "Upvote" [ref=f40e1356] [cursor=pointer]:
+                      - generic [ref=f40e1357]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1358] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1359] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e1363]: Could you give any sources or describe shortly what Adversarial Stochastic Blending is? I've never heard of the concept
+                - button "Reply" [ref=f40e1365] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1366]: reply
+                - generic [ref=f40e1368]:
+                  - generic [ref=f40e1373]:
+                    - link "Maxwell's profile" [ref=f40e1374] [cursor=pointer]:
+                      - /url: /maxwell110
+                      - generic "Maxwell" [ref=f40e1375]
+                    - generic [ref=f40e1381]:
+                      - generic [ref=f40e1382]:
+                        - link [ref=f40e1383] [cursor=pointer]:
+                          - /url: /maxwell110
+                          - heading "Maxwell" [level=3] [ref=f40e1384]
+                        - paragraph [ref=f40e1387]: Topic Author
+                      - generic [ref=f40e1388]:
+                        - paragraph [ref=f40e1389]: Posted 8 years ago
+                        - paragraph [ref=f40e1391]: · 2nd in this Competition
+                    - generic [ref=f40e1393]:
+                      - generic [ref=f40e1394]:
+                        - button "Upvote" [ref=f40e1395] [cursor=pointer]:
+                          - generic [ref=f40e1396]: arrow_drop_up
+                        - button "1 votes" [ref=f40e1397] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f40e1398] [cursor=pointer]: more_vert
+                    - generic [ref=f40e1401]:
+                      - paragraph [ref=f40e1402]:
+                        - text: Hi
+                        - link "@Adams (opens in a new tab)" [ref=f40e1403] [cursor=pointer]:
+                          - /url: https://www.kaggle.com/adamsfei
+                          - text: "@Adams"
+                        - text: Good question. Could you read
+                        - link "this (opens in a new tab)" [ref=f40e1404] [cursor=pointer]:
+                          - /url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379799
+                          - text: this
+                        - text: "?"
+                      - paragraph [ref=f40e1405]: Addition to linked explanation, I will refer naming of this method.
+                      - paragraph [ref=f40e1406]: "Adversarial : This means just using adversarial validation as sampling weights. Stochastic : We iterated sampling process for 350 times and averaged weights of each model to get converged. This procedure is Monet Carlo like method."
+                    - button "Reply" [ref=f40e1408] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e1409]: reply
+                  - generic [ref=f40e1411]:
+                    - button "4 more replies" [ref=f40e1412] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f40e1414]: arrow_drop_down
+                    - generic [ref=f40e1415]:
+                      - img "Profile picture for Adams" [ref=f40e1417]
+                      - img "Profile picture for Maxwell" [ref=f40e1419]
+              - separator [ref=f40e1420]
+            - generic [ref=f40e1421]:
+              - generic [ref=f40e1425]:
+                - link "YaGana Sheriff-Hussaini's profile" [ref=f40e1426] [cursor=pointer]:
+                  - /url: /sheriytm
+                  - generic "YaGana Sheriff-Hussaini" [ref=f40e1427]
+                - generic [ref=f40e1433]:
+                  - link [ref=f40e1435] [cursor=pointer]:
+                    - /url: /sheriytm
+                    - heading "YaGana Sheriff-Hussaini" [level=3] [ref=f40e1436]
+                  - generic [ref=f40e1437]:
+                    - paragraph [ref=f40e1438]: Posted 8 years ago
+                    - paragraph [ref=f40e1440]: · 85th in this Competition
+                - generic [ref=f40e1442]:
+                  - generic [ref=f40e1443]:
+                    - button "Upvote" [ref=f40e1444] [cursor=pointer]:
+                      - generic [ref=f40e1445]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1446] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1447] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e1451]: Congratulations to your team and thanks for sharing your solutions.
+                - button "Reply" [ref=f40e1453] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1454]: reply
+                - generic [ref=f40e1461]:
+                  - link "Maxwell's profile" [ref=f40e1462] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e1463]
+                  - generic [ref=f40e1469]:
+                    - generic [ref=f40e1470]:
+                      - link [ref=f40e1471] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e1472]
+                      - paragraph [ref=f40e1475]: Topic Author
+                    - generic [ref=f40e1476]:
+                      - paragraph [ref=f40e1477]: Posted 8 years ago
+                      - paragraph [ref=f40e1479]: · 2nd in this Competition
+                  - generic [ref=f40e1481]:
+                    - generic [ref=f40e1482]:
+                      - button "Upvote" [ref=f40e1483] [cursor=pointer]:
+                        - generic [ref=f40e1484]: arrow_drop_up
+                      - button "1 votes" [ref=f40e1485] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f40e1486] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e1490]:
+                    - text: Thanks
+                    - link "@YaGana (opens in a new tab)" [ref=f40e1491] [cursor=pointer]:
+                      - /url: /YaGana
+                      - text: "@YaGana"
+                    - text: and congrats your medal.
+                  - button "Reply" [ref=f40e1493] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e1494]: reply
+              - separator [ref=f40e1496]
+            - generic [ref=f40e1497]:
+              - generic [ref=f40e1501]:
+                - link "zr's profile" [ref=f40e1502] [cursor=pointer]:
+                  - /url: /mzr2017
+                  - generic "zr" [ref=f40e1503]
+                - generic [ref=f40e1509]:
+                  - link [ref=f40e1511] [cursor=pointer]:
+                    - /url: /mzr2017
+                    - heading "zr" [level=3] [ref=f40e1512]
+                  - generic [ref=f40e1513]:
+                    - paragraph [ref=f40e1514]: Posted 8 years ago
+                    - paragraph [ref=f40e1516]: · 12th in this Competition
+                - generic [ref=f40e1518]:
+                  - generic [ref=f40e1519]:
+                    - button "Upvote" [ref=f40e1520] [cursor=pointer]:
+                      - generic [ref=f40e1521]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1522] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1523] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e1527]: Congrats, amazing work!
+                - button "Reply" [ref=f40e1529] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1530]: reply
+                - generic [ref=f40e1537]:
+                  - link "Maxwell's profile" [ref=f40e1538] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e1539]
+                  - generic [ref=f40e1545]:
+                    - generic [ref=f40e1546]:
+                      - link [ref=f40e1547] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e1548]
+                      - paragraph [ref=f40e1551]: Topic Author
+                    - generic [ref=f40e1552]:
+                      - paragraph [ref=f40e1553]: Posted 8 years ago
+                      - paragraph [ref=f40e1555]: · 2nd in this Competition
+                  - generic [ref=f40e1557]:
+                    - generic [ref=f40e1558]:
+                      - button "Upvote" [ref=f40e1559] [cursor=pointer]:
+                        - generic [ref=f40e1560]: arrow_drop_up
+                      - button "0 votes" [ref=f40e1561] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f40e1562] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e1566]:
+                    - text: Thanks
+                    - link "@zr (opens in a new tab)" [ref=f40e1567] [cursor=pointer]:
+                      - /url: /zr
+                      - text: "@zr"
+                    - text: "! Congrats for your 12th place !"
+                  - button "Reply" [ref=f40e1569] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e1570]: reply
+              - separator [ref=f40e1572]
+            - generic [ref=f40e1573]:
+              - generic [ref=f40e1577]:
+                - link "Md. Manjurul Hussain Shourov's profile" [ref=f40e1578] [cursor=pointer]:
+                  - /url: /mmhs013
+                  - generic "Md. Manjurul Hussain Shourov" [ref=f40e1579]
+                - generic [ref=f40e1585]:
+                  - link [ref=f40e1587] [cursor=pointer]:
+                    - /url: /mmhs013
+                    - heading "Md. Manjurul Hussain Shourov" [level=3] [ref=f40e1588]
+                  - paragraph [ref=f40e1590]: Posted 8 years ago
+                - generic [ref=f40e1592]:
+                  - generic [ref=f40e1593]:
+                    - button "Upvote" [ref=f40e1594] [cursor=pointer]:
+                      - generic [ref=f40e1595]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1596] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1597] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e1601]: Excellent work!!! Congrats!
+                - button "Reply" [ref=f40e1603] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1604]: reply
+                - generic [ref=f40e1611]:
+                  - link "Maxwell's profile" [ref=f40e1612] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e1613]
+                  - generic [ref=f40e1619]:
+                    - generic [ref=f40e1620]:
+                      - link [ref=f40e1621] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e1622]
+                      - paragraph [ref=f40e1625]: Topic Author
+                    - generic [ref=f40e1626]:
+                      - paragraph [ref=f40e1627]: Posted 8 years ago
+                      - paragraph [ref=f40e1629]: · 2nd in this Competition
+                  - generic [ref=f40e1631]:
+                    - generic [ref=f40e1632]:
+                      - button "Upvote" [ref=f40e1633] [cursor=pointer]:
+                        - generic [ref=f40e1634]: arrow_drop_up
+                      - button "1 votes" [ref=f40e1635] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f40e1636] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e1640]:
+                    - text: Thanks
+                    - link "@Shourov (opens in a new tab)" [ref=f40e1641] [cursor=pointer]:
+                      - /url: /Shourov
+                      - text: "@Shourov"
+                    - text: "!"
+                  - button "Reply" [ref=f40e1643] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e1644]: reply
+              - separator [ref=f40e1646]
+            - generic [ref=f40e1647]:
+              - generic [ref=f40e1651]:
+                - link "senkin13's profile" [ref=f40e1652] [cursor=pointer]:
+                  - /url: /senkin13
+                  - generic "senkin13" [ref=f40e1653]
+                - generic [ref=f40e1659]:
+                  - link [ref=f40e1661] [cursor=pointer]:
+                    - /url: /senkin13
+                    - heading "senkin13" [level=3] [ref=f40e1662]
+                  - generic [ref=f40e1663]:
+                    - paragraph [ref=f40e1664]: Posted 8 years ago
+                    - paragraph [ref=f40e1666]: · 8th in this Competition
+                - generic [ref=f40e1668]:
+                  - generic [ref=f40e1669]:
+                    - button "Upvote" [ref=f40e1670] [cursor=pointer]:
+                      - generic [ref=f40e1671]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1672] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1673] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e1677]: Congrats!Impressive team management.
+                - button "Reply" [ref=f40e1679] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1680]: reply
+                - generic [ref=f40e1687]:
+                  - link "Maxwell's profile" [ref=f40e1688] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e1689]
+                  - generic [ref=f40e1695]:
+                    - generic [ref=f40e1696]:
+                      - link [ref=f40e1697] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e1698]
+                      - paragraph [ref=f40e1701]: Topic Author
+                    - generic [ref=f40e1702]:
+                      - paragraph [ref=f40e1703]: Posted 8 years ago
+                      - paragraph [ref=f40e1705]: · 2nd in this Competition
+                  - generic [ref=f40e1707]:
+                    - generic [ref=f40e1708]:
+                      - button "Upvote" [ref=f40e1709] [cursor=pointer]:
+                        - generic [ref=f40e1710]: arrow_drop_up
+                      - button "0 votes" [ref=f40e1711] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f40e1712] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e1716]:
+                    - text: Thanks
+                    - link "@senkin13 (opens in a new tab)" [ref=f40e1717] [cursor=pointer]:
+                      - /url: /senkin13
+                      - text: "@senkin13"
+                    - text: "! and congrats your 8th position!"
+                  - button "Reply" [ref=f40e1719] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e1720]: reply
+              - separator [ref=f40e1722]
+            - generic [ref=f40e1723]:
+              - generic [ref=f40e1727]:
+                - link "Souvik Banerjee's profile" [ref=f40e1728] [cursor=pointer]:
+                  - /url: /souvikb07
+                  - generic "Souvik Banerjee" [ref=f40e1729]
+                - generic [ref=f40e1735]:
+                  - link [ref=f40e1737] [cursor=pointer]:
+                    - /url: /souvikb07
+                    - heading "Souvik Banerjee" [level=3] [ref=f40e1738]
+                  - paragraph [ref=f40e1740]: Posted 8 years ago
+                - generic [ref=f40e1742]:
+                  - generic [ref=f40e1743]:
+                    - button "Upvote" [ref=f40e1744] [cursor=pointer]:
+                      - generic [ref=f40e1745]: arrow_drop_up
+                    - button "1 votes" [ref=f40e1746] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f40e1747] [cursor=pointer]: more_vert
+                - paragraph [ref=f40e1751]: Nice.
+                - button "Reply" [ref=f40e1753] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f40e1754]: reply
+                - generic [ref=f40e1761]:
+                  - link "Maxwell's profile" [ref=f40e1762] [cursor=pointer]:
+                    - /url: /maxwell110
+                    - generic "Maxwell" [ref=f40e1763]
+                  - generic [ref=f40e1769]:
+                    - generic [ref=f40e1770]:
+                      - link [ref=f40e1771] [cursor=pointer]:
+                        - /url: /maxwell110
+                        - heading "Maxwell" [level=3] [ref=f40e1772]
+                      - paragraph [ref=f40e1775]: Topic Author
+                    - generic [ref=f40e1776]:
+                      - paragraph [ref=f40e1777]: Posted 8 years ago
+                      - paragraph [ref=f40e1779]: · 2nd in this Competition
+                  - generic [ref=f40e1781]:
+                    - generic [ref=f40e1782]:
+                      - button "Upvote" [ref=f40e1783] [cursor=pointer]:
+                        - generic [ref=f40e1784]: arrow_drop_up
+                      - button "0 votes" [ref=f40e1785] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f40e1786] [cursor=pointer]: more_vert
+                  - paragraph [ref=f40e1790]:
+                    - link "@Banerjee (opens in a new tab)" [ref=f40e1791] [cursor=pointer]:
+                      - /url: /Banerjee
+                      - text: "@Banerjee"
+                    - text: Thank you!
+                  - button "Reply" [ref=f40e1793] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f40e1794]: reply
+              - separator [ref=f40e1796]
+            - generic [ref=f40e1797]:
+              - paragraph [ref=f40e1803]: This comment has been deleted.
+              - separator [ref=f40e1804]
+            - paragraph [ref=f40e1811]: This comment has been deleted.
+  - alert [ref=f40e1814]

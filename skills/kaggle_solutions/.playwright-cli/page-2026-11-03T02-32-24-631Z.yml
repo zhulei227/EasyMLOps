@@ -1,0 +1,375 @@
+- generic [ref=f30e2]:
+  - navigation "Main Kaggle page navigation" [ref=f30e3]:
+    - generic [ref=f30e5]:
+      - button "Navigation menu" [ref=f30e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f30e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f30e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f30e12] [cursor=pointer]:
+      - paragraph [ref=f30e18]: Create
+    - generic [ref=f30e21]:
+      - list [ref=f30e22]:
+        - listitem "Home List Item" [ref=f30e23]:
+          - link "Home" [ref=f30e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f30e31]: Home
+        - listitem "Competitions List Item" [ref=f30e32]:
+          - link "Competitions" [ref=f30e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f30e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f30e41]:
+          - link "Benchmarks" [ref=f30e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f30e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f30e50]:
+          - link "Arenas" [ref=f30e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f30e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f30e59]:
+          - link "Game Arena" [ref=f30e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f30e67]: Game Arena
+      - list [ref=f30e68]:
+        - listitem "Data Hub List Item" [ref=f30e69]:
+          - generic [ref=f30e70]:
+            - link "Data Hub" [ref=f30e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f30e77]: Data Hub
+            - button "Expand" [ref=f30e80] [cursor=pointer]
+      - list [ref=f30e82]:
+        - listitem "More on Kaggle List Item" [ref=f30e83]:
+          - generic [ref=f30e84]:
+            - link "More on Kaggle" [ref=f30e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f30e91]: More
+            - button "Expand" [ref=f30e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f30e97]:
+    - generic [ref=f30e98]:
+      - generic [ref=f30e102]:
+        - textbox "Search" [ref=f30e104]
+        - group [aria-hidden]
+      - generic [ref=f30e106]:
+        - link [ref=f30e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Findoor-location-navigation%2Fdiscussion%2F240197
+          - button "Login" [ref=f30e108]
+        - link [ref=f30e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Findoor-location-navigation%2Fdiscussion%2F240197
+          - button "Sign Up" [ref=f30e111]
+  - main [ref=f30e113]:
+    - generic [ref=f30e115]:
+      - generic [ref=f30e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f30e117]:
+        - link "Learn more" [ref=f30e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f30e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f30e123]:
+      - generic [ref=f30e125]:
+        - generic [ref=f30e126]:
+          - link "Microsoft Research's profile" [ref=f30e127] [cursor=pointer]:
+            - /url: /organizations/microsoft-research
+            - generic "Microsoft Research" [ref=f30e128]
+          - generic [ref=f30e132]:
+            - generic [ref=f30e133]: Microsoft Research
+            - generic [ref=f30e135]: · Research Prediction Competition · 5 years ago
+          - generic [ref=f30e136]:
+            - button "Late Submission" [disabled] [ref=f30e138]
+            - button "Competition options menu collapsed" [ref=f30e141] [cursor=pointer]: more_horiz
+        - generic [ref=f30e143]:
+          - heading "Indoor Location & Navigation" [level=1] [ref=f30e144]
+          - paragraph [ref=f30e146]: Identify the position of a smartphone in a shopping mall
+      - generic [ref=f30e150]:
+        - tablist [ref=f30e157]:
+          - tab "Overview, 1 of 7" [ref=f30e158] [cursor=pointer]:
+            - generic [ref=f30e159]: Overview
+          - tab "Data, 2 of 7" [ref=f30e160] [cursor=pointer]:
+            - generic [ref=f30e161]: Data
+          - tab "Code, 3 of 7" [ref=f30e162] [cursor=pointer]:
+            - generic [ref=f30e163]: Code
+          - tab "Models, 4 of 7" [ref=f30e164] [cursor=pointer]:
+            - generic [ref=f30e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f30e166] [cursor=pointer]:
+            - generic [ref=f30e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f30e168] [cursor=pointer]:
+            - generic [ref=f30e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f30e170] [cursor=pointer]:
+            - generic [ref=f30e171]: Rules
+        - separator [ref=f30e173]
+      - generic [ref=f30e177]:
+        - generic [ref=f30e178]:
+          - generic [ref=f30e179]:
+            - generic [ref=f30e180]:
+              - link "Reza's profile" [ref=f30e181] [cursor=pointer]:
+                - /url: /vaghefi
+                - generic "Reza" [ref=f30e182]
+              - generic [ref=f30e186]:
+                - link "Reza" [ref=f30e187] [cursor=pointer]:
+                  - /url: /vaghefi
+                - text: ·
+                - generic [ref=f30e188]: 2nd in this Competition
+                - text: ·
+                - generic [ref=f30e189]: Posted 5 years ago
+            - generic [ref=f30e190]:
+              - generic [ref=f30e191]:
+                - button "Upvote" [ref=f30e192] [cursor=pointer]:
+                  - generic [ref=f30e193]: arrow_drop_up
+                - button "32 votes" [ref=f30e194] [cursor=pointer]: "32"
+              - button "More Options for this Topic" [ref=f30e195] [cursor=pointer]: more_vert
+            - heading "[Part of] 2nd Place Solution - (Reza)" [level=3] [ref=f30e196]
+            - generic [ref=f30e199]:
+              - paragraph [ref=f30e200]: Thanks for the host for an amazing competition and precious dataset. I have been in localization industry and know how hard it would to collect such a large and valuable dataset.
+              - paragraph [ref=f30e201]:
+                - text: I would like to thank my teammates
+                - link "@mamasinkgs (opens in a new tab)" [ref=f30e202] [cursor=pointer]:
+                  - /url: /mamasinkgs
+                  - text: "@mamasinkgs"
+                - text: ","
+                - link "@ymatioun (opens in a new tab)" [ref=f30e203] [cursor=pointer]:
+                  - /url: /ymatioun
+                  - text: "@ymatioun"
+                - text: ","
+                - link "@demonen (opens in a new tab)" [ref=f30e204] [cursor=pointer]:
+                  - /url: /demonen
+                  - text: "@demonen"
+                - text: ", and"
+                - link "@rsakata (opens in a new tab)" [ref=f30e205] [cursor=pointer]:
+                  - /url: /rsakata
+                  - text: "@rsakata"
+                - text: . I learned a lot from them.
+              - paragraph [ref=f30e206]:
+                - text: Before I join the team I spent a lot of time working on WiFi only localization and didn't spend much time on sensor data and post processing. I basically used the great public kernels of
+                - link "snap to grid (opens in a new tab)" [ref=f30e207] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/robikscube/indoor-navigation-snap-to-grid-post-processing
+                  - text: snap to grid
+                - text: and
+                - link "cost minimization (opens in a new tab)" [ref=f30e208] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/saitodevel01/indoor-post-processing-by-cost-minimization
+                  - text: cost minimization
+                - text: .
+              - paragraph [ref=f30e209]:
+                - text: Here is the summary of my model which I think would be a winner if only WiFi data was available.
+                - link "@mamasinkgs (opens in a new tab)" [ref=f30e210] [cursor=pointer]:
+                  - /url: /mamasinkgs
+                  - text: "@mamasinkgs"
+                - text: will explain how he did ensembling and amazing optimization for our 2nd place solution.
+              - heading "Model" [level=4] [ref=f30e211]
+              - list [ref=f30e212]:
+                - listitem [ref=f30e213]: Convert RSSI values from log scale to linear scale
+                - listitem [ref=f30e214]: Discard bad RSSI values using last timestamp
+                - listitem [ref=f30e215]: WKNN model (different number of neighbors for floor and x/y predictions)
+                - listitem [ref=f30e216]: Use correlation/Braycurtis dissimilarity instead of Euclidean
+                - listitem [ref=f30e217]: Use Gaussian process regression (GPR) to fill coverage holes
+              - heading "Results" [level=4] [ref=f30e218]
+              - table [ref=f30e219]:
+                - rowgroup [ref=f30e220]:
+                  - row [ref=f30e221]:
+                    - columnheader "Model" [ref=f30e222]
+                    - columnheader "Public" [ref=f30e223]
+                    - columnheader "Private" [ref=f30e224]
+                - rowgroup [ref=f30e225]:
+                  - row [ref=f30e226]:
+                    - cell "WKNN - WiFi Only" [ref=f30e227]
+                    - cell "4.64181" [ref=f30e228]
+                    - cell "4.84857" [ref=f30e229]
+                  - row [ref=f30e230]:
+                    - cell "After Cost Minimization" [ref=f30e231]
+                    - cell "3.41539" [ref=f30e232]
+                    - cell "3.70724" [ref=f30e233]
+                  - row [ref=f30e234]:
+                    - cell "After Snap-to-Grid" [ref=f30e235]
+                    - cell "2.88465" [ref=f30e236]
+                    - cell "3.17900" [ref=f30e237]
+              - heading "Coverage Hole" [level=4] [ref=f30e238]
+              - paragraph [ref=f30e239]: One of the disadvantage of WKNN is its lack of capability for extrapolation. If the test datapoint is outside the region covered by train datapoints, we cannot find proper neighbors to predict the location. There are some sites you can clearly see the coverage holes where you don't have any training WiFi point . This is very common issue in fingerprinting localization (WiFi-based only). One of the approach to deal with this issue is called radio map reconstruction and GPR can based for this purpose. It is interesting that in GPR, your feature and target variables are swapped. We use x,y coordinates as features and RSSI values as a response variable.
+              - paragraph [ref=f30e240]: Below is the number of waypoints in train and test. As you can see, we don't have enough training coverage for the sites at the bottom the table. WKNN would not work very well for those sites.
+              - table [ref=f30e241]:
+                - rowgroup [ref=f30e242]:
+                  - row [ref=f30e243]:
+                    - columnheader "site" [ref=f30e244]
+                    - columnheader "test" [ref=f30e245]
+                    - columnheader "train" [ref=f30e246]
+                    - columnheader "test/train" [ref=f30e247]
+                - rowgroup [ref=f30e248]:
+                  - row [ref=f30e249]:
+                    - cell "5d27075f03f801723c2e360f" [ref=f30e250]
+                    - cell "47" [ref=f30e251]
+                    - cell "7290" [ref=f30e252]
+                    - cell "0.006" [ref=f30e253]
+                  - row [ref=f30e254]:
+                    - cell "5c3c44b80379370013e0fd2b" [ref=f30e255]
+                    - cell "26" [ref=f30e256]
+                    - cell "1697" [ref=f30e257]
+                    - cell "0.015" [ref=f30e258]
+                  - row [ref=f30e259]:
+                    - cell "5d27099f03f801723c32511d" [ref=f30e260]
+                    - cell "49" [ref=f30e261]
+                    - cell "897" [ref=f30e262]
+                    - cell "0.054" [ref=f30e263]
+                  - row [ref=f30e264]:
+                    - cell "5d2709a003f801723c3251bf" [ref=f30e265]
+                    - cell "218" [ref=f30e266]
+                    - cell "1008" [ref=f30e267]
+                    - cell "0.216" [ref=f30e268]
+                  - row [ref=f30e269]:
+                    - cell "." [ref=f30e270]
+                    - cell "." [ref=f30e271]
+                    - cell "." [ref=f30e272]
+                    - cell "." [ref=f30e273]
+                  - row [ref=f30e274]:
+                    - cell "5da138754db8ce0c98bca82f" [ref=f30e275]
+                    - cell "386" [ref=f30e276]
+                    - cell "1430" [ref=f30e277]
+                    - cell "0.269" [ref=f30e278]
+                  - row [ref=f30e279]:
+                    - cell "5d27096c03f801723c31e5e0" [ref=f30e280]
+                    - cell "654" [ref=f30e281]
+                    - cell "1925" [ref=f30e282]
+                    - cell "0.339" [ref=f30e283]
+                  - row [ref=f30e284]:
+                    - cell "5d2709d403f801723c32bd39" [ref=f30e285]
+                    - cell "1223" [ref=f30e286]
+                    - cell "2978" [ref=f30e287]
+                    - cell "0.410" [ref=f30e288]
+              - paragraph [ref=f30e289]:
+                - text: "This figure shows before and after radio reconstruction:"
+                - img "radio"
+              - paragraph [ref=f30e290]: Thanks for reading.
+          - separator [ref=f30e291]
+        - generic [ref=f30e292]:
+          - generic [ref=f30e293]:
+            - paragraph [ref=f30e296]:
+              - paragraph [ref=f30e297]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f30e298] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f30e299]
+          - generic [ref=f30e301]:
+            - generic [ref=f30e302]:
+              - generic [aria-hidden] [ref=f30e303]: comment
+              - heading "6 Comments" [level=2] [ref=f30e305]
+            - generic [ref=f30e308]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f30e309] [cursor=pointer]:
+                - generic [ref=f30e310]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f30e312]:
+            - generic [ref=f30e313]:
+              - generic [ref=f30e317]:
+                - link "mamas's profile" [ref=f30e318] [cursor=pointer]:
+                  - /url: /mamasinkgs
+                  - generic "mamas" [ref=f30e319]
+                - generic [ref=f30e325]:
+                  - link [ref=f30e327] [cursor=pointer]:
+                    - /url: /mamasinkgs
+                    - heading "mamas" [level=3] [ref=f30e328]
+                  - generic [ref=f30e329]:
+                    - paragraph [ref=f30e330]: Posted 5 years ago
+                    - paragraph [ref=f30e332]: · 2nd in this Competition
+                - generic [ref=f30e334]:
+                  - generic [ref=f30e335]:
+                    - button "Upvote" [ref=f30e336] [cursor=pointer]:
+                      - generic [ref=f30e337]: arrow_drop_up
+                    - button "3 votes" [ref=f30e338] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f30e339] [cursor=pointer]: more_vert
+                - paragraph [ref=f30e343]: Thanks Reza, your work is really great and I'm sure your absolute position prediction model is the best in all the participants in this competition.
+                - generic [ref=f30e349]:
+                  - link "Reza's profile" [ref=f30e350] [cursor=pointer]:
+                    - /url: /vaghefi
+                    - generic "Reza" [ref=f30e351]
+                  - generic [ref=f30e357]:
+                    - generic [ref=f30e358]:
+                      - link [ref=f30e359] [cursor=pointer]:
+                        - /url: /vaghefi
+                        - heading "Reza" [level=3] [ref=f30e360]
+                      - paragraph [ref=f30e363]: Topic Author
+                    - generic [ref=f30e364]:
+                      - paragraph [ref=f30e365]: Posted 5 years ago
+                      - paragraph [ref=f30e367]: · 2nd in this Competition
+                  - generic [ref=f30e369]:
+                    - generic [ref=f30e370]:
+                      - button "Upvote" [ref=f30e371] [cursor=pointer]:
+                        - generic [ref=f30e372]: arrow_drop_up
+                      - button "1 votes" [ref=f30e373] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f30e374] [cursor=pointer]: more_vert
+                  - paragraph [ref=f30e378]: Thanks mamas, it was a pleasure working with you, congrats again on becoming GM, well deserved.
+              - separator [ref=f30e379]
+            - generic [ref=f30e380]:
+              - generic [ref=f30e384]:
+                - link "Rob Mulla's profile" [ref=f30e385] [cursor=pointer]:
+                  - /url: /robikscube
+                  - generic "Rob Mulla" [ref=f30e386]
+                - generic [ref=f30e392]:
+                  - link [ref=f30e394] [cursor=pointer]:
+                    - /url: /robikscube
+                    - heading "Rob Mulla" [level=3] [ref=f30e395]
+                  - generic [ref=f30e396]:
+                    - paragraph [ref=f30e397]: Posted 5 years ago
+                    - paragraph [ref=f30e399]: · 73rd in this Competition
+                - generic [ref=f30e401]:
+                  - generic [ref=f30e402]:
+                    - button "Upvote" [ref=f30e403] [cursor=pointer]:
+                      - generic [ref=f30e404]: arrow_drop_up
+                    - button "1 votes" [ref=f30e405] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f30e406] [cursor=pointer]: more_vert
+                - paragraph [ref=f30e410]: Outstanding. Honored to have my notebook mentioned in your solution. Extremely strong WIFI model and smart idea converting RSSI from log to linear scale.
+              - separator [ref=f30e411]
+            - generic [ref=f30e416]:
+              - link "Jiwei Liu's profile" [ref=f30e417] [cursor=pointer]:
+                - /url: /jiweiliu
+                - generic "Jiwei Liu" [ref=f30e418]
+              - generic [ref=f30e424]:
+                - link [ref=f30e426] [cursor=pointer]:
+                  - /url: /jiweiliu
+                  - heading "Jiwei Liu" [level=3] [ref=f30e427]
+                - generic [ref=f30e428]:
+                  - paragraph [ref=f30e429]: Posted 5 years ago
+                  - paragraph [ref=f30e431]: · 10th in this Competition
+              - generic [ref=f30e433]:
+                - generic [ref=f30e434]:
+                  - button "Upvote" [ref=f30e435] [cursor=pointer]:
+                    - generic [ref=f30e436]: arrow_drop_up
+                  - button "1 votes" [ref=f30e437] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f30e438] [cursor=pointer]: more_vert
+              - paragraph [ref=f30e442]: WOW, your wifi model is amazing. much better than mine. Please let me know if you'll share the code. Congratulations on winning the 2nd place!
+              - generic [ref=f30e443]:
+                - generic [ref=f30e448]:
+                  - link "Reza's profile" [ref=f30e449] [cursor=pointer]:
+                    - /url: /vaghefi
+                    - generic "Reza" [ref=f30e450]
+                  - generic [ref=f30e456]:
+                    - generic [ref=f30e457]:
+                      - link [ref=f30e458] [cursor=pointer]:
+                        - /url: /vaghefi
+                        - heading "Reza" [level=3] [ref=f30e459]
+                      - paragraph [ref=f30e462]: Topic Author
+                    - generic [ref=f30e463]:
+                      - paragraph [ref=f30e464]: Posted 5 years ago
+                      - paragraph [ref=f30e466]: · 2nd in this Competition
+                  - generic [ref=f30e468]:
+                    - generic [ref=f30e469]:
+                      - button "Upvote" [ref=f30e470] [cursor=pointer]:
+                        - generic [ref=f30e471]: arrow_drop_up
+                      - button "3 votes" [ref=f30e472] [cursor=pointer]: "3"
+                    - button "More Options for this Comment" [ref=f30e473] [cursor=pointer]: more_vert
+                  - paragraph [ref=f30e477]: Thanks, I share after some cleanup
+                - generic [ref=f30e482]:
+                  - link "Hugues's profile" [ref=f30e483] [cursor=pointer]:
+                    - /url: /seuguh
+                    - generic "Hugues" [ref=f30e484]
+                  - generic [ref=f30e490]:
+                    - link [ref=f30e492] [cursor=pointer]:
+                      - /url: /seuguh
+                      - heading "Hugues" [level=3] [ref=f30e493]
+                    - generic [ref=f30e494]:
+                      - paragraph [ref=f30e495]: Posted 5 years ago
+                      - paragraph [ref=f30e497]: · 12th in this Competition
+                  - generic [ref=f30e499]:
+                    - generic [ref=f30e500]:
+                      - button "Upvote" [ref=f30e501] [cursor=pointer]:
+                        - generic [ref=f30e502]: arrow_drop_up
+                      - button "0 votes" [ref=f30e503] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f30e504] [cursor=pointer]: more_vert
+                  - paragraph [ref=f30e508]: Congratulations on winning the 2nd place. I'm very interested in your wifi model also. This looks very interesting. I wanted to explore GPR but have no experience with it. I'm looking forward to looking at your code!
+  - alert [ref=f30e511]

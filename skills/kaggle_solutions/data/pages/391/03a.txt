@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/alaska2-image-steganalysis/discussion/168870
-fetched: 2026-10-27
-chars: 818
+fetched: 2026-11-03
+chars: 5310
 
 menu
 Skip to
@@ -22,35 +22,124 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Troyes University of Technology · Research Prediction Competition · 6 years ago
-Late Submission
-more_horiz
+3rd place solution — ALASKA2 Image Steganalysis
+3rd place solution
+
 ALASKA2 Image Steganalysis
 
-Detect secret data hidden within digital images
+Solution Writeup · 3rd place
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+Thanks for hosting this interesting, leakage free competition. I learned a lot from this competition. I also thank the other participants. I am very impressed with the unique solutions of the other participants. I will read all posted solutions.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Here is a description of the my solution.
 
-error
+Validation
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I split the file names randomly into 80% and 20% stratifying based on quality factor. Looking at the distribution of predictions for the test set, it seems that the percentage of cover images is relatively high. However, I thought that the AUC based metric is robust to such imbalance data, so I didn't take any special care of it at validation level.
 
-Failed to load the discussion topic
+Methods
 
-error
+I have created an ensemble of two models: one for inputting 3-channel color images and the other for feature engineering and inputting DCT coefficient.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+3-channel color image model (validation score: 0.9382 (RGB), 0.9378 (YUV), 0.9364 (Lab))
+I made 3 models that inputs RGB, YUV, and Lab, respectively.
+I used cv2 for loading and conversion. I also tried to use non-quantized YCrCb directly from DCT coefficient in the beginning, but the accuracy was almost the same as the YUV read with cv2, so I chose to use faster cv2.
+4-class classification
+EfficientNet-b5
+I also tried RegNet, ResNeSt, HRNet, PyConv, and others, but EfficientNet was more accurate for this task than the other models which took a similar amount of time in my implementation.
+Augmentation is Flip & Rotate90 (8 types in total) and CutMix
+I tried to do CutMix with the data in different folder with the same file name, but the accuracy became worse. Did it become too difficult?
+SGD + Cosine Annealing, 50 epoch per cycle
+Hyperparameters are almost identical to the EfficientNet experiment in RegNet paper.
+When I tried b0 and b2, I found that the accuracy of multiple cycles of Cosine Annealing was better than one cycle with the same total number of epochs. Especially, the gain at the second cycle was large. In the end, I ran 4 cycles of 50 epoch.
+DCT coefficient model (validation score: 0.9022)
+
+I thought it would be difficult to make a differentiation in a model that uses RGB, so I attempted to create a network that directly handles the DCT coefficient by trial and error, but this was the only one that worked.
+
+Input features are
+one-hot encoding of the value {<= -16, -15, -14, …, -2, -1, 1, 2, …, 14, 15, 16 <=}
+positional encoding (I'm not sure if it helped)
+quantization matrix / 50
+a matrix such that matrix[i, j] = cos(pi * (i % 8) / 16) * cos(pi * (j % 8) / 16)
+Model architecture is
+EfficientNet-b2
+Change the first stride 2 to 1
+Change dilation of Conv2d to 8. This modification is applied Conv2d layers from the first (patched) stride 2 Conv2d to the next stride 2 Conv2d.
+Augmentation is Flip & Rotate90
+SGD + Cosine Annealing, 50 epoch, 1 cycle
+This model takes a long time to train, so I were not able to do a proper ablation study, but there was a difference of about 0.01 depending on whether the stride was changed or not.
+Ensemble with MLP (validation score: 0.9399, private: 0.930)
+
+Since outputs from the DCT coefficient model is quite different from outputs from 3-channel color image models, mixing it well improves the accuracy, but since it is considerably weaker than 3-channel models as a single model, it doesn't work well when simply averaging it. So I used MLP.
+
+Input the feature maps of DCT Binary, RGB, YUV, Lab after Average Pooling of each network. (There was a mistake, and softmax was applied to each feature maps.)
+To cancel the difference in scale between the networks, we use BatchNorm as follows.
+x = torch.cat([bn(feat.reshape(-1, 1)).reshape(feat.shape) for feat, bn in zip(feats, self.bns)], dim=1)
+
+Holdout stacking with LightGBM to push the last 0.001 (validation score: 0.9405, private: 0.931)
+
+The holdout validation set has 15000 x 4 (Cover and Stegos) x 8 (flip / rotate90) = 4800000 examples, which is large enough to train LightGBM by splitting the holdout set into 5 folds. I used the MLP predictions and the t-SNE of each CNN feature map as features. The hyperparameter is determined by LightGBMTunerCV further splitting the train data in each fold into 80% and 20%.
+
+Author
+KaizaburoChubachi
+
+zaburo
+
+arrow_drop_up
+45
+Share
+more_horiz
+Citation
+
+KaizaburoChubachi. 3rd place solution. https://www.kaggle.com/competitions/alaska2-image-steganalysis/writeups/kaizaburochubachi-3rd-place-solution. 2020. Kaggle
+
+comment
+3 Comments
+1 appreciation comment
+Hotness
+KaizaburoChubachi
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We have published the code! https://github.com/pfnet-research/kaggle-alaska2-3rd-place-solution
+
+reply
+Reply
+Gryffindor
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats @zaburo to you and Thanks for sharing the approach.
+
+reply
+Reply
+Appreciation (1)
+Remek Kinas
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice solution! Thank you for sharing.

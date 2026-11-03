@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/uw-madison-gi-tract-image-segmentation/discussion/337217
-fetched: 2026-10-27
-chars: 821
+fetched: 2026-11-03
+chars: 8664
 
 menu
 Skip to
@@ -22,35 +22,287 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-UW Madison · Research Code Competition · 4 years ago
-Late Submission
-more_horiz
+1st place solution for 2.5d parts — UW-Madison GI Tract Image Segmentation
+1st place solution for 2.5d parts
+
 UW-Madison GI Tract Image Segmentation
 
-Track healthy organs in medical scans to improve cancer treatment
+Solution Writeup · 1st place · Jul 15, 2022
 
-Overview
+2.5D method Overall pipeline
+
+The overall pipeline of our 2.5D solution is divided into two stages: the classification stage and the segmentation stage. The former one is responsible for determining whether there are targets in the image, while the latter one segments the targets in the image. By analyzing the classification stage to control the target segmentation in the image, the classification and segmentation stage are both model-weighted fusion to enhance the robustness of our 2.5D, and the pure 2.5D model can achieve a score of 0.889 on the public leaderboard. The details are presented below ↓
+
 Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+For data production, we refer to @awsaf49 's data production method, set the stride size to 2, and take a total of three to produce 2.5D data. https://www.kaggle.com/code/awsaf49/uwmgi-2-5d-stride-2-data
 
-error
+Traing & test time augmentation
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+We tried 640*640 and 512*512 image resize resolution. where in the case of 640*640 resolution, we used RandomCrop method to randomly crop down the target of 448*448 resolution during training. We also used random flip, elastic transformation, grid distortion and optical distortion, the specific parameters are
 
-Failed to load the discussion topic
+dict(type='RandomFlip', direction='horizental', p=0.5)
+dict(type='ElasticTransform', alpha=120, sigma=6.0, alpha_affine=3.6, p=1)
+dict(type='GridDistortion', p=1)
+dict(type='OpticalDistortion', distort_limit=2, shift_limit=0.5, p=1)
 
-error
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+When it comes to test time, we use horizental flip method to preduce a new image and use weighted fusion to get the output mask. TTA can boost our score for 0.001 ~ 0.002 approximately.
+
+Backbone
+
+The algorithm is based on Unet, the backbone network we tried efficientNet b4 ~ b7, single model can reach about 0.883 on the public leaderboard, and model fusion at submission can reach about 0.889. And for the deep learning framework, we use our teammate @CarnoZhao 's work https://www.kaggle.com/code/carnozhao/uwmgit-mmsegmentation-end-to-end-submission
+
+Training and inference tips & loss function
+
+The classification network is trained for full data, which contains empty pictures as well as images with mask. The segmentation network is only responsible for segmenting the target images, and the segmentation network is trained on full data with mask images only. The classification network is trained with a single BCELoss, and the segmentation network is trained with a BCE and Dice weighted loss function with a 1:3 loss function ratio. Besides, we use fp16 traing method to make our training more faster and it can save about 50% gpu memory, which allowed us to use bigger batch size.
+
+Furture work
+
+When analyzing the data, i found that there exits some margin that contains no useful imformation, i have tried using CenterCrop method to remove those useless margin(maybe useless, i'm not sure), the score have little influence.
+
+def CenterCrop(image, crop_ratio=0.9):
+   '''
+   input numpy type image
+       width
+   h ###################
+   e #                 #
+   i #                 #
+   g #                 #
+   h #                 # 
+   t ###################
+   crop_ratio -> remain ratio
+   return crop_image, xmin, ymin, xmax, ymax, org_size 
+   '''
+   height, width, channel = image.shape
+   xmin, ymin, xmax, ymax = int(width  * (1 - crop_ratio) / 2), \
+                            int(height * (1 - crop_ratio) / 2), \
+                            int(width  * (1 + crop_ratio) / 2), \
+                            int(height * (1 + crop_ratio) / 2)
+   crop_image = image[ymin:ymax, xmin:xmax, ...]
+   extra_info = [height, width, xmin, ymin, xmax, ymax]
+   return crop_image, extra_info
+def PaddingCrop(crop_image, extra_info):
+   '''
+   input crop_image -> the centerCrop image
+   input extra_info -> original image size and Crop size infomation
+   '''
+   crop_shape = np.array(crop_image.shape[:2])
+   height, width, xmin, ymin, xmax, ymax = extra_info
+   pady = [ymin - 1, height - ymax + 1]
+   padx = [xmin - 1, width - xmax + 1]
+   original_image = np.pad(crop_image, [pady, padx, [0, 0]])
+   return original_image
+
+Insights from a year of cv competition on kaggle
+
+Kaggle is a talent-packed data science platform that has taught me many algorithms, techniques, and ways of thinking about problems that I had not been exposed to before. I would like to thank my teammates @namgalielei @cgq081616 @CarnoZhao @shajiayu who supported me immensely during the competition. After this year of competition, I successfully reached the Kaggle Master title. Next stage goal is Kaggle Grand Master (which I don't think I will ever reach).😂
+
+Authors
+shajiayu
+
+shajiayu
+
+WEST-GQ
+
+cgq081616
+
+Manyu Li
+
+manyuli
+
+Carno Zhao
+
+carnozhao
+
+Liam Nguyen
+
+namgalielei
+
+arrow_drop_up
+56
+Share
+more_horiz
+Citation
+
+shajiayu, WEST-GQ, Manyu Li, Carno Zhao, Liam Nguyen. 1st place solution for 2.5d parts. https://www.kaggle.com/competitions/uw-madison-gi-tract-image-segmentation/writeups/nccsm-1st-place-solution-for-2-5d-parts. 2022. Kaggle
+
+comment
+12 Comments
+1 appreciation comment
+Hotness
+Satwik
+
+Posted 4 years ago
+
+· 27th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Pretty amazing results with 2.5D ! I was not able to get past 0.87 with 2.5D . Thanks for sharing , and congratulations on the win!
+
+reply
+Reply
+Irving Kyrie
+
+Posted 4 years ago
+
+· 85th in this Competition
+
+arrow_drop_up
+-1
+more_vert
+
+Congratulations！ Can I ask some questions about your method ? 1.训练的时候resize到比较大的图片，随机Crop。预测的时候是resize到大的图片，滑动预测窗口输出预测值吗？ 2.上面提到，分类网络使用dice loss。分类网络是像素点的分类还是整张图片的分类，像素点是否存在分割以及整张图片是否存在分割。分类模型对结果的提升有多大：）。 感谢您的分享，这让我们学习到了很多。
+
+reply
+Reply
+Manyu Li
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+The inference phase only resize image to the maximum size.
+The classfication model will judge whether there exit organs, if so, this image will send to the segmentation phase.
+reply
+Reply
+Anton Semenistyy
+
+Posted 4 years ago
+
+· 629th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, @manyuli ! Thanks for providing detailed overview of your solution. I have one question about generating 2.5D data. What mask do you use for corresponding 2.5D image? In public kernel https://www.kaggle.com/code/awsaf49/uwmgi-2-5d-stride-2-data the mask of first slice is used as final mask. But there can be cases when there're non-empty masks for second or third slices. And if we use mask of first slice, then we have some incorrect labels. How do you solve this problem?
+
+reply
+Reply
+coolz
+
+Posted 4 years ago
+
+· 19th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations! My single 2.5D data model can get 0.885 public lb, and simply average with 4 weights get 0.889 . But not that good for private lb.
+
+reply
+Reply
+豆柴金鯱
+
+Posted 4 years ago
+
+· 109th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hello, @manyuli congrats! Could you clarify the loss ratio between BCELoss & DiceLoss? Why is BCELoss = 1, DiceLoss=3? During my training, my dice loss is about 10x larger than that of BCELoss.
+
+reply
+Reply
+Manyu Li
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+BCELoss focuses more on pixel classification accuracy, and DiceLoss focuses more on the dice value between the predicted mask and the ground-truth. The purpose of setting the loss function ratio to 1:3 is to lead the model learn features that are more like the ground-truth without forgetting the accuracy of pixel classification.
+
+reply
+Reply
+Bilal Suppal
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+The information provided is so clear and easy to understand, Awesome post :) Looking forward to see more !!! let's grow together
+
+reply
+Reply
+shajiayu
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+2.5D method： public leaderboard 0.889 private leaderboard 0.882
+
+reply
+Reply
+Arunim Basak
+
+Posted 4 years ago
+
+· 961st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thankyou for sharing your approach for this competition. Congratulations on the win as well.🤩
+
+reply
+Reply
+Awsaf
+
+Posted 4 years ago
+
+· 841st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations
+
+reply
+Reply
+Appreciation (1)
+Hasna
+
+Posted 4 years ago
+
+· 415th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing and congratulations!

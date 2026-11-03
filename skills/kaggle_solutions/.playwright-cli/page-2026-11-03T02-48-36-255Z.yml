@@ -1,0 +1,704 @@
+- generic [ref=f62e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f62e3]:
+    - generic [ref=f62e5]:
+      - button "Navigation menu" [ref=f62e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f62e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f62e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f62e14]:
+      - link [ref=f62e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Foutbrain-click-prediction%2Fwriteups%2Fthree-data-points-3rd-place-solution
+        - button "Login" [ref=f62e16]
+      - link [ref=f62e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Foutbrain-click-prediction%2Fwriteups%2Fthree-data-points-3rd-place-solution
+        - button "Sign Up" [ref=f62e19]
+  - main [ref=f62e21]:
+    - generic [ref=f62e23]:
+      - generic [ref=f62e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f62e25]:
+        - link "Learn more" [ref=f62e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f62e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f62e29]:
+      - generic [ref=f62e31]: 3rd place solution — Outbrain Click Prediction
+      - separator [ref=f62e32]
+      - generic [ref=f62e34]:
+        - generic [ref=f62e35]:
+          - heading "3rd place solution" [level=1] [ref=f62e36]
+          - generic [ref=f62e37]:
+            - link [ref=f62e38] [cursor=pointer]:
+              - /url: /competitions/outbrain-click-prediction
+              - paragraph [ref=f62e40]: Outbrain Click Prediction
+            - paragraph [ref=f62e41]: Solution Writeup · 3rd place · Jan 20, 2017
+        - separator [ref=f62e43]
+        - generic [ref=f62e44]:
+          - generic [ref=f62e46]:
+            - paragraph [ref=f62e47]: Congratulations to code monkey, brain-afk and everyone! And I’d like to thank my teammates carl and Little Boat. I could learn lots of things from them.
+            - paragraph [ref=f62e48]:
+              - text: As
+              - link "Little Boat explained (opens in a new tab)" [ref=f62e49] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/outbrain-click-prediction/forums/t/27897/congrats-and-solution-sharing?forumMessageId=157062#post157062
+                - text: Little Boat explained
+              - text: ", our model is ffm models + xgboost models as first layer, and xgboost as second layer."
+            - paragraph [ref=f62e50]: I would like to explain our first layer models here.
+            - heading [level=2] [ref=f62e51]:
+              - strong [ref=f62e52]: Feature extraction
+            - paragraph [ref=f62e53]: Following is the list of unobvious features we used. We made lots of other features which turned out to be useless. But analyzing large scale user behavior was very interesting to me.
+            - list [ref=f62e54]:
+              - listitem [ref=f62e55]: page view counts of each user.
+              - listitem [ref=f62e56]: page view counts of ad landing page.
+              - listitem [ref=f62e57]: impression counts for each ad_id, landing document_id, campaign_id and advertiser_id.
+              - listitem [ref=f62e58]: landing page confidence vector, where confidence vector is defined as a vector which element is composed of confidence level from documents_*.csv. This feature is used only for ffm as numeric data.
+              - listitem [ref=f62e59]: user confidence vector - this is the average of document confidence vector which is viewed by each user. This feature is used only for ffm as numeric data.
+              - listitem [ref=f62e60]: inner dot product of document confidence vectors of ad impression page and ad landing page .
+              - listitem [ref=f62e61]: inner dot product of user confidence vector and ad landing page document confidence vector
+              - listitem [ref=f62e62]: XGB leaf for ffm feature.
+              - listitem [ref=f62e63]: immediate document viewed after click event.
+            - heading [level=2] [ref=f62e64]:
+              - strong [ref=f62e65]: Modeling and Training
+            - heading [level=3] [ref=f62e66]:
+              - strong [ref=f62e67]: FFM
+            - paragraph [ref=f62e68]:
+              - text: In addition to
+              - link "carl’s light-ffm (opens in a new tab)" [ref=f62e69] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/outbrain-click-prediction/forums/t/27892/introducing-light-ffm-and-stack-nn
+                - text: carl’s light-ffm
+              - text: ", we used another customized libffm which has pair-wise rank and can take sample weight. Best public LB score is 0.6974."
+            - heading [level=3] [ref=f62e70]:
+              - strong [ref=f62e71]: XGB
+            - paragraph [ref=f62e72]: We used xgboost with rank:pairwise objective. Best public LB score is 0.6885.
+            - heading [level=3] [ref=f62e73]:
+              - strong [ref=f62e74]: Leak Row Excluding
+            - paragraph [ref=f62e75]: We trained ffm models without leak row by removing them from training data first, then blend/merge leak information later. This improved single model score.
+            - heading [level=3] [ref=f62e76]:
+              - strong [ref=f62e77]: Present/Future split
+            - paragraph [ref=f62e78]: We split test data into ‘present’ data (in time samples) and ‘future’ data (out time samples), then built models for each data. Here, Features and hyper parameters for each model are optimized independently. For example we used timestamp feature for ‘present’ model, but did not used it for ‘future’ model. And we used sample weight of training data for ‘future’ model to add higher weight to last day than first day.
+            - paragraph [ref=f62e79]: Please feel free to ask any questions.
+          - generic [ref=f62e80]:
+            - generic [ref=f62e81]:
+              - text: Authors
+              - generic [ref=f62e82]:
+                - link "Little Boat's profile" [ref=f62e83] [cursor=pointer]:
+                  - /url: /xiaozhouwang
+                  - generic "Little Boat" [ref=f62e84]
+                - generic [ref=f62e88]:
+                  - link "Little Boat" [ref=f62e89] [cursor=pointer]:
+                    - /url: /xiaozhouwang
+                  - paragraph [ref=f62e90]: xiaozhouwang
+              - generic [ref=f62e91]:
+                - link "Jiwei Liu's profile" [ref=f62e92] [cursor=pointer]:
+                  - /url: /jiweiliu
+                  - generic "Jiwei Liu" [ref=f62e93]
+                - generic [ref=f62e97]:
+                  - link "Jiwei Liu" [ref=f62e98] [cursor=pointer]:
+                    - /url: /jiweiliu
+                  - paragraph [ref=f62e99]: jiweiliu
+              - generic [ref=f62e100]:
+                - link "tito's profile" [ref=f62e101] [cursor=pointer]:
+                  - /url: /its7171
+                  - generic "tito" [ref=f62e102]
+                - generic [ref=f62e106]:
+                  - link "tito" [ref=f62e107] [cursor=pointer]:
+                    - /url: /its7171
+                  - paragraph [ref=f62e108]: its7171
+            - separator [ref=f62e109]
+            - generic [ref=f62e110]:
+              - generic [ref=f62e111]:
+                - button "Upvote" [ref=f62e112] [cursor=pointer]:
+                  - generic [ref=f62e113]: arrow_drop_up
+                - button "21 votes" [ref=f62e114] [cursor=pointer]: "21"
+              - button "Share" [ref=f62e115] [cursor=pointer]
+              - button "Writeup actions" [ref=f62e117] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f62e118]
+        - paragraph [ref=f62e119]: Little Boat, Jiwei Liu, tito. 3rd place solution. https://www.kaggle.com/competitions/outbrain-click-prediction/writeups/three-data-points-3rd-place-solution. 2017. Kaggle
+        - separator [ref=f62e120]
+        - generic [ref=f62e121]:
+          - generic [ref=f62e123]:
+            - generic [ref=f62e124]:
+              - generic [aria-hidden] [ref=f62e125]: comment
+              - heading "17 Comments" [level=2] [ref=f62e127]
+            - generic [ref=f62e130]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f62e131] [cursor=pointer]:
+                - generic [ref=f62e132]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f62e134]:
+            - generic [ref=f62e135]:
+              - generic [ref=f62e139]:
+                - link "Gabriel Moreira's profile" [ref=f62e140] [cursor=pointer]:
+                  - /url: /gspmoreira
+                  - generic "Gabriel Moreira" [ref=f62e141]
+                - generic [ref=f62e147]:
+                  - link [ref=f62e149] [cursor=pointer]:
+                    - /url: /gspmoreira
+                    - heading "Gabriel Moreira" [level=3] [ref=f62e150]
+                  - generic [ref=f62e151]:
+                    - paragraph [ref=f62e152]: Posted 10 years ago
+                    - paragraph [ref=f62e154]: · 19th in this Competition
+                - generic [ref=f62e156]:
+                  - generic [ref=f62e157]:
+                    - button "Upvote" [ref=f62e158] [cursor=pointer]:
+                      - generic [ref=f62e159]: arrow_drop_up
+                    - button "2 votes" [ref=f62e160] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f62e161] [cursor=pointer]: more_vert
+                - generic [ref=f62e164]:
+                  - paragraph [ref=f62e165]:
+                    - text: Good job
+                    - link "@CuteChibiko (opens in a new tab)" [ref=f62e166] [cursor=pointer]:
+                      - /url: /CuteChibiko
+                      - text: "@CuteChibiko"
+                    - text: "- I took a look in your implementation and saw it really deserved a try. I've run today a benchmark using some of my datasets in FFM format comparing standard LibFFM and your fork with custom pairwise rank customization. I just run the models with the same FFM hyperparameters (without tunning for MAP ranking) and weight 1 for all samples. The environment was a Google Compute Engine instance with 32 CPUs, 256 GB RAM and FFM data in a SSD disk."
+                  - paragraph [ref=f62e167]: "1) Dataset with categorical fields and some binned numeric fields Parameters: -l 0.0001 -k 6 -t 20 -r 0.2 -s 28 --auto-stop Rounds: 20"
+                  - paragraph [ref=f62e168]: LibFFM - Cross-validation MAP = 0.65911 LibFFM - Cross-validation MAP + leak = 0.67795 LibFFM - Training time = 291m
+                  - paragraph [ref=f62e169]: LibFFM pairwise - Cross-validation MAP = 0.66040 LibFFM pairwise - Cross-validation MAP + leak = 0.67792 LibFFM pairwise - Training time = 631m
+                  - separator [ref=f62e170]
+                  - paragraph [ref=f62e171]: "2) Dataset with only categorical fields Parameters: -l 0.00002 -k 6 -t 50 -r 0.1 -s 28 --auto-stop"
+                  - paragraph [ref=f62e172]: LibFFM - Training rounds = 13 (auto-stop on validation logloss) LibFFM - Cross-validation MAP = 0.66428 LibFFM - Cross-validation MAP + leak = 0.67859 LibFFM - Training time = 27m
+                  - paragraph [ref=f62e173]: LibFFM - Training rounds = 26 (auto-stop on validation MAP) LibFFM pairwise - Cross-validation MAP = 0.66552 LibFFM pairwise - Cross-validation MAP + leak = 0.67973 LibFFM pairwise - Training time = 211m
+                  - separator [ref=f62e174]
+                  - paragraph [ref=f62e175]: I noticed a diff of around 0.001 in CV MAP by for two datasets. Was this the order of difference you could find in your experiments with your FFM with ranking optimization? Ps. I also noticed a great increase in training logloss (from 0.41009 to 0.56855), but this is expected as the optimization is now driven by MAP and not logloss), right?
+                  - paragraph [ref=f62e176]: I am worried only about accuracy at this time, but I could notice that training time of your implementation is very slow compared to standard FFM, and that during most of the processing it is using only 1 CPU. Is that because you had not time to parallelize MAP evaluation?
+                  - paragraph [ref=f62e177]: Which sample weight strategy have you used? More weight on recent samples / clicked samples / display_ids with more ads?
+                  - paragraph [ref=f62e178]: Thanks again!
+                - button "Reply" [ref=f62e180] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e181]: reply
+              - separator [ref=f62e183]
+            - generic [ref=f62e184]:
+              - generic [ref=f62e188]:
+                - link "tito's profile" [ref=f62e189] [cursor=pointer]:
+                  - /url: /its7171
+                  - generic "tito" [ref=f62e190]
+                - generic [ref=f62e196]:
+                  - generic [ref=f62e197]:
+                    - link [ref=f62e198] [cursor=pointer]:
+                      - /url: /its7171
+                      - heading "tito" [level=3] [ref=f62e199]
+                    - paragraph [ref=f62e202]: Topic Author
+                  - generic [ref=f62e203]:
+                    - paragraph [ref=f62e204]: Posted 10 years ago
+                    - paragraph [ref=f62e206]: · 3rd in this Competition
+                - generic [ref=f62e208]:
+                  - generic [ref=f62e209]:
+                    - button "Upvote" [ref=f62e210] [cursor=pointer]:
+                      - generic [ref=f62e211]: arrow_drop_up
+                    - button "2 votes" [ref=f62e212] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f62e213] [cursor=pointer]: more_vert
+                - generic [ref=f62e216]:
+                  - paragraph [ref=f62e217]:
+                    - link "@Gabriel (opens in a new tab)" [ref=f62e218] [cursor=pointer]:
+                      - /url: /Gabriel
+                      - text: "@Gabriel"
+                    - text: Moreira,
+                  - paragraph [ref=f62e219]:
+                    - text: I uploaded this source code. You can find pairwise rank customization
+                    - link "around here (opens in a new tab)" [ref=f62e220] [cursor=pointer]:
+                      - /url: https://github.com/CuteChibiko/Outbrain-Click-Prediction/blob/master/libffm_pairwise/ffm.cpp#L443
+                      - text: around here
+                    - text: .
+                  - code [ref=f62e222]: "if(param.use_default_train){ # default libffm training } else { # pairwise rank training }"
+                - button "Reply" [ref=f62e224] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e225]: reply
+              - separator [ref=f62e227]
+            - generic [ref=f62e228]:
+              - generic [ref=f62e232]:
+                - link "tito's profile" [ref=f62e233] [cursor=pointer]:
+                  - /url: /its7171
+                  - generic "tito" [ref=f62e234]
+                - generic [ref=f62e240]:
+                  - generic [ref=f62e241]:
+                    - link [ref=f62e242] [cursor=pointer]:
+                      - /url: /its7171
+                      - heading "tito" [level=3] [ref=f62e243]
+                    - paragraph [ref=f62e246]: Topic Author
+                  - generic [ref=f62e247]:
+                    - paragraph [ref=f62e248]: Posted 10 years ago
+                    - paragraph [ref=f62e250]: · 3rd in this Competition
+                - generic [ref=f62e252]:
+                  - generic [ref=f62e253]:
+                    - button "Upvote" [ref=f62e254] [cursor=pointer]:
+                      - generic [ref=f62e255]: arrow_drop_up
+                    - button "2 votes" [ref=f62e256] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f62e257] [cursor=pointer]: more_vert
+                - generic [ref=f62e260]:
+                  - paragraph [ref=f62e261]:
+                    - link "@Sameh (opens in a new tab)" [ref=f62e262] [cursor=pointer]:
+                      - /url: /Sameh
+                      - text: "@Sameh"
+                    - text: Faidi,
+                  - paragraph [ref=f62e263]:
+                    - text: I meant impression count as how many times the ad is shown. Explanation of impression in the context of online advertising can be found
+                    - link "wikipedia (opens in a new tab)" [ref=f62e264] [cursor=pointer]:
+                      - /url: https://en.wikipedia.org/wiki/Impression_(online_media)
+                      - text: wikipedia
+                    - text: .
+                  - paragraph [ref=f62e265]: For example, impression counts for advertiser_id means how many times ads from the advertiser is shown.
+                - button "Reply" [ref=f62e267] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e268]: reply
+              - separator [ref=f62e270]
+            - generic [ref=f62e271]:
+              - generic [ref=f62e275]:
+                - link "tito's profile" [ref=f62e276] [cursor=pointer]:
+                  - /url: /its7171
+                  - generic "tito" [ref=f62e277]
+                - generic [ref=f62e283]:
+                  - generic [ref=f62e284]:
+                    - link [ref=f62e285] [cursor=pointer]:
+                      - /url: /its7171
+                      - heading "tito" [level=3] [ref=f62e286]
+                    - paragraph [ref=f62e289]: Topic Author
+                  - generic [ref=f62e290]:
+                    - paragraph [ref=f62e291]: Posted 10 years ago
+                    - paragraph [ref=f62e293]: · 3rd in this Competition
+                - generic [ref=f62e295]:
+                  - generic [ref=f62e296]:
+                    - button "Upvote" [ref=f62e297] [cursor=pointer]:
+                      - generic [ref=f62e298]: arrow_drop_up
+                    - button "2 votes" [ref=f62e299] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f62e300] [cursor=pointer]: more_vert
+                - generic [ref=f62e303]:
+                  - paragraph [ref=f62e304]: Thank you, Sangzia,
+                  - list [ref=f62e305]:
+                    - listitem [ref=f62e306]:
+                      - text: Page 9 of
+                      - link "this presentation by 3 idiots (opens in a new tab)" [ref=f62e307] [cursor=pointer]:
+                        - /url: http://www.csie.ntu.edu.tw/~r01922136/kaggle-2014-criteo.pdf
+                        - text: this presentation by 3 idiots
+                      - text: is very good explanation of XGB leaf feature.
+                    - listitem [ref=f62e308]: Document confidence vectors are not normalized, but user confidence vectors are normalized.
+                - button "Reply" [ref=f62e310] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e311]: reply
+              - separator [ref=f62e313]
+            - generic [ref=f62e314]:
+              - generic [ref=f62e318]:
+                - link "Gabriel Moreira's profile" [ref=f62e319] [cursor=pointer]:
+                  - /url: /gspmoreira
+                  - generic "Gabriel Moreira" [ref=f62e320]
+                - generic [ref=f62e326]:
+                  - link [ref=f62e328] [cursor=pointer]:
+                    - /url: /gspmoreira
+                    - heading "Gabriel Moreira" [level=3] [ref=f62e329]
+                  - generic [ref=f62e330]:
+                    - paragraph [ref=f62e331]: Posted 10 years ago
+                    - paragraph [ref=f62e333]: · 19th in this Competition
+                - generic [ref=f62e335]:
+                  - generic [ref=f62e336]:
+                    - button "Upvote" [ref=f62e337] [cursor=pointer]:
+                      - generic [ref=f62e338]: arrow_drop_up
+                    - button "1 votes" [ref=f62e339] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f62e340] [cursor=pointer]: more_vert
+                - paragraph [ref=f62e344]:
+                  - text: Great
+                  - link "@CuteChibiko (opens in a new tab)" [ref=f62e345] [cursor=pointer]:
+                    - /url: /CuteChibiko
+                    - text: "@CuteChibiko"
+                  - text: "! Thanks for sharing!"
+                - button "Reply" [ref=f62e347] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e348]: reply
+              - separator [ref=f62e350]
+            - generic [ref=f62e351]:
+              - generic [ref=f62e355]:
+                - link "tito's profile" [ref=f62e356] [cursor=pointer]:
+                  - /url: /its7171
+                  - generic "tito" [ref=f62e357]
+                - generic [ref=f62e363]:
+                  - generic [ref=f62e364]:
+                    - link [ref=f62e365] [cursor=pointer]:
+                      - /url: /its7171
+                      - heading "tito" [level=3] [ref=f62e366]
+                    - paragraph [ref=f62e369]: Topic Author
+                  - generic [ref=f62e370]:
+                    - paragraph [ref=f62e371]: Posted 10 years ago
+                    - paragraph [ref=f62e373]: · 3rd in this Competition
+                - generic [ref=f62e375]:
+                  - generic [ref=f62e376]:
+                    - button "Upvote" [ref=f62e377] [cursor=pointer]:
+                      - generic [ref=f62e378]: arrow_drop_up
+                    - button "1 votes" [ref=f62e379] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f62e380] [cursor=pointer]: more_vert
+                - generic [ref=f62e383]:
+                  - paragraph [ref=f62e384]: Thank you Yuriy Makarov,
+                  - paragraph [ref=f62e385]: Yes, we tried CTR with some impression threshold. If impression threshold was low, CTR caused overfit. And if impression threshold was high, CTR did not contribute to score. So We did not use CTR in the end.
+                  - paragraph [ref=f62e386]: "\"immediate document viewed after click event.\" means the first document that was seen by a user after the user clicked an ad."
+                - button "Reply" [ref=f62e388] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e389]: reply
+              - separator [ref=f62e391]
+            - generic [ref=f62e392]:
+              - generic [ref=f62e396]:
+                - link "tito's profile" [ref=f62e397] [cursor=pointer]:
+                  - /url: /its7171
+                  - generic "tito" [ref=f62e398]
+                - generic [ref=f62e404]:
+                  - generic [ref=f62e405]:
+                    - link [ref=f62e406] [cursor=pointer]:
+                      - /url: /its7171
+                      - heading "tito" [level=3] [ref=f62e407]
+                    - paragraph [ref=f62e410]: Topic Author
+                  - generic [ref=f62e411]:
+                    - paragraph [ref=f62e412]: Posted 10 years ago
+                    - paragraph [ref=f62e414]: · 3rd in this Competition
+                - generic [ref=f62e416]:
+                  - generic [ref=f62e417]:
+                    - button "Upvote" [ref=f62e418] [cursor=pointer]:
+                      - generic [ref=f62e419]: arrow_drop_up
+                    - button "1 votes" [ref=f62e420] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f62e421] [cursor=pointer]: more_vert
+                - generic [ref=f62e424]:
+                  - paragraph [ref=f62e425]:
+                    - link "@Gabriel (opens in a new tab)" [ref=f62e426] [cursor=pointer]:
+                      - /url: /Gabriel
+                      - text: "@Gabriel"
+                    - text: Moreira,
+                  - paragraph [ref=f62e427]: Your CV score drop, from CV=0.679 to 0.670, is very big, so I think something should be happening. I'm not sure why, but maybe you are right. We made XGB models for test and validation respectively, so this may cause the difference.
+                  - paragraph [ref=f62e428]: BTW, our best single score did not improved with GBDT leaves, but it worked for ensemble model.
+                  - paragraph [ref=f62e429]: Our best single CV score without GBDT leaves was 0.69586 and score with GBDT leaves was 0.69588 when we tested GBDT leaves. And weighted average of them scored 0.6971.So even single model score was not improved, GBDT leaves feature was very important.
+                - button "Reply" [ref=f62e431] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e432]: reply
+              - separator [ref=f62e434]
+            - generic [ref=f62e435]:
+              - generic [ref=f62e439]:
+                - link "Gabriel Moreira's profile" [ref=f62e440] [cursor=pointer]:
+                  - /url: /gspmoreira
+                  - generic "Gabriel Moreira" [ref=f62e441]
+                - generic [ref=f62e447]:
+                  - link [ref=f62e449] [cursor=pointer]:
+                    - /url: /gspmoreira
+                    - heading "Gabriel Moreira" [level=3] [ref=f62e450]
+                  - generic [ref=f62e451]:
+                    - paragraph [ref=f62e452]: Posted 10 years ago
+                    - paragraph [ref=f62e454]: · 19th in this Competition
+                - generic [ref=f62e456]:
+                  - generic [ref=f62e457]:
+                    - button "Upvote" [ref=f62e458] [cursor=pointer]:
+                      - generic [ref=f62e459]: arrow_drop_up
+                    - button "1 votes" [ref=f62e460] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f62e461] [cursor=pointer]: more_vert
+                - paragraph [ref=f62e465]:
+                  - link "@CuteChibiko (opens in a new tab)" [ref=f62e466] [cursor=pointer]:
+                    - /url: /CuteChibiko
+                    - text: "@CuteChibiko"
+                  - text: I also tried the 3 idiots approach to add GBDT leaves nodes as features to FFM, but did not succeeded improving the score using standard LibFFM, (actually they made my FFM CV score worse). I tried 30 trees with 64 and 128 leaves, using XGBoost and LightGBM. Do you think my GBDT model may not have being accurate enought (CV=0.670), while my FFM model was (0.679)? Other aspect is that I used a fixed validation set following test set days distribution. So, I trained GBDT on full train set and used the model to predict both the train set and validation set. Maybe that could cause some overfit on FFM model, even with using leaf nodes?
+                - button "Reply" [ref=f62e468] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e469]: reply
+              - separator [ref=f62e471]
+            - generic [ref=f62e472]:
+              - generic [ref=f62e476]:
+                - link "Sameh Faidi's profile" [ref=f62e477] [cursor=pointer]:
+                  - /url: /samehif
+                  - generic "Sameh Faidi" [ref=f62e478]
+                - generic [ref=f62e484]:
+                  - link [ref=f62e486] [cursor=pointer]:
+                    - /url: /samehif
+                    - heading "Sameh Faidi" [level=3] [ref=f62e487]
+                  - generic [ref=f62e488]:
+                    - paragraph [ref=f62e489]: Posted 10 years ago
+                    - paragraph [ref=f62e491]: · 18th in this Competition
+                - generic [ref=f62e493]:
+                  - generic [ref=f62e494]:
+                    - button "Upvote" [ref=f62e495] [cursor=pointer]:
+                      - generic [ref=f62e496]: arrow_drop_up
+                    - button "1 votes" [ref=f62e497] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f62e498] [cursor=pointer]: more_vert
+                - generic [ref=f62e501]:
+                  - paragraph [ref=f62e502]: "\"impression counts for each ad_id, landing document_id, campaign_id and advertiser_id.\""
+                  - paragraph [ref=f62e503]: what do you mean by impression counts?
+                - button "Reply" [ref=f62e505] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e506]: reply
+              - separator [ref=f62e508]
+            - generic [ref=f62e509]:
+              - generic [ref=f62e513]:
+                - link "Sangxia's profile" [ref=f62e514] [cursor=pointer]:
+                  - /url: /sangxia
+                  - generic "Sangxia" [ref=f62e515]
+                - generic [ref=f62e521]:
+                  - link [ref=f62e523] [cursor=pointer]:
+                    - /url: /sangxia
+                    - heading "Sangxia" [level=3] [ref=f62e524]
+                  - generic [ref=f62e525]:
+                    - paragraph [ref=f62e526]: Posted 10 years ago
+                    - paragraph [ref=f62e528]: · 10th in this Competition
+                - generic [ref=f62e530]:
+                  - generic [ref=f62e531]:
+                    - button "Upvote" [ref=f62e532] [cursor=pointer]:
+                      - generic [ref=f62e533]: arrow_drop_up
+                    - button "1 votes" [ref=f62e534] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f62e535] [cursor=pointer]: more_vert
+                - generic [ref=f62e538]:
+                  - paragraph [ref=f62e539]: "I have 2 questions:"
+                  - list [ref=f62e540]:
+                    - listitem [ref=f62e541]: Could you explain what XGB leaf feature is?
+                    - listitem [ref=f62e542]: Do you normalize the confidence vectors for documents?
+                  - paragraph [ref=f62e543]: Thanks and congrats!
+                - button "Reply" [ref=f62e545] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e546]: reply
+              - separator [ref=f62e548]
+            - generic [ref=f62e549]:
+              - generic [ref=f62e553]:
+                - link "nomo's profile" [ref=f62e554] [cursor=pointer]:
+                  - /url: /ecow1338
+                  - generic "nomo" [ref=f62e555]
+                - generic [ref=f62e561]:
+                  - link [ref=f62e563] [cursor=pointer]:
+                    - /url: /ecow1338
+                    - heading "nomo" [level=3] [ref=f62e564]
+                  - generic [ref=f62e565]:
+                    - paragraph [ref=f62e566]: Posted 10 years ago
+                    - paragraph [ref=f62e568]: · 1st in this Competition
+                - generic [ref=f62e570]:
+                  - generic [ref=f62e571]:
+                    - button "Upvote" [ref=f62e572] [cursor=pointer]:
+                      - generic [ref=f62e573]: arrow_drop_up
+                    - button "0 votes" [ref=f62e574] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f62e575] [cursor=pointer]: more_vert
+                - generic [ref=f62e578]:
+                  - paragraph [ref=f62e579]: Thanks for your kindly share@CuteChibiko . It is really impressive and interesting. I have several questoins about gbdt leaf node as feature.
+                  - paragraph [ref=f62e580]: 1). Does the gbdt feature contain label information? like click/ctr. Or if not contain, like impression/pageview count etc.
+                  - paragraph [ref=f62e581]: 2). Does the gbdt training data have overlap with ffm training data, If yes, does it suffer from overfitting at first due to label twice used and do you use some method to avoid overfitting?
+                  - paragraph [ref=f62e582]: 3). Your weighted average with gbdt leaf's gain is large. Have you compared with ffm containing the gbdt's count feature in some transformation like log without gbdt leafnode, or use gbdt and ffm pctr prediction score together feeded into stacking model. I'm curious that the gain is from gbdt leaf node transformation method or the count/statistics feature itself.
+                  - paragraph [ref=f62e583]: 4). Ususallly gbdt training has several hundred or thousand trees, and the cost is large for ffm. How many trees you have used and do you have some hyper-paramter or feature tuning for the less tree numbers?
+                  - paragraph [ref=f62e584]: Thanks a lot.
+                - button "Reply" [ref=f62e586] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e587]: reply
+                - generic [ref=f62e589]:
+                  - generic [ref=f62e594]:
+                    - link "tito's profile" [ref=f62e595] [cursor=pointer]:
+                      - /url: /its7171
+                      - generic "tito" [ref=f62e596]
+                    - generic [ref=f62e602]:
+                      - generic [ref=f62e603]:
+                        - link [ref=f62e604] [cursor=pointer]:
+                          - /url: /its7171
+                          - heading "tito" [level=3] [ref=f62e605]
+                        - paragraph [ref=f62e608]: Topic Author
+                      - generic [ref=f62e609]:
+                        - paragraph [ref=f62e610]: Posted 10 years ago
+                        - paragraph [ref=f62e612]: · 3rd in this Competition
+                    - generic [ref=f62e614]:
+                      - generic [ref=f62e615]:
+                        - button "Upvote" [ref=f62e616] [cursor=pointer]:
+                          - generic [ref=f62e617]: arrow_drop_up
+                        - button "0 votes" [ref=f62e618] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f62e619] [cursor=pointer]: more_vert
+                    - generic [ref=f62e622]:
+                      - paragraph [ref=f62e623]:
+                        - link "@nomo (opens in a new tab)" [ref=f62e624] [cursor=pointer]:
+                          - /url: /nomo
+                          - text: "@nomo"
+                        - text: ","
+                      - paragraph [ref=f62e625]: 1) The gbdt feature dose not contain label information but contains impression/pageview count. This is almost same as what I listed in the first post of this topic.
+                      - paragraph [ref=f62e626]: 2) Yes, it dose. The gbdt training data was same as ffm training data. But it did not suffer from overfitting.
+                      - paragraph [ref=f62e627]: 3) I'm not sure I could understand your question correctly, but we only tried xgb leafnode information itself as feature and did not compared with any variations.
+                      - paragraph [ref=f62e628]: 4) We used ntrees=39 and maxDepth=15. Almost all features and hyper-paramters of this model are the same as values of best xgb single model. But only eta was tuned for this model to reduce ntrees.
+                    - button "Reply" [ref=f62e630] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f62e631]: reply
+                  - generic [ref=f62e637]:
+                    - link "nomo's profile" [ref=f62e638] [cursor=pointer]:
+                      - /url: /ecow1338
+                      - generic "nomo" [ref=f62e639]
+                    - generic [ref=f62e645]:
+                      - link [ref=f62e647] [cursor=pointer]:
+                        - /url: /ecow1338
+                        - heading "nomo" [level=3] [ref=f62e648]
+                      - generic [ref=f62e649]:
+                        - paragraph [ref=f62e650]: Posted 10 years ago
+                        - paragraph [ref=f62e652]: · 1st in this Competition
+                    - generic [ref=f62e654]:
+                      - generic [ref=f62e655]:
+                        - button "Upvote" [ref=f62e656] [cursor=pointer]:
+                          - generic [ref=f62e657]: arrow_drop_up
+                        - button "0 votes" [ref=f62e658] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f62e659] [cursor=pointer]: more_vert
+                    - generic [ref=f62e662]:
+                      - paragraph [ref=f62e663]:
+                        - link "@CuteChibiko (opens in a new tab)" [ref=f62e664] [cursor=pointer]:
+                          - /url: /CuteChibiko
+                          - text: "@CuteChibiko"
+                        - text: thank you very much for your detailed explain. It is interesting:-)
+                      - paragraph [ref=f62e665]: I have also tried split data as present/future for xgb stacking training, but the result is neutral to not split one, and am interested in the different and your success trying reason.
+                      - paragraph [ref=f62e666]: 1). For a.single model ffm / b.single model xgb / c. stacking model, your present/future split has gains on all of these three models or some of these models?
+                      - paragraph [ref=f62e667]: 2). How much gain do your solution has compared with not split modeling? Is it mainly from present part or future part?
+                      - paragraph [ref=f62e668]:
+                        - text: 3). The future model process is interesting. Does the sample weight use exponent decay, like DecayFactor ^ (LastDay -
+                        - strong [ref=f62e669]: SampleDay
+                        - text: ) as sample weight?
+                      - paragraph [ref=f62e670]: 4). I have also used timestamp feature for split modeling present part, but use same hyper-parameter for the present/future part, and the result is neutral. Do your different parameters for these two part influence a lot? Or some other feature or model method also make a difference, like weighted average of present/future split modeling and not split model.
+                      - paragraph [ref=f62e671]: thanks a lot!
+                    - button "Reply" [ref=f62e673] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f62e674]: reply
+                  - generic [ref=f62e680]:
+                    - link "tito's profile" [ref=f62e681] [cursor=pointer]:
+                      - /url: /its7171
+                      - generic "tito" [ref=f62e682]
+                    - generic [ref=f62e688]:
+                      - generic [ref=f62e689]:
+                        - link [ref=f62e690] [cursor=pointer]:
+                          - /url: /its7171
+                          - heading "tito" [level=3] [ref=f62e691]
+                        - paragraph [ref=f62e694]: Topic Author
+                      - generic [ref=f62e695]:
+                        - paragraph [ref=f62e696]: Posted 10 years ago
+                        - paragraph [ref=f62e698]: · 3rd in this Competition
+                    - generic [ref=f62e700]:
+                      - generic [ref=f62e701]:
+                        - button "Upvote" [ref=f62e702] [cursor=pointer]:
+                          - generic [ref=f62e703]: arrow_drop_up
+                        - button "0 votes" [ref=f62e704] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f62e705] [cursor=pointer]: more_vert
+                    - generic [ref=f62e708]:
+                      - paragraph [ref=f62e709]:
+                        - link "@nomo (opens in a new tab)" [ref=f62e710] [cursor=pointer]:
+                          - /url: /nomo
+                          - text: "@nomo"
+                        - text: ","
+                      - paragraph [ref=f62e711]: 1) Splitting data worked for a and b. And It seemed to work for validation data set of stacking model, but LB score decreased. We did not have enough time to find the reason, so we did not use splitting for stacking model.
+                      - paragraph [ref=f62e712]: 2) The single model gain is 0.001 for ffm future model with sample weight, 0.002 for ffm present model with timestamp feature and 0.002 for xgb present model with timestamp.
+                      - paragraph [ref=f62e713]: "3) Exactly. We used this formula:"
+                      - code [ref=f62e715]: sample weight = 1 + 2 * 0.5 ^ ((max_timestamp - timestamp)/86400000.0)
+                      - paragraph [ref=f62e716]: 4) Timestamp feature for present data made big gain without any special method. We used almost same hyper-parameters for split model. Only tuned hyper-parameter is iterations/ntrees.
+                    - button "Reply" [ref=f62e718] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f62e719]: reply
+              - separator [ref=f62e721]
+            - generic [ref=f62e722]:
+              - generic [ref=f62e726]:
+                - link "tito's profile" [ref=f62e727] [cursor=pointer]:
+                  - /url: /its7171
+                  - generic "tito" [ref=f62e728]
+                - generic [ref=f62e734]:
+                  - generic [ref=f62e735]:
+                    - link [ref=f62e736] [cursor=pointer]:
+                      - /url: /its7171
+                      - heading "tito" [level=3] [ref=f62e737]
+                    - paragraph [ref=f62e740]: Topic Author
+                  - generic [ref=f62e741]:
+                    - paragraph [ref=f62e742]: Posted 10 years ago
+                    - paragraph [ref=f62e744]: · 3rd in this Competition
+                - generic [ref=f62e746]:
+                  - generic [ref=f62e747]:
+                    - button "Upvote" [ref=f62e748] [cursor=pointer]:
+                      - generic [ref=f62e749]: arrow_drop_up
+                    - button "0 votes" [ref=f62e750] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f62e751] [cursor=pointer]: more_vert
+                - generic [ref=f62e754]:
+                  - paragraph [ref=f62e755]:
+                    - link "@Gabriel (opens in a new tab)" [ref=f62e756] [cursor=pointer]:
+                      - /url: /Gabriel
+                      - text: "@Gabriel"
+                    - text: Moreira, thank you for your feedback.
+                  - paragraph [ref=f62e757]: The difference was 0.0015 ~ 0.002 for our models. Relatively bigger ETA for LibFFM pairwise made better results.
+                  - paragraph [ref=f62e758]:
+                    - text: You are right. It is using only 1 CPU to calculate validation score. I don't remember why I commented out
+                    - link "here (opens in a new tab)" [ref=f62e759] [cursor=pointer]:
+                      - /url: https://github.com/CuteChibiko/Outbrain-Click-Prediction/blob/master/libffm_pairwise/ffm.cpp#L500
+                      - text: here
+                    - text: and did not use omp. :(
+                  - paragraph [ref=f62e760]: We added higher weights to recent samples for ‘future’ model. This improved 'future' model score about 0.001.
+                - button "Reply" [ref=f62e762] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e763]: reply
+              - separator [ref=f62e765]
+            - generic [ref=f62e766]:
+              - generic [ref=f62e770]:
+                - link "Gabriel Moreira's profile" [ref=f62e771] [cursor=pointer]:
+                  - /url: /gspmoreira
+                  - generic "Gabriel Moreira" [ref=f62e772]
+                - generic [ref=f62e778]:
+                  - link [ref=f62e780] [cursor=pointer]:
+                    - /url: /gspmoreira
+                    - heading "Gabriel Moreira" [level=3] [ref=f62e781]
+                  - generic [ref=f62e782]:
+                    - paragraph [ref=f62e783]: Posted 10 years ago
+                    - paragraph [ref=f62e785]: · 19th in this Competition
+                - generic [ref=f62e787]:
+                  - generic [ref=f62e788]:
+                    - button "Upvote" [ref=f62e789] [cursor=pointer]:
+                      - generic [ref=f62e790]: arrow_drop_up
+                    - button "0 votes" [ref=f62e791] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f62e792] [cursor=pointer]: more_vert
+                - paragraph [ref=f62e796]:
+                  - text: Thanks for sharing
+                  - link "@CuteChibiko (opens in a new tab)" [ref=f62e797] [cursor=pointer]:
+                    - /url: /CuteChibiko
+                    - text: "@CuteChibiko"
+                  - text: "! You've told you used a customized libffm supporting pairwise rank. I am really interested in how the FFM optimization works when using pairwise ranking for libffm…. could you share something about that?"
+                - button "Reply" [ref=f62e799] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f62e800]: reply
+              - separator [ref=f62e802]
+            - paragraph [ref=f62e809]: This comment has been deleted.
+  - alert [ref=f62e812]

@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/kaggle-survey-2022/discussion/375837
-fetched: 2026-10-27
-chars: 824
+fetched: 2026-11-03
+chars: 4165
 
 menu
 Skip to
@@ -41,15 +41,72 @@ Code
 Models
 Discussion
 Rules
+Michal Bogacz · Posted 4 years ago
+arrow_drop_up
+6
+more_vert
+1st place solution approach "behind the scenes" - part III: charts
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Today I will tell you briefly about how I created charts for my notebook, which are the most visible element.
 
-error
+Creating charts is the easiest and the most difficult part at the same time - after all, everyone can create a chart often in many software, but how to make sure that the chart is error-free and interesting at the same time? First of all, the literature was very useful here: I read a lot about the principles of creating charts, different concepts, how different information is perceived by the recipient and other important details. Two items of literature in particular influenced my way of shaping charts: the widely known book Storytelling with Data: A Data Visualization Guide for Business Professionals by Cole Nussbaumer Knaflic and the collection of essays available only in Polish, but for free online Odkrywać! Ujawniać! Objaśniać! Zbiór esejów o sztuce prezentowania danych by prof. Przemyslaw Biecek. While practice is extremely important, it is worth getting acquainted with good theoretical sources. The elements that I took into account when creating the charts were:
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+consistency of charts (preserving the background, font, sizes, colors, shapes and axes naming between not only the elements of one chart, but also between all created charts)
+removing unnecessary elements and adding comments and additional elements at the same time (arrows, shading)
+consistency of the image with the described one (colors, mention in the description about important elements that did not fit on the chart in order to supplement and expand the content)
 
-Failed to load the discussion topic
+As for the tool itself, I used the R language (although I work more in Python on a daily basis) because of the ggplot2 package - in my opinion, it is the best library where we can create great plots using code. The library itself has very wide applications, but most importantly, there are a lot of supplementary libraries where we can create less popular types of visualizations (e.g. dendrogram in my case), so creating all the graphs required loading about 10-15 charts from CRAN and installing one from GitHub. The code itself, although sometimes quite long, is much more readable for me than solutions in other libraries (e.g. in Seabron or Matplotlib), which makes it easier to manage a project with a larger number of different visualizations.
 
-error
+More from "behind the scenes" soon in the next posts. I hope you found the above information useful and/or inspiring. Let me know what you think in the commentary or if you have any suggestions on how you think it's worth working on such problems, share in the comment - I'd love to read it!
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Please sign in to reply to this topic.
+
+comment
+2 Comments
+Hotness
+Sherlock
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice work Micheal!
+
+I'm currently going through your work and have this question: Is there a reason why my visualization charts in R Markdown doesn't render completely?
+
+Visualization not rendering completely.png
+Michal Bogacz
+
+Topic Author
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@emmanuelajoma I think the reason might be the size of chart. Try to change this line of code: options(repr.plot.width = 20.8, repr.plot.height = 15.2)
+
+I'm not fluent in .Rmd files and format so I'm not sure about such prolems.
+
+Sherlock
+
+Posted 4 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Notebooks are saved as .Rmd files as well. Tried with notebooks; same experience: that line of code you suggested didnt make any difference.
+
+However, this helped:
+
+```{r fig.height = 10, fig.width = 5}
+
+your plot code
+
+```
+
+thank you,

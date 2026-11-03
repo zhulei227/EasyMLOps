@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/petfinder-pawpularity-score/discussion/300938
-fetched: 2026-10-27
-chars: 798
+fetched: 2026-11-03
+chars: 8867
 
 menu
 Skip to
@@ -22,35 +22,522 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-PetFinder.my · Research Code Competition · 5 years ago
-Late Submission
-more_horiz
+1st Place - Winning Solution - Placeholder — PetFinder.my - Pawpularity Contest
+1st Place - Winning Solution - Placeholder
+
 PetFinder.my - Pawpularity Contest
 
-Predict the popularity of shelter pet photos
+Solution Writeup · 1st place
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+I'm not home right now (actually in vacations) but wanted to share a macro vision of my solution. I will write in more details tomorrrow.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I basically used three awesome great libraries, PyTorch Image Models(thanks to Ross Wightman), RAPIDS cuml (thanks NVIDIA) and OpenAI CLIP.
 
-error
+The solution is an ensemble of a SVR(tabular data) and image models.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+For the tabular SVR part the features were extracted from pretrained architectures using timm and openai clip libraries, then concatenated the embeddings of multiple pretrained models and fit a cuml SVR on the top of it. The resulting dataset have thousands of columns and only using cuml SVR I was able to fit that dataset in a reasonable amount of time. Better than that I extracted features from most of the models available in timm libraries and used forward model selection to choose the best models to pick for SVR.
+Extracted features SVR CV: 16.92
 
-Failed to load the discussion topic
+The Image part of the solution is an standard image regression approach, fit some Visions transformers and CNN models then ensemble the predictions. My best single model is a beit_large_patch16_224 with CV around 17.38. Image ensemble CV: 17.02
 
-error
+FInal solution is an ensemble of the two approaches. CV: 16.818 / Private LB: 16.8225 (local CV and Private LB are very close, not sure if it is just by luck)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Huge thanks to Kaggle and Petfinder for make it happen. Also congrats to all prize winners, gold, silver and bronze medalists and everyone that enjoyed and contributed to this competition. This is very special to me since its my first solo win in an image competition.
+
+Giba
+
+Author
+Giba
+
+titericz
+
+arrow_drop_up
+274
+Share
+more_horiz
+Citation
+
+Giba. 1st Place - Winning Solution - Placeholder. https://www.kaggle.com/competitions/petfinder-pawpularity-score/writeups/giba-rapids-svr-magic-1st-place-winning-solution-p. 2022. Kaggle
+
+comment
+115 Comments
+6 appreciation comments
+Hotness
+Chris Deotte
+
+Posted 5 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Fantastic solution Giba! I love how you concatenated many model embeddings before training SVR. That's smart. I also like how you used the imagenet pretrained model as is without finetuning. I guess since imagenet photos include animals, the pretraining already provided good features. And the SVR turned these good features into 1st place Cash Gold solution. Congratulations!
+
+reply
+Reply
+Awsaf
+
+Posted 5 years ago
+
+· 1113th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yep, I'm wondering the same thing….
+
+reply
+Reply
+Giba
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thanks @cdeotte. While everyone else was looking to improve cnn and vision transformers, I was looking for ways to improve the SVR "magic" model. In the end, thinking out of the box was the key.
+
+reply
+Reply
+Dieter
+
+Posted 5 years ago
+
+arrow_drop_up
+8
+more_vert
+
+Congratulation Giba. Its inspiring to see someone with more than 50 competition gold medals and who was #1 overall for such a long time stay motivated with kaggling and achieving himself new goals. A solo win in an image competition. 🎉
+
+reply
+Reply
+Allie K.
+
+Posted 5 years ago
+
+· 49th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+It is a pity that you skipped this competition! The results could have been even more interesting.
+
+reply
+Reply
+7 more replies
+arrow_drop_down
+Charlie Craine
+
+Posted 5 years ago
+
+· 93rd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+@titericz congrats. I have to say, it was about a year and a half ago that I read an interview with you which really inspired me to come back to Kaggle and want to compete vs. just being an observer. I signed up eight years ago but did nothing and was inspired by your amazing dedication and becoming a grandmaster. Amazing work! 😊
+
+reply
+Reply
+Giba
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @crained, your story is inspiring as well.
+
+reply
+Reply
+Charlie Craine
+
+Posted 5 years ago
+
+· 93rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@titericz thank you. i'm hoping to have that golden ring very soon! 😊
+
+reply
+Reply
+Software Shop
+
+Posted 5 years ago
+
+arrow_drop_up
+5
+more_vert
+
+Congrats, very good.
+
+reply
+Reply
+CPMP
+
+Posted 5 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Well done Giba, looking forward to more details when you can share! Using CLIP for feature generation is a great idea, I'm sure they have a low correlation with imagenet classification models features.
+
+reply
+Reply
+Giba
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, and thats right, using CLIP helped to improve even model the SVR model due low correlation with imagenet pretrained models.
+
+reply
+Reply
+amar jeet kushwaha
+
+Posted 5 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congrats Giba
+
+reply
+Reply
+tqrahman
+
+Posted 5 years ago
+
+· 2251st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats! gotta check out Vision transformers.
+
+reply
+Reply
+Utkarsh Balooni
+
+Posted 5 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Ma Yuan
+
+Posted 5 years ago
+
+arrow_drop_up
+2
+more_vert
+
+thank you for sharing this information while you're on vacation! I really appreciate that!
+
+reply
+Reply
+RAHUL BAJAJ
+
+Posted 5 years ago
+
+· 191st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @titericz. Wasn't sure why clip was working but I used CLIP embeddings with knn to find similar images which worked quite smoothly.
+
+reply
+Reply
+Robin Smits
+
+Posted 5 years ago
+
+· 62nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @titericz Really Cool solution and looking forward to your full write up :-)
+
+Also very nice to see that your solution is a combination of things. We used Swin, Beit and EfficientNet in an ensemble and had a surprising but very nice result with that.
+
+We also tried SVR but the results didn't seem to come close to what you were able to achieve. So we are very interrested to learn how you were able to achieve that :-) Again congrats.
+
+reply
+Reply
+Giba
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks @rsmits , check my full writeup. Using SVR from combined features extracted directly from imagenet were the key.
+
+reply
+Reply
+Awsaf
+
+Posted 5 years ago
+
+· 1113th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations! @titericz
+
+Did you fine-tune both timm & clip in the pet-finder dataset or direct used imagenet embeddings?
+Could you give a brief idea about forward model selection, perhaps a reference?
+reply
+Reply
+Ioannis M
+
+Posted 5 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+@awsaf49
+
+forward model selection
+
+probably he means the well known as forward OOF selection or hill climbing, see for eg here and nb attached (from cdeotte)
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Trushant Kalyanpur
+
+Posted 5 years ago
+
+· 1380th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @titericz on the solo win! Amazing work and thanks for sharing the solution even on your vacation ! You deserve a break now !
+
+reply
+Reply
+Giba
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @trushk
+
+reply
+Reply
+Michael Awowole
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations
+
+reply
+Reply
+Kimaya Khilare
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!!
+
+reply
+Reply
+Parv Yadav
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats @titericz !😄
+
+reply
+Reply
+W of U
+
+Posted 5 years ago
+
+· 65th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations.
+
+reply
+Reply
+GAURAV PAHWA
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats Buddy
+
+reply
+Reply
+Magiking
+
+Posted 5 years ago
+
+· 2370th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Very impressive result. Thanks for sharing!
+
+reply
+Reply
+Kahan Sheth
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations
+
+reply
+Reply
+SIRisha lakshmi
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Good,Congrats!
+
+reply
+Reply
+PHAM GIA KHAI
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Jedidiah Asare-Nyarko
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply
+heyyou05
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations
+
+reply
+Reply
+Mike Kuklin
+
+Posted 5 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!
+
+reply
+Reply

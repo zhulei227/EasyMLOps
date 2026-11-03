@@ -1,0 +1,785 @@
+- generic [ref=f9e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f9e3]:
+    - generic [ref=f9e5]:
+      - button "Navigation menu" [ref=f9e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f9e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f9e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f9e14]:
+      - link [ref=f9e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fg2net-gravitational-wave-detection%2Fwriteups%2Fkdl-top-1-solution-deep-learning-part
+        - button "Login" [ref=f9e16]
+      - link [ref=f9e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fg2net-gravitational-wave-detection%2Fwriteups%2Fkdl-top-1-solution-deep-learning-part
+        - button "Sign Up" [ref=f9e19]
+  - main [ref=f9e21]:
+    - generic [ref=f9e23]:
+      - generic [ref=f9e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f9e25]:
+        - link "Learn more" [ref=f9e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f9e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f9e29]:
+      - generic [ref=f9e31]: "Top 1 solution: Deep Learning part — G2Net Gravitational Wave Detection"
+      - separator [ref=f9e32]
+      - generic [ref=f9e34]:
+        - generic [ref=f9e35]:
+          - 'heading "Top 1 solution: Deep Learning part" [level=1] [ref=f9e36]'
+          - generic [ref=f9e37]:
+            - link [ref=f9e38] [cursor=pointer]:
+              - /url: /competitions/g2net-gravitational-wave-detection
+              - paragraph [ref=f9e40]: G2Net Gravitational Wave Detection
+            - paragraph [ref=f9e41]: Solution Writeup · 1st place · Oct 2, 2021
+        - separator [ref=f9e43]
+        - generic [ref=f9e44]:
+          - generic [ref=f9e46]:
+            - paragraph [ref=f9e47]:
+              - text: We decided to make two posts to make them more or less focused and concise. DSP part
+              - link "https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275507 (opens in a new tab)" [ref=f9e48] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275507
+                - text: https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275507
+            - heading "Baseline solution, simple Conv1D (0.88 public LB)" [level=2] [ref=f9e49]
+            - paragraph [ref=f9e50]: "At the very beginning we tried different inputs:"
+            - list [ref=f9e51]:
+              - listitem [ref=f9e52]: CQT - could not make it past 0.87
+              - listitem [ref=f9e53]: Spectrograms - with nnAudio, a bit better
+              - listitem [ref=f9e54]: raw signal - much better
+            - paragraph [ref=f9e55]: After applying highpass filter at 20Hz 1D conv on stacked channels input quickly produced good val scores. Also it was much easier to make experiments as training on a single GPU took less than 1 hour. The model was very simple, just a bunch of conv-bn-silu blocks and maxpools. For convolutions we used kernel sizes (by block) 64- > 32 -> 16 -> 8.
+            - paragraph [ref=f9e56]: "At that stage for augmentations we used:"
+            - paragraph [ref=f9e57]: channel shuffle (only Hanford, Livingston) minor time shifts between channels, 5ms
+            - paragraph [ref=f9e58]: This approach gave us 0.877 public LB score with a single 5fold model.
+            - paragraph [ref=f9e59]:
+              - strong [ref=f9e60]: SGD is better than AdamW for Conv1D without synthetic data
+            - paragraph [ref=f9e61]:
+              - text: Even though model capacity was quite low, the model quickly overfitted, usually after 20 epochs, which took around 30 mins. Switching to SGD with weight decay and nesterov momentum improved LB score to
+              - strong [ref=f9e62]: "0.880"
+              - text: . Other Optimizers like AdamW with whatever weight decay, MadGrad gave lower quality.
+            - heading "Improved Conv1D model (0.883 public LB)" [level=2] [ref=f9e63]
+            - paragraph [ref=f9e64]:
+              - text: At that time the generated synthetic dataset was not good enough and we felt that 1D model could be improved. Following the Inception V3 approach we added different kernel sizes in each conv block, the starting block was with 32, 64, 128 kernel sizes. This gave us a boost from 0.88 to 0.881 on the LB. Next step was to try even more kernel sizes as it also made sense from DSP theory. Inception like block with 5 different kernels (16, 32, 64, 128, 256) allowed us to get 0.8823 single model LB score. A small ensemble improved LB score to
+              - strong [ref=f9e65]: "0.883"
+              - text: . Adding more kernel sizes did not improve CV/LB scores.
+            - code [ref=f9e67]: "# Main building block for Conv1D models class ConcatBlockConv5(nn.Module): def __init__(self, in_ch, out_ch, k, act=nn.SiLU): super().__init__() self.c1 = conv_bn_silu_block(in_ch, out_ch, k, act) self.c2 = conv_bn_silu_block(in_ch, out_ch, k * 2, act) self.c3 = conv_bn_silu_block(in_ch, out_ch, k // 2, act) self.c4 = conv_bn_silu_block(in_ch, out_ch, k // 4, act) self.c5 = conv_bn_silu_block(in_ch, out_ch, k * 4, act) self.c6 = conv_bn_silu_block(in_ch * 5 + in_ch, out_ch, 1, act) def forward(self, x): x = torch.cat([self.c1(x), self.c2(x), self.c3(x), self.c4(x), self.c5(x), x], dim=1) x = self.c6(x) return x"
+            - paragraph [ref=f9e68]: Hyperparameters
+            - list [ref=f9e69]:
+              - listitem [ref=f9e70]: "optimizer: SGD, wd=1e-4, nesterov momentum"
+              - listitem [ref=f9e71]: "learning rate: 0.1 with cosine annealing"
+              - listitem [ref=f9e72]: "batch size: 128"
+              - listitem [ref=f9e73]: "epochs: 40"
+              - listitem [ref=f9e74]: "input: 3 channels of raw signal filtered with butterworth filter at 20hz"
+              - listitem [ref=f9e75]: "augmentations: freq masking, time masking, small shifts, channel shuffle"
+            - heading "Using synthetic dataset (0.886 public LB)" [level=2] [ref=f9e76]
+            - paragraph [ref=f9e77]: As soon as Denis found a more or less good approach to signal/noise generation we started experimenting with additional data. Overall we had 2 million noise samples and 1 million pure signal samples. During training positive sample = random noise sample + random signal sample.
+            - paragraph [ref=f9e78]: From these experiments
+            - list [ref=f9e79]:
+              - listitem [ref=f9e80]: mixing synthetic data with the train dataset did not work
+              - listitem [ref=f9e81]: augmentations are actually harmful in this case
+              - listitem [ref=f9e82]: pretraining on synthetic data and fine tuning on the train set works great
+            - paragraph [ref=f9e83]:
+              - text: During pretraining stage for simplicity we used the same amount of samples in epoch as in the train set. Pre-training around 100 epochs and fine tuning 5 folds on the train set gave 8836 on the public LB for the single Conv1d model. As detectors, especially Virgo, have different noise distribution it makes sense to use a separate conv1d encoder for each channel. Split encoders and a linear classifier on top of concatenated features boosted the LB score to
+              - strong [ref=f9e84]: "0.8842"
+              - text: .
+            - paragraph [ref=f9e85]:
+              - text: It is clear that a fully connected layer is not the best fusion approach for the model with separate encoders for each channel. That’s where resnet34 came into play and surprisingly it worked better than other 2D models. We also predicted signal parameters during pretraining (SNR, chirp mass, Q) which also brought minor improvements. Pretraining 200 epochs and fine tuning 5 folds just 1 epoch gives
+              - strong [ref=f9e86]: "0.8858"
+              - text: public LB score. Augmentations during finetuning or pretraining negatively affected CV, so the best models are without any augmentations and trained with AdamW optimizer.
+              - img "model"
+            - paragraph [ref=f9e87]: Input to Resnet34 looked the following way (Handford band)
+            - paragraph [ref=f9e88]:
+              - img "1D features"
+            - heading "Segmentation" [level=2] [ref=f9e89]
+            - paragraph [ref=f9e90]:
+              - text: Binary segmentation using output of Conv1D predicted good masks for strong signals but did not improve recall on weak signals. In general it could be a useful tool to analyse the data, but we did not get any boost on the LB from that.
+              - img "good signal segmentation"
+            - heading "Things that did not work" [level=2] [ref=f9e91]
+            - paragraph [ref=f9e92]: "There were much more experiments that I won't describe (including different frontends, training approaches etc.), but most noticeable are:"
+            - paragraph [ref=f9e93]:
+              - strong [ref=f9e94]: Denoising autoencoder
+            - paragraph [ref=f9e95]: I trained different variants of autoencoders to separate noise and signals which worked great for strong signals but produced poor results on medium to low amplitude signals.
+            - paragraph [ref=f9e96]:
+              - strong [ref=f9e97]: OHEM collapse and reverse labels mystery
+            - paragraph [ref=f9e98]: I tried different versions of hard example mining to improve model performance on hard samples but usually the model collapsed and started predicting the same probability for all samples.
+            - paragraph [ref=f9e99]: "Which led to an interesting experiment:"
+            - list [ref=f9e100]:
+              - listitem [ref=f9e101]: from full OOF predictions select positive samples with low probability and negative with high probability
+              - listitem [ref=f9e102]: train on this subset but validate on proper split
+              - listitem [ref=f9e103]: evaluate using predicted probabilities
+              - listitem [ref=f9e104]: evaluate using reversed predctions (1 - p)
+            - paragraph [ref=f9e105]
+            - paragraph [ref=f9e106]: That result was really confusing and at first we thought that the dataset was mislabeled. Later even with generated synthetic data we had the same problem. It is clear that because of the SNR wall some positive samples can be considered as just noise, but how the model generalized to predict signal from noise samples, that’s what we could not find.
+          - generic [ref=f9e107]:
+            - generic [ref=f9e108]:
+              - text: Authors
+              - generic [ref=f9e109]:
+                - link "Selim Seferbekov's profile" [ref=f9e110] [cursor=pointer]:
+                  - /url: /selimsef
+                  - generic "Selim Seferbekov" [ref=f9e111]
+                - generic [ref=f9e115]:
+                  - link "Selim Seferbekov" [ref=f9e116] [cursor=pointer]:
+                    - /url: /selimsef
+                  - paragraph [ref=f9e117]: selimsef
+              - generic [ref=f9e118]:
+                - link "Denis Kanonik's profile" [ref=f9e119] [cursor=pointer]:
+                  - /url: /denisbsu
+                  - generic "Denis Kanonik" [ref=f9e120]
+                - generic [ref=f9e124]:
+                  - link "Denis Kanonik" [ref=f9e125] [cursor=pointer]:
+                    - /url: /denisbsu
+                  - paragraph [ref=f9e126]: denisbsu
+            - separator [ref=f9e127]
+            - generic [ref=f9e128]:
+              - generic [ref=f9e129]:
+                - button "Upvote" [ref=f9e130] [cursor=pointer]:
+                  - generic [ref=f9e131]: arrow_drop_up
+                - button "131 votes" [ref=f9e132] [cursor=pointer]: "131"
+              - button "Share" [ref=f9e133] [cursor=pointer]
+              - button "Writeup actions" [ref=f9e135] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f9e136]
+        - paragraph [ref=f9e137]: "Selim Seferbekov, Denis Kanonik. Top 1 solution: Deep Learning part. https://www.kaggle.com/competitions/g2net-gravitational-wave-detection/writeups/kdl-top-1-solution-deep-learning-part. 2021. Kaggle"
+        - separator [ref=f9e138]
+        - generic [ref=f9e139]:
+          - generic [ref=f9e141]:
+            - generic [ref=f9e142]:
+              - generic [aria-hidden] [ref=f9e143]: comment
+              - heading "27 Comments" [level=2] [ref=f9e145]
+            - generic [ref=f9e148]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f9e149] [cursor=pointer]:
+                - generic [ref=f9e150]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f9e152]:
+            - generic [ref=f9e153]:
+              - generic [ref=f9e157]:
+                - link "Giba's profile" [ref=f9e158] [cursor=pointer]:
+                  - /url: /titericz
+                  - generic "Giba" [ref=f9e159]
+                - generic [ref=f9e165]:
+                  - link [ref=f9e167] [cursor=pointer]:
+                    - /url: /titericz
+                    - heading "Giba" [level=3] [ref=f9e168]
+                  - generic [ref=f9e169]:
+                    - paragraph [ref=f9e170]: Posted 5 years ago
+                    - paragraph [ref=f9e172]: · 8th in this Competition
+                - generic [ref=f9e174]:
+                  - generic [ref=f9e175]:
+                    - button "Upvote" [ref=f9e176] [cursor=pointer]:
+                      - generic [ref=f9e177]: arrow_drop_up
+                    - button "3 votes" [ref=f9e178] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f9e179] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e183]: Solid approach, congrats. I tried synthetic data but couldn't score better than 0.865. Could you describe how you generated the synthetic data?
+                - button "Reply" [ref=f9e185] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e186]: reply
+                - generic [ref=f9e188]:
+                  - generic [ref=f9e193]:
+                    - link "Selim Seferbekov's profile" [ref=f9e194] [cursor=pointer]:
+                      - /url: /selimsef
+                      - generic "Selim Seferbekov" [ref=f9e195]
+                    - generic [ref=f9e201]:
+                      - generic [ref=f9e202]:
+                        - link [ref=f9e203] [cursor=pointer]:
+                          - /url: /selimsef
+                          - heading "Selim Seferbekov" [level=3] [ref=f9e204]
+                        - paragraph [ref=f9e207]: Topic Author
+                      - generic [ref=f9e208]:
+                        - paragraph [ref=f9e209]: Posted 5 years ago
+                        - paragraph [ref=f9e211]: · 1st in this Competition
+                    - generic [ref=f9e213]:
+                      - generic [ref=f9e214]:
+                        - button "Upvote" [ref=f9e215] [cursor=pointer]:
+                          - generic [ref=f9e216]: arrow_drop_up
+                        - button "3 votes" [ref=f9e217] [cursor=pointer]: "3"
+                      - button "More Options for this Comment" [ref=f9e218] [cursor=pointer]: more_vert
+                    - paragraph [ref=f9e222]:
+                      - text: Yes it is quite tricky to make it work.
+                      - link "@denisbsu (opens in a new tab)" [ref=f9e223] [cursor=pointer]:
+                        - /url: /denisbsu
+                        - text: "@denisbsu"
+                      - text: is writing a separate post on that right now, will be ready soon
+                    - button "Reply" [ref=f9e225] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f9e226]: reply
+                  - generic [ref=f9e228]:
+                    - button "4 more replies" [ref=f9e229] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f9e231]: arrow_drop_down
+                    - generic [ref=f9e232]:
+                      - img "Profile picture for Vincent Wang" [ref=f9e234]
+                      - img "Profile picture for Selim Seferbekov" [ref=f9e236]
+                      - img "Profile picture for Giba" [ref=f9e238]
+                      - img "Profile picture for AmorfEvo" [ref=f9e240]
+              - separator [ref=f9e241]
+            - generic [ref=f9e242]:
+              - generic [ref=f9e246]:
+                - link "ChristopherZerafa's profile" [ref=f9e247] [cursor=pointer]:
+                  - /url: /zerafachris
+                  - generic "ChristopherZerafa" [ref=f9e248]
+                - generic [ref=f9e254]:
+                  - generic [ref=f9e255]:
+                    - link [ref=f9e256] [cursor=pointer]:
+                      - /url: /zerafachris
+                      - heading "ChristopherZerafa" [level=3] [ref=f9e257]
+                    - paragraph [ref=f9e260]: Competition Host
+                  - paragraph [ref=f9e262]: Posted 5 years ago
+                - generic [ref=f9e264]:
+                  - generic [ref=f9e265]:
+                    - button "Upvote" [ref=f9e266] [cursor=pointer]:
+                      - generic [ref=f9e267]: arrow_drop_up
+                    - button "2 votes" [ref=f9e268] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f9e269] [cursor=pointer]: more_vert
+                - generic [ref=f9e272]:
+                  - paragraph [ref=f9e273]: Hey All,
+                  - paragraph [ref=f9e274]:
+                    - text: Thank you all for taking part in our competition. The participation has been overwhelmingly positive. We are currently conducting a survey to gauge the demographic and outreach achieved. Kindly spare 2min and fill in this survey
+                    - link "https://forms.gle/QP9L16niPexozyhu5 (opens in a new tab)" [ref=f9e275] [cursor=pointer]:
+                      - /url: https://forms.gle/QP9L16niPexozyhu5
+                      - text: https://forms.gle/QP9L16niPexozyhu5
+                    - text: .
+                  - paragraph [ref=f9e276]: Thank you all,
+                  - paragraph [ref=f9e277]: Regards, Chris
+                - button "Reply" [ref=f9e279] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e280]: reply
+              - separator [ref=f9e282]
+            - generic [ref=f9e283]:
+              - generic [ref=f9e287]:
+                - link "RabotniKuma's profile" [ref=f9e288] [cursor=pointer]:
+                  - /url: /analokamus
+                  - generic "RabotniKuma" [ref=f9e289]
+                - generic [ref=f9e295]:
+                  - link [ref=f9e297] [cursor=pointer]:
+                    - /url: /analokamus
+                    - heading "RabotniKuma" [level=3] [ref=f9e298]
+                  - generic [ref=f9e299]:
+                    - paragraph [ref=f9e300]: Posted 5 years ago
+                    - paragraph [ref=f9e302]: · 2nd in this Competition
+                - generic [ref=f9e304]:
+                  - generic [ref=f9e305]:
+                    - button "Upvote" [ref=f9e306] [cursor=pointer]:
+                      - generic [ref=f9e307]: arrow_drop_up
+                    - button "2 votes" [ref=f9e308] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f9e309] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e313]: Beautiful solution, congratulations!
+                - button "Reply" [ref=f9e315] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e316]: reply
+              - separator [ref=f9e318]
+            - generic [ref=f9e319]:
+              - generic [ref=f9e323]:
+                - link "hengck23's profile" [ref=f9e324] [cursor=pointer]:
+                  - /url: /hengck23
+                  - generic "hengck23" [ref=f9e325]
+                - generic [ref=f9e331]:
+                  - link [ref=f9e333] [cursor=pointer]:
+                    - /url: /hengck23
+                    - heading "hengck23" [level=3] [ref=f9e334]
+                  - generic [ref=f9e335]:
+                    - paragraph [ref=f9e336]: Posted 5 years ago
+                    - paragraph [ref=f9e338]: · 18th in this Competition
+                - generic [ref=f9e340]:
+                  - generic [ref=f9e341]:
+                    - button "Upvote" [ref=f9e342] [cursor=pointer]:
+                      - generic [ref=f9e343]: arrow_drop_up
+                    - button "2 votes" [ref=f9e344] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f9e345] [cursor=pointer]: more_vert
+                - generic [ref=f9e348]:
+                  - paragraph [ref=f9e349]: thank you for the write-up. it is a brilliant solution.
+                  - paragraph [ref=f9e350]: "\"Input to Resnet34 looked the following way (Handford band)\" How are the features sorted? e.g. by kernel_size (64,32,16,8) or random or by frequency response?"
+                  - paragraph [ref=f9e351]: i think the frequency response is related to the length. that is why you can see the banana shape for the chirp wave in the segmentation diagram?
+                - button "Reply" [ref=f9e353] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e354]: reply
+                - generic [ref=f9e356]:
+                  - generic [ref=f9e361]:
+                    - link "Selim Seferbekov's profile" [ref=f9e362] [cursor=pointer]:
+                      - /url: /selimsef
+                      - generic "Selim Seferbekov" [ref=f9e363]
+                    - generic [ref=f9e369]:
+                      - generic [ref=f9e370]:
+                        - link [ref=f9e371] [cursor=pointer]:
+                          - /url: /selimsef
+                          - heading "Selim Seferbekov" [level=3] [ref=f9e372]
+                        - paragraph [ref=f9e375]: Topic Author
+                      - generic [ref=f9e376]:
+                        - paragraph [ref=f9e377]: Posted 5 years ago
+                        - paragraph [ref=f9e379]: · 1st in this Competition
+                    - generic [ref=f9e381]:
+                      - generic [ref=f9e382]:
+                        - button "Upvote" [ref=f9e383] [cursor=pointer]:
+                          - generic [ref=f9e384]: arrow_drop_up
+                        - button "2 votes" [ref=f9e385] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f9e386] [cursor=pointer]: more_vert
+                    - paragraph [ref=f9e390]: Surprisingly random is working just fine, just hoped that model learned the right represenation needed for classification :) If we add segmentation mask as an additional target then it learns sorting implicitly. For example you can see the effect of notch filter at 300Hz on the segmentation mask in the main post. Also we removed low freq signal part from the masks because signals are attenuated at low frequencies due to filtering. So in general model learns to detect something that is similar to GW, visualisation of logits clear shows that. Unfortunately it doesn't matter for the CV/LB scores. Spectrograms of GW look similar to the masks just with low frquency part.
+                    - button "Reply" [ref=f9e392] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f9e393]: reply
+                  - generic [ref=f9e399]:
+                    - link "hengck23's profile" [ref=f9e400] [cursor=pointer]:
+                      - /url: /hengck23
+                      - generic "hengck23" [ref=f9e401]
+                    - generic [ref=f9e407]:
+                      - link [ref=f9e409] [cursor=pointer]:
+                        - /url: /hengck23
+                        - heading "hengck23" [level=3] [ref=f9e410]
+                      - generic [ref=f9e411]:
+                        - paragraph [ref=f9e412]: Posted 5 years ago
+                        - paragraph [ref=f9e414]: · 18th in this Competition
+                    - generic [ref=f9e416]:
+                      - generic [ref=f9e417]:
+                        - button "Upvote" [ref=f9e418] [cursor=pointer]:
+                          - generic [ref=f9e419]: arrow_drop_up
+                        - button "0 votes" [ref=f9e420] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f9e421] [cursor=pointer]: more_vert
+                    - generic [ref=f9e424]:
+                      - paragraph [ref=f9e425]: "\"Surprisingly random is working just fine,\" \"That’s where resnet34 came into play and surprisingly it worked better than other 2D models\""
+                      - paragraph [ref=f9e426]: so the resnet34 has to enforce some spatial consistency in the stacked response image in its own ways (e.g. 2 nearby 1dcnn encoders should activate at the same location in the stack image). we should see some line-like structure (the banana shape is deformed and dismantled). max pooling on the stacked response image would max it more obvious (different 1d features is activated for different wave)
+                      - paragraph [ref=f9e427]: This is probably a simple convolution 2dCNN is better.
+                      - paragraph [ref=f9e428]: "\"If we add segmentation mask as an additional target then it learns sorting implicitly.\" this is basically a modern-day matched filter. Basically, we can trace out the ridge and recover the wavelet parameters."
+                      - separator [ref=f9e429]
+                      - paragraph [ref=f9e430]: as a side note, I wonder what happens if you use your 1dCNN encoder+2dCNNdecoder on other data. How would the 2d decoder image look like? what if we use it on NLP?
+                    - button "Reply" [ref=f9e432] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f9e433]: reply
+                  - generic [ref=f9e439]:
+                    - link "Selim Seferbekov's profile" [ref=f9e440] [cursor=pointer]:
+                      - /url: /selimsef
+                      - generic "Selim Seferbekov" [ref=f9e441]
+                    - generic [ref=f9e447]:
+                      - generic [ref=f9e448]:
+                        - link [ref=f9e449] [cursor=pointer]:
+                          - /url: /selimsef
+                          - heading "Selim Seferbekov" [level=3] [ref=f9e450]
+                        - paragraph [ref=f9e453]: Topic Author
+                      - generic [ref=f9e454]:
+                        - paragraph [ref=f9e455]: Posted 5 years ago
+                        - paragraph [ref=f9e457]: · 1st in this Competition
+                    - generic [ref=f9e459]:
+                      - generic [ref=f9e460]:
+                        - button "Upvote" [ref=f9e461] [cursor=pointer]:
+                          - generic [ref=f9e462]: arrow_drop_up
+                        - button "1 votes" [ref=f9e463] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f9e464] [cursor=pointer]: more_vert
+                    - generic [ref=f9e467]:
+                      - blockquote [ref=f9e468]:
+                        - paragraph [ref=f9e469]: what if we use it on NLP?
+                      - paragraph [ref=f9e470]: ufortunately last time I seriously worked with NLP data was when GloVe and word2vec + LSTM were state of the art approaches 😄
+                      - blockquote [ref=f9e471]:
+                        - paragraph [ref=f9e472]: How would the 2d decoder image look like?
+                      - paragraph [ref=f9e473]:
+                        - text: Have not done any experiments with UNet here though I doubt that it would bring any improvements to the score. The limit here is how well Conv1D can handle signals with low SNR. While playing with synthetic data we saw a lot of examples when model could properly predict
+                        - code [ref=f9e474]: 1.2* signal + noise
+                        - text: as 1. with high probability and the same
+                        - code [ref=f9e475]: singal + noise
+                        - text: with close to 0 probability. There was a clear threshold (SNR wall) where model could not differentiate GW from noise.
+                    - button "Reply" [ref=f9e477] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f9e478]: reply
+              - separator [ref=f9e480]
+            - generic [ref=f9e481]:
+              - generic [ref=f9e485]:
+                - link "عثمان's profile" [ref=f9e486] [cursor=pointer]:
+                  - /url: /authman
+                  - generic "عثمان" [ref=f9e487]
+                - generic [ref=f9e493]:
+                  - link [ref=f9e495] [cursor=pointer]:
+                    - /url: /authman
+                    - heading "عثمان" [level=3] [ref=f9e496]
+                  - generic [ref=f9e497]:
+                    - paragraph [ref=f9e498]: Posted 5 years ago
+                    - paragraph [ref=f9e500]: · 21st in this Competition
+                - generic [ref=f9e502]:
+                  - generic [ref=f9e503]:
+                    - button "Upvote" [ref=f9e504] [cursor=pointer]:
+                      - generic [ref=f9e505]: arrow_drop_up
+                    - button "2 votes" [ref=f9e506] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f9e507] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e511]: Would love to see you two distill this into a white paper.
+                - button "Reply" [ref=f9e513] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e514]: reply
+                - generic [ref=f9e521]:
+                  - link "Selim Seferbekov's profile" [ref=f9e522] [cursor=pointer]:
+                    - /url: /selimsef
+                    - generic "Selim Seferbekov" [ref=f9e523]
+                  - generic [ref=f9e529]:
+                    - generic [ref=f9e530]:
+                      - link [ref=f9e531] [cursor=pointer]:
+                        - /url: /selimsef
+                        - heading "Selim Seferbekov" [level=3] [ref=f9e532]
+                      - paragraph [ref=f9e535]: Topic Author
+                    - generic [ref=f9e536]:
+                      - paragraph [ref=f9e537]: Posted 5 years ago
+                      - paragraph [ref=f9e539]: · 1st in this Competition
+                  - generic [ref=f9e541]:
+                    - generic [ref=f9e542]:
+                      - button "Upvote" [ref=f9e543] [cursor=pointer]:
+                        - generic [ref=f9e544]: arrow_drop_up
+                      - button "1 votes" [ref=f9e545] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f9e546] [cursor=pointer]: more_vert
+                  - paragraph [ref=f9e550]: writing a good paper would take more time than the challenge itself😧
+                  - button "Reply" [ref=f9e552] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f9e553]: reply
+              - separator [ref=f9e555]
+            - generic [ref=f9e556]:
+              - generic [ref=f9e560]:
+                - link "Rinat's profile" [ref=f9e561] [cursor=pointer]:
+                  - /url: /trytolose
+                  - generic "Rinat" [ref=f9e562]
+                - generic [ref=f9e568]:
+                  - link [ref=f9e570] [cursor=pointer]:
+                    - /url: /trytolose
+                    - heading "Rinat" [level=3] [ref=f9e571]
+                  - generic [ref=f9e572]:
+                    - paragraph [ref=f9e573]: Posted 5 years ago
+                    - paragraph [ref=f9e575]: · 29th in this Competition
+                - generic [ref=f9e577]:
+                  - generic [ref=f9e578]:
+                    - button "Upvote" [ref=f9e579] [cursor=pointer]:
+                      - generic [ref=f9e580]: arrow_drop_up
+                    - button "1 votes" [ref=f9e581] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f9e582] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e586]: Brilliant solution! Well done, as always)
+                - button "Reply" [ref=f9e588] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e589]: reply
+              - separator [ref=f9e591]
+            - generic [ref=f9e592]:
+              - generic [ref=f9e596]:
+                - link "CPMP's profile" [ref=f9e597] [cursor=pointer]:
+                  - /url: /cpmpml
+                  - generic "CPMP" [ref=f9e598]
+                - generic [ref=f9e604]:
+                  - link [ref=f9e606] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - heading "CPMP" [level=3] [ref=f9e607]
+                  - generic [ref=f9e608]:
+                    - paragraph [ref=f9e609]: Posted 5 years ago
+                    - paragraph [ref=f9e611]: · 8th in this Competition
+                - generic [ref=f9e613]:
+                  - generic [ref=f9e614]:
+                    - button "Upvote" [ref=f9e615] [cursor=pointer]:
+                      - generic [ref=f9e616]: arrow_drop_up
+                    - button "1 votes" [ref=f9e617] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f9e618] [cursor=pointer]: more_vert
+                - generic [ref=f9e621]:
+                  - paragraph [ref=f9e622]: Very interesting method, congrats!
+                  - paragraph [ref=f9e623]: It is clear that additional data helped but it looks like you could have won without it.
+                - button "Reply" [ref=f9e625] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e626]: reply
+                - generic [ref=f9e633]:
+                  - link "Selim Seferbekov's profile" [ref=f9e634] [cursor=pointer]:
+                    - /url: /selimsef
+                    - generic "Selim Seferbekov" [ref=f9e635]
+                  - generic [ref=f9e641]:
+                    - generic [ref=f9e642]:
+                      - link [ref=f9e643] [cursor=pointer]:
+                        - /url: /selimsef
+                        - heading "Selim Seferbekov" [level=3] [ref=f9e644]
+                      - paragraph [ref=f9e647]: Topic Author
+                    - generic [ref=f9e648]:
+                      - paragraph [ref=f9e649]: Posted 5 years ago
+                      - paragraph [ref=f9e651]: · 1st in this Competition
+                  - generic [ref=f9e653]:
+                    - generic [ref=f9e654]:
+                      - button "Upvote" [ref=f9e655] [cursor=pointer]:
+                        - generic [ref=f9e656]: arrow_drop_up
+                      - button "1 votes" [ref=f9e657] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f9e658] [cursor=pointer]: more_vert
+                  - paragraph [ref=f9e662]: That would be much harder without big ensembles, on the other hand that would push us to experiment more with Conv1D architecture and augmentations.
+                  - button "Reply" [ref=f9e664] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f9e665]: reply
+              - separator [ref=f9e667]
+            - generic [ref=f9e668]:
+              - generic [ref=f9e672]:
+                - link "astroboysanju's profile" [ref=f9e673] [cursor=pointer]:
+                  - /url: /astroboysanju
+                  - generic "astroboysanju" [ref=f9e674]
+                - generic [ref=f9e680]:
+                  - link [ref=f9e682] [cursor=pointer]:
+                    - /url: /astroboysanju
+                    - heading "astroboysanju" [level=3] [ref=f9e683]
+                  - paragraph [ref=f9e685]: Posted 3 years ago
+                - generic [ref=f9e687]:
+                  - generic [ref=f9e688]:
+                    - button "Upvote" [ref=f9e689] [cursor=pointer]:
+                      - generic [ref=f9e690]: arrow_drop_up
+                    - button "0 votes" [ref=f9e691] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f9e692] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e696]:
+                  - text: Hi
+                  - link "@selimsef (opens in a new tab)" [ref=f9e697] [cursor=pointer]:
+                    - /url: /selimsef
+                    - text: "@selimsef"
+                  - text: ", is your whole code of this problem publically available? where one can get your complete solution for this competition ?"
+                - button "Reply" [ref=f9e699] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e700]: reply
+              - separator [ref=f9e702]
+            - generic [ref=f9e703]:
+              - generic [ref=f9e707]:
+                - link "skynet's profile" [ref=f9e708] [cursor=pointer]:
+                  - /url: /patrickmichel
+                  - generic "skynet" [ref=f9e709]
+                - generic [ref=f9e715]:
+                  - link [ref=f9e717] [cursor=pointer]:
+                    - /url: /patrickmichel
+                    - heading "skynet" [level=3] [ref=f9e718]
+                  - paragraph [ref=f9e720]: Posted 5 years ago
+                - generic [ref=f9e722]:
+                  - generic [ref=f9e723]:
+                    - button "Upvote" [ref=f9e724] [cursor=pointer]:
+                      - generic [ref=f9e725]: arrow_drop_up
+                    - button "0 votes" [ref=f9e726] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f9e727] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e731]:
+                  - text: hello, it' there is a github for the solution with the deep learning as there is for DSP part ?
+                  - link "@selimsef (opens in a new tab)" [ref=f9e732] [cursor=pointer]:
+                    - /url: /selimsef
+                    - text: "@selimsef"
+                - button "Reply" [ref=f9e734] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e735]: reply
+                - generic [ref=f9e742]:
+                  - link "Selim Seferbekov's profile" [ref=f9e743] [cursor=pointer]:
+                    - /url: /selimsef
+                    - generic "Selim Seferbekov" [ref=f9e744]
+                  - generic [ref=f9e750]:
+                    - generic [ref=f9e751]:
+                      - link [ref=f9e752] [cursor=pointer]:
+                        - /url: /selimsef
+                        - heading "Selim Seferbekov" [level=3] [ref=f9e753]
+                      - paragraph [ref=f9e756]: Topic Author
+                    - generic [ref=f9e757]:
+                      - paragraph [ref=f9e758]: Posted 5 years ago
+                      - paragraph [ref=f9e760]: · 1st in this Competition
+                  - generic [ref=f9e762]:
+                    - generic [ref=f9e763]:
+                      - button "Upvote" [ref=f9e764] [cursor=pointer]:
+                        - generic [ref=f9e765]: arrow_drop_up
+                      - button "0 votes" [ref=f9e766] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f9e767] [cursor=pointer]: more_vert
+                  - paragraph [ref=f9e771]: Unfortunately no, I have not uploaded this one to github
+                  - button "Reply" [ref=f9e773] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f9e774]: reply
+              - separator [ref=f9e776]
+            - generic [ref=f9e777]:
+              - generic [ref=f9e781]:
+                - link "Anandhu H's profile" [ref=f9e782] [cursor=pointer]:
+                  - /url: /anandhuh
+                  - generic "Anandhu H" [ref=f9e783]
+                - generic [ref=f9e789]:
+                  - link [ref=f9e791] [cursor=pointer]:
+                    - /url: /anandhuh
+                    - heading "Anandhu H" [level=3] [ref=f9e792]
+                  - paragraph [ref=f9e794]: Posted 5 years ago
+                - generic [ref=f9e796]:
+                  - generic [ref=f9e797]:
+                    - button "Upvote" [ref=f9e798] [cursor=pointer]:
+                      - generic [ref=f9e799]: arrow_drop_up
+                    - button "0 votes" [ref=f9e800] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f9e801] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e805]: Wow, this is awesome
+                - button "Reply" [ref=f9e807] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e808]: reply
+              - separator [ref=f9e810]
+            - generic [ref=f9e811]:
+              - generic [ref=f9e815]:
+                - link "'s profile" [ref=f9e816] [cursor=pointer]:
+                  - /url: /
+                - generic [ref=f9e823]:
+                  - generic:
+                    - link:
+                      - /url: /
+                      - heading [level=3]
+                  - paragraph [ref=f9e825]: Posted 5 years ago
+                - generic [ref=f9e827]:
+                  - generic [ref=f9e828]:
+                    - button "Upvote" [ref=f9e829] [cursor=pointer]:
+                      - generic [ref=f9e830]: arrow_drop_up
+                    - button "0 votes" [ref=f9e831] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f9e832] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e836]:
+                  - text: Awesome, great to see new stuff, well posted
+                  - link "@selimsef (opens in a new tab)" [ref=f9e837] [cursor=pointer]:
+                    - /url: /selimsef
+                    - text: "@selimsef"
+                - button "Reply" [ref=f9e839] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e840]: reply
+              - separator [ref=f9e842]
+            - generic [ref=f9e843]:
+              - generic [ref=f9e847]:
+                - link "Shashank Rathi's profile" [ref=f9e848] [cursor=pointer]:
+                  - /url: /shashankrathi
+                  - generic "Shashank Rathi" [ref=f9e849]
+                - generic [ref=f9e855]:
+                  - link [ref=f9e857] [cursor=pointer]:
+                    - /url: /shashankrathi
+                    - heading "Shashank Rathi" [level=3] [ref=f9e858]
+                  - paragraph [ref=f9e860]: Posted 5 years ago
+                - generic [ref=f9e862]:
+                  - generic [ref=f9e863]:
+                    - button "Upvote" [ref=f9e864] [cursor=pointer]:
+                      - generic [ref=f9e865]: arrow_drop_up
+                    - button "0 votes" [ref=f9e866] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f9e867] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e871]: Such a wonderful solution!
+                - button "Reply" [ref=f9e873] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e874]: reply
+              - separator [ref=f9e876]
+            - generic [ref=f9e877]:
+              - generic [ref=f9e881]:
+                - link "Kalilur Rahman's profile" [ref=f9e882] [cursor=pointer]:
+                  - /url: /kalilurrahman
+                  - generic "Kalilur Rahman" [ref=f9e883]
+                - generic [ref=f9e889]:
+                  - link [ref=f9e891] [cursor=pointer]:
+                    - /url: /kalilurrahman
+                    - heading "Kalilur Rahman" [level=3] [ref=f9e892]
+                  - paragraph [ref=f9e894]: Posted 5 years ago
+                - generic [ref=f9e896]:
+                  - generic [ref=f9e897]:
+                    - button "Upvote" [ref=f9e898] [cursor=pointer]:
+                      - generic [ref=f9e899]: arrow_drop_up
+                    - button "0 votes" [ref=f9e900] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f9e901] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e905]: Wow. Beautiful solution indeed. Congratulations 👏🎉
+                - button "Reply" [ref=f9e907] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e908]: reply
+              - separator [ref=f9e910]
+            - generic [ref=f9e911]:
+              - generic [ref=f9e915]:
+                - link "hengck23's profile" [ref=f9e916] [cursor=pointer]:
+                  - /url: /hengck23
+                  - generic "hengck23" [ref=f9e917]
+                - generic [ref=f9e923]:
+                  - link [ref=f9e925] [cursor=pointer]:
+                    - /url: /hengck23
+                    - heading "hengck23" [level=3] [ref=f9e926]
+                  - generic [ref=f9e927]:
+                    - paragraph [ref=f9e928]: Posted 5 years ago
+                    - paragraph [ref=f9e930]: · 18th in this Competition
+                - generic [ref=f9e932]:
+                  - generic [ref=f9e933]:
+                    - button "Upvote" [ref=f9e934] [cursor=pointer]:
+                      - generic [ref=f9e935]: arrow_drop_up
+                    - button "0 votes" [ref=f9e936] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f9e937] [cursor=pointer]: more_vert
+                - generic [ref=f9e940]:
+                  - paragraph [ref=f9e941]: "\"OHEM collapse and reverse labels mystery\""
+                  - paragraph [ref=f9e942]:
+                    - text: "check my post related to this (comparison of zebra augmentation with others):"
+                    - link "https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275335 (opens in a new tab)" [ref=f9e943] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275335
+                      - text: https://www.kaggle.com/c/g2net-gravitational-wave-detection/discussion/275335
+                - button "Reply" [ref=f9e945] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e946]: reply
+              - separator [ref=f9e948]
+            - generic [ref=f9e953]:
+              - link "Bibek's profile" [ref=f9e954] [cursor=pointer]:
+                - /url: /bibek777
+                - generic "Bibek" [ref=f9e955]
+              - generic [ref=f9e961]:
+                - link [ref=f9e963] [cursor=pointer]:
+                  - /url: /bibek777
+                  - heading "Bibek" [level=3] [ref=f9e964]
+                - generic [ref=f9e965]:
+                  - paragraph [ref=f9e966]: Posted 5 years ago
+                  - paragraph [ref=f9e968]: · 793rd in this Competition
+              - generic [ref=f9e970]:
+                - generic [ref=f9e971]:
+                  - button "Upvote" [ref=f9e972] [cursor=pointer]:
+                    - generic [ref=f9e973]: arrow_drop_up
+                  - button "0 votes" [ref=f9e974] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f9e975] [cursor=pointer]: more_vert
+              - paragraph [ref=f9e979]: Data centric approach!! Congrats. So PB score of 0.8864 was from ensemble? If yes, how many and all of them were resnet34?
+              - button "Reply" [ref=f9e981] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f9e982]: reply
+              - generic [ref=f9e989]:
+                - link "Selim Seferbekov's profile" [ref=f9e990] [cursor=pointer]:
+                  - /url: /selimsef
+                  - generic "Selim Seferbekov" [ref=f9e991]
+                - generic [ref=f9e997]:
+                  - generic [ref=f9e998]:
+                    - link [ref=f9e999] [cursor=pointer]:
+                      - /url: /selimsef
+                      - heading "Selim Seferbekov" [level=3] [ref=f9e1000]
+                    - paragraph [ref=f9e1003]: Topic Author
+                  - generic [ref=f9e1004]:
+                    - paragraph [ref=f9e1005]: Posted 5 years ago
+                    - paragraph [ref=f9e1007]: · 1st in this Competition
+                - generic [ref=f9e1009]:
+                  - generic [ref=f9e1010]:
+                    - button "Upvote" [ref=f9e1011] [cursor=pointer]:
+                      - generic [ref=f9e1012]: arrow_drop_up
+                    - button "2 votes" [ref=f9e1013] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f9e1014] [cursor=pointer]: more_vert
+                - paragraph [ref=f9e1018]: We also trained 20 folds on the same model - it gave 0.8862, but basically anything above is exponentially hard, at that point all models make the same mistakes and ensemble brings very minor boost. They key was not resnet34 but the features from Conv1d.
+                - button "Reply" [ref=f9e1020] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f9e1021]: reply
+  - alert [ref=f9e1025]

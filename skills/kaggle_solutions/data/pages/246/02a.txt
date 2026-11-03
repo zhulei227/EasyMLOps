@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/cdiscount-image-classification-challenge/discussion/45709
-fetched: 2026-10-27
-chars: 654
+fetched: 2026-11-03
+chars: 6893
 
 menu
 Skip to
@@ -42,9 +42,254 @@ Models
 Discussion
 Leaderboard
 Rules
+hengck23 · 2nd in this Competition · Posted 9 years ago
+arrow_drop_up
+49
+more_vert
+[ my ensemble solution ]
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Updated! please refer to the ppt and xls in the attachment for full details.
 
-error
+I present my solution , which is part of team "Convoluted predictions". I submitted an ensemble of 6 models (combine.0, combine.1, combine.2 combine.5, combine.5-max, combine.5-mix). This ensemble has LB=0.787.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+There is one model that is discarded and not used (combine.4, single base network), but nevertheless gives good results.
+
+Credits go to my teammate @Miha Skalic who discover the fast way to train the model in 2 stages. By training on the extracted features, it is much more faster and accurate!
+
+.
+
+First, I introduce combine.2. It uses gated scaling in the combination network fcnet3.
+
+https://kaggle2.blob.core.windows.net/forum-message-attachments/257777/8063/c2.png
+
+https://kaggle2.blob.core.windows.net/forum-message-attachments/257777/8064/fcnet3.png
+
+How to train fcnet3:
+
+Train the base networks (se-resent101 and xception) image wise.
+Extract the features for each train image and store in disk (quantised to np.uint8 and store as memmap)
+train fcnet3 product wise.
+
+Tricks in training:
+
+for base networks , use dropout and use augmentation=small shift, scale, rotation + flip + rotate90,180,270. Batch_size = 512 to 768, num_epoches = about 20. SDG/learning rate=0.01,0.001,0.0001 (manually tuned)
+
+time to train (4x1080Ti) = 5 days per base networks
+
+for fcnet3, use dropout and i only use augmentation=flip (due to lack of space in my SSD drive). Batch_size = 4096, num_epoches = about 100.SDG/learning rate=0.01,0.001,0.0001 (manually tuned)
+
+time to train (4x1080Ti) = 1.5 days
+
+Other variants (to be updated)
+
+a. other base network
+
+I make combine.0 and combine.1 as shown below. These differs in dropout probability. Initially, i intended to use only one of them in final submission. But surprisingly, using both of them is better than using one. (you note that these are exact same models that i post in another post: https://www.kaggle.com/c/cdiscount-image-classification-challenge/discussion/41021) . With my gated Fcnet3, you can use low performance base network in the range of LB=0.69 to 0.71.
+
+https://kaggle2.blob.core.windows.net/forum-message-attachments/257777/8069/combine.0.png
+
+https://kaggle2.blob.core.windows.net/forum-message-attachments/257777/8070/combine.1.png
+
+https://kaggle2.blob.core.windows.net/forum-message-attachments/257777/8126/graph1.png
+(loss curve for combine.1)
+
+b. fcnet1 : max to replace scaling
+
+c. fcnet0 : fcnet1 + mixup augmentation
+
+https://kaggle2.blob.core.windows.net/forum-message-attachments/257777/8124/graph3.png
+imagehttps://kaggle2.blob.core.windows.net/forum-message-attachments/257777/8125/graph2.png
+
+c2.png
+fcnet3.png
+fcnet3_curve.png
+combine.0.png
+combine.1.png
+loss-combnine.1.png
+loss.xlsx
+report.pptx
+graph3.png
+graph2.png
+graph1.png
+
+Please sign in to reply to this topic.
+
+comment
+20 Comments
+Hotness
+Guanshuo Xu
+
+Posted 9 years ago
+
+· 11th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi Heng,
+Do you use exactly the same training and validation set in the two stages of your pipeline? May I know the corresponding training accuracies (corrsponds to the 0.7256 and 0.7192) for your finetuning models?
+
+hengck23
+
+Topic Author
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+yes. same training/validation set for both stages.0.7256 and 0.7192 (and 0.7753) are validation accuracy on the same set. I will post the training accuracy later.
+
+7 more replies
+arrow_drop_down
+YaGana Sheriff-Hussaini
+
+Posted 9 years ago
+
+· 181st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @Heng Cherkeng and team on coming 2nd in this competition. And thanks so much for your always useful contribution to the community with every competition you have participated in. It really is a pleasure competing with you.
+
+And thank you so much for sharing your team's solution once again. I will find time to read through it later.
+
+ldlamarc
+
+Posted 9 years ago
+
+· 60th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for all your great contributions!
+
+swkcoding
+
+Posted 9 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+cool, don't even know the final ensemble has such a great improvement! I just simply average all my models. Thanks for sharing!
+
+lyakaap
+
+Posted 9 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations 2nd place and thank you for the great solution!
+I'm curious whether "Mixup" contributed to LB score.
+
+hengck23
+
+Topic Author
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+i use mixup as a regularizer (noise in train data).
+mixup did better when used in an ensemble. Alone, results is slightly worst than dropout.
+(i will post some results later)
+
+CrazyBoy
+
+Posted 9 years ago
+
+· 30th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Heng, you split the train/val set by products or by images?
+
+hengck23
+
+Topic Author
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+by products
+
+Ravi Teja Gutta
+
+Posted 9 years ago
+
+· 62nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Heng, one more question, the 'x.sum(dim=1)' in Forward Propagation of FcNet3, adds up the vectors of 4 images element-wise and gives one long 8192 length vector right ?
+
+hengck23
+
+Topic Author
+
+Posted 9 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+No. The adding is done for 4 images per product. After adding, one product has 2x2048 (2 base network) dim. This will make results independent of image order, see this paper: https://arxiv.org/abs/1612.00593.
+The scaling is a gate to select how much to add from each of the 4 image.
+
+"PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation"
+
+Charles R. Qi, Hao Su, Kaichun Mo, Leonidas J. Guibas
+Charles Tintera
+
+Posted 9 years ago
+
+· 23rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I was trying something similar with base models that had 74.8 % and 72.3 % accuracy, respectively, but I couldn't get my MLP to train.
+
+Ravi Teja Gutta
+
+Posted 9 years ago
+
+· 62nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Heng, Congrats !!, gained a lot from you in this competition.Thank You
+Regarding Network structure was this network trained jointly ? i.e the net parameters are shared across different images that belong to same product ?

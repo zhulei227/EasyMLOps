@@ -1,0 +1,696 @@
+- generic [ref=f41e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f41e3]:
+    - generic [ref=f41e5]:
+      - button "Navigation menu" [ref=f41e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f41e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f41e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f41e14]:
+      - link [ref=f41e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fsp-society-camera-model-identification%2Fwriteups%2Fods-ai-gpu-muscles-spcup-eligible-2nd-place-soluti
+        - button "Login" [ref=f41e16]
+      - link [ref=f41e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fsp-society-camera-model-identification%2Fwriteups%2Fods-ai-gpu-muscles-spcup-eligible-2nd-place-soluti
+        - button "Sign Up" [ref=f41e19]
+  - main [ref=f41e21]:
+    - generic [ref=f41e23]:
+      - generic [ref=f41e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f41e25]:
+        - link "Learn more" [ref=f41e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f41e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f41e29]:
+      - generic [ref=f41e31]: 2nd place solution with GPU muscles — IEEE's Signal Processing Society - Camera Model Identification
+      - separator [ref=f41e32]
+      - generic [ref=f41e34]:
+        - generic [ref=f41e35]:
+          - heading "2nd place solution with GPU muscles" [level=1] [ref=f41e36]
+          - generic [ref=f41e37]:
+            - link [ref=f41e38] [cursor=pointer]:
+              - /url: /competitions/sp-society-camera-model-identification
+              - paragraph [ref=f41e40]: IEEE's Signal Processing Society - Camera Model Identification
+            - paragraph [ref=f41e41]: Solution Writeup · 2nd place
+        - separator [ref=f41e43]
+        - generic [ref=f41e44]:
+          - generic [ref=f41e46]:
+            - paragraph [ref=f41e47]:
+              - strong [ref=f41e48]: tldr
+              - text: ": We downloaded a about 500+ GB photos, trained 9+ imagenet-like models with 3 version of the pipeline. Finally, we averaged 27 checkpoints with geometric mean."
+            - paragraph [ref=f41e49]:
+              - strong [ref=f41e50]: "Key components of a good solution, by priorities:"
+            - list [ref=f41e51]:
+              - listitem [ref=f41e52]: Large and clean external dataset
+              - listitem [ref=f41e53]: Consistant local validation
+              - listitem [ref=f41e54]: Classic competitive approach to learning models
+              - listitem [ref=f41e55]: Diverse models
+            - paragraph [ref=f41e56]:
+              - strong [ref=f41e57]: Data mining
+              - text: ": We downloaded 500+ Gb photos from various resources: Flickr, Yandex.Fotki, Wikipedia Commons, mobile reviews. In addition, on the last night we downloaded 22k more photos with urls from Flickr gathered by"
+              - link "Andres Torrubia (opens in a new tab)" [ref=f41e58] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/sp-society-camera-model-identification/discussion/49064
+                - text: Andres Torrubia
+              - text: .
+            - paragraph [ref=f41e59]:
+              - strong [ref=f41e60]: Filtering data
+              - text: ": Lightroom/photoshop/etc processing could eliminate all the information about the camera. We filtered on: model, resolution, quality of jpeg compression, software of processing. After filtering of the training and validation, the datasets looked like this:"
+              - img "enter image description here"
+              - text: We took the validation from
+              - link "Gleb’s post (opens in a new tab)" [ref=f41e61] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/sp-society-camera-model-identification/discussion/47235
+                - text: Gleb’s post
+              - text: ", but replaced iPhone 6 plus pictures in it by iPhone 6 ones."
+            - paragraph [ref=f41e62]:
+              - strong [ref=f41e63]: Training models
+              - text: ": Our code is based on pytorch version of"
+              - link "Andres solution (opens in a new tab)" [ref=f41e64] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/sp-society-camera-model-identification/discussion/48679
+                - text: Andres solution
+              - text: ". For all the models, the binary flag is_manip was used as an additional feature for the classifier of a net. All models had an input of 480. For the majority of our models, five crops + flip photo orientation (10TTA) was applied to the pictures, for D4 models five crops + the whole group of D4 were applied (40TTA); then geometric mean was applied to the predictions. Useful tricks:"
+            - list [ref=f41e65]:
+              - listitem [ref=f41e66]: Adam, reducing LR on plateau with patience 2-4
+              - listitem [ref=f41e67]: Cyclic LR with SGD
+              - listitem [ref=f41e68]: Pseudo-labeling
+              - listitem [ref=f41e69]: Averaging 3 checkpoints with the best loss for validation
+            - paragraph [ref=f41e70]: Also on the last day we trained several models with D4 augmentations, finetune from best checkpoint of previous pipeline. We didn’t have submit to check all models on LB, but the result on one was impressive.
+            - paragraph [ref=f41e71]:
+              - text: "The final ensemble of models looked like this:"
+              - img "enter image description here"
+              - text: "Logging models:"
+              - img "enter image description here"
+              - strong [ref=f41e72]: Averaging
+              - text: ": We tried different approaches with class balancing and dropping the missing classes according to the probabilities. But in the end geometric average of 27 checkpoints of different models is the best."
+            - paragraph [ref=f41e73]:
+              - strong [ref=f41e74]: What did not work?
+              - text: Demosizing
+              - img "enter image description here"
+              - text: Cameras fix on the matrix in a particular pixel the intensity of only one color, and the rest of the colors are restored to neighboring pixels, and the recovery algorithm for different camera manufacturers is different. The idea was to calculate the difference between the original image and the image obtained by one of the standard demosayzingov. The inertia of the differences is to train the neural network.
+            - paragraph [ref=f41e75]:
+              - strong [ref=f41e76]: "Hardware:"
+            - list [ref=f41e77]:
+              - listitem [ref=f41e78]: i7 7700k, 64gb, 2x 1080 (just for development)
+              - listitem [ref=f41e79]: i7 6700k, 32gb, 2x Titan X (Maxwell)
+              - listitem [ref=f41e80]: i7 5930K, 32GB, 3x1080Ti
+              - listitem [ref=f41e81]: Xeon 2696v3, 64gb, 4x1080Ti
+              - listitem [ref=f41e82]: i7 3770k, 16gb, 2x 1080Ti
+          - generic [ref=f41e83]:
+            - generic [ref=f41e84]:
+              - text: Authors
+              - generic [ref=f41e85]:
+                - link "Ilya Kibardin's profile" [ref=f41e86] [cursor=pointer]:
+                  - /url: /ikibardin
+                  - generic "Ilya Kibardin" [ref=f41e87]
+                - generic [ref=f41e91]:
+                  - link "Ilya Kibardin" [ref=f41e92] [cursor=pointer]:
+                    - /url: /ikibardin
+                  - paragraph [ref=f41e93]: ikibardin
+              - generic [ref=f41e94]:
+                - link "n01z3's profile" [ref=f41e95] [cursor=pointer]:
+                  - /url: /drn01z3
+                  - generic "n01z3" [ref=f41e96]
+                - generic [ref=f41e100]:
+                  - link "n01z3" [ref=f41e101] [cursor=pointer]:
+                    - /url: /drn01z3
+                  - paragraph [ref=f41e102]: drn01z3
+              - generic [ref=f41e103]:
+                - link "Artur Fattakhov (MIPT DIHT)'s profile" [ref=f41e104] [cursor=pointer]:
+                  - /url: /fartuk1
+                  - generic "Artur Fattakhov (MIPT DIHT)" [ref=f41e105]
+                - generic [ref=f41e109]:
+                  - link "Artur Fattakhov (MIPT DIHT)" [ref=f41e110] [cursor=pointer]:
+                    - /url: /fartuk1
+                  - paragraph [ref=f41e111]: fartuk1
+              - generic [ref=f41e112]:
+                - link "ValeriyBabushkin's profile" [ref=f41e113] [cursor=pointer]:
+                  - /url: /venheads
+                  - generic "ValeriyBabushkin" [ref=f41e114]
+                - generic [ref=f41e118]:
+                  - link "ValeriyBabushkin" [ref=f41e119] [cursor=pointer]:
+                    - /url: /venheads
+                  - paragraph [ref=f41e120]: venheads
+              - generic [ref=f41e121]:
+                - link "Andrey Kiselev's profile" [ref=f41e122] [cursor=pointer]:
+                  - /url: /andreykiselev
+                  - generic "Andrey Kiselev" [ref=f41e123]
+                - generic [ref=f41e127]:
+                  - link "Andrey Kiselev" [ref=f41e128] [cursor=pointer]:
+                    - /url: /andreykiselev
+                  - paragraph [ref=f41e129]: andreykiselev
+            - separator [ref=f41e130]
+            - generic [ref=f41e131]:
+              - generic [ref=f41e132]:
+                - button "Upvote" [ref=f41e133] [cursor=pointer]:
+                  - generic [ref=f41e134]: arrow_drop_up
+                - button "70 votes" [ref=f41e135] [cursor=pointer]: "70"
+              - button "Share" [ref=f41e136] [cursor=pointer]
+              - button "Writeup actions" [ref=f41e138] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f41e139]
+        - paragraph [ref=f41e140]: Ilya Kibardin, n01z3, Artur Fattakhov (MIPT DIHT), ValeriyBabushkin, Andrey Kiselev. 2nd place solution with GPU muscles. https://www.kaggle.com/competitions/sp-society-camera-model-identification/writeups/ods-ai-gpu-muscles-spcup-eligible-2nd-place-soluti. 2018. Kaggle
+        - separator [ref=f41e141]
+        - generic [ref=f41e142]:
+          - generic [ref=f41e144]:
+            - generic [ref=f41e145]:
+              - generic [aria-hidden] [ref=f41e146]: comment
+              - heading "25 Comments" [level=2] [ref=f41e148]
+            - generic [ref=f41e151]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f41e152] [cursor=pointer]:
+                - generic [ref=f41e153]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f41e155]:
+            - generic [ref=f41e156]:
+              - generic [ref=f41e160]:
+                - link "Emil Kayumov's profile" [ref=f41e161] [cursor=pointer]:
+                  - /url: /emilkayumov
+                  - generic "Emil Kayumov" [ref=f41e162]
+                - generic [ref=f41e168]:
+                  - link [ref=f41e170] [cursor=pointer]:
+                    - /url: /emilkayumov
+                    - heading "Emil Kayumov" [level=3] [ref=f41e171]
+                  - paragraph [ref=f41e173]: Posted 8 years ago
+                - generic [ref=f41e175]:
+                  - generic [ref=f41e176]:
+                    - button "Upvote" [ref=f41e177] [cursor=pointer]:
+                      - generic [ref=f41e178]: arrow_drop_up
+                    - button "4 votes" [ref=f41e179] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f41e180] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e184]:
+                  - text: We have published a video with 1st and 2nd places solutions with English subtitles from Moscow ML trainings meetup.
+                  - link "https://youtu.be/ETh8bJ_xKGA (opens in a new tab)" [ref=f41e185] [cursor=pointer]:
+                    - /url: https://youtu.be/ETh8bJ_xKGA
+                    - text: https://youtu.be/ETh8bJ_xKGA
+                - button "Reply" [ref=f41e187] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e188]: reply
+                - generic [ref=f41e195]:
+                  - link "IdhamHalim's profile" [ref=f41e196] [cursor=pointer]:
+                    - /url: /iddy93
+                    - generic "IdhamHalim" [ref=f41e197]
+                  - generic [ref=f41e203]:
+                    - link [ref=f41e205] [cursor=pointer]:
+                      - /url: /iddy93
+                      - heading "IdhamHalim" [level=3] [ref=f41e206]
+                    - paragraph [ref=f41e208]: Posted 8 years ago
+                  - generic [ref=f41e210]:
+                    - generic [ref=f41e211]:
+                      - button "Upvote" [ref=f41e212] [cursor=pointer]:
+                        - generic [ref=f41e213]: arrow_drop_up
+                      - button "0 votes" [ref=f41e214] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f41e215] [cursor=pointer]: more_vert
+                  - paragraph [ref=f41e219]: cool !
+                  - button "Reply" [ref=f41e221] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f41e222]: reply
+              - separator [ref=f41e224]
+            - generic [ref=f41e225]:
+              - generic [ref=f41e229]:
+                - link "Matt Kleinsmith's profile" [ref=f41e230] [cursor=pointer]:
+                  - /url: /kleinsmith
+                  - generic "Matt Kleinsmith" [ref=f41e231]
+                - generic [ref=f41e237]:
+                  - link [ref=f41e239] [cursor=pointer]:
+                    - /url: /kleinsmith
+                    - heading "Matt Kleinsmith" [level=3] [ref=f41e240]
+                  - generic [ref=f41e241]:
+                    - paragraph [ref=f41e242]: Posted 9 years ago
+                    - paragraph [ref=f41e244]: · 154th in this Competition
+                - generic [ref=f41e246]:
+                  - generic [ref=f41e247]:
+                    - button "Upvote" [ref=f41e248] [cursor=pointer]:
+                      - generic [ref=f41e249]: arrow_drop_up
+                    - button "4 votes" [ref=f41e250] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f41e251] [cursor=pointer]: more_vert
+                - generic [ref=f41e254]:
+                  - paragraph [ref=f41e255]: Thank you. This was fun to read as someone new to Kaggle.
+                  - blockquote [ref=f41e256]:
+                    - paragraph [ref=f41e257]: All models had an input of 480.
+                  - paragraph [ref=f41e258]: Did you crop from the 512x512 center region or from the entire image?
+                  - blockquote [ref=f41e259]:
+                    - paragraph [ref=f41e260]: D4 augmentations
+                  - paragraph [ref=f41e261]: Does this refer to compression, resizing, gamma correction, and transpose? Where does the term "D4" come from?
+                - button "Reply" [ref=f41e263] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e264]: reply
+                - generic [ref=f41e266]:
+                  - generic [ref=f41e271]:
+                    - link "Artur Fattakhov (MIPT DIHT)'s profile" [ref=f41e272] [cursor=pointer]:
+                      - /url: /fartuk1
+                      - generic "Artur Fattakhov (MIPT DIHT)" [ref=f41e273]
+                    - generic [ref=f41e279]:
+                      - link [ref=f41e281] [cursor=pointer]:
+                        - /url: /fartuk1
+                        - heading "Artur Fattakhov (MIPT DIHT)" [level=3] [ref=f41e282]
+                      - generic [ref=f41e283]:
+                        - paragraph [ref=f41e284]: Posted 9 years ago
+                        - paragraph [ref=f41e286]: · 2nd in this Competition
+                    - generic [ref=f41e288]:
+                      - generic [ref=f41e289]:
+                        - button "Upvote" [ref=f41e290] [cursor=pointer]:
+                          - generic [ref=f41e291]: arrow_drop_up
+                        - button "6 votes" [ref=f41e292] [cursor=pointer]: "6"
+                      - button "More Options for this Comment" [ref=f41e293] [cursor=pointer]: more_vert
+                    - paragraph [ref=f41e297]: We crop from entire image. Term D4 comes from group theory. It means all rotation on 90 and flips.
+                    - button "Reply" [ref=f41e299] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f41e300]: reply
+                  - generic [ref=f41e306]:
+                    - link "n01z3's profile" [ref=f41e307] [cursor=pointer]:
+                      - /url: /drn01z3
+                      - generic "n01z3" [ref=f41e308]
+                    - generic [ref=f41e314]:
+                      - generic [ref=f41e315]:
+                        - link [ref=f41e316] [cursor=pointer]:
+                          - /url: /drn01z3
+                          - heading "n01z3" [level=3] [ref=f41e317]
+                        - paragraph [ref=f41e320]: Topic Author
+                      - generic [ref=f41e321]:
+                        - paragraph [ref=f41e322]: Posted 9 years ago
+                        - paragraph [ref=f41e324]: · 2nd in this Competition
+                    - generic [ref=f41e326]:
+                      - generic [ref=f41e327]:
+                        - button "Upvote" [ref=f41e328] [cursor=pointer]:
+                          - generic [ref=f41e329]: arrow_drop_up
+                        - button "2 votes" [ref=f41e330] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f41e331] [cursor=pointer]: more_vert
+                    - paragraph [ref=f41e335]:
+                      - text: "About D4:"
+                      - link "https://en.wikipedia.org/wiki/Dihedral_group (opens in a new tab)" [ref=f41e336] [cursor=pointer]:
+                        - /url: https://en.wikipedia.org/wiki/Dihedral_group
+                        - text: https://en.wikipedia.org/wiki/Dihedral_group
+                    - button "Reply" [ref=f41e338] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f41e339]: reply
+                  - generic [ref=f41e345]:
+                    - link "Matt Kleinsmith's profile" [ref=f41e346] [cursor=pointer]:
+                      - /url: /kleinsmith
+                      - generic "Matt Kleinsmith" [ref=f41e347]
+                    - generic [ref=f41e353]:
+                      - link [ref=f41e355] [cursor=pointer]:
+                        - /url: /kleinsmith
+                        - heading "Matt Kleinsmith" [level=3] [ref=f41e356]
+                      - generic [ref=f41e357]:
+                        - paragraph [ref=f41e358]: Posted 9 years ago
+                        - paragraph [ref=f41e360]: · 154th in this Competition
+                    - generic [ref=f41e362]:
+                      - generic [ref=f41e363]:
+                        - button "Upvote" [ref=f41e364] [cursor=pointer]:
+                          - generic [ref=f41e365]: arrow_drop_up
+                        - button "1 votes" [ref=f41e366] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f41e367] [cursor=pointer]: more_vert
+                    - generic [ref=f41e370]:
+                      - paragraph [ref=f41e371]: "Thank you. Here's an image from wikipedia that explains D8 (not D4) visually:"
+                      - paragraph [ref=f41e372]:
+                        - link "https://en.wikipedia.org/wiki/Dihedral_group#/media/File:Dihedral8.png (opens in a new tab)" [ref=f41e373] [cursor=pointer]:
+                          - /url: https://en.wikipedia.org/wiki/Dihedral_group#/media/File:Dihedral8.png
+                          - text: https://en.wikipedia.org/wiki/Dihedral_group#/media/File:Dihedral8.png
+                    - button "Reply" [ref=f41e375] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f41e376]: reply
+              - separator [ref=f41e378]
+            - generic [ref=f41e379]:
+              - generic [ref=f41e383]:
+                - link "A0198918E_MaZhaoyang's profile" [ref=f41e384] [cursor=pointer]:
+                  - /url: /zhaoyangma
+                  - generic "A0198918E_MaZhaoyang" [ref=f41e385]
+                - generic [ref=f41e391]:
+                  - link [ref=f41e393] [cursor=pointer]:
+                    - /url: /zhaoyangma
+                    - heading "A0198918E_MaZhaoyang" [level=3] [ref=f41e394]
+                  - generic [ref=f41e395]:
+                    - paragraph [ref=f41e396]: Posted 9 years ago
+                    - paragraph [ref=f41e398]: · 119th in this Competition
+                - generic [ref=f41e400]:
+                  - generic [ref=f41e401]:
+                    - button "Upvote" [ref=f41e402] [cursor=pointer]:
+                      - generic [ref=f41e403]: arrow_drop_up
+                    - button "2 votes" [ref=f41e404] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f41e405] [cursor=pointer]: more_vert
+                - generic [ref=f41e408]:
+                  - paragraph [ref=f41e409]: Congratulations!
+                  - paragraph [ref=f41e410]: The hardware is powerful!
+                  - paragraph [ref=f41e411]: Why most the loss curves are periodically jumping very high?
+                  - paragraph [ref=f41e412]: The validation score is not too high. Is it because the curve are only part of all? But the epic seems already goes beyond 60.
+                  - paragraph [ref=f41e413]: For DenseNet201, what is the batch size used? It does not run in my computer even with a batch size of 1. :(
+                  - paragraph [ref=f41e414]: Have you tried other ensembling methods instead of only geometric mean?
+                  - paragraph [ref=f41e415]: How is dual path network in terms of accuracy, performance and memory consumption comparing to DenseNet or other networks?
+                  - paragraph [ref=f41e416]: "Two more questions: what is D4 and what is demosizing?"
+                  - paragraph [ref=f41e417]: Quite a few questions. But these are something I am curious to know. :)
+                - button "Reply" [ref=f41e419] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e420]: reply
+                - generic [ref=f41e422]:
+                  - generic [ref=f41e427]:
+                    - link "n01z3's profile" [ref=f41e428] [cursor=pointer]:
+                      - /url: /drn01z3
+                      - generic "n01z3" [ref=f41e429]
+                    - generic [ref=f41e435]:
+                      - generic [ref=f41e436]:
+                        - link [ref=f41e437] [cursor=pointer]:
+                          - /url: /drn01z3
+                          - heading "n01z3" [level=3] [ref=f41e438]
+                        - paragraph [ref=f41e441]: Topic Author
+                      - generic [ref=f41e442]:
+                        - paragraph [ref=f41e443]: Posted 9 years ago
+                        - paragraph [ref=f41e445]: · 2nd in this Competition
+                    - generic [ref=f41e447]:
+                      - generic [ref=f41e448]:
+                        - button "Upvote" [ref=f41e449] [cursor=pointer]:
+                          - generic [ref=f41e450]: arrow_drop_up
+                        - button "1 votes" [ref=f41e451] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f41e452] [cursor=pointer]: more_vert
+                    - list [ref=f41e456]:
+                      - listitem [ref=f41e457]: Loss curves seems jumpy due to scale and little amount of sample in validation set.
+                      - listitem [ref=f41e458]: Almost all validation accuracy is about 0.98. Pretty high for me.
+                      - listitem [ref=f41e459]: As far as I remember typically batch size is 24-40 for 4x 1080ti.
+                      - listitem [ref=f41e460]: We tried weighted mean, small class sorting. Doesn't work for us.
+                      - listitem [ref=f41e461]: "DPN is fantastic! Our best single model: dpn92 with pseudo labeling, TTA, 3 checkpoints TTA: 0.987 (private) and 0.984 (public)."
+                      - listitem [ref=f41e462]: About D4 answered above
+                    - button "Reply" [ref=f41e464] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f41e465]: reply
+                  - generic [ref=f41e467]:
+                    - button "5 more replies" [ref=f41e468] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f41e470]: arrow_drop_down
+                    - generic [ref=f41e471]:
+                      - img "Profile picture for Andrés Miguel Torrubia Sáez" [ref=f41e473]
+                      - img "Profile picture for DennisSakva" [ref=f41e475]
+                      - img "Profile picture for A0198918E_MaZhaoyang" [ref=f41e477]
+                      - img "Profile picture for Matt Kleinsmith" [ref=f41e479]
+              - separator [ref=f41e480]
+            - generic [ref=f41e481]:
+              - generic [ref=f41e485]:
+                - link "Vlad Golubev's profile" [ref=f41e486] [cursor=pointer]:
+                  - /url: /golubev
+                  - generic "Vlad Golubev" [ref=f41e487]
+                - generic [ref=f41e493]:
+                  - link [ref=f41e495] [cursor=pointer]:
+                    - /url: /golubev
+                    - heading "Vlad Golubev" [level=3] [ref=f41e496]
+                  - generic [ref=f41e497]:
+                    - paragraph [ref=f41e498]: Posted 9 years ago
+                    - paragraph [ref=f41e500]: · 11th in this Competition
+                - generic [ref=f41e502]:
+                  - generic [ref=f41e503]:
+                    - button "Upvote" [ref=f41e504] [cursor=pointer]:
+                      - generic [ref=f41e505]: arrow_drop_up
+                    - button "2 votes" [ref=f41e506] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f41e507] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e511]: Amazing work!
+                - button "Reply" [ref=f41e513] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e514]: reply
+              - separator [ref=f41e516]
+            - generic [ref=f41e517]:
+              - generic [ref=f41e521]:
+                - link "yyll008's profile" [ref=f41e522] [cursor=pointer]:
+                  - /url: /yyll008
+                  - generic "yyll008" [ref=f41e523]
+                - generic [ref=f41e529]:
+                  - link [ref=f41e531] [cursor=pointer]:
+                    - /url: /yyll008
+                    - heading "yyll008" [level=3] [ref=f41e532]
+                  - generic [ref=f41e533]:
+                    - paragraph [ref=f41e534]: Posted 9 years ago
+                    - paragraph [ref=f41e536]: · 145th in this Competition
+                - generic [ref=f41e538]:
+                  - generic [ref=f41e539]:
+                    - button "Upvote" [ref=f41e540] [cursor=pointer]:
+                      - generic [ref=f41e541]: arrow_drop_up
+                    - button "1 votes" [ref=f41e542] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f41e543] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e547]: Wow! Congratulation!
+                - button "Reply" [ref=f41e549] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e550]: reply
+              - separator [ref=f41e552]
+            - generic [ref=f41e553]:
+              - generic [ref=f41e557]:
+                - link "Yuzhe Mao's profile" [ref=f41e558] [cursor=pointer]:
+                  - /url: /mao1998gun
+                  - generic "Yuzhe Mao" [ref=f41e559]
+                - generic [ref=f41e565]:
+                  - link [ref=f41e567] [cursor=pointer]:
+                    - /url: /mao1998gun
+                    - heading "Yuzhe Mao" [level=3] [ref=f41e568]
+                  - paragraph [ref=f41e570]: Posted 8 years ago
+                - generic [ref=f41e572]:
+                  - generic [ref=f41e573]:
+                    - button "Upvote" [ref=f41e574] [cursor=pointer]:
+                      - generic [ref=f41e575]: arrow_drop_up
+                    - button "0 votes" [ref=f41e576] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f41e577] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e581]: Why some images in HTC directory appears to be of Nexus o(╥﹏╥)o
+                - button "Reply" [ref=f41e583] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e584]: reply
+                - generic [ref=f41e591]:
+                  - link "Yuzhe Mao's profile" [ref=f41e592] [cursor=pointer]:
+                    - /url: /mao1998gun
+                    - generic "Yuzhe Mao" [ref=f41e593]
+                  - generic [ref=f41e599]:
+                    - link [ref=f41e601] [cursor=pointer]:
+                      - /url: /mao1998gun
+                      - heading "Yuzhe Mao" [level=3] [ref=f41e602]
+                    - paragraph [ref=f41e604]: Posted 8 years ago
+                  - generic [ref=f41e606]:
+                    - generic [ref=f41e607]:
+                      - button "Upvote" [ref=f41e608] [cursor=pointer]:
+                        - generic [ref=f41e609]: arrow_drop_up
+                      - button "0 votes" [ref=f41e610] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f41e611] [cursor=pointer]: more_vert
+                  - paragraph [ref=f41e615]: anyway thanks for sharing QAQ
+                  - button "Reply" [ref=f41e617] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f41e618]: reply
+              - separator [ref=f41e620]
+            - generic [ref=f41e621]:
+              - generic [ref=f41e625]:
+                - link "TzeSing's profile" [ref=f41e626] [cursor=pointer]:
+                  - /url: /jjzzxx000
+                  - generic "TzeSing" [ref=f41e627]
+                - generic [ref=f41e633]:
+                  - link [ref=f41e635] [cursor=pointer]:
+                    - /url: /jjzzxx000
+                    - heading "TzeSing" [level=3] [ref=f41e636]
+                  - paragraph [ref=f41e638]: Posted 9 years ago
+                - generic [ref=f41e640]:
+                  - generic [ref=f41e641]:
+                    - button "Upvote" [ref=f41e642] [cursor=pointer]:
+                      - generic [ref=f41e643]: arrow_drop_up
+                    - button "0 votes" [ref=f41e644] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f41e645] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e649]: nice
+                - button "Reply" [ref=f41e651] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e652]: reply
+              - separator [ref=f41e654]
+            - generic [ref=f41e655]:
+              - generic [ref=f41e659]:
+                - link "Pratip Khandelwal's profile" [ref=f41e660] [cursor=pointer]:
+                  - /url: /pratipk
+                  - generic "Pratip Khandelwal" [ref=f41e661]
+                - generic [ref=f41e667]:
+                  - link [ref=f41e669] [cursor=pointer]:
+                    - /url: /pratipk
+                    - heading "Pratip Khandelwal" [level=3] [ref=f41e670]
+                  - paragraph [ref=f41e672]: Posted 9 years ago
+                - generic [ref=f41e674]:
+                  - generic [ref=f41e675]:
+                    - button "Upvote" [ref=f41e676] [cursor=pointer]:
+                      - generic [ref=f41e677]: arrow_drop_up
+                    - button "0 votes" [ref=f41e678] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f41e679] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e683]: Amazing .. Congrats !!
+                - button "Reply" [ref=f41e685] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e686]: reply
+              - separator [ref=f41e688]
+            - generic [ref=f41e689]:
+              - generic [ref=f41e693]:
+                - link "Matt Kleinsmith's profile" [ref=f41e694] [cursor=pointer]:
+                  - /url: /kleinsmith
+                  - generic "Matt Kleinsmith" [ref=f41e695]
+                - generic [ref=f41e701]:
+                  - link [ref=f41e703] [cursor=pointer]:
+                    - /url: /kleinsmith
+                    - heading "Matt Kleinsmith" [level=3] [ref=f41e704]
+                  - generic [ref=f41e705]:
+                    - paragraph [ref=f41e706]: Posted 9 years ago
+                    - paragraph [ref=f41e708]: · 154th in this Competition
+                - generic [ref=f41e710]:
+                  - generic [ref=f41e711]:
+                    - button "Upvote" [ref=f41e712] [cursor=pointer]:
+                      - generic [ref=f41e713]: arrow_drop_up
+                    - button "0 votes" [ref=f41e714] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f41e715] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e719]: Did you use the official manipulations (compression, gamma correction, and resizing) for training? I would guess yes, so you could bring the training set closer to the test set, and because you mentioned using Ivan's PyTorch version of Andres's code which has them turned on by default.
+                - button "Reply" [ref=f41e721] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e722]: reply
+                - generic [ref=f41e729]:
+                  - link "Ilya Kibardin's profile" [ref=f41e730] [cursor=pointer]:
+                    - /url: /ikibardin
+                    - generic "Ilya Kibardin" [ref=f41e731]
+                  - generic [ref=f41e737]:
+                    - link [ref=f41e739] [cursor=pointer]:
+                      - /url: /ikibardin
+                      - heading "Ilya Kibardin" [level=3] [ref=f41e740]
+                    - generic [ref=f41e741]:
+                      - paragraph [ref=f41e742]: Posted 9 years ago
+                      - paragraph [ref=f41e744]: · 2nd in this Competition
+                  - generic [ref=f41e746]:
+                    - generic [ref=f41e747]:
+                      - button "Upvote" [ref=f41e748] [cursor=pointer]:
+                        - generic [ref=f41e749]: arrow_drop_up
+                      - button "1 votes" [ref=f41e750] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f41e751] [cursor=pointer]: more_vert
+                  - paragraph [ref=f41e755]: Yes. We did not change augmentations from Ivan's code, except adding D4 transforms after them for some models.
+                  - button "Reply" [ref=f41e757] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f41e758]: reply
+              - separator [ref=f41e760]
+            - generic [ref=f41e761]:
+              - generic [ref=f41e765]:
+                - link "pengpengyang's profile" [ref=f41e766] [cursor=pointer]:
+                  - /url: /meprobjtu
+                  - generic "pengpengyang" [ref=f41e767]
+                - generic [ref=f41e773]:
+                  - link [ref=f41e775] [cursor=pointer]:
+                    - /url: /meprobjtu
+                    - heading "pengpengyang" [level=3] [ref=f41e776]
+                  - generic [ref=f41e777]:
+                    - paragraph [ref=f41e778]: Posted 9 years ago
+                    - paragraph [ref=f41e780]: · 112th in this Competition
+                - generic [ref=f41e782]:
+                  - generic [ref=f41e783]:
+                    - button "Upvote" [ref=f41e784] [cursor=pointer]:
+                      - generic [ref=f41e785]: arrow_drop_up
+                    - button "0 votes" [ref=f41e786] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f41e787] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e791]: Congratulations! what is your input of your reported models? the original image with 480x480 or the difference between the original image and the image obtained by one of the standard demosayzingov? If the difference was used, which one standard demosayzingov?
+                - button "Reply" [ref=f41e793] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e794]: reply
+                - generic [ref=f41e801]:
+                  - link "Matt Kleinsmith's profile" [ref=f41e802] [cursor=pointer]:
+                    - /url: /kleinsmith
+                    - generic "Matt Kleinsmith" [ref=f41e803]
+                  - generic [ref=f41e809]:
+                    - link [ref=f41e811] [cursor=pointer]:
+                      - /url: /kleinsmith
+                      - heading "Matt Kleinsmith" [level=3] [ref=f41e812]
+                    - generic [ref=f41e813]:
+                      - paragraph [ref=f41e814]: Posted 9 years ago
+                      - paragraph [ref=f41e816]: · 154th in this Competition
+                  - generic [ref=f41e818]:
+                    - generic [ref=f41e819]:
+                      - button "Upvote" [ref=f41e820] [cursor=pointer]:
+                        - generic [ref=f41e821]: arrow_drop_up
+                      - button "0 votes" [ref=f41e822] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f41e823] [cursor=pointer]: more_vert
+                  - paragraph [ref=f41e827]: n01z3 said demosaicing didn't work for them.
+                  - button "Reply" [ref=f41e829] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f41e830]: reply
+              - separator [ref=f41e832]
+            - generic [ref=f41e833]:
+              - generic [ref=f41e837]:
+                - link "alside's profile" [ref=f41e838] [cursor=pointer]:
+                  - /url: /alside
+                  - generic "alside" [ref=f41e839]
+                - generic [ref=f41e845]:
+                  - link [ref=f41e847] [cursor=pointer]:
+                    - /url: /alside
+                    - heading "alside" [level=3] [ref=f41e848]
+                  - generic [ref=f41e849]:
+                    - paragraph [ref=f41e850]: Posted 9 years ago
+                    - paragraph [ref=f41e852]: · 96th in this Competition
+                - generic [ref=f41e854]:
+                  - generic [ref=f41e855]:
+                    - button "Upvote" [ref=f41e856] [cursor=pointer]:
+                      - generic [ref=f41e857]: arrow_drop_up
+                    - button "0 votes" [ref=f41e858] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f41e859] [cursor=pointer]: more_vert
+                - paragraph [ref=f41e863]: Much data! so Wow!
+                - button "Reply" [ref=f41e865] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f41e866]: reply
+              - separator [ref=f41e868]
+            - generic [ref=f41e873]:
+              - link "Zaporozhan Stanislav 's profile" [ref=f41e874] [cursor=pointer]:
+                - /url: /staniszap
+                - generic "Zaporozhan Stanislav" [ref=f41e875]
+              - generic [ref=f41e881]:
+                - link [ref=f41e883] [cursor=pointer]:
+                  - /url: /staniszap
+                  - heading "Zaporozhan Stanislav" [level=3] [ref=f41e884]
+                - paragraph [ref=f41e886]: Posted 9 years ago
+              - generic [ref=f41e888]:
+                - generic [ref=f41e889]:
+                  - button "Upvote" [ref=f41e890] [cursor=pointer]:
+                    - generic [ref=f41e891]: arrow_drop_up
+                  - button "0 votes" [ref=f41e892] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f41e893] [cursor=pointer]: more_vert
+              - paragraph [ref=f41e897]: It's fantastic!
+              - button "Reply" [ref=f41e899] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f41e900]: reply
+  - alert [ref=f41e904]

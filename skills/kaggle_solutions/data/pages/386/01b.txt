@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/tweet-sentiment-extraction/discussion/159254
-fetched: 2026-10-27
-chars: 784
+fetched: 2026-11-03
+chars: 3488
 
 menu
 Skip to
@@ -42,15 +42,177 @@ Models
 Discussion
 Leaderboard
 Rules
+Theo Viel · 1st in this Competition · Posted 6 years ago
+arrow_drop_up
+64
+more_vert
+Some call it magic
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I'll take the time to make two posts tonight, first one being about the "magic". I hope my explaination is good enough, it's late here. I'll refine here tomorrow if needed :)
 
-error
+The pattern
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Here's what we found regarding the "noise" in the labels. It comes from consecutive spaces. We assumed they were removed during annotation, which results in problems when retrieving the labels on the original text.
 
-Failed to load the discussion topic
+Leveraging it
 
-error
+This simple post-processing does the job to retrieve the noise in the data.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+However we used something more robust than that, and our solution includes no post-processing at all.
+
+PS : We found the pattern 3 days ago. We had it implemented by mistake when drafting models, and correcting the mistake dropped performances so we kept it.
+
+Edit : This is only a pattern we found, we suspect there's more stuff we missed :)
+
+Please sign in to reply to this topic.
+
+comment
+12 Comments
+Hotness
+Keith Amundsen
+
+Posted 6 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Neat tricks. Some call it magic, others call it skill!
+
+mymecoder
+
+Posted 6 years ago
+
+· 494th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Great observation, Congratulations!
+
+Firas Baba
+
+Posted 6 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This should explain all the shiffting to the left? What about when the selected_text should be "happy" but we find" happy fo"? did you find an explanation for these examples?
+
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+That's a pattern we found, it does not explain everything at all. For instance the preprocessing can be more complicated than just removing consecutive spaces. I didn't dig into it to be honest !
+
+It seems like your team also found some interesting stuff
+
+Nischay Dhankhar
+
+Posted 6 years ago
+
+· 95th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Nikola Bacic
+
+Posted 6 years ago
+
+· 38th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+And I've classified this as "shaky hands". .eel stupi.
+
+CPMP
+
+Posted 6 years ago
+
+· 15th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I tried that but got more split. I'll look into this again tomorrow. Congrats on the result!
+
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks !
+
+Uday Kumar Gurugubelli
+
+Posted 6 years ago
+
+· 638th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation for both of you..
+
+datasaurus
+
+Posted 6 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for sharing and congrats! I knew there was a trick in there somewhere, I just couldn't join the dots.
+
+Do you know how much of a boost this was worth alone?
+
+Theo Viel
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We didn't try it actually, but some teams reported +0.01~ with similar ideas
+
+Chin
+
+Posted 6 years ago
+
+· 75th in this Competition
+
+arrow_drop_up
+-2
+more_vert

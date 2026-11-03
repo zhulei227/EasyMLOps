@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/youtube8m-2018/discussion/62781
-fetched: 2026-10-27
-chars: 835
+fetched: 2026-11-03
+chars: 19396
 
 menu
 Skip to
@@ -22,35 +22,673 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Google AI · Featured Prediction Competition · 8 years ago
-Late Submission
-more_horiz
+1st place solution summary — The 2nd YouTube-8M Video Understanding Challenge
+1st place solution summary
+
 The 2nd YouTube-8M Video Understanding Challenge
 
-Can you create a constrained-size model to predict video labels?
+Solution Writeup · 1st place · Aug 27, 2018
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+First off: Congratulations to everyone who participated and was burning their GPUs trying to squeeze in as much performance into 1GB as possible. Personally I would like to thank David for all the effort, time and resources he put into this competition, carrying out all of our crazy ideas.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+TLDR: Our final model was combination of 9 submodels belonging to 4 model families - NetVlad, Deep Bag of Frames (DBoF), Fisher Vector (FV) and Recurrent neural networks (RNNs), weighting contributions based on test set performance. To make things work efficiently we used (multilayer) distillation, 8bit partial weights quantization, exponential moving averaging of weights and “smarter” inference time frame sampling.
 
-error
+Models and Distillation schema
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+We did not use any fancy new architectures for our models. The four used model families (NetVLAD, FV, RNNs and DBoFs) were all used in the first year competition. The models were however adjusted due to the competition constraints. We found especially useful architectures provided by Miech et al (https://arxiv.org/abs/1706.06905). Following figure shows models scores and flow of distillation training:
 
-Failed to load the discussion topic
+ *Scores in architecture figure are public leaderboard equivalent scores. Values were obtained through local validation which had a consistent offset to public leaderboard scores. The values are collected from quantized models.
 
-error
+Tricks
+1. Distillation
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Distillation was done in a similar way as in work of Wang et. al. (https://arxiv.org/abs/1706.05150) using soft labels - mixture of ground truth and teacher model predictions. As a teacher model we used ensemble of 3 (or in case of 2nd layer model 6) models. For student networks we used same family of networks as teacher networks. This means that for a student NetVlad network we would use 3 teacher NetVlad. The idea was that similar networks could learn similar patterns from data - thus giving better results. This might not be entirely true since in some of our experiments, doing cross family training, the students performed as good as ones trained on same family while improving ensemble diversity. In general distillation allowed us to train lighter version of model with better performance. For NetVlad, we chose 2nd layer distillation because of the positive impact it had on the overall ensemble score (+0.001) even though the individual models produced by it were not better than the 1st level distillation.
+
+2. Quantization
+
+To minimize weight of the models we casted them into 8 bit encoding (cutting weights size down to 1/4) in addition to storing the centroids. To not lose too much performance we kept the graph nodes in default float32 format and at inference time the variables are cast back to float32 format. We limited quantization only to variables with less than 1700 elements. This means that weights of typical fully connected layer would get quantized while batch norm factors wouldn’t get. We used uniform min-max quantization, since other methods (such as quantile based quantization) did not work well.
+
+3. Inference time sampling
+
+During training, for models like FV, NetVLAD and DBoF a collection of 300 frames was selected based on random sampling with replacement. During test time we ensured at each frame would be selected at least once and the remainder of the frames were chosen at random. This can be considered as a way of data augmentation.
+
+4. In model averaging
+
+To improve performance of single model we used in model averaging of weights over training time. We let the model train to convergence and then started averaging. Performance improvement was significant for our smaller models (DBoF and RNNs 0.002-0.003), while for bigger models (NetVLAD and FV) we did not see an improved prediction. We applied exponential decay averaging as well as equal weight averaging - both of them giving similar boosts, but we did not detect increase in performance if combining the two averages.
+
+Train and testing
+
+For training we used all samples except for samples in 800 validation TF records. The 800 randomly selected record files (~5% of all data) were used to monitor training, model selection and weighting of final meta-model. We observed a very consistent 0.00207 offset between local validation and public leaderboard so we used local validation for all testing. The test set turned out to be sufficiently big enough to avoid overfitting. Training on all data with the 800 records included did not improve final score for us.
+
+Training was performed on single GPU’s, taking between 1.5-3.5 days per model. Approx 60 GPU-days would be required to train all models. We varied batch size, number of clusters, and number of hidden layers between models within a given family.
+
+Random search was performed on local system to determine final weights of the ensembles. We observed a ~0.0050 range in GAP score that could be achieved between taking a weighted average of models vs optimized weights determined by random search in 500 iterations.
+
+A detailed report/paper will be published at a later time in addition to making the code available.
+
+Authors
+Miha Skalic
+
+mihaskalic
+
+David Austin
+
+tivfrvqhs5
+
+arrow_drop_up
+83
+Share
+more_horiz
+Citation
+
+Miha Skalic, David Austin. 1st place solution summary. https://www.kaggle.com/competitions/youtube8m-2018/writeups/next-top-gb-model-1st-place-solution-summary. 2018. Kaggle
+
+comment
+57 Comments
+3 appreciation comments
+Hotness
+Miha Skalic
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+Code is now available: https://github.com/miha-skalic/youtube8mchallange
+
+reply
+Reply
+Kushajveer Singh
+
+Posted 8 years ago
+
+arrow_drop_up
+5
+more_vert
+
+My compilation of the research papers covering the topics discussed in the soln. If I missed some paper please reply and I would add it to the list. I know that you would give a reference to the papers in your paper for the solution but can you provide a quick list of some of the papers that I missed.
+
+NetVlad: CNN architecture for weakly supervised place recognition
+Deep Bag of Frames approach: a not so sufficient model for soundscapes
+A Discriminative CNN Video Representation for event Detection
+Semi Supervised Fisher Vector Network
+Learnable Pooling with Context Gating for video classification
+Distilling the Knowledge in a Neural Network
+The MonkeyTyping Soln to the Youtube-*M Video Understanding Challenge
+reply
+Reply
+Miha Skalic
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+This is from the solution paper. Full paper will be released at a later time.
+
+LeCun, Y.A., Bengio, Y., Hinton, G.E.: Deep learning. Nature (2015)
+
+Krizhevsky, A., Sutskever, I., Hinton, G.E.: ImageNet Classification with DeepConvolutional Neural Networks. Advances In Neural Information Processing Sys-tems (2012)
+
+Graves, a., Mohamed, A., Hinton, G.: Speech recognition with deep recurrentneural networks. Icassp (2013)
+
+Ng, J.Y.H., Hausknecht, M., Vijayanarasimhan, S., Vinyals, O., Monga, R.,Toderici, G.: Beyond short snippets: Deep networks for video classification. In:Proceedings of the IEEE Computer Society Conference on Computer Vision andPattern Recognition. (2015)
+
+Abu-El-Haija, S., Kothari, N., Lee, J., Natsev, P., Toderici, G., Varadarajan, B.,Vijayanarasimhan, S.: Youtube-8m: A large-scale video classification benchmark.CoRRabs/1609.08675(2016)
+
+Miech, A., Laptev, I., Sivic, J.: Learnable pooling with context gating for videoclassification. CoRRabs/1706.06905(2017)
+
+Wang, H., Zhang, T., Wu, J.: The monkeytyping solution to the youtube-8m videounderstanding challenge. CoRRabs/1706.05150(2017)
+
+Li, F., Gan, C., Liu, X., Bian, Y., Long, X., Li, Y., Li, Z., Zhou, J., Wen, S.:Temporal modeling approaches for large-scale youtube-8m video understanding.CoRRabs/1707.04555(2017)
+
+Chen, S., Wang, X., Tang, Y., Chen, X., Wu, Z., Jiang, Y.: Aggregating frame-levelfeatures for large-scale video classification. CoRRabs/1707.00803(2017)
+
+Skalic, M., Pekalski, M., Pan, X.E.: Deep learning methods for efficient large scalevideo labeling. CoRRabs/1706.04572(2017)
+
+Abadi, M., Agarwal, A., Barham, P., Brevdo, E., Chen, Z., Citro, C., Corrado,G.S., Davis, A., Dean, J., Devin, M., Ghemawat, S., Goodfellow, I., Harp, A.,Irving, G., Isard, M., Jia, Y., Jozefowicz, R., Kaiser, L., Kudlur, M., Levenberg,J., Man ́e, D., Monga, R., Moore, S., Murray, D., Olah, C., Schuster, M., Shlens, J.,Steiner, B., Sutskever, I., Talwar, K., Tucker, P., Vanhoucke, V., Vasudevan, V.,Vi ́egas, F., Vinyals, O., Warden, P., Wattenberg, M., Wicke, M., Yu, Y., Zheng,X.: TensorFlow: Large-scale machine learning on heterogeneous systems (2015)Software available from tensorflow.org.
+
+Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., Wojna, Z.: Rethinking the in-ception architecture for computer vision. In: The IEEE Conference on ComputerVision and Pattern Recognition (CVPR). (June 2016)
+
+Hochreiter, S., Schmidhuber, J.: Long Short-Term Memory. Neural Computation(1997)
+
+Cho, K., van Merrienboer, B., G ̈ul ̧cehre, C ̧ ., Bougares, F., Schwenk, H., Bengio,Y.: Learning phrase representations using RNN encoder-decoder for statisticalmachine translation. CoRRabs/1406.1078(2014)
+
+Laptev, I., Marsza lek, M., Schmid, C., Rozenfeld, B.: Learning realistic humanactions from movies. In: 26th IEEE Conference on Computer Vision and PatternRecognition, CVPR. (2008) Building Size Constrained Predictive Models for Video Classification9
+
+Wang, H., Schmid, C.: Action recognition with improved trajectories. In: Proceed-ings of the IEEE International Conference on Computer Vision. (2013)
+
+Wang, H., Ullah, M.M., Klaser, A., Laptev, I., Schmid, C.: Evaluation of localspatio-temporal features for action recognition. BMVC 2009 - British MachineVision Conference (2009)
+
+J ́egou, H., Douze, M., Schmid, C., P ́erez, P.: Aggregating local descriptors intoa compact image representation. In: Proceedings of the IEEE Computer SocietyConference on Computer Vision and Pattern Recognition. (2010)
+
+Perronnin, F., Dance, C.: Fisher kernels on visual vocabularies for image catego-rization. In: Proceedings of the IEEE Computer Society Conference on ComputerVision and Pattern Recognition. (2007)
+
+Arandjelovic, R., Gronat, P., Torii, A., Pajdla, T., Sivic, J.: NetVLAD: CNNArchitecture for Weakly Supervised Place Recognition. IEEE Transactions onPattern Analysis and Machine Intelligence (2018)
+
+Hinton, G., Vinyals, O., Dean, J.: Distilling the knowledge in a neural network.In: NIPS Deep Learning and Representation Learning Workshop. (2015)
+
+Ruppert, D.: Efficient estimations from a slowly convergent robbins-monro process.Technical report, Cornell University Operations Research and Industrial Engineer-ing (2018)
+
+Han, S., Mao, H., Dally, W.J.: Deep compression: Compressing deep neural networkwith pruning, trained quantization and huffman coding. CoRRabs/1510.00149(2015
+
+reply
+Reply
+Kushajveer Singh
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Just what was needed to widen my knowledge scope
+
+reply
+Reply
+Wudi Wang
+
+Posted 8 years ago
+
+· 9th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Excellent! I never figured out how to combine several small models into one graph, which limits my solution to only one model. Looking forward to see your code! Surely it will be super helpful!
+
+reply
+Reply
+Youliang Yu
+
+Posted 8 years ago
+
+· 21st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Hi Wudi. Scoring 0.88 on LB with a single model is impressive. Could you share your solution? A brief description would be good. Thanks.
+
+reply
+Reply
+AbhishekSaitwal
+
+Posted 8 years ago
+
+arrow_drop_up
+1
+more_vert
+
+congratulations
+
+reply
+Reply
+ryches
+
+Posted 8 years ago
+
+arrow_drop_up
+1
+more_vert
+
+You might not have timed this but did you see any improvement in inference time after quantizing the weights? I originally tried that out a while ago when I was trying to run things on a raspberry pi after training on gpu. I forgot why but at the time tensorflow had a reason why no speedup occurred. Wasn't sure if that was something you tested?
+
+reply
+Reply
+
+This comment has been deleted.
+
+3 more replies
+arrow_drop_down
+notsofast
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! I think it's essentially ensembling rather than distillation? :)
+
+reply
+Reply
+unfashionable
+
+Posted 8 years ago
+
+· 16th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I agree!
+
+reply
+Reply
+Miha Skalic
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Depends on how you look at it. From another perspective the model had 15 student models and 9 models in final ensemble.
+
+reply
+Reply
+fuhodev
+
+Posted 7 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Could you tell me about what types of GPU did you use ?
+
+reply
+Reply
+zhou
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! May I ask how much accuracy drops if we quantize the weights but not mapping them back to float32? Thanks!
+
+reply
+Reply
+Miha Skalic
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Zhou, Unfortunately we did not try quantized inference, so I cannot provide any numbers
+
+reply
+Reply
+Wei Zheng
+
+Posted 8 years ago
+
+· 67th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!
+I am also trying NetVLAD and had some trouble achieving your GAP. Can you please share your experiences/opinion on the following questions?
+
+
+Is it important to ensemble multiple NetVLADs? From my experience, a single NetVLAD can only reach ~83%. But your NetVLADs have an average of 87%.
+
+I flatten the NetVLAD matrix (shape = feature size x cluster size) and fed it into a dense layer. With 256 clusters I got CUDA_out of memory error on my Titan X 12 GB, even with batch size = 1. How did you address this problem?
+
+This question is a continuation from the 2nd question. I tried to avoid the OOM error by applying convolution. Basically I treat the NetVLAD matrix as 2D image and apply convolutions on it, then flatten and fed into Mixture of Experts. Do you think this strategy is reasonable?
+
+
+Thank you!
+
+reply
+Reply
+Miha Skalic
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Wei, which implementation of netVLAD are you using? ones from https://github.com/miha-skalic/youtube8mchallange or some other? models from model_configs.xlsx in that repo should be able to achive 0.87, even on a single GPU.
+
+In regards to TF (OOM) error - We had some unsolved problems ourselves but not on a single GPU. I'm not sure I can help you with this (maybe try different TF/CUDA/drivers/…).
+
+reply
+Reply
+Kushajveer Singh
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Am I missing something here. But I am not able to see the figure with the distillation scheme.
+
+reply
+Reply
+Miha Skalic
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+sorry, the link expired. Fixing it now.
+
+edit: fixed
+
+reply
+Reply
+Kushajveer Singh
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Thanks
+
+reply
+Reply
+WlMx
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great!
+
+reply
+Reply
+The Bird
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!
+
+reply
+Reply
+Pedro Ulisses
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Parabéns, ótimo trabalho.
+
+reply
+Reply
+Arnab
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+amazing technique
+
+reply
+Reply
+Pedro Aaron
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!
+
+reply
+Reply
+Ales Pokorny
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Nice, good job!
+
+reply
+Reply
+kerriop
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+good
+
+reply
+Reply
+Mohsen Kiskani
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats Miha! Can't wait to see your paper and your code!
+
+reply
+Reply
+liuhao
+
+Posted 8 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats!!!
+
+reply
+Reply
+Heda Wang
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Bravo! Congratulations!
+
+reply
+Reply
+Grey Fertich
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congrats
+
+reply
+Reply
+Andrey Vykhodtsev
+
+Posted 8 years ago
+
+· 103rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thank you very much for sharing! Looking forward to see the code
+
+reply
+Reply
+Chris Deotte
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations!! And thanks for sharing your design and methodology.
+
+reply
+Reply
+Rob Wishart
+
+Posted 8 years ago
+
+· 99th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Well done !
+
+Any information on how to combine Tensorflow models would be appreciated.
+
+reply
+Reply
+Miha Skalic
+
+Topic Author
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+It took us some time to figure out these kind of things ourselves. In general I find TF documentation hard to follow and not so descriptive - thus we applied trial and error approach.
+
+common_input = tf.placeholder(tf.float32, shape=(None, 300, 1152), name="CommonIn")
+common_frames = tf.placeholder(tf.int32, shape=(None,))
+
+with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
+    for i, in_model in enumerate(in_models):
+        with tf.variable_scope("model_{}".format(i)), tf.device("/cpu:0"):
+            saver = tf.train.import_meta_graph(in_model + ".meta", clear_devices=True)
+        logging.info("restoring variables from " + in_model)
+        saver.restore(sess, in_model)
+
+    input_tensor = tf.get_collection("input_batch_raw")
+    num_frames_tensor = tf.get_collection("num_frames")
+    predictions_tensor = tf.get_collection("predictions")
+
+    for g_inpt in input_tensor:
+        tf.contrib.graph_editor.connect(common_input, g_inpt)
+    for g_inpt in num_frames_tensor:
+        tf.contrib.graph_editor.connect(common_frames, g_inpt)
+
+    final_out = predictions_tensor[0] * weights[0]
+    for sumodel_out, wfactor in zip(predictions_tensor[1:], weights[1:]):
+        final_out = final_out + sumodel_out * wfactor
+
+    tf.get_default_graph().clear_collection("input_batch_raw")
+    tf.add_to_collection("input_batch_raw", common_input)
+
+    tf.get_default_graph().clear_collection("num_frames")
+    tf.add_to_collection("num_frames", common_frames)
+
+    tf.get_default_graph().clear_collection("predictions")
+    tf.add_to_collection("predictions", final_out)
+
+    os.makedirs(save_folder)
+
+    uninit = set(sess.run(tf.report_uninitialized_variables()))
+    used_vars = [v for v in tf.global_variables() if v.name.split(':')[0] not in uninit]
+
+    saver = tf.train.Saver(used_vars)
+    saver.save(sess, os.path.join(save_folder, "inference_model"))
+
+    ref_falgs = os.path.join(os.path.dirname(in_models[-1]), "model_flags.json")
+    shutil.copy(ref_falgs, save_folder)
+    logging.info("We are done!")
+
+reply
+Reply
+Rob Wishart
+
+Posted 8 years ago
+
+· 99th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you again.
+
+reply
+Reply
+Amit Kumar Jaiswal
+
+Posted 8 years ago
+
+· 181st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations @mihaskalic!
+
+reply
+Reply

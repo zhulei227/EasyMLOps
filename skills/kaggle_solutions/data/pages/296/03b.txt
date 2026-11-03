@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75131
-fetched: 2026-10-27
-chars: 744
+fetched: 2026-11-03
+chars: 12448
 
 menu
 Skip to
@@ -22,33 +22,401 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-LSST Project · Featured Prediction Competition · 8 years ago
-Late Submission
-more_horiz
+3rd Place Part II — PLAsTiCC Astronomical Classification
+3rd Place Part II
+
 PLAsTiCC Astronomical Classification
 
-Can you help make sense of the Universe?
+Solution Writeup · 3rd place · May 19, 2021
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
-Failed to load the discussion topic
-error
+Thank you my briliant team, all teams who competed with us, and all people who participated in this competition. Congrats Kyle Boone, who won this competition with an incredible performance!
+I'm happy because I and yuval became kaggle expert with 2 gold medals in this competition, and We finally became Prize Winner :)
+It's my second kaggle competition and it was fun to compete with AhmetErdem and CPMP again, who I competed with in my previous competition, TalkingData Adtracking Fraud Detection. Here, I won't explain all of my team's solution, please take a look at @yuval6967 and @nyanpn solutions, if you want to see what my teammate has done.
+yuval's solution : https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75116 nyanp's solution : https://www.kaggle.com/c/PLAsTiCC-2018/discussion/75222 My github for the host: https://github.com/takashioya/plasticc
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+My Model
 
-error
+my model is based on CatBoost, with lotta feature engineering. I made 3 types of models. (1) galactic model, the number of features are about 1000. (2) extra-galactic model, the number of features are about 2000. (3) extra-galactic model with hostgal_specz, the number of features are about 2000. It gave 0.004 improvement. Then, I trained 7 * 3 types models with different feature set and get simple average of them, which scored 0.806 on Public LB, while my best single model scored 0.823.
+you may think the number of features of my model is too big, but using small number of features degraded the score. tbh I prefer to use big features, because I think big features lead to big improvement in ensemble, from my experience.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+My Features
 
-Failed to load the discussion topic
+actually, I used nyanp's features for my model and some of them have much bigger importance than mine (especially salt-2 features). However, some of my features still have high importance, so I'll explain a bit about them.
+
+features related to mjd: something like 'variance of mjd whose detected == 1' worked well.
+abs_curve_angle_features: by calculating np.arctan(flux_diff/mjd_diff), we can calculate 'angle' of light curve. I calculated many stats from this.
+feets features: I used https://github.com/carpyncho/feets, which was effective.
+gaussian process features: It worked better than the features like 'days_from_peak_n_percent_flux'. for gaussian process, I used Gpy, but it's too slow and I had to use 30 instances for feature extraction.
+shifted_flux * distance ** 2 features: I calculated shifted_flux = flux - flux.min() if flux.min() > 0 per each object_id and passband, which worked better than just calculating flux * distance ** 2
+Ensemble
+
+I used weighted average for ensemble. however, I gave different weights to each class, which gave us 0.006 improvement. I calculated the weights using oof-predictions by hyperopt.
+By getting weighted average of mamas's CatBoost(0.806) and nyanp's LightGBM(0.834), we got 0.780 on public LB.Then, in the same way, we calculated weighted average of 0.780 model and yuval's NN (0.791) and got 0.737.
+
+probing class99
+
+Actually, we did nothing special about class99 7 days before the end of the competition. We noticed class99 probing is very effective 6 days before the end and spent 5 days probing class99 distribution. Finally, we got 0.057 improvement by probing class99, which took us to the Prize zone (0.680 on public LB).
+For extra-galactic, we used this special formula. c99 = 1.65 * (c42 + c52 + c62 + c95) ** 2.5 * (1 - c62 - c95) ** 0.635
+For galactic, we did nothing special, just a normal method like this. c99 = 0.2 * (1 - c42) * (1 - c52) * .... * (1 - c90)
+Here, I'll explain how we found this special formula.
+First, we started with the normal method like this. c99 = 0.9 * (1 - c42) * (1 - c52) * .... * (1 - c90)
+Then, we noticed this way works better, which means c90 is not similar to c99 at all. c99 = 0.9 * (1 - c42) * (1 - c52) * .... * (1 - c90) ** 2
+Then, we also tried changing power for other classes and got this formula. (We spent about 19 subs for this step) powers = {c42 : 0, c52 : 0, c62 : 0.5, c95 : 1, c90 : 2, c88 : 2, c67 : 2, c64 : 2, c15 : 2} c99 = np.prod([(1 - pred[c]) ** powers[c] for c in classes])
+This formula means c99 is very similar to c42 and c52, and somewhat similar to c62 and c95. actually, this formula already improved our score by 0.049 and it was the last day of the competition. but, we didn't give up and finally found the problem of this formula.
+
+For object_id whose c90 = 0.5 and c88 = 0.5, we thought we should assign c99 = 0.
+
+However, this formula assigns c99 = 0.5 ** 2 * 0.5 ** 2 = 0.0625, which looks too high for us. so, we thought we should do something like c99 *= (1 - c90 - c88) and finally found c99 = 1.65 * (1 - c90 - c88 - c67 - c64 - c15) ** 2 * (1 - c62 - c95) ** 0.635 = 1.65 * (c42 + c52 + c62 + c95) ** 2 * (1 - c62 - c95) ** 0.635 is a very good approximation of the formula.
+Actually, it was our last submission in this competition and we couldn't tune coefficient at all.
+
+
+what didn't work for me
+
+some of the experiments that didn't work (Not all)
+
+
+Band-correction using hostgal_photoz
+
+target encoding using ra, decl
+
+using adversarial validation for feature selection
+
+stacking using GBDT as meta model
+
+UNet-like Autoencoder for feature extraction
+
+make binary classification model and use oof-predictions as features
+
+what worked
+class90 pseudo-labelling: It gave 0.016 improvements for me.
+
+adversarial pseudo-labelling: I selected the objects whose the prediction is very high and similar to train data and used them for training. It didn't give a significant improvement for me, but I suppose it somewhat contributed to diversity in ensemble.
+Comments
+
+Actually, I haven't figured out why we dropped from 2nd to 3rd on Private LB. I'm wondering whether it's because of the luck or not.
+
+As for the competition design, I think making 'class99' is not so good, because it leads to LB probing and is not so practical. However, on the whole, I suppose this competition is really interesting and one of the most successful competition in kaggle. I'm especially really impressed with the yuval's beautiful and practical NN modelling :)
+
+Anyway, I really enjoyed my second kaggle competition. I'll continue kaggle and want to become the winner in the next competition :)
+
+Thanks all, see you again!
+Authors
+yuval reina
+
+yuval6967
+
+mamas
+
+mamasinkgs
+
+nyanp
+
+nyanpn
+
+arrow_drop_up
+46
+Share
+more_horiz
+Citation
+
+yuval reina, mamas, nyanp. 3rd Place Part II. https://www.kaggle.com/competitions/PLAsTiCC-2018/writeups/major-tom-3rd-place-part-ii. 2018. Kaggle
+
+comment
+24 Comments
+Hotness
+takus
+
+Posted 8 years ago
+
+· 95th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congraturations! Thank you for sharing. I'll try your solutions.
+
+reply
+Reply
+Giba
+
+Posted 8 years ago
+
+· 20th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Your class 99 probing strategy is great, congrats!
+
+reply
+Reply
+Tania J
+
+Posted 8 years ago
+
+· 58th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Your class_99 calculation improved my best model by 0.039!
+
+I guess one of my biggest lessons out of this competition is: don't be afraid to LB probe!
+
+reply
+Reply
+Vig
+
+Posted 8 years ago
+
+· 126th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats and thanks for sharing a detailed explanation of Class 99 probing.
+
+reply
+Reply
+Kyle Boone
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! I'm amazed that you were able to use 2000 features on the training set without running into serious overfitting problems. For the galactic set, there are only 2325 objects in the training set! How did you regularize to deal with that?
+
+reply
+Reply
+mamas
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks, Kyle. Actually, I was able to use more than 5000 features without overfitting problem. The only reason I used 2000 features is inference time and loading time for the huge test set.
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the final result!
+
+Thanks a lot for sharing. I tried FEATS without much success, is feets really different?
+
+I see that once again class 99 probing is what we missed most. Too bad for us.
+
+reply
+Reply
+mamas
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I remember feets gave a small improvement for me. (but maybe it's not significant) yes, actually I might have been 5th place if we had not succeeded in class99 probing, because our best private LB score without class99 probing is 0.758, which is worse than your team.
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I'd like to try your class_99 computation with our best submission (so that it hurts even more ;) ) From your post I assume you normalize the sum of probabilities for known classes to 1 before applying your formula. Is that right?
+
+reply
+Reply
+mamas
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+yes, right.
+
+reply
+Reply
+Silogram
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Yes, it will hurt a lot more. Our PB score would have been 0.656 with this Class_99 formula!
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I yields to some class_99 probabilities being higher than 1 in my case. I guess it is a sign that I need to move to something else ;)
+
+reply
+Reply
+CPMP
+
+Posted 8 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+It is the first time I see catboost being better than lgb or xgb. To make sure this is because of catboost and not something else I'm curious to know if you tried lgb with your features, or if you tried catboost with nyanpn features?
+
+reply
+Reply
+mamas
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think it's not only because of catboost, it is very sensitive to the features we use. These are what we tried.
+
+lgb only with my features : didn't work at all. I remember it's much worse than catboost by more than 0.05.
+
+lgb only with nyanp features: it somewhat works, scored 0.834 on LB. (you can see detail in nyanp's solution)
+
+lgb with nyanp and mamas features: didn't work at all.
+
+catboost only with my features: actually I haven't checked it for a long time, but I remember it worked.
+
+catboost with my features and nyanp features : it worked well, scored 0.806 on LB as I said.
+
+XGBoost only with my features: It's not so bad as lgb, but works worse than catboost.
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+yuval reina
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Another comment related @mamas adversarial pseudo-labeling, I used his pseudo-labeling to retrain the NN's, which gave nice improvement to 2 of the 3 NN (The only one which wasn't improved was the one with mamas's best features ;) )
+
+reply
+Reply
+Kyle Boone
+
+Posted 8 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Very interesting! I thought about trying to do something like this but ran out of time. How much did the pseudo-labeling improve your final scores?
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+iprapas
+
+Posted 8 years ago
+
+· 22nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thanks for sharing! Did you calculate all your features on adjusted flux?
+
+I also tried abs_curve_angle_features in total curve, per bandpass and concentrated around maximum, but they only helped my model overfit to training set in all cases
+
+reply
+Reply
+mamas
+
+Topic Author
+
+Posted 8 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+no, some features are calculated on adjusted flux, others not.
+
+I also tried abs_curve_angle_features in total curve, per bandpass and concentrated around maximum, but they only helped my model overfit to training set in all cases It may be related to your model. actually, my LightGBM model doesn't work at all in this competition, it overfits to training set very fast.
+
+reply
+Reply

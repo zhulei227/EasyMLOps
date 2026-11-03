@@ -1,0 +1,267 @@
+- generic [ref=f8e2]:
+  - navigation "Main Kaggle page navigation" [ref=f8e3]:
+    - generic [ref=f8e5]:
+      - button "Navigation menu" [ref=f8e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f8e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f8e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f8e12] [cursor=pointer]:
+      - paragraph [ref=f8e18]: Create
+    - generic [ref=f8e21]:
+      - list [ref=f8e22]:
+        - listitem "Home List Item" [ref=f8e23]:
+          - link "Home" [ref=f8e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f8e31]: Home
+        - listitem "Competitions List Item" [ref=f8e32]:
+          - link "Competitions" [ref=f8e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f8e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f8e41]:
+          - link "Benchmarks" [ref=f8e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f8e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f8e50]:
+          - link "Arenas" [ref=f8e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f8e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f8e59]:
+          - link "Game Arena" [ref=f8e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f8e67]: Game Arena
+      - list [ref=f8e68]:
+        - listitem "Data Hub List Item" [ref=f8e69]:
+          - generic [ref=f8e70]:
+            - link "Data Hub" [ref=f8e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f8e77]: Data Hub
+            - button "Expand" [ref=f8e80] [cursor=pointer]
+      - list [ref=f8e82]:
+        - listitem "More on Kaggle List Item" [ref=f8e83]:
+          - generic [ref=f8e84]:
+            - link "More on Kaggle" [ref=f8e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f8e91]: More
+            - button "Expand" [ref=f8e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f8e97]:
+    - generic [ref=f8e98]:
+      - generic [ref=f8e102]:
+        - textbox "Search" [ref=f8e104]
+        - group [aria-hidden]
+      - generic [ref=f8e106]:
+        - link [ref=f8e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fventilator-pressure-prediction%2Fdiscussion%2F287200
+          - button "Login" [ref=f8e108]
+        - link [ref=f8e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fventilator-pressure-prediction%2Fdiscussion%2F287200
+          - button "Sign Up" [ref=f8e111]
+  - main [ref=f8e113]:
+    - generic [ref=f8e115]:
+      - generic [ref=f8e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f8e117]:
+        - link "Learn more" [ref=f8e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f8e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f8e123]:
+      - generic [ref=f8e125]:
+        - generic [ref=f8e126]:
+          - link "Google Brain's profile" [ref=f8e127] [cursor=pointer]:
+            - /url: /organizations/google-brain
+            - generic "Google Brain" [ref=f8e128]
+          - generic [ref=f8e132]:
+            - generic [ref=f8e133]: Google Brain
+            - generic [ref=f8e135]: · Research Prediction Competition · 5 years ago
+          - generic [ref=f8e136]:
+            - button "Late Submission" [disabled] [ref=f8e138]
+            - button "Competition options menu collapsed" [ref=f8e141] [cursor=pointer]: more_horiz
+        - generic [ref=f8e143]:
+          - heading "Google Brain - Ventilator Pressure Prediction" [level=1] [ref=f8e144]
+          - paragraph [ref=f8e146]: Simulate a ventilator connected to a sedated patient's lung
+      - generic [ref=f8e150]:
+        - tablist [ref=f8e157]:
+          - tab "Overview, 1 of 7" [ref=f8e158] [cursor=pointer]:
+            - generic [ref=f8e159]: Overview
+          - tab "Data, 2 of 7" [ref=f8e160] [cursor=pointer]:
+            - generic [ref=f8e161]: Data
+          - tab "Code, 3 of 7" [ref=f8e162] [cursor=pointer]:
+            - generic [ref=f8e163]: Code
+          - tab "Models, 4 of 7" [ref=f8e164] [cursor=pointer]:
+            - generic [ref=f8e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f8e166] [cursor=pointer]:
+            - generic [ref=f8e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f8e168] [cursor=pointer]:
+            - generic [ref=f8e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f8e170] [cursor=pointer]:
+            - generic [ref=f8e171]: Rules
+        - separator [ref=f8e173]
+      - generic [ref=f8e177]:
+        - generic [ref=f8e178]:
+          - generic [ref=f8e179]:
+            - generic [ref=f8e180]:
+              - link "Gilles Vandewiele's profile" [ref=f8e181] [cursor=pointer]:
+                - /url: /group16
+                - generic "Gilles Vandewiele" [ref=f8e182]
+              - generic [ref=f8e186]:
+                - link "Gilles Vandewiele" [ref=f8e187] [cursor=pointer]:
+                  - /url: /group16
+                - text: ·
+                - generic [ref=f8e188]: 1st in this Competition
+                - text: ·
+                - generic [ref=f8e189]: Posted 5 years ago
+            - generic [ref=f8e190]:
+              - generic [ref=f8e191]:
+                - button "Upvote" [ref=f8e192] [cursor=pointer]:
+                  - generic [ref=f8e193]: arrow_drop_up
+                - button "32 votes" [ref=f8e194] [cursor=pointer]: "32"
+              - button "More Options for this Topic" [ref=f8e195] [cursor=pointer]: more_vert
+            - heading "[#1 Solution] Blog Post" [level=3] [ref=f8e196]
+            - generic [ref=f8e199]:
+              - paragraph [ref=f8e200]: I have just published my blog post describing our solution more in depth!
+              - paragraph [ref=f8e201]:
+                - text: You can find it
+                - link "here (opens in a new tab)" [ref=f8e202] [cursor=pointer]:
+                  - /url: https://gillesvandewiele.medium.com/winning-the-kaggle-google-brain-ventilator-pressure-prediction-2d4c90d831ec
+                  - text: here
+                - text: .
+              - paragraph [ref=f8e203]: In case anything is unclear, or you have any questions, feel free to raise them here or as a comment on Medium itself.
+          - separator [ref=f8e204]
+        - generic [ref=f8e205]:
+          - generic [ref=f8e206]:
+            - paragraph [ref=f8e209]:
+              - paragraph [ref=f8e210]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f8e211] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f8e212]
+          - generic [ref=f8e214]:
+            - generic [ref=f8e215]:
+              - generic [aria-hidden] [ref=f8e216]: comment
+              - heading "5 Comments" [level=2] [ref=f8e218]
+            - generic [ref=f8e221]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f8e222] [cursor=pointer]:
+                - generic [ref=f8e223]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f8e225]:
+            - generic [ref=f8e226]:
+              - generic [ref=f8e230]:
+                - link "Ctrl_CV's profile" [ref=f8e231] [cursor=pointer]:
+                  - /url: /guohey
+                  - generic "Ctrl_CV" [ref=f8e232]
+                - generic [ref=f8e238]:
+                  - link [ref=f8e240] [cursor=pointer]:
+                    - /url: /guohey
+                    - heading "Ctrl_CV" [level=3] [ref=f8e241]
+                  - generic [ref=f8e242]:
+                    - paragraph [ref=f8e243]: Posted 5 years ago
+                    - paragraph [ref=f8e245]: · 62nd in this Competition
+                - generic [ref=f8e247]:
+                  - generic [ref=f8e248]:
+                    - button "Upvote" [ref=f8e249] [cursor=pointer]:
+                      - generic [ref=f8e250]: arrow_drop_up
+                    - button "1 votes" [ref=f8e251] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f8e252] [cursor=pointer]: more_vert
+                - paragraph [ref=f8e256]: Very impressive work! i will learn to it!thanks for your blog!
+              - separator [ref=f8e257]
+            - generic [ref=f8e258]:
+              - generic [ref=f8e262]:
+                - link "Mathurin Ache's profile" [ref=f8e263] [cursor=pointer]:
+                  - /url: /mathurinache
+                  - generic "Mathurin Ache" [ref=f8e264]
+                - generic [ref=f8e270]:
+                  - link [ref=f8e272] [cursor=pointer]:
+                    - /url: /mathurinache
+                    - heading "Mathurin Ache" [level=3] [ref=f8e273]
+                  - generic [ref=f8e274]:
+                    - paragraph [ref=f8e275]: Posted 5 years ago
+                    - paragraph [ref=f8e277]: · 218th in this Competition
+                - generic [ref=f8e279]:
+                  - generic [ref=f8e280]:
+                    - button "Upvote" [ref=f8e281] [cursor=pointer]:
+                      - generic [ref=f8e282]: arrow_drop_up
+                    - button "1 votes" [ref=f8e283] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f8e284] [cursor=pointer]: more_vert
+                - paragraph [ref=f8e288]:
+                  - text: Thanks a lot
+                  - link "@group16 (opens in a new tab)" [ref=f8e289] [cursor=pointer]:
+                    - /url: /group16
+                    - text: "@group16"
+                  - text: . Clever your matching algorithm. Reverse Data Generation.
+                - generic [ref=f8e295]:
+                  - link "Gilles Vandewiele's profile" [ref=f8e296] [cursor=pointer]:
+                    - /url: /group16
+                    - generic "Gilles Vandewiele" [ref=f8e297]
+                  - generic [ref=f8e303]:
+                    - generic [ref=f8e304]:
+                      - link [ref=f8e305] [cursor=pointer]:
+                        - /url: /group16
+                        - heading "Gilles Vandewiele" [level=3] [ref=f8e306]
+                      - paragraph [ref=f8e309]: Topic Author
+                    - generic [ref=f8e310]:
+                      - paragraph [ref=f8e311]: Posted 5 years ago
+                      - paragraph [ref=f8e313]: · 1st in this Competition
+                  - generic [ref=f8e315]:
+                    - generic [ref=f8e316]:
+                      - button "Upvote" [ref=f8e317] [cursor=pointer]:
+                        - generic [ref=f8e318]: arrow_drop_up
+                      - button "0 votes" [ref=f8e319] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f8e320] [cursor=pointer]: more_vert
+                  - paragraph [ref=f8e324]:
+                    - text: Thank you
+                    - link "@mathurinache (opens in a new tab)" [ref=f8e325] [cursor=pointer]:
+                      - /url: /mathurinache
+                      - text: "@mathurinache"
+                    - text: "!"
+              - separator [ref=f8e326]
+            - generic [ref=f8e331]:
+              - link "Theo Viel's profile" [ref=f8e332] [cursor=pointer]:
+                - /url: /theoviel
+                - generic "Theo Viel" [ref=f8e333]
+              - generic [ref=f8e339]:
+                - link [ref=f8e341] [cursor=pointer]:
+                  - /url: /theoviel
+                  - heading "Theo Viel" [level=3] [ref=f8e342]
+                - generic [ref=f8e343]:
+                  - paragraph [ref=f8e344]: Posted 5 years ago
+                  - paragraph [ref=f8e346]: · 1758th in this Competition
+              - generic [ref=f8e348]:
+                - generic [ref=f8e349]:
+                  - button "Upvote" [ref=f8e350] [cursor=pointer]:
+                    - generic [ref=f8e351]: arrow_drop_up
+                  - button "1 votes" [ref=f8e352] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f8e353] [cursor=pointer]: more_vert
+              - paragraph [ref=f8e357]:
+                - text: I love these kind of write-ups with some storytelling. Thanks a lot
+                - link "@group16 (opens in a new tab)" [ref=f8e358] [cursor=pointer]:
+                  - /url: /group16
+                  - text: "@group16"
+                - text: for the post, I hope to see more of those !
+              - generic [ref=f8e364]:
+                - link "Gilles Vandewiele's profile" [ref=f8e365] [cursor=pointer]:
+                  - /url: /group16
+                  - generic "Gilles Vandewiele" [ref=f8e366]
+                - generic [ref=f8e372]:
+                  - generic [ref=f8e373]:
+                    - link [ref=f8e374] [cursor=pointer]:
+                      - /url: /group16
+                      - heading "Gilles Vandewiele" [level=3] [ref=f8e375]
+                    - paragraph [ref=f8e378]: Topic Author
+                  - generic [ref=f8e379]:
+                    - paragraph [ref=f8e380]: Posted 5 years ago
+                    - paragraph [ref=f8e382]: · 1st in this Competition
+                - generic [ref=f8e384]:
+                  - generic [ref=f8e385]:
+                    - button "Upvote" [ref=f8e386] [cursor=pointer]:
+                      - generic [ref=f8e387]: arrow_drop_up
+                    - button "1 votes" [ref=f8e388] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f8e389] [cursor=pointer]: more_vert
+                - paragraph [ref=f8e393]:
+                  - text: Thank you so much
+                  - link "@theoviel (opens in a new tab)" [ref=f8e394] [cursor=pointer]:
+                    - /url: /theoviel
+                    - text: "@theoviel"
+                  - text: ", I greatly appreciate that!"
+  - alert [ref=f8e397]

@@ -1,0 +1,432 @@
+url: https://www.kaggle.com/c/pkdd-15-taxi-trip-time-prediction-ii/discussion/14988#83196
+fetched: 2026-11-03
+chars: 15502
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+Method Sharing — ECML/PKDD 15: Taxi Trip Time Prediction (II)
+Method Sharing
+
+ECML/PKDD 15: Taxi Trip Time Prediction (II)
+
+Solution Writeup · 24th place
+
+Congrats to all the winners.
+
+For my submission, the idea was to do something quick and dirty without the usual time-consuming steps of modeling, cross validating, and ensembling. Whereas my posted benchmark code used 1 point to find similar trajectories, the final submission used 2 points.
+
+Below is the recipe.
+
+Only use the most relevant rows. For example, to predict for 2014-12-21 at 14:30, only use train data from the afternoons of Sundays before public holidays.
+Only use the most relevant columns. Basically, just timestamp and polyline.
+Look up the most similar trajectories in train for each test case.  For simplicity, only the starting locations and the cut-off locations are compared. (Train trajectory is cut to about the same length as test).
+Similarity features include distance, overall bearing, and last bearing.
+Calculate the average of coordinates and log(polyline length), weighted by similarity.
+Thresholds chosen based on intuition and looking at a couple of examples to make sure enough similar trajectories are used.
+Author
+Willie Liao
+
+willieliao
+
+arrow_drop_up
+9
+Share
+more_horiz
+Citation
+
+Willie Liao. Method Sharing. https://www.kaggle.com/competitions/pkdd-15-taxi-trip-time-prediction-ii/writeups/willie-liao-method-sharing. 2015. Kaggle
+
+comment
+14 Comments
+Hotness
+lamthuy
+
+Posted 11 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Hi,
+
+Here is  our team's approach (BlueTaxi):
+
+First we created our local training set by selecting the cut-off times the same as the five snapshots on the test set (the same week-date as well). We also see that 14th of august is the day before a big holiday in Portugal and 21th of December is the last Sunday before Christmas, we hypothesize that on that day people go to shopping and to the Church.
+
+We created a bunch of features as follows:
+
+1. Features from 10-nn, for every test trip we find 10 nearest neighbours w.r.t the Euclidean distance (DTW is an option but we see that it is not very efficient) , consider the durations of those trips as predictors.
+
+2. Features from kernel regression, similar to 10-nn kernel regression was used to predict the duration, kernel regression is a smooth version of knn and these features showed very good results.
+
+3. Some features from the partial trips: travelled distance, num_gps, last gps, average speed at different part of the trips, accelerations at different part of the trips
+
+When matching a test trip with the training trips, we only consider to match the last 100, 200, 300, 400, 500, 1000 meters and the full trips as well. This is because the later part of the trip is more important in some cases. Our model show that the last 500 meters of the trip is very important.
+
+We also considered contextual matching (match only trips with same taxi_id, the same week_date, the same call_id etc.) because we see different distributions of destination for these contexts. The kernel regression on taxi_id context gives the best results.
+
+When modelling, don't predict the duration of the whole trip but predict additional travel time instead. Because the metric of evaluation is RMSLE so we should predict log of the additional travel time.
+
+Outlier handling: we found that trips with missing values  (identified at speed limits 160, 140, 100 Km/h) are more difficult to predict, we try to recover this information on the test set by looking at the gap between the cut-off timestamp and the start timestamp. Unfortunately, this information is not reliable so we decided to remove outliers  with num_gps more than at 3.5 median of num_gps update. 
+
+We used different models, I used random forest and SVR while Bluebalam used extreme randomized trees, gradient boosting trees etc. Locally we see consistent results with CV  (0.41). On the test set the result is quite different. But our approach is robust enough on both public and private test sets.
+
+Cheers,
+
+cheers,
+
+reply
+Reply
+David Shinn
+
+Posted 11 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Here's my approach:
+
+1. Reduce Training to around 58K records:
+
+Reduce to trips with POLYLINE that overlapped the 5 different times of day in the Test.
+Reduce to trips on 5 days of week in Test
+
+2. Features (where snapshot was the time of day coinciding with the times of day in the Test).
+
+call_type_dummies
+origin_stand (missing set to -1)
+taxi_id
+beg_long
+beg_lat
+length_polyline_to_snapshot
+snapshot_lat
+snapshot_long
+snapshot_weekday
+snapshot_hour (In Test, manually set based upon the snapshot datetime because some of the polylines lengths did not match the snapshot datetime)
+net_distance_to_snapshot
+seconds_to_snapshot
+log_seconds_to_snapshot
+
+3. Dependent Variable
+
+Log of trip seconds
+
+4.  Model
+
+Random Forest Regressor (sklearn) with default settings except used 500 and 1000 trees for my last two submissions.
+
+5. Result:
+
+Public LB = 0.54511
+Private LB = 0.54356
+
+There was definitely some luck here (my CVs were way too optimistic and my Public Leaderboard scores were marginally competitive), however I did spend a fair amount of time in the taxi-I competition early on, so I was comfortable with the data.  Like other competitions with small Train, small Test, or noisy data, sometimes the simpler models do well.  Besides, there were plenty of prior competitions where luck did not play in my favor, so I guess it balances out eventually.
+
+reply
+Reply
+Willie Liao
+
+Topic Author
+
+Posted 11 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Posted my solution on GitHub.  Cleaning the code took almost as much time as creating it since I introduced a bug and also found another bug.  Clean code got scores of 0.55903 for time duration and 2.39573 for location.
+
+reply
+Reply
+Santiago Mota
+
+Posted 11 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats to everybody and most at all, the top 10. I finish 11th and I will clean the code and post it on GitHub.
+
+Last two weeks all my model were on h2o, and I used gbm, random forest and deep learning. It seems the best one was gbm. My selected submissions were (1) one pure gbm and (2) a combination of two gbm one deep learning and one random forest (all on h2o)
+
+I used  "weekday", "minute" (0-1440), "initial_longitude", "initial_latitude", "call_type" and "taxi_id" variables.
+
+The only trick on my strategy was the use of duration time of trips. I did not use it to calculate the model but prior to submit it, I calculate if the predicted duration was less than time on test dataset and if so I choosed the time on dataset and multiply it to 1.45. Usually the number of this kind of trips was around 70 over 320.
+
+reply
+Reply
+Fluxus
+
+Posted 11 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Hi all,
+
+here is a short overview of the 1st place solution. 
+
+My solution is based on 3 different kind of models:
+
+A base model, where the features were extracted from all the tracks in the training set, and longer tracks were sampled more frequently than shorter ones.
+Expert models for short trips (e.g. only 1,2 or 3 positions are known).
+Expert models for each cut off position in the test set (e.g. tracks close to the cut-off position have been selected).
+
+Selected Features:
+
+working day (Mon-Sun)
+hour
+trip length
+lat coordinate start point
+long coordinate start point
+lat coordinate cut of point
+long coordinate cut of point
+distance from start point to city center
+direction from the start point towards the city center
+distance from city center to cut of point
+direction from the city center towards the cut of point
+net distance to cut of point
+median velocity of the car along the track
+velocity of the car at the cut of point
+heading of the car at the cut of point
+
+Training:
+
+All models are trained using 5 fold cross-validation. I used RandomForestRegressor  and GrandientBoostingRegressor from sklearn with default settings except the number of trees, which was set to 200. For most models the GradientBoostingRegressor was slightly better. I also tried neural networks but they performed worse.
+
+
+The final prediction of each test trip was based on the corresponding expert model except for the trips with a low training set size, where I used either the base model or a simple average of all the short trip models depending on trip length.
+
+
+A detailed description of my approach and the code will follow soon.
+
+reply
+Reply
+tyi2000
+
+Posted 11 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Here goes my approach.
+
+
+preprocessing & feature generation
+From each training data, I created multiple training examples: each partial trajectory starting from the start location becomes a training example. For each training example, I then calculated the elapsed time until the last position, travel distance, the overall bearing, and the nearest taxi stand from the starting point.
+
+training
+I used gradient boosting (R gbm package) for training.
+
+local validation
+For local validation, I created two validation sets. Each consists of 5 cutoff points whose month, day of week, and time within day are same as the test dataset. I was able to pick the 2nd best result using the local validation result.
+
+reply
+Reply
+Dessy Amirudin
+
+Posted 11 years ago
+
+arrow_drop_up
+1
+more_vert
+
+[quote=Willie Liao;83398]
+
+Just tried it with R 3.2 and data.table 1.9.4 and it works.  Try upgrading to R 3.2.1 and reinstalling your packages to see if that solves the problem.
+
+[/quote]
+
+@Willie
+
+Thank you. It did work :)
+
+reply
+Reply
+Willie Liao
+
+Topic Author
+
+Posted 11 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@Dessy, I have not seen that error before.  It may be related to this this or this.  I don't have the computer that I tested the code with so I can't verify the versions.  Just tried it with R 3.2 and data.table 1.9.4 and it works.  Try upgrading to R 3.2.1 and reinstalling your packages to see if that solves the problem.
+
+And just in case, I've updated the code to call setkey on train and poly before that particular statement.  This shouldn't be the problem though.
+
+reply
+Reply
+Dessy Amirudin
+
+Posted 11 years ago
+
+arrow_drop_up
+1
+more_vert
+
+[quote=Willie Liao;83285]
+
+Posted my solution on GitHub.  Cleaning the code took almost as much time as creating it since I introduced a bug and also found another bug.  Clean code got scores of 0.55903 for time duration and 2.39573 for location.
+
+[/quote]
+
+Hi Willie, thank you for sharing your code on github. I want to recreate your code but find an error.
+
+When I execute
+
+poly[r==0, r2:=r2-1L]
+
+I got following error
+
+Error in setkeyv(..., physical = FALSE) :
+4 arguments passed to .Internal(nchar) which requires 3
+
+Do you know what the problem is? I am not really familiar with data.table package, already google it but clueless.
+
+Thanks
+
+reply
+Reply
+lebroschar
+
+Posted 11 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Here's an overview of my approach for the 7th place solution.
+
+The approach for this submission was pretty simple.  I used an sklearn RandomForestRegressor with 30 trees to bin the training cases using log(duration + 1) as the target.  The features I used were hour of the day, taxi id, caller id, and trip starting location (binned onto a grid with ~100m resolution).
+
+For each test trip, I found the appropriate leaf in each tree of the random forest and removed the samples whose duration was shorter than the duration of the test trip segment.  If necessary, I climbed the tree to include other nearby leaves so that I had at least 10 training trips that were longer than the test segment.  I took the average of the log(duration +1) for those samples and that was my prediction.
+
+Despite having learned better from other Kagglers, I did an awful job of CV.  I didn't do any proper CV until the last day of the contest, thinking that due to the log factors in the evaluation metric the public leaderboard would be much less volatile due to the small number of test cases than in taxi-I.  That was wrong =p  I paid the price though - I ended up selecting only my 4th best case for submission and I discarded several ideas on account of the public leaderboard result that were actually good ones.  We live and learn....
+
+reply
+Reply
+mlandry
+
+Posted 11 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@Smota, nice to see use of H2O here :-) Thanks for posting your work so quickly. Interesting to see so many trees: RF with 3100 trees and GBM with 10000 deep trees (15).
+
+My best models in H2O also had to have post-processing, but on the short trips, whereas it would seem like the target of your post-processing step was the long ones.
+
+reply
+Reply
+Santiago Mota
+
+Posted 11 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+GitHub: https://github.com/santiagomota/kaggle-taxi-II
+
+reply
+Reply
+moreiraMatias
+
+Competition Host
+
+Posted 11 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Dear competitors,
+
+Thank you for participating with your straightforward ideas. You made the success of this competition. I want to highlight that this dataset was donated to the UCI data repository to make it available for everyone who wants to run experiments with it.
+
+During my Phd, I used this data for other purposes (not this dataset, but similar data collected in previous periods). I will share my own insights with you (please feel free to make other questions if you think that they are relevant:
+
+1) The spatial discretization is a must. It is not surprising to see that almost everyone did it somehow…
+
+2) The cutoff points were not randomly selected. They respond to particular seasonalities in Porto which could be mined through the calendar or by some exploratory data analysis as well.
+
+3) The model itself requires a carefull feature engineering before take off. Anyhow, I saw here very elegant solutions…e.g. gradient boosting. But maybe to get a model for each cutoff (or each cutoff type) wouldnt be a bad idea….what do you think?
+
+Please feel free to pose more questions and continue to share your own solutions.
+
+I do hope to see you all in Porto next September, in ECML/PKDD.
+
+Best, Luis Moreira-Matias
+
+reply
+Reply
+Santiago Mota
+
+Posted 11 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you Mark. For my this contest was an occasion to test h2o. I really like your product but I need more time to extract all the potential. I did use at the last stage of the contest so I could not make many models, but made some parameters changes on random forest, gbm and deep learning over h2o.
+
+I must to say I did not spent enough time studding the problem of this trips. As I did not use the length of polyline to predict, I used it to test the prediction, When my predicted time was lower I tried to replace it and then I started to multiply first 1, 1.2, 2, and at last I used 1.45. I did not quite understand why on some many trips (around 70 over 320) all my models make a low prediction than the final time on test set. I wish I would work more on this, but the solution to multiply by 1.45 improve a lot the results. I need more time to analyze it.
+
+reply
+Reply

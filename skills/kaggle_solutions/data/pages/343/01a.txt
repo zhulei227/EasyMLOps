@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111308
-fetched: 2026-10-27
-chars: 825
+fetched: 2026-11-03
+chars: 24190
 
 menu
 Skip to
@@ -22,35 +22,818 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-IEEE Computational Intelligence Society · Research Prediction Competition · 7 years ago
-Late Submission
-more_horiz
+1st Place Solution - Part 2 — IEEE-CIS Fraud Detection
+1st Place Solution - Part 2
+
 IEEE-CIS Fraud Detection
 
-Can you detect fraud from customer transactions?
+Solution Writeup · 1st place · Oct 8, 2019
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+In "1st Place Solution - Part 1" posted here, we discussed the benefits of classifying clients (credit cards) instead of transactions in Kaggle's Fraud competition. Here we will discuss the technical details.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Final Model
 
-error
+Our final model was a combination of 3 high scoring single models. CatBoost (Public/Private LB of 0.9639/0.9408), LGBM (0.9617/0.9384), and XGB (0.9602/0.9324). These models were diversified because Konstantin built the CAT and LGB while I built the XGB and NN. And we engineered features independently. (In the end we didn't use the NN which had LB 0.9432). XGB notebook posted here.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+One final submission was a stack where LGBM was trained on top of the predictions of CAT and XGB and the other final submission was an ensemble with equal weights. Both submissions were post processed by taking all predictions from a single client (credit card) and replacing them with that client's average prediction. This PP increased LB by 0.001.
 
-Failed to load the discussion topic
+How to Find UIDs
 
-error
+We found UIDs in two different ways. (Specific details here).
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Wrote a script that finds UIDs here
+Train our models to find UIDs here and here
+
+If you remember, Konstantin's original public FE kernel here without UIDs achieves local validation AUC = 0.9245 and public LB 0.9485. His new FE kernel here achieves local validation AUC = 0.9377 and public LB 0.9617 by finding and using UIDs. Soon I will post my XGB kernel which finds UIDs with even less human assistance and proves to beat all other methods of finding UIDs. (XGB posted here). The purpose of producing UIDs by a script was for EDA, special validation tests, and post process. We did not add the script's UIDs to our models. Machine learning did better finding them on its own.
+
+EDA
+
+EDA was daunting in this competition. There were so many columns to analyze and their meanings were obscured. For the first 150 columns, we used Alijs's great EDA here. For the remaining 300 columns, we used my V and ID EDA here. We reduced the number of V columns with 3 tricks. First groups of V columns were found that shared similar NAN structure, next we used 1 of 3 methods:
+
+We applied PCA on each group individually
+We selected a maximum sized subset of uncorrelated columns from each group
+We replaced the entire group with all columns averaged.
+
+Afterward, these reduced groups were further evaluated using feature selection techniques below. For example, the block V322-V339 failed "time consistency" and was removed from our models.
+
+Feature Selection
+
+Feature selection was important because we had many columns and preferred to keep our models efficient. My XGB had 250 features and would train 6 folds in 10 minutes. Konstantin will need to say what his models had. We used every trick we knew to select our features:
+
+forward feature selection (using single or groups of features)
+recursive feature elimination (using single or groups of features)
+permutation importance
+adversarial validation
+correlation analysis
+time consistency
+client consistency
+train/test distribution analysis
+
+One interesting trick called "time consistency" is to train a single model using a single feature (or small group of features) on the first month of train dataset and predict isFraud for the last month of train dataset. This evaluates whether a feature by itself is consistent over time. 95% were but we found 5% of columns hurt our models. They had training AUC around 0.60 and validation AUC 0.40. In other words some features found patterns in the present that did not exist in the future. Of course the possible of interactions complicates things but we double checked every test with other tests.
+
+Validation Strategy
+
+We never trusted a single validation strategy so we used lots of validation strategies. Train on first 4 months of train, skip a month, predict last month. We also did train 2, skip 2, predict 2. We did train 1 skip 4 predict 1. We reviewed LB scores (which is just train 6, skip 1, predict 1 and no less valid than other holdouts). We did a CV GroupKFold using month as the group. We also analyzed models by how well they classified known versus unknown clients using our script's UIDs.
+
+For example when training on the first 5 months and predicting the last month, we found that our
+
+XGB model did best predicting known UIDs with AUC = 0.99723
+LGBM model did best predicting unknown UIDs with AUC = 0.92117
+CAT model did best predicting questionable UIDs with AUC = 0.98834
+
+Questionable UIDs are transactions that our script could not confidently link to other transactions. When we ensembled and/or stacked our models we found that the resultant model excelled in all three categories. It could predict known, unknown, and questionable UIDs forward in time with great accuracy !!
+
+Authors
+Konstantin Yakovlev
+
+kyakovlev
+
+Chris Deotte
+
+cdeotte
+
+arrow_drop_up
+405
+Share
+more_horiz
+Citation
+
+Konstantin Yakovlev, Chris Deotte. 1st Place Solution - Part 2. https://www.kaggle.com/competitions/ieee-fraud-detection/writeups/fraudsquad-1st-place-solution-part-2. 2019. Kaggle
+
+54
+2
+comment
+96 Comments
+8 appreciation comments
+Hotness
+Vitalii Mokin
+
+Posted 7 years ago
+
+· 1317th in this Competition
+
+arrow_drop_up
+8
+more_vert
+
+@cdeotte, congratulations! Thanks for sharing your approaches and magic! I added your post to my collection of the best kernels and posts of winners of Kaggle Prize Competitions: Data Science for tabular data: Advanced Techniques
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks
+
+reply
+Reply
+Adrian Zinovei
+
+Posted 7 years ago
+
+· 2065th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Thanks for sharing. CAT boost looks to be used more and more. I think you guys made a huge work to get to this point. Best of luck. A
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+CatBoost is great. In Santander Comp it was my best performing GBM
+
+reply
+Reply
+Yury Kashnitsky
+
+Posted 7 years ago
+
+· 6305th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+@cdeotte congrats on your 1st place and becoming Kaggle Master! I see you like sharing your knowledge. I'm leading mlcourse.ai - free and open ML course with a good mixture of theory and practice. Students have to both understand how to derive logloss from MLE and to participate in 4 Kaggle Inclass competitions in 10 weeks, pretty tough :) Currently we have >2k students involved.
+
+How about giving a live intro to feature engineering & selection techniques to mlcourse.ai students? It can be an extended version of your post.
+
+I thought of a bit different format - talkatorial, smth in between a talk and a tutorial. So we can talk about life for 10-15 minutes, and then you can explain the subject, (preferably) showing some reproducible code.
+
+reply
+Reply
+YaGana Sheriff-Hussaini
+
+Posted 7 years ago
+
+· 239th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Congrats @cdeotte and thanks for a comprehensive sharing of your solution.
+
+We never trusted a single validation strategy so we used lots of validation strategies…
+
+That was my frustration during this competition. I only had one XGBoost model with the same CV and public LB score that is only 0.9419 (privale LB=0.916041). I could not make it better and maintain the scores agreement. In hindsight, it was because I was not able to make noiseless FE. Like the last Santander competition, there is so much to disect in the top solutions for this competition for knowledge enhancement.
+
+reply
+Reply
+Jonathan Mallia
+
+Posted 7 years ago
+
+arrow_drop_up
+3
+more_vert
+
+Thanks a lot for the write-up. It's really interesting.
+
+Did you try to use over / under sampling techniques given the unbalanced nature of the data set? Do you have any insights on that?
+
+Thanks
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I did try that. It helped my CatBoost models using hyperparameter class_weights=[1,2.5] but over/under sampling didn't help my LGBM nor XGB models.
+
+I don't have any great insights but I think the proportion of isFraud in the test.csv file makes a difference. For example if the train.csv had 3% isFraud but the test.csv had 10% isFraud then it would be important to upsample so that your predictor would predict more isFraud than 3% in the test.csv.
+
+reply
+Reply
+Aditya Soni
+
+Posted 7 years ago
+
+· 1343rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks for sharing the details and the notebooks! But the nbs https://www.kaggle.com/cdeotte/columns-v-and-id-eda/ is private i guess..
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I fixed the link. Thanks for pointing that out. I fixed it once but somehow it reverted to the old link.
+
+reply
+Reply
+malek.badreddine
+
+Posted 7 years ago
+
+· 1159th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi, congratulation for the 1st place and thank you for all the amazing explanations, I checked the link of the kernel but I get 404 not found, can you fix it please ?
+
+reply
+Reply
+Konstantin Yakovlev
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+https://www.kaggle.com/cdeotte/eda-for-columns-v-and-id
+
+reply
+Reply
+Correlation
+
+Posted 7 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulation Chris. I am interested what categorical_features used in catboost?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you. @kyakovlev will need to answer that. He made lots of new creative categorical features that didn't help LGBM nor XGB but helped CatBoost.
+
+reply
+Reply
+Adrian Zinovei
+
+Posted 7 years ago
+
+· 2065th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Catboost nice boost!
+
+reply
+Reply
+Tyler
+
+Posted 7 years ago
+
+· 4252nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This is amazing, your work is just so inspiring! I was desperate to stack models and also realized models handles with ID differently to without ID, but never come up with the approach you've made. The thought road map you've introduced here gonna benefit me a lot in future projects. Thanks to you both and congratulation to the well deserved win!
+
+reply
+Reply
+Shang
+
+Posted 7 years ago
+
+arrow_drop_up
+2
+more_vert
+
+@cdeotte Thanks for sharing! Can you tell me more about "client consistency" and "train/test distribution consistency"? I don't know how to use them to do feature selection.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+"train/test distribution consistency" is comparing the distribution (histogram) of a feature in the training set with its distribution (histogram) in the test set. For example TransactionDT has low values in train and high values in test. And the values do not overlap. This feature is bad (obviously) so we drop it. You can either inspect features manually or use a library like from scipy.stats import ks_2samp. Documentation here, drop features with p=0.
+
+"client consistency" is similar to "time consistency". Split your train dataset by UIDs. Put 80% of UIDs (clients i.e. credit cards) into a train subset and 20% UIDs into a holdout (validation set). Make sure that no UID (client/credit card) is in both sets. Then train models on the 80% train and predict the 20% unseen clients. This evaluates how well features can predict unseen clients (credit cards).
+
+reply
+Reply
+Ilya Khristoforov
+
+Posted 7 years ago
+
+· 5175th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thatis awesome, Chris! Thank you for sharing!
+
+reply
+Reply
+Sagar Rathod
+
+Posted 7 years ago
+
+· 1390th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Heartly Congratulations !! @cdeotte @kyakovlev 👍
+
+reply
+Reply
+FGPC
+
+Posted 7 years ago
+
+· 1897th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations @cdeotte @kyakovlev! Really great solutions and sharing of your one of the best knowledge. Looking forward again in another tabular data competition with the same team! :-)
+
+reply
+Reply
+KhanhVD
+
+Posted 7 years ago
+
+· 1641st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+So amazing! Congrats and thank you for sharing!
+
+reply
+Reply
+Tonghui Li
+
+Posted 7 years ago
+
+· 52nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing! I have a question about Train our models to find UIDs. What do you mean by this and how is this different than writing script which finds uids using card, addrs and Ds?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+An actual client group is smaller than uid1 = card1+addr1+D1n where D1n=day-D1. But as the architect we shouldn't force our model to use a more precise uid such as uid2 = card1+addr1+D1n+D15n. Instead we should give it uid1 and D15n separately and let the model decide when it wants to combine the two. Furthermore we can give it columns dist1, D4, D10, D15, C13, C14, V127, V136, V307, V309, V320 as various aggregations over uid1.
+
+For example, C14 should stay the same for a single client (card holder) most of the time. In our script we enforce that is does all the time. But we give our model df.groupby('uid').C14.agg(['std']). When std=0, the model knows that the C14 is the same for the entire uid. When std!=0, the model knows that that uid contains more than 1 client. Next the model will use another column to separate that uid into 2 or more clients. You see the model will figure out how to use C14 better than the rules we enforce in our script.
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Bowen Peng
+
+Posted 7 years ago
+
+· 5236th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for such detailed sharings! And if not mind I want to know have you tried to solve the code start problem here? Because there are some features in the test dataset have some values that never show up in the train dataset. Thanks again.
+
+reply
+Reply
+sssjunjun
+
+Posted 7 years ago
+
+· 1531st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks so much for sharing!!! In this competition I did know my model suffer seriously from time consistency from and didn't how to fix it. Your solution help me a lot!
+
+reply
+Reply
+KEEP MOVING
+
+Posted 7 years ago
+
+· 2304th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for sharing!!! Perfect kernel!!!!! I try to reproduce ensemble processing with equal weight. I use three csv ('catboost_best_single.csv', 'lgbm_best_single.csv', 'xgb_best_single.csv'). I get 0.965778/0.943568 with the following code. 'final_model_blend.csv' gets 0.967722/0.945884. I am not sure whether my ensemble code is wrong.
+
+reply
+Reply
+KEEP MOVING
+
+Posted 7 years ago
+
+· 2304th in this Competition
+
+arrow_drop_up
+1
+more_vert
+import pandas as pd
+import numpy as np
+
+def average_ensemble(res_list):
+    submit = pd.DataFrame({
+        res_list[0].columns[0]: res_list[0].iloc[:, 0].values,
+        res_list[0].columns[1]: 0})
+    for res in res_list:
+        submit.iloc[:, 1] = submit.iloc[:, 1] + res.iloc[:, 1] / len(res_list)
+    return submit
+
+input_path = '/home/IEEE-CIS_Fraud_Detection/output/test_results/1st_solution/'
+save_path = '/home/IEEE-CIS_Fraud_Detection/output/test_results/'
+
+file_name_1 = 'lgbm_best_single.csv'
+file_name_2 = 'catboost_best_single.csv'
+file_name_3 = 'xgb_best_single.csv'
+
+res_1 = pd.read_csv(input_path + file_name_1)
+res_2 = pd.read_csv(input_path + file_name_2)
+res_3 = pd.read_csv(input_path + file_name_3)
+res_list = [res_1, res_2, res_3]
+submit = average_ensemble(res_list)
+
+file_name = 'res_20.csv'
+submit.to_csv(save_path + file_name, index=False)
+
+reply
+Reply
+Konstantin Yakovlev
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I think your code is ok. The result you have is without postprocess.
+
+'catboostbestsingle.csv', 'lgbmbestsingle.csv', 'xgbbestsingle.csv' are predictions without any postprocess applied.
+
+finalmodelblend is a result of blend with "Stacking model" and postprocess over final blend.
+
+reply
+Reply
+KEEP MOVING
+
+Posted 7 years ago
+
+· 2304th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Amazing! Thank you.
+
+reply
+Reply
+haataa
+
+Posted 7 years ago
+
+· 1117th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot! I really learn a lot from your post!!
+
+reply
+Reply
+lionsheep24
+
+Posted 7 years ago
+
+· 2511th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+What a great work! Thanks for sharing!!! I didn't tried to identifying UID, since I thought prediction for prediction would harm my model.
+Now I know it was my critical mistake :( I wish to ask about anonymity of given transactions. There are some columns can show anonymity, such as email domain and information about web browser. (e.g : protonmail can hide user info) I tried to give anonymity score to each rows, by creating boolean columns such as is_protonmail(use protonmail or not), and gave weight to them. How do you think about this approach? Did you focused on anonymity of transactions?
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Good observation. Anonymity most likely is correlated with isFraud but there is no need to add booleans such as "is_protonmail". Your model can already do that for you. Especially if you make the parent feature a categorical variable, i.e. df['P_emaildomain'] = df['P_emaildomain'].astype('category').
+
+reply
+Reply
+lionsheep24
+
+Posted 7 years ago
+
+· 2511th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you for your followup!
+
+reply
+Reply
+BiteMe
+
+Posted 7 years ago
+
+· 181st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hello, Chris. Thanks for every kernels and discussion followups. I wish to ask a question about a parameter in lightGBM, which is the 'importance_type'. For the first one month, I'm always using "split" as the importance type. So when I plotted the feature importance rate, I couldn't find the importance features like V258. (It was actually at the bottom of all the features.) When I changed to "gain", it's different. I saw a totally different importance ranking, which helps me boost a lot. (Change from "split" to "gain" give me a boost of 0.001) Can you elaborate why did this happen? What's the difference between the two types of importance rates and how to determine which one is better?
+
+Thanks a lot!!!!
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Both types are useful to review. "split" refers to quantity and "gain" refers to quality. LGBM is lots of trees and trees are lots of nodes with splits. The importance type "split" refers to how often a feature is used to make splits and "gain" refers to how beneficial splits are when they occur.
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Note that regarding "gain", you can use "average gain" or "total gain" where average is "average per split" and total is "total over all splits". Gain is a measure of the model becoming more accurate. Every time a tree makes a split the model will always increase or stay at the same accuracy. (The bottom plot below is "split" and the image is cropped so we can read the feature names). http://playagricola.com/Kaggle/f1b.png http://playagricola.com/Kaggle/f2b.png imagehttp://playagricola.com/Kaggle/f3b.png
+
+reply
+Reply
+Karan Jakhar
+
+Posted 7 years ago
+
+· 952nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+congrats @cdeotte
+
+reply
+Reply
+delai50
+
+Posted 7 years ago
+
+· 466th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations and thank you for such a detailed explanation. Could you please elaborate a bit how did you do the Forward Feature Selection/Recursive Feature Elimination? What kind of CV you used for that? Did you use it inside of each fold of your general CV (i.e. a nested CV)? Thanks again!
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+My local validation scheme was to train a model on the first 75% rows and predict isFraud on the last 25% rows. (This is approximately train first 4.5 months and predict last 1.5 month). Konstantin used train on first 4 months, skip 1 month, and predict last month.
+
+When I engineer a new feature (or group of features), I evaluate whether it (they) increased this local validation AUC. Other tests like train.csv/test.csv distribution, time consistency, correlation redundancy would indicate possible "bad" features. I would then remove these features and evaluate whether local validation AUC increased or decreased.
+
+When local validation AUC increased, the Group k Fold CV AUC usually increased too. When they did not agree, I trusted local holdout AUC more because it was a forward in time prediction whereas Group K Fold CV includes some backwards in time folds.
+
+reply
+Reply
+🐳鲲(China)
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Why Group K Fold CV includes some backwards in time folds not trusted than local holdout, is there any information leak? and in other reply you said you perfer local validation AUC for selecting features… so why you create so many validation strategy like train 5 months skip 1 month and train 4 so on…, there seems some conflicts and I am a little confused~ hope u can dispel my doubts😬
+
+reply
+Reply
+Lluis Salord
+
+Posted 7 years ago
+
+· 4618th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation Chris, you did an awsome work with the kernels you posted. I am curios to know in detail how did you do the "time consistency". You say that you train one feature (with data of first month) to predict itself (on the last month) and then you look for AUC score better than 0.5 (which is randomness). I can imagine this easily with boolean features with a simple binary classification, but for multiclass or regression problems. How did you do? Thanks for all!! 👍
+
+reply
+Reply
+Chris Deotte
+
+Topic Author
+
+Posted 7 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+Here's some code
+
+# ADD MONTH FEATURE
+import datetime
+START_DATE = datetime.datetime.strptime('2017-11-30', '%Y-%m-%d')
+train['DT_M'] = train['TransactionDT'].apply(lambda x: (START_DATE + datetime.timedelta(seconds = x)))
+train['DT_M'] = (train['DT_M'].dt.year-2017)*12 + train['DT_M'].dt.month 
+
+# SPLIT DATA INTO FIRST MONTH AND LAST MONTH
+train = train[train.DT_M==12].copy()
+validate = train[train.DT_M==17].copy()
+
+# TRAIN AND VALIDATE
+lgbm = lgb.LGBMClassifier(n_estimators=500, objective='binary', 
+        num_leaves=8, learning_rate=0.02)
+h = lgbm.fit(train[[col]], train.isFraud, eval_metric='auc', 
+        eval_set=[(train[[col]],train.isFraud),(validate[[col]],validate.isFraud)])
+auc_train = np.round(h._best_score['valid_0']['auc'],4)
+auc_val = np.round(h._best_score['valid_1']['auc'],4)
+
+
+Run this with variable col equal to the column you wish to test. Here are some results. Variable C3 has auc_train = 0.5 and auc_val = 0.5. Variable C7 has auc_train = 0.65 and auc_val = 0.67. And Variable id_38 has auc_train = 0.61 and auc_val = 0.36. The next step is to remove weak variables from your model and then evaluate your entire model with your normal local validation to see if AUC increases or decreases. Using this, we found and removed 19 features and resultantly improved our model.
+
+reply
+Reply
+Yu Liwei
+
+Posted a year ago
+
+arrow_drop_up
+0
+more_vert
+SPLIT DATA INTO FIRST MONTH AND LAST MONTH
+
+train = train[train.DT_M==12].copy() # something wrong happen !!! make the validate empty. validate = train[train.DT_M==17].copy()
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+KarthikDulam
+
+Posted 7 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations Chris! Thanks for sharing.
+
+reply
+Reply

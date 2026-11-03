@@ -1,0 +1,10 @@
+[     537ms] [LOG]  _                       _       
+| |    Welcome to       | |      
+| | __ ___   __ _  __ _ | | ___  
+| |/ /|__ \ / _` |/ _` || |/ _ \ 
+|   < / _  | (_| | (_| || |  __/ 
+|_|\_\\__,_|\__, |\__, ||_|\___| 
+             __/ | __/ |         
+            |___/ |___/          
+ @ https://www.kaggle.com/static/assets/app.js?v=df8446d64af00f71:0
+[     565ms] [WARNING] No `HydrateFallback` element provided to render during initial hydration @ https://www.kaggle.com/static/assets/vendor.js?v=3f0098e18ce0426a:248

@@ -1,0 +1,292 @@
+- generic [ref=f32e2]:
+  - navigation "Main Kaggle page navigation" [ref=f32e3]:
+    - generic [ref=f32e5]:
+      - button "Navigation menu" [ref=f32e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f32e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f32e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f32e12] [cursor=pointer]:
+      - paragraph [ref=f32e18]: Create
+    - generic [ref=f32e21]:
+      - list [ref=f32e22]:
+        - listitem "Home List Item" [ref=f32e23]:
+          - link "Home" [ref=f32e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f32e31]: Home
+        - listitem "Competitions List Item" [ref=f32e32]:
+          - link "Competitions" [ref=f32e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f32e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f32e41]:
+          - link "Benchmarks" [ref=f32e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f32e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f32e50]:
+          - link "Arenas" [ref=f32e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f32e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f32e59]:
+          - link "Game Arena" [ref=f32e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f32e67]: Game Arena
+      - list [ref=f32e68]:
+        - listitem "Data Hub List Item" [ref=f32e69]:
+          - generic [ref=f32e70]:
+            - link "Data Hub" [ref=f32e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f32e77]: Data Hub
+            - button "Expand" [ref=f32e80] [cursor=pointer]
+      - list [ref=f32e82]:
+        - listitem "More on Kaggle List Item" [ref=f32e83]:
+          - generic [ref=f32e84]:
+            - link "More on Kaggle" [ref=f32e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f32e91]: More
+            - button "Expand" [ref=f32e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f32e97]:
+    - generic [ref=f32e98]:
+      - generic [ref=f32e102]:
+        - textbox "Search" [ref=f32e104]
+        - group [aria-hidden]
+      - generic [ref=f32e106]:
+        - link [ref=f32e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Findoor-location-navigation%2Fdiscussion%2F240141
+          - button "Login" [ref=f32e108]
+        - link [ref=f32e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Findoor-location-navigation%2Fdiscussion%2F240141
+          - button "Sign Up" [ref=f32e111]
+  - main [ref=f32e113]:
+    - generic [ref=f32e115]:
+      - generic [ref=f32e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f32e117]:
+        - link "Learn more" [ref=f32e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f32e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f32e123]:
+      - generic [ref=f32e125]:
+        - generic [ref=f32e126]:
+          - link "Microsoft Research's profile" [ref=f32e127] [cursor=pointer]:
+            - /url: /organizations/microsoft-research
+            - generic "Microsoft Research" [ref=f32e128]
+          - generic [ref=f32e132]:
+            - generic [ref=f32e133]: Microsoft Research
+            - generic [ref=f32e135]: · Research Prediction Competition · 5 years ago
+          - generic [ref=f32e136]:
+            - button "Late Submission" [disabled] [ref=f32e138]
+            - button "Competition options menu collapsed" [ref=f32e141] [cursor=pointer]: more_horiz
+        - generic [ref=f32e143]:
+          - heading "Indoor Location & Navigation" [level=1] [ref=f32e144]
+          - paragraph [ref=f32e146]: Identify the position of a smartphone in a shopping mall
+      - generic [ref=f32e150]:
+        - tablist [ref=f32e157]:
+          - tab "Overview, 1 of 7" [ref=f32e158] [cursor=pointer]:
+            - generic [ref=f32e159]: Overview
+          - tab "Data, 2 of 7" [ref=f32e160] [cursor=pointer]:
+            - generic [ref=f32e161]: Data
+          - tab "Code, 3 of 7" [ref=f32e162] [cursor=pointer]:
+            - generic [ref=f32e163]: Code
+          - tab "Models, 4 of 7" [ref=f32e164] [cursor=pointer]:
+            - generic [ref=f32e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f32e166] [cursor=pointer]:
+            - generic [ref=f32e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f32e168] [cursor=pointer]:
+            - generic [ref=f32e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f32e170] [cursor=pointer]:
+            - generic [ref=f32e171]: Rules
+        - separator [ref=f32e173]
+      - generic [ref=f32e177]:
+        - generic [ref=f32e178]:
+          - generic [ref=f32e179]:
+            - generic [ref=f32e180]:
+              - link "Jack (Japan)'s profile" [ref=f32e181] [cursor=pointer]:
+                - /url: /rsakata
+                - generic "Jack (Japan)" [ref=f32e182]
+              - generic [ref=f32e186]:
+                - link "Jack (Japan)" [ref=f32e187] [cursor=pointer]:
+                  - /url: /rsakata
+                - text: ·
+                - generic [ref=f32e188]: 2nd in this Competition
+                - text: ·
+                - generic [ref=f32e189]: Posted 5 years ago
+            - generic [ref=f32e190]:
+              - generic [ref=f32e191]:
+                - button "Upvote" [ref=f32e192] [cursor=pointer]:
+                  - generic [ref=f32e193]: arrow_drop_up
+                - button "36 votes" [ref=f32e194] [cursor=pointer]: "36"
+              - button "More Options for this Topic" [ref=f32e195] [cursor=pointer]: more_vert
+            - heading "Part of the 2nd place solution (Jack's model)" [level=3] [ref=f32e196]
+            - generic [ref=f32e199]:
+              - paragraph [ref=f32e200]: My main contribution to the team was to provide the absolute position prediction from signal strength of wifi as an input to the team's ensemble. There are other things I've done in our team, but I'll write about this here. My prediction accounts for about 1/3 of the weight of the ensemble.
+              - separator [ref=f32e201]
+              - heading "Data Preparation" [level=1] [ref=f32e202]
+              - list [ref=f32e203]:
+                - listitem [ref=f32e204]: The spacing of the way points is too sparse to be combined with the wifi information, so the location between way points was interpolated by host's function "compute_step_positions" and generate the target value at intervals of 1 second.
+                - listitem [ref=f32e205]: As input features to the model, I generated data with each column having RSSI value for each BSSID, as well as the others. However, I completely ignored the timestamp of the wifi data and instead adopted last_seen_timestamp as the true timestamp.
+                - listitem [ref=f32e206]: The last_seen_timestamp was rounded to the nearest second, and the BSSIDs observed during that time were stored in the same row, and combined with the target.
+              - paragraph [ref=f32e207]: I've added some other processing, but roughly, this data is the input for training my model.
+              - separator [ref=f32e208]
+              - heading "Model" [level=1] [ref=f32e209]
+              - list [ref=f32e210]:
+                - listitem [ref=f32e211]: I built one model per floor, because I thought that the information on the other sites, and even on the other floors of the same building, didn't seem to help much in estimating the location.
+                - listitem [ref=f32e212]: What is characteristic, I think, is that I approached the problem of location estimation not as a regression task, but as a multiclass classification task. To be more precise, I discretized the coordinates into square regions of 2m on a side, and then trained a model to predict which region has the highest probability of being present. (For a floor with a width and height of 200 meters, this means a multiclass classification of 10,000 classes.)
+                - listitem [ref=f32e213]: My model is NN (non-RNN), and I introduced my own innovations to make it learn well as a multi-class classification problem.
+                - listitem [ref=f32e214]: By the trained model, the probability of existence in each region for every second was output and the region with the high probability (the average of the x, y values of the top 30 regions) was adopted as the location prediction.
+                - listitem [ref=f32e215]: Depending on the hyperparameters, it took about 4-6h using the GPU in Kaggle Notebook to do a 5-fold CV of all the sites/floors appearing in the test data. (about 1 min per model)
+              - separator [ref=f32e216]
+              - heading "Post-processing" [level=1] [ref=f32e217]
+              - list [ref=f32e218]:
+                - listitem [ref=f32e219]:
+                  - text: Since my model is not an RNN, the accuracy is low without post-processing, and it can only make good predictions when
+                  - link "cost minimization (opens in a new tab)" [ref=f32e220] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/saitodevel01/indoor-post-processing-by-cost-minimization
+                    - text: cost minimization
+                  - text: post-processing is applied. Rather, I decided that there is not much benefit to learn the dependencies of time series by RNN, since it can be introduced by the post-processing.
+                - listitem [ref=f32e221]: Since my model is a multiclass classification model, the predictions for each second have a confidence level, and it was effective to weight the predictions by this confidence level in cost minimization.
+                - listitem [ref=f32e222]: It was also effective to iterate the process, ignoring the points where the position changed significantly as a result of the cost minimization, and redoing the cost minimization.
+                - listitem [ref=f32e223]: This, with some minor angular corrections and thinned out to a way point timestamp, was the input to the team's ensemble.
+              - separator [ref=f32e224]
+              - heading "Performance" [level=1] [ref=f32e225]
+              - paragraph [ref=f32e226]: "The score when this prediction is submitted without ensemble and further post-processing is as follows:"
+              - paragraph [ref=f32e227]: "public : 3.54326 private: 4.07147"
+              - paragraph [ref=f32e228]: "Before I joined the team, I added various further post-processing steps (snap to corridor, snap to grid, and so on) after that, but they were not applied for the input of team's ensemble. If they are applied, the score is:"
+              - paragraph [ref=f32e229]: "public : 2.73972 private: 3.31607"
+              - paragraph [ref=f32e230]: If I hadn't teamed up and gotten no improvement in my post-processing, the score would have been about this.
+              - separator [ref=f32e231]
+              - paragraph [ref=f32e232]: It was a great honor to play in this competition with a very good team. Thank you to all the team members, the hosts, and the competitors!
+          - separator [ref=f32e233]
+        - generic [ref=f32e234]:
+          - generic [ref=f32e235]:
+            - paragraph [ref=f32e238]:
+              - paragraph [ref=f32e239]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f32e240] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f32e241]
+          - generic [ref=f32e243]:
+            - generic [ref=f32e244]:
+              - generic [aria-hidden] [ref=f32e245]: comment
+              - heading "11 Comments" [level=2] [ref=f32e247]
+            - generic [ref=f32e250]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f32e251] [cursor=pointer]:
+                - generic [ref=f32e252]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f32e254]:
+            - generic [ref=f32e255]:
+              - generic [ref=f32e259]:
+                - link "chris's profile" [ref=f32e260] [cursor=pointer]:
+                  - /url: /chris62
+                  - generic "chris" [ref=f32e261]
+                - generic [ref=f32e267]:
+                  - link [ref=f32e269] [cursor=pointer]:
+                    - /url: /chris62
+                    - heading "chris" [level=3] [ref=f32e270]
+                  - generic [ref=f32e271]:
+                    - paragraph [ref=f32e272]: Posted 5 years ago
+                    - paragraph [ref=f32e274]: · 5th in this Competition
+                - generic [ref=f32e276]:
+                  - generic [ref=f32e277]:
+                    - button "Upvote" [ref=f32e278] [cursor=pointer]:
+                      - generic [ref=f32e279]: arrow_drop_up
+                    - button "3 votes" [ref=f32e280] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f32e281] [cursor=pointer]: more_vert
+                - paragraph [ref=f32e285]: Great idea treating it as a multi-class problem! Were there any tricks you used that you can share for how to train a 10,000 class multi-class prediction network?
+                - generic [ref=f32e286]:
+                  - generic [ref=f32e291]:
+                    - link "Jack (Japan)'s profile" [ref=f32e292] [cursor=pointer]:
+                      - /url: /rsakata
+                      - generic "Jack (Japan)" [ref=f32e293]
+                    - generic [ref=f32e299]:
+                      - generic [ref=f32e300]:
+                        - link [ref=f32e301] [cursor=pointer]:
+                          - /url: /rsakata
+                          - heading "Jack (Japan)" [level=3] [ref=f32e302]
+                        - paragraph [ref=f32e305]: Topic Author
+                      - generic [ref=f32e306]:
+                        - paragraph [ref=f32e307]: Posted 5 years ago
+                        - paragraph [ref=f32e309]: · 2nd in this Competition
+                    - generic [ref=f32e311]:
+                      - generic [ref=f32e312]:
+                        - button "Upvote" [ref=f32e313] [cursor=pointer]:
+                          - generic [ref=f32e314]: arrow_drop_up
+                        - button "2 votes" [ref=f32e315] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f32e316] [cursor=pointer]: more_vert
+                    - generic [ref=f32e319]:
+                      - paragraph [ref=f32e320]: Thanks for your comment! First of all, I would like to applaud your excellent results in solo.
+                      - paragraph [ref=f32e321]: The biggest problem in solving this problem as a multiclass classification problem is that regions with close locations are treated as completely different classes. To solve this problem, I devised a structure for the NN so that predictions for classes in close location are highly correlated. This made it possible to train the model much more efficiently than learning for each of a very large number of classes independently.
+                  - generic [ref=f32e322]:
+                    - button "6 more replies" [ref=f32e323] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f32e325]: arrow_drop_down
+                    - generic [ref=f32e326]:
+                      - img "Profile picture for chris" [ref=f32e328]
+                      - img "Profile picture for higepon" [ref=f32e330]
+                      - img "Profile picture for Jack (Japan)" [ref=f32e332]
+                      - img "Profile picture for Paul Fornia" [ref=f32e334]
+              - separator [ref=f32e335]
+            - generic [ref=f32e336]:
+              - generic [ref=f32e340]:
+                - link "mamas's profile" [ref=f32e341] [cursor=pointer]:
+                  - /url: /mamasinkgs
+                  - generic "mamas" [ref=f32e342]
+                - generic [ref=f32e348]:
+                  - link [ref=f32e350] [cursor=pointer]:
+                    - /url: /mamasinkgs
+                    - heading "mamas" [level=3] [ref=f32e351]
+                  - generic [ref=f32e352]:
+                    - paragraph [ref=f32e353]: Posted 5 years ago
+                    - paragraph [ref=f32e355]: · 2nd in this Competition
+                - generic [ref=f32e357]:
+                  - generic [ref=f32e358]:
+                    - button "Upvote" [ref=f32e359] [cursor=pointer]:
+                      - generic [ref=f32e360]: arrow_drop_up
+                    - button "2 votes" [ref=f32e361] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f32e362] [cursor=pointer]: more_vert
+                - paragraph [ref=f32e366]: Thanks Jack, I really enjoyed the discussion with you and I couldn't improve my discrete optimization process without you!
+                - generic [ref=f32e372]:
+                  - link "Jack (Japan)'s profile" [ref=f32e373] [cursor=pointer]:
+                    - /url: /rsakata
+                    - generic "Jack (Japan)" [ref=f32e374]
+                  - generic [ref=f32e380]:
+                    - generic [ref=f32e381]:
+                      - link [ref=f32e382] [cursor=pointer]:
+                        - /url: /rsakata
+                        - heading "Jack (Japan)" [level=3] [ref=f32e383]
+                      - paragraph [ref=f32e386]: Topic Author
+                    - generic [ref=f32e387]:
+                      - paragraph [ref=f32e388]: Posted 5 years ago
+                      - paragraph [ref=f32e390]: · 2nd in this Competition
+                  - generic [ref=f32e392]:
+                    - generic [ref=f32e393]:
+                      - button "Upvote" [ref=f32e394] [cursor=pointer]:
+                        - generic [ref=f32e395]: arrow_drop_up
+                      - button "0 votes" [ref=f32e396] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f32e397] [cursor=pointer]: more_vert
+                  - paragraph [ref=f32e401]: Thanks a lot too! It was very exciting to work with you, and I learned a lot of things.
+              - separator [ref=f32e402]
+            - generic [ref=f32e407]:
+              - link "Rob Mulla's profile" [ref=f32e408] [cursor=pointer]:
+                - /url: /robikscube
+                - generic "Rob Mulla" [ref=f32e409]
+              - generic [ref=f32e415]:
+                - link [ref=f32e417] [cursor=pointer]:
+                  - /url: /robikscube
+                  - heading "Rob Mulla" [level=3] [ref=f32e418]
+                - generic [ref=f32e419]:
+                  - paragraph [ref=f32e420]: Posted 5 years ago
+                  - paragraph [ref=f32e422]: · 73rd in this Competition
+              - generic [ref=f32e424]:
+                - generic [ref=f32e425]:
+                  - button "Upvote" [ref=f32e426] [cursor=pointer]:
+                    - generic [ref=f32e427]: arrow_drop_up
+                  - button "1 votes" [ref=f32e428] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f32e429] [cursor=pointer]: more_vert
+              - paragraph [ref=f32e433]:
+                - text: Congrats
+                - link "@rsakata (opens in a new tab)" [ref=f32e434] [cursor=pointer]:
+                  - /url: /rsakata
+                  - text: "@rsakata"
+                - text: "! One of many strong finishes."
+  - alert [ref=f32e437]

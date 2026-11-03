@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/home-credit-default-risk/discussion/64722
-fetched: 2026-10-27
-chars: 581
+fetched: 2026-11-03
+chars: 15676
 
 menu
 Skip to
@@ -22,25 +22,842 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Home Credit Group · Featured Prediction Competition · 8 years ago
-Late Submission
-more_horiz
+2nd place solution ( team ikiri_DS ) — Home Credit Default Risk
+2nd place solution ( team ikiri_DS )
+
 Home Credit Default Risk
 
-Can you predict how capable each applicant is of repaying a loan?
+Solution Writeup · 2nd place · Sep 6, 2018
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+Congratulations to the winner Home Aloan and to all participants in this competition!
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+This competition was very tough for us and the biggest competition ever.
+Thank you Home Credit and kaggle for organizing this great competition.
+
+ikiri_DS consists of 12 kagglers and we can not write up detail of each solution at once.
+So we decided to post our model pipeline and short description of individual approaches at first.
+We will add more descriptions with requests in your comments of this discussion.
+Please feel free to ask us questions and comments, thanks.
+
+Member comments
+
+ONODERA
+I'm in charge of feature engineering. I don't have any my models. Here is my git.
+
+RK
+Feature
+・Various dimension reductions (PCA, UMAP, T-SNE, LDA…)
+・Genetic programming application (from kernel)
+・Brute force feature search from ~1TB feature pools
+Model
+・Algorithm comparison (Catboost, LightGBM with dart, and so on)
+・Parameter tuning
+Blending
+・Algorithm comparison (Direct AUC maximization with modified Powell algorithm is good for making my 2nd level model)
+
+Yuya Yamamoto
+Interest rate feature, finding about difference between train and test data and residual correction of Neural Network predictions. I have posted my finding and others in https://www.kaggle.com/c/home-credit-default-risk/discussion/64784.
+
+tosh
+I'm in charge of Neural Network(NN) in this competiton. https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#380224
+
+ireko8
+DAE based on porto seguro 1st solution
+https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379891
+
+tereka
+CNN and RNN models.
+https://www.kaggle.com/c/home-credit-default-risk/discussion/64722#379880
+
+branden
+
+takuoko
+I worked with angus and branden.
+Our task in team ikiri_DS is to generate diversity, and we could do it!
+I made LGBM ( private 0.79966 / public 0.80328 ).
+
+Angus
+Hello ~ I am Shuo-Jen, Chang - a kaggler from Taiwan. you can just call me Angus. My job in ikiri_DS is to generate diversity by modeling with my feature set. see the attachment below ( HC - Brief solution from Shuo-Jen, Chang.html )!
+
+Tam
+
+Giba
+Post Processing
+discussion
+https://www.kaggle.com/c/home-credit-default-risk/discussion/64485
+kernel
+https://www.kaggle.com/titericz/giba-post-processing-user-id-boost
+
+Maxwell
+Meta features on train_app and bureau( gain : public +0.002 / private +0.003 ), some models( LGBM, ExtraTree ) for model diversity and blending using adversarial validation( gain : private +0.0002 )
+
+Authors
+RK
+
+ryuichi0704
+
+Maxwell
+
+maxwell110
+
+ONODERA
+
+onodera
+
+tosh
+
+ktts1031
+
+Tam T. Nguyen
+
+nthanhtam
+
+YuyaYamamoto
+
+nejumi
+
+Ireko8
+
+ireko8
+
+tereka
+
+tereka
+
+Branden Murray
+
+brandenkmurray
+
+Angus Chang
+
+andrew60909
+
+takuoko
+
+takuok
+
+Giba
+
+titericz
+
+arrow_drop_up
+122
+Share
+more_horiz
+Project Files
+table_chart
+model_structure_v8_blending.png
+get_app
+table_chart
+HC - Brief solution from Shuo-Jen Chang.html
+get_app
+Download All
+Citation
+
+RK, Maxwell, ONODERA, tosh, Tam T. Nguyen, YuyaYamamoto, Ireko8, tereka, Branden Murray, Angus Chang, takuoko, Giba. 2nd place solution ( team ikiri_DS ). https://www.kaggle.com/competitions/home-credit-default-risk/writeups/ikiri-ds-2nd-place-solution-team-ikiri-ds. 2018. Kaggle
+
+comment
+56 Comments
+Hotness
+tosh
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+16
+more_vert
+
+Thanks @Fenglv
+
+Hi, This is tosh. I'm in charge of Neural Network(NN) in this competiton. I'm glad you are interested in our solutions.
+
+My Solutions are simple NN.
+
+I apply dense layer by tables(app, prev.. etc) and DAE then, concatenate dense layers. Finally, apply dense layer. NN: CV/Public/Private LB: 0.799/0.804/0.796
+
+I also attached a simple architecture.
+
+reply
+Reply
+Adams
+
+Posted 8 years ago
+
+· 179th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Tosh that is spectacular - i haven't seen anything like it before. Could you link aby kernel/code that demonstrates how to actually code something like this in pytorch/keras?
+
+reply
+Reply
+Fenglv
+
+Posted 8 years ago
+
+· 350th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks your great share, tosh! Some question about your NN network I want to konw.
+
+In your NN network the inputs of tables(prev, bureau… ), is it groupby 'SK_ID_CURR' of application table to input in the nn network?
+What is your inputs for DAE?
+Thanks tosh, I learn much from your reply!
+reply
+Reply
+pocket
+
+Posted 8 years ago
+
+arrow_drop_up
+8
+more_vert
+
+Congratulations IkiriDS!
+I Hope you will win the next competition :)
+
+While we wait for each writeup, I have a few questions about your pipeline
+1) What is "stochastic adversarial blending"?
+2) Did you all share the features for each of your models?
+3) What features did you use for the final blend?
+4) Were you looking at the CV score to tune your blend?
+5) Did you all choose the same cv-split for the blend?
+
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+9
+more_vert
+
+@pocket thanks for many questions.
+
+1) What is "stochastic adversarial blending"?
+As @andy refered in this post, we can build a model which can distinguish train or test data.
+We use that prediction ( adversarial validation ) when blending.
+The process is as follows,
+
+Sample data with a sampling ratio by using adversarial validation as a sampling weight.
+Optimize the weights with train prediction.
+Iterate 1~2 process to get converged weights.
+
+This technique propelled our score about 0.0002.
+
+2) Did you all share the features for each of your models?
+Some were shared, others were not.
+
+3) What features did you use for the final blend?
+For the final blend, we did not use any features.
+Attached image shows the features used in each model.
+( Cardinal numbers were allocated in each feature. )
+
+4) Were you looking at the CV score to tune your blend?
+Yes. We monitored both CV and Public LB.
+We submitted the predictions which have nice score in CV and public LB, both.
+
+5) Did you all choose the same cv-split for the blend?
+Actually at first we tried to keep same cv-split.
+But after some experiments of stacking we did not care cv-split any more.
+( Stacking tended to overfit. CV >> LB. So we decided to use only blending. )
+
+reply
+Reply
+5 more replies
+arrow_drop_down
+Anthony Chiu
+
+Posted 8 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Nice image!
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@nlgn Thanks ! Huge team, a lot of models, a lot of features.
+
+reply
+Reply
+Fenglv
+
+Posted 8 years ago
+
+· 350th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing! There some quesiton I want to ask you. Thanks!
+1.What kind of NN module do you use? Can you tell us what tricks in your NN modlue?
+2.In your picture , I see "Residual " 1 from 3, what is this in your model? And why use this?
+3.In 13 of features, I see you use DAE. Is there any reference DAE code you use?
+Thank you!
+
+reply
+Reply
+tereka
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+14
+more_vert
+
+Hi, This is tereka. I'm in charge of Neural Network(CNN,RNN) in this competiton.
+That is interesting competiton!
+I only reply your first question, Maybe other member reply additional 1 answer and others
+
+Solution
+
+My Solutions are End to End CNN and RNN.
+Purpose is getting time series features from tables.
+Prev, ins, pos_cash bbureu, credit tables have days columns.
+So I wanna get *** time series features ***.
+
+I sort tables by days(e.g. instalment is DAYS_INSTALMENT)
+apply convolution or rnn to tables
+concatenate convolutional features and onodera's feature.(when CNN exclude onodera's feature)
+apply dense layer to 3
+
+CNN: Public/Private LB: 0.785/0.782
+RNN: Public/Private LB: 0.795/0.791
+
+Network Structure
+
+CNN Keras Network Structure Picture(output of Keras) 
+
+RNN Network Structure Picture(output of Keras) 
+
+reply
+Reply
+7 more replies
+arrow_drop_down
+AL
+
+Posted 8 years ago
+
+· 1000th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you for sharing Maxwell!! This is really great. I included your write in a summary post if you don't mind!
+
+https://www.kaggle.com/c/home-credit-default-risk/discussion/64510
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@Arthur Thank you for letting me know. Sure, go ahead.
+
+reply
+Reply
+pacificactuary
+
+Posted 8 years ago
+
+· 541st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats Maxwell and ikiri_DS team!
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@pacificactuary thanks!
+
+reply
+Reply
+Wate Soyan
+
+Posted 8 years ago
+
+· 1338th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Clear image shows well cooperative team. Nice! Deserve me to study.
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+@Soyan Many thanks. For blender, to get the picture of this complex model pipeline was the first task.
+
+reply
+Reply
+KAMLESH
+
+Posted 8 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Thanks everyone, for sharing the approach.
+
+reply
+Reply
+Janmejaya
+
+Posted 8 years ago
+
+· 1722nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot guys.
+There are a tons of features and models present in your solution. I have couple of questions.
+Is there reason/thought process behind using CNN and RNN?
+And How does they behave individually on this data?
+Thanks
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@janmejaya
+Thanks for your some questions.
+
+Is there reason/thought process behind using CNN and RNN?
+
+A good question.
+Some tables (e.i. bureau_balance, POS_CASH_balance, .. ) have time series information.
+So @tereka tried to catch those information via both RNN and CNN.
+
+And How does they behave individually on this data?
+
+Could you check the below link ?
+Thanks.
+tereka solution
+
+reply
+Reply
+Janmejaya
+
+Posted 8 years ago
+
+· 1722nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks @Maxwell
+
+reply
+Reply
+Ali Osman
+
+Posted 8 years ago
+
+· 135th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@alosmn
+Thanks and congrats for your silver medal !
+
+reply
+Reply
+Pragyan Subedi
+
+Posted 8 years ago
+
+· 1242nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hey! Congratulations and thanks for sharing. I was trying to dig deeper into how you guys made the features through ONODERA's git but there are a lot of files there. Could you suggest some specific ones to look at for someone who wants to go over financial feature engineering?
+
+Btw the image is real nice!
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@pragyanbo
+
+Thnaks for your comments.
+For example, @nejumi made some interesting features.
+He explained about his fe in following link.
+nejumi's findings
+
+reply
+Reply
+banzhuchihu
+
+Posted 8 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats ikiri_DS, and thanks for your post, Maxwell.
+
+May I ask two questions on the Adversarial Stochastic Blending?
+
+If I understand correctly, the new test-like feature is only used as sampling weight to blend multiples models. Repeat sampling-blending procedures k times then take the average. I am curious how this Adversarial Stochastic Blending improves your results. Do you have some comparison result on simple blending and Adversarial Stochastic Blending?
+
+I am also curious is it possible to use this test-like feature directly into those classifiers. For example in lightgbm, instead of uniformly sampling with bagging_fraction to grow each tree, use the test-like feature as the sampling weight .
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@ziychen
+Thank you for your questions.
+
+If I understand correctly, the new test-like feature is only used as sampling weight to blend multiples models. Repeat sampling-blending procedures k times then take the average. I am curious how this Adversarial Stochastic Blending improves your results. Do you have some comparison result on simple blending and Adversarial Stochastic Blending?
+
+Yes.
+I used 30% sampling ratio in the result of simple experiment.
+30% sampling improve blended score by about 0.0002 (Not so much) in comparison to 100% sampling.
+Improvement could be observed on both public and private.
+I have also tested 20%. But score became worse.
+
+I am also curious is it possible to use this test-like feature directly into those classifiers. For example in lightgbm, instead of uniformly sampling with bagging_fraction to grow each tree, use the test-like feature as the sampling weight .
+
+To be honest, at first I tried to use test-like feature as you said.
+But my trials went in failure.
+So at that point I changed my mind to use test-like feature in model, I hit on using it in blending.
+
+Thanks.
+
+reply
+Reply
+banzhuchihu
+
+Posted 8 years ago
+
+· 25th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for your response!
+
+reply
+Reply
+Adams
+
+Posted 8 years ago
+
+· 179th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Could you give any sources or describe shortly what Adversarial Stochastic Blending is? I've never heard of the concept
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hi @Adams Good question. Could you read this?
+
+Addition to linked explanation, I will refer naming of this method.
+
+Adversarial : This means just using adversarial validation as sampling weights.
+Stochastic : We iterated sampling process for 350 times and averaged weights of each model to get converged. This procedure is Monet Carlo like method.
+
+reply
+Reply
+4 more replies
+arrow_drop_down
+YaGana Sheriff-Hussaini
+
+Posted 8 years ago
+
+· 85th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations to your team and thanks for sharing your solutions.
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @YaGana and congrats your medal.
+
+reply
+Reply
+zr
+
+Posted 8 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats, amazing work!
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks @zr ! Congrats for your 12th place !
+
+reply
+Reply
+Md. Manjurul Hussain Shourov
+
+Posted 8 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Excellent work!!! Congrats!
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @Shourov !
+
+reply
+Reply
+senkin13
+
+Posted 8 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats!Impressive team management.
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks @senkin13! and congrats your 8th position!
+
+reply
+Reply
+Souvik Banerjee
+
+Posted 8 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Nice.
+
+reply
+Reply
+Maxwell
+
+Topic Author
+
+Posted 8 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@Banerjee Thank you!
+
+reply
+Reply
+
+This comment has been deleted.
+
+This comment has been deleted.

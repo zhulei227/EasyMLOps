@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/covid19-global-forecasting-week-5/discussion/146754
-fetched: 2026-10-27
-chars: 745
+fetched: 2026-11-03
+chars: 10655
 
 menu
 Skip to
@@ -22,33 +22,216 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Kaggle · Research Code Competition · 6 years ago
-Late Submission
-more_horiz
+PDD Writeup — COVID19 Global Forecasting (Week 5)
+PDD Writeup
+
 COVID19 Global Forecasting (Week 5)
 
-Forecast daily COVID-19 spread in regions around world
+Solution Writeup · 2nd place
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
-Failed to load the discussion topic
-error
+Thanks to my teammates @dott1718 and @christofhenkel for collaborating throughout the four competitions. As even the last week competition is already close to half-time in terms of scoring, we want to give a short overview over out solutions. We are really happy with our results across the four weeks, specifically as more optimistic models (predicting fewer cases and fatalities) performed better and our most pessimistic models in week 2 performed the worst.
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Week 1
 
-error
+Everyone went into this competition with a lot of fear and uncertainty about covid-19 and I think this also reflects in the models that were produced. Very little data was available and most countries were in earlier periods of severe exponential growth. We quite quickly figured that utilizing any ML model does not seem appropriate here due to lack of historical data. We thus crafted the basis for our main model that we utilized throughout all four weeks. For predicting confirmed cases, the model uses a constant growth rate that is reduced by a decay that is accelerating over time. For fatalities, we multiply predicted cases of a given time lag with a fatality rate for a given country, and also add a constant growth.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+This model allowed us some flexibility also in choice of (hyper-)parameters. We ended up deciding on one optimistic and one pessimistic submission in week 1, where the optimistic one has lower growth rates and higher acceleration of the decay of this growth rate and the pessimistic one has it the other way around. For countries where we already have "sufficient" data above a certain threshold, we learn the growth over a certain time period, and for others we employ default growth rates.
 
-Failed to load the discussion topic
+Optimistic sub: https://www.kaggle.com/dott1718/cv19-by-growth-rate-v5-09?scriptVersionId=30833479 Pessimistic sub: https://www.kaggle.com/dott1718/cv19-by-growth-rate-v5-03-per-5?scriptVersionId=30833633
+
+The optimistic sub predicted globally 2.6 mio cases after 30 days and 120k fatalities after 30 days as of 22nd of April. The pessimistic one was way more doomsday and predicted 24 mio cases and 430k fatalities. The optimistic one ended 2nd on private LB and scored 1.07716 while the pessimistic one scored still 1.29940 and would have been 5th rank. This also gives you a good idea of the problems of this metric, because even if you are off that far globally from the actual numbers, if you get some low-case countries right, the metric improves drastically.
+
+Now looking back, I have to say that our global estimation here was really, really precise. I just checked worldometer data, and on 23nd of April the actual confirmed cases were 2,722,000 and what we predicted was 2,650,252. I would have not thought that we can be so precise there, even if individual countries can be off.
+
+Week 2
+
+Even more exponential short-term growth was observed in the pre-ceding week. We mostly re-utilized our models from week 1 and adapted them a bit and overfitted them thankfully on short-term growth patterns which made them quite pessimistic in retrospective. The second submissions blends a power law fit with exponential cutoff to the model and it is actually our better sub here.
+
+Sub 1: https://www.kaggle.com/dott1718/cv19w2-2-sub?scriptVersionId=31270684 Sub 2: https://www.kaggle.com/philippsinger/cv19w2-pl4-sub?scriptVersionId=31271930
+
+Week 3
+
+We saw that machine learning solutions slowly start to shine, specifically for short-term predictions and decided to one the one hand further tune our model and sub it, and as a second submission blend some of the public ML solutions in. In detail, we used subs from @cpmpml (+team), @gaborfodor and @osciiart - so thanks to them! We heavily overweighted our model and the one from oscii in the final blend, so the weights were 8-8-1-1.
+
+Single model sub: https://www.kaggle.com/philippsinger/cv19w3-2-v2-play-2-v3fix-sub-last6dayopt?scriptVersionId=31654736 Blend sub: https://www.kaggle.com/christofhenkel/cv19w3-v3fix-cpmp-oscii-belug-full-8118?scriptVersionId=31655753
+
+Our blend sub predicts 3,668,603 confirmed cases for 7th of May and 295,911 fatalities which is ~10 days in the future. I think globally this solution will also come quite close to reality. We are also currently ranked 3rd in the competition with trending upwards, even though the gap to 2nd might be too large.
+
+Week 4
+
+Again, we decided to improve our model and blend it with other solutions. The big change we did to our model was that we do not rely for fatality predictions anylonger on predictions on confirmed cases but rather also take the individual fatality curves for future predictions. We also blend our model now with solutions from @osciiart, @rohanrao and @david1013. Our two subs this time have different weights for the blends, usually overweighting our model. We also fully rely on our model predictions for Chinese countries.
+
+Sub 1: https://www.kaggle.com/christofhenkel/cv19w4-full-pdd-oscii-david-vopa-sub1?scriptVersionId=32072839 Sub 2: https://www.kaggle.com/christofhenkel/cv19w4-full-pdd-oscii-david-vopa-sub2?scriptVersionId=32072928
+
+Sub 1 predicts globally on 14th of May 3,898,447 cases and 278,848 fatalities while sub 2 predicts 3,802,472 and 224,623 respectively. In general it seems that public subs tend to agree way more on cases and fatalities seems to drive most of the score differences. We are currently positioned 5th, but trending down a bit. Will be interesting to see how scores evolve.
+
+Learnings
+
+I am writing this write-up while hearing the news that Austria (the country I live in) removes many of the restrictions in place from May 1st onward. We have had one of the best curve flattenings globally, even though having huge exponential growth in the beginning and we quite overpredicted Austria from the start thankfully. The country implemented strong restrictions very early on and I believe they have helped a ton. This is something that we can learn from the most I feel like. Active cases (from worldemeters) looks like that for Austria:
+
+I really hope that this trend will not reverse again, many other countries also look that promising and we can only hope for a bright future.
+
+Predicting these pandemics is very hard, mostly due to lack of data, very large uncertainty, difference in reporting, differences in public behavior, and so forth. Still, I believe the models produced in these competitions can be helpful in the future, even if it is only due to our better understanding how hard it is to predict it. A lot of personal judgement flows into these models and predictions, making them also very subjective and thus combining multiple models and opinions seems to be also worth-wile to follow up on in future.
+
+Authors
+Psi
+
+philippsinger
+
+dott
+
+dott1718
+
+Dieter
+
+christofhenkel
+
+arrow_drop_up
+20
+Share
+more_horiz
+Citation
+
+Psi, dott, Dieter. PDD Writeup. https://www.kaggle.com/competitions/covid19-global-forecasting-week-5/writeups/pdd-pdd-writeup. 2020. Kaggle
+
+comment
+8 Comments
+1 appreciation comment
+Hotness
+CPMP
+
+Posted 7 years ago
+
+arrow_drop_up
+5
+more_vert
+
+Thanks for the writeup. Your exponential with decay was a great idea. Glad you reused our sub at some point, but I am not sure it was wise in hindsight.
+
+I don't know if we will write one given we either didn't select our good week 2 solution (currently 7th I think), or don't perform well in week 3. Maybe I'll write one for week4 if my model stays in top 10 or so.
+
+I mostly want to use this response as a way to thank people who contributed to my week 4 model via datasets they created: @rohanrao , @jcyzag , and @johnjdavisiv . Vopani's dataset in particular with its last day update, was key.
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Your week 4 model looks very good. Will very likely overtake us and some others soon.
+
+reply
+Reply
+CPMP
+
+Posted 7 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Thanks, I hope you are right :D Others seem to have great week 4 models too. And the ones who used one extra day say they also have strong models when trained with one day less.
+
+Finish will be interesting.
+
+reply
+Reply
+Μαριος Μιχαηλιδης KazAnova
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+The week1 competition was in my opinion the toughest one.
+
+Very little data
+Very little time to come up with something credible.
+
+Congrats on doing consistently well in the covid competitions.
+
+Also very glad that Austria is easing the restrictions.
+
+reply
+Reply
+Vopani
+
+Posted 7 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+And no public notebooks / solutions :-)
+
+reply
+Reply
+Vopani
+
+Posted 7 years ago
+
+· 13th in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Thanks for sharing! Pretty glad that optimistic models are performing better and some countries are on a steady path to recovery (Austria in particular). Lots to learn from different geographies but unfortunately not everything works across geographies. But hopefully the learnings from one geography can and should be tweaked to best fit another geography. Transfer learning with tuning of weights 😁
+
+Now looking back, I have to say that our global estimation here was really, really precise. I just checked worldometer data, and on 23nd of April the actual confirmed cases were 2,722,000 and what we predicted was 2,650,252. I would have not thought that we can be so precise there, even if individual countries can be off.
+
+Errors tend to cancel each other out when you roll up the data. So its expected that the predictions will look better at any aggregated level with some overestimates cancelling underestimates.
+
+Overall great job and I believe this would be one of the best and cleanest solutions across the weeks.
+
+reply
+Reply
+Psi
+
+Topic Author
+
+Posted 7 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+Thanks @rohanrao - totally agree that errors cancel each other out, getting the global estimates right is still based on a combination of luck, personal tuning, and modeling.
+
+Thanks for your contributions throughout the weeks, your model appears to be very strong and we borrowed parts of it for our blend :)
+
+reply
+Reply
+Appreciation (1)
+Kuldeep Arya
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+thanks for sharing

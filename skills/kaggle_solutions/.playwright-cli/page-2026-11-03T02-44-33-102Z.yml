@@ -1,0 +1,184 @@
+- generic [ref=f46e2]:
+  - navigation "Main Kaggle page navigation" [ref=f46e3]:
+    - generic [ref=f46e5]:
+      - button "Navigation menu" [ref=f46e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f46e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f46e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f46e12] [cursor=pointer]:
+      - paragraph [ref=f46e18]: Create
+    - generic [ref=f46e21]:
+      - list [ref=f46e22]:
+        - listitem "Home List Item" [ref=f46e23]:
+          - link "Home" [ref=f46e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f46e31]: Home
+        - listitem "Competitions List Item" [ref=f46e32]:
+          - link "Competitions" [ref=f46e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f46e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f46e41]:
+          - link "Benchmarks" [ref=f46e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f46e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f46e50]:
+          - link "Arenas" [ref=f46e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f46e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f46e59]:
+          - link "Game Arena" [ref=f46e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f46e67]: Game Arena
+      - list [ref=f46e68]:
+        - listitem "Data Hub List Item" [ref=f46e69]:
+          - generic [ref=f46e70]:
+            - link "Data Hub" [ref=f46e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f46e77]: Data Hub
+            - button "Expand" [ref=f46e80] [cursor=pointer]
+      - list [ref=f46e82]:
+        - listitem "More on Kaggle List Item" [ref=f46e83]:
+          - generic [ref=f46e84]:
+            - link "More on Kaggle" [ref=f46e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f46e91]: More
+            - button "Expand" [ref=f46e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f46e97]:
+    - generic [ref=f46e98]:
+      - generic [ref=f46e102]:
+        - textbox "Search" [ref=f46e104]
+        - group [aria-hidden]
+      - generic [ref=f46e106]:
+        - link [ref=f46e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fhappy-whale-and-dolphin%2Fdiscussion%2F320191
+          - button "Login" [ref=f46e108]
+        - link [ref=f46e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fhappy-whale-and-dolphin%2Fdiscussion%2F320191
+          - button "Sign Up" [ref=f46e111]
+  - main [ref=f46e113]:
+    - generic [ref=f46e115]:
+      - generic [ref=f46e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f46e117]:
+        - link "Learn more" [ref=f46e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f46e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f46e123]:
+      - generic [ref=f46e125]:
+        - generic [ref=f46e126]:
+          - link "Happywhale's profile" [ref=f46e127] [cursor=pointer]:
+            - /url: /organizations/happywhale
+            - generic "Happywhale" [ref=f46e128]
+          - generic [ref=f46e132]:
+            - generic [ref=f46e133]: Happywhale
+            - generic [ref=f46e135]: · Research Prediction Competition · 5 years ago
+          - generic [ref=f46e136]:
+            - button "Late Submission" [disabled] [ref=f46e138]
+            - button "Competition options menu collapsed" [ref=f46e141] [cursor=pointer]: more_horiz
+        - generic [ref=f46e143]:
+          - heading "Happywhale - Whale and Dolphin Identification" [level=1] [ref=f46e144]
+          - paragraph [ref=f46e146]: Identify whales and dolphins by unique characteristics
+      - generic [ref=f46e150]:
+        - tablist [ref=f46e157]:
+          - tab "Overview, 1 of 7" [ref=f46e158] [cursor=pointer]:
+            - generic [ref=f46e159]: Overview
+          - tab "Data, 2 of 7" [ref=f46e160] [cursor=pointer]:
+            - generic [ref=f46e161]: Data
+          - tab "Code, 3 of 7" [ref=f46e162] [cursor=pointer]:
+            - generic [ref=f46e163]: Code
+          - tab "Models, 4 of 7" [ref=f46e164] [cursor=pointer]:
+            - generic [ref=f46e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f46e166] [cursor=pointer]:
+            - generic [ref=f46e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f46e168] [cursor=pointer]:
+            - generic [ref=f46e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f46e170] [cursor=pointer]:
+            - generic [ref=f46e171]: Rules
+        - separator [ref=f46e173]
+      - generic [ref=f46e177]:
+        - generic [ref=f46e178]:
+          - generic [ref=f46e179]:
+            - generic [ref=f46e180]:
+              - link "tik_boa's profile" [ref=f46e181] [cursor=pointer]:
+                - /url: /tikboa
+                - generic "tik_boa" [ref=f46e182]
+              - generic [ref=f46e186]:
+                - link "tik_boa" [ref=f46e187] [cursor=pointer]:
+                  - /url: /tikboa
+                - text: ·
+                - generic [ref=f46e188]: 3rd in this Competition
+                - text: ·
+                - generic [ref=f46e189]: Posted 5 years ago
+            - generic [ref=f46e190]:
+              - generic [ref=f46e191]:
+                - button "Upvote" [ref=f46e192] [cursor=pointer]:
+                  - generic [ref=f46e193]: arrow_drop_up
+                - button "10 votes" [ref=f46e194] [cursor=pointer]: "10"
+              - button "More Options for this Topic" [ref=f46e195] [cursor=pointer]: more_vert
+            - heading "3rd solution - supplement to the post-processing section" [level=3] [ref=f46e196]
+            - generic [ref=f46e199]:
+              - paragraph [ref=f46e200]: First of all congratulations to all the winners 🎉， and thanks to kaggle for hosting such an interesting competition.
+              - paragraph [ref=f46e201]: A lot of post-processing strategies were tried in this competition，but most are disappointing.
+              - list [ref=f46e202]:
+                - listitem [ref=f46e203]:
+                  - text: re-rank, accelerate with gpu and segmentation strategy. （not work）
+                  - list [ref=f46e204]:
+                    - listitem [ref=f46e205]:
+                      - link "https://arxiv.org/pdf/1701.08398.pdf (opens in a new tab)" [ref=f46e206] [cursor=pointer]:
+                        - /url: https://arxiv.org/pdf/1701.08398.pdf
+                        - text: https://arxiv.org/pdf/1701.08398.pdf
+                - listitem [ref=f46e207]:
+                  - text: dba, or neighbor blending. (not work)
+                  - list [ref=f46e208]:
+                    - listitem [ref=f46e209]:
+                      - link "https://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf (opens in a new tab)" [ref=f46e210] [cursor=pointer]:
+                        - /url: https://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf
+                        - text: https://www.robots.ox.ac.uk/~vgg/publications/2012/Arandjelovic12/arandjelovic12.pdf
+                - listitem [ref=f46e211]:
+                  - text: gnn-re-rank, based on graph convolution. (not work)
+                  - list [ref=f46e212]:
+                    - listitem [ref=f46e213]:
+                      - link "https://arxiv.org/abs/2012.07620 (opens in a new tab)" [ref=f46e214] [cursor=pointer]:
+                        - /url: https://arxiv.org/abs/2012.07620
+                        - text: https://arxiv.org/abs/2012.07620
+                - listitem [ref=f46e215]: some feature dimension processing strategies：PCA(part/whole), SVD(part/SVD), RMAC
+                - listitem [ref=f46e216]:
+                  - text: bayesian search weights
+                  - list [ref=f46e217]:
+                    - listitem [ref=f46e218]: before 0.875, it can be greatly improved by searching
+                    - listitem [ref=f46e219]: but through repeated iterations, when the model reaches 0.880, the effect of search and concat is equivalent
+              - paragraph [ref=f46e220]: Reference Code：
+              - list [ref=f46e221]:
+                - listitem [ref=f46e222]:
+                  - link "https://github.com/PyRetri/PyRetri (opens in a new tab)" [ref=f46e223] [cursor=pointer]:
+                    - /url: https://github.com/PyRetri/PyRetri
+                    - text: https://github.com/PyRetri/PyRetri
+                - listitem [ref=f46e224]:
+                  - link "https://github.com/Xuanmeng-Zhang/gnn-re-ranking (opens in a new tab)" [ref=f46e225] [cursor=pointer]:
+                    - /url: https://github.com/Xuanmeng-Zhang/gnn-re-ranking
+                    - text: https://github.com/Xuanmeng-Zhang/gnn-re-ranking
+                - listitem [ref=f46e226]:
+                  - link "https://github.com/JDAI-CV/fast-reid (opens in a new tab)" [ref=f46e227] [cursor=pointer]:
+                    - /url: https://github.com/JDAI-CV/fast-reid
+                    - text: https://github.com/JDAI-CV/fast-reid
+          - separator [ref=f46e228]
+        - generic [ref=f46e229]:
+          - generic [ref=f46e230]:
+            - paragraph [ref=f46e233]:
+              - paragraph [ref=f46e234]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f46e235] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f46e236]
+          - generic [ref=f46e238]:
+            - generic [ref=f46e239]:
+              - generic [aria-hidden] [ref=f46e240]: comment
+              - heading "0 Comments" [level=2] [ref=f46e242]
+            - generic [ref=f46e245]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f46e246] [cursor=pointer]:
+                - generic [ref=f46e247]: Hotness
+              - textbox [aria-hidden]: Hotness
+  - alert [ref=f46e251]

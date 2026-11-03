@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/quora-question-pairs/discussion/34288
-fetched: 2026-10-27
-chars: 797
+fetched: 2026-11-03
+chars: 9513
 
 menu
 Skip to
@@ -22,35 +22,255 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Quora · Featured Prediction Competition · 9 years ago
-Late Submission
-more_horiz
+Overview Of 3rd Place Solution — Quora Question Pairs
+Overview Of 3rd Place Solution
+
 Quora Question Pairs
 
-Can you identify question pairs that have the same intent?
+Solution Writeup · 3rd place · Jun 7, 2017
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+I'll update this post with more detail and the code when I have documented it better, but I figure I'll quickly describe my part of our solution. I'll focus on my parts, Sean provided very good NLP, nn and graphical features so I'll let him describe these.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Overall we used around 1300 features for the 1st level models, which were nn, lightgbm and xgb models. Lightgbm worked really well for this competition, being up to 5x faster than xgb and only a little less accurate. These features were primarily NLP features and what I'll call meta-features. The meta-features were frequency features and graph features, such as intersection count, the frequency of intersecting questions, question frequency, question frequency just for q1, question frequency just for q2 and so on. NLP features were things like matching words, if the word before a "?" matched, frequencies of matching words, frequencies of not matching words, how similar matching and non-matching words were, etc.
 
-error
+These models, roughly 15 of them (some nn were bagged, I'm counting that as 1 model) were then stacked together. Before stacking we introduced features such as q1_hash_by_mean_pred, q1_hash_by_min_pred, sum of the question hashes etc. Our best single model was an xgb model and got around 0.185 on cv, stacking got down to 0.157 on cv. It was important to include meta features when stacking, as some models were built just on NLP and this allowed them to still be useful. Sean also found a feature in the last couple days which was related to the OOF predictions of NLP models to the intersections somehow, and this provided significant gains.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Edit: Another interesting find by Sean was that averaging the stacked models with the individual models (so the final ensemble was 0.75 stacked + 0.25 * (base models)). This lead to gains of ~ 0.001 on public lb, but harmed cv. So doing this somehow ensured better generalization, still not sure exactly why but it did also translate to private lb.
 
-Failed to load the discussion topic
+For one idea which probably a lot of teams did not do, was to selectively adjust our predictions based on question frequency. There was a systematic difference between lb and cv, and it was somehow related to question frequency. For instance we used the link function (adjust the odds down) by a factor of 4.7 when the question frequency sum was 2 (both questions unique) and scaled this gradually down with increasing question frequency.
 
-error
+That is all for now, there is a bunch of other things we did and I'll try and post the code when it is cleaned and documented. Thanks for a fun competition, even if it was about more than just NLP.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Authors
+Jared Turkewitz
+
+jturkewitz
+
+sjv
+
+seanjv
+
+arrow_drop_up
+85
+Share
+more_horiz
+Citation
+
+Jared Turkewitz, sjv. Overview Of 3rd Place Solution. https://www.kaggle.com/competitions/quora-question-pairs/writeups/jared-turkewitz-sjv-overview-of-3rd-place-solution. 2017. Kaggle
+
+comment
+16 Comments
+1 appreciation comment
+Hotness
+sjv
+
+Posted 9 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+14
+more_vert
+
+Here's a quick summary of my main contributions
+
+Graphical features
+
+We added a few hundred graphical features since it was clear that encoding the graphical structure was key to exploiting the leak. We used intersection counts as posted in the forums in addition to a generalization of intersection counts that measured the overlap between the regions of the graph around each node. We also included features using PageRank, node degrees, shortest paths, clique sizes, etc. to encode the graphical structure and the relationship between nodes on the graph. These features could be created on the unweighted graph, but we also created similar features using a weighted graph where the edge weights were the out of fold predictions of our base models.
+
+NLP features
+
+We used TFIDF and LSA distances, word co-occurrence measures (pointwise mutual information), word matching measures, fuzzy word matching measures (edit distance, character ngram distances, etc), LDA, word2vec distances, part of speech and named entity features, and some other minor features. These features were mostly recycled from a previous NLP competition, and were not nearly as essential in this competition.
+
+Neural networks
+
+The main neural network model was more or less a bidirectional LSTM with attention. Our word representations included pretrained glove vectors, part of speech embeddings, named entity embeddings, and dependency parse embeddings. The word representation sequences were fed through a bidirectional LSTM, an attention layer with softmax matching and maxpool matching, and a dense layer. The sequences were then encoded into vectors using another bidirectional LSTM and the concatenated vectors were then run through two dense layers. The other main neural network we used was essentially a siamese network with bidirectional LSTM and self-attention.
+
+reply
+Reply
+Sameh Faidi
+
+Posted 9 years ago
+
+· 18th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+congrats on your well deserved position. Could you share your LB score of best single model? will you share the code for your NN ? how much did it contribute to your final score?
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+Shujian Liu
+
+Posted 9 years ago
+
+· 41st in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Congratulations Jared! I am so shocked by your 1300 features. Looking forward to reading your details and code!
+
+reply
+Reply
+Alson Yap
+
+Posted 9 years ago
+
+· 154th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Jared thanks so much for providing your solution so quickly after the competition has ended. Much thanks for being selfless and sharing the magic features which helped to even the field ;) again, thanks again and very observant on that last section that gave you an insight on scaling your prediction.
+Will be looking forward to your updated post! :)
+
+reply
+Reply
+paulantoine
+
+Posted 9 years ago
+
+· 145th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for sharing so quickly ! I'm impressed by the number of features : I thought I was in the diminishing returns area and you have 7 times more !
+
+Thanks also for 1st sharing on graph features during competition. It opened the path for features I would have missed.
+
+reply
+Reply
+MaxBaudry
+
+Posted 9 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great job guys!
+Congratulations!
+
+reply
+Reply
+guotong1988
+
+Posted 8 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Our best single model was an xgb model and got around 0.185 on cv, stacking got down to 0.157 on cv.
+
+So XGB / LGBM are powerful, but I only got 0.4 on them.
+
+reply
+Reply
+Siddharth Vashishtha
+
+Posted 9 years ago
+
+· 143rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats team and thanks a lot Jared. It's good to see you finishing in the top 3. You shared one of the most powerful 'magic' features that paved the way for even more interesting findings.
+
+reply
+Reply
+Canoe
+
+Posted 9 years ago
+
+· 219th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+wow I have two models with 0.3 and 0.7 shares each haha.
+
+reply
+Reply
+David Thaler
+
+Posted 9 years ago
+
+· 24th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Jared,
+
+Congratulations on the great result! Was question frequency the only variable that you tried as a basis for prediction adjustment? And how did you decide how much to scale the predictions by?
+
+reply
+Reply
+Jared Turkewitz
+
+Topic Author
+
+Posted 9 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+I also tried by test question frequency and intersection count (for one submission only). I actually suspect there may be a better way to exploit it, but I discovered this pretty late in the comp and didn't want to waste too many submissions searching for it. I basically did two approaches - I used some submissions to get the fractions in public lb for each frequency, by submitting a 0.5 prediction for all instances and then varying the prediction for question frequencies between all 0 and then another submission for all 1. The original motivation was to get the number of real questions in each frequency bin, because for instance ~30% of the dataset was unique questions which are pure NLP in train and I wanted to know if this held true in test. Once I did this though I noticed that only 3% of the unique questions in public lb were duplicates, compared to like 25% in train. This was one reason NLP wasn't as important for this comp. I mainly just used trial and error with public lb feedback, to do the adjustment. Minor tweaks to the adjustment didn't matter that much.
+
+One thing I noticed that lead me to think there was a systematic difference was including test frequency as a feature lead to gains on cv, but significant losses on the lb.
+
+reply
+Reply
+Fengari
+
+Posted 9 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations to all guys! Our single model get around 0.188 on CV, stacking to 0.165. Learning a lot from this game, we also will share latter.
+
+reply
+Reply
+Appreciation (1)
+CPMP
+
+Posted 9 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats and thank for sharing.

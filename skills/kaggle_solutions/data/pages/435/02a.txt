@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/indoor-location-navigation/discussion/239880
-fetched: 2026-10-27
-chars: 756
+fetched: 2026-11-03
+chars: 3852
 
 menu
 Skip to
@@ -42,13 +42,95 @@ Models
 Discussion
 Leaderboard
 Rules
-Failed to load the discussion topic
-error
+Youri Matiounine · 2nd in this Competition · Posted 5 years ago
+arrow_drop_up
+37
+more_vert
+2nd place solution(my part of it)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+The code is in kernel https://www.kaggle.com/ymatioun/indoor-navigation-fingerprinting-ym which I just made public, and below is a brief description of the approach. Team submission used a different (and a lot more advanced) post-processing, which will be described by team leader, mamas.
 
-error
+1. Relative position prediction: pedestrian dead reckoning, based on data from ROTATION_VECTOR and ACCELEROMETER sensors: similar to what competition organizers did (counting steps to get distance), but with more parameters that were tuned to all the training data, including some parameters that varied by site. That approach produced predictions that tracked train paths significantly better than organizers' model.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+2. Absolute prediction based on fingerprinting of Wi-Fi signals: for each test Wi-Fi point, find training Wi-Fi points that match closely by BSSIDs and signal strength, select top matches and take x/y/floor of those training points, weighted by closeness of match. I did this not just for single points, but for sets of point (path segments) up to almost 100 in length, by including previous and next points on the path in the weighted average, with x/y shifted by relative prediction distance. This approach is similar to "cost minimization" algorithm that combines predictions for individual points with relative position predictions.
 
-Failed to load the discussion topic
+3. Post-processing: based on "snap-to-grid" algorithm: snap all points on the path to grid of train waypoints if they are within 5 meters of the nearest grid point; shift whole initial path prediction by average change in x/y coordinates due to this "snapping", repeat until results stop changing. This repetition positions path closer to its true location, making snap-to-grid more efficient. As a second part of post-processing, predict position of each point based of previous or next point and relative position prediction, and snap it to different grid point if it is close enough; repeat until the process converges. This fixes some situations where adjacent points got snapped to the same grid point.
+
+Please sign in to reply to this topic.
+
+comment
+6 Comments
+Hotness
+Nanashi
+
+Posted 5 years ago
+
+· 90th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+thank you @ymatioun , congrats for the amazing 2nd place. Can you share the score of your model without any postprocessing (or basic) ?
+
+Devansh Chowdhury
+
+Posted 5 years ago
+
+· 1089th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank You @ymatioun .I just have few questions regarding the post - Does pedestrian dead reckoning uses only accelerometer and rotation gyroscope ? You have also mentioned the technique used by organizers , i did not get that .
+
+mamas
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks youri, it was really a great success to team up with you, and congrats kaggle master!
+
+Youri Matiounine
+
+Topic Author
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks! Before post-processing score was around 3.7
+
+ADITI MAURYA
+
+Posted 5 years ago
+
+· 116th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations :)
+
+Reza
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats @ymatioun for becoming Competition Master 👍

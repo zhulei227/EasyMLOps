@@ -1,0 +1,356 @@
+- generic [ref=f10e2]:
+  - navigation "Main Kaggle page navigation" [ref=f10e3]:
+    - generic [ref=f10e5]:
+      - button "Navigation menu" [ref=f10e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f10e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f10e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f10e12] [cursor=pointer]:
+      - paragraph [ref=f10e18]: Create
+    - generic [ref=f10e21]:
+      - list [ref=f10e22]:
+        - listitem "Home List Item" [ref=f10e23]:
+          - link "Home" [ref=f10e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f10e31]: Home
+        - listitem "Competitions List Item" [ref=f10e32]:
+          - link "Competitions" [ref=f10e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f10e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f10e41]:
+          - link "Benchmarks" [ref=f10e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f10e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f10e50]:
+          - link "Arenas" [ref=f10e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f10e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f10e59]:
+          - link "Game Arena" [ref=f10e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f10e67]: Game Arena
+      - list [ref=f10e68]:
+        - listitem "Data Hub List Item" [ref=f10e69]:
+          - generic [ref=f10e70]:
+            - link "Data Hub" [ref=f10e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f10e77]: Data Hub
+            - button "Expand" [ref=f10e80] [cursor=pointer]
+      - list [ref=f10e82]:
+        - listitem "More on Kaggle List Item" [ref=f10e83]:
+          - generic [ref=f10e84]:
+            - link "More on Kaggle" [ref=f10e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f10e91]: More
+            - button "Expand" [ref=f10e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f10e97]:
+    - generic [ref=f10e98]:
+      - generic [ref=f10e102]:
+        - textbox "Search" [ref=f10e104]
+        - group [aria-hidden]
+      - generic [ref=f10e106]:
+        - link [ref=f10e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fjane-street-market-prediction%2Fdiscussion%2F229623
+          - button "Login" [ref=f10e108]
+        - link [ref=f10e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fjane-street-market-prediction%2Fdiscussion%2F229623
+          - button "Sign Up" [ref=f10e111]
+  - main [ref=f10e113]:
+    - generic [ref=f10e115]:
+      - generic [ref=f10e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f10e117]:
+        - link "Learn more" [ref=f10e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f10e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f10e123]:
+      - generic [ref=f10e125]:
+        - generic [ref=f10e126]:
+          - link "Jane Street Group's profile" [ref=f10e127] [cursor=pointer]:
+            - /url: /organizations/jane-street-group
+            - generic "Jane Street Group" [ref=f10e128]
+          - generic [ref=f10e132]:
+            - generic [ref=f10e133]: Jane Street Group
+            - generic [ref=f10e135]: · Featured Code Competition · 5 years ago
+          - generic [ref=f10e136]:
+            - button "Late Submission" [disabled] [ref=f10e138]
+            - button "Competition options menu collapsed" [ref=f10e141] [cursor=pointer]: more_horiz
+        - generic [ref=f10e143]:
+          - heading "Jane Street Market Prediction" [level=1] [ref=f10e144]
+          - paragraph [ref=f10e146]: Test your model against future real market data
+      - generic [ref=f10e150]:
+        - tablist [ref=f10e157]:
+          - tab "Overview, 1 of 7" [ref=f10e158] [cursor=pointer]:
+            - generic [ref=f10e159]: Overview
+          - tab "Data, 2 of 7" [ref=f10e160] [cursor=pointer]:
+            - generic [ref=f10e161]: Data
+          - tab "Code, 3 of 7" [ref=f10e162] [cursor=pointer]:
+            - generic [ref=f10e163]: Code
+          - tab "Models, 4 of 7" [ref=f10e164] [cursor=pointer]:
+            - generic [ref=f10e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f10e166] [cursor=pointer]:
+            - generic [ref=f10e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f10e168] [cursor=pointer]:
+            - generic [ref=f10e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f10e170] [cursor=pointer]:
+            - generic [ref=f10e171]: Rules
+        - separator [ref=f10e173]
+      - generic [ref=f10e177]:
+        - generic [ref=f10e178]:
+          - generic [ref=f10e179]:
+            - generic [ref=f10e180]:
+              - link "Mingjie Wang's profile" [ref=f10e181] [cursor=pointer]:
+                - /url: /xiaowangiiiii
+                - generic "Mingjie Wang" [ref=f10e182]
+              - generic [ref=f10e186]:
+                - link "Mingjie Wang" [ref=f10e187] [cursor=pointer]:
+                  - /url: /xiaowangiiiii
+                - text: ·
+                - generic [ref=f10e188]: 1st in this Competition
+                - text: ·
+                - generic [ref=f10e189]: Posted 6 years ago
+            - generic [ref=f10e190]:
+              - generic [ref=f10e191]:
+                - button "Upvote" [ref=f10e192] [cursor=pointer]:
+                  - generic [ref=f10e193]: arrow_drop_up
+                - button "34 votes" [ref=f10e194] [cursor=pointer]: "34"
+              - button "More Options for this Topic" [ref=f10e195] [cursor=pointer]: more_vert
+            - 'heading "TOP1 : Additional Information and Unique Techniques" [level=3] [ref=f10e196]'
+            - generic [ref=f10e199]:
+              - paragraph [ref=f10e200]:
+                - text: 国内的朋友可以
+                - link "看这里 (opens in a new tab)" [ref=f10e201] [cursor=pointer]:
+                  - /url: https://zhuanlan.zhihu.com/p/355606168
+                  - text: 看这里
+                - text: 🙈
+                - link "kaggle Kernel (opens in a new tab)" [ref=f10e202] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/xiaowangiiiii/current-1th-jane-street-ae-mlp-xgb
+                  - text: kaggle Kernel
+                - link "github (opens in a new tab)" [ref=f10e203] [cursor=pointer]:
+                  - /url: https://github.com/MingjieWang0606/-Jane-Street-AE-MLP-xgb-TOP1
+                  - text: github
+              - paragraph [ref=f10e204]:
+                - text: When we finally submitted it, we made some changes to yirun's code. But most of them have not changed, you can check our notebook and
+                - link "the yirun discussion (opens in a new tab)" [ref=f10e205] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/c/jane-street-market-prediction/discussion/224348
+                  - text: the yirun discussion
+                - text: for details.
+              - paragraph [ref=f10e206]:
+                - text: The official data provided 5 sets of income indicators, namely resp_1, resp_2, resp_3, resp_4 and resp. Our final benefit is calculated according to the value of resp. please check
+                - link "here. (opens in a new tab)" [ref=f10e207] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/christoffer/rough-estimate-of-resp-i-timeframes
+                  - text: here.
+              - paragraph [ref=f10e208]: According to resp_1, the income obtained by resp_2 exchange is more stable, and the t value is high According to resp_3, the exchange may have a higher t value, and the p value tends to be higher According to resp, resp_4 transactions may achieve high p-values, but t-values are often very low From the above conclusions, we found that by using resp_3, we can obtain a model that is both stable and highly profitable. If we directly use resp_3 when predicting and training, we are likely to get higher benefits than using resp to predict! Regardless of the model, submit resp_3 to increase the point! This first conclusion is valid most of the time whether it is online or offline.
+              - paragraph [ref=f10e209]:
+                - link "image https://pic2.zhimg.com/80/v2-dc1d3bcb7ddcb82515fc60e0ef9cc0bd_720w.jpg" [ref=f10e210] [cursor=pointer]:
+                  - /url: https://pic2.zhimg.com/80/v2-dc1d3bcb7ddcb82515fc60e0ef9cc0bd_720w.jpg
+                  - generic [ref=f10e211]: image
+                  - text: https://pic2.zhimg.com/80/v2-dc1d3bcb7ddcb82515fc60e0ef9cc0bd_720w.jpg
+                - text: This is the income curve obtained when training the neural network. The abscissa is epoch//5, and the ordinate is the utility score. For the gains obtained by different resp, it can be seen that the gains obtained by resp_1 and resp_2 are always low, while resp_3 , resp_4, resp gains even higher gains. The curves listed here are those obtained when the model converges relatively stably. In fact, by selecting different verification sets, different modes can be observed. When the data distribution is completely different, resp_2 can achieve better returns!
+              - paragraph [ref=f10e212]: Mean or mode? In fact, through offline analysis and observation, it can be found that in the pre-test, if multiple targets are used during training, the gains obtained by taking the mean and mode are actually the same, but for some special cases, the mean or mode is often surprisingly effective. In view of the serious uncertainty here, we have not done much research here.
+              - paragraph [ref=f10e213]: Optimal transaction threshold Offline experiments have concluded that a threshold between 0.51 and 0.52 can bring higher benefits. One of the final submitted models uses 0.51 as the threshold. I also hope that this discovery can be used in the next six months. Come on positive income.
+              - paragraph [ref=f10e214]: How to improve the model effect? Using more data (weight=0), here is where we are lacking, but I believe that other teams have not done too well. It is not ruled out that some teams have done some processing and achieved results, but they have done some processing and It does not mean that they have used the data. It takes a lot of experiments to verify that it is correct before drawing conclusions. Reduce the number of transactions. In view of the penalty mechanism of the evaluation standard, giving up risky trading opportunities may result in an increase in scores. But here is also more metaphysical, and no convincing method that can improve scores has been found. Feature engineering. More feature engineering can make it easier for the model to learn the patterns in the data, but the subsequent severe overfitting. Final model The data of the game are anonymous features (130 columns). Feature engineering is not completely useless, but it is often thankless. In order to maintain the simplicity of the solution, the final submitted model did not include feature engineering. In fact, there are some feature projects that can improve scores offline, but adding online models will lower the scores. We hope to keep only the strong conclusion that both online and offline are improved. Readers who have read here may find that we have not used any particularly complicated methods. In fact, most of my energy is spent on observing the performance of data and models. Complex models or methods have also been tried, but the results are often not good, online and offline are inconsistent, or not significant. I believe everyone will have an intuition that the final winning model may not be that complicated. This is also the principle we followed in the final submission.
+              - paragraph [ref=f10e215]: Our final model is AE+MLP + XGBOOST (100 round), and each model is trained on three seeds. The scores obtained in the public list are 99xx and 97xx respectively, and the scores in the private list are 54xx and 52xx.
+              - paragraph [ref=f10e216]: I'm lazy, so I use Google Translate directly. Please let me know if there is something unclear about the expression. :) Thanks to my teammates!!!Without them, I can't do anything.
+          - separator [ref=f10e217]
+        - generic [ref=f10e218]:
+          - generic [ref=f10e219]:
+            - paragraph [ref=f10e222]:
+              - paragraph [ref=f10e223]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f10e224] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f10e225]
+          - generic [ref=f10e227]:
+            - generic [ref=f10e228]:
+              - generic [aria-hidden] [ref=f10e229]: comment
+              - heading "9 Comments" [level=2] [ref=f10e231]
+            - generic [ref=f10e234]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f10e235] [cursor=pointer]:
+                - generic [ref=f10e236]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f10e238]:
+            - generic [ref=f10e239]:
+              - generic [ref=f10e243]:
+                - link "M.C.'s profile" [ref=f10e244] [cursor=pointer]:
+                  - /url: /chongchong33
+                  - generic "M.C." [ref=f10e245]
+                - generic [ref=f10e251]:
+                  - link [ref=f10e253] [cursor=pointer]:
+                    - /url: /chongchong33
+                    - heading "M.C." [level=3] [ref=f10e254]
+                  - paragraph [ref=f10e256]: Posted 6 years ago
+                - generic [ref=f10e258]:
+                  - generic [ref=f10e259]:
+                    - button "Upvote" [ref=f10e260] [cursor=pointer]:
+                      - generic [ref=f10e261]: arrow_drop_up
+                    - button "3 votes" [ref=f10e262] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f10e263] [cursor=pointer]: more_vert
+                - paragraph [ref=f10e267]: “ I use Google Translate directly. ” 😂 我可以看中文版😀 Congratulations！Upvote!
+                - generic [ref=f10e273]:
+                  - link "Mingjie Wang's profile" [ref=f10e274] [cursor=pointer]:
+                    - /url: /xiaowangiiiii
+                    - generic "Mingjie Wang" [ref=f10e275]
+                  - generic [ref=f10e281]:
+                    - generic [ref=f10e282]:
+                      - link [ref=f10e283] [cursor=pointer]:
+                        - /url: /xiaowangiiiii
+                        - heading "Mingjie Wang" [level=3] [ref=f10e284]
+                      - paragraph [ref=f10e287]: Topic Author
+                    - generic [ref=f10e288]:
+                      - paragraph [ref=f10e289]: Posted 6 years ago
+                      - paragraph [ref=f10e291]: · 1st in this Competition
+                  - generic [ref=f10e293]:
+                    - generic [ref=f10e294]:
+                      - button "Upvote" [ref=f10e295] [cursor=pointer]:
+                        - generic [ref=f10e296]: arrow_drop_up
+                      - button "1 votes" [ref=f10e297] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f10e298] [cursor=pointer]: more_vert
+                  - paragraph [ref=f10e302]: Hope you like it~🙈
+              - separator [ref=f10e303]
+            - generic [ref=f10e304]:
+              - generic [ref=f10e308]:
+                - link "DECEM's profile" [ref=f10e309] [cursor=pointer]:
+                  - /url: /zy1343930734
+                  - generic "DECEM" [ref=f10e310]
+                - generic [ref=f10e316]:
+                  - link [ref=f10e318] [cursor=pointer]:
+                    - /url: /zy1343930734
+                    - heading "DECEM" [level=3] [ref=f10e319]
+                  - paragraph [ref=f10e321]: Posted 5 years ago
+                - generic [ref=f10e323]:
+                  - generic [ref=f10e324]:
+                    - button "Upvote" [ref=f10e325] [cursor=pointer]:
+                      - generic [ref=f10e326]: arrow_drop_up
+                    - button "1 votes" [ref=f10e327] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f10e328] [cursor=pointer]: more_vert
+                - paragraph [ref=f10e332]:
+                  - link "@xiaowangiiiii (opens in a new tab)" [ref=f10e333] [cursor=pointer]:
+                    - /url: /xiaowangiiiii
+                    - text: "@xiaowangiiiii"
+                  - text: It's incredible. Great job.
+              - separator [ref=f10e334]
+            - generic [ref=f10e335]:
+              - generic [ref=f10e339]:
+                - link "Kostadinov's profile" [ref=f10e340] [cursor=pointer]:
+                  - /url: /freeman89
+                  - generic "Kostadinov" [ref=f10e341]
+                - generic [ref=f10e347]:
+                  - link [ref=f10e349] [cursor=pointer]:
+                    - /url: /freeman89
+                    - heading "Kostadinov" [level=3] [ref=f10e350]
+                  - generic [ref=f10e351]:
+                    - paragraph [ref=f10e352]: Posted 5 years ago
+                    - paragraph [ref=f10e354]: · 648th in this Competition
+                - generic [ref=f10e356]:
+                  - generic [ref=f10e357]:
+                    - button "Upvote" [ref=f10e358] [cursor=pointer]:
+                      - generic [ref=f10e359]: arrow_drop_up
+                    - button "1 votes" [ref=f10e360] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f10e361] [cursor=pointer]: more_vert
+                - paragraph [ref=f10e365]: Why do you have train = train1.query('date > 85').reset_index(drop = True) in your submission? In the testing phase you can not know if something like that is going to be useful, as the model will be trained on different data.
+                - generic [ref=f10e366]:
+                  - generic [ref=f10e371]:
+                    - link "Mingjie Wang's profile" [ref=f10e372] [cursor=pointer]:
+                      - /url: /xiaowangiiiii
+                      - generic "Mingjie Wang" [ref=f10e373]
+                    - generic [ref=f10e379]:
+                      - generic [ref=f10e380]:
+                        - link [ref=f10e381] [cursor=pointer]:
+                          - /url: /xiaowangiiiii
+                          - heading "Mingjie Wang" [level=3] [ref=f10e382]
+                        - paragraph [ref=f10e385]: Topic Author
+                      - generic [ref=f10e386]:
+                        - paragraph [ref=f10e387]: Posted 5 years ago
+                        - paragraph [ref=f10e389]: · 1st in this Competition
+                    - generic [ref=f10e391]:
+                      - generic [ref=f10e392]:
+                        - button "Upvote" [ref=f10e393] [cursor=pointer]:
+                          - generic [ref=f10e394]: arrow_drop_up
+                        - button "0 votes" [ref=f10e395] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f10e396] [cursor=pointer]: more_vert
+                    - paragraph [ref=f10e400]: In fact, the data before this is very jittery. It is completely inconsistent with the data of the following date. So there is no reference value. Secondly, both CV and LB support my view :)
+                  - generic [ref=f10e405]:
+                    - link "Kostadinov's profile" [ref=f10e406] [cursor=pointer]:
+                      - /url: /freeman89
+                      - generic "Kostadinov" [ref=f10e407]
+                    - generic [ref=f10e413]:
+                      - link [ref=f10e415] [cursor=pointer]:
+                        - /url: /freeman89
+                        - heading "Kostadinov" [level=3] [ref=f10e416]
+                      - generic [ref=f10e417]:
+                        - paragraph [ref=f10e418]: Posted 5 years ago
+                        - paragraph [ref=f10e420]: · 648th in this Competition
+                    - generic [ref=f10e422]:
+                      - generic [ref=f10e423]:
+                        - button "Upvote" [ref=f10e424] [cursor=pointer]:
+                          - generic [ref=f10e425]: arrow_drop_up
+                        - button "1 votes" [ref=f10e426] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f10e427] [cursor=pointer]: more_vert
+                    - paragraph [ref=f10e431]: Yes I know that is true for the first phase of the competiotion. After the final submission, the evaluation phase started and lasted for several months. The kernels are exeecuted with completely new data, that is unknown to us. So skipping the first 85 days for the new data does not make any sense. In fact, I think if you remove this line of code, you would get even better final score.
+                  - generic [ref=f10e436]:
+                    - link "Mingjie Wang's profile" [ref=f10e437] [cursor=pointer]:
+                      - /url: /xiaowangiiiii
+                      - generic "Mingjie Wang" [ref=f10e438]
+                    - generic [ref=f10e444]:
+                      - generic [ref=f10e445]:
+                        - link [ref=f10e446] [cursor=pointer]:
+                          - /url: /xiaowangiiiii
+                          - heading "Mingjie Wang" [level=3] [ref=f10e447]
+                        - paragraph [ref=f10e450]: Topic Author
+                      - generic [ref=f10e451]:
+                        - paragraph [ref=f10e452]: Posted 5 years ago
+                        - paragraph [ref=f10e454]: · 1st in this Competition
+                    - generic [ref=f10e456]:
+                      - generic [ref=f10e457]:
+                        - button "Upvote" [ref=f10e458] [cursor=pointer]:
+                          - generic [ref=f10e459]: arrow_drop_up
+                        - button "0 votes" [ref=f10e460] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f10e461] [cursor=pointer]: more_vert
+                    - paragraph [ref=f10e465]: I don't find it meaningless. It will interfere with our training. One of the ways to deal with outliers is to delete them directly~ If both CV and LB tell me that it is not good, I have no reason not to believe them. When I am doing real stock data, the effect of deleting premature data and outlier data will also improve our model. It may just be my experience~ I hope I can help you.
+              - separator [ref=f10e466]
+            - generic [ref=f10e467]:
+              - generic [ref=f10e471]:
+                - link "Fahmi Sulthoni's profile" [ref=f10e472] [cursor=pointer]:
+                  - /url: /fahmisulthoni
+                  - generic "Fahmi Sulthoni" [ref=f10e473]
+                - generic [ref=f10e479]:
+                  - link [ref=f10e481] [cursor=pointer]:
+                    - /url: /fahmisulthoni
+                    - heading "Fahmi Sulthoni" [level=3] [ref=f10e482]
+                  - paragraph [ref=f10e484]: Posted 5 years ago
+                - generic [ref=f10e486]:
+                  - generic [ref=f10e487]:
+                    - button "Upvote" [ref=f10e488] [cursor=pointer]:
+                      - generic [ref=f10e489]: arrow_drop_up
+                    - button "1 votes" [ref=f10e490] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f10e491] [cursor=pointer]: more_vert
+                - paragraph [ref=f10e495]: Good one!😃
+              - separator [ref=f10e496]
+            - generic [ref=f10e501]:
+              - link "Sidney Ng's profile" [ref=f10e502] [cursor=pointer]:
+                - /url: /sidneyng
+                - generic "Sidney Ng" [ref=f10e503]
+              - generic [ref=f10e509]:
+                - link [ref=f10e511] [cursor=pointer]:
+                  - /url: /sidneyng
+                  - heading "Sidney Ng" [level=3] [ref=f10e512]
+                - generic [ref=f10e513]:
+                  - paragraph [ref=f10e514]: Posted 6 years ago
+                  - paragraph [ref=f10e516]: · 2026th in this Competition
+              - generic [ref=f10e518]:
+                - generic [ref=f10e519]:
+                  - button "Upvote" [ref=f10e520] [cursor=pointer]:
+                    - generic [ref=f10e521]: arrow_drop_up
+                  - button "1 votes" [ref=f10e522] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f10e523] [cursor=pointer]: more_vert
+              - paragraph [ref=f10e527]:
+                - text: Thanks
+                - link "@xiaowangiiiii (opens in a new tab)" [ref=f10e528] [cursor=pointer]:
+                  - /url: /xiaowangiiiii
+                  - text: "@xiaowangiiiii"
+                - text: "! Simplicity is often the best"
+  - alert [ref=f10e531]

@@ -1,0 +1,667 @@
+- generic [ref=f57e2]:
+  - navigation "Main Kaggle page navigation" [ref=f57e3]:
+    - generic [ref=f57e5]:
+      - button "Navigation menu" [ref=f57e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f57e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f57e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f57e12] [cursor=pointer]:
+      - paragraph [ref=f57e18]: Create
+    - generic [ref=f57e21]:
+      - list [ref=f57e22]:
+        - listitem "Home List Item" [ref=f57e23]:
+          - link "Home" [ref=f57e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f57e31]: Home
+        - listitem "Competitions List Item" [ref=f57e32]:
+          - link "Competitions" [ref=f57e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f57e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f57e41]:
+          - link "Benchmarks" [ref=f57e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f57e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f57e50]:
+          - link "Arenas" [ref=f57e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f57e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f57e59]:
+          - link "Game Arena" [ref=f57e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f57e67]: Game Arena
+      - list [ref=f57e68]:
+        - listitem "Data Hub List Item" [ref=f57e69]:
+          - generic [ref=f57e70]:
+            - link "Data Hub" [ref=f57e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f57e77]: Data Hub
+            - button "Expand" [ref=f57e80] [cursor=pointer]
+      - list [ref=f57e82]:
+        - listitem "More on Kaggle List Item" [ref=f57e83]:
+          - generic [ref=f57e84]:
+            - link "More on Kaggle" [ref=f57e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f57e91]: More
+            - button "Expand" [ref=f57e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f57e97]:
+    - generic [ref=f57e98]:
+      - generic [ref=f57e102]:
+        - textbox "Search" [ref=f57e104]
+        - group [aria-hidden]
+      - generic [ref=f57e106]:
+        - link [ref=f57e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2FPLAsTiCC-2018%2Fdiscussion%2F75116
+          - button "Login" [ref=f57e108]
+        - link [ref=f57e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2FPLAsTiCC-2018%2Fdiscussion%2F75116
+          - button "Sign Up" [ref=f57e111]
+  - main [ref=f57e113]:
+    - generic [ref=f57e115]:
+      - generic [ref=f57e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f57e117]:
+        - link "Learn more" [ref=f57e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f57e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f57e123]:
+      - generic [ref=f57e125]:
+        - generic [ref=f57e126]:
+          - link "LSST Project's profile" [ref=f57e127] [cursor=pointer]:
+            - /url: /organizations/lsstproject
+            - generic "LSST Project" [ref=f57e128]
+          - generic [ref=f57e132]:
+            - generic [ref=f57e133]: LSST Project
+            - generic [ref=f57e135]: · Featured Prediction Competition · 8 years ago
+          - generic [ref=f57e136]:
+            - button "Late Submission" [disabled] [ref=f57e138]
+            - button "Competition options menu collapsed" [ref=f57e141] [cursor=pointer]: more_horiz
+        - generic [ref=f57e143]:
+          - heading "PLAsTiCC Astronomical Classification" [level=1] [ref=f57e144]
+          - paragraph [ref=f57e146]: Can you help make sense of the Universe?
+      - generic [ref=f57e150]:
+        - tablist [ref=f57e157]:
+          - tab "Overview, 1 of 7" [ref=f57e158] [cursor=pointer]:
+            - generic [ref=f57e159]: Overview
+          - tab "Data, 2 of 7" [ref=f57e160] [cursor=pointer]:
+            - generic [ref=f57e161]: Data
+          - tab "Code, 3 of 7" [ref=f57e162] [cursor=pointer]:
+            - generic [ref=f57e163]: Code
+          - tab "Models, 4 of 7" [ref=f57e164] [cursor=pointer]:
+            - generic [ref=f57e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f57e166] [cursor=pointer]:
+            - generic [ref=f57e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f57e168] [cursor=pointer]:
+            - generic [ref=f57e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f57e170] [cursor=pointer]:
+            - generic [ref=f57e171]: Rules
+        - separator [ref=f57e173]
+      - generic [ref=f57e177]:
+        - generic [ref=f57e178]:
+          - generic [ref=f57e179]:
+            - generic [ref=f57e180]:
+              - link "yuval reina's profile" [ref=f57e181] [cursor=pointer]:
+                - /url: /yuval6967
+                - generic "yuval reina" [ref=f57e182]
+              - generic [ref=f57e186]:
+                - link "yuval reina" [ref=f57e187] [cursor=pointer]:
+                  - /url: /yuval6967
+                - text: ·
+                - generic [ref=f57e188]: 3rd in this Competition
+                - text: ·
+                - generic [ref=f57e189]: Posted 8 years ago
+            - generic [ref=f57e190]:
+              - generic [ref=f57e191]:
+                - button "Upvote" [ref=f57e192] [cursor=pointer]:
+                  - generic [ref=f57e193]: arrow_drop_up
+                - button "39 votes" [ref=f57e194] [cursor=pointer]: "39"
+              - button "More Options for this Topic" [ref=f57e195] [cursor=pointer]: more_vert
+            - heading "3rd Place Part I -CNN" [level=3] [ref=f57e196]
+            - generic [ref=f57e199]:
+              - paragraph [ref=f57e200]:
+                - text: First I want to thank the organizers for a very challenging and exciting competition. I also want to thank all the kagglers who already shared a lot of very useful information during and after the competition. And mostly I want to thank my team mates
+                - link "@mamas (opens in a new tab)" [ref=f57e201] [cursor=pointer]:
+                  - /url: /mamas
+                  - text: "@mamas"
+                - text: and
+                - link "@nyanp (opens in a new tab)" [ref=f57e202] [cursor=pointer]:
+                  - /url: /nyanp
+                  - text: "@nyanp"
+                - text: who thought me a lot and were great company.
+              - paragraph [ref=f57e203]:
+                - text: "Our solution was an ensemble of 3 different solutions: LGB and CatBoost with different features by"
+                - link "@nyanp (opens in a new tab)" [ref=f57e204] [cursor=pointer]:
+                  - /url: /nyanp
+                  - text: "@nyanp"
+                - text: and
+                - link "@mamas (opens in a new tab)" [ref=f57e205] [cursor=pointer]:
+                  - /url: /mamas
+                  - text: "@mamas"
+                - text: and a CNN. The 3 solution where very different which meant, averaging really worked well for us.
+              - paragraph [ref=f57e206]: In this post I will mostly describe the CNN.
+              - paragraph [ref=f57e207]:
+                - text: Our CNN is a Fully 1D Convolutional Neural Network with 256 * 8,5,3 convolution kernels followed by a GlobalMaxPulling , this FCN is close to the one described here
+                - 'link "\"Time Series Classiﬁcation from Scratch with Deep Neural Networks: A Strong Baseline\"" [ref=f57e208] [cursor=pointer]':
+                  - /url: https://arxiv.org/pdf/1611.06455.pdf
+              - paragraph [ref=f57e209]: To the output of the last layer is concatenated with the output of a small MLP whose inputs are some meta features which would be described later.
+              - paragraph [ref=f57e210]: "The inputs to the convolution layer is an 18 channels 128 long vectors:"
+              - list [ref=f57e211]:
+                - listitem [ref=f57e212]: 6 channels are built by linear interpolation of the Flux time series
+                - listitem [ref=f57e213]: 6 channels are built by linear interpolation of Flux*detected time series
+                - listitem [ref=f57e214]: 6 channels describe the distance of the current sampling point to the nearest valid sampling point in the corresponding channel (i.e. this channel have a high value if the interpolation is done with very distant points)
+              - paragraph [ref=f57e215]: "There were 3 different NNs with different meta features as inputs to the MLP:"
+              - list [ref=f57e216]:
+                - listitem [ref=f57e217]: "Minimal - only 4 meta features: hostgal_photoz, distmod, delta mjd, Flux std (the two later ones are designed to keep the normalization data)"
+                - listitem [ref=f57e218]:
+                  - text: Minimal + 16 best features from
+                  - link "@mamas (opens in a new tab)" [ref=f57e219] [cursor=pointer]:
+                    - /url: /mamas
+                    - text: "@mamas"
+                  - text: "'s model"
+                - listitem [ref=f57e220]:
+                  - text: Minimal + 15 best features from
+                  - link "@nyanp (opens in a new tab)" [ref=f57e221] [cursor=pointer]:
+                    - /url: /nyanp
+                    - text: "@nyanp"
+                  - text: "'s model"
+              - paragraph [ref=f57e222]: "For augmentation during training we used:"
+              - paragraph [ref=f57e223]:
+                - strong [ref=f57e224]: Before interpolation
+              - list [ref=f57e225]:
+                - listitem [ref=f57e226]: Deletion - up to 30% of the time samples in the training set where deleted (the deletion was done over all the set, not per object)
+                - listitem [ref=f57e227]: Noise - random value proportional to flux_err
+              - paragraph [ref=f57e228]:
+                - strong [ref=f57e229]: After interpolation
+              - list [ref=f57e230]:
+                - listitem [ref=f57e231]: Cyclic shift
+                - listitem [ref=f57e232]: Skew - every flux channel was multiplied by 1+k where k is a small random number
+              - paragraph [ref=f57e233]: We didn't use TTA as it degraded the LB
+              - paragraph [ref=f57e234]:
+                - text: Training was done on 4 folds, with changing learning rate, and averaging the best weights (More details can be found in
+                - link "this kernel (opens in a new tab)" [ref=f57e235] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/yuval6967/3rd-place-cnn
+                  - text: this kernel
+                - text: )
+              - paragraph [ref=f57e236]: The best LBs scores of the individual NNs were 0.857, 0.857, 0.814 and the average scored 0.791
+          - separator [ref=f57e237]
+        - generic [ref=f57e238]:
+          - generic [ref=f57e239]:
+            - paragraph [ref=f57e242]:
+              - paragraph [ref=f57e243]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f57e244] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f57e245]
+          - generic [ref=f57e247]:
+            - generic [ref=f57e248]:
+              - generic [aria-hidden] [ref=f57e249]: comment
+              - generic [ref=f57e250]:
+                - heading "23 Comments" [level=2] [ref=f57e251]
+                - link "Go To Appreciation Comments (1 total)" [ref=f57e252] [cursor=pointer]:
+                  - /url: /c/PLAsTiCC-2018/discussion/75116#appreciation
+                  - text: 1 appreciation comment
+            - generic [ref=f57e255]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f57e256] [cursor=pointer]:
+                - generic [ref=f57e257]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f57e259]:
+            - generic [ref=f57e260]:
+              - generic [ref=f57e264]:
+                - link "yuval reina's profile" [ref=f57e265] [cursor=pointer]:
+                  - /url: /yuval6967
+                  - generic "yuval reina" [ref=f57e266]
+                - generic [ref=f57e272]:
+                  - generic [ref=f57e273]:
+                    - link [ref=f57e274] [cursor=pointer]:
+                      - /url: /yuval6967
+                      - heading "yuval reina" [level=3] [ref=f57e275]
+                    - paragraph [ref=f57e278]: Topic Author
+                  - generic [ref=f57e279]:
+                    - paragraph [ref=f57e280]: Posted 8 years ago
+                    - paragraph [ref=f57e282]: · 3rd in this Competition
+                - generic [ref=f57e284]:
+                  - generic [ref=f57e285]:
+                    - button "Upvote" [ref=f57e286] [cursor=pointer]:
+                      - generic [ref=f57e287]: arrow_drop_up
+                    - button "2 votes" [ref=f57e288] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f57e289] [cursor=pointer]: more_vert
+                - paragraph [ref=f57e293]:
+                  - text: A kernel with the CNN can be found
+                  - link "here (opens in a new tab)" [ref=f57e294] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/yuval6967/3rd-place-cnn
+                    - text: here
+              - separator [ref=f57e295]
+            - generic [ref=f57e296]:
+              - generic [ref=f57e300]:
+                - link "CPMP's profile" [ref=f57e301] [cursor=pointer]:
+                  - /url: /cpmpml
+                  - generic "CPMP" [ref=f57e302]
+                - generic [ref=f57e308]:
+                  - link [ref=f57e310] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - heading "CPMP" [level=3] [ref=f57e311]
+                  - generic [ref=f57e312]:
+                    - paragraph [ref=f57e313]: Posted 8 years ago
+                    - paragraph [ref=f57e315]: · 5th in this Competition
+                - generic [ref=f57e317]:
+                  - generic [ref=f57e318]:
+                    - button "Upvote" [ref=f57e319] [cursor=pointer]:
+                      - generic [ref=f57e320]: arrow_drop_up
+                    - button "2 votes" [ref=f57e321] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f57e322] [cursor=pointer]: more_vert
+                - generic [ref=f57e325]:
+                  - paragraph [ref=f57e326]: Great solution, thanks for sharing, and congrats on the result! Including distance to nearest interpolation point is what makes it work probably.
+                  - paragraph [ref=f57e327]: I am not sure I get 'We didn't use TTA as it degraded the LB' because you did use augmentation during training set. Can you clarify?
+                - generic [ref=f57e328]:
+                  - generic [ref=f57e333]:
+                    - link "yuval reina's profile" [ref=f57e334] [cursor=pointer]:
+                      - /url: /yuval6967
+                      - generic "yuval reina" [ref=f57e335]
+                    - generic [ref=f57e341]:
+                      - generic [ref=f57e342]:
+                        - link [ref=f57e343] [cursor=pointer]:
+                          - /url: /yuval6967
+                          - heading "yuval reina" [level=3] [ref=f57e344]
+                        - paragraph [ref=f57e347]: Topic Author
+                      - generic [ref=f57e348]:
+                        - paragraph [ref=f57e349]: Posted 8 years ago
+                        - paragraph [ref=f57e351]: · 3rd in this Competition
+                    - generic [ref=f57e353]:
+                      - generic [ref=f57e354]:
+                        - button "Upvote" [ref=f57e355] [cursor=pointer]:
+                          - generic [ref=f57e356]: arrow_drop_up
+                        - button "1 votes" [ref=f57e357] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f57e358] [cursor=pointer]: more_vert
+                    - paragraph [ref=f57e362]: I'm a little weak when in comes to all the professional terms, I actually meant TTA - Test Time Augmentation
+                  - generic [ref=f57e363]:
+                    - button "3 more replies" [ref=f57e364] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f57e366]: arrow_drop_down
+                    - generic [ref=f57e367]:
+                      - img "Profile picture for yuval reina" [ref=f57e369]
+                      - img "Profile picture for CPMP" [ref=f57e371]
+                      - img "Profile picture for Blonde" [ref=f57e373]
+              - separator [ref=f57e374]
+            - generic [ref=f57e375]:
+              - generic [ref=f57e379]:
+                - link "Blonde's profile" [ref=f57e380] [cursor=pointer]:
+                  - /url: /blondinka
+                  - generic "Blonde" [ref=f57e381]
+                - generic [ref=f57e387]:
+                  - link [ref=f57e389] [cursor=pointer]:
+                    - /url: /blondinka
+                    - heading "Blonde" [level=3] [ref=f57e390]
+                  - generic [ref=f57e391]:
+                    - paragraph [ref=f57e392]: Posted 8 years ago
+                    - paragraph [ref=f57e394]: · 13th in this Competition
+                - generic [ref=f57e396]:
+                  - generic [ref=f57e397]:
+                    - button "Upvote" [ref=f57e398] [cursor=pointer]:
+                      - generic [ref=f57e399]: arrow_drop_up
+                    - button "1 votes" [ref=f57e400] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f57e401] [cursor=pointer]: more_vert
+                - generic [ref=f57e404]:
+                  - paragraph [ref=f57e405]: Congratulations and thank you for the interesting solution. It's inspiring how you manage to get exclusively gold medals :-)
+                  - paragraph [ref=f57e406]:
+                    - code [ref=f57e407]: We didn't use TTA as it degraded the LB
+                    - text: "-- we did not do TTA cause it's a pain! But it's nice to see that somebody tried :-)))"
+                - generic [ref=f57e413]:
+                  - link "yuval reina's profile" [ref=f57e414] [cursor=pointer]:
+                    - /url: /yuval6967
+                    - generic "yuval reina" [ref=f57e415]
+                  - generic [ref=f57e421]:
+                    - generic [ref=f57e422]:
+                      - link [ref=f57e423] [cursor=pointer]:
+                        - /url: /yuval6967
+                        - heading "yuval reina" [level=3] [ref=f57e424]
+                      - paragraph [ref=f57e427]: Topic Author
+                    - generic [ref=f57e428]:
+                      - paragraph [ref=f57e429]: Posted 8 years ago
+                      - paragraph [ref=f57e431]: · 3rd in this Competition
+                  - generic [ref=f57e433]:
+                    - generic [ref=f57e434]:
+                      - button "Upvote" [ref=f57e435] [cursor=pointer]:
+                        - generic [ref=f57e436]: arrow_drop_up
+                      - button "1 votes" [ref=f57e437] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f57e438] [cursor=pointer]: more_vert
+                  - paragraph [ref=f57e442]: It really is a pain ;) but I had to give it a try.
+              - separator [ref=f57e443]
+            - generic [ref=f57e444]:
+              - generic [ref=f57e448]:
+                - link "pao's profile" [ref=f57e449] [cursor=pointer]:
+                  - /url: /go5kuramubon
+                  - generic "pao" [ref=f57e450]
+                - generic [ref=f57e456]:
+                  - link [ref=f57e458] [cursor=pointer]:
+                    - /url: /go5kuramubon
+                    - heading "pao" [level=3] [ref=f57e459]
+                  - generic [ref=f57e460]:
+                    - paragraph [ref=f57e461]: Posted 8 years ago
+                    - paragraph [ref=f57e463]: · 92nd in this Competition
+                - generic [ref=f57e465]:
+                  - generic [ref=f57e466]:
+                    - button "Upvote" [ref=f57e467] [cursor=pointer]:
+                      - generic [ref=f57e468]: arrow_drop_up
+                    - button "1 votes" [ref=f57e469] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f57e470] [cursor=pointer]: more_vert
+                - generic [ref=f57e473]:
+                  - paragraph [ref=f57e474]: Thank you for great NN solution!!! I have two question.
+                  - list [ref=f57e475]:
+                    - listitem [ref=f57e476]: How did you normalize the flux value? (like std 1.0 and mean 0?)
+                    - listitem [ref=f57e477]: If there are multiple value in 128 vector, how did you process? (mean?)
+                - generic [ref=f57e478]:
+                  - generic [ref=f57e483]:
+                    - link "yuval reina's profile" [ref=f57e484] [cursor=pointer]:
+                      - /url: /yuval6967
+                      - generic "yuval reina" [ref=f57e485]
+                    - generic [ref=f57e491]:
+                      - generic [ref=f57e492]:
+                        - link [ref=f57e493] [cursor=pointer]:
+                          - /url: /yuval6967
+                          - heading "yuval reina" [level=3] [ref=f57e494]
+                        - paragraph [ref=f57e497]: Topic Author
+                      - generic [ref=f57e498]:
+                        - paragraph [ref=f57e499]: Posted 8 years ago
+                        - paragraph [ref=f57e501]: · 3rd in this Competition
+                    - generic [ref=f57e503]:
+                      - generic [ref=f57e504]:
+                        - button "Upvote" [ref=f57e505] [cursor=pointer]:
+                          - generic [ref=f57e506]: arrow_drop_up
+                        - button "1 votes" [ref=f57e507] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f57e508] [cursor=pointer]: more_vert
+                    - list [ref=f57e512]:
+                      - listitem [ref=f57e513]: I divide by the std of the values of the all 6 channels. I then use the std as an extra feature which is an input the MLP. I don't shift the mean, I don't really find it necessary if the std is close to 1 and the mean is low enough.
+                      - listitem [ref=f57e514]: There is no special treatment to multiple values which fall between two sampling points. I use np.interp for interpolation.
+                  - generic [ref=f57e519]:
+                    - link "pao's profile" [ref=f57e520] [cursor=pointer]:
+                      - /url: /go5kuramubon
+                      - generic "pao" [ref=f57e521]
+                    - generic [ref=f57e527]:
+                      - link [ref=f57e529] [cursor=pointer]:
+                        - /url: /go5kuramubon
+                        - heading "pao" [level=3] [ref=f57e530]
+                      - generic [ref=f57e531]:
+                        - paragraph [ref=f57e532]: Posted 8 years ago
+                        - paragraph [ref=f57e534]: · 92nd in this Competition
+                    - generic [ref=f57e536]:
+                      - generic [ref=f57e537]:
+                        - button "Upvote" [ref=f57e538] [cursor=pointer]:
+                          - generic [ref=f57e539]: arrow_drop_up
+                        - button "1 votes" [ref=f57e540] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f57e541] [cursor=pointer]: more_vert
+                    - paragraph [ref=f57e545]: Thanks!! I will try making 1D-CNN model in reference to your solution. And I'm looking forward to your kernel!
+              - separator [ref=f57e546]
+            - generic [ref=f57e547]:
+              - generic [ref=f57e551]:
+                - link "mamas's profile" [ref=f57e552] [cursor=pointer]:
+                  - /url: /mamasinkgs
+                  - generic "mamas" [ref=f57e553]
+                - generic [ref=f57e559]:
+                  - link [ref=f57e561] [cursor=pointer]:
+                    - /url: /mamasinkgs
+                    - heading "mamas" [level=3] [ref=f57e562]
+                  - generic [ref=f57e563]:
+                    - paragraph [ref=f57e564]: Posted 8 years ago
+                    - paragraph [ref=f57e566]: · 3rd in this Competition
+                - generic [ref=f57e568]:
+                  - generic [ref=f57e569]:
+                    - button "Upvote" [ref=f57e570] [cursor=pointer]:
+                      - generic [ref=f57e571]: arrow_drop_up
+                    - button "1 votes" [ref=f57e572] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f57e573] [cursor=pointer]: more_vert
+                - paragraph [ref=f57e577]: Thanks yuval, I'm really impressed with your beautiful 1D-CNN model, and your many valuable ideas related to class99 handling. I'm really proud of working with such a great team :)
+              - separator [ref=f57e578]
+            - generic [ref=f57e579]:
+              - generic [ref=f57e583]:
+                - link "Giba's profile" [ref=f57e584] [cursor=pointer]:
+                  - /url: /titericz
+                  - generic "Giba" [ref=f57e585]
+                - generic [ref=f57e591]:
+                  - link [ref=f57e593] [cursor=pointer]:
+                    - /url: /titericz
+                    - heading "Giba" [level=3] [ref=f57e594]
+                  - generic [ref=f57e595]:
+                    - paragraph [ref=f57e596]: Posted 8 years ago
+                    - paragraph [ref=f57e598]: · 20th in this Competition
+                - generic [ref=f57e600]:
+                  - generic [ref=f57e601]:
+                    - button "Upvote" [ref=f57e602] [cursor=pointer]:
+                      - generic [ref=f57e603]: arrow_drop_up
+                    - button "1 votes" [ref=f57e604] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f57e605] [cursor=pointer]: more_vert
+                - paragraph [ref=f57e609]: Great solution and congrats Yuval and team!
+              - separator [ref=f57e610]
+            - generic [ref=f57e611]:
+              - generic [ref=f57e615]:
+                - link "henripal's profile" [ref=f57e616] [cursor=pointer]:
+                  - /url: /henripal
+                  - generic "henripal" [ref=f57e617]
+                - generic [ref=f57e623]:
+                  - link [ref=f57e625] [cursor=pointer]:
+                    - /url: /henripal
+                    - heading "henripal" [level=3] [ref=f57e626]
+                  - generic [ref=f57e627]:
+                    - paragraph [ref=f57e628]: Posted 8 years ago
+                    - paragraph [ref=f57e630]: · 114th in this Competition
+                - generic [ref=f57e632]:
+                  - generic [ref=f57e633]:
+                    - button "Upvote" [ref=f57e634] [cursor=pointer]:
+                      - generic [ref=f57e635]: arrow_drop_up
+                    - button "1 votes" [ref=f57e636] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f57e637] [cursor=pointer]: more_vert
+                - paragraph [ref=f57e641]: Super interesting! A question - how do you get from the long time series to a 128 long vector? You linearly interpolate the entire 1000 days then subsample 128 days from that?
+                - generic [ref=f57e647]:
+                  - link "yuval reina's profile" [ref=f57e648] [cursor=pointer]:
+                    - /url: /yuval6967
+                    - generic "yuval reina" [ref=f57e649]
+                  - generic [ref=f57e655]:
+                    - generic [ref=f57e656]:
+                      - link [ref=f57e657] [cursor=pointer]:
+                        - /url: /yuval6967
+                        - heading "yuval reina" [level=3] [ref=f57e658]
+                      - paragraph [ref=f57e661]: Topic Author
+                    - generic [ref=f57e662]:
+                      - paragraph [ref=f57e663]: Posted 8 years ago
+                      - paragraph [ref=f57e665]: · 3rd in this Competition
+                  - generic [ref=f57e667]:
+                    - generic [ref=f57e668]:
+                      - button "Upvote" [ref=f57e669] [cursor=pointer]:
+                        - generic [ref=f57e670]: arrow_drop_up
+                      - button "0 votes" [ref=f57e671] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f57e672] [cursor=pointer]: more_vert
+                  - paragraph [ref=f57e676]: I just linear interpolate from the min(mjd) of that object to max(mjd)
+              - separator [ref=f57e677]
+            - generic [ref=f57e678]:
+              - generic [ref=f57e682]:
+                - link "takuoko's profile" [ref=f57e683] [cursor=pointer]:
+                  - /url: /takuok
+                  - generic "takuoko" [ref=f57e684]
+                - generic [ref=f57e690]:
+                  - link [ref=f57e692] [cursor=pointer]:
+                    - /url: /takuok
+                    - heading "takuoko" [level=3] [ref=f57e693]
+                  - generic [ref=f57e694]:
+                    - paragraph [ref=f57e695]: Posted 8 years ago
+                    - paragraph [ref=f57e697]: · 21st in this Competition
+                - generic [ref=f57e699]:
+                  - generic [ref=f57e700]:
+                    - button "Upvote" [ref=f57e701] [cursor=pointer]:
+                      - generic [ref=f57e702]: arrow_drop_up
+                    - button "1 votes" [ref=f57e703] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f57e704] [cursor=pointer]: more_vert
+                - paragraph [ref=f57e708]: Congrats and thank you for sharing! mamas said your NN was super cool. I am looking forward that you post the kernel;)
+                - generic [ref=f57e714]:
+                  - link "yuval reina's profile" [ref=f57e715] [cursor=pointer]:
+                    - /url: /yuval6967
+                    - generic "yuval reina" [ref=f57e716]
+                  - generic [ref=f57e722]:
+                    - generic [ref=f57e723]:
+                      - link [ref=f57e724] [cursor=pointer]:
+                        - /url: /yuval6967
+                        - heading "yuval reina" [level=3] [ref=f57e725]
+                      - paragraph [ref=f57e728]: Topic Author
+                    - generic [ref=f57e729]:
+                      - paragraph [ref=f57e730]: Posted 8 years ago
+                      - paragraph [ref=f57e732]: · 3rd in this Competition
+                  - generic [ref=f57e734]:
+                    - generic [ref=f57e735]:
+                      - button "Upvote" [ref=f57e736] [cursor=pointer]:
+                        - generic [ref=f57e737]: arrow_drop_up
+                      - button "2 votes" [ref=f57e738] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f57e739] [cursor=pointer]: more_vert
+                  - paragraph [ref=f57e743]: Thanks, I will post it over the weekend
+              - separator [ref=f57e744]
+            - generic [ref=f57e745]:
+              - generic [ref=f57e749]:
+                - link "DavidGbodiOdaibo's profile" [ref=f57e750] [cursor=pointer]:
+                  - /url: /godaibo
+                  - generic "DavidGbodiOdaibo" [ref=f57e751]
+                - generic [ref=f57e757]:
+                  - link [ref=f57e759] [cursor=pointer]:
+                    - /url: /godaibo
+                    - heading "DavidGbodiOdaibo" [level=3] [ref=f57e760]
+                  - generic [ref=f57e761]:
+                    - paragraph [ref=f57e762]: Posted 8 years ago
+                    - paragraph [ref=f57e764]: · 169th in this Competition
+                - generic [ref=f57e766]:
+                  - generic [ref=f57e767]:
+                    - button "Upvote" [ref=f57e768] [cursor=pointer]:
+                      - generic [ref=f57e769]: arrow_drop_up
+                    - button "1 votes" [ref=f57e770] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f57e771] [cursor=pointer]: more_vert
+                - paragraph [ref=f57e775]: Congrats! did your NN models do better than LGB?
+                - generic [ref=f57e781]:
+                  - link "yuval reina's profile" [ref=f57e782] [cursor=pointer]:
+                    - /url: /yuval6967
+                    - generic "yuval reina" [ref=f57e783]
+                  - generic [ref=f57e789]:
+                    - generic [ref=f57e790]:
+                      - link [ref=f57e791] [cursor=pointer]:
+                        - /url: /yuval6967
+                        - heading "yuval reina" [level=3] [ref=f57e792]
+                      - paragraph [ref=f57e795]: Topic Author
+                    - generic [ref=f57e796]:
+                      - paragraph [ref=f57e797]: Posted 8 years ago
+                      - paragraph [ref=f57e799]: · 3rd in this Competition
+                  - generic [ref=f57e801]:
+                    - generic [ref=f57e802]:
+                      - button "Upvote" [ref=f57e803] [cursor=pointer]:
+                        - generic [ref=f57e804]: arrow_drop_up
+                      - button "0 votes" [ref=f57e805] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f57e806] [cursor=pointer]: more_vert
+                  - paragraph [ref=f57e810]: They were very different. In the NN most of the features were actually extracted by the NN itself. The average of the 3 NN had a weight of about 50% of our solution, the LBG+CatBoost were the other 50%. and we gained about 0.035 by class99 probing
+              - separator [ref=f57e811]
+            - generic [ref=f57e812]:
+              - generic [ref=f57e816]:
+                - link "Blonde's profile" [ref=f57e817] [cursor=pointer]:
+                  - /url: /blondinka
+                  - generic "Blonde" [ref=f57e818]
+                - generic [ref=f57e824]:
+                  - link [ref=f57e826] [cursor=pointer]:
+                    - /url: /blondinka
+                    - heading "Blonde" [level=3] [ref=f57e827]
+                  - generic [ref=f57e828]:
+                    - paragraph [ref=f57e829]: Posted 8 years ago
+                    - paragraph [ref=f57e831]: · 13th in this Competition
+                - generic [ref=f57e833]:
+                  - generic [ref=f57e834]:
+                    - button "Upvote" [ref=f57e835] [cursor=pointer]:
+                      - generic [ref=f57e836]: arrow_drop_up
+                    - button "0 votes" [ref=f57e837] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f57e838] [cursor=pointer]: more_vert
+                - generic [ref=f57e841]:
+                  - paragraph [ref=f57e842]:
+                    - link "@yuval6967 (opens in a new tab)" [ref=f57e843] [cursor=pointer]:
+                      - /url: /yuval6967
+                      - text: "@yuval6967"
+                  - paragraph [ref=f57e844]: I actually have a few questions regarding your NN. I also tried to apply FCN with global max pooling as a feature extractor in my internship (medical signals), so far unsuccessfully. I used 1D FCN with 1 channel (around 10 layers with small kernels of 3-5)
+                  - paragraph [ref=f57e845]: "In your architecture:"
+                  - list [ref=f57e846]:
+                    - listitem [ref=f57e847]:
+                      - paragraph [ref=f57e848]: 6 channels are built by linear interpolation of the Flux time series -- what are those 6 channels? How they differ? Was is critical to have 6 of them and not just 1, did it help ?
+                    - listitem [ref=f57e849]:
+                      - paragraph [ref=f57e850]: 256 * 8,5,3 convolution kernels -- this is not quite clear, did you use 256 filters with kernel sizes 8, 5 and 3 for each 6-channel group or did you change the amount of filters, or size of filters? How deep was your net for 128 signals then ? Also, NN needs lot's of augmentation, so do you recall approx order of signals you generated with augmentation (1000 000? )
+                    - listitem [ref=f57e851]:
+                      - paragraph [ref=f57e852]: To the output of the last layer is concatenated with the output of a small MLP whose inputs are some meta features -- so was it a three 500 fully connected layers MLP like in that paper? When you concatenate before the softmax, did you bring both outputs (MLP and NN to the same size, like 32-32 or something like that)? Was it important to have the MLP to make it work? I have around 18 features in med signals, so you take a vector of M features x N signals for MLP input then?
+                  - paragraph [ref=f57e853]: Too many questions, sorry :), I want to try to make my FCN work for med signals, and see yours architecture is much more advanced, but do not fully understand how to implement those advances. Thank you for that paper link as well
+                - generic [ref=f57e854]:
+                  - generic [ref=f57e859]:
+                    - link "yuval reina's profile" [ref=f57e860] [cursor=pointer]:
+                      - /url: /yuval6967
+                      - generic "yuval reina" [ref=f57e861]
+                    - generic [ref=f57e867]:
+                      - generic [ref=f57e868]:
+                        - link [ref=f57e869] [cursor=pointer]:
+                          - /url: /yuval6967
+                          - heading "yuval reina" [level=3] [ref=f57e870]
+                        - paragraph [ref=f57e873]: Topic Author
+                      - generic [ref=f57e874]:
+                        - paragraph [ref=f57e875]: Posted 8 years ago
+                        - paragraph [ref=f57e877]: · 3rd in this Competition
+                    - generic [ref=f57e879]:
+                      - generic [ref=f57e880]:
+                        - button "Upvote" [ref=f57e881] [cursor=pointer]:
+                          - generic [ref=f57e882]: arrow_drop_up
+                        - button "2 votes" [ref=f57e883] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f57e884] [cursor=pointer]: more_vert
+                    - generic [ref=f57e887]:
+                      - paragraph [ref=f57e888]: Below you can find the KERAS code with the model definition.
+                      - paragraph [ref=f57e889]: The 6 channel inputs are the 6 passbands.
+                      - paragraph [ref=f57e890]:
+                        - text: The parameter num_samples in the definition is set in global scope to 128 This network is set to receive 6 extra features, in other networks I set it to 4, 19 (when added
+                        - link "@nyanp (opens in a new tab)" [ref=f57e891] [cursor=pointer]:
+                          - /url: /nyanp
+                          - text: "@nyanp"
+                        - text: features) or 20 (with
+                        - link "@mamas (opens in a new tab)" [ref=f57e892] [cursor=pointer]:
+                          - /url: /mamas
+                          - text: "@mamas"
+                        - text: featurs).
+                      - paragraph [ref=f57e893]: The layer MySwitch forces the galactic outputs to be 0 for extragalactic objects and vice versa.
+                      - paragraph [ref=f57e894]:
+                        - text: When training, I augmented and interpolated on the fly (thanks to
+                        - link "@mamas (opens in a new tab)" [ref=f57e895] [cursor=pointer]:
+                          - /url: /mamas
+                          - text: "@mamas"
+                        - text: great code), I used 4 * 58 epochs for every training and I also repeated training with more noise/deletion.
+                      - paragraph [ref=f57e896]: Later today I will release a full kernel
+                      - code [ref=f57e898]: "def build_model(): input_timeseries = Input(shape=(num_samples, 6,),name='input_timeseries') input_timeseries0 = Input(shape=(num_samples, 6,),name='input_timeseries0') input_timeseriese = Input(shape=(num_samples, 6,),name='input_timeseriese') input_meta = Input(shape=(6,),name='input_meta') input_gal = Input(shape=(1,),name='input_gal') _series=concatenate([input_timeseries,input_timeseries0,input_timeseriese]) x = Conv1D(256,8,padding='same',name='Conv1')(_series) x = BatchNormalization()(x) x = LeakyReLU(alpha=0.1)(x) x = Dropout(0.2)(x) x = Conv1D(256,5,padding='same',name='Conv2')(x) x = BatchNormalization()(x) x = LeakyReLU(alpha=0.1)(x) x = Dropout(0.2)(x) x = Conv1D(256,3,padding='same',name='Conv5')(x) x = BatchNormalization()(x) x = LeakyReLU(alpha=0.1)(x) x = GlobalMaxPooling1D()(x) x1 = Dense(16,activation='relu',name='dense0')(input_meta) x1 = Dense(32,activation='relu',name='dense1')(x1) xc = concatenate([x,x1],name='concat') x = Dense(256,activation='relu',name='features')(xc) x = Dense(real_targets.shape[0],name='bout')(x) x = MySwitch(galactic_targets.shape[0])([input_gal,x]) out = Activation('softmax',name='out')(x) model=Model([input_timeseries,input_timeseries0, input_timeseriese,input_meta,input_gal],out) return model"
+                  - generic [ref=f57e903]:
+                    - link "Blonde's profile" [ref=f57e904] [cursor=pointer]:
+                      - /url: /blondinka
+                      - generic "Blonde" [ref=f57e905]
+                    - generic [ref=f57e911]:
+                      - link [ref=f57e913] [cursor=pointer]:
+                        - /url: /blondinka
+                        - heading "Blonde" [level=3] [ref=f57e914]
+                      - generic [ref=f57e915]:
+                        - paragraph [ref=f57e916]: Posted 8 years ago
+                        - paragraph [ref=f57e918]: · 13th in this Competition
+                    - generic [ref=f57e920]:
+                      - generic [ref=f57e921]:
+                        - button "Upvote" [ref=f57e922] [cursor=pointer]:
+                          - generic [ref=f57e923]: arrow_drop_up
+                        - button "1 votes" [ref=f57e924] [cursor=pointer]: "1"
+                      - button "More Options for this Comment" [ref=f57e925] [cursor=pointer]: more_vert
+                    - paragraph [ref=f57e929]: Thank you Yuval, now it's clear. I'll see if the trick with adding features in parallel works for medicine as well, looks like a good idea. :)
+              - separator [ref=f57e930]
+          - generic [ref=f57e931]:
+            - heading "Appreciation (1)" [level=2] [ref=f57e933]
+            - generic [ref=f57e938]:
+              - link "Ahmed abdelreheem's profile" [ref=f57e939] [cursor=pointer]:
+                - /url: /ahmedbaz
+                - generic "Ahmed abdelreheem" [ref=f57e940]
+              - generic [ref=f57e946]:
+                - link [ref=f57e948] [cursor=pointer]:
+                  - /url: /ahmedbaz
+                  - heading "Ahmed abdelreheem" [level=3] [ref=f57e949]
+                - paragraph [ref=f57e951]: Posted 8 years ago
+              - generic [ref=f57e953]:
+                - generic [ref=f57e954]:
+                  - button "Upvote" [ref=f57e955] [cursor=pointer]:
+                    - generic [ref=f57e956]: arrow_drop_up
+                  - button "1 votes" [ref=f57e957] [cursor=pointer]: "1"
+                - button "More Options for this Comment" [ref=f57e958] [cursor=pointer]: more_vert
+              - paragraph [ref=f57e962]: Congratulations, and thanks for sharing
+  - alert [ref=f57e965]

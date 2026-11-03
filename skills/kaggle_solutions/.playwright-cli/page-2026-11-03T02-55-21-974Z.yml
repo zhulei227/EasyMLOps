@@ -1,0 +1,760 @@
+- generic [ref=f68e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f68e3]:
+    - generic [ref=f68e5]:
+      - button "Navigation menu" [ref=f68e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f68e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f68e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f68e14]:
+      - link [ref=f68e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fbiohub-cell-tracking-during-development%2Fwriteups%2F4th-place-solution
+        - button "Login" [ref=f68e16]
+      - link [ref=f68e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fbiohub-cell-tracking-during-development%2Fwriteups%2F4th-place-solution
+        - button "Sign Up" [ref=f68e19]
+  - main [ref=f68e21]:
+    - generic [ref=f68e23]:
+      - generic [ref=f68e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f68e25]:
+        - link "Learn more" [ref=f68e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f68e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f68e29]:
+      - generic [ref=f68e31]: 4th Place Solution — Biohub - Cell Tracking During Development
+      - separator [ref=f68e32]
+      - generic [ref=f68e34]:
+        - generic [ref=f68e35]:
+          - heading "4th Place Solution" [level=1] [ref=f68e36]
+          - paragraph [ref=f68e37]: 3D Net detection, learned linking, and a division prior inside the ILP
+          - generic [ref=f68e38]:
+            - link [ref=f68e39] [cursor=pointer]:
+              - /url: /competitions/biohub-cell-tracking-during-development
+              - paragraph [ref=f68e41]: Biohub - Cell Tracking During Development
+            - paragraph [ref=f68e42]: Solution Writeup · 4th place · Oct 1, 2026
+        - separator [ref=f68e44]
+        - generic [ref=f68e45]:
+          - generic [ref=f68e47]:
+            - paragraph [ref=f68e48]:
+              - strong [ref=f68e49]: Public 0.969 / Private 0.962.
+              - text: "Code (MIT License):"
+              - link "github.com/SongqiZhou/biohub-cell-tracking-4th-place (opens in a new tab)" [ref=f68e50] [cursor=pointer]:
+                - /url: https://github.com/SongqiZhou/biohub-cell-tracking-4th-place
+                - text: github.com/SongqiZhou/biohub-cell-tracking-4th-place
+              - text: "· Notebook:"
+              - link "biohub-4th-place-solution (opens in a new tab)" [ref=f68e51] [cursor=pointer]:
+                - /url: https://www.kaggle.com/code/songqizhou/biohub-4th-place-solution
+                - text: biohub-4th-place-solution
+              - text: "· Models:"
+              - link "biohub-4th-place-artifacts (opens in a new tab)" [ref=f68e52] [cursor=pointer]:
+                - /url: https://www.kaggle.com/datasets/songqizhou/biohub-4th-place-artifacts
+                - text: biohub-4th-place-artifacts
+              - text: "· Pseudo-labels:"
+              - link "biohub-4th-place-pseudo-labels (opens in a new tab)" [ref=f68e53] [cursor=pointer]:
+                - /url: https://www.kaggle.com/datasets/songqizhou/biohub-4th-place-pseudo-labels
+                - text: biohub-4th-place-pseudo-labels
+            - paragraph [ref=f68e54]: Many thanks to the organisers for a challenging and well-designed competition, and to everyone who shared notebooks, support packs and ideas on the forum.
+            - heading "Overview" [level=2] [ref=f68e55]
+            - paragraph [ref=f68e56]: "Our tracker has five stages: learned models for detection, links and divisions, a global ILP that puts them together, and rule-based post-processing."
+            - table [ref=f68e57]:
+              - rowgroup [ref=f68e58]:
+                - row [ref=f68e59]:
+                  - columnheader "stage" [ref=f68e60]
+                  - columnheader "what it does" [ref=f68e61]
+                  - columnheader "section" [ref=f68e62]
+              - rowgroup [ref=f68e63]:
+                - row [ref=f68e64]:
+                  - cell "1. Detection" [ref=f68e65]
+                  - cell "3D Net finds nuclei; a pseudo-label model refines them; sparse movies get a stricter threshold" [ref=f68e66]
+                  - cell "2" [ref=f68e67]
+                - row [ref=f68e68]:
+                  - cell "2. Linking" [ref=f68e69]
+                  - cell "every candidate link gets a learned probability" [ref=f68e70]
+                  - cell "3" [ref=f68e71]
+                - row [ref=f68e72]:
+                  - cell "3. Divisions" [ref=f68e73]
+                  - cell [ref=f68e74]:
+                    - text: every node gets a learned division score
+                    - code [ref=f68e75]: s
+                  - cell "4" [ref=f68e76]
+                - row [ref=f68e77]:
+                  - cell "4. ILP" [ref=f68e78]
+                  - cell [ref=f68e79]:
+                    - text: solves the tracks; each node pays its own division cost
+                    - code [ref=f68e80]: 6 − 16·s
+                    - text: (base 5 in sparse movies)
+                  - cell "4, 5" [ref=f68e81]
+                - row [ref=f68e82]:
+                  - cell "5. Post-processing" [ref=f68e83]
+                  - cell "fork verifier, smoothing, gap bridging, track-support gate for sparse movies" [ref=f68e84]
+                  - cell "4, 5" [ref=f68e85]
+            - paragraph [ref=f68e86]: The per-node division cost in the ILP was our largest single gain (+0.035).
+            - paragraph [ref=f68e87]
+            - 'heading "Our approach: model the biology" [level=2] [ref=f68e88]'
+            - paragraph [ref=f68e89]: "Our compute was modest. Every network in the pipeline is small (the largest, the 3D Net, has 18 M parameters), and all the models that combine evidence (the edge model, the division graph and pair models, the fork verifier) are gradient-boosted trees on CPU. Most of our gains therefore came from looking closely at the biology and at the metric, and turning each observation into a small, targeted model:"
+            - table [ref=f68e90]:
+              - rowgroup [ref=f68e91]:
+                - row [ref=f68e92]:
+                  - columnheader "observation" [ref=f68e93]
+                  - columnheader "what we built" [ref=f68e94]
+                  - columnheader "section" [ref=f68e95]
+              - rowgroup [ref=f68e96]:
+                - row [ref=f68e97]:
+                  - cell "Only about 3% of the cells are annotated (under 1% in the dense embryo); most real cells and most real divisions carry no label" [ref=f68e98]
+                  - cell "a loss with separate tiers for annotated, background and unannotated voxels; division labels only from annotated tracks" [ref=f68e99]
+                  - cell "2.1, 4.2" [ref=f68e100]
+                - row [ref=f68e101]:
+                  - cell "Two touching nuclei form one bright blob, but their centres are distinct" [ref=f68e102]
+                  - cell "a vector field that points each voxel to its own centre" [ref=f68e103]
+                  - cell "2.1" [ref=f68e104]
+                - row [ref=f68e105]:
+                  - cell "Nucleus size and spacing differ strongly between embryos" [ref=f68e106]
+                  - cell "a DoG density router that sets the detection threshold per movie" [ref=f68e107]
+                  - cell "2.3" [ref=f68e108]
+                - row [ref=f68e109]:
+                  - cell "A mother rounds up and brightens, its chromatin splits, and two compact daughters appear" [ref=f68e110]
+                  - cell "a division score built from these cues, used as a per-node division cost in the ILP" [ref=f68e111]
+                  - cell "4" [ref=f68e112]
+                - row [ref=f68e113]:
+                  - cell "Real daughters keep moving apart for several frames" [ref=f68e114]
+                  - cell "a fork verifier that follows both daughters in the raw images" [ref=f68e115]
+                  - cell "4.3" [ref=f68e116]
+                - row [ref=f68e117]:
+                  - cell "The whole tissue drifts between frames" [ref=f68e118]
+                  - cell "motion-compensated smoothing of the tracks" [ref=f68e119]
+                  - cell "5.2" [ref=f68e120]
+                - row [ref=f68e121]:
+                  - cell "A model trained on more (pseudo-)labels finds more cells, but also invents some on a new embryo" [ref=f68e122]
+                  - cell "keep its tracks only where an independent model agrees" [ref=f68e123]
+                  - cell "2.2, 5.3" [ref=f68e124]
+            - heading "1. Data, metric and validation" [level=2] [ref=f68e125]
+            - paragraph [ref=f68e126]:
+              - strong [ref=f68e127]: Data.
+            - list [ref=f68e128]:
+              - listitem [ref=f68e129]: 199 training movies from two embryos (71 and 128 movies).
+              - listitem [ref=f68e130]: Each movie is 100 frames of 64 × 256 × 256 voxels at 1.625 × 0.406 × 0.406 µm.
+              - listitem [ref=f68e131]:
+                - text: Only a handful of lineages per movie are annotated, about 3% of the cells overall and under 1% in the dense embryo. The whole training set contains only
+                - strong [ref=f68e132]: 151 annotated divisions
+                - text: .
+              - listitem [ref=f68e133]: One embryo is dense with small nuclei (DoG nucleus spacing about 13–19 µm), the other mostly sparse with large nuclei (about 17–31 µm).
+            - paragraph [ref=f68e134]:
+              - strong [ref=f68e135]: Metric.
+              - code [ref=f68e136]: adjusted edge Jaccard + 0.1 · division Jaccard
+              - text: .
+            - list [ref=f68e137]:
+              - listitem [ref=f68e138]: A predicted edge is a false positive only if it touches an annotated node, so most unannotated cells are "free".
+              - listitem [ref=f68e139]: A node-count adjustment penalises predicting more nodes than the estimated number of cells, so the node count still matters.
+            - paragraph [ref=f68e140]:
+              - img "data"
+            - paragraph [ref=f68e141]:
+              - strong [ref=f68e142]: Validation rules.
+            - list [ref=f68e143]:
+              - listitem [ref=f68e144]: Score everything with the official evaluator. An early custom node-level metric reversed two of our conclusions.
+              - listitem [ref=f68e145]: Out-of-fold everything. Detections for all 199 movies come from 5-fold copies of the main detector (refined, as at inference, by the pseudo-label model), and every second-level model (edge model, division graph and pair models, fork verifier) is trained on these out-of-fold detections. The deployed detectors are trained on all 199 movies.
+              - listitem [ref=f68e146]: Check detector changes across embryos (train on one embryo, test on the other), not only on random folds. Same-embryo validation over-rated changes that fit the seen embryos better.
+              - listitem [ref=f68e147]: Change one component at a time and compare against the deployed chain's own output.
+            - heading "2. Detection" [level=2] [ref=f68e148]
+            - heading "2.1 3D Net" [level=3] [ref=f68e149]
+            - paragraph [ref=f68e150]:
+              - strong [ref=f68e151]: Idea.
+              - text: For every voxel, predict a cell probability and a unit vector pointing to the centre of its nucleus (the Cellpose flow idea), then follow the vectors to find the nuclei.
+            - paragraph [ref=f68e152]:
+              - strong [ref=f68e153]: Network.
+              - text: "Adapted from a dual-encoder 3D U-Net with temporal attention from the literature. One encoder sees the current frame, the other the difference between the next and the previous frame. Adding the neighbouring frames clearly helps: removing this input dropped the detection score from 0.93 to 0.73 in cross-embryo validation, while a wider five-frame window gave no further gain."
+            - paragraph [ref=f68e154]:
+              - strong [ref=f68e155]: "Decoding: our choices."
+            - list [ref=f68e156]:
+              - listitem [ref=f68e157]:
+                - strong [ref=f68e158]: Strict seeds.
+                - text: Only voxels with probability > 0.97 are followed (0.99 in sparse movies, section 2.3), so dim background rarely turns into a nucleus.
+              - listitem [ref=f68e159]:
+                - strong [ref=f68e160]: Short, binned convergence.
+                - text: Seeds move 40 steps of 0.5 µm. Seeds whose end points fall into the same 1 µm cell form one nucleus; duplicates are left to the NMS.
+              - listitem [ref=f68e161]:
+                - strong [ref=f68e162]: Probability-ranked, adaptive NMS.
+                - text: "Nuclei are ranked by their highest probability, and the NMS radius is set per movie: 4 µm, or 7 µm when the median nearest-neighbour distance is ≥ 10 µm (large nuclei)."
+            - paragraph [ref=f68e163]:
+              - img "3D Net outputs"
+            - paragraph [ref=f68e164]:
+              - strong [ref=f68e165]: "Loss: our choices."
+              - text: "The vector field gets an L1 loss and the probability a weighted BCE with three tiers: annotated nuclei, confident background, and everything else (only a very weak push towards background). What matters is how the tiers are built:"
+            - list [ref=f68e166]:
+              - listitem [ref=f68e167]:
+                - strong [ref=f68e168]: Tier normalisation.
+                - text: Each tier's weight is divided by its voxel count, so the weights set how much each tier counts as a whole. With per-voxel weights the few annotated voxels carried less than 0.5% of the loss, and the probability head collapsed towards zero.
+              - listitem [ref=f68e169]:
+                - strong [ref=f68e170]: Where the vectors are supervised.
+                - text: An annotation owns the voxels that are nearest to it, within 5.5 µm and among the brightest 5% of the frame, plus a 2 µm core that is always kept. The cap keeps an unannotated neighbour from being pulled into the region.
+              - listitem [ref=f68e171]:
+                - strong [ref=f68e172]: Local background.
+                - text: A voxel is confident background only if it is darker than 0.4 × the local maximum within 3.5 µm, so the rim of a real cell in a dense frame is not labelled background.
+            - paragraph [ref=f68e173]: "We trained three 3D Nets:"
+            - table [ref=f68e174]:
+              - rowgroup [ref=f68e175]:
+                - row [ref=f68e176]:
+                  - columnheader "model" [ref=f68e177]
+                  - columnheader "training data" [ref=f68e178]
+                  - columnheader "role" [ref=f68e179]
+              - rowgroup [ref=f68e180]:
+                - row [ref=f68e181]:
+                  - cell "3D Net-128 (XY pooled by 2)" [ref=f68e182]
+                  - cell "ground truth" [ref=f68e183]
+                  - cell "main detector" [ref=f68e184]
+                - row [ref=f68e185]:
+                  - cell "3D Net-128-PL" [ref=f68e186]
+                  - cell "ground truth + pseudo-labels" [ref=f68e187]
+                  - cell "refines the nodes (2.2)" [ref=f68e188]
+                - row [ref=f68e189]:
+                  - cell "3D Net-64 (XY pooled by 4)" [ref=f68e190]
+                  - cell "ground truth" [ref=f68e191]
+                  - cell "independent check in sparse movies (5.3)" [ref=f68e192]
+            - paragraph [ref=f68e193]:
+              - strong [ref=f68e194]: Training.
+              - text: "The deployed models are trained on all 199 movies with learning rate 3e-4. Each detector is trained several times (five folds for the out-of-fold detections plus the final model), so with our limited GPU compute we kept every run short: 10 epochs for the 128 models, using the"
+              - strong [ref=f68e195]: average of the epoch 7–10 weights
+              - text: ", and 50 for the 64 model, which is about four times cheaper per epoch. We do not claim that 10 epochs is optimal: many teams train for hundreds. In our runs, however, recall on unseen embryos peaked early in training, so our short-trained detector leans towards recall and predicts somewhat more nodes than there are cells (about 9% more). Much of the rest of the pipeline is about removing those extra nodes downstream: the strict seed threshold, the pseudo-label check (2.2), the ILP with its short-track filter and the track-support gate (5.3). In that sense, several of these steps compensate for short training; with more GPU compute we would rather put that effort into the detector itself, which would be the more elegant route."
+            - paragraph [ref=f68e196]:
+              - strong [ref=f68e197]: Resolution.
+              - text: "In a quick check on one random fold with the same simple linker, the 128 × 128 XY grid scored 0.856 against 0.853 for the 64 × 64 grid: at 64 crowded nuclei merge in dense tissue. In sparse movies, however, the 64 grid did best locally. Rather than switching detectors per movie, which changes the node count, we use 3D Net-64 as an independent check there (5.3). Full resolution (256 × 256) costs 4.4× the compute of 128 and needs a smaller batch. We could train it only once, on one fold and for 10 epochs; that single short run showed no clear gain, and whether it pays off when trained to convergence remains open."
+            - paragraph [ref=f68e198]:
+              - strong [ref=f68e199]: No heatmap detector.
+              - text: The public heatmap U-Net needs several hundred epochs to converge, which was beyond our compute, so we could not train our own folds of it. Its public weights were trained on all 199 training movies, so we had no way to cross-validate an ensemble with them. Without a reliable local score, the risk outweighed the expected gain for us, and we left it out.
+            - paragraph [ref=f68e200]:
+              - strong [ref=f68e201]: No test-time augmentation for the 3D Net.
+              - text: 4- or 8-view TTA multiplies the cost of every validation run. A quick test on our chain gave no reliable gain (within noise locally, lower on the leaderboard), so we left it out. Other teams report gains from TTA, so this may depend on the pipeline.
+            - heading "2.2 Pseudo-label refinement" [level=3] [ref=f68e202]
+            - paragraph [ref=f68e203]:
+              - strong [ref=f68e204]: Problem.
+              - text: "The ground-truth-only model is conservative: few false tracks, but it misses dim nuclei in some frames. A model trained with pseudo-labels finds more nuclei, but used alone it also invents tracks on a new embryo (−0.003 to −0.004 on the leaderboard)."
+            - paragraph [ref=f68e205]:
+              - strong [ref=f68e206]: Pseudo-labels.
+              - text: "The out-of-fold detections of all 199 movies, plus the detections on one unlabelled external embryo: 102 windows of the public Ultrack"
+              - code [ref=f68e207]: zebrafish_embryo
+              - text: light-sheet volume (Royer Lab, CZ Biohub). 3D Net-128-PL is trained on ground truth plus these pseudo-labels.
+            - paragraph [ref=f68e208]:
+              - strong [ref=f68e209]: Method.
+              - text: "Use the pseudo-label model's nodes, but only on tracks the ground-truth model agrees with:"
+            - list [ref=f68e210]:
+              - listitem [ref=f68e211]: Run both models on the movie.
+              - listitem [ref=f68e212]:
+                - text: A pseudo-label node is
+                - strong [ref=f68e213]: confirmed
+                - text: if it is matched one-to-one to a ground-truth-model node within 6 µm in the same frame.
+              - listitem [ref=f68e214]: Link the pseudo-label nodes frame to frame into tracks (Hungarian matching, 7 µm gate).
+              - listitem [ref=f68e215]:
+                - text: Keep a track only if
+                - strong [ref=f68e216]: at least 50% of its nodes are confirmed
+                - text: . The output is the pseudo-label nodes of the kept tracks.
+            - paragraph [ref=f68e217]:
+              - img "pseudo-label refinement"
+            - paragraph [ref=f68e218]:
+              - strong [ref=f68e219]: Effect.
+              - text: "Frames where the ground-truth model missed a nucleus are filled in, and tracks it never saw disappear: +0.004 on public and +0.011 on private, for the cost of one extra training run rather than an ensemble."
+            - heading "2.3 Density-aware threshold (DoG router)" [level=3] [ref=f68e220]
+            - paragraph [ref=f68e221]:
+              - strong [ref=f68e222]: Problem.
+              - text: In sparse movies, large nuclei produce extra seeds at the normal threshold.
+            - paragraph [ref=f68e223]:
+              - strong [ref=f68e224]: Method.
+            - list [ref=f68e225]:
+              - listitem [ref=f68e226]: A simple rule-based DoG blob tracker counts nuclei and gives each movie a nucleus spacing.
+              - listitem [ref=f68e227]: Movies with spacing ≥ 19.7 µm are re-detected with a stricter seed threshold (0.99 instead of 0.97).
+            - paragraph [ref=f68e228]:
+              - strong [ref=f68e229]: Why DoG.
+              - text: Our first version used the detector's own node count to decide. But a detector's count drifts on an unseen embryo, and a router should not depend on the model it routes. The detector-independent DoG router gained +0.002 on public with no change in local validation.
+            - heading "3. Linking" [level=2] [ref=f68e230]
+            - heading "3.1 Candidate links" [level=3] [ref=f68e231]
+            - paragraph [ref=f68e232]: "For every node at frame t: all nodes at t+1 within 10 µm and its 5 nearest successors. In addition, every node at t+1 is linked to its 3 nearest predecessors."
+            - heading "3.2 Evidence for each link" [level=3] [ref=f68e233]
+            - list [ref=f68e234]:
+              - listitem [ref=f68e235]:
+                - strong [ref=f68e236]: Geometry (26 features).
+                - text: Displacement, distance ranks and gaps among competing candidates in both directions, nearest-neighbour distances, detection confidence and cluster size, the residual against the node's velocity from a first frame-to-frame matching pass, the residual against the local tissue flow (median displacement of the first-pass links shorter than 6 µm within three nearest-neighbour distances), and whether the nodes continue into the past / future.
+              - listitem [ref=f68e237]:
+                - strong [ref=f68e238]: Transformer probability.
+                - text: We retrained the competition baseline's linker architecture (a temporal U-Net encoder plus a node transformer that scores all node pairs of two consecutive frames) on all 199 movies. It is run in both directions; the two softmax-normalised probabilities and their weighted harmonic mean are features.
+              - listitem [ref=f68e239]:
+                - strong [ref=f68e240]: Cell embedding.
+                - text: A small 3D CNN encodes a 16 × 32 × 32 raw patch around each node. It is trained with InfoNCE so that the same annotated cell at t and t+1 is closer than its competing candidates. The cosine similarity of the two ends of a link is a feature.
+            - heading "3.3 Edge model" [level=3] [ref=f68e241]
+            - paragraph [ref=f68e242]:
+              - text: LightGBM on all of the above (47 features), trained on out-of-fold detections, gives the link probability
+              - code [ref=f68e243]: p
+              - text: used everywhere downstream.
+            - paragraph [ref=f68e244]:
+              - strong [ref=f68e245]: Lesson.
+              - text: Out-of-fold stacking under-values evidence from models trained on all data. Locally we could only use fold versions of the transformer, trained on less data, and its feature looked worth almost nothing. On the leaderboard, the version trained on all 199 movies was worth +0.005.
+            - heading "4. Divisions" [level=2] [ref=f68e246]
+            - heading "4.1 Why a per-node division cost" [level=3] [ref=f68e247]
+            - paragraph [ref=f68e248]: "In the ILP a division means that one node keeps two outgoing edges. The second daughter's edge is usually weak: that daughter is further away and looks different from its mother. With one global division cost, the solver either never opens forks, or opens false ones wherever two cells sit close together."
+            - paragraph [ref=f68e249]:
+              - text: We therefore give
+              - strong [ref=f68e250]: each node its own division cost
+              - text: ","
+              - code [ref=f68e251]: cost = 6 − 16·s
+              - text: (
+              - code [ref=f68e252]: 5 − 16·s
+              - text: in sparse movies), where
+              - code [ref=f68e253]: s
+              - text: is the learned probability that the node is a dividing mother. Forks open only where the evidence supports them.
+            - paragraph [ref=f68e254]:
+              - img "division prior in the ILP"
+            - heading [level=3] [ref=f68e255]:
+              - text: 4.2 The division score
+              - code [ref=f68e256]: s
+            - paragraph [ref=f68e257]: "Divisions are rare and subtle. The mother rounds up and brightens, its chromatin splits, and two compact, bright daughters appear that keep moving apart for a few frames:"
+            - paragraph [ref=f68e258]
+            - paragraph [ref=f68e259]:
+              - strong [ref=f68e260]: Labels.
+              - text: "For the division CNN and the graph model, a node with two annotated children is positive and a node with one annotated child is negative; unannotated nodes are never used as negatives, because most real divisions are unannotated. The pair model takes its negatives from 200 random nodes per movie, which are rarely dividing. For the same reason, hard-negative mining hurt badly: the \"hardest negatives\" are mostly real, unannotated divisions."
+            - paragraph [ref=f68e261]:
+              - strong [ref=f68e262]: Three scorers.
+            - table [ref=f68e263]:
+              - rowgroup [ref=f68e264]:
+                - row [ref=f68e265]:
+                  - columnheader "scorer" [ref=f68e266]
+                  - columnheader "input" [ref=f68e267]
+                  - columnheader "model" [ref=f68e268]
+              - rowgroup [ref=f68e269]:
+                - row [ref=f68e270]:
+                  - cell "Division CNN" [ref=f68e271]
+                  - cell "5-frame crop (t−2 … t+2) of 9 × 33 × 33 voxels around the node" [ref=f68e272]
+                  - cell "6 CNNs (3 seeds, with and without copy-paste augmentation), 4 flips" [ref=f68e273]
+                - row [ref=f68e274]:
+                  - cell "Graph model" [ref=f68e275]
+                  - 'cell "53 features of the node in the candidate graph: its best links and how contested they are, where its candidate daughters are (distance, opposite sides, symmetry), whether they continue, motion, local density, the CNN score" [ref=f68e276]'
+                  - cell "CatBoost" [ref=f68e277]
+                - row [ref=f68e278]:
+                  - cell "Pair model" [ref=f68e279]
+                  - cell "candidate (mother, daughter, daughter) triplets with 174 image features, plus graph, embedding and link features of both daughter edges" [ref=f68e280]
+                  - cell "LightGBM + CatBoost" [ref=f68e281]
+            - paragraph [ref=f68e282]: "How the pair model works:"
+            - list [ref=f68e283]:
+              - listitem [ref=f68e284]: "For every node, candidate daughter pairs are taken from the next frame: both within 13.5 µm, sisters 4.5–17 µm apart, the mother near their midpoint, the daughters on opposite sides."
+              - listitem [ref=f68e285]: "The 174 image features follow the biology: the mother's brightness, texture, compactness and size over her last 7 frames, the intensity drop at her position at the split, both daughters over their first 3 frames, sister separation and its growth, movement along the division axis."
+              - listitem [ref=f68e286]: A node's score is its best pair.
+            - paragraph [ref=f68e287]:
+              - text: The final score is
+              - code [ref=f68e288]: s = max(pair model, graph model)
+              - text: ", which added +0.003 on public and +0.010 on private over the graph model alone."
+            - heading "4.3 Divisions inside and after the ILP" [level=3] [ref=f68e289]
+            - list [ref=f68e290]:
+              - listitem [ref=f68e291]:
+                - strong [ref=f68e292]: Relaxed admission.
+                - text: A link enters the ILP graph if
+                - code [ref=f68e293]: p > 0.3 − 0.5·s
+                - text: ", so likely mothers keep their weaker second link."
+              - listitem [ref=f68e294]:
+                - strong [ref=f68e295]: Second-daughter rescue.
+                - text: For nodes with
+                - code [ref=f68e296]: s ≥ 0.2
+                - text: ", links that are not the node's best link take"
+                - code [ref=f68e297]: max(p, transformer probability)
+                - text: ", because the transformer is often more confident about the second daughter."
+              - listitem [ref=f68e298]:
+                - strong [ref=f68e299]: Fork verifier.
+                - text: "After the ILP, both daughters of every fork are traced in the raw images from 3 frames before to 5 frames after the fork (motion-compensated DoG peak search). 157 features describe their separation over time, peak quality and displacement. A CatBoost model removes the weaker daughter edge when its score is below 0.25, unless the two daughters clearly move apart along the fork axis. +0.002 on public (private unchanged), and +0.003 more on public from tuning the threshold (private −0.001). Its training rows are the forks of a tracking run on the training movies, candidate division events labelled by the annotations, and 409 hand labels: candidate divisions that our models proposed in 39 training movies, each checked by eye (274 divisions, 135 rejections). Trained on the official annotations only, with its threshold re-chosen (0.40), it scores 0.0017 lower on the public and 0.0006 higher on the private leaderboard."
+              - listitem [ref=f68e300]:
+                - strong [ref=f68e301]: Division base cost.
+                - text: The optimum is broad, around 5–6; dense movies use 6, sparse movies 5.
+            - paragraph [ref=f68e302]:
+              - strong [ref=f68e303]: Effect.
+              - text: Turning on the division score took the leaderboard from
+              - strong [ref=f68e304]: 0.913 to 0.948 (+0.035 on both public and private)
+              - text: .
+            - heading "5. Tracking and post-processing" [level=2] [ref=f68e305]
+            - heading "5.1 ILP" [level=3] [ref=f68e306]
+            - paragraph [ref=f68e307]: "tracksdata with the SCIP solver, one movie per process:"
+            - list [ref=f68e308]:
+              - listitem [ref=f68e309]:
+                - text: edge reward
+                - code [ref=f68e310]: p
+                - text: ;
+              - listitem [ref=f68e311]: appearance cost 0.5, disappearance cost 3.2;
+              - listitem [ref=f68e312]:
+                - text: per-node division cost
+                - code [ref=f68e313]: 6 − 16·s
+                - text: ", or"
+                - code [ref=f68e314]: 5 − 16·s
+                - text: in sparse movies (section 4).
+            - heading "5.2 Cleaning the tracks" [level=3] [ref=f68e315]
+            - list [ref=f68e316]:
+              - listitem [ref=f68e317]:
+                - strong [ref=f68e318]: Short-track filter.
+                - text: Isolated single nodes are removed.
+              - listitem [ref=f68e319]:
+                - strong [ref=f68e320]: Motion-compensated smoothing.
+                - text: The per-frame tissue translation is estimated from confident non-division links. Coordinates are then smoothed along each track with a local line fit (±3 frames) after removing that translation.
+              - listitem [ref=f68e321]:
+                - strong [ref=f68e322]: Gap bridging.
+                - text: A track ending at t and a nearby track starting at t+2 or t+3 are joined through linearly interpolated nodes (+0.002).
+            - heading "5.3 Track-support gate (sparse movies)" [level=3] [ref=f68e323]
+            - paragraph [ref=f68e324]:
+              - strong [ref=f68e325]: Problem.
+              - text: "In sparse movies the main remaining error is over-counting: long, dim tracks that are not real nuclei."
+            - paragraph [ref=f68e326]:
+              - strong [ref=f68e327]: Method.
+              - text: "The same principle as in 2.2, now applied to the final tracks with two independent detectors, 3D Net-64 and a sensitive DoG detector:"
+            - list [ref=f68e328]:
+              - listitem [ref=f68e329]: Cut the tracks into division-free segments.
+              - listitem [ref=f68e330]: A node is confirmed if an independent detection is close by in the same frame.
+              - listitem [ref=f68e331]: "Remove a segment if too few of its nodes are confirmed:"
+            - table [ref=f68e332]:
+              - rowgroup [ref=f68e333]:
+                - row [ref=f68e334]:
+                  - columnheader "movie spacing" [ref=f68e335]
+                  - columnheader "a node is confirmed if …" [ref=f68e336]
+                  - columnheader "remove the segment if confirmed <" [ref=f68e337]
+              - rowgroup [ref=f68e338]:
+                - row [ref=f68e339]:
+                  - cell "19.7–25 µm" [ref=f68e340]
+                  - cell [ref=f68e341]:
+                    - text: a DoG detection within 4 µm
+                    - strong [ref=f68e342]: or
+                    - text: a 3D Net-64 node within 5 µm
+                  - cell "40%" [ref=f68e343]
+                - row [ref=f68e344]:
+                  - cell "> 25 µm" [ref=f68e345]
+                  - cell [ref=f68e346]:
+                    - text: a DoG detection within 5 µm
+                    - strong [ref=f68e347]: and
+                    - text: a 3D Net-64 node within 5 µm
+                  - cell "20%" [ref=f68e348]
+            - paragraph [ref=f68e349]: Dense movies are not touched.
+            - paragraph [ref=f68e350]:
+              - strong [ref=f68e351]: Effect.
+              - text: "Positive in local validation and neutral on public (0.969), so it went into the final submission. On private it cost 0.001, while a more lenient setting gained 0.001: like other changes to the node count, it transferred to new embryos less predictably than the rest of the pipeline."
+            - heading "5.4 Model sizes and cost" [level=3] [ref=f68e352]
+            - table [ref=f68e353]:
+              - rowgroup [ref=f68e354]:
+                - row [ref=f68e355]:
+                  - columnheader "model" [ref=f68e356]
+                  - columnheader "size" [ref=f68e357]
+                  - columnheader "input" [ref=f68e358]
+              - rowgroup [ref=f68e359]:
+                - row [ref=f68e360]:
+                  - cell "3D Net-128 / 3D Net-128-PL / 3D Net-64" [ref=f68e361]
+                  - cell "18 M parameters each (10 / 10 / 50 epochs)" [ref=f68e362]
+                  - cell "three-frame window of the whole volume" [ref=f68e363]
+                - row [ref=f68e364]:
+                  - cell "Edge transformer" [ref=f68e365]
+                  - cell "2.1 M parameters" [ref=f68e366]
+                  - cell "two consecutive frames, downsampled" [ref=f68e367]
+                - row [ref=f68e368]:
+                  - cell "Division CNN" [ref=f68e369]
+                  - cell "1.4 M parameters × 6" [ref=f68e370]
+                  - cell "5-frame patch of 9 × 33 × 33 voxels" [ref=f68e371]
+                - row [ref=f68e372]:
+                  - cell "Cell embedding" [ref=f68e373]
+                  - cell "0.24 M parameters" [ref=f68e374]
+                  - cell "16 × 32 × 32 patch" [ref=f68e375]
+                - row [ref=f68e376]:
+                  - cell "Edge model, division graph and pair models, fork verifier" [ref=f68e377]
+                  - cell "gradient-boosted trees (CPU)" [ref=f68e378]
+                  - cell "tabular features" [ref=f68e379]
+            - paragraph [ref=f68e380]: The whole chain runs in one Kaggle notebook on 2 × T4, about 30 minutes on the 4 visible movies. The heaviest parts are the division CNN (about half of the run, split over both GPUs by node count), the ILP and the detection.
+            - heading "6. Results" [level=2] [ref=f68e381]
+            - paragraph [ref=f68e382]:
+              - img "ladder"
+            - list [ref=f68e383]:
+              - listitem [ref=f68e384]: Each row adds one component, and every row is a single submission.
+              - listitem [ref=f68e385]: The detector work (0.875 → 0.906) and the division score (0.913 → 0.948) are the two big blocks. Linking and post-processing add the rest.
+              - listitem [ref=f68e386]:
+                - text: The final submission scored
+                - strong [ref=f68e387]: 0.969 / 0.962
+                - text: . Our best private score was
+                - strong [ref=f68e388]: 0.969 / 0.964
+                - text: . It came from a more lenient setting of the same track-support gate, which tied on public, so we did not pick it.
+            - paragraph [ref=f68e389]: "Across all submissions of our chain, private stayed close to public:"
+            - paragraph [ref=f68e390]:
+              - img "public vs private"
+            - heading "7. What did not help" [level=2] [ref=f68e391]
+            - table [ref=f68e392]:
+              - rowgroup [ref=f68e393]:
+                - row [ref=f68e394]:
+                  - columnheader "idea" [ref=f68e395]
+                  - columnheader "effect on the leaderboard" [ref=f68e396]
+              - rowgroup [ref=f68e397]:
+                - row [ref=f68e398]:
+                  - cell "The pseudo-label 3D Net as the detector itself" [ref=f68e399]
+                  - cell "−0.003 to −0.004" [ref=f68e400]
+                - row [ref=f68e401]:
+                  - cell "Registering frames before computing link geometry" [ref=f68e402]
+                  - cell "−0.003" [ref=f68e403]
+                - row [ref=f68e404]:
+                  - cell "A DoG-only support gate (without 3D Net-64)" [ref=f68e405]
+                  - cell "−0.001 public, −0.011 private" [ref=f68e406]
+                - row [ref=f68e407]:
+                  - cell "TensorRT FP16 for all networks" [ref=f68e408]
+                  - cell "42% faster, −0.001; we kept fp32" [ref=f68e409]
+                - row [ref=f68e410]:
+                  - cell "Hard-negative mining for division models, re-admitting nodes the ILP dropped, constant coordinate offsets" [ref=f68e411]
+                  - cell "negative in local validation" [ref=f68e412]
+            - heading "8. Takeaways" [level=2] [ref=f68e413]
+            - list [ref=f68e414]:
+              - listitem [ref=f68e415]:
+                - strong [ref=f68e416]: Look at the biology first.
+                - text: The biggest gains came from turning simple observations (how a division looks, how nuclei scale with density, how tissue drifts) into small, targeted models.
+              - listitem [ref=f68e417]:
+                - strong [ref=f68e418]: Validate the way the test set differs.
+                - text: New embryos meant cross-embryo splits for the detector and out-of-fold stacking for everything downstream.
+              - listitem [ref=f68e419]:
+                - strong [ref=f68e420]: The division term is worth fighting for.
+                - text: A learned, per-node division cost inside the ILP was the largest single gain, and it only works with labels taken strictly from annotated tracks.
+              - listitem [ref=f68e421]:
+                - strong [ref=f68e422]: Use a second model as a check, not as a replacement.
+                - text: Both the pseudo-label refinement and the track-support gate keep a track only when an independent model agrees with it.
+              - listitem [ref=f68e423]:
+                - strong [ref=f68e424]: Be careful with changes that alter how many nodes you output.
+                - text: They transferred worst from local validation to the leaderboard, especially on sparse movies (the track-support gates in 5.3 and section 7).
+            - heading "9. Code and reproduction" [level=2] [ref=f68e425]
+            - paragraph [ref=f68e426]:
+              - text: All code is released under the MIT License on
+              - link "GitHub (opens in a new tab)" [ref=f68e427] [cursor=pointer]:
+                - /url: https://github.com/SongqiZhou/biohub-cell-tracking-4th-place
+                - text: GitHub
+              - text: ": inference, the training of every model, and the download and pseudo-labelling of the external data. Parts derived from the official baseline keep its BSD 3-Clause License."
+            - list [ref=f68e428]:
+              - listitem [ref=f68e429]:
+                - strong [ref=f68e430]: Inference.
+                - text: With our released models (
+                - link "biohub-4th-place-artifacts (opens in a new tab)" [ref=f68e431] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/datasets/songqizhou/biohub-4th-place-artifacts
+                  - text: biohub-4th-place-artifacts
+                - text: ) the pipeline reproduces our final submission. On Kaggle it runs as the
+                - link "notebook (opens in a new tab)" [ref=f68e432] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/code/songqizhou/biohub-4th-place-solution
+                  - text: notebook
+                - text: (2 × T4, about 30 minutes for the 4 visible movies).
+              - listitem [ref=f68e433]:
+                - strong [ref=f68e434]: Training.
+                - code [ref=f68e435]: GPUS="0 1 2 3" bash training/train_all.sh
+                - text: trains every model from the competition data, our pseudo-labels (
+                - link "biohub-4th-place-pseudo-labels (opens in a new tab)" [ref=f68e436] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/datasets/songqizhou/biohub-4th-place-pseudo-labels
+                  - text: biohub-4th-place-pseudo-labels
+                - text: ") and the external windows, which it downloads itself: about 15 hours on 4 × H100."
+              - listitem [ref=f68e437]:
+                - strong [ref=f68e438]: Reproducibility.
+                - text: GPU training is not bit-reproducible. In our checks, submissions with retrained models or model groups scored 0.959–0.971 public and 0.959–0.964 private (final submission 0.969 / 0.962).
+          - generic [ref=f68e439]:
+            - generic [ref=f68e440]:
+              - text: Author
+              - generic [ref=f68e441]:
+                - link "BarryZhou's profile" [ref=f68e442] [cursor=pointer]:
+                  - /url: /songqizhou
+                  - generic "BarryZhou" [ref=f68e443]
+                - generic [ref=f68e447]:
+                  - link "BarryZhou" [ref=f68e448] [cursor=pointer]:
+                    - /url: /songqizhou
+                  - paragraph [ref=f68e449]: songqizhou
+            - separator [ref=f68e450]
+            - generic [ref=f68e451]:
+              - generic [ref=f68e452]:
+                - button "Upvote" [ref=f68e453] [cursor=pointer]:
+                  - generic [ref=f68e454]: arrow_drop_up
+                - button "18 votes" [ref=f68e455] [cursor=pointer]: "18"
+              - button "Share" [ref=f68e456] [cursor=pointer]
+              - button "Writeup actions" [ref=f68e458] [cursor=pointer]: more_horiz
+        - heading "Project Links" [level=2] [ref=f68e459]
+        - generic [ref=f68e460]:
+          - link "undefined opens in new window" [ref=f68e462] [cursor=pointer]:
+            - /url: https://kaggle.com/code/songqizhou/biohub-4th-place-solution
+            - generic [ref=f68e464]:
+              - generic [ref=f68e466]:
+                - generic [ref=f68e467]:
+                  - generic "Biohub 4th Place Solution" [ref=f68e468]
+                  - paragraph [ref=f68e469]: a month ago · 8 upvotes
+                - link "BarryZhou's profile" [ref=f68e470]:
+                  - /url: /songqizhou
+                  - generic "BarryZhou" [ref=f68e471]
+                  - generic [aria-hidden] [ref=f68e476]: code
+              - generic [ref=f68e477]:
+                - paragraph [ref=f68e478]: Kaggle Notebook
+                - paragraph [ref=f68e479]: Public
+          - link "undefined opens in new window" [ref=f68e481] [cursor=pointer]:
+            - /url: https://github.com/SongqiZhou/biohub-cell-tracking-4th-place/tree/main
+            - generic [ref=f68e482]:
+              - generic [ref=f68e483]:
+                - generic [ref=f68e485]:
+                  - generic [ref=f68e486]:
+                    - 'generic "GitHub - SongqiZhou/biohub-cell-tracking-4th-place: 4th place solution (public 0.969 / private 0.962) - Kaggle Biohub Cell Tracking During Development: 3D Net detectors, learned linking, and a division prior inside the ILP · GitHub" [ref=f68e487]'
+                    - paragraph [ref=f68e488]: https://github.com/SongqiZhou/biohub-cell-tracking-4th-place/tree/main
+                  - generic [aria-hidden] [ref=f68e491]: link
+                - paragraph [ref=f68e493]: github.com
+              - paragraph [ref=f68e494]: training code
+          - link "undefined opens in new window" [ref=f68e496] [cursor=pointer]:
+            - /url: https://kaggle.com/models/songqizhou/biohub-4th-place-cell-tracking
+            - generic [ref=f68e498]:
+              - generic [ref=f68e500]:
+                - generic [ref=f68e501]:
+                  - generic "Biohub 4th Place Cell Tracking" [ref=f68e502]
+                  - paragraph [ref=f68e503]:
+                    - text: 23 days ago ·
+                    - generic [ref=f68e504]: Usability 6.7
+                - generic [aria-hidden] [ref=f68e511]: tenancy
+              - generic [ref=f68e512]:
+                - paragraph [ref=f68e513]: Kaggle Model
+                - paragraph [ref=f68e514]: Public
+        - heading "Citation" [level=2] [ref=f68e515]
+        - paragraph [ref=f68e516]:
+          - generic [ref=f68e517]:
+            - generic [ref=f68e518]:
+              - generic [ref=f68e519]: DOI (Digital Object Identifier)
+              - link "https://doi.org/10.34740/kaggle/w/115972 opens in new window" [ref=f68e520] [cursor=pointer]:
+                - /url: https://doi.org/10.34740/kaggle/w/115972
+                - text: https://doi.org/10.34740/kaggle/w/115972
+            - generic [ref=f68e521]:
+              - generic [ref=f68e522]: Citation Type
+              - radiogroup [ref=f68e523]:
+                - generic [ref=f68e524] [cursor=pointer]:
+                  - radio "BibTeX" [checked] [ref=f68e526]
+                  - generic [ref=f68e532]: BibTeX
+                - generic [ref=f68e533] [cursor=pointer]:
+                  - radio "APA" [ref=f68e535]
+                  - generic [ref=f68e539]: APA
+            - generic [ref=f68e542]:
+              - generic [ref=f68e543]: Citation
+              - generic [ref=f68e544]:
+                - textbox "Citation" [ref=f68e545]: "@article{z7777_2026, title={4th Place Solution}, url={https://www.kaggle.com/w/115972}, DOI={10.34740/KAGGLE/W/115972}, journal={Kaggle}, publisher={Kaggle}, author={z7777}, year={2026} }"
+                - button "Copy Public URL" [ref=f68e546] [cursor=pointer]: content_copy
+                - group [aria-hidden]:
+                  - generic: Citation
+              - paragraph:
+                - alert
+        - separator [ref=f68e547]
+        - generic [ref=f68e548]:
+          - generic [ref=f68e550]:
+            - generic [ref=f68e551]:
+              - generic [aria-hidden] [ref=f68e552]: comment
+              - heading "2 Comments" [level=2] [ref=f68e554]
+            - generic [ref=f68e557]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f68e558] [cursor=pointer]:
+                - generic [ref=f68e559]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f68e561]:
+            - generic [ref=f68e562]:
+              - generic [ref=f68e566]:
+                - link "riri's profile" [ref=f68e567] [cursor=pointer]:
+                  - /url: /badboiriri
+                  - generic "riri" [ref=f68e568]
+                - generic [ref=f68e574]:
+                  - link [ref=f68e576] [cursor=pointer]:
+                    - /url: /badboiriri
+                    - heading "riri" [level=3] [ref=f68e577]
+                  - generic [ref=f68e578]:
+                    - paragraph [ref=f68e579]: Posted a month ago
+                    - paragraph [ref=f68e581]: · 133rd in this Competition
+                - generic [ref=f68e583]:
+                  - generic [ref=f68e584]:
+                    - button "Upvote" [ref=f68e585] [cursor=pointer]:
+                      - generic [ref=f68e586]: arrow_drop_up
+                    - button "1 votes" [ref=f68e587] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f68e588] [cursor=pointer]: more_vert
+                - paragraph [ref=f68e592]: 感谢 Barry 哥的思路，已严肃学习
+                - generic [ref=f68e593]:
+                  - button "Reply" [ref=f68e594] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f68e595]: reply
+                  - generic [ref=f68e599]:
+                    - img "love" [ref=f68e601]
+                    - generic [ref=f68e602]: "1"
+              - separator [ref=f68e603]
+            - generic [ref=f68e608]:
+              - link "ZavodRobotov's profile" [ref=f68e609] [cursor=pointer]:
+                - /url: /zavodrobotov
+                - generic "ZavodRobotov" [ref=f68e610]
+              - generic [ref=f68e616]:
+                - link [ref=f68e618] [cursor=pointer]:
+                  - /url: /zavodrobotov
+                  - heading "ZavodRobotov" [level=3] [ref=f68e619]
+                - paragraph [ref=f68e621]: Posted 5 days ago
+              - generic [ref=f68e623]:
+                - generic [ref=f68e624]:
+                  - button "Upvote" [ref=f68e625] [cursor=pointer]:
+                    - generic [ref=f68e626]: arrow_drop_up
+                  - button "0 votes" [ref=f68e627] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f68e628] [cursor=pointer]: more_vert
+              - paragraph [ref=f68e632]: Do you think using Implicit Shape Model for linking is good idea?
+              - button "Reply" [ref=f68e634] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f68e635]: reply
+  - alert [ref=f68e639]

@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/amazon-employee-access-challenge/discussion/5283
-fetched: 2026-10-27
-chars: 821
+fetched: 2026-11-03
+chars: 20252
 
 menu
 Skip to
@@ -22,35 +22,564 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-kenmonta · Featured Prediction Competition · 13 years ago
-Late Submission
-more_horiz
+Winning solution code and methodology — Amazon.com - Employee Access Challenge
+Winning solution code and methodology
+
 Amazon.com - Employee Access Challenge
 
-Predict an employee's access needs, given his/her job role
+Solution Writeup · 1st place · Aug 4, 2013
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+Hi everyone,
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I just released the code for our solution on Github. It is published under a MIT License:
 
-Failed to load the discussion topic
+https://github.com/pyduan/amazonaccess
 
-error
+I did some refactoring but more may be needed. In particular, I have pretty much left Ben's code as is (in BSMan/) and only made minor modifications to files that I have integrated into my own code but haven't written myself (in external/). I'll do some additional cleaning if I have time.
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+As of now, the code that is being ran when launching classifier.py is my model (which include some of Ben's features) -- to obtain the final blend, one must run Ben's code independently then merge the predictions (which can be done by slightly modifying combine.py, which was written ad-hoc and which I haven't generalized yet). As you can see, the skeleton is basically the same as the one I used in the starter code I published.
 
-error
+Also, special thanks to Miroslaw, whose code I shamelessly copied to create some of my datasets.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+ 
+
+Methodology:
+
+The final prediction is a weighted average of my code (2/3) and Ben's (1/3).
+
+ 
+
+Benjamin Solecki
+
+Ben's approach is itself a blend of a logistic model and a mixture of tree-based models. He explained his approach for the logistic model in more detail here. As for the tree-based models, it is a combination of Random Forests, GBMs, and Extremely Randomized Trees that are grown using features based on counts and frequencies (e.g. number of resources managed by a given manager, etc.). I'll let him explain his approach further if he wishes to -- we merged comparatively late in the game (2 weeks before the deadline) so I would risk misrepresenting his train of thoughts.
+
+ 
+
+Paul Duan
+
+As for mine, it was mainly driven by the fact that the structure of the dataset contained all categorical variables, with a large number of categories and some rare features. This meant that stability was a high priority, ie. models should be relatively robust to changes in the composition of the dataset. I believe this is what in the end helped our score to drop less than the other top competitors from the public leaderboard to the private one.
+
+As such:
+
+- I trusted my CV score above all else, which was obtained by repeating a 80/20 train/test split 10 times. I would then select the models not only based on raw score, but also on the standard deviation between the 10 folds.
+
+I made no attempt at fixing the discrepancy between CV and leaderboard scores that was due to the fact that all categories in the test set appeared in the train set, which was not necessarily the case when doing a CV split. The reasoning being that the best model would need to be resistant to a change in the split.
+
+- I removed role 1 and role 2 from the original columns, as their effect was too strong and seemed to cause too much variance; I suspect that the algorithms weren't too good at dealing with unknown role IDs (they were the ones with the fewest number of categories, so the models tended to trust them too much)
+
+- I spent comparatively very little time on feature selection (which was a big subject in this competition, judging by the forums), as they would be highly dependent on the makeup of the dataset. I did, however, reuse some of Miroslaw's code to generate three different datasets built by using greedy feature selection with different seeds. This was not critical to the raw performance of the blend but did help diversifying it/reducing the variance.
+
+- I considered feature extraction to be much more important to feature selection
+
+
+- my classifier consists of a large combination of models (~15 currently) that are each either using a different algorithm or a different feature set. The top 3-5 models are probably enough to reach .92+ on the private leaderboard, but I found adding additional variants to the datasets helped minimize variance.
+
+I then combined them by computing their predictions using cross-validation, and combining them using a second model (stacking). When training the second model, I also added meta-features (nb of time this resource/manager/etc appeared in the training set, etc.), the idea being to try to determine dynamically which model should be trusted the most (some perform better when the manager is unknown, etc.).
+
+ Each dataset consists of what I called base data sets (combination of the original columns) and extracted feature sets.
+
+The extracted feature sets are based on cross-tabulating all categories and looking at the counts manager/resource/etc X had been associated with role/department/etc Y, and so on (in feature_extraction.py, this is what I called the pivot tables; the features sets are lists of lambda functions that extract the relevant cell in the table).
+
+ 
+
+Usage 
+
+To run the code, you'll need Python, numpy/scipy and pandas installed. Pandas is not really necessary for the most part, but it is used in some of the external code; I may rewrite them to remove this dependency when I have the time.
+
+The usage is described on the Github page (to create a submission made up of a simple average of the models in my blend, simply run python classifier.py -v -f testsubmission and it should show up in your submissions/ folder. This should net you a private leaderboard score of .92330. To get the full .92360, you'll need to also run BSMan's code in the BSMan/ folder then combine all predictions according to a 2/3 1/3 split, where BSMan's final prediction is itself a 2/3 1/3 combination of his logistic model and ensemble models.
+
+Runtime for my models should be ~30 minutes per fold, considerably less if you remove some models (simply comment out some strings in the model list, especially the GBC ones), and considerably more if you enable stacking as this will require cross-validated predictions on the training set to be computed as well.
+
+Everything is cached so you'll never have to compute the same thing twice -- it also means that you should have some disk space available (the cache may grow to a couple gigabytes).
+
+  
+
+Paul
+
+Authors
+Paul Duan
+
+pyduan
+
+Ben S
+
+bensolucky
+
+arrow_drop_up
+78
+Share
+more_horiz
+Citation
+
+Paul Duan, Ben S. Winning solution code and methodology. https://www.kaggle.com/competitions/amazon-employee-access-challenge/writeups/paul-duan-bs-man-winning-solution-code-and-methodo. 2013. Kaggle
+
+comment
+22 Comments
+Hotness
+Dmitry Efimov
+
+Posted 13 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+27
+more_vert
+
+Hi, Paul,
+
+Thank you for your description and congratulations! It was tough to compete with such big number of participants :)
+
+We have just released our code as well:
+
+https://github.com/diefimov/amazon_employee_access_2013
+
+The instructions can be found in the file README.md.
+
+Summary of our approach.
+
+Our result submission was linear combination of 11 models: 6 GBM models with different sets of features (package gbm in R), 2 GLMNET models (package glmnet in R), 1 RF model (randomForest package in R), 2 logistic regression models (based on Miroslaw code).
+
+1) GBM models were based on different sets of features, here the ideas:
+
+1.1) We used categorical features as numerical in several GBM models.
+
+1.2) We also removed role1 and family from several GBM models.
+
+1.3) Homogeneous ensembling for all GBM models (average of predictions based on parts of the train set).
+
+1.4) One GBM model was with likelihood features, this was the most accurate individual model.
+
+Here is the description from Lucas (Leustagos):
+
+The likelihood dataset consisted on replacing each categorical value (id) for its likelihood.
+Usually this procedure overfits badly, so in order to get around this, we did the following:
+
+Used shrunken likelihood instead of raw likelihood. The shrunken likelihood can be defined as: shr_likelihood = alpha*global_likelihood + (1-alpha)*item_likelihood, where global_likelihood is the global average, item_likelihood is the likelihood of each categorical value, and alpha is a function on the number of occurrences of each item. It could be something like alpha(n) = 1/(n+1).
+
+So if a item occurred many times, its likelihood will be pretty close to item_likelihood. If it occurred a few times (or never occurred before) it will be close to global_likelihood. To calculate this alpha we used the lme4 package of R as a black box. As stated in another forum thread, using the outputs to produce features tends to overfit. To solve this issue, we used nested
+cross-validation. The cross validation usually splits the set into a validation and a training set. The likelihood of the validation set will be calculated only on the training set (so we never use validation outputs). But it still overfits. Se we took the training part and did another 10-fold validation on it. The likelihood of each fold is calculated based on the other 9. Because of this we were forced to have as many likelihood datasets as we had folds, but at least it didnt overfit! We also calculated likelihood for the combination of ids. We used 1,2,3,6,7 degrees of combination here.
+
+1.5) One GBM model was based only on occurrences count for initial variables and their combinations.
+
+1.6) One GBM model was based on distance features: we introduced new categorical variable "person" - different combinations of 7 initial categorical features without resource (there about 12000 persons in the dataset). After we created the graph of persons: two persons are connected if they have common resource. Based on this we created features for each person based on it neighbors.
+
+1.7) In one GBM model we transformed target variable based on boolean XOR function. New target variable = XOR (output of libfm algorithm, initial target variable).
+
+2) GLMNET models were just homogeneous ensembling of 200 glmnet models with different sets of dummy features.
+
+3) RF model was pretty similar to GBM model with categorical features transformed to numbers and some count features, like number of persons with the same resource in the department.
+
+4) Logistic regression model was just modified Miroslaw's code with some improvements: faster search, black list of features and so on.
+
+The final prediction was linear combination with coefficients found based on cv results.
+
+reply
+Reply
+Owen
+
+Posted 13 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+12
+more_vert
+
+Appologize for the delay but I finally got around to clean up the code and posted them on github:
+
+https://github.com/owenzhang/Kaggle-AmazonChallenge2013
+
+I converted all the categoricals to either counts or average of actuals at each level (taking consideration of the size of data in that level), so in the end I have almost all inputs to the model being continuous predictors.
+
+ 
+
+reply
+Reply
+Praveen Kumar
+
+Posted 9 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi Owen,
+Can you explain your code please?
+
+reply
+Reply
+Ben S
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+11
+more_vert
+
+Thanks for that description Paul, Dmitry and everyone else who's sharing their final code.  Paul described my code correctly, I'll just add a little more detail here.
+
+My plan was to make 1 set of sparse features using Miroslaw's code (details here) to use with logistic regression and other sparse classifiers. Then I made a second set of non-sparse features for ensemble methods.
+
+My ensemble features:
+
+The original categorical variables, with role_title and role_family merged (title is a subset of family) and rollups1&2 merged (1 is almost a subset of 2).  I figured this would speed things up over the dozens or hundreds of times I ran the code and allow the algorithms to focus on the more informative interactions.
+Counts of the remaining 5 variables.
+ % of a categorical variable's total requests coming from each particular resource. 
+The number of unique resources that a MGR_ID received requests for.
+
+I tried these but didn't use them:
+
+% of a resource's requests coming from a particular department.
+The number of unique resources that each variable (aside from MGR_ID) received requests for.
+The number of unique counts of each variable that each resource received requests for.
+2nd order feature counts.
+
+I put all these features into a RandomForest, an ExtraTreesForest and a GBM.  Then I blended them using logistic regression after transforming them with an inverse sigmoid function, which was an idea I got from user hornar  on this thread. The blend RF:ET:GB was about 0.25 : 1 : 0.10.
+
+The ensemble blend scored 0.90428 on the private board, vs. 0.91387 for my best logistic.  But blended 1:2 they got 0.92059.  
+
+I relied less than Paul on CV scores because of rare feature issues.  I think that turned out to be OK, my private scores ended up being very consistently 0.004 lower +/-. 0.001.  And the difference between public and private was more stable than the CV vs. public difference. But then again Paul's solo score was much higher than mine!
+
+reply
+Reply
+Afroz Hussain
+
+Posted 13 years ago
+
+· 296th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+[quote=Raghu;28113]
+
+Congrats Paul and Ben. Is there a book I could refer to or buy that you could suggest that will help me in understanding the techniques that you have used. I am pretty comfortable with most of the DM alogorithms being a statistician. But, I would like to enhance my skills around data manipulation(feature extraction), ensembling. Any pointer is appreciated.
+
+ 
+
+Thanks
+
+Raghu
+
+[/quote]
+
+ 
+
+There is a wonderful book that may be of your interest check it.
+
+http://www-stat.stanford.edu/~tibs/ElemStatLearn/
+
+http://www-stat.stanford.edu/~tibs/ElemStatLearn/printings/ESLII_print10.pdf
+
+ 
+
+ 
+
+reply
+Reply
+Dmytro Lystopad
+
+Posted 13 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Hint for Windows. In Paul's code all "open()" corresponding to pickle call must have parameter 'wb' for write or 'rb' for read.
+
+reply
+Reply
+Jianxian
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+[quote=Owen;32161]
+
+Appologize for the delay but I finally got around to clean up the code and posted them on github:
+
+https://github.com/owenzhang/Kaggle-AmazonChallenge2013
+
+I converted all the categoricals to either counts or average of actuals at each level (taking consideration of the size of data in that level), so in the end I have almost all inputs to the model being continuous predictors.
+
+[/quote]
+
+Hi, Owen
+
+Thank you for sharing your model!
+
+I review your model and have one question on it. Could you explain this part of code-''#shrank and randomized leave-one-out average actual for categorical variables.''(located in '__final_utils.R') in more detail, please? How do you exactly do the calculation, and what are those for?
+
+Thanks again!
+
+reply
+Reply
+Jianxian
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi, Owen
+
+Thank you for sharing your model!
+
+I review your model and have one question on it. Could you explain this part of code-''#shrank and randomized leave-one-out average actual for categorical variables.''(located in '__final_utils.R') in more detail, please? How do you exactly do the calculation, and what those for?
+
+Thanks again!
+
+reply
+Reply
+Ofd
+
+Posted 13 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi,
+
+Congratulations to the winners. I read most of the forum posts, but I don't get an answer to the following: 
+
+I converted all the features to categorical, because that is what they are, but I don't know How to deal with so many categories in almost every feature, because I want to use Random Forest in R, but it is restricted to a number of categories in order for it to run. What to do?
+
+Thanks in advance for the answers.
+
+reply
+Reply
+Paul Duan
+
+Topic Author
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I see. What is happening is that your OS is using another dtype for integer arrays than int64 -- replace the condition with:
+
+if issubclass(Xg.dtype.type, np.integer):
+
+(I updated the code on Github)
+
+This should be more general. I had added this condition so that it wouldn't try consolidating numeric datasets (like the "effects" one).
+
+reply
+Reply
+Dmytro Lystopad
+
+Posted 13 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+[quote=Paul Duan;28141]
+
+I added the triples back  (I had removed them since I wasn't using them). Not too sure about the tuples_cf thing though -- it generates fine for me. Is it the only _cf that doesn't generate for you?
+
+[/quote]
+
+All tuples sets after "if Xg.dtype == 'int64':" condition doesn't generates. I just removed condition and added triples. Calculation stops without it.
+
+reply
+Reply
+Paul Duan
+
+Topic Author
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I added the triples back  (I had removed them since I wasn't using them). Not too sure about the tuples_cf thing though -- it generates fine for me. Is it the only _cf that doesn't generate for you?
+
+reply
+Reply
+Dmytro Lystopad
+
+Posted 13 years ago
+
+· 6th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+[quote=Paul Duan;28138] Has anyone tested it on Windows?[/quote]
+
+Also it looks like in feature_extraction.py\create_datasets lost generation of triples and tuples_cf.
+
+reply
+Reply
+Paul Duan
+
+Topic Author
+
+Posted 13 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+[quote=Haru;28129]
+
+Hint for Windows. In Paul's code all "open()" corresponding to pickle call must have parameter 'wb' for write or 'rb' for read.
+
+[/quote]
+
+Good catch. I updated the flags in the code. Has anyone tested it on Windows? I have only run it on UNIX systems so far.
+
+reply
+Reply
+Yashvir Prasad ASA
+
+Posted 13 years ago
+
+· 364th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you Paul and Ben for providing a thorough description of your winning method.  Looking forward to the next competition !
+
+reply
+Reply
+CodingNeo
+
+Posted 13 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+This competition is the best one I participate because of so many sharing and it becomes a valuable resources for learning. I would like to share mine, but the feature I used has been included in Paul's method. I will make the source code available later anyway.
+
+reply
+Reply
+Dylan Friedmann
+
+Posted 13 years ago
+
+· 411th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thank you guys so much for sharing your code and your thought process.  this will help me immensely as I continue to learn :)
+
+funny that a competition based on information withholding has virtually everyone here sharing as much info as possible. 
+
+reply
+Reply
+Jared Huling
+
+Posted 13 years ago
+
+· 35th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks, Paul and Dmitry for sharing your code. Congratulations!
+
+reply
+Reply
+CodingNeo
+
+Posted 13 years ago
+
+· 61st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks Paul. Not just make your code available but also describe your thoughts on how you come up your implementation, which inspires me a lot!
+
+reply
+Reply
+Eriza Fazli
+
+Posted 13 years ago
+
+· 236th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi Paul, thanks for sharing the code and giving a very detailed explanation. Just one question: how exactly do you determine the relative strengths of role 1 and role 2? I mean, how do you know that they are too strong so that you just removed them in the first place? thanks again..
+
+reply
+Reply
+Raghu
+
+Posted 13 years ago
+
+· 943rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats Paul and Ben. Is there a book I could refer to or buy that you could suggest that will help me in understanding the techniques that you have used. I am pretty comfortable with most of the DM alogorithms being a statistician. But, I would like to enhance my skills around data manipulation(feature extraction), ensembling. Any pointer is appreciated.
+
+ 
+
+Thanks
+
+Raghu
+
+reply
+Reply
+Anthony Lo
+
+Posted 13 years ago
+
+· 56th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks Paul and BS. 
+
+reply
+Reply

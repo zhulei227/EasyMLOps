@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/indoor-location-navigation/discussion/240197
-fetched: 2026-10-27
-chars: 820
+fetched: 2026-11-03
+chars: 4397
 
 menu
 Skip to
@@ -42,15 +42,128 @@ Models
 Discussion
 Leaderboard
 Rules
+Reza · 2nd in this Competition · Posted 5 years ago
+arrow_drop_up
+32
+more_vert
+[Part of] 2nd Place Solution - (Reza)
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Thanks for the host for an amazing competition and precious dataset. I have been in localization industry and know how hard it would to collect such a large and valuable dataset.
 
-Failed to load the discussion topic
+I would like to thank my teammates @mamasinkgs, @ymatioun, @demonen, and @rsakata. I learned a lot from them.
 
-error
+Before I join the team I spent a lot of time working on WiFi only localization and didn't spend much time on sensor data and post processing. I basically used the great public kernels of snap to grid and cost minimization.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Here is the summary of my model which I think would be a winner if only WiFi data was available. @mamasinkgs will explain how he did ensembling and amazing optimization for our 2nd place solution.
 
-error
+Model
+Convert RSSI values from log scale to linear scale
+Discard bad RSSI values using last timestamp
+WKNN model (different number of neighbors for floor and x/y predictions)
+Use correlation/Braycurtis dissimilarity instead of Euclidean
+Use Gaussian process regression (GPR) to fill coverage holes
+Results
+Model	Public	Private
+WKNN - WiFi Only	4.64181	4.84857
+After Cost Minimization	3.41539	3.70724
+After Snap-to-Grid	2.88465	3.17900
+Coverage Hole
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+One of the disadvantage of WKNN is its lack of capability for extrapolation. If the test datapoint is outside the region covered by train datapoints, we cannot find proper neighbors to predict the location. There are some sites you can clearly see the coverage holes where you don't have any training WiFi point . This is very common issue in fingerprinting localization (WiFi-based only). One of the approach to deal with this issue is called radio map reconstruction and GPR can based for this purpose. It is interesting that in GPR, your feature and target variables are swapped. We use x,y coordinates as features and RSSI values as a response variable.
+
+Below is the number of waypoints in train and test. As you can see, we don't have enough training coverage for the sites at the bottom the table. WKNN would not work very well for those sites.
+
+site	test	train	test/train
+5d27075f03f801723c2e360f	47	7290	0.006
+5c3c44b80379370013e0fd2b	26	1697	0.015
+5d27099f03f801723c32511d	49	897	0.054
+5d2709a003f801723c3251bf	218	1008	0.216
+.	.	.	.
+5da138754db8ce0c98bca82f	386	1430	0.269
+5d27096c03f801723c31e5e0	654	1925	0.339
+5d2709d403f801723c32bd39	1223	2978	0.410
+
+This figure shows before and after radio reconstruction: 
+
+Thanks for reading.
+
+Please sign in to reply to this topic.
+
+comment
+6 Comments
+Hotness
+mamas
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks Reza, your work is really great and I'm sure your absolute position prediction model is the best in all the participants in this competition.
+
+Reza
+
+Topic Author
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks mamas, it was a pleasure working with you, congrats again on becoming GM, well deserved.
+
+Rob Mulla
+
+Posted 5 years ago
+
+· 73rd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Outstanding. Honored to have my notebook mentioned in your solution. Extremely strong WIFI model and smart idea converting RSSI from log to linear scale.
+
+Jiwei Liu
+
+Posted 5 years ago
+
+· 10th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+WOW, your wifi model is amazing. much better than mine. Please let me know if you'll share the code. Congratulations on winning the 2nd place!
+
+Reza
+
+Topic Author
+
+Posted 5 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Thanks, I share after some cleanup
+
+Hugues
+
+Posted 5 years ago
+
+· 12th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations on winning the 2nd place. I'm very interested in your wifi model also. This looks very interesting. I wanted to explore GPR but have no experience with it. I'm looking forward to looking at your code!

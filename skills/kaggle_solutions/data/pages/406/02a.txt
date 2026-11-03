@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/conways-reverse-game-of-life-2020/discussion/200531
-fetched: 2026-10-27
-chars: 797
+fetched: 2026-11-03
+chars: 5119
 
 menu
 Skip to
@@ -22,35 +22,153 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Kaggle · Playground Code Competition · 6 years ago
-Late Submission
-more_horiz
+2nd place solution write-up,Team "Under a penny", ebouteillon part 🔥 — Conway's Reverse Game of Life 2020
+2nd place solution write-up,Team "Under a penny", ebouteillon part 🔥
+
 Conway's Reverse Game of Life 2020
 
-Reverse the arrow of time in the Game of Life
+Solution Writeup · 2nd place · Dec 1, 2020
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
+First, I would like to thank my teammates @knstqq , @maximim , @robertjohncannell (alphabetical order) for their ideas and work. It was really amazing to work with you guys!
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+During this competition, I tried a lot of different approaches. Here are those giving best results:
 
-Failed to load the discussion topic
+Genetic algorithm using pytorch 🔥
 
-error
+I looked up existing Kaggle notebooks using Genetic Algorithm, but none of them were using a GPU accelerator (sorry if I am wrong and missed one). So I implemented one.
 
-Too many requests to GetWriteUpByTopicId. Please try again later. Learn more about Rate Limits.
+Implementing this genetic algorithm from scratch using pytorch was hard but I learned a lot in the process about genetic algorithm (first purpose), but also on pytorch and how to optimize using NVIDIA Nsight.
 
-error
+This solution performed very well during this competition as the below notebook alone scores in the top-10 leaderboard. This new approach helped improving final solution of our team "Under a Penny".
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Notebook with GA on GPU : Top 10 with First Genetic Algorithm on GPU! 🔥 (version 1 runs 9 hours and scores 0.0450)
+
+Kissat SAT solver for perfect solution
+
+Kaggle's Conway's Reverse Game of Life 2020 can be viewed as a boolean satisfiability problem. I used the kissat SAT solver, which won first place in the main track of the SAT Competition 2020 and first place on unsatisfiable instances.
+
+The tricky part might be to turn the problem into an efficient CNF form, but it was pretty easy in fact using sympy.
+
+Following notebook solves 9532 puzzles (delta=1) in 25 minutes: Perfect Solve of Puzzles using a SAT solver
+
+The drawback of this approach is, it may takes a loooong time for solving some puzzle and bigger the delta, the harder.
+
+Google OR-tools constraints solver
+
+It is also possible to express the problem as a constraints problem. You will find an iterative approach using OR-tool in section "Notebooks Prize attempt" below.
+
+The iterative approach consists in solving the puzzle with delta = 1, then solve again this solution with delta=1 until we did it delta times. It is much faster than solving the problem end-to-end, but it does not always find a solution.
+
+Notebooks Prize attempt
+
+In this competition there is a "Notebooks Prize":
+
+Highest scoring Kaggle Notebook (as determined by Leaderboard submission score). To be eligible for this prize, the Notebook must do the entirety of its computation within the Notebook.
+
+My solution for this was to use the genetic algorithm running on 1-GPU + 1-CPU (pytorch uses a CPU at 100% even if all the work is on GPU) and an iterative solution using OR-tool on 1-CPU. The drawback of this approach is: we only have 2 hours and 2 CPU for a GPU notebook versus 9 hours and 4 CPU for CPU notebooks.
+
+2 hours score: : 0.05353 GA on GPU + OR-tools on CPU2 9 hours score: : 0.0433 (cannot submit due to code limit)
+
+Solution ensembling
+
+Ensembling of solutions was pretty easy. We compute the score for each solution found for a puzzle and then we take the solution scoring the lowest.
+
+Team-up
+
+Teaming with @knstqq , @maximim , @robertjohncannell was a great experience, all keeping the motivation in the team and their solutions to this problem are really amazing. In the end, merging together really is the secret ingredient to get to this position.
+
+Final notes
+
+Team name comes when the team was only @maximim and I .We had the objective to get under the score .01 what we called "a penny".
+
+Thanks for reading. 😄
+
+My teammates write-ups:
+
+@knstqq (opens in a new tab)">write-up of @knstqq
+write-up of @maximim : TBD
+write-up of @robertjohncannell : TBD
+Tagged
+GPU
+Authors
+Eric Bouteillon
+
+ebouteillon
+
+Maximiliano
+
+maximim
+
+Konstantin
+
+knstqq
+
+Robert C
+
+robertjohncannell
+
+arrow_drop_up
+10
+Share
+more_horiz
+Citation
+
+Eric Bouteillon, Maximiliano, Konstantin, Robert C. 2nd place solution write-up,Team "Under a penny", ebouteillon part 🔥. https://www.kaggle.com/competitions/conways-reverse-game-of-life-2020/writeups/under-a-penny-2nd-place-solution-write-up-team-und. 2020. Kaggle
+
+comment
+3 Comments
+Hotness
+Eric Bouteillon
+
+Topic Author
+
+Posted 6 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Hi, You can have a look to my blog post in "Towards Data Science" where I explain the Genetic Algorithm solution: https://towardsdatascience.com/reverse-arrow-of-time-with-genetic-algorithm-and-gpu-1871a7b4fff8
+
+reply
+Reply
+Konstantin
+
+Posted 6 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+9 hours score: : 0.433 (cannot submit due to code limit) 0.0433 may be?
+
+reply
+Reply
+Eric Bouteillon
+
+Topic Author
+
+Posted 6 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks. Fixed.
+
+reply
+Reply

@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/shopee-product-matching/discussion/238362
-fetched: 2026-10-27
-chars: 798
+fetched: 2026-11-03
+chars: 1368
 
 menu
 Skip to
@@ -42,15 +42,44 @@ Models
 Discussion
 Leaderboard
 Rules
+tkm2261 · 2nd in this Competition · Posted 5 years ago
+arrow_drop_up
+45
+more_vert
+2nd Place Solution Code
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Hi all,
 
-error
+In addition to our solution write-up at https://www.kaggle.com/c/shopee-product-matching/discussion/238022, we have just published our submission code here.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+https://www.kaggle.com/lyakaap/2nd-place-solution
 
-Failed to load the discussion topic
+My single part has Public LB: 0.782. After ensembling with lyakaap's GCN (Public LB 0.781) and LGB (Public LB: unknown), it achieves 0.792 in Public LB.
 
-error
+We are also making all datasets public. You should be able to run and modify our code freely. Please let us know if you cannot see some datasets.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Thanks!
+
+TKM
+
+Please sign in to reply to this topic.
+
+comment
+2 Comments
+1 appreciation comment
+Hotness
+
+This comment has been deleted.
+
+Appreciation (1)
+NoMalady
+
+Posted 5 years ago
+
+· 482nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you for sharing your approach : )

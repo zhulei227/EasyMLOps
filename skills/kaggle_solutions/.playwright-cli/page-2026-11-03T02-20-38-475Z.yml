@@ -1,0 +1,667 @@
+- generic [ref=f11e2]:
+  - navigation "Main Kaggle page navigation" [ref=f11e3]:
+    - generic [ref=f11e5]:
+      - button "Navigation menu" [ref=f11e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f11e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f11e10] [cursor=pointer]:
+        - /url: /
+    - button "Create on Kaggle" [ref=f11e12] [cursor=pointer]:
+      - paragraph [ref=f11e18]: Create
+    - generic [ref=f11e21]:
+      - list [ref=f11e22]:
+        - listitem "Home List Item" [ref=f11e23]:
+          - link "Home" [ref=f11e25] [cursor=pointer]:
+            - /url: /
+            - paragraph [ref=f11e31]: Home
+        - listitem "Competitions List Item" [ref=f11e32]:
+          - link "Competitions" [ref=f11e34] [cursor=pointer]:
+            - /url: /competitions
+            - paragraph [ref=f11e40]: Competitions
+        - listitem "Benchmarks List Item" [ref=f11e41]:
+          - link "Benchmarks" [ref=f11e43] [cursor=pointer]:
+            - /url: /benchmarks
+            - paragraph [ref=f11e49]: Benchmarks
+        - listitem "Arenas List Item" [ref=f11e50]:
+          - link "Arenas" [ref=f11e52] [cursor=pointer]:
+            - /url: /arenas
+            - paragraph [ref=f11e58]: Arenas
+        - listitem "Game Arena List Item" [ref=f11e59]:
+          - link "Game Arena" [ref=f11e61] [cursor=pointer]:
+            - /url: /game-arena
+            - paragraph [ref=f11e67]: Game Arena
+      - list [ref=f11e68]:
+        - listitem "Data Hub List Item" [ref=f11e69]:
+          - generic [ref=f11e70]:
+            - link "Data Hub" [ref=f11e71] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f11e77]: Data Hub
+            - button "Expand" [ref=f11e80] [cursor=pointer]
+      - list [ref=f11e82]:
+        - listitem "More on Kaggle List Item" [ref=f11e83]:
+          - generic [ref=f11e84]:
+            - link "More on Kaggle" [ref=f11e85] [cursor=pointer]:
+              - /url: "#"
+              - paragraph [ref=f11e91]: More
+            - button "Expand" [ref=f11e94] [cursor=pointer]
+  - navigation "Main menu, search and your account" [ref=f11e97]:
+    - generic [ref=f11e98]:
+      - generic [ref=f11e102]:
+        - textbox "Search" [ref=f11e104]
+        - group [aria-hidden]
+      - generic [ref=f11e106]:
+        - link [ref=f11e107] [cursor=pointer]:
+          - /url: /account/login?phase=startSignInTab&returnUrl=%2Fc%2Fcoleridgeinitiative-show-us-the-data%2Fdiscussion%2F248253
+          - button "Login" [ref=f11e108]
+        - link [ref=f11e110] [cursor=pointer]:
+          - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fc%2Fcoleridgeinitiative-show-us-the-data%2Fdiscussion%2F248253
+          - button "Sign Up" [ref=f11e111]
+  - main [ref=f11e113]:
+    - generic [ref=f11e115]:
+      - generic [ref=f11e116]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f11e117]:
+        - link "Learn more" [ref=f11e118] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f11e120] [cursor=pointer]: OK, Got it.
+    - generic [ref=f11e123]:
+      - generic [ref=f11e125]:
+        - generic [ref=f11e126]:
+          - link "Coleridge Initiative's profile" [ref=f11e127] [cursor=pointer]:
+            - /url: /organizations/coleridgeinitiative
+            - generic "Coleridge Initiative" [ref=f11e128]
+          - generic [ref=f11e132]:
+            - generic [ref=f11e133]: Coleridge Initiative
+            - generic [ref=f11e135]: · Featured Code Competition · 5 years ago
+          - generic [ref=f11e136]:
+            - button "Late Submission" [disabled] [ref=f11e138]
+            - button "Competition options menu collapsed" [ref=f11e141] [cursor=pointer]: more_horiz
+        - generic [ref=f11e143]:
+          - heading "Coleridge Initiative - Show US the Data" [level=1] [ref=f11e144]
+          - paragraph [ref=f11e146]: Discover how data is used for the public good
+      - generic [ref=f11e150]:
+        - tablist [ref=f11e157]:
+          - tab "Overview, 1 of 7" [ref=f11e158] [cursor=pointer]:
+            - generic [ref=f11e159]: Overview
+          - tab "Data, 2 of 7" [ref=f11e160] [cursor=pointer]:
+            - generic [ref=f11e161]: Data
+          - tab "Code, 3 of 7" [ref=f11e162] [cursor=pointer]:
+            - generic [ref=f11e163]: Code
+          - tab "Models, 4 of 7" [ref=f11e164] [cursor=pointer]:
+            - generic [ref=f11e165]: Models
+          - tab "Discussion, 5 of 7" [selected] [ref=f11e166] [cursor=pointer]:
+            - generic [ref=f11e167]: Discussion
+          - tab "Leaderboard, 6 of 7" [ref=f11e168] [cursor=pointer]:
+            - generic [ref=f11e169]: Leaderboard
+          - tab "Rules, 7 of 7" [ref=f11e170] [cursor=pointer]:
+            - generic [ref=f11e171]: Rules
+        - separator [ref=f11e173]
+      - generic [ref=f11e177]:
+        - generic [ref=f11e178]:
+          - generic [ref=f11e179]:
+            - generic [ref=f11e180]:
+              - link "Nguyen Quan Anh Minh's profile" [ref=f11e181] [cursor=pointer]:
+                - /url: /dathudeptrai
+                - generic "Nguyen Quan Anh Minh" [ref=f11e182]
+              - generic [ref=f11e186]:
+                - link "Nguyen Quan Anh Minh" [ref=f11e187] [cursor=pointer]:
+                  - /url: /dathudeptrai
+                - text: ·
+                - generic [ref=f11e188]: 1st in this Competition
+                - text: ·
+                - generic [ref=f11e189]: Posted 5 years ago
+            - generic [ref=f11e190]:
+              - generic [ref=f11e191]:
+                - button "Upvote" [ref=f11e192] [cursor=pointer]:
+                  - generic [ref=f11e193]: arrow_drop_up
+                - button "80 votes" [ref=f11e194] [cursor=pointer]: "80"
+              - button "More Options for this Topic" [ref=f11e195] [cursor=pointer]: more_vert
+            - 'heading "1st solution: Matching the <MASK>: Context Similarity via Deep Metric Learning and Beyond" [level=3] [ref=f11e196]'
+            - generic [ref=f11e199]:
+              - paragraph [ref=f11e200]:
+                - text: Thanks Kaggle for this exciting competition and our team (@suicaokhoailang). Congrats to me to become Kaggle Master and
+                - link "@suicaokhoailang (opens in a new tab)" [ref=f11e201] [cursor=pointer]:
+                  - /url: /suicaokhoailang
+                  - text: "@suicaokhoailang"
+                - text: to become Kaggle GM. Congratulate all winners -- we have learned a lot from this competition and all winners’ solutions !!.
+              - paragraph [ref=f11e202]
+              - paragraph [ref=f11e203]: "Here Is a summary of my solution:"
+              - list [ref=f11e204]:
+                - listitem [ref=f11e205]: A shared Bert model for extract Context Embedding and Sequence Tokens Embedding.
+                - listitem [ref=f11e206]: An ArcFace Loss for training Mask/NoMask Embedding.
+                - listitem [ref=f11e207]: A BCE loss for training NER model to detect dataset citation in the input string.
+              - paragraph [ref=f11e208]: Bellow is the most important question that we should answer for ourselves before deciding on an approach.
+              - heading "Do we need a context?" [level=3] [ref=f11e209]
+              - paragraph [ref=f11e210]: Yes, a semantic context is very important for this kind of problem. As you can see, there are some solutions that don’t need semantic context and only needs dataset title. But those solutions are only suitable for this contest data since almost the dataset title includes keywords such as Study, Survey, Database, Dataset, … then the dataset title itself is good enough to classify if it’s a real dataset title or not. In this competition, we aim for a general solution that uses a semantic context to detect a dataset citation.
+              - heading "How my model was trained?" [level=3] [ref=f11e211]
+              - list [ref=f11e212]:
+                - listitem [ref=f11e213]: An input text is randomly split into Support Set and Query Set.
+                - listitem [ref=f11e214]:
+                  - text: In Support Set, we use a
+                  - strong [ref=f11e215]: MASK
+                  - text: token to replace all dataset titles in an input text.
+                - listitem [ref=f11e216]:
+                  - text: Pass all input text from Support Set into a BertModel and extract
+                  - strong [ref=f11e217]: MASK
+                  - text: /
+                  - strong [ref=f11e218]: NoMASK
+                  - text: embedding.
+                - listitem [ref=f11e219]: In Query Set, we pass a raw input into a shared BertModel used for Support Set to extract a sequence tokens embedding.
+                - listitem [ref=f11e220]:
+                  - strong [ref=f11e221]: MASK
+                  - text: and
+                  - strong [ref=f11e222]: NoMask
+                  - text: embedding from Support/Query Set is passed into an ArcFace Metric Learning layer.
+                - listitem [ref=f11e223]:
+                  - text: A
+                  - strong [ref=f11e224]: MASK
+                  - text: embedding from the Support Set contains only a semantic context feature is used to calculate l2 norm cosine similarity with every token feature from the input text in the Query Set.
+                - listitem [ref=f11e225]: A l2 norm cosine similarity will range from (-1, 1), we scale it into a range (-10, 10) then apply sigmoid activation before use it for training the NER model via BCE loss.
+              - heading "How to use my trained model for the inference?" [level=3] [ref=f11e226]
+              - list [ref=f11e227]:
+                - listitem [ref=f11e228]:
+                  - text: Pre-extract all
+                  - strong [ref=f11e229]: MASK
+                  - text: embedding from the given training set.
+                - listitem [ref=f11e230]:
+                  - text: Random selection K
+                  - strong [ref=f11e231]: MASK
+                  - text: embedding then average them to obtain the semantic context vector and perform step (6), (7) from the above training process.
+              - heading "Post-Processing" [level=3] [ref=f11e232]
+              - paragraph [ref=f11e233]:
+                - text: As
+                - link "@leecming (opens in a new tab)" [ref=f11e234] [cursor=pointer]:
+                  - /url: /leecming
+                  - text: "@leecming"
+                - text: said in his solution, a dataset is probably referenced by multiple documents so the more frequently they’re referenced, the more likely they’re a hit and not a spurious find. We use a threshold frequency of 2, which means if our model can detect that dataset title twice, we will get that dataset. We choose 2 because, in training data, there are many dataset titles mentioned only 1-2 times, we are afraid in the private dataset, such dataset titles will be many but we seem to be wrong, a higher threshold frequency gives better results on public and private leaderboards.
+              - paragraph [ref=f11e235]: Here is a summary of my solution, there are a few string rules-based that were used but did not affect the final result too much. The final submission is based on an ensemble of allenai/scibert and allenai/biomed_roberta. The code is done on Tensorflow 2.4 with V100 16gb version in AWS EC2.
+              - paragraph [ref=f11e236]:
+                - strong [ref=f11e237]: Inference Kernel
+                - text: ":"
+                - link "https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base (opens in a new tab)" [ref=f11e238] [cursor=pointer]:
+                  - /url: https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base
+                  - text: https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base
+              - heading "Thanks for reading !" [level=5] [ref=f11e239]
+          - separator [ref=f11e240]
+        - generic [ref=f11e241]:
+          - generic [ref=f11e242]:
+            - paragraph [ref=f11e245]:
+              - paragraph [ref=f11e246]:
+                - text: Please
+                - link "sign in opens in new window" [ref=f11e247] [cursor=pointer]:
+                  - /url: /account/login
+                  - text: sign in
+                - text: to reply to this topic.
+            - separator [ref=f11e248]
+          - generic [ref=f11e250]:
+            - generic [ref=f11e251]:
+              - generic [aria-hidden] [ref=f11e252]: comment
+              - generic [ref=f11e253]:
+                - heading "22 Comments" [level=2] [ref=f11e254]
+                - link "Go To Appreciation Comments (1 total)" [ref=f11e255] [cursor=pointer]:
+                  - /url: /c/coleridgeinitiative-show-us-the-data/discussion/248253#appreciation
+                  - text: 1 appreciation comment
+            - generic [ref=f11e258]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f11e259] [cursor=pointer]:
+                - generic [ref=f11e260]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f11e262]:
+            - generic [ref=f11e263]:
+              - generic [ref=f11e267]:
+                - link "laxman kusuma's profile" [ref=f11e268] [cursor=pointer]:
+                  - /url: /laxmankusuma
+                  - generic "laxman kusuma" [ref=f11e269]
+                - generic [ref=f11e275]:
+                  - link [ref=f11e277] [cursor=pointer]:
+                    - /url: /laxmankusuma
+                    - heading "laxman kusuma" [level=3] [ref=f11e278]
+                  - generic [ref=f11e279]:
+                    - paragraph [ref=f11e280]: Posted 5 years ago
+                    - paragraph [ref=f11e282]: · 322nd in this Competition
+                - generic [ref=f11e284]:
+                  - generic [ref=f11e285]:
+                    - button "Upvote" [ref=f11e286] [cursor=pointer]:
+                      - generic [ref=f11e287]: arrow_drop_up
+                    - button "1 votes" [ref=f11e288] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e289] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e293]: Nice, congratulations…
+              - separator [ref=f11e294]
+            - generic [ref=f11e295]:
+              - generic [ref=f11e299]:
+                - link "Samarth Gupta's profile" [ref=f11e300] [cursor=pointer]:
+                  - /url: /samarthgupta39
+                  - generic "Samarth Gupta" [ref=f11e301]
+                - generic [ref=f11e307]:
+                  - link [ref=f11e309] [cursor=pointer]:
+                    - /url: /samarthgupta39
+                    - heading "Samarth Gupta" [level=3] [ref=f11e310]
+                  - paragraph [ref=f11e312]: Posted 5 years ago
+                - generic [ref=f11e314]:
+                  - generic [ref=f11e315]:
+                    - button "Upvote" [ref=f11e316] [cursor=pointer]:
+                      - generic [ref=f11e317]: arrow_drop_up
+                    - button "1 votes" [ref=f11e318] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e319] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e323]: Nice solution, Congratulations!!
+              - separator [ref=f11e324]
+            - generic [ref=f11e325]:
+              - generic [ref=f11e329]:
+                - link "Antonio's profile" [ref=f11e330] [cursor=pointer]:
+                  - /url: /antonmaster007
+                  - generic "Antonio" [ref=f11e331]
+                - generic [ref=f11e337]:
+                  - link [ref=f11e339] [cursor=pointer]:
+                    - /url: /antonmaster007
+                    - heading "Antonio" [level=3] [ref=f11e340]
+                  - generic [ref=f11e341]:
+                    - paragraph [ref=f11e342]: Posted 5 years ago
+                    - paragraph [ref=f11e344]: · 12th in this Competition
+                - generic [ref=f11e346]:
+                  - generic [ref=f11e347]:
+                    - button "Upvote" [ref=f11e348] [cursor=pointer]:
+                      - generic [ref=f11e349]: arrow_drop_up
+                    - button "1 votes" [ref=f11e350] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e351] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e355]: Interesting solution, congrats!
+              - separator [ref=f11e356]
+            - generic [ref=f11e357]:
+              - generic [ref=f11e361]:
+                - link "caochanhduong's profile" [ref=f11e362] [cursor=pointer]:
+                  - /url: /duongprovipvip
+                  - generic "caochanhduong" [ref=f11e363]
+                - generic [ref=f11e369]:
+                  - link [ref=f11e371] [cursor=pointer]:
+                    - /url: /duongprovipvip
+                    - heading "caochanhduong" [level=3] [ref=f11e372]
+                  - paragraph [ref=f11e374]: Posted 5 years ago
+                - generic [ref=f11e376]:
+                  - generic [ref=f11e377]:
+                    - button "Upvote" [ref=f11e378] [cursor=pointer]:
+                      - generic [ref=f11e379]: arrow_drop_up
+                    - button "1 votes" [ref=f11e380] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e381] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e385]: Congrats! Nice solution!
+              - separator [ref=f11e386]
+            - generic [ref=f11e387]:
+              - generic [ref=f11e391]:
+                - link "MaChaogong's profile" [ref=f11e392] [cursor=pointer]:
+                  - /url: /mcggood
+                  - generic "MaChaogong" [ref=f11e393]
+                - generic [ref=f11e399]:
+                  - link [ref=f11e401] [cursor=pointer]:
+                    - /url: /mcggood
+                    - heading "MaChaogong" [level=3] [ref=f11e402]
+                  - paragraph [ref=f11e404]: Posted 5 years ago
+                - generic [ref=f11e406]:
+                  - generic [ref=f11e407]:
+                    - button "Upvote" [ref=f11e408] [cursor=pointer]:
+                      - generic [ref=f11e409]: arrow_drop_up
+                    - button "1 votes" [ref=f11e410] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e411] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e415]: Congrats and nice solution !
+              - separator [ref=f11e416]
+            - generic [ref=f11e417]:
+              - generic [ref=f11e421]:
+                - link "InnerVoice's profile" [ref=f11e422] [cursor=pointer]:
+                  - /url: /adityakumarsinha
+                  - generic "InnerVoice" [ref=f11e423]
+                - generic [ref=f11e429]:
+                  - link [ref=f11e431] [cursor=pointer]:
+                    - /url: /adityakumarsinha
+                    - heading "InnerVoice" [level=3] [ref=f11e432]
+                  - generic [ref=f11e433]:
+                    - paragraph [ref=f11e434]: Posted 5 years ago
+                    - paragraph [ref=f11e436]: · 530th in this Competition
+                - generic [ref=f11e438]:
+                  - generic [ref=f11e439]:
+                    - button "Upvote" [ref=f11e440] [cursor=pointer]:
+                      - generic [ref=f11e441]: arrow_drop_up
+                    - button "1 votes" [ref=f11e442] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e443] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e447]: "Just to understand few things: Is purpose of ARcFace loss is to ensure that embeddings for mask and statement from same document should be similar. What is the shape of Mask/No mask embeddings? Trying to understand. Any description around intuition will help. Your solution is quite innovative."
+                - generic [ref=f11e453]:
+                  - link "Nguyen Quan Anh Minh's profile" [ref=f11e454] [cursor=pointer]:
+                    - /url: /dathudeptrai
+                    - generic "Nguyen Quan Anh Minh" [ref=f11e455]
+                  - generic [ref=f11e461]:
+                    - generic [ref=f11e462]:
+                      - link [ref=f11e463] [cursor=pointer]:
+                        - /url: /dathudeptrai
+                        - heading "Nguyen Quan Anh Minh" [level=3] [ref=f11e464]
+                      - paragraph [ref=f11e467]: Topic Author
+                    - generic [ref=f11e468]:
+                      - paragraph [ref=f11e469]: Posted 5 years ago
+                      - paragraph [ref=f11e471]: · 1st in this Competition
+                  - generic [ref=f11e473]:
+                    - generic [ref=f11e474]:
+                      - button "Upvote" [ref=f11e475] [cursor=pointer]:
+                        - generic [ref=f11e476]: arrow_drop_up
+                      - button "2 votes" [ref=f11e477] [cursor=pointer]: "2"
+                    - button "More Options for this Comment" [ref=f11e478] [cursor=pointer]: more_vert
+                  - paragraph [ref=f11e482]:
+                    - text: Hi
+                    - link "@adityakumarsinha (opens in a new tab)" [ref=f11e483] [cursor=pointer]:
+                      - /url: /adityakumarsinha
+                      - text: "@adityakumarsinha"
+                    - text: ", the purpose of Arcface loss is to ensure that the embeddings for the MASK from all positive samples are similar. The shape of Mask/NoMask Embedding is [B, F], which is an average feature of all MASK/NoMASK token in the input text."
+              - separator [ref=f11e484]
+            - generic [ref=f11e485]:
+              - generic [ref=f11e489]:
+                - link "Nguyen Duc Dung's profile" [ref=f11e490] [cursor=pointer]:
+                  - /url: /nddung
+                  - generic "Nguyen Duc Dung" [ref=f11e491]
+                - generic [ref=f11e497]:
+                  - link [ref=f11e499] [cursor=pointer]:
+                    - /url: /nddung
+                    - heading "Nguyen Duc Dung" [level=3] [ref=f11e500]
+                  - paragraph [ref=f11e502]: Posted 5 years ago
+                - generic [ref=f11e504]:
+                  - generic [ref=f11e505]:
+                    - button "Upvote" [ref=f11e506] [cursor=pointer]:
+                      - generic [ref=f11e507]: arrow_drop_up
+                    - button "1 votes" [ref=f11e508] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e509] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e513]: great work. hope to collaborate with you again soon ^^
+              - separator [ref=f11e514]
+            - generic [ref=f11e515]:
+              - generic [ref=f11e519]:
+                - link "KhanhVD's profile" [ref=f11e520] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f11e521]
+                - generic [ref=f11e527]:
+                  - link [ref=f11e529] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f11e530]
+                  - generic [ref=f11e531]:
+                    - paragraph [ref=f11e532]: Posted 5 years ago
+                    - paragraph [ref=f11e534]: · 262nd in this Competition
+                - generic [ref=f11e536]:
+                  - generic [ref=f11e537]:
+                    - button "Upvote" [ref=f11e538] [cursor=pointer]:
+                      - generic [ref=f11e539]: arrow_drop_up
+                    - button "1 votes" [ref=f11e540] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e541] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e545]: Wow amazing solution! Thanks for sharing!
+              - separator [ref=f11e546]
+            - generic [ref=f11e547]:
+              - generic [ref=f11e551]:
+                - link "KhanhVD's profile" [ref=f11e552] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f11e553]
+                - generic [ref=f11e559]:
+                  - link [ref=f11e561] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f11e562]
+                  - generic [ref=f11e563]:
+                    - paragraph [ref=f11e564]: Posted 5 years ago
+                    - paragraph [ref=f11e566]: · 262nd in this Competition
+                - generic [ref=f11e568]:
+                  - generic [ref=f11e569]:
+                    - button "Upvote" [ref=f11e570] [cursor=pointer]:
+                      - generic [ref=f11e571]: arrow_drop_up
+                    - button "1 votes" [ref=f11e572] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f11e573] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e577]: Nghỉ mấy hôm rồi quay lại nhanh nha :))
+              - separator [ref=f11e578]
+            - generic [ref=f11e579]:
+              - generic [ref=f11e583]:
+                - link "Nguyen Quan Anh Minh's profile" [ref=f11e584] [cursor=pointer]:
+                  - /url: /dathudeptrai
+                  - generic "Nguyen Quan Anh Minh" [ref=f11e585]
+                - generic [ref=f11e591]:
+                  - generic [ref=f11e592]:
+                    - link [ref=f11e593] [cursor=pointer]:
+                      - /url: /dathudeptrai
+                      - heading "Nguyen Quan Anh Minh" [level=3] [ref=f11e594]
+                    - paragraph [ref=f11e597]: Topic Author
+                  - generic [ref=f11e598]:
+                    - paragraph [ref=f11e599]: Posted 5 years ago
+                    - paragraph [ref=f11e601]: · 1st in this Competition
+                - generic [ref=f11e603]:
+                  - generic [ref=f11e604]:
+                    - button "Upvote" [ref=f11e605] [cursor=pointer]:
+                      - generic [ref=f11e606]: arrow_drop_up
+                    - button "0 votes" [ref=f11e607] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e608] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e612]:
+                  - text: "Update: Surprisingly, remove the label from scispacy got a better result (0.588 on private), we should trust only our model :D."
+                  - link "https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base (opens in a new tab)" [ref=f11e613] [cursor=pointer]:
+                    - /url: https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base
+                    - text: https://www.kaggle.com/dathudeptrai/biomed-roberta-scibert-base
+              - separator [ref=f11e614]
+            - generic [ref=f11e615]:
+              - generic [ref=f11e619]:
+                - link "Ramesh Makwana's profile" [ref=f11e620] [cursor=pointer]:
+                  - /url: /ramesh084
+                  - generic "Ramesh Makwana" [ref=f11e621]
+                - generic [ref=f11e627]:
+                  - link [ref=f11e629] [cursor=pointer]:
+                    - /url: /ramesh084
+                    - heading "Ramesh Makwana" [level=3] [ref=f11e630]
+                  - paragraph [ref=f11e632]: Posted 5 years ago
+                - generic [ref=f11e634]:
+                  - generic [ref=f11e635]:
+                    - button "Upvote" [ref=f11e636] [cursor=pointer]:
+                      - generic [ref=f11e637]: arrow_drop_up
+                    - button "0 votes" [ref=f11e638] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e639] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e643]: Congratulations!
+              - separator [ref=f11e644]
+            - generic [ref=f11e645]:
+              - generic [ref=f11e649]:
+                - link "Theo Viel's profile" [ref=f11e650] [cursor=pointer]:
+                  - /url: /theoviel
+                  - generic "Theo Viel" [ref=f11e651]
+                - generic [ref=f11e657]:
+                  - link [ref=f11e659] [cursor=pointer]:
+                    - /url: /theoviel
+                    - heading "Theo Viel" [level=3] [ref=f11e660]
+                  - generic [ref=f11e661]:
+                    - paragraph [ref=f11e662]: Posted 5 years ago
+                    - paragraph [ref=f11e664]: · 44th in this Competition
+                - generic [ref=f11e666]:
+                  - generic [ref=f11e667]:
+                    - button "Upvote" [ref=f11e668] [cursor=pointer]:
+                      - generic [ref=f11e669]: arrow_drop_up
+                    - button "0 votes" [ref=f11e670] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e671] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e675]:
+                  - text: Very cool solution
+                  - link "@dathudeptrai (opens in a new tab)" [ref=f11e676] [cursor=pointer]:
+                    - /url: /dathudeptrai
+                    - text: "@dathudeptrai"
+                  - text: ", congratz on the win !"
+                - generic [ref=f11e682]:
+                  - link "Nguyen Quan Anh Minh's profile" [ref=f11e683] [cursor=pointer]:
+                    - /url: /dathudeptrai
+                    - generic "Nguyen Quan Anh Minh" [ref=f11e684]
+                  - generic [ref=f11e690]:
+                    - generic [ref=f11e691]:
+                      - link [ref=f11e692] [cursor=pointer]:
+                        - /url: /dathudeptrai
+                        - heading "Nguyen Quan Anh Minh" [level=3] [ref=f11e693]
+                      - paragraph [ref=f11e696]: Topic Author
+                    - generic [ref=f11e697]:
+                      - paragraph [ref=f11e698]: Posted 5 years ago
+                      - paragraph [ref=f11e700]: · 1st in this Competition
+                  - generic [ref=f11e702]:
+                    - generic [ref=f11e703]:
+                      - button "Upvote" [ref=f11e704] [cursor=pointer]:
+                        - generic [ref=f11e705]: arrow_drop_up
+                      - button "1 votes" [ref=f11e706] [cursor=pointer]: "1"
+                    - button "More Options for this Comment" [ref=f11e707] [cursor=pointer]: more_vert
+                  - paragraph [ref=f11e711]:
+                    - text: Thanks
+                    - link "@theoviel (opens in a new tab)" [ref=f11e712] [cursor=pointer]:
+                      - /url: /theoviel
+                      - text: "@theoviel"
+                    - text: ", hope to work with you again soon :D"
+              - separator [ref=f11e713]
+            - generic [ref=f11e714]:
+              - generic [ref=f11e718]:
+                - link "rin2401's profile" [ref=f11e719] [cursor=pointer]:
+                  - /url: /rin2401
+                  - generic "rin2401" [ref=f11e720]
+                - generic [ref=f11e726]:
+                  - link [ref=f11e728] [cursor=pointer]:
+                    - /url: /rin2401
+                    - heading "rin2401" [level=3] [ref=f11e729]
+                  - paragraph [ref=f11e731]: Posted 5 years ago
+                - generic [ref=f11e733]:
+                  - generic [ref=f11e734]:
+                    - button "Upvote" [ref=f11e735] [cursor=pointer]:
+                      - generic [ref=f11e736]: arrow_drop_up
+                    - button "0 votes" [ref=f11e737] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e738] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e742]: Congrats 💪
+              - separator [ref=f11e743]
+            - generic [ref=f11e744]:
+              - generic [ref=f11e748]:
+                - link "Quan Nguyen's profile" [ref=f11e749] [cursor=pointer]:
+                  - /url: /quanbk
+                  - generic "Quan Nguyen" [ref=f11e750]
+                - generic [ref=f11e756]:
+                  - link [ref=f11e758] [cursor=pointer]:
+                    - /url: /quanbk
+                    - heading "Quan Nguyen" [level=3] [ref=f11e759]
+                  - paragraph [ref=f11e761]: Posted 5 years ago
+                - generic [ref=f11e763]:
+                  - generic [ref=f11e764]:
+                    - button "Upvote" [ref=f11e765] [cursor=pointer]:
+                      - generic [ref=f11e766]: arrow_drop_up
+                    - button "0 votes" [ref=f11e767] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e768] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e772]: "Amazing work 😍! Congrats P/s: rep me idol Anh Minh"
+                - generic [ref=f11e778]:
+                  - link "Nguyen Quan Anh Minh's profile" [ref=f11e779] [cursor=pointer]:
+                    - /url: /dathudeptrai
+                    - generic "Nguyen Quan Anh Minh" [ref=f11e780]
+                  - generic [ref=f11e786]:
+                    - generic [ref=f11e787]:
+                      - link [ref=f11e788] [cursor=pointer]:
+                        - /url: /dathudeptrai
+                        - heading "Nguyen Quan Anh Minh" [level=3] [ref=f11e789]
+                      - paragraph [ref=f11e792]: Topic Author
+                    - generic [ref=f11e793]:
+                      - paragraph [ref=f11e794]: Posted 5 years ago
+                      - paragraph [ref=f11e796]: · 1st in this Competition
+                  - generic [ref=f11e798]:
+                    - generic [ref=f11e799]:
+                      - button "Upvote" [ref=f11e800] [cursor=pointer]:
+                        - generic [ref=f11e801]: arrow_drop_up
+                      - button "0 votes" [ref=f11e802] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f11e803] [cursor=pointer]: more_vert
+                  - paragraph [ref=f11e807]:
+                    - link "@quanbk (opens in a new tab)" [ref=f11e808] [cursor=pointer]:
+                      - /url: /quanbk
+                      - text: "@quanbk"
+                    - text: Thanks, hope we can work together in the future :)))
+              - separator [ref=f11e809]
+            - generic [ref=f11e810]:
+              - generic [ref=f11e814]:
+                - link "youzi's profile" [ref=f11e815] [cursor=pointer]:
+                  - /url: /youzi2016
+                  - generic "youzi" [ref=f11e816]
+                - generic [ref=f11e822]:
+                  - link [ref=f11e824] [cursor=pointer]:
+                    - /url: /youzi2016
+                    - heading "youzi" [level=3] [ref=f11e825]
+                  - generic [ref=f11e826]:
+                    - paragraph [ref=f11e827]: Posted 5 years ago
+                    - paragraph [ref=f11e829]: · 53rd in this Competition
+                - generic [ref=f11e831]:
+                  - generic [ref=f11e832]:
+                    - button "Upvote" [ref=f11e833] [cursor=pointer]:
+                      - generic [ref=f11e834]: arrow_drop_up
+                    - button "0 votes" [ref=f11e835] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e836] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e840]: Congrats to the 1st place.
+              - separator [ref=f11e841]
+            - generic [ref=f11e842]:
+              - generic [ref=f11e846]:
+                - link "( ͡° ͜ʖ ͡°)'s profile" [ref=f11e847] [cursor=pointer]:
+                  - /url: /truonghoang
+                  - generic "( ͡° ͜ʖ ͡°)" [ref=f11e848]
+                - generic [ref=f11e854]:
+                  - link [ref=f11e856] [cursor=pointer]:
+                    - /url: /truonghoang
+                    - heading "( ͡° ͜ʖ ͡°)" [level=3] [ref=f11e857]
+                  - generic [ref=f11e858]:
+                    - paragraph [ref=f11e859]: Posted 5 years ago
+                    - paragraph [ref=f11e861]: · 26th in this Competition
+                - generic [ref=f11e863]:
+                  - generic [ref=f11e864]:
+                    - button "Upvote" [ref=f11e865] [cursor=pointer]:
+                      - generic [ref=f11e866]: arrow_drop_up
+                    - button "0 votes" [ref=f11e867] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e868] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e872]: Congrats ✊
+              - separator [ref=f11e873]
+            - generic [ref=f11e874]:
+              - generic [ref=f11e878]:
+                - link "Chun Ming Lee's profile" [ref=f11e879] [cursor=pointer]:
+                  - /url: /leecming
+                  - generic "Chun Ming Lee" [ref=f11e880]
+                - generic [ref=f11e886]:
+                  - link [ref=f11e888] [cursor=pointer]:
+                    - /url: /leecming
+                    - heading "Chun Ming Lee" [level=3] [ref=f11e889]
+                  - generic [ref=f11e890]:
+                    - paragraph [ref=f11e891]: Posted 5 years ago
+                    - paragraph [ref=f11e893]: · 2nd in this Competition
+                - generic [ref=f11e895]:
+                  - generic [ref=f11e896]:
+                    - button "Upvote" [ref=f11e897] [cursor=pointer]:
+                      - generic [ref=f11e898]: arrow_drop_up
+                    - button "0 votes" [ref=f11e899] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e900] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e904]: Congrats on your hardwork paying off!
+              - separator [ref=f11e905]
+            - generic [ref=f11e906]:
+              - generic [ref=f11e910]:
+                - link "Khuong T G Hieu's profile" [ref=f11e911] [cursor=pointer]:
+                  - /url: /ktgiahieu
+                  - generic "Khuong T G Hieu" [ref=f11e912]
+                - generic [ref=f11e918]:
+                  - link [ref=f11e920] [cursor=pointer]:
+                    - /url: /ktgiahieu
+                    - heading "Khuong T G Hieu" [level=3] [ref=f11e921]
+                  - generic [ref=f11e922]:
+                    - paragraph [ref=f11e923]: Posted 5 years ago
+                    - paragraph [ref=f11e925]: · 629th in this Competition
+                - generic [ref=f11e927]:
+                  - generic [ref=f11e928]:
+                    - button "Upvote" [ref=f11e929] [cursor=pointer]:
+                      - generic [ref=f11e930]: arrow_drop_up
+                    - button "0 votes" [ref=f11e931] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f11e932] [cursor=pointer]: more_vert
+                - paragraph [ref=f11e936]: Congratulations! Cố lên anh ơi!
+              - separator [ref=f11e937]
+          - generic [ref=f11e938]:
+            - heading "Appreciation (1)" [level=2] [ref=f11e940]
+            - generic [ref=f11e945]:
+              - link "Nguyen Quan Anh Minh's profile" [ref=f11e946] [cursor=pointer]:
+                - /url: /dathudeptrai
+                - generic "Nguyen Quan Anh Minh" [ref=f11e947]
+              - generic [ref=f11e953]:
+                - generic [ref=f11e954]:
+                  - link [ref=f11e955] [cursor=pointer]:
+                    - /url: /dathudeptrai
+                    - heading "Nguyen Quan Anh Minh" [level=3] [ref=f11e956]
+                  - paragraph [ref=f11e959]: Topic Author
+                - generic [ref=f11e960]:
+                  - paragraph [ref=f11e961]: Posted 5 years ago
+                  - paragraph [ref=f11e963]: · 1st in this Competition
+              - generic [ref=f11e965]:
+                - generic [ref=f11e966]:
+                  - button "Upvote" [ref=f11e967] [cursor=pointer]:
+                    - generic [ref=f11e968]: arrow_drop_up
+                  - button "0 votes" [ref=f11e969] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f11e970] [cursor=pointer]: more_vert
+              - paragraph [ref=f11e974]:
+                - text: Thanks
+                - link "@suicaokhoailang (opens in a new tab)" [ref=f11e975] [cursor=pointer]:
+                  - /url: /suicaokhoailang
+                  - text: "@suicaokhoailang"
+                - text: :D.
+  - alert [ref=f11e978]

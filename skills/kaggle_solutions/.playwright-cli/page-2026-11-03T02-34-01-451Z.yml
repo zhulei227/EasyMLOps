@@ -1,0 +1,829 @@
+- generic [ref=f37e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f37e3]:
+    - generic [ref=f37e5]:
+      - button "Navigation menu" [ref=f37e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f37e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f37e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f37e14]:
+      - link [ref=f37e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fieee-fraud-detection%2Fwriteups%2F2-uncles-and-3-puppies-2nd-solution-cpmp-view
+        - button "Login" [ref=f37e16]
+      - link [ref=f37e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fieee-fraud-detection%2Fwriteups%2F2-uncles-and-3-puppies-2nd-solution-cpmp-view
+        - button "Sign Up" [ref=f37e19]
+  - main [ref=f37e21]:
+    - generic [ref=f37e23]:
+      - generic [ref=f37e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f37e25]:
+        - link "Learn more" [ref=f37e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f37e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f37e29]:
+      - generic [ref=f37e31]: 2nd Solution, CPMP View — IEEE-CIS Fraud Detection
+      - separator [ref=f37e32]
+      - generic [ref=f37e34]:
+        - generic [ref=f37e35]:
+          - heading "2nd Solution, CPMP View" [level=1] [ref=f37e36]
+          - generic [ref=f37e37]:
+            - link [ref=f37e38] [cursor=pointer]:
+              - /url: /competitions/ieee-fraud-detection
+              - paragraph [ref=f37e40]: IEEE-CIS Fraud Detection
+            - paragraph [ref=f37e41]: Solution Writeup · 2nd place · Oct 8, 2019
+        - separator [ref=f37e43]
+        - generic [ref=f37e44]:
+          - generic [ref=f37e46]:
+            - paragraph [ref=f37e47]:
+              - text: When Giba and I joined the team,
+              - link "@sggpls (opens in a new tab)" [ref=f37e48] [cursor=pointer]:
+                - /url: /sggpls
+                - text: "@sggpls"
+              - link "@tony321 (opens in a new tab)" [ref=f37e49] [cursor=pointer]:
+                - /url: /tony321
+                - text: "@tony321"
+              - text: and
+              - link "@krivoship (opens in a new tab)" [ref=f37e50] [cursor=pointer]:
+                - /url: /krivoship
+                - text: "@krivoship"
+              - text: already had a solid position in top 10 and there were less than 10 days left. It is hard to add value in this case, and I decided to focus on adding diversity to the models they were blending. For that I started my own dataset and borrowed bits of theirs. Let me describe the steps I took.
+            - paragraph [ref=f37e51]:
+              - strong [ref=f37e52]: Data Cleaning
+              - text: The data was a bit similar to Malware, with time stamped observations, and many features with lots of values present in test and not in train. I screened all features by looking at train vs test distributions, for raw feature and also frequency encoding of features. Here is an example for
+              - code [ref=f37e53]: card1
+              - text: .
+              - img "card1 plot" [ref=f37e54]
+              - text: Raw data is used on the left column, and feature encoding of it in the right column. Red is train, blue is test. Left row x axis is
+              - code [ref=f37e55]: card1
+              - text: . Top left y axis is frequency. Top left show frequency of each card1 value in train (red) and test (blue). Bottom left y axis is mean of target with a log transform. 0 is the average for train. Right column is the same, except card1 is replaced by log of its frequency.
+            - paragraph [ref=f37e56]: We see that lots of card1 values only appear in test. If we use it directly it will lead to major drop in private LB. We also see that frequency encoding of card1 looks more balanced across train and test. FOr this feature I discarded the original one and kept the frequency encoding.
+            - paragraph [ref=f37e57]: I did not merge values as I did in Malware, for lack of time. I am not sure it would have helped a lot, in hindsight.
+            - paragraph [ref=f37e58]:
+              - strong [ref=f37e59]: Cross Validation
+            - paragraph [ref=f37e60]: Cross validation for time series is always tricky. Here is what I ended up with. I tried to mimic the fact that there is a significant time gap between train and test, and also that test can be several months away from train.
+            - paragraph [ref=f37e61]: I run these folds, using months starting with with 0. The | indicates the train/val split 0 | 2 3 4 5 6 0 1 | 3 4 5 6 0 1 2 | 4 5 6 0 1 2 3 | 5 6 This makes me train 4 models for a given model type. I then average the auc score of each of these models on the corresponding validation data. This scheme or some variants were reused by my team mates for validating their models. The advantage is that we have folds that test long term forecast.
+            - paragraph [ref=f37e62]: I used this CV to evaluate features, to evaluate HPO, and for feature selection. For submission I tried two ways. One, to extrapolate the number of trees from the CV runs. I just ran a linear regression on the log of trees, and predicted the value for full train. I also tried to use an unshuffled 8 fold CV and average all fold model predictions for test. Both ways were giving similar LB score. I probably have used both and blend the result, but I didn't…
+            - paragraph [ref=f37e63]:
+              - strong [ref=f37e64]: Feature Engineering
+            - paragraph [ref=f37e65]:
+              - text: I started by computing frequency encoding of all features, then used lightgbm with the above cross validation to select features using
+              - link "permutation importance (opens in a new tab)" [ref=f37e66] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/107877#latest-635386
+                - text: permutation importance
+              - text: "with some modification: I kept a feature only if permuting it did not improve any of the 4 model predictions. This removed some features. I repeated the process, using permutation importance to remove features until the feature list does not shrink anymore. With this I got 0.942 on public LB."
+            - paragraph [ref=f37e67]: "The next level was to look for user id, and this is when I teamed. I was hoping my new team mates had sorted out the user id puzzle. They did. They actually had a number of different uids. I selected two of them defined as follows:"
+            - code [ref=f37e69]:
+              - generic [ref=f37e70]: "data['uid1']` = (data.day - data.D1).astype(str) +'_' + \\"
+              - generic [ref=f37e71]: data.P_emaildomain.astype(str)
+              - generic [ref=f37e72]: data['uid2'] = (data.card1.astype(str) +'_' + \
+              - generic [ref=f37e73]: data.addr1.astype(str) +'_' + \
+              - text: (
+              - generic [ref=f37e74]: data.day - data.D1).astype(str) +'_' + \
+              - generic [ref=f37e75]: data.P_emaildomain.astype(str))
+            - paragraph [ref=f37e76]:
+              - text: where
+              - code [ref=f37e77]: data.day
+              - text: is the number of days since the beginning, computed from
+              - code [ref=f37e78]: TransactionDT
+              - text: .
+            - paragraph [ref=f37e79]: "I did not want to use these user ids directly for fear of overfitting (in hindsight this was a mistake, and in my last sub I just ran catboost using these as features and it led to my best sub). I rather used these uids to compute aggregate features from the sequence of time intervals for transactions for a given uid, and also for teh transaction amount. Here is one way I used:"
+            - code [ref=f37e81]: "def add_gr(data, col): cols = data.columns gr = data.groupby(col) data[col+'_count'] = gr.TransactionID.transform('count').astype('int32') data[col+'_next_dt'] = gr.TransactionDT.shift(-1) data[col+'_next_dt'] -= data.TransactionDT data[col+'_mean_dt'] = gr[col+'_next_dt'].transform('mean').astype('float32') data[col+'_std_dt'] = gr[col+'_next_dt'].transform('std').astype('float32') data[col+'_median_dt'] = gr[col+'_next_dt'].transform('median').astype('float32') data[col+'_next_amt'] = gr.TransactionAmt.shift(-1) data[col+'_mean_amt'] = gr.TransactionAmt.transform('mean').astype('float32') data[col+'_std_amt'] = gr.TransactionAmt.transform('std').astype('float32') data[col+'_median_amt'] = gr.TransactionAmt.transform('median').astype('float32') new_cols = list(set(data.columns) - set(cols) -set([col+'_next_dt'])) return new_cols"
+            - paragraph [ref=f37e82]:
+              - text: where col is one of
+              - code [ref=f37e83]: uid1
+              - text: or
+              - code [ref=f37e84]: uid2
+              - text: .
+            - paragraph [ref=f37e85]: With these I got 0.952 public LB.
+            - paragraph [ref=f37e86]:
+              - text: Another significant improvement was to use target encoding of these uids and a set of transaction chains that my team mates derieed by combining uids with additional feature columns that represent successive transaction amounts, eg
+              - code [ref=f37e87]: V307
+              - text: . This moved my lgb model to 0.9606 public LB unless mistaken.
+            - paragraph [ref=f37e88]: I added few other features that improved a bit, but nothing very important.
+            - paragraph [ref=f37e89]:
+              - strong [ref=f37e90]: Final Blend
+            - paragraph [ref=f37e91]: "I mostly used lightgbm, but I also tried xgboost and catboost. XGboost was giving models extremely close to lgb, with both very high correlation in predictions and similar LB score. My features were added my team mates already very good models, yielding even higher scores: Giba had one at 0.9644, and my Russian team mates had models up to 0.9626. Giba then used his blending magic to reach 0.9662 public LB the day of original deadline. We then wondered about what could yield us the extra 0.001 we needed to reach prize zone. We realized we were not using the main property of the dataset: if a card is a fraud at some point, then it is a fraud in the future of that point. Well Giba captured that partially with some lag variables, but that was it. We then added some post processing that overrides predictions if a card is a fraud in the past, and this moved us to 0.9672 at the last minute."
+            - paragraph [ref=f37e92]:
+              - strong [ref=f37e93]: What did not work
+            - paragraph [ref=f37e94]: "Many things, but the one I spent most time on what to try to leverage the fact that if a card is a fraud at some point, then it is a fraud in the future of that point. I didn't want to use post processing as it can lead to overfitting if the card ids are not perfect. Indeed, if one of our id actually covers several cards, then one fraud isn't necessarily followed by all frauds. I therefore tried this: Create one submission. Then for each uid create a lag variable equal to the average of predictions before the current point, and train again. This is like stacking, but with a temporal shift. This did not work, CV skyrocketed, but LB dropped by 0.01. I still think there is something to be done to make it work, but I could not find how."
+            - paragraph [ref=f37e95]:
+              - strong [ref=f37e96]: What worked
+            - paragraph [ref=f37e97]:
+              - text: Teaming. See
+              - link "here (opens in a new tab)" [ref=f37e98] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111159
+                - text: here
+              - text: for more details.
+            - paragraph [ref=f37e99]: It is clear that 3 + 1 + 1 > 5 here. If you have never teamed then try, you will not regret it.
+            - paragraph [ref=f37e100]: "Edit: Additional information about our solution can be found in these two posts:"
+            - paragraph [ref=f37e101]:
+              - text: "How to find card ids:"
+              - link "https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559 (opens in a new tab)" [ref=f37e102] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559
+                - text: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559
+              - text: "The whole team story:"
+              - link "https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554 (opens in a new tab)" [ref=f37e103] [cursor=pointer]:
+                - /url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554
+                - text: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554
+          - generic [ref=f37e104]:
+            - generic [ref=f37e105]:
+              - text: Authors
+              - generic [ref=f37e106]:
+                - link "Sergey Bryansky's profile" [ref=f37e107] [cursor=pointer]:
+                  - /url: /sggpls
+                  - generic "Sergey Bryansky" [ref=f37e108]
+                - generic [ref=f37e112]:
+                  - link "Sergey Bryansky" [ref=f37e113] [cursor=pointer]:
+                    - /url: /sggpls
+                  - paragraph [ref=f37e114]: sggpls
+              - generic [ref=f37e115]:
+                - link "Tony's profile" [ref=f37e116] [cursor=pointer]:
+                  - /url: /tony321
+                  - generic "Tony" [ref=f37e117]
+                - generic [ref=f37e121]:
+                  - link "Tony" [ref=f37e122] [cursor=pointer]:
+                    - /url: /tony321
+                  - paragraph [ref=f37e123]: tony321
+              - generic [ref=f37e124]:
+                - link "krivoship's profile" [ref=f37e125] [cursor=pointer]:
+                  - /url: /krivoship
+                  - generic "krivoship" [ref=f37e126]
+                - generic [ref=f37e130]:
+                  - link "krivoship" [ref=f37e131] [cursor=pointer]:
+                    - /url: /krivoship
+                  - paragraph [ref=f37e132]: krivoship
+              - generic [ref=f37e133]:
+                - link "CPMP's profile" [ref=f37e134] [cursor=pointer]:
+                  - /url: /cpmpml
+                  - generic "CPMP" [ref=f37e135]
+                - generic [ref=f37e139]:
+                  - link "CPMP" [ref=f37e140] [cursor=pointer]:
+                    - /url: /cpmpml
+                  - paragraph [ref=f37e141]: cpmpml
+              - generic [ref=f37e142]:
+                - link "Giba's profile" [ref=f37e143] [cursor=pointer]:
+                  - /url: /titericz
+                  - generic "Giba" [ref=f37e144]
+                - generic [ref=f37e148]:
+                  - link "Giba" [ref=f37e149] [cursor=pointer]:
+                    - /url: /titericz
+                  - paragraph [ref=f37e150]: titericz
+            - separator [ref=f37e151]
+            - generic [ref=f37e152]:
+              - generic [ref=f37e153]:
+                - button "Upvote" [ref=f37e154] [cursor=pointer]:
+                  - generic [ref=f37e155]: arrow_drop_up
+                - button "121 votes" [ref=f37e156] [cursor=pointer]: "121"
+              - button "Share" [ref=f37e157] [cursor=pointer]
+              - button "Writeup actions" [ref=f37e159] [cursor=pointer]: more_horiz
+        - heading "Project Files" [level=2] [ref=f37e160]
+        - generic [ref=f37e161]:
+          - separator [ref=f37e162]
+          - list [ref=f37e163]:
+            - listitem "card1.png List Item" [ref=f37e164]:
+              - generic [ref=f37e165]:
+                - link "card1.png" [ref=f37e166] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/641506/14236/card1.png
+                  - generic [ref=f37e167]:
+                    - generic [ref=f37e168]: table_chart
+                    - generic [ref=f37e171]: card1.png
+                - link "Download card1.png" [ref=f37e173] [cursor=pointer]:
+                  - /url: https://storage.googleapis.com/kaggle-forum-message-attachments/641506/14236/card1.png
+                  - generic "Download card1.png" [ref=f37e174]: get_app
+          - separator [ref=f37e175]
+        - button "Download All" [ref=f37e176] [cursor=pointer]
+        - heading "Citation" [level=2] [ref=f37e178]
+        - paragraph [ref=f37e179]: Sergey Bryansky, Tony, krivoship, CPMP, Giba. 2nd Solution, CPMP View. https://www.kaggle.com/competitions/ieee-fraud-detection/writeups/2-uncles-and-3-puppies-2nd-solution-cpmp-view. 2019. Kaggle
+        - separator [ref=f37e180]
+        - generic [ref=f37e181]:
+          - generic [ref=f37e183]:
+            - generic [ref=f37e184]:
+              - generic [aria-hidden] [ref=f37e185]: comment
+              - generic [ref=f37e186]:
+                - heading "51 Comments" [level=2] [ref=f37e187]
+                - link "Go To Appreciation Comments (6 total)" [ref=f37e188] [cursor=pointer]:
+                  - /url: /competitions/ieee-fraud-detection/writeups/2-uncles-and-3-puppies-2nd-solution-cpmp-view#appreciation
+                  - text: 6 appreciation comments
+            - generic [ref=f37e191]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f37e192] [cursor=pointer]:
+                - generic [ref=f37e193]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f37e195]:
+            - generic [ref=f37e196]:
+              - generic [ref=f37e200]:
+                - link "Chris Deotte's profile" [ref=f37e201] [cursor=pointer]:
+                  - /url: /cdeotte
+                  - generic "Chris Deotte" [ref=f37e202]
+                - generic [ref=f37e208]:
+                  - link [ref=f37e210] [cursor=pointer]:
+                    - /url: /cdeotte
+                    - heading "Chris Deotte" [level=3] [ref=f37e211]
+                  - generic [ref=f37e212]:
+                    - paragraph [ref=f37e213]: Posted 7 years ago
+                    - paragraph [ref=f37e215]: · 1st in this Competition
+                - generic [ref=f37e217]:
+                  - generic [ref=f37e218]:
+                    - button "Upvote" [ref=f37e219] [cursor=pointer]:
+                      - generic [ref=f37e220]: arrow_drop_up
+                    - button "2 votes" [ref=f37e221] [cursor=pointer]: "2"
+                  - button "More Options for this Comment" [ref=f37e222] [cursor=pointer]: more_vert
+                - generic [ref=f37e225]:
+                  - paragraph [ref=f37e226]: Congrats again CPMP and team. Great job!!
+                  - paragraph [ref=f37e227]: Can you describe the main models in your ensemble and their individual LB scores? Were their features developed separately or did your models share the same features? Lastly, were the models' features chosen based on the same local validation scheme?
+                  - paragraph [ref=f37e228]: I'm particularly curious because I suspect our solution and your solution are very similar. But I think our models stacked a higher score. For the original competition deadline, we stacked a CAT LB 0.9620, LGBM LB 0.9610, and XGB 0.9600 and achieved LB 0.9664 then post process to LB 0.9674. (This solution wins the comp). In the extra 2 days, we mixed features between the models and did more convoluted stacking and ensembling to get to LB 0.9677.
+                  - paragraph [ref=f37e229]: Our original models had features different from each other and were discovered using different local validation schemes (that emphasized different mixtures of seen versus unseen clients). I think this added diversity and allowed them to reach a higher score when stacked.
+                - button "Reply" [ref=f37e231] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e232]: reply
+                - generic [ref=f37e234]:
+                  - generic [ref=f37e239]:
+                    - link "CPMP's profile" [ref=f37e240] [cursor=pointer]:
+                      - /url: /cpmpml
+                      - generic "CPMP" [ref=f37e241]
+                    - generic [ref=f37e247]:
+                      - generic [ref=f37e248]:
+                        - link [ref=f37e249] [cursor=pointer]:
+                          - /url: /cpmpml
+                          - heading "CPMP" [level=3] [ref=f37e250]
+                        - paragraph [ref=f37e253]: Topic Author
+                      - generic [ref=f37e254]:
+                        - paragraph [ref=f37e255]: Posted 7 years ago
+                        - paragraph [ref=f37e257]: · 2nd in this Competition
+                    - generic [ref=f37e259]:
+                      - generic [ref=f37e260]:
+                        - button "Upvote" [ref=f37e261] [cursor=pointer]:
+                          - generic [ref=f37e262]: arrow_drop_up
+                        - button "2 votes" [ref=f37e263] [cursor=pointer]: "2"
+                      - button "More Options for this Comment" [ref=f37e264] [cursor=pointer]: more_vert
+                    - generic [ref=f37e267]:
+                      - paragraph [ref=f37e268]: Indeed, from reading your writeups our solutions are extremely similar (no surprise I guess). I was also surprised to see that our individual models look a bit better than yours on public LB.
+                      - paragraph [ref=f37e269]: "We had different datasets and different validation schemes. My Russian team mates had their own, with way more features than mine. And Giba started from theirs, selected features aggressively and added his own. This ensured some diversity but I reused the exact same card ids. The top models in the blend are:"
+                      - paragraph [ref=f37e270]: lgb 0.9644 Catboost 0.9626 xgb/lgb blend 0.9623
+                    - button "Reply" [ref=f37e272] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f37e273]: reply
+                  - generic [ref=f37e275]:
+                    - button "16 more replies" [ref=f37e276] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f37e278]: arrow_drop_down
+                    - generic [ref=f37e279]:
+                      - img "Profile picture for CPMP" [ref=f37e281]
+                      - img "Profile picture for Chris Deotte" [ref=f37e283]
+                      - img "Profile picture for AmirH" [ref=f37e285]
+                      - img "Profile picture for TweakIT" [ref=f37e287]
+              - separator [ref=f37e288]
+            - generic [ref=f37e289]:
+              - generic [ref=f37e293]:
+                - link "LongYin/杰少's profile" [ref=f37e294] [cursor=pointer]:
+                  - /url: /longyin2
+                  - generic "LongYin/杰少" [ref=f37e295]
+                - generic [ref=f37e301]:
+                  - link [ref=f37e303] [cursor=pointer]:
+                    - /url: /longyin2
+                    - heading "LongYin/杰少" [level=3] [ref=f37e304]
+                  - generic [ref=f37e305]:
+                    - paragraph [ref=f37e306]: Posted 7 years ago
+                    - paragraph [ref=f37e308]: · 26th in this Competition
+                - generic [ref=f37e310]:
+                  - generic [ref=f37e311]:
+                    - button "Upvote" [ref=f37e312] [cursor=pointer]:
+                      - generic [ref=f37e313]: arrow_drop_up
+                    - button "1 votes" [ref=f37e314] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e315] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e319]: Congrats! Great as usual.
+                - button "Reply" [ref=f37e321] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e322]: reply
+              - separator [ref=f37e324]
+            - generic [ref=f37e325]:
+              - generic [ref=f37e329]:
+                - link "corochann's profile" [ref=f37e330] [cursor=pointer]:
+                  - /url: /corochann
+                  - generic "corochann" [ref=f37e331]
+                - generic [ref=f37e337]:
+                  - link [ref=f37e339] [cursor=pointer]:
+                    - /url: /corochann
+                    - heading "corochann" [level=3] [ref=f37e340]
+                  - paragraph [ref=f37e342]: Posted 7 years ago
+                - generic [ref=f37e344]:
+                  - generic [ref=f37e345]:
+                    - button "Upvote" [ref=f37e346] [cursor=pointer]:
+                      - generic [ref=f37e347]: arrow_drop_up
+                    - button "1 votes" [ref=f37e348] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e349] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e353]: Congrats! Surprised such a many things done in only 10 days!
+                - button "Reply" [ref=f37e355] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e356]: reply
+                - generic [ref=f37e363]:
+                  - link "CPMP's profile" [ref=f37e364] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - generic "CPMP" [ref=f37e365]
+                  - generic [ref=f37e371]:
+                    - generic [ref=f37e372]:
+                      - link [ref=f37e373] [cursor=pointer]:
+                        - /url: /cpmpml
+                        - heading "CPMP" [level=3] [ref=f37e374]
+                      - paragraph [ref=f37e377]: Topic Author
+                    - generic [ref=f37e378]:
+                      - paragraph [ref=f37e379]: Posted 7 years ago
+                      - paragraph [ref=f37e381]: · 2nd in this Competition
+                  - generic [ref=f37e383]:
+                    - generic [ref=f37e384]:
+                      - button "Upvote" [ref=f37e385] [cursor=pointer]:
+                        - generic [ref=f37e386]: arrow_drop_up
+                      - button "0 votes" [ref=f37e387] [cursor=pointer]: "0"
+                    - button "More Options for this Comment" [ref=f37e388] [cursor=pointer]: more_vert
+                  - paragraph [ref=f37e392]: Thanks, but I didn't do that much. The time consuming part, analyzing data to find uids, was done by my team mates before I joined the team.
+                  - button "Reply" [ref=f37e394] [cursor=pointer]:
+                    - generic [aria-hidden] [ref=f37e395]: reply
+              - separator [ref=f37e397]
+            - generic [ref=f37e398]:
+              - generic [ref=f37e402]:
+                - link "Hayato's profile" [ref=f37e403] [cursor=pointer]:
+                  - /url: /hayatoyamaguchi
+                  - generic "Hayato" [ref=f37e404]
+                - generic [ref=f37e410]:
+                  - link [ref=f37e412] [cursor=pointer]:
+                    - /url: /hayatoyamaguchi
+                    - heading "Hayato" [level=3] [ref=f37e413]
+                  - generic [ref=f37e414]:
+                    - paragraph [ref=f37e415]: Posted 7 years ago
+                    - paragraph [ref=f37e417]: · 249th in this Competition
+                - generic [ref=f37e419]:
+                  - generic [ref=f37e420]:
+                    - button "Upvote" [ref=f37e421] [cursor=pointer]:
+                      - generic [ref=f37e422]: arrow_drop_up
+                    - button "1 votes" [ref=f37e423] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e424] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e428]: Thanks for sharing, I learned a lot. Congratulations!
+                - button "Reply" [ref=f37e430] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e431]: reply
+              - separator [ref=f37e433]
+            - generic [ref=f37e434]:
+              - generic [ref=f37e438]:
+                - link "KhanhVD's profile" [ref=f37e439] [cursor=pointer]:
+                  - /url: /duykhanh99
+                  - generic "KhanhVD" [ref=f37e440]
+                - generic [ref=f37e446]:
+                  - link [ref=f37e448] [cursor=pointer]:
+                    - /url: /duykhanh99
+                    - heading "KhanhVD" [level=3] [ref=f37e449]
+                  - generic [ref=f37e450]:
+                    - paragraph [ref=f37e451]: Posted 7 years ago
+                    - paragraph [ref=f37e453]: · 1641st in this Competition
+                - generic [ref=f37e455]:
+                  - generic [ref=f37e456]:
+                    - button "Upvote" [ref=f37e457] [cursor=pointer]:
+                      - generic [ref=f37e458]: arrow_drop_up
+                    - button "1 votes" [ref=f37e459] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e460] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e464]:
+                  - text: Thank you for sharing great solution! Congrats
+                  - link "@cpmpml (opens in a new tab)" [ref=f37e465] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - text: "@cpmpml"
+                  - text: and your team
+                - button "Reply" [ref=f37e467] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e468]: reply
+              - separator [ref=f37e470]
+            - generic [ref=f37e471]:
+              - generic [ref=f37e475]:
+                - link "YaGana Sheriff-Hussaini's profile" [ref=f37e476] [cursor=pointer]:
+                  - /url: /sheriytm
+                  - generic "YaGana Sheriff-Hussaini" [ref=f37e477]
+                - generic [ref=f37e483]:
+                  - link [ref=f37e485] [cursor=pointer]:
+                    - /url: /sheriytm
+                    - heading "YaGana Sheriff-Hussaini" [level=3] [ref=f37e486]
+                  - generic [ref=f37e487]:
+                    - paragraph [ref=f37e488]: Posted 7 years ago
+                    - paragraph [ref=f37e490]: · 239th in this Competition
+                - generic [ref=f37e492]:
+                  - generic [ref=f37e493]:
+                    - button "Upvote" [ref=f37e494] [cursor=pointer]:
+                      - generic [ref=f37e495]: arrow_drop_up
+                    - button "1 votes" [ref=f37e496] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e497] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e501]:
+                  - text: Congratulations
+                  - link "@cpmpml (opens in a new tab)" [ref=f37e502] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - text: "@cpmpml"
+                  - text: and team "2 uncles and 3 puppies". Thanks for sharing your solution. I will take a break to recharge and then read yours and other top solutions carefully.
+                - button "Reply" [ref=f37e504] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e505]: reply
+              - separator [ref=f37e507]
+            - generic [ref=f37e508]:
+              - generic [ref=f37e512]:
+                - link "AmirH's profile" [ref=f37e513] [cursor=pointer]:
+                  - /url: /tpthegreat
+                  - generic "AmirH" [ref=f37e514]
+                - generic [ref=f37e520]:
+                  - link [ref=f37e522] [cursor=pointer]:
+                    - /url: /tpthegreat
+                    - heading "AmirH" [level=3] [ref=f37e523]
+                  - generic [ref=f37e524]:
+                    - paragraph [ref=f37e525]: Posted 7 years ago
+                    - paragraph [ref=f37e527]: · 29th in this Competition
+                - generic [ref=f37e529]:
+                  - generic [ref=f37e530]:
+                    - button "Upvote" [ref=f37e531] [cursor=pointer]:
+                      - generic [ref=f37e532]: arrow_drop_up
+                    - button "1 votes" [ref=f37e533] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e534] [cursor=pointer]: more_vert
+                - generic [ref=f37e537]:
+                  - paragraph [ref=f37e538]: Thanks CPMP for sharing, Could you share what method you used for target encoding? did you use some kind of regularization?
+                  - paragraph [ref=f37e539]: Thanks!
+                - button "Reply" [ref=f37e541] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e542]: reply
+                - generic [ref=f37e544]:
+                  - generic [ref=f37e549]:
+                    - link "CPMP's profile" [ref=f37e550] [cursor=pointer]:
+                      - /url: /cpmpml
+                      - generic "CPMP" [ref=f37e551]
+                    - generic [ref=f37e557]:
+                      - generic [ref=f37e558]:
+                        - link [ref=f37e559] [cursor=pointer]:
+                          - /url: /cpmpml
+                          - heading "CPMP" [level=3] [ref=f37e560]
+                        - paragraph [ref=f37e563]: Topic Author
+                      - generic [ref=f37e564]:
+                        - paragraph [ref=f37e565]: Posted 7 years ago
+                        - paragraph [ref=f37e567]: · 2nd in this Competition
+                    - generic [ref=f37e569]:
+                      - generic [ref=f37e570]:
+                        - button "Upvote" [ref=f37e571] [cursor=pointer]:
+                          - generic [ref=f37e572]: arrow_drop_up
+                        - button "4 votes" [ref=f37e573] [cursor=pointer]: "4"
+                      - button "More Options for this Comment" [ref=f37e574] [cursor=pointer]: more_vert
+                    - paragraph [ref=f37e578]: Yes, I use a blend with overall target mean. The smaller the frequency, the closer to train average. Values that only appear in test get the average train value. This is key.
+                    - button "Reply" [ref=f37e580] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f37e581]: reply
+                  - generic [ref=f37e583]:
+                    - button "9 more replies" [ref=f37e584] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f37e586]: arrow_drop_down
+                    - generic [ref=f37e587]:
+                      - img "Profile picture for AmirH" [ref=f37e589]
+                      - img "Profile picture for LongYin/杰少" [ref=f37e591]
+                      - img "Profile picture for CPMP" [ref=f37e593]
+                      - img "Profile picture for MeisterMorxrc" [ref=f37e595]
+              - separator [ref=f37e596]
+            - generic [ref=f37e597]:
+              - generic [ref=f37e601]:
+                - link "Ailurophile's profile" [ref=f37e602] [cursor=pointer]:
+                  - /url: /veeralakrishna
+                  - generic "Ailurophile" [ref=f37e603]
+                - generic [ref=f37e609]:
+                  - link [ref=f37e611] [cursor=pointer]:
+                    - /url: /veeralakrishna
+                    - heading "Ailurophile" [level=3] [ref=f37e612]
+                  - generic [ref=f37e613]:
+                    - paragraph [ref=f37e614]: Posted 7 years ago
+                    - paragraph [ref=f37e616]: · 5174th in this Competition
+                - generic [ref=f37e618]:
+                  - generic [ref=f37e619]:
+                    - button "Upvote" [ref=f37e620] [cursor=pointer]:
+                      - generic [ref=f37e621]: arrow_drop_up
+                    - button "1 votes" [ref=f37e622] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e623] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e627]:
+                  - text: Congratulations Great Write-Up Thank You for Sharing Your Approach & Insights….!!
+                  - link "@cpmpml (opens in a new tab)" [ref=f37e628] [cursor=pointer]:
+                    - /url: /cpmpml
+                    - text: "@cpmpml"
+                - button "Reply" [ref=f37e630] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e631]: reply
+              - separator [ref=f37e633]
+            - generic [ref=f37e634]:
+              - generic [ref=f37e638]:
+                - link "Taemyung Heo's profile" [ref=f37e639] [cursor=pointer]:
+                  - /url: /tmheo74
+                  - generic "Taemyung Heo" [ref=f37e640]
+                - generic [ref=f37e646]:
+                  - link [ref=f37e648] [cursor=pointer]:
+                    - /url: /tmheo74
+                    - heading "Taemyung Heo" [level=3] [ref=f37e649]
+                  - generic [ref=f37e650]:
+                    - paragraph [ref=f37e651]: Posted 7 years ago
+                    - paragraph [ref=f37e653]: · 17th in this Competition
+                - generic [ref=f37e655]:
+                  - generic [ref=f37e656]:
+                    - button "Upvote" [ref=f37e657] [cursor=pointer]:
+                      - generic [ref=f37e658]: arrow_drop_up
+                    - button "1 votes" [ref=f37e659] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e660] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e664]: Great insights! Thanks for sharing and congrats!
+                - button "Reply" [ref=f37e666] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e667]: reply
+              - separator [ref=f37e669]
+            - generic [ref=f37e670]:
+              - generic [ref=f37e674]:
+                - link "Ngoc Bien's profile" [ref=f37e675] [cursor=pointer]:
+                  - /url: /ngocbien
+                  - generic "Ngoc Bien" [ref=f37e676]
+                - generic [ref=f37e682]:
+                  - link [ref=f37e684] [cursor=pointer]:
+                    - /url: /ngocbien
+                    - heading "Ngoc Bien" [level=3] [ref=f37e685]
+                  - paragraph [ref=f37e687]: Posted 7 years ago
+                - generic [ref=f37e689]:
+                  - generic [ref=f37e690]:
+                    - button "Upvote" [ref=f37e691] [cursor=pointer]:
+                      - generic [ref=f37e692]: arrow_drop_up
+                    - button "0 votes" [ref=f37e693] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f37e694] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e698]: May you explain more clearly about your processing of card1 to get the down row in 4 pictures? Thanks a lots.
+                - button "Reply" [ref=f37e700] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e701]: reply
+              - separator [ref=f37e703]
+            - generic [ref=f37e704]:
+              - generic [ref=f37e708]:
+                - link "Ngoc Bien's profile" [ref=f37e709] [cursor=pointer]:
+                  - /url: /ngocbien
+                  - generic "Ngoc Bien" [ref=f37e710]
+                - generic [ref=f37e716]:
+                  - link [ref=f37e718] [cursor=pointer]:
+                    - /url: /ngocbien
+                    - heading "Ngoc Bien" [level=3] [ref=f37e719]
+                  - paragraph [ref=f37e721]: Posted 7 years ago
+                - generic [ref=f37e723]:
+                  - generic [ref=f37e724]:
+                    - button "Upvote" [ref=f37e725] [cursor=pointer]:
+                      - generic [ref=f37e726]: arrow_drop_up
+                    - button "0 votes" [ref=f37e727] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f37e728] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e732]: That is very helpful. Thanks a lots to share
+                - button "Reply" [ref=f37e734] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e735]: reply
+              - separator [ref=f37e737]
+            - generic [ref=f37e738]:
+              - generic [ref=f37e742]:
+                - link "ZhouDeng's profile" [ref=f37e743] [cursor=pointer]:
+                  - /url: /zhoudeng
+                  - generic "ZhouDeng" [ref=f37e744]
+                - generic [ref=f37e750]:
+                  - link [ref=f37e752] [cursor=pointer]:
+                    - /url: /zhoudeng
+                    - heading "ZhouDeng" [level=3] [ref=f37e753]
+                  - paragraph [ref=f37e755]: Posted 7 years ago
+                - generic [ref=f37e757]:
+                  - generic [ref=f37e758]:
+                    - button "Upvote" [ref=f37e759] [cursor=pointer]:
+                      - generic [ref=f37e760]: arrow_drop_up
+                    - button "0 votes" [ref=f37e761] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f37e762] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e766]:
+                  - emphasis [ref=f37e767]: I kept a feature only if permuting it did not improve any of the 4 model predictions.
+                  - text: how can i understand this ? can you elaborate with more detail. thanks
+                - button "Reply" [ref=f37e769] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e770]: reply
+                - generic [ref=f37e772]:
+                  - generic [ref=f37e777]:
+                    - link "CPMP's profile" [ref=f37e778] [cursor=pointer]:
+                      - /url: /cpmpml
+                      - generic "CPMP" [ref=f37e779]
+                    - generic [ref=f37e785]:
+                      - generic [ref=f37e786]:
+                        - link [ref=f37e787] [cursor=pointer]:
+                          - /url: /cpmpml
+                          - heading "CPMP" [level=3] [ref=f37e788]
+                        - paragraph [ref=f37e791]: Topic Author
+                      - generic [ref=f37e792]:
+                        - paragraph [ref=f37e793]: Posted 7 years ago
+                        - paragraph [ref=f37e795]: · 2nd in this Competition
+                    - generic [ref=f37e797]:
+                      - generic [ref=f37e798]:
+                        - button "Upvote" [ref=f37e799] [cursor=pointer]:
+                          - generic [ref=f37e800]: arrow_drop_up
+                        - button "0 votes" [ref=f37e801] [cursor=pointer]: "0"
+                      - button "More Options for this Comment" [ref=f37e802] [cursor=pointer]: more_vert
+                    - paragraph [ref=f37e806]: Are you familiar with permutation importance (link in my post)? Then I use it with the 4 models I got from my 4 different folds. A feature is fremoved if permuting the values then predicting improves the score for one of the models.
+                    - button "Reply" [ref=f37e808] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f37e809]: reply
+                  - generic [ref=f37e811]:
+                    - button "3 more replies" [ref=f37e812] [cursor=pointer]:
+                      - generic [aria-hidden] [ref=f37e814]: arrow_drop_down
+                    - generic [ref=f37e815]:
+                      - img "Profile picture for Sergey Markov" [ref=f37e817]
+                      - img "Profile picture for CPMP" [ref=f37e819]
+              - separator [ref=f37e820]
+            - generic [ref=f37e821]:
+              - generic [ref=f37e825]:
+                - link "CPMP's profile" [ref=f37e826] [cursor=pointer]:
+                  - /url: /cpmpml
+                  - generic "CPMP" [ref=f37e827]
+                - generic [ref=f37e833]:
+                  - generic [ref=f37e834]:
+                    - link [ref=f37e835] [cursor=pointer]:
+                      - /url: /cpmpml
+                      - heading "CPMP" [level=3] [ref=f37e836]
+                    - paragraph [ref=f37e839]: Topic Author
+                  - generic [ref=f37e840]:
+                    - paragraph [ref=f37e841]: Posted 7 years ago
+                    - paragraph [ref=f37e843]: · 2nd in this Competition
+                - generic [ref=f37e845]:
+                  - generic [ref=f37e846]:
+                    - button "Upvote" [ref=f37e847] [cursor=pointer]:
+                      - generic [ref=f37e848]: arrow_drop_up
+                    - button "0 votes" [ref=f37e849] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f37e850] [cursor=pointer]: more_vert
+                - generic [ref=f37e853]:
+                  - paragraph [ref=f37e854]: "Additional information about our solution can be found in these two posts:"
+                  - paragraph [ref=f37e855]:
+                    - text: "How to find card ids:"
+                    - link "https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559 (opens in a new tab)" [ref=f37e856] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559
+                      - text: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111559
+                    - text: "The whole team story:"
+                    - link "https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554 (opens in a new tab)" [ref=f37e857] [cursor=pointer]:
+                      - /url: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554
+                      - text: https://www.kaggle.com/c/ieee-fraud-detection/discussion/111554
+                - button "Reply" [ref=f37e859] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f37e860]: reply
+              - separator [ref=f37e862]
+          - generic [ref=f37e863]:
+            - heading "Appreciation (6)" [level=2] [ref=f37e865]
+            - generic [ref=f37e866]:
+              - generic [ref=f37e870]:
+                - link "Yixinchen's profile" [ref=f37e871] [cursor=pointer]:
+                  - /url: /yixinchen1
+                  - generic "Yixinchen" [ref=f37e872]
+                - generic [ref=f37e878]:
+                  - link [ref=f37e880] [cursor=pointer]:
+                    - /url: /yixinchen1
+                    - heading "Yixinchen" [level=3] [ref=f37e881]
+                  - paragraph [ref=f37e883]: Posted 7 years ago
+                - generic [ref=f37e885]:
+                  - generic [ref=f37e886]:
+                    - button "Upvote" [ref=f37e887] [cursor=pointer]:
+                      - generic [ref=f37e888]: arrow_drop_up
+                    - button "3 votes" [ref=f37e889] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f37e890] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e894]: Congrats and thanks for share!
+              - separator [ref=f37e895]
+            - generic [ref=f37e896]:
+              - generic [ref=f37e900]:
+                - link "Markus.JM's profile" [ref=f37e901] [cursor=pointer]:
+                  - /url: /maiernator
+                  - generic "Markus.JM" [ref=f37e902]
+                - generic [ref=f37e908]:
+                  - link [ref=f37e910] [cursor=pointer]:
+                    - /url: /maiernator
+                    - heading "Markus.JM" [level=3] [ref=f37e911]
+                  - paragraph [ref=f37e913]: Posted 7 years ago
+                - generic [ref=f37e915]:
+                  - generic [ref=f37e916]:
+                    - button "Upvote" [ref=f37e917] [cursor=pointer]:
+                      - generic [ref=f37e918]: arrow_drop_up
+                    - button "1 votes" [ref=f37e919] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e920] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e924]: Congrats, thanks for sharing👍
+              - separator [ref=f37e925]
+            - generic [ref=f37e926]:
+              - generic [ref=f37e930]:
+                - link "SanthoRiyu's profile" [ref=f37e931] [cursor=pointer]:
+                  - /url: /santhoriyu
+                  - generic "SanthoRiyu" [ref=f37e932]
+                - generic [ref=f37e938]:
+                  - link [ref=f37e940] [cursor=pointer]:
+                    - /url: /santhoriyu
+                    - heading "SanthoRiyu" [level=3] [ref=f37e941]
+                  - paragraph [ref=f37e943]: Posted 7 years ago
+                - generic [ref=f37e945]:
+                  - generic [ref=f37e946]:
+                    - button "Upvote" [ref=f37e947] [cursor=pointer]:
+                      - generic [ref=f37e948]: arrow_drop_up
+                    - button "1 votes" [ref=f37e949] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e950] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e954]: Congrats! Thanks for sharing.
+              - separator [ref=f37e955]
+            - generic [ref=f37e956]:
+              - generic [ref=f37e960]:
+                - link "Zakrea Almansouri's profile" [ref=f37e961] [cursor=pointer]:
+                  - /url: /zakrea
+                  - generic "Zakrea Almansouri" [ref=f37e962]
+                - generic [ref=f37e968]:
+                  - link [ref=f37e970] [cursor=pointer]:
+                    - /url: /zakrea
+                    - heading "Zakrea Almansouri" [level=3] [ref=f37e971]
+                  - generic [ref=f37e972]:
+                    - paragraph [ref=f37e973]: Posted 7 years ago
+                    - paragraph [ref=f37e975]: · 3880th in this Competition
+                - generic [ref=f37e977]:
+                  - generic [ref=f37e978]:
+                    - button "Upvote" [ref=f37e979] [cursor=pointer]:
+                      - generic [ref=f37e980]: arrow_drop_up
+                    - button "1 votes" [ref=f37e981] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f37e982] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e986]: Cool, thanks for the sharing!
+              - separator [ref=f37e987]
+            - generic [ref=f37e988]:
+              - generic [ref=f37e992]:
+                - link "fraise's profile" [ref=f37e993] [cursor=pointer]:
+                  - /url: /fraise
+                  - generic "fraise" [ref=f37e994]
+                - generic [ref=f37e1000]:
+                  - link [ref=f37e1002] [cursor=pointer]:
+                    - /url: /fraise
+                    - heading "fraise" [level=3] [ref=f37e1003]
+                  - paragraph [ref=f37e1005]: Posted 7 years ago
+                - generic [ref=f37e1007]:
+                  - generic [ref=f37e1008]:
+                    - button "Upvote" [ref=f37e1009] [cursor=pointer]:
+                      - generic [ref=f37e1010]: arrow_drop_up
+                    - button "0 votes" [ref=f37e1011] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f37e1012] [cursor=pointer]: more_vert
+                - paragraph [ref=f37e1016]: Congratulations! Thanks for sharing!
+              - separator [ref=f37e1017]
+            - generic [ref=f37e1022]:
+              - link "Ankit Mishra's profile" [ref=f37e1023] [cursor=pointer]:
+                - /url: /ankit14498
+                - generic "Ankit Mishra" [ref=f37e1024]
+              - generic [ref=f37e1030]:
+                - link [ref=f37e1032] [cursor=pointer]:
+                  - /url: /ankit14498
+                  - heading "Ankit Mishra" [level=3] [ref=f37e1033]
+                - paragraph [ref=f37e1035]: Posted 7 years ago
+              - generic [ref=f37e1037]:
+                - generic [ref=f37e1038]:
+                  - button "Upvote" [ref=f37e1039] [cursor=pointer]:
+                    - generic [ref=f37e1040]: arrow_drop_up
+                  - button "0 votes" [ref=f37e1041] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f37e1042] [cursor=pointer]: more_vert
+              - paragraph [ref=f37e1046]: Congrats,thanks for share !
+  - alert [ref=f37e1049]

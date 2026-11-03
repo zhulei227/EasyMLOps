@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/ventilator-pressure-prediction/discussion/287200
-fetched: 2026-10-27
-chars: 830
+fetched: 2026-11-03
+chars: 1723
 
 menu
 Skip to
@@ -42,15 +42,83 @@ Models
 Discussion
 Leaderboard
 Rules
+Gilles Vandewiele · 1st in this Competition · Posted 5 years ago
+arrow_drop_up
+32
+more_vert
+[#1 Solution] Blog Post
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+I have just published my blog post describing our solution more in depth!
 
-error
+You can find it here.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+In case anything is unclear, or you have any questions, feel free to raise them here or as a comment on Medium itself.
 
-Failed to load the discussion topic
+Please sign in to reply to this topic.
 
-error
+comment
+5 Comments
+Hotness
+Ctrl_CV
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Posted 5 years ago
+
+· 62nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Very impressive work! i will learn to it!thanks for your blog!
+
+Mathurin Ache
+
+Posted 5 years ago
+
+· 218th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks a lot @group16. Clever your matching algorithm. Reverse Data Generation.
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you @mathurinache !
+
+Theo Viel
+
+Posted 5 years ago
+
+· 1758th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I love these kind of write-ups with some storytelling. Thanks a lot @group16 for the post, I hope to see more of those !
+
+Gilles Vandewiele
+
+Topic Author
+
+Posted 5 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thank you so much @theoviel, I greatly appreciate that!

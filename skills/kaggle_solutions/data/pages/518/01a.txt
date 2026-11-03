@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/kaggle-survey-2022/discussion/374969
-fetched: 2026-10-27
-chars: 764
+fetched: 2026-11-03
+chars: 4045
 
 menu
 Skip to
@@ -41,13 +41,44 @@ Code
 Models
 Discussion
 Rules
-Failed to load the discussion topic
-error
+Michal Bogacz · Posted 4 years ago
+arrow_drop_up
+12
+more_vert
+1st place solution approach "behind the scenes" - part II: idea
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Hi, Today I will tell you a bit about the idea for my notebook, where it came from and why in this form.
 
-error
+I have participated in this competition 2 times before and was not completely satisfied with my analysis. When we look at the data from this competition, or more broadly from the majority of surveys on the market, we can easily come to the conclusion that the result database contains columns in a qualitative form (or in a dummy form if it is a multi-choise or multi-category, e.g. in the case of a country, age, etc.).
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+If we are well versed in descriptive statistics, we know that variables in a qualitative form are generally less interesting to analyze, because the number of metrics or ways to analyze them is much more limited than in the case of quantitative variables on a continuous scale.
 
-Failed to load the discussion topic
+But we do not have to rely on competition data in an unchanged form, if there is no quantitative data, then why not come to it … after a few transformations?
+
+And so the idea to create "factors" was born. The factor works on the principle that we specify a grouping variable (in this case, country) to which we add a factor condition (e.g. the percentage of people under 30). In this way, using the classic "group by" and "summarise", it will obtain a table in which the rows contain different levels of the grouping variable (in my case, countries) and the columns contain the desired continuous variable whose values are in the range from 0 to 1. On such data, we can already use a whole range of methods that would be impossible without transformation (e.g. distribution analysis, regression, correlation using the perason coefficient, scatterplot… you can go on and on).
+
+I focused on a comparative analysis between countries for two reasons:
+
+Firstly, I was very curious about data science/kaggling in other countries 😃
+Secondly, taking part in previous editions and looking through the work of other people, it is easy to see that the country of residence of the respondent really says a lot about him in every sphere (demographic, educational, technological professional), so I expected a lot of differences and interesting conclusions even before the data transformation.
+
+About factories, I came up with 15 different ones, looking through all the columns and choosing the most interesting ones in my opinion. What I wanted was for the columns to be different from each other and describe different spheres (demography, education/science, technology and professional work) to have a holistic view of the respondents from these countries.
+
+This is an example of how it gives a unique character to the analysis that is not repeated later in other notebooks and at the same time greatly extends the analysis. The conclusion is simple: if the data in its pure form seems insufficient to us, it is worth thinking about transformations (filtering, grouping, aggregations) that will make the same input data more interesting.
+
+More from "behind the scenes" soon in the next posts. I hope you found the above information useful and/or inspiring. Let me know what you think in the commentary or if you have any suggestions on how you think it's worth working on such problems, share in the comment - I'd love to read it!
+
+Please sign in to reply to this topic.
+
+comment
+1 Comment
+Hotness
+Oscar Aguilar
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Interesting. Again, thanks for sharing your journey on this competition👍🏻

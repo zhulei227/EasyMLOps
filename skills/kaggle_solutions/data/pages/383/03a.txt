@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/abstraction-and-reasoning-challenge/discussion/154409
-fetched: 2026-10-27
-chars: 685
+fetched: 2026-11-03
+chars: 4509
 
 menu
 Skip to
@@ -22,29 +22,164 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-Abstraction and Reasoning Corpus · Research Code Competition · 6 years ago
-Late Submission
-more_horiz
+My part of the 3rd place solution — Abstraction and Reasoning Challenge
+My part of the 3rd place solution
+
 Abstraction and Reasoning Challenge
 
-Create an AI capable of solving reasoning tasks it has never seen before
+Solution Writeup · 3rd place
 
-Overview
-Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
-Failed to load the discussion topic
-error
+Here is the description of our final solution https://www.kaggle.com/c/abstraction-and-reasoning-challenge/discussion/154305 @golubev has definitely contributed more than I into the final result, but even my solo solution could get at least the high silver so I share it with all the source code.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+The code and more detailed approach description can be found here: https://github.com/IliaLarchenko/abstract_reasoning
 
-Failed to load the discussion topic
+Below is the short write up of my approach.
+
+In general, my method can be described as a domain-specific language (DSL) based. I have created the abstract representation of the colors, image blocks extracted from the original input image, and different binary masks. Using these abstractions, I wrote several "predictors" that try to derive a set of transformations used to get every output image from the corresponding input image and, if it succeeds – apply these transformations to test input to get the final answer.
+
+By the moment of team-up, I had 5 tasks solved (+2 from public kernels). (my kernel demonstrating how it works). Probably there are other tasks that can be solved as well, but I have not tested my solution separately after the merge. My approach also solves 138 and 96 samples from the train and valid sets, respectively.
+
+The general logic of every predictor is described in the pseudo-code below (although, it can be different for some classes).
+
+for n, (input_image, output_image) in enumerate(sample[‘train’]):
+    list_of_solutions = []
+    for possible_solution in all_possible_solutions:
+        if apply_solution(input_image, possible_solution) == output_image:
+            list_of_solutions.append(possible_solution)
+    if n == 0:
+        final_list_of_solutions = list_of_solutions
+    else:
+        final_list_of_solutions = intersection(list_of_solutions, final_list_of_solutions)
+
+    if len(final_list_of_solutions) == 0
+        return None
+
+answers = []
+for test_input_image in sample[‘test’]:
+    answers.append([])
+    for solution in final_list_of_solutions:
+        answers[-1].append(apply_solution(test_input_image, solution))
+
+return answers
+
+
+The best working predictors (on the test set) were those that restore some kind of mosaic on images.
+
+Other important tips: – I have used multiprocessing to significantly speed up computations and control RAM and time each process uses. – I have cached all blocks generated at any step. Without it, 16gb RAM often was not enough. – I have used unit test extensively to control that I have not broken anything with my last changes (I think, it saved me a lot of hours)
+
+Authors
+Vlad Golubev
+
+golubev
+
+Ilia Larchenko
+
+ilialar
+
+arrow_drop_up
+28
+Share
+more_horiz
+Citation
+
+Vlad Golubev, Ilia Larchenko. My part of the 3rd place solution. https://www.kaggle.com/competitions/abstraction-and-reasoning-challenge/writeups/vlad-ilia-my-part-of-the-3rd-place-solution. 2020. Kaggle
+
+comment
+7 Comments
+1 appreciation comment
+Hotness
+Vlad Golubev
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+@ilialar You have contributed exactly what we need for Top3🎉 And you have very motivated me via your daily activity/progress. I had glad to team-up with you
+
+reply
+Reply
+Jan Bre
+
+Posted 6 years ago
+
+· 8th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations on becoming Kaggle Master
+
+reply
+Reply
+Ilia Larchenko
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Thank you! And congratulations on becoming Kaggle Master too
+
+reply
+Reply
+Froggy McFrogson
+
+Posted 6 years ago
+
+· 252nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Good job. Very professionally done. Seems like you and Zoltan both got a lot of the symmetry questions correct.
+
+reply
+Reply
+Ilia Larchenko
+
+Topic Author
+
+Posted 6 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you. Yes, it seems so. I think we have a significant intersection between solved tasks.
+
+reply
+Reply
+
+This comment has been deleted.
+
+Appreciation (1)
+corochann
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Conglats! thanks for sharing.

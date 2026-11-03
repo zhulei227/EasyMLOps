@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/prostate-cancer-grade-assessment/discussion/169143
-fetched: 2026-10-27
-chars: 771
+fetched: 2026-11-03
+chars: 14322
 
 menu
 Skip to
@@ -22,33 +22,727 @@ Data Hub
 
 More
 
-​
+menu
+Skip to
+content
 Login
 Sign Up
 Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
 Learn more
 OK, Got it.
-PANDA Challenge · Featured Code Competition · 6 years ago
-Late Submission
-more_horiz
+1st Place Solution [PND] — Prostate cANcer graDe Assessment (PANDA) Challenge
+1st Place Solution [PND]
+
 Prostate cANcer graDe Assessment (PANDA) Challenge
 
-Prostate cancer diagnosis using the Gleason grading system
+Solution Writeup · 1st place · Feb 1, 2021
 
-Overview
+Congratulations to everyone and thanks for the hosts for preparing this competition!
+
+I published slide!
+Our code is here!
+Proposed Denoising Method
+
+We're very suprised that we finished 1st, and our simple label-denoising method (suprisingly) boosted up PB.
+
+The competition was all about handling noisy labels, so we worked hard on finding good ways to denoising.
+
+Here is our simple denoising method by @kyoshioka47:
+
+Getting cleaned labels
+train k-folds with effnet-b1 (Almost identical to Qishen's kernel)
+
+Model specifics in fam_taro( @yukkyo ) part
+Predict hold-out sets with the trained model. We get pred with this step.
+Remove the training data which has a high disparity between ground truth and pred. The filtered labels will be called cleaned labels.
+
+We calculate disparity by the absolute difference of ISUP between GT and pred. Data with disparity larger than 1.6 was simply removed.
+
+Here is the psuedo codes. probs_raw is the raw prediciton results (ISUP)
+
+# Base arutema method
+def remove_noisy(df, thresh):
+    gap = np.abs(df["isup_grade"] - df["probs_raw"])
+    df_removed = df[gap > thresh].reset_index(drop=True)
+    df_keep = df[gap <= thresh].reset_index(drop=True)
+    return df_keep, df_removed
+
+df_keep, df_remove = remove_noisy(df, thresh=1.6)
+show_keep_remove(df, df_keep, df_remove)
+
+
+Retraining
+
+Retrain model with using the denoised labels. We get CV 0.94 LB 0.90 PB 0.934 with a simple Qishen Eff-b0 model with k-folds. Ensambling with different models further boosted to 1st place.
+
+We tried CleanLab too, but that did not perform well in CV/LB so we sticked with this.
+
+1. Our final submission
+Select 1 (public LB 0.910, private LB 0.922)
+Resnext50_32x4d(poteman)
+Select 2 (public LB 0.904, private LB 0.940)
+Effnet-B0(arutema47) + Effnet-B1(fam_taro)
+Simple average (1 : 1)
+
+Suprisingly, even with several weight patterns, the PB was 0.940.
+
+2. Resnext50_32x4d( @poteman ), public 0.910, private 0.922
+
+This was our best LB model.
+
+Split kfold: stratified kfold with imghash(threshold 0.90)
+iafoss tile method
+tile size 256, tile num 64
+model:resnext50_32x4d
+head: 3 * reg_head + 1 * softmax head
+3. Effnet-B1(fam_taro), public 0.901, private 0.932
+Split kfold
+stratified 5 kfold with gleason-score and imghash similarity (threshold 0.90)
+convert negative to 0+0
+how to grouping by imghash similarity
+This is based on @appian 's kernel
+https://www.kaggle.com/appian/panda-imagehash-to-detect-duplicate-images
+https://www.kaggle.com/yukkyo/imagehash-to-detect-duplicate-images-and-grouping
+In my opinion, split method is import point for our denoise method.
+Because we use prediction of out of fold
+If you put the duplicate images in a different fold, I don't think denoise will work for them
 Data
-Code
-Models
-Discussion
-Leaderboard
-Rules
-Failed to load the discussion topic
-error
+iafoss tile method
+tile size 192, tile num 64
+Model: Effnet-B1 + GeM
+label: isup-grade and first score of gleason(10 dim bin)
+Make final sub by 3 steps
+Local train & predict
+Remove noisy label
+extended @kyoshioka47 method
+Change threshold for each isup-grade and data-provider
+Re-train
+Not work for me
+Remove noisy by confident-learning
+Cycle GAN augmentation(karolinska <-> radboud)
+test with AdaBN & Freezing BN at train
+CutMix, Mixup (before denoising)
+def remove_noisy2(df, thresholds):
+    gap = np.abs(df["isup_grade"] - df["probs_raw"])
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+    df_keeps = list()
+    df_removes = list()
 
-error
+    for label, thresh in enumerate(thresholds):
+        df_tmp = df[df.isup_grade == label].reset_index(drop=True)
+        gap_tmp = gap[df.isup_grade == label].reset_index(drop=True)
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+        df_remove_tmp = df_tmp[gap_tmp > thresh].reset_index(drop=True)
+        df_keep_tmp = df_tmp[gap_tmp <= thresh].reset_index(drop=True)
 
-Failed to load the discussion topic
+        df_removes.append(df_remove_tmp)
+        df_keeps.append(df_keep_tmp)
+
+    df_keep = pd.concat(df_keeps, axis=0)
+    df_removed = pd.concat(df_removes, axis=0)
+    return df_keep, df_removed
+
+def remove_noisy3(df, thresholds_rad, thresholds_ka):
+    df_r = df[df.data_provider == "radboud"].reset_index(drop=True)
+    df_k = df[df.data_provider != "radboud"].reset_index(drop=True)
+
+    dfs = [df_r, df_k]
+    thresholds = [thresholds_rad, thresholds_ka]
+    df_keeps = list()
+    df_removes = list()
+
+    for df_tmp, thresholds_tmp in zip(dfs, thresholds):
+        df_keep_tmp, df_remove_tmp = remove_noisy2(df_tmp, thresholds_tmp)
+        df_keeps.append(df_keep_tmp)
+        df_removes.append(df_remove_tmp)
+
+    df_keep = pd.concat(df_keeps, axis=0)
+    df_removed = pd.concat(df_removes, axis=0)
+    return df_keep, df_removed
+
+# Change thresh each label each dataprovider
+thresholds_rad=[1.3, 0.8, 0.8, 0.8, 0.8, 1.3]
+thresholds_ka=[1.5, 1.0, 1.0, 1.0, 1.0, 1.5]
+
+df_keep, df_removed = remove_noisy3(df, thresholds_rad=thresholds_rad, thresholds_ka=thresholds_ka)
+show_keep_remove(df, df_keep, df_removed)
+
+
+Authors
+arutema47
+
+kyoshioka47
+
+poteman
+
+poteman
+
+fam_taro
+
+yukkyo
+
+arrow_drop_up
+225
+Share
+more_horiz
+Citation
+
+arutema47, poteman, fam_taro. 1st Place Solution [PND]. https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/writeups/pnd-1st-place-solution-pnd. 2020. Kaggle
+
+comment
+116 Comments
+17 appreciation comments
+Hotness
+
+Posted 6 years ago
+
+arrow_drop_up
+6
+more_vert
+
+Our single model @kyoshioka47 can get 3th place.👍
+
+reply
+Reply
+arutema47
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+After doing some analysis on late subs, I have a feeling that mixup augmentation was effective for generalization. I think this is a famous technique and most top-teams have implemented this too.
+
+For mixup, I simply made an another tile and mixed two images. I just implemented mixup from the original paper, but some implementation can be found from Bengali contests.
+
+Also tried cutmix, does not work well. Maybe because tile includes important information partially.
+
+mixup: Beyond Empirical Risk Minimization https://arxiv.org/abs/1710.09412
+
+viz
+
+You get weird images like this 
+
+some codes
+rd = np.random.rand()
+if mixup and rd < 0.3:
+    mix_idx = np.random.random_integers(0, len(self.df))
+    row2 = self.df.iloc[mix_idx]
+    img_id2 = row2.image_id
+    file = os.path.join("train_{}_{}".format(self.image_size, self.n_tiles), f'{img_id2}.npz')
+    images2 = np.load(file)["arr_0"]
+    images2 = images2.transpose(2, 0, 1)
+
+    if self.transform is not None:
+        images2 = self.transform(image=images2)['image']
+
+    # blend image
+    gamma = np.random.beta(1,1)
+    images = ((images*gamma + images2*(1-gamma))).astype(np.uint8)
+    # blend labels
+    label2 = np.zeros(5).astype(np.float32)
+    label2[:row2.isup_grade] = 1.
+    label = (label*gamma+label2*(1-gamma))       
+
+reply
+Reply
+patriot
+
+Posted 5 years ago
+
+· 146th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+thanks for sharing!!
+
+One question is, is there any other way to use mixup to predict scale variables other than bin processing as in the example above?
+
+reply
+Reply
+Jaideep
+
+Posted 6 years ago
+
+· 449th in this Competition
+
+arrow_drop_up
+4
+more_vert
+
+Very nice congrats. I did exactly that in last few days although not systematically as you . Got 93 with this strategy ,few more iterations could have got more ,sad I din't believe that solution of self as it scored poor at public
+
+reply
+Reply
+arutema47
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Actually it was your discussion which lead us to this idea :) big thanks
+
+Currently looking at our submissions, this solution overfits to the PB, still need to investigate if this works well as a machine learning solution for prostitute cancer.
+
+reply
+Reply
+3 more replies
+arrow_drop_down
+arutema47
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+We will share our codes! https://github.com/kentaroy47/Kaggle-PANDA-1st-place-solution
+
+reply
+Reply
+Amritvir Singh
+
+Posted 6 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing. It was quite insighful.
+
+reply
+Reply
+Vinay Phadnis
+
+Posted 6 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Thanks for sharing your method for handling noisy labels
+
+reply
+Reply
+Eek The Cat
+
+Posted 6 years ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congratulations, very interesting solution! I also tried cleaning labels online, but CV was unstable and I dropped this idea. Never got to try it the way you did. And our team also tried various stain normalizations, not GAN however. Also failed.
+
+reply
+Reply
+fam_taro
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+@cateek thx and congrats 2nd place ! Very interesting. Indeed, my CV was unstable in my case as well.
+
+I also considered stain normalization, but I didn't adopt it because I was afraid of test run time.
+
+reply
+Reply
+fam_taro
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@cateek I'll add a few things that I remembered.
+
+As you pointed out, the CV was unstable and I was looking at Public LB to make some adjustments. Also at that time I continued to use a light model (EfficientNet-B1) to avoid overfitting to noise that remained in local after denoising and Public LB.
+
+reply
+Reply
+Heroseo
+
+Posted 6 years ago
+
+arrow_drop_up
+2
+more_vert
+
+Wow, congrats @kyoshioka47, @yukkyo, @poteman.
+
+I did not participate in this competition. However, it is a pleasure to see the familiar guys I saw at other competitions.
+
+I look forward to your other competitions. 👍
+
+reply
+Reply
+fam_taro
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@piantic thx ! I'll see you at another competition soon!
+
+reply
+Reply
+DhruvGargg02
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulation, very good. Thaks for the information
+
+reply
+Reply
+Stanley Zheng
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Wow, a very novel solution and a great writeup, thanks for sharing. Congratulations!
+
+reply
+Reply
+Yassine Alouini
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Lots of things to remember for upcoming competitions! How did you come up with the noise removal technique? 🤔 And finally, congratulations on your win!
+
+reply
+Reply
+fam_taro
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+7
+more_vert
+
+@yassinealouini thx! This idea came to me by @kentaroy47. However, it's simple, but it came out of many experiments.
+
+The point of this idea is that my model may be more accurate than the Original Label.
+
+Specifically, prior to this idea I found that updating all of Radboud's labels to my out of fold predictions and re-training them would raise the public LB. This led me to think that the accuracy of the model might be better than Original Label.
+
+However, this denoising method has many problems (ex. breaking LocalCV, discarding to hard examples). Be careful if you use this method.
+
+reply
+Reply
+Yassine Alouini
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Alright, thanks for the tips!
+
+reply
+Reply
+Michal Brezak
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+@yukkyo I am just curious, if you say it comes from "many experiments", how much time is behind those experiments? hours, days, weeks? Thanks 🙊
+
+reply
+Reply
+عثمان
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations! I love this write up and I love your your techniques. Boss move / well done.
+
+reply
+Reply
+Mahmud Hasan
+
+Posted 6 years ago
+
+· 282nd in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks @yukkyo for your outstanding work and share with us
+
+reply
+Reply
+Walia
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats
+
+reply
+Reply
+tattaka
+
+Posted 6 years ago
+
+· 515th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats your team!!! Does probs_raw mean regression value? For example, it is possible that the model outputs a large negative value for a sample whose label is 0. Did you do processing such as clipping?
+
+reply
+Reply
+fam_taro
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+@tattaka thx ! I convert each label value to bin (ex. 2 -> [1, 1, 0, 0, 0]) and using sigmoid for predicting. So there are no negative value on my case.
+
+reply
+Reply
+tattaka
+
+Posted 6 years ago
+
+· 515th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks.
+
+reply
+Reply
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Hi @yukkyo!! What is the usual motivation use bin label?
+
+reply
+Reply
+Wonho Song
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! The method to get clean label looks fancy. I wonder score before/after applying this method.
+
+reply
+Reply
+fam_taro
+
+Topic Author
+
+Posted 6 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+5
+more_vert
+
+@songwonho thx ! On my single model, before and after removing the noise, the following is what it looks like
+
+before: Public: 0.892, Private: 0.916
+after: Public: 0.901, Private: 0.932
+reply
+Reply
+Wonho Song
+
+Posted 6 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Interesting ! Thanks.
+
+reply
+Reply
+Marek Nurzynski
+
+Posted 6 years ago
+
+· 66th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats ! Gratuluje ! Marek
+
+reply
+Reply
+Alex
+
+Posted 6 years ago
+
+· 99th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats ! Thanks for sharing your method to handle noisy labels, very interesting.
+
+reply
+Reply
+Erik Larson
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+congratulations!!
+
+reply
+Reply
+Sami.Alashabi
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Well done
+
+reply
+Reply
+Rafael Pompeu
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations
+
+reply
+Reply
+Saksham Agrawal
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Great Solution
+
+reply
+Reply
+Alex Rain
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulations and thank you. I learned a lot!
+
+reply
+Reply
+Adhyan Maji
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Your work really helped me to learn and understand. Thank you.
+
+reply
+Reply
+LeeSangHun_JackJack
+
+Posted 6 years ago
+
+arrow_drop_up
+0
+more_vert
+
+Congratulation…!!
+
+reply
+Reply

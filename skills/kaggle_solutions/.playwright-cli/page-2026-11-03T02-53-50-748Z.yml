@@ -1,0 +1,605 @@
+- generic [ref=f65e2]:
+  - navigation:
+    - generic:
+      - generic:
+        - generic:
+          - button: menu
+        - link:
+          - /url: "#site-content"
+          - text: Skip to content
+        - generic:
+          - link:
+            - /url: /
+    - generic:
+      - button:
+        - generic:
+          - generic:
+            - generic:
+              - paragraph: Create
+    - generic:
+      - generic:
+        - generic:
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /
+                  - generic:
+                    - generic:
+                      - paragraph: Home
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /competitions
+                  - generic:
+                    - generic:
+                      - paragraph: Competitions
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /benchmarks
+                  - generic:
+                    - generic:
+                      - paragraph: Benchmarks
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /arenas
+                  - generic:
+                    - generic:
+                      - paragraph: Arenas
+            - listitem:
+              - generic:
+                - link:
+                  - /url: /game-arena
+                  - generic:
+                    - generic:
+                      - paragraph: Game Arena
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: Data Hub
+                - generic:
+                  - generic:
+                    - button
+          - list:
+            - listitem:
+              - generic:
+                - link:
+                  - /url: "#"
+                  - generic:
+                    - generic:
+                      - paragraph: More
+                - generic:
+                  - generic:
+                    - button
+  - navigation "Main menu, search and your account" [ref=f65e3]:
+    - generic [ref=f65e5]:
+      - button "Navigation menu" [ref=f65e7] [cursor=pointer]: menu
+      - link "Skip to content" [ref=f65e8] [cursor=pointer]:
+        - /url: "#site-content"
+        - text: Skip tocontent
+      - link "Return to Kaggle home page" [ref=f65e10] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f65e14]:
+      - link [ref=f65e15] [cursor=pointer]:
+        - /url: /account/login?phase=startSignInTab&returnUrl=%2Fcompetitions%2Fpkdd-15-taxi-trip-time-prediction-ii%2Fwriteups%2Fwillie-liao-method-sharing
+        - button "Login" [ref=f65e16]
+      - link [ref=f65e18] [cursor=pointer]:
+        - /url: /account/login?phase=startRegisterTab&returnUrl=%2Fcompetitions%2Fpkdd-15-taxi-trip-time-prediction-ii%2Fwriteups%2Fwillie-liao-method-sharing
+        - button "Sign Up" [ref=f65e19]
+  - main [ref=f65e21]:
+    - generic [ref=f65e23]:
+      - generic [ref=f65e24]: Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+      - generic [ref=f65e25]:
+        - link "Learn more" [ref=f65e26] [cursor=pointer]:
+          - /url: /cookies
+        - generic [ref=f65e28] [cursor=pointer]: OK, Got it.
+    - generic [ref=f65e29]:
+      - generic [ref=f65e31]: "Method Sharing — ECML/PKDD 15: Taxi Trip Time Prediction (II)"
+      - separator [ref=f65e35]
+      - generic [ref=f65e37]:
+        - generic [ref=f65e38]:
+          - heading "Method Sharing" [level=1] [ref=f65e39]
+          - generic [ref=f65e40]:
+            - link [ref=f65e41] [cursor=pointer]:
+              - /url: /competitions/pkdd-15-taxi-trip-time-prediction-ii
+              - paragraph [ref=f65e43]: "ECML/PKDD 15: Taxi Trip Time Prediction (II)"
+            - paragraph [ref=f65e44]: Solution Writeup · 24th place
+        - separator [ref=f65e46]
+        - generic [ref=f65e47]:
+          - generic [ref=f65e49]:
+            - paragraph [ref=f65e50]: Congrats to all the winners.
+            - paragraph [ref=f65e51]: For my submission, the idea was to do something quick and dirty without the usual time-consuming steps of modeling, cross validating, and ensembling. Whereas my posted benchmark code used 1 point to find similar trajectories, the final submission used 2 points.
+            - paragraph [ref=f65e52]: Below is the recipe.
+            - list [ref=f65e53]:
+              - listitem [ref=f65e54]: Only use the most relevant rows. For example, to predict for 2014-12-21 at 14:30, only use train data from the afternoons of Sundays before public holidays.
+              - listitem [ref=f65e55]: Only use the most relevant columns. Basically, just timestamp and polyline.
+              - listitem [ref=f65e56]: Look up the most similar trajectories in train for each test case. For simplicity, only the starting locations and the cut-off locations are compared. (Train trajectory is cut to about the same length as test).
+              - listitem [ref=f65e57]: Similarity features include distance, overall bearing, and last bearing.
+              - listitem [ref=f65e58]: Calculate the average of coordinates and log(polyline length), weighted by similarity.
+              - listitem [ref=f65e59]: Thresholds chosen based on intuition and looking at a couple of examples to make sure enough similar trajectories are used.
+          - generic [ref=f65e60]:
+            - generic [ref=f65e61]:
+              - text: Author
+              - generic [ref=f65e62]:
+                - link "Willie Liao's profile" [ref=f65e63] [cursor=pointer]:
+                  - /url: /willieliao
+                  - generic "Willie Liao" [ref=f65e64]
+                - generic [ref=f65e68]:
+                  - link "Willie Liao" [ref=f65e69] [cursor=pointer]:
+                    - /url: /willieliao
+                  - paragraph [ref=f65e70]: willieliao
+            - separator [ref=f65e71]
+            - generic [ref=f65e72]:
+              - generic [ref=f65e73]:
+                - button "Upvote" [ref=f65e74] [cursor=pointer]:
+                  - generic [ref=f65e75]: arrow_drop_up
+                - button "9 votes" [ref=f65e76] [cursor=pointer]: "9"
+              - button "Share" [ref=f65e77] [cursor=pointer]
+              - button "Writeup actions" [ref=f65e79] [cursor=pointer]: more_horiz
+        - heading "Citation" [level=2] [ref=f65e80]
+        - paragraph [ref=f65e81]: Willie Liao. Method Sharing. https://www.kaggle.com/competitions/pkdd-15-taxi-trip-time-prediction-ii/writeups/willie-liao-method-sharing. 2015. Kaggle
+        - separator [ref=f65e82]
+        - generic [ref=f65e83]:
+          - generic [ref=f65e85]:
+            - generic [ref=f65e86]:
+              - generic [aria-hidden] [ref=f65e87]: comment
+              - heading "14 Comments" [level=2] [ref=f65e89]
+            - generic [ref=f65e92]:
+              - combobox "Select combobox. Hotness currently selected." [ref=f65e93] [cursor=pointer]:
+                - generic [ref=f65e94]: Hotness
+              - textbox [aria-hidden]: Hotness
+          - generic [ref=f65e96]:
+            - generic [ref=f65e97]:
+              - generic [ref=f65e101]:
+                - link "lamthuy's profile" [ref=f65e102] [cursor=pointer]:
+                  - /url: /lamthuy
+                  - generic "lamthuy" [ref=f65e103]
+                - generic [ref=f65e109]:
+                  - link [ref=f65e111] [cursor=pointer]:
+                    - /url: /lamthuy
+                    - heading "lamthuy" [level=3] [ref=f65e112]
+                  - generic [ref=f65e113]:
+                    - paragraph [ref=f65e114]: Posted 11 years ago
+                    - paragraph [ref=f65e116]: · 3rd in this Competition
+                - generic [ref=f65e118]:
+                  - generic [ref=f65e119]:
+                    - button "Upvote" [ref=f65e120] [cursor=pointer]:
+                      - generic [ref=f65e121]: arrow_drop_up
+                    - button "7 votes" [ref=f65e122] [cursor=pointer]: "7"
+                  - button "More Options for this Comment" [ref=f65e123] [cursor=pointer]: more_vert
+                - generic [ref=f65e126]:
+                  - paragraph [ref=f65e127]: Hi,
+                  - paragraph [ref=f65e128]: "Here is our team's approach (BlueTaxi):"
+                  - paragraph [ref=f65e129]: First we created our local training set by selecting the cut-off times the same as the five snapshots on the test set (the same week-date as well). We also see that 14th of august is the day before a big holiday in Portugal and 21th of December is the last Sunday before Christmas, we hypothesize that on that day people go to shopping and to the Church.
+                  - paragraph [ref=f65e130]: "We created a bunch of features as follows:"
+                  - paragraph [ref=f65e131]: 1. Features from 10-nn, for every test trip we find 10 nearest neighbours w.r.t the Euclidean distance (DTW is an option but we see that it is not very efficient) , consider the durations of those trips as predictors.
+                  - paragraph [ref=f65e132]: 2. Features from kernel regression, similar to 10-nn kernel regression was used to predict the duration, kernel regression is a smooth version of knn and these features showed very good results.
+                  - paragraph [ref=f65e133]: "3. Some features from the partial trips: travelled distance, num_gps, last gps, average speed at different part of the trips, accelerations at different part of the trips"
+                  - paragraph [ref=f65e134]: When matching a test trip with the training trips, we only consider to match the last 100, 200, 300, 400, 500, 1000 meters and the full trips as well. This is because the later part of the trip is more important in some cases. Our model show that the last 500 meters of the trip is very important.
+                  - paragraph [ref=f65e135]: We also considered contextual matching (match only trips with same taxi_id, the same week_date, the same call_id etc.) because we see different distributions of destination for these contexts. The kernel regression on taxi_id context gives the best results.
+                  - paragraph [ref=f65e136]: When modelling, don't predict the duration of the whole trip but predict additional travel time instead. Because the metric of evaluation is RMSLE so we should predict log of the additional travel time.
+                  - paragraph [ref=f65e137]: "Outlier handling: we found that trips with missing values (identified at speed limits 160, 140, 100 Km/h) are more difficult to predict, we try to recover this information on the test set by looking at the gap between the cut-off timestamp and the start timestamp. Unfortunately, this information is not reliable so we decided to remove outliers with num_gps more than at 3.5 median of num_gps update."
+                  - paragraph [ref=f65e138]: We used different models, I used random forest and SVR while Bluebalam used extreme randomized trees, gradient boosting trees etc. Locally we see consistent results with CV (0.41). On the test set the result is quite different. But our approach is robust enough on both public and private test sets.
+                  - paragraph [ref=f65e139]: Cheers,
+                  - paragraph [ref=f65e140]: cheers,
+                - button "Reply" [ref=f65e142] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e143]: reply
+              - separator [ref=f65e145]
+            - generic [ref=f65e146]:
+              - generic [ref=f65e150]:
+                - link "David Shinn's profile" [ref=f65e151] [cursor=pointer]:
+                  - /url: /davidshinn
+                  - generic "David Shinn" [ref=f65e152]
+                - generic [ref=f65e158]:
+                  - link [ref=f65e160] [cursor=pointer]:
+                    - /url: /davidshinn
+                    - heading "David Shinn" [level=3] [ref=f65e161]
+                  - generic [ref=f65e162]:
+                    - paragraph [ref=f65e163]: Posted 11 years ago
+                    - paragraph [ref=f65e165]: · 6th in this Competition
+                - generic [ref=f65e167]:
+                  - generic [ref=f65e168]:
+                    - button "Upvote" [ref=f65e169] [cursor=pointer]:
+                      - generic [ref=f65e170]: arrow_drop_up
+                    - button "6 votes" [ref=f65e171] [cursor=pointer]: "6"
+                  - button "More Options for this Comment" [ref=f65e172] [cursor=pointer]: more_vert
+                - generic [ref=f65e175]:
+                  - paragraph [ref=f65e176]: "Here's my approach:"
+                  - paragraph [ref=f65e177]: "1. Reduce Training to around 58K records:"
+                  - list [ref=f65e178]:
+                    - listitem [ref=f65e179]: Reduce to trips with POLYLINE that overlapped the 5 different times of day in the Test.
+                    - listitem [ref=f65e180]: Reduce to trips on 5 days of week in Test
+                  - paragraph [ref=f65e181]: 2. Features (where snapshot was the time of day coinciding with the times of day in the Test).
+                  - list [ref=f65e182]:
+                    - listitem [ref=f65e183]: call_type_dummies
+                    - listitem [ref=f65e184]: origin_stand (missing set to -1)
+                    - listitem [ref=f65e185]: taxi_id
+                    - listitem [ref=f65e186]: beg_long
+                    - listitem [ref=f65e187]: beg_lat
+                    - listitem [ref=f65e188]: length_polyline_to_snapshot
+                    - listitem [ref=f65e189]: snapshot_lat
+                    - listitem [ref=f65e190]: snapshot_long
+                    - listitem [ref=f65e191]: snapshot_weekday
+                    - listitem [ref=f65e192]: snapshot_hour (In Test, manually set based upon the snapshot datetime because some of the polylines lengths did not match the snapshot datetime)
+                    - listitem [ref=f65e193]: net_distance_to_snapshot
+                    - listitem [ref=f65e194]: seconds_to_snapshot
+                    - listitem [ref=f65e195]: log_seconds_to_snapshot
+                  - paragraph [ref=f65e196]: 3. Dependent Variable
+                  - list [ref=f65e197]:
+                    - listitem [ref=f65e198]: Log of trip seconds
+                  - paragraph [ref=f65e199]: 4. Model
+                  - list [ref=f65e200]:
+                    - listitem [ref=f65e201]: Random Forest Regressor (sklearn) with default settings except used 500 and 1000 trees for my last two submissions.
+                  - paragraph [ref=f65e202]: "5. Result:"
+                  - list [ref=f65e203]:
+                    - listitem [ref=f65e204]: Public LB = 0.54511
+                    - listitem [ref=f65e205]: Private LB = 0.54356
+                  - paragraph [ref=f65e206]: There was definitely some luck here (my CVs were way too optimistic and my Public Leaderboard scores were marginally competitive), however I did spend a fair amount of time in the taxi-I competition early on, so I was comfortable with the data. Like other competitions with small Train, small Test, or noisy data, sometimes the simpler models do well. Besides, there were plenty of prior competitions where luck did not play in my favor, so I guess it balances out eventually.
+                - button "Reply" [ref=f65e208] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e209]: reply
+              - separator [ref=f65e211]
+            - generic [ref=f65e212]:
+              - generic [ref=f65e216]:
+                - link "Willie Liao's profile" [ref=f65e217] [cursor=pointer]:
+                  - /url: /willieliao
+                  - generic "Willie Liao" [ref=f65e218]
+                - generic [ref=f65e224]:
+                  - generic [ref=f65e225]:
+                    - link [ref=f65e226] [cursor=pointer]:
+                      - /url: /willieliao
+                      - heading "Willie Liao" [level=3] [ref=f65e227]
+                    - paragraph [ref=f65e230]: Topic Author
+                  - generic [ref=f65e231]:
+                    - paragraph [ref=f65e232]: Posted 11 years ago
+                    - paragraph [ref=f65e234]: · 24th in this Competition
+                - generic [ref=f65e236]:
+                  - generic [ref=f65e237]:
+                    - button "Upvote" [ref=f65e238] [cursor=pointer]:
+                      - generic [ref=f65e239]: arrow_drop_up
+                    - button "4 votes" [ref=f65e240] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f65e241] [cursor=pointer]: more_vert
+                - paragraph [ref=f65e245]:
+                  - text: Posted my solution on
+                  - link "GitHub" [ref=f65e246] [cursor=pointer]:
+                    - /url: https://github.com/WillieLiao/Kaggle_Taxi_Trajectory
+                  - text: . Cleaning the code took almost as much time as creating it since I introduced a bug and also found another bug. Clean code got scores of 0.55903 for time duration and 2.39573 for location.
+                - button "Reply" [ref=f65e248] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e249]: reply
+              - separator [ref=f65e251]
+            - generic [ref=f65e252]:
+              - generic [ref=f65e256]:
+                - link "Santiago Mota's profile" [ref=f65e257] [cursor=pointer]:
+                  - /url: /santiagomota
+                  - generic "Santiago Mota" [ref=f65e258]
+                - generic [ref=f65e264]:
+                  - link [ref=f65e266] [cursor=pointer]:
+                    - /url: /santiagomota
+                    - heading "Santiago Mota" [level=3] [ref=f65e267]
+                  - generic [ref=f65e268]:
+                    - paragraph [ref=f65e269]: Posted 11 years ago
+                    - paragraph [ref=f65e271]: · 10th in this Competition
+                - generic [ref=f65e273]:
+                  - generic [ref=f65e274]:
+                    - button "Upvote" [ref=f65e275] [cursor=pointer]:
+                      - generic [ref=f65e276]: arrow_drop_up
+                    - button "4 votes" [ref=f65e277] [cursor=pointer]: "4"
+                  - button "More Options for this Comment" [ref=f65e278] [cursor=pointer]: more_vert
+                - generic [ref=f65e281]:
+                  - paragraph [ref=f65e282]: Congrats to everybody and most at all, the top 10. I finish 11th and I will clean the code and post it on GitHub.
+                  - paragraph [ref=f65e283]: Last two weeks all my model were on h2o, and I used gbm, random forest and deep learning. It seems the best one was gbm. My selected submissions were (1) one pure gbm and (2) a combination of two gbm one deep learning and one random forest (all on h2o)
+                  - paragraph [ref=f65e284]: I used "weekday", "minute" (0-1440), "initial_longitude", "initial_latitude", "call_type" and "taxi_id" variables.
+                  - paragraph [ref=f65e285]: The only trick on my strategy was the use of duration time of trips. I did not use it to calculate the model but prior to submit it, I calculate if the predicted duration was less than time on test dataset and if so I choosed the time on dataset and multiply it to 1.45. Usually the number of this kind of trips was around 70 over 320.
+                - button "Reply" [ref=f65e287] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e288]: reply
+              - separator [ref=f65e290]
+            - generic [ref=f65e291]:
+              - generic [ref=f65e295]:
+                - link "Fluxus's profile" [ref=f65e296] [cursor=pointer]:
+                  - /url: /hochthom
+                  - generic "Fluxus" [ref=f65e297]
+                - generic [ref=f65e303]:
+                  - link [ref=f65e305] [cursor=pointer]:
+                    - /url: /hochthom
+                    - heading "Fluxus" [level=3] [ref=f65e306]
+                  - generic [ref=f65e307]:
+                    - paragraph [ref=f65e308]: Posted 11 years ago
+                    - paragraph [ref=f65e310]: · 1st in this Competition
+                - generic [ref=f65e312]:
+                  - generic [ref=f65e313]:
+                    - button "Upvote" [ref=f65e314] [cursor=pointer]:
+                      - generic [ref=f65e315]: arrow_drop_up
+                    - button "3 votes" [ref=f65e316] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f65e317] [cursor=pointer]: more_vert
+                - generic [ref=f65e320]:
+                  - paragraph [ref=f65e321]: Hi all,
+                  - paragraph [ref=f65e322]: here is a short overview of the 1st place solution.
+                  - paragraph [ref=f65e323]: "My solution is based on 3 different kind of models:"
+                  - list [ref=f65e324]:
+                    - listitem [ref=f65e325]: A base model, where the features were extracted from all the tracks in the training set, and longer tracks were sampled more frequently than shorter ones.
+                    - listitem [ref=f65e326]: Expert models for short trips (e.g. only 1,2 or 3 positions are known).
+                    - listitem [ref=f65e327]: Expert models for each cut off position in the test set (e.g. tracks close to the cut-off position have been selected).
+                  - paragraph [ref=f65e328]:
+                    - strong [ref=f65e329]: "Selected Features:"
+                  - list [ref=f65e330]:
+                    - listitem [ref=f65e331]: working day (Mon-Sun)
+                    - listitem [ref=f65e332]: hour
+                    - listitem [ref=f65e333]: trip length
+                    - listitem [ref=f65e334]: lat coordinate start point
+                    - listitem [ref=f65e335]: long coordinate start point
+                    - listitem [ref=f65e336]: lat coordinate cut of point
+                    - listitem [ref=f65e337]: long coordinate cut of point
+                    - listitem [ref=f65e338]: distance from start point to city center
+                    - listitem [ref=f65e339]: direction from the start point towards the city center
+                    - listitem [ref=f65e340]: distance from city center to cut of point
+                    - listitem [ref=f65e341]: direction from the city center towards the cut of point
+                    - listitem [ref=f65e342]: net distance to cut of point
+                    - listitem [ref=f65e343]: median velocity of the car along the track
+                    - listitem [ref=f65e344]: velocity of the car at the cut of point
+                    - listitem [ref=f65e345]: heading of the car at the cut of point
+                  - paragraph [ref=f65e346]:
+                    - strong [ref=f65e347]: "Training:"
+                  - paragraph [ref=f65e348]: All models are trained using 5 fold cross-validation. I used RandomForestRegressor and GrandientBoostingRegressor from sklearn with default settings except the number of trees, which was set to 200. For most models the GradientBoostingRegressor was slightly better. I also tried neural networks but they performed worse.
+                  - paragraph [ref=f65e349]: The final prediction of each test trip was based on the corresponding expert model except for the trips with a low training set size, where I used either the base model or a simple average of all the short trip models depending on trip length.
+                  - paragraph [ref=f65e350]: A detailed description of my approach and the code will follow soon.
+                - button "Reply" [ref=f65e352] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e353]: reply
+              - separator [ref=f65e355]
+            - generic [ref=f65e356]:
+              - generic [ref=f65e360]:
+                - link "tyi2000's profile" [ref=f65e361] [cursor=pointer]:
+                  - /url: /tyi2000
+                  - generic "tyi2000" [ref=f65e362]
+                - generic [ref=f65e368]:
+                  - link [ref=f65e370] [cursor=pointer]:
+                    - /url: /tyi2000
+                    - heading "tyi2000" [level=3] [ref=f65e371]
+                  - generic [ref=f65e372]:
+                    - paragraph [ref=f65e373]: Posted 11 years ago
+                    - paragraph [ref=f65e375]: · 2nd in this Competition
+                - generic [ref=f65e377]:
+                  - generic [ref=f65e378]:
+                    - button "Upvote" [ref=f65e379] [cursor=pointer]:
+                      - generic [ref=f65e380]: arrow_drop_up
+                    - button "3 votes" [ref=f65e381] [cursor=pointer]: "3"
+                  - button "More Options for this Comment" [ref=f65e382] [cursor=pointer]: more_vert
+                - generic [ref=f65e385]:
+                  - paragraph [ref=f65e386]: Here goes my approach.
+                  - paragraph [ref=f65e387]:
+                    - strong [ref=f65e388]: preprocessing & feature generation
+                    - text: "From each training data, I created multiple training examples: each partial trajectory starting from the start location becomes a training example. For each training example, I then calculated the elapsed time until the last position, travel distance, the overall bearing, and the nearest taxi stand from the starting point."
+                  - paragraph [ref=f65e389]:
+                    - strong [ref=f65e390]: training
+                    - text: I used gradient boosting (R gbm package) for training.
+                  - paragraph [ref=f65e391]:
+                    - strong [ref=f65e392]: local validation
+                    - text: For local validation, I created two validation sets. Each consists of 5 cutoff points whose month, day of week, and time within day are same as the test dataset. I was able to pick the 2nd best result using the local validation result.
+                - button "Reply" [ref=f65e394] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e395]: reply
+              - separator [ref=f65e397]
+            - generic [ref=f65e398]:
+              - generic [ref=f65e402]:
+                - link "Dessy Amirudin's profile" [ref=f65e403] [cursor=pointer]:
+                  - /url: /staesthetics
+                  - generic "Dessy Amirudin" [ref=f65e404]
+                - generic [ref=f65e410]:
+                  - link [ref=f65e412] [cursor=pointer]:
+                    - /url: /staesthetics
+                    - heading "Dessy Amirudin" [level=3] [ref=f65e413]
+                  - paragraph [ref=f65e415]: Posted 11 years ago
+                - generic [ref=f65e417]:
+                  - generic [ref=f65e418]:
+                    - button "Upvote" [ref=f65e419] [cursor=pointer]:
+                      - generic [ref=f65e420]: arrow_drop_up
+                    - button "1 votes" [ref=f65e421] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f65e422] [cursor=pointer]: more_vert
+                - generic [ref=f65e425]:
+                  - paragraph [ref=f65e426]: "[quote=Willie Liao;83398]"
+                  - paragraph [ref=f65e427]: Just tried it with R 3.2 and data.table 1.9.4 and it works. Try upgrading to R 3.2.1 and reinstalling your packages to see if that solves the problem.
+                  - paragraph [ref=f65e428]: "[/quote]"
+                  - paragraph [ref=f65e429]: "@Willie"
+                  - paragraph [ref=f65e430]: Thank you. It did work :)
+                - button "Reply" [ref=f65e432] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e433]: reply
+              - separator [ref=f65e435]
+            - generic [ref=f65e436]:
+              - generic [ref=f65e440]:
+                - link "Willie Liao's profile" [ref=f65e441] [cursor=pointer]:
+                  - /url: /willieliao
+                  - generic "Willie Liao" [ref=f65e442]
+                - generic [ref=f65e448]:
+                  - generic [ref=f65e449]:
+                    - link [ref=f65e450] [cursor=pointer]:
+                      - /url: /willieliao
+                      - heading "Willie Liao" [level=3] [ref=f65e451]
+                    - paragraph [ref=f65e454]: Topic Author
+                  - generic [ref=f65e455]:
+                    - paragraph [ref=f65e456]: Posted 11 years ago
+                    - paragraph [ref=f65e458]: · 24th in this Competition
+                - generic [ref=f65e460]:
+                  - generic [ref=f65e461]:
+                    - button "Upvote" [ref=f65e462] [cursor=pointer]:
+                      - generic [ref=f65e463]: arrow_drop_up
+                    - button "1 votes" [ref=f65e464] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f65e465] [cursor=pointer]: more_vert
+                - generic [ref=f65e468]:
+                  - paragraph [ref=f65e469]:
+                    - text: "@Dessy, I have not seen that error before. It may be related to this"
+                    - link "this" [ref=f65e470] [cursor=pointer]:
+                      - /url: http://r.789695.n4.nabble.com/data-table-package-problem-td4708890.html
+                    - text: or
+                    - link "this" [ref=f65e471] [cursor=pointer]:
+                      - /url: http://stackoverflow.com/questions/31142280/unusual-error-in-setkeyv-with-data-table
+                    - text: . I don't have the computer that I tested the code with so I can't verify the versions. Just tried it with R 3.2 and data.table 1.9.4 and it works. Try upgrading to R 3.2.1 and reinstalling your packages to see if that solves the problem.
+                  - paragraph [ref=f65e472]: And just in case, I've updated the code to call setkey on train and poly before that particular statement. This shouldn't be the problem though.
+                - button "Reply" [ref=f65e474] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e475]: reply
+              - separator [ref=f65e477]
+            - generic [ref=f65e478]:
+              - generic [ref=f65e482]:
+                - link "Dessy Amirudin's profile" [ref=f65e483] [cursor=pointer]:
+                  - /url: /staesthetics
+                  - generic "Dessy Amirudin" [ref=f65e484]
+                - generic [ref=f65e490]:
+                  - link [ref=f65e492] [cursor=pointer]:
+                    - /url: /staesthetics
+                    - heading "Dessy Amirudin" [level=3] [ref=f65e493]
+                  - paragraph [ref=f65e495]: Posted 11 years ago
+                - generic [ref=f65e497]:
+                  - generic [ref=f65e498]:
+                    - button "Upvote" [ref=f65e499] [cursor=pointer]:
+                      - generic [ref=f65e500]: arrow_drop_up
+                    - button "1 votes" [ref=f65e501] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f65e502] [cursor=pointer]: more_vert
+                - generic [ref=f65e505]:
+                  - paragraph [ref=f65e506]: "[quote=Willie Liao;83285]"
+                  - paragraph [ref=f65e507]:
+                    - text: Posted my solution on
+                    - link "GitHub" [ref=f65e508] [cursor=pointer]:
+                      - /url: https://github.com/WillieLiao/Kaggle_Taxi_Trajectory
+                    - text: . Cleaning the code took almost as much time as creating it since I introduced a bug and also found another bug. Clean code got scores of 0.55903 for time duration and 2.39573 for location.
+                  - paragraph [ref=f65e509]: "[/quote]"
+                  - paragraph [ref=f65e510]: Hi Willie, thank you for sharing your code on github. I want to recreate your code but find an error.
+                  - paragraph [ref=f65e511]: When I execute
+                  - paragraph [ref=f65e512]:
+                    - strong [ref=f65e513]: poly[r==0, r2:=r2-1L]
+                  - paragraph [ref=f65e514]: I got following error
+                  - paragraph [ref=f65e515]:
+                    - strong [ref=f65e516]: "Error in setkeyv(..., physical = FALSE) :"
+                    - strong [ref=f65e517]: 4 arguments passed to .Internal(nchar) which requires 3
+                  - paragraph [ref=f65e518]: Do you know what the problem is? I am not really familiar with data.table package, already google it but clueless.
+                  - paragraph [ref=f65e519]: Thanks
+                - button "Reply" [ref=f65e521] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e522]: reply
+              - separator [ref=f65e524]
+            - generic [ref=f65e525]:
+              - generic [ref=f65e529]:
+                - link "lebroschar's profile" [ref=f65e530] [cursor=pointer]:
+                  - /url: /lebroschar
+                  - generic "lebroschar" [ref=f65e531]
+                - generic [ref=f65e537]:
+                  - link [ref=f65e539] [cursor=pointer]:
+                    - /url: /lebroschar
+                    - heading "lebroschar" [level=3] [ref=f65e540]
+                  - generic [ref=f65e541]:
+                    - paragraph [ref=f65e542]: Posted 11 years ago
+                    - paragraph [ref=f65e544]: · 7th in this Competition
+                - generic [ref=f65e546]:
+                  - generic [ref=f65e547]:
+                    - button "Upvote" [ref=f65e548] [cursor=pointer]:
+                      - generic [ref=f65e549]: arrow_drop_up
+                    - button "1 votes" [ref=f65e550] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f65e551] [cursor=pointer]: more_vert
+                - generic [ref=f65e554]:
+                  - paragraph [ref=f65e555]: Here's an overview of my approach for the 7th place solution.
+                  - paragraph [ref=f65e556]: The approach for this submission was pretty simple. I used an sklearn RandomForestRegressor with 30 trees to bin the training cases using log(duration + 1) as the target. The features I used were hour of the day, taxi id, caller id, and trip starting location (binned onto a grid with ~100m resolution).
+                  - paragraph [ref=f65e557]: For each test trip, I found the appropriate leaf in each tree of the random forest and removed the samples whose duration was shorter than the duration of the test trip segment. If necessary, I climbed the tree to include other nearby leaves so that I had at least 10 training trips that were longer than the test segment. I took the average of the log(duration +1) for those samples and that was my prediction.
+                  - paragraph [ref=f65e558]: Despite having learned better from other Kagglers, I did an awful job of CV. I didn't do any proper CV until the last day of the contest, thinking that due to the log factors in the evaluation metric the public leaderboard would be much less volatile due to the small number of test cases than in taxi-I. That was wrong =p I paid the price though - I ended up selecting only my 4th best case for submission and I discarded several ideas on account of the public leaderboard result that were actually good ones. We live and learn....
+                - button "Reply" [ref=f65e560] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e561]: reply
+              - separator [ref=f65e563]
+            - generic [ref=f65e564]:
+              - generic [ref=f65e568]:
+                - link "mlandry's profile" [ref=f65e569] [cursor=pointer]:
+                  - /url: /mlandry
+                  - generic "mlandry" [ref=f65e570]
+                - generic [ref=f65e576]:
+                  - link [ref=f65e578] [cursor=pointer]:
+                    - /url: /mlandry
+                    - heading "mlandry" [level=3] [ref=f65e579]
+                  - generic [ref=f65e580]:
+                    - paragraph [ref=f65e581]: Posted 11 years ago
+                    - paragraph [ref=f65e583]: · 12th in this Competition
+                - generic [ref=f65e585]:
+                  - generic [ref=f65e586]:
+                    - button "Upvote" [ref=f65e587] [cursor=pointer]:
+                      - generic [ref=f65e588]: arrow_drop_up
+                    - button "1 votes" [ref=f65e589] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f65e590] [cursor=pointer]: more_vert
+                - generic [ref=f65e593]:
+                  - paragraph [ref=f65e594]: "@Smota, nice to see use of H2O here :-) Thanks for posting your work so quickly. Interesting to see so many trees: RF with 3100 trees and GBM with 10000 deep trees (15)."
+                  - paragraph [ref=f65e595]: My best models in H2O also had to have post-processing, but on the short trips, whereas it would seem like the target of your post-processing step was the long ones.
+                - button "Reply" [ref=f65e597] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e598]: reply
+              - separator [ref=f65e600]
+            - generic [ref=f65e601]:
+              - generic [ref=f65e605]:
+                - link "Santiago Mota's profile" [ref=f65e606] [cursor=pointer]:
+                  - /url: /santiagomota
+                  - generic "Santiago Mota" [ref=f65e607]
+                - generic [ref=f65e613]:
+                  - link [ref=f65e615] [cursor=pointer]:
+                    - /url: /santiagomota
+                    - heading "Santiago Mota" [level=3] [ref=f65e616]
+                  - generic [ref=f65e617]:
+                    - paragraph [ref=f65e618]: Posted 11 years ago
+                    - paragraph [ref=f65e620]: · 10th in this Competition
+                - generic [ref=f65e622]:
+                  - generic [ref=f65e623]:
+                    - button "Upvote" [ref=f65e624] [cursor=pointer]:
+                      - generic [ref=f65e625]: arrow_drop_up
+                    - button "1 votes" [ref=f65e626] [cursor=pointer]: "1"
+                  - button "More Options for this Comment" [ref=f65e627] [cursor=pointer]: more_vert
+                - paragraph [ref=f65e631]: "GitHub: https://github.com/santiagomota/kaggle-taxi-II"
+                - button "Reply" [ref=f65e633] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e634]: reply
+              - separator [ref=f65e636]
+            - generic [ref=f65e637]:
+              - generic [ref=f65e641]:
+                - link "moreiraMatias's profile" [ref=f65e642] [cursor=pointer]:
+                  - /url: /lmatias
+                  - generic "moreiraMatias" [ref=f65e643]
+                - generic [ref=f65e649]:
+                  - generic [ref=f65e650]:
+                    - link [ref=f65e651] [cursor=pointer]:
+                      - /url: /lmatias
+                      - heading "moreiraMatias" [level=3] [ref=f65e652]
+                    - paragraph [ref=f65e655]: Competition Host
+                  - paragraph [ref=f65e657]: Posted 11 years ago
+                - generic [ref=f65e659]:
+                  - generic [ref=f65e660]:
+                    - button "Upvote" [ref=f65e661] [cursor=pointer]:
+                      - generic [ref=f65e662]: arrow_drop_up
+                    - button "0 votes" [ref=f65e663] [cursor=pointer]: "0"
+                  - button "More Options for this Comment" [ref=f65e664] [cursor=pointer]: more_vert
+                - generic [ref=f65e667]:
+                  - paragraph [ref=f65e668]: Dear competitors,
+                  - paragraph [ref=f65e669]: Thank you for participating with your straightforward ideas. You made the success of this competition. I want to highlight that this dataset was donated to the UCI data repository to make it available for everyone who wants to run experiments with it.
+                  - paragraph [ref=f65e670]: "During my Phd, I used this data for other purposes (not this dataset, but similar data collected in previous periods). I will share my own insights with you (please feel free to make other questions if you think that they are relevant:"
+                  - paragraph [ref=f65e671]: 1) The spatial discretization is a must. It is not surprising to see that almost everyone did it somehow…
+                  - paragraph [ref=f65e672]: 2) The cutoff points were not randomly selected. They respond to particular seasonalities in Porto which could be mined through the calendar or by some exploratory data analysis as well.
+                  - paragraph [ref=f65e673]: 3) The model itself requires a carefull feature engineering before take off. Anyhow, I saw here very elegant solutions…e.g. gradient boosting. But maybe to get a model for each cutoff (or each cutoff type) wouldnt be a bad idea….what do you think?
+                  - paragraph [ref=f65e674]: Please feel free to pose more questions and continue to share your own solutions.
+                  - paragraph [ref=f65e675]: I do hope to see you all in Porto next September, in ECML/PKDD.
+                  - paragraph [ref=f65e676]: Best, Luis Moreira-Matias
+                - button "Reply" [ref=f65e678] [cursor=pointer]:
+                  - generic [aria-hidden] [ref=f65e679]: reply
+              - separator [ref=f65e681]
+            - generic [ref=f65e686]:
+              - link "Santiago Mota's profile" [ref=f65e687] [cursor=pointer]:
+                - /url: /santiagomota
+                - generic "Santiago Mota" [ref=f65e688]
+              - generic [ref=f65e694]:
+                - link [ref=f65e696] [cursor=pointer]:
+                  - /url: /santiagomota
+                  - heading "Santiago Mota" [level=3] [ref=f65e697]
+                - generic [ref=f65e698]:
+                  - paragraph [ref=f65e699]: Posted 11 years ago
+                  - paragraph [ref=f65e701]: · 10th in this Competition
+              - generic [ref=f65e703]:
+                - generic [ref=f65e704]:
+                  - button "Upvote" [ref=f65e705] [cursor=pointer]:
+                    - generic [ref=f65e706]: arrow_drop_up
+                  - button "0 votes" [ref=f65e707] [cursor=pointer]: "0"
+                - button "More Options for this Comment" [ref=f65e708] [cursor=pointer]: more_vert
+              - generic [ref=f65e711]:
+                - paragraph [ref=f65e712]: Thank you Mark. For my this contest was an occasion to test h2o. I really like your product but I need more time to extract all the potential. I did use at the last stage of the contest so I could not make many models, but made some parameters changes on random forest, gbm and deep learning over h2o.
+                - paragraph [ref=f65e713]: I must to say I did not spent enough time studding the problem of this trips. As I did not use the length of polyline to predict, I used it to test the prediction, When my predicted time was lower I tried to replace it and then I started to multiply first 1, 1.2, 2, and at last I used 1.45. I did not quite understand why on some many trips (around 70 over 320) all my models make a low prediction than the final time on test set. I wish I would work more on this, but the solution to multiply by 1.45 improve a lot the results. I need more time to analyze it.
+              - button "Reply" [ref=f65e715] [cursor=pointer]:
+                - generic [aria-hidden] [ref=f65e716]: reply
+  - alert [ref=f65e720]

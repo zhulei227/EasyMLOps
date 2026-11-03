@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/hpa-single-cell-image-classification/discussion/238910
-fetched: 2026-10-27
-chars: 834
+fetched: 2026-11-03
+chars: 6782
 
 menu
 Skip to
@@ -42,15 +42,115 @@ Models
 Discussion
 Leaderboard
 Rules
+ZFTurbo · 3rd in this Competition · Posted 5 years ago
+arrow_drop_up
+28
+more_vert
+3rd place solution - ZFTurbo part
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Before further reading it's better to read solution of my teammates @mpware and @christofhenkel first:
 
-error
+MPWARE part
+Dieter part
+Introduction
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+My initial solution was made on cell level only. E.g. I extracted all cells from all large images (including all available external data) and then used them independently. We merge with MPWARE early, and he used image level models. So I didn’t start to create my own pipeline for image level and concentrate on cell level only. We investigated early that ensembling of our approaches gives good boost. ~0.550 public.
 
-Failed to load the discussion topic
+ZFTurbo Part 1. Cell level models.
 
-error
+The training of cell level models was pretty straight-forward. I used image level labels for each independent cell. I used KFold split which were created using CellLine variable for external data. Actually training on all data or only external data gave me similar results.
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Models were different types of EffNet: EffNetB0, EffNetB3 and EffNetB5. The quality for all of them was similar. In first ensembles we usually took smallest ones. I used sigmoid on final layer with BCE loss and later switch to Focal Loss which improved score a little. I also used soft labels with (0.01*num_label)s koeff. I added large Dropout (0.5) to prevent overfitting.
+
+For validation I used several metrics: Avg AUC per class, Avg Accuracy per class and LogLoss. I mostly used AUC for early stopping. And ReduceLROnPlateu for the AUC metric as well. It was actually pretty hard to find where to stop. After some point model tends to overfit a little. I trained on 6 channel images [red, green, blue, yellow, mask, nuclei]. I used many different augmentations, including random crops, rotations etc. On inference I used TTA2 – original and mirror image.
+
+My simple cell level models had typical score from 0.460 on public LB up to 0.480 (around 0.465 on private). While this approach worked I had no real improvements after some point. It’s understandable because of weak labels. For some classes there was only small number of cells which actually of given class, while others are from other classes etc. Model start to give large probability for incorrect cells e.g. increasing number of false positives. I tried to train on single class images but it didn’t give additional boost.
+
+ZFTurbo Part 2. OOF models.
+
+I created OOF predictions for all cells on all images for some of my models. Eric (MPWARE) also created OOF for his models. We mixed OOF predictions together in the same way we ensemble our models on kaggle LB. So in some way we created mark up which is closer to reality e.g. “decrease” weakness of labels. I had some problems with creating OOF because we extract cells with slightly different algorithms. I wasn’t always able to find the same cell in Eric predictions. So only around 90% of cells were included in OOF with some small noise. So I adapt my models from previous chapter and used OOF predictions as new target. I used mean square error loss function here and tried to minimize it.
+
+These models gives around 0.528 on public LB, and after competition ends I find out that private is very similar to public score for these models. I also trained such model using green channel only. These two models, trained on OOF, were included in our final ensemble instead of standard classification models.
+
+ZFTurbo Part 3. Single class models.
+
+At some point we checked which classes had low score for our solution. And as we expected class 11 was the worst. This class has low amount of images available. So I spend one evening on the following: I created small labeler tool. It shows you single cell from full image and you must click on one button if cell of target class or other button otherwise (see screenshot). It stores your answer in cache, so you can continue from last point.
+
+image//soloro.ru/images/2021/hpa-kaggle.png
+
+I’m not biologist so I just googled “Mitotic spindle” and check images how it looks like. And actually it was pretty simple to find these cells on images. Also I probably found out why our models were bad for this class. The main reason is that Mitotic spindle cells are rare on images. It can have many cells and only single class 11. So when I trained my cell level models I show them mostly incorrect cells in training process. Using labeler tool I easily made good labels for all images in 3-4 hours. After all images were processed I just create single CSV with markup for class 11. And you can find it in this open dataset. So I trained binary classifier model on new labels and our score increased on public +0.008 (and as I find out recently it probably even more around 0.014 on private). So actually in my opinion handlabeling is key to win in this competition. ) But it was hard to do mark up for other classes because of large number of images and not so obvious differences in cells between some classes. Also I was too lazy to do additional markup. So class 11 was the only one where we made labels.
+
+I also created some other single models using default training labels, but they mostly wasn’t very good comparing to multiclass models, so we didn’t use them.
+
+Please sign in to reply to this topic.
+
+comment
+6 Comments
+1 appreciation comment
+Hotness
+narsil (jobs-in-data.com)
+
+Posted 5 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+This is a snapshot if images in my dataset 
+
+ZFTurbo
+
+Topic Author
+
+Posted 5 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Looks very similar to what I marked up as positive for class 11 )
+
+narsil (jobs-in-data.com)
+
+Posted 5 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats on the very impressive result @zfturbo !
+
+Regarding manual re-labeling of class 11, I had exactly the same intuition and followed a very similar procedure. I am working to make the dataset public.
+
+narsil (jobs-in-data.com)
+
+Posted 5 years ago
+
+· 5th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+I released the dataset here https://www.kaggle.com/narsil/hpa2021-class11-manuallabels
+
+This comment has been deleted.
+
+Appreciation (1)
+corochann
+
+Posted 5 years ago
+
+· 7th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats! Thank you for sharing.

@@ -1,6 +1,6 @@
 url: https://www.kaggle.com/c/feedback-prize-effectiveness/discussion/347537
-fetched: 2026-10-27
-chars: 800
+fetched: 2026-11-03
+chars: 5626
 
 menu
 Skip to
@@ -42,13 +42,172 @@ Models
 Discussion
 Leaderboard
 Rules
-Failed to load the discussion topic
-error
+Psi · 1st in this Competition · Posted 4 years ago
+arrow_drop_up
+74
+more_vert
+Team Hydrogen: Efficiency Prize 1st Place
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Thanks a lot to the hosts and Kaggle for hosting a separate efficiency track in this competition. Also thank you @ryanholbrook for answering our questions and addressing technical issues for this new format.
 
-error
+Summary
 
-Too many requests to GetForumTopicById. Please try again later. Learn more about Rate Limits.
+Our most efficient model is a single deberta-v3-large that got a 0.557 score on the Private LB in 5 minutes and 40 seconds. So, this model alone would get a top-3 position on the Private LB with such a quick submission. Here you can find a notebook with our most efficient submission: https://www.kaggle.com/code/philippsinger/team-hydrogen-efficiency-prize-1st-place
 
-Failed to load the discussion topic
+Model design
+
+The model architecture follows the same principles we’ve described in our main solution (essay group model). However, the main difference comes from the way this model has been trained. We were fortunate to figure this approach out two days before the competition deadline:
+
+We generate pseudo labels data for the previous Feedback competition by using our large ensemble with 2nd level models. In the main solution we used 3 rounds of pseudo labeling, but for this model we used 4th round
+We also generate out-of-fold pseudo labels for our given train data
+Now we combine these 2 datasets with soft pseudo labels together and train a single new model without any original labels
+
+It allows us to distill the knowledge from the large ensemble to a single model. And it is doing that pretty well, only losing 3 points vs our best large ensemble submission.
+
+Additionally to a deberta-v3-large model, we have a couple of extra 2nd level models to further improve the quality of the predictions. More details about our 2nd level models are available in the main solution description. Note though that these extra 2nd level models only bring one additional point here.
+
+Inference optimization
+
+During the competition we always had some plans to optimize the speed of the model inference, but have never found time/priority for it. So, our final kernel is a simple PyTorch model with a cleaned inference loop. One thing that allowed us to save another 40 seconds was to pre-tokenize essays in advance and sort them by the sequence length. Such an approach in combination with dynamic padding is 40 seconds faster compared to just sorting the essays by the char length.
+
+We also tried Deberta-small and Deberta-base models, both of them also work really well and you would only lose a couple more points in accuracy, while even reducing the runtime by some minutes more. For example, a single base model runs in less than two minutes!
+
+Please sign in to reply to this topic.
+
+comment
+11 Comments
+Hotness
+Trushant Kalyanpur
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+6
+more_vert
+
+Top 3 finish for a model that runs under 6 mins blows my mind. Amazing work!
+
+Raja Biswas
+
+Posted 4 years ago
+
+· 3rd in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congratulation Team Hydrogen!! Pretty insane to achieve 0.557 in 5 min 40sec 🎉🎉🎉 Cool strategy on pseudo labelling, specifically on using out of fold pseudo labels for the provided labelled training data. Once again, well done!!
+
+Darragh
+
+Posted 4 years ago
+
+· 4th in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Congrats @psi great write up and work from team hydrogen
+
+DeepUnderstanding
+
+Posted 4 years ago
+
+· 160th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+We also generate out-of-fold pseudo labels for our given train data what do you mean by this?
+
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+OOF predictions
+
+Apa
+
+Posted 4 years ago
+
+· 74th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Now we combine these 2 datasets with soft pseudo labels together and train a single new model without any original labels
+
+I want to know how to merge between these two datasets is each weight added? Is the final training loss function based on the new dataset soft label CrossEntropyLoss?
+
+Patrick Chan
+
+Posted 4 years ago
+
+· 60th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for the sharing PSI and hearty congratulations for the last 2 days brilliance!
+
+Posted 4 years ago
+
+arrow_drop_up
+1
+more_vert
+
+Congratulations!🎉🎉~~~~
+
+Roman Weilguny
+
+Posted 4 years ago
+
+· 114th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Congrats to your team! great work as usual… ad "Now we combine these 2 datasets with soft pseudo labels together and train a single new model without any original labels": Is this a well known distillation method? Think a never read about such a strategy…
+
+Psi
+
+Topic Author
+
+Posted 4 years ago
+
+· 1st in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+I personally know very little of the literature around this topic, but I am sure it came up somewhere before. In our case it was more of an intuition to try / use it.
+
+emoji_people
+Illia Rohalskyi
+
+Posted 4 years ago
+
+· 1304th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Good, thank you for sharing! Could you please explain what is pseudo labeling? I am really confused in your apporach
