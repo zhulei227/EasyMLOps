@@ -217,7 +217,42 @@ else:
     print("[SKIP] real laya smoke: set EASYMLOPS_TEST_REAL_LAYA=1 to enable "
           "(downloads 322M checkpoint)")
 
-# ============ 汇总 ============
+# ============ 5. DecisionSampleGenerator(微调样本生成) ============
+print("=== 5. DecisionSampleGenerator ===")
+from easymlops.llm import DecisionSampleGenerator
+
+sgen_df = pd.DataFrame({
+    "text": ["refund now", "slow shipping", "angry!", "where order", "refund pls"],
+    "label": ["refund", "logistics", "other", "logistics", "refund"],
+    "urgent": [1, 0, 1, 0, 0],
+})
+sgen = DecisionSampleGenerator(
+    questions=[{"name": "intent", "type": "choice", "instructions": "用户意图"},
+               {"name": "is_urgent", "type": "noul", "instructions": "是否紧急"}],
+    text_col="text", random_state=42)
+samples = sgen.generate(sgen_df, label_map={"intent": "label", "is_urgent": "urgent"})
+check("sgen_count", len(samples) == len(sgen_df) and sgen.last_skipped_ == 0)
+s0 = samples[0]
+check("sgen_contract", set(s0.keys()) == {"state", "questions", "answers"} and
+      s0["answers"]["intent"]["choice"] in ("refund", "logistics", "other") and
+      s0["answers"]["is_urgent"]["p"] in (0.0, 1.0))
+check("sgen_criteria_from_data", set(s0["questions"]["intent"]["criteria"].keys()) ==
+      {"refund", "logistics", "other"})
+# 非法标签行跳过
+sgen_df2 = pd.DataFrame({"text": ["ok", "bad"], "label": ["refund", "unknown_label"]})
+sgen2 = DecisionSampleGenerator(
+    questions=[{"name": "intent", "type": "choice",
+                "criteria": {"refund": "refund request"}}],
+    text_col="text")
+samples2 = sgen2.generate(sgen_df2, label_map={"intent": "label"})
+check("sgen_skips_invalid", len(samples2) == 1 and sgen2.last_skipped_ == 1)
+# split 可复现
+train_s, val_s = sgen.split(samples, val_ratio=0.2)
+train_s2, val_s2 = sgen.split(samples, val_ratio=0.2)
+check("sgen_split", len(val_s) >= 1 and len(train_s) + len(val_s) == len(samples) and
+      train_s == train_s2 and val_s == val_s2)
+
+print("================ SUMMARY ================")
 if os.path.exists(PKL):
     os.remove(PKL)
 print("")

@@ -206,6 +206,7 @@
 |------|------|---------|
 | DecisionModelPipe | 类 Jev 决策模型 pipe：state + typed questions(choice/score/noul) → 校准概率，单次前向非自回归 | questions, backend("laya"/"service"), state_col, api_base, min_confidence |
 | LoRAFineTuner | LoRA/QLoRA 微调接口：auto_adapt() 自动推断 target_modules（扫描全部投影层，兼容 GPT 系 Conv1D/ModernBERT/Qwen 系），train_sft/train_decision, load_adapter, merge_and_export | model_id, lora_rank, lora_alpha, use_qlora, local_path |
+| DecisionSampleGenerator | 微调样本生成：带标签表格 → Jev 契约样本({"state","questions","answers"})，criteria 从数据派生(显式给出则为封闭空间)，split 可复现 | questions, text_col, random_state |
 
 > 后端 "laya"：本地 `pip install laya`（421M/322M 非 AR 决策模型，CPU 可跑，Apache-2.0）；
 > 后端 "service"：Jev 兼容 HTTP `POST {api_base}/v1/systemone`（Jeff-serve/laya serve/OneJev）。
