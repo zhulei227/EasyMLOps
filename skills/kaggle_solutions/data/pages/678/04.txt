@@ -1,0 +1,183 @@
+url: https://www.kaggle.com/c/playground-series-s5e11/writeups/4th-place-solution
+fetched: 2026-11-03
+chars: 4998
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place Solution — Predicting Loan Payback
+4th Place Solution
+
+My Birthday Gift
+
+Predicting Loan Payback
+
+Solution Writeup · 4th place · Dec 1, 2025
+
+fullscreen
+
+Wow! I finally finished in the Top 5. More special because I had just turned 26… perfect timing for a gift. 😁
+
+I want to thank Kaggle for continuously organizing these competitions. I’ve been competing for a year now, and I’ve learned a lot from the Playground Series. You get to learn from great, skilled people like @optimistix, @tilii7, @ravi20076, and the two geniuses @cdeotte and @siukeitin. My participation in the Playground Series was a major reason why I later won 3 silver medals. I genuinely recommend newcomers to start here.
+
+Thanks to: @sagarnagpure1310, @mikhailnaumov, @masayakawamata, @yeoyunsianggeremie, @yekenot and others for the public codes.
+
+My approach: Two Models + Huge Feature Engineering
+
+I used LGBM as the main workhorse along with a strong DNN. I started late (last 10 days), so I began from public notebooks and optimized upon.
+
+First, I trained about 8 models (cv_xgb 0.9276, hgb 0.9273,, catboost 0.9272 .. etc), and ensembled them in multiple ways, but the gains were negligible. So I decided to invest more into FE.
+
+To avoid throwing away my earlier ensemble effort, I used the ensemble predictions over the test set as pseudo-labels. This was very effective (+0.0004 on CV).
+
+Then each of the two models (LGBM, DNN) followed the same pipeline:
+
+Large and diverse engineered feature space (about 100 new features). Surprisingly, n-way interactions didn’t help me 🤷‍♂️.
+Pseudo-labeling based on ensemble predictions.
+Stratified 5-fold CV training.
+N_SEEDS = 5 independent training runs.
+Differential-evolution hill-climbing for ensemble weighting (optimal convex combination of the 5 seeds using scipy.optimize.differential_evolution). This increased CV_DNN by +0.0004 over the best single seed, and CV_LGBM by +0.0002.
+Final test predictions by applying the optimized seed weights.
+
+For the final submission, I used a weighted average of LGBM and DNN.
+
+Model	CV	Public LB
+LGBM	0.9284	0.9279
+DNN	0.9274	0.927
+
+Public LB: 0.928
+Private LB: 0.92915
+
+Some notes/tips:
+
+I noticed many people weren’t happy with DNN/CatBoost performance. For me they worked well, but you need to treat them differently. FE sometimes is everything; it determines how the architecture "sees" the data.
+Always trust your CV score but avoid leakage, especially with TE. I repeatedly see public notebooks getting this wrong.
+Monitor LB when the test data is large enough (0.2 × 254,569 is a good indicator), but mix it with CV.
+Add features gradually and check if CV improves. Dropping a batch of features all at once could cancel each other.
+(Personal view; no idea if others agree) LLMs are totally useless for creativity. They just memorize and spit it nicely. Don’t waste time asking them to "optimize" anything unless your baseline is terrible. Searching with them or writing code is fine, but that’s it.
+I strongly recommend reading @cdeotte’s previous solutions.
+Tagged
+Binary Classification
+Feature Engineering
+Banking
+Author
+Ali_Haider_Ahmad
+
+alihaiderahmad
+
+arrow_drop_up
+17
+Share
+more_horiz
+Citation
+
+Ali_Haider_Ahmad. 4th Place Solution. https://www.kaggle.com/competitions/playground-series-s5e11/writeups/4th-place-solution. 2025. Kaggle
+
+comment
+5 Comments
+Hotness
+Optimistix
+
+Posted a year ago
+
+· 9th in this Competition
+
+arrow_drop_up
+3
+more_vert
+
+Congrats! You've been doing solid work for a while, and earned a well-deserved Top 5 place this time. Also - Happy Birthday!
+
+reply
+Reply
+1
+Crafty Code
+
+Posted a year ago
+
+· 154th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! for getting in a well-deserved Top 5 place. Also, Happy Birthday!
+
+reply
+Reply
+1
+Mahog
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats! Did you use the pseudo labels for all folds or did you do pseudo labeling separately for each fold? PS: happy birthday!
+
+reply
+Reply
+1
+Ali_Haider_Ahmad
+
+Topic Author
+
+Posted a year ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Same pseudo-labeled set for all folds. Training portion augmented with the entire pseudo-labeled subset, while the validation portion remained strictly original data.
+
+Thanks for the birthday note.
+
+reply
+Reply
+Tilii
+
+Posted a year ago
+
+· 6th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Great job! It is well known that pseudo labeling works when done properly, but I think you still managed to squeeze more out of it than what is normally expected.
+
+CatBoost worked well for me as well, but mostly when I created many categorical features. It was almost impossible to beat XGBoost when the numerical features were in majority.
+
+reply
+Reply
+1

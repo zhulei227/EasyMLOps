@@ -1,0 +1,234 @@
+url: https://www.kaggle.com/c/physionet-ecg-image-digitization/writeups/4th-place-solution
+fetched: 2026-11-03
+chars: 9228
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place Solution — PhysioNet - Digitization of ECG Images
+4th Place Solution
+
+ECG Digitization via Grid Rectification and Segmented Regression
+
+PhysioNet - Digitization of ECG Images
+
+Solution Writeup · 4th place · Jan 25, 2026
+
+First, I would like to thank the hosts and Kaggle for organizing this competition.
+I will explain my 4th place solution, focusing on the processing pipeline and model/training strategy.
+
+Solution Overview
+
+My approach focuses on rectification to make it easier for the model to recognize the signals, and then estimating the waveform using a regression model. Signal segmentation is treated only as an auxiliary task.
+
+The main points are:
+
+Robust Rectification: Estimate grid intersections and layout, then map from an indexed grid to a normalized coordinate system (based on @hengck23's Discussion).
+Vertical Splitting: Split the rectified image vertically by leads. This reduces the complexity of the prediction task.
+SNR-based Training: Use a loss function based on SNR, which is close to the evaluation metric.
+Processing Pipeline
+
+The process from input image to signal estimation is divided into 4 stages.
+
+Stage 1: Grid Intersection & Orientation
+Grid Intersection & Layout Detection
+
+For one high-resolution image, I use a sliding window (704x704 size, 0.5 overlap) to estimate the following using a multi-task model:
+
+Grid Intersection Heatmap: All grid intersections.
+Layout Segmentation: Positions of lead separator lines and calibration signals.
+
+Orientation Correction
+
+Using the detected layout information, I estimate the image orientation and rotate it (0/90/180/270 degrees) to a unified upright orientation. The detected intersection coordinates are also rotated.
+
+Stage 2: Grid Line Indexing
+
+Using the corrected image, the model estimates an index for each pixel indicating which vertical or horizontal line it belongs to.
+
+Input: Resized and padded to 1536x1536.
+Output: Vertical line index (55 classes + background), Horizontal line index (43 classes + background).
+Assignment: For each intersection detected in Stage 1, I aggregate the predicted labels in its neighborhood (radius 6px) and determine the row/col index by majority vote.
+
+This determines where each intersection corresponds to in the grid (row, col).
+
+Stage 3: Rectification & Splitting
+Rectification (Grid Unwarping)
+
+I create a sampling coordinate field from the indexed intersections and warp the image to a fixed-size coordinate system. This method is the same as the grid_sample approach shared by @hengck23.
+The output size is fixed at 1700x2200.
+
+Crop & Vertical Splitting
+
+The rectified image often contains headers or margins, so I crop the top 25% to keep only the signal area.
+Then, I split the image width into 4 segments. The segment boundaries are determined by converting fixed column indices to pixels in the rectified image.
+
+Each segment contains 3 short leads and 2.5 seconds of the long Lead II stacked vertically.
+Purpose:
+Reduce Complexity: The model does not need to search spatially for where each lead is in the whole image.
+Information Interpolation: Since the time axis is aligned within the same segment, taking 4 signals as input allows the model to use information from signals above and below to fill in gaps if grid lines are missing or noisy.
+
+Each segment image is resized to 800x800.
+
+Stage 4: Signal Estimation (Regression)
+Waveform Estimation Model
+
+The model takes the 4 segmented images as input and regresses the time-series values for 12 leads.
+
+Input: 800x800 x 3ch (x 4 segments)
+Output:
+Short Leads: Outputs waveforms for the corresponding 3 leads from each of the 4 segments.
+Long Lead II: Concatenates features from the 4 segments and outputs the full-length waveform.
+Resampling: The fixed-length output sequence is resampled to the required number of samples based on the test data's fs (sampling frequency) using linear interpolation.
+Ensemble
+
+I trained multiple models with different backbones and ensembled them using weighted median. The median was more robust against spike-like outlier predictions than the mean.
+
+Backbone	Weight	CV (SNR)	Public LB	Private LB
+resnetaa101d.sw_in12k_ft_in1k	1	25.62	21.99	22.03
+tf_efficientnetv2_m.in21k_ft_in1k	3	26.05	22.39	22.42
+tf_efficientnet_b6.ns_jft_in1k	4	26.05	22.50	22.44
+tf_efficientnetv2_l.in21k_ft_in1k	2	26.08	22.50	22.53
+Ensemble (Mean)		26.58	22.30	22.37
+Ensemble (Median)		26.45	22.71	22.69
+Models & Training Strategy
+Stage 1 & 2 Models (Grid & Index)
+Dataset & Annotation
+
+I created annotations (intersections and line indices) myself. I used a cycle of "Initial labeling by rule-based processing" -> "Model training" -> "Manual correction of inference results" to create about 1000 annotated images. Note that "lines" are stored as sequences of intersections, not as pixel-level continuous curves.
+
+Backbone & Pretraining
+
+I used ConvNeXt Small (convnext_small.dinov3_lvd1689m) for the backbones of Stage 1 and 2.
+Notably, I performed pretraining in the ECG image domain using FCMAE (Fully Convolutional Masked Autoencoder). This helped the model converge faster and improved detection accuracy even with limited labels.
+
+Stage 4 Model (Digitization)
+Network Architecture
+
+I used a U-Net based architecture with specific modifications for ECG Digitization.
+
+Asymmetric Decoder: The decoder performs normal 2D Upsampling initially. However, after the feature map size becomes large enough (1/8 scale), it performs Upsampling only in the horizontal (time) direction.
+This reduces the computational cost of unnecessary vertical resolution while ensuring high temporal resolution.
+Multi-head Regression:
+Short Leads Head: Performs Global Average Pooling vertically on the decoder output, then regresses using 1D Conv.
+Long Lead II Head: Concatenates features between segments along the time axis, then regresses using another 1D Conv.
+Auxiliary Head:
+I added a segmentation head to estimate the signal area for each lead. This was an auxiliary task to improve signal discrimination.
+
+Loss Function
+
+To prevent discrepancy with the evaluation metric, I designed a loss function based on SNR. I optimized the SNR term and the Mean term separately.
+
+External Datasets
+
+In addition to the training data, I used the following external datasets converted into images using ecg-image-kit:
+
+PTB-XL
+CODE-15%
+
+Since the generated data has accurate ground truth masks for which pixel corresponds to which lead, I was able to use them for training the auxiliary segmentation task.
+
+References
+
+Woo, S., Debnath, S., Hu, R., Chen, X., Liu, Z., Kweon, I. S., & Xie, S. (2023). Convnext v2: Co-designing and scaling convnets with masked autoencoders. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition (pp. 16133-16142).
+
+Kshama Kodthalu Shivashankara, Deepanshi, Afagh Mehri Shervedani, Matthew A. Reyna, Gari D. Clifford, Reza Sameni (2024). ECG-image-kit: a synthetic image generation toolbox to facilitate deep learning-based electrocardiogram digitization. In Physiological Measurement. IOP Publishing. doi: 10.1088/1361-6579/ad4954
+
+ECG-Image-Kit: A Toolkit for Synthesis, Analysis, and Digitization of Electrocardiogram Images, (2024). URL: https://github.com/alphanumericslab/ecg-image-kit
+
+Wagner, P., Strodthoff, N., Bousseljot, R., Samek, W., & Schaeffter, T. (2022). PTB-XL, a large publicly available electrocardiography dataset (version 1.0.3). PhysioNet. RRID:SCR_007345. https://doi.org/10.13026/kfzx-aw45
+
+Ribeiro, A. H., Paixao, G. M. M., Lima, E. M., Horta Ribeiro, M., Pinto Filho, M. M., Gomes, P. R., Oliveira, D. M., Meira Jr, W., Schon, T. B., & Ribeiro, A. L. P. (2021). CODE-15%: a large scale annotated dataset of 12-lead ECGs (1.0.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.4916206
+
+Code Release
+
+Code: https://github.com/uchiyama33/physionet_4th_place
+
+Submission notebook: https://www.kaggle.com/code/tomoon33/physionet-submission-4th-place
+
+Author
+tomoon33
+
+tomoon33
+
+arrow_drop_up
+27
+Share
+more_horiz
+Citation
+
+tomoon33. 4th Place Solution. https://www.kaggle.com/competitions/physionet-ecg-image-digitization/writeups/4th-place-solution. 2026. Kaggle
+
+1
+comment
+3 Comments
+Hotness
+Arko Bera
+
+Posted 9 months ago
+
+· 161st in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Congrats on the win I was going through your git hub code trying to reproduce the work, but got stuck with a missing json file error. data/annotations/multitask_lines_v2/. could you update that or provide resources to reproduce that file
+
+reply
+Reply
+tomoon33
+
+Topic Author
+
+Posted 9 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Thanks for checking out the code. I’ve uploaded the missing annotation files to GitHub under data/annotations/. Please pull the latest commit and try again.
+
+reply
+Reply
+2
+Simon Beck
+
+Posted 4 months ago
+
+arrow_drop_up
+0
+more_vert
+
+hi, @tomoon33 . what type of GPU did u use to train it and how long did it take?
+Congrats on this amazing work btw.
+
+reply
+Reply

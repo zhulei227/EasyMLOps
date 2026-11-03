@@ -1,0 +1,252 @@
+url: https://www.kaggle.com/c/playground-series-s5e10/writeups/4th-place-residual-xgboost-meta-nn-hill-clim
+fetched: 2026-11-03
+chars: 6234
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place – Residual XGBoost + Meta NN + Hill Climb Opt — Predicting Road Accident Risk
+4th Place – Residual XGBoost + Meta NN + Hill Climb Opt
+
+Road Accident Risk: From Residuals to Robust Blending
+
+Predicting Road Accident Risk
+
+Solution Writeup · 4th place · Nov 2, 2025
+
+fullscreen
+
+First, I would like to express my sincere thanks to the Kaggle team and the Playground Series organizers for this valuable learning experience.
+A big thank you as well to all participants for sharing ideas and notebooks.
+
+I’m especially grateful to @cdeotte for the helpful information he always provides, and also to Masaya Kawamata, Mikhail Naumov, Kirderf Aliffa Agnur, and others who published their great notebooks — they were very inspiring and useful references during this competition.
+
+I would also like to sincerely thank my teammate @ravi20076 for the great teamwork, thank you so much
+
+Approach
+
+Our approach in this competition was to collect and learn from shared community information.
+I started with notebooks by @cdeotte and valuable comments in discussions, especially from @broccoli_beef.
+
+XGBoost
+
+I experimented with several models — XGBoost, LightGBM, and CatBoost — and found that XGBoost gave the best results.
+So, I decided to focus mainly on XGBoost, training residual models and using Optuna for fine-tuning.
+
+My journey started with a CV of 0.05598 after the first submission.
+After applying the residual training technique inspired by @cdeotte , my CV improved slightly to 0.05594.
+Then, I introduced feature engineering, which helped reduce my CV to 0.05590.
+Using Optuna for parameter optimization brought it down further to 0.05588 after using
+
+BEST_PARAMS = {
+    'objective': 'reg:squarederror',
+    'eval_metric': 'rmse',
+    'tree_method': 'hist',
+    'max_bin': 518,
+    'learning_rate': 0.018518760913887423,
+    'max_depth': 7,
+    'min_child_weight': 6,
+    'subsample': 0.8043445574984056,
+    'colsample_bytree': 0.632194196921175,
+    'colsample_bylevel': 0.8258554264939971,
+    'colsample_bynode': 0.8456510777534194,
+    'reg_alpha': 0.15615008876432407,
+    'reg_lambda': 0.9717727187629448,
+    'gamma': 0.0048414273522507795,
+    'max_delta_step': 0,
+    'scale_pos_weight': 0.8129498984084946,
+    'random_state': 42
+}
+
+
+
+@metamodels params , thank you
+
+Used OOF and prediction as new features
+
+Next, I used OOF predictions as new features.
+I trained 14 XGBoost models, all using the same base features (my own delta features) plus additional features oof who shared by other participants.
+
+Neural Network
+Finally, I trained a Neural Network meta-blender +14 from our XGB and +7 oofs and using 17 different seeds , reaching CV = 0.0558347.
+
+When I moved to the Neural Network meta-model, I again included these external OOF features along with my stacked model outputs.
+
+Hill Climbing
+
+Then, I used hill climbing (with tolerance = 1e-9, inspired by @cdeotte method hill-climbing) to fine-tune the weights, which improved my CV to 0.055821.
+
+In the final stage, I applied blending between this 2 results my best models
+
+This consistent alignment between CV and lb score gave me strong confidence in my final solution.
+
+At the very end, after exploring @AnthonyTherrien’s notebook, I also experimented with hill-climb weighting (1.2 to hill-climb and 0.6 to nn ) , which slightly enhanced the final private score.
+
+Conclusion
+
+This competition was an incredible learning journey.
+By experimenting with different approaches — from feature engineering and residual training to model stacking, neural network blending, and hill climbing — I was able to gradually improve my CV and achieve a solid alignment with the private leaderboard.
+
+I’m truly grateful to the Kaggle community for the openness and collaboration that make these challenges so valuable.
+Finishing 4th place was very rewarding, but the real value came from the knowledge gained and the chance
+
+Authors
+benkerrouche abdelbasset
+
+bassetkerouche
+
+Ravi Ramakrishnan
+
+ravi20076
+
+arrow_drop_up
+13
+Share
+more_horiz
+Project Links
+4th Place Part 02
+
+a year ago · 12 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+4th Place Part 01
+
+a year ago · 12 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Citation
+
+abdelbasset Basto, Ravi Ramakrishnan. 4th Place – Residual XGBoost + Meta NN + Hill Climb Opt. https://www.kaggle.com/competitions/playground-series-s5e10/writeups/4th-place-residual-xgboost-meta-nn-hill-clim. 2025. Kaggle
+
+1
+comment
+6 Comments
+Hotness
+Tilii
+
+Posted a year ago
+
+· 1st in this Competition
+
+arrow_drop_up
+2
+more_vert
+
+Nicely done. I like how deliberate you were in sticking with XGB.
+
+reply
+Reply
+emoji_people
+benkerrouche abdelbasset
+
+Topic Author
+
+Posted a year ago
+
+· 4th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Appreciated, sir.thank you ,you deserve 1st place,, In many competitions, XGBoost has proven its robustness. So I decided in this playground to focus on one model, improving it step by step, since I didn’t have much time to test orher models,i found my CV decreasing step by step …so i decided sticking with it
+
+reply
+Reply
+Aaditya Khanal
+
+Posted a year ago
+
+arrow_drop_up
+1
+more_vert
+
+What an impressive and methodical approach! Your step-by-step CV improvements from 0.05598 to 0.055821 show real mastery. The residual training + meta NN + hill climbing combo is brilliant. Congratulations on 4th place!
+
+reply
+Reply
+1
+emoji_people
+benkerrouche abdelbasset
+
+Topic Author
+
+Posted a year ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Appreciate your compliment thank you so much
+
+reply
+Reply
+Meta Models
+
+Posted a year ago
+
+· 14th in this Competition
+
+arrow_drop_up
+1
+more_vert
+
+Huge congrats on 4th place! That single XGBoost model you mentioned with such a low CV RMSE is outstanding - clean features and tuning clearly paid off. Thanks for publishing your solution!
+
+reply
+Reply
+1
+emoji_people
+benkerrouche abdelbasset
+
+Topic Author
+
+Posted a year ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+you are welcome
+
+reply
+Reply

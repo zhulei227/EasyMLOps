@@ -1,0 +1,188 @@
+url: https://www.kaggle.com/c/MABe-mouse-behavior-detection/writeups/4th-place-solution-xgb-nn-ensemble
+fetched: 2026-11-03
+chars: 7706
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place Solution - XGB + NN Ensemble — MABe Challenge - Social Action Recognition in Mice
+4th Place Solution - XGB + NN Ensemble
+
+MABe Challenge - Social Action Recognition in Mice
+
+Solution Writeup · 4th place · Dec 17, 2025
+
+First of all thanks the host and Kaggle for hosting this competition! Also, a huge shoutout to @tomirol and @aerdem4 for the partnership and effort working in this challenge!
+
+TLDR
+
+Our solution is based on both NN and XGB trained per lab with different setups and parameters. For most labs we simply pick the model with highest CV for that lab, except for "LyricalHare", "InvincibleJellyfish" and "ElegantMink" where we perform majority voting frame-wise.
+
+Our models' per-lab CV scores are the following:
+
+
+XGB Pipeline
+
+Our code was originally forked from the great public notebook from @ravaghi, which was already a pretty strong baseline.
+Below we list the main points of our solution and the differences from the original notebook:
+
+We normalize the FPS of all videos to 30fps and use the mode to get the label in the window
+We standardize all sensors to only use nose, ear_left, ear_right, body_center and tail_base.
+For labs where body_center is not available we can derive it from hip_left + hip_right or lateral_left + lateral_right. As a last resort (only 2 labs) we interpolate it from tail_base + ears_l+r.
+For labs where nose is not available we simply replace it by head
+We train separated models from single mouse and pair setups
+We train 3 groups of 4 models (4Fold CV groupped per video and stratified by action label) for each lab_id and action, i.e., binary classifier per action
+We change the model initialization and KFold seed for each model group and average the probs in the end to get the prediction for the action
+We compute the individual action threshold by optimizing the F1 score on that lab's OOF predictions
+We combine the individual action predictions into multi-class by first computing the residual between prediction and its threshold, i.e., residual_action_i = pred_action_i - threshold_action_i, then taking the argmax across all residual_action_i. Finally, for the highest residual we simply check if residual_action_i > 0 to choose between action_i and no action.
+Since we train binary models for each action we simply ignore any frame where the label of the action in question is NaN
+For "CautiousGiraffe", "DeliriousFly", "GroovyShrew" and "TranquilPanther" we preprocess the keypoints by temporally interpolating (group["x"] = group["x"].interpolate(method="linear", limit_direction="both")) across the frames in order the reduce the large amount of NaN in the input.
+This preproc improved significantly the labs aforementioned but not for others, which we suspect could be due to a large amount of id-switch in the tracking system (it makes the interpolation results terrible)
+When applying interpolation we also add binary features for each keypoint flagging if the value is interpolated or not
+Single mouse features
+
+For the single mouse models we performed feature engieering focusing on the topics below:
+
+Pair-wise distance between sensor's keypoints
+Velocity for ear and tail
+Elongation vs. compactness features
+Body angle features
+Body center displacement features
+Body center acceleration and jerk features across different windows
+Angular velocity and turn-rate
+Grooming specific features
+Mouse metadata, e.g., sex, color, has device, etc..
+Arena boundary feats, e.g., how close mouse is from center or edges of the arena
+Pair features
+
+For pair of mice we simply try to create features that would capture the relationship between the mice:
+
+Self-mouse features similarly to the described above
+Cross-mice pair-wise distance between sensor's keypoints
+Relative speed between mice
+Relative acceleration and jerk
+Relative orientation
+Allogroom specific features
+Pair metadata feat, e.g., is_same_sex, is_same_color, etc..
+Temporal features
+
+Although part of our feature engineering pipeline was already capturing some features at different windows, we found really beneficial to simply "borrow" the features from neighbour frames as well. We did it in two different ways: "simple copy" and "statistics over window".
+
+Simple copy
+
+The first thing we tried was to simply use a sliding window to copy features from frames around frame_i. For example, we applied window=4 and stride=5 meaning that for frame_i we would concat the features from frames [frame_i-20, frame_i-15, frame_i-10, frame_i-5, frame_i, frame_i+5, frame_i+10, frame_i+15, frame_i+20].
+
+Of course this approach lead to a sharp increase in the number of features but we found XGB really robust to high dimensionality. We denote the model trained with this "simple copy" approach as "Matheus XGB" in the picture with scores.
+
+Statistics over window
+
+The second option for temporal features we tried was to compute statistics over each window instead of copying the frame features as is. We used median, min, max and std as aggregators for each window. This model used window=2 and stride=15 and is denoted as "Edu XGB".
+
+NN Pipeline
+
+Similarly to our XGB pipeline, we standardized the sensor keypoints by:
+
+lateral_left -> hip_left
+lateral_right -> hip_right
+head -> nose
+Remove headpiece and spine
+
+For each 24 frame, we calculate the following features and provide it as main input to the model:
+
+Body part availability mean, max
+X axis mean, std
+Y axis mean, std
+Interpolate missing x, y but keep availability (not missing) info
+Min distance to arena edge as 7th feature
+
+After the initial feature extraction backbone, we late inject extra features into the model:
+
+Mouse to mouse body parts distance
+Speed itself and speed and heading vector similarities
+Behaviors labelled array
+
+Regarding the our architecutre, we opted for the following design choices:
+
+Convolutions of different dilations with residual connections after GroupNorms
+InstanceNorm3d on the inputs
+ELU activation
+Large avg and max pool windows are fed in the last layer
+For some part of layers, take softmax over all mice pairs including self
+
+For our training, the main considerations are the following:
+
+Data is represented as tensor of shape (batch_size, features, n_mice, n_mice, seq_len)
+BCEWithLogitsLoss is used as loos function on masked target (no backprop on NaN targets)
+Loss is weighted by sqrt(binary_label_mean) to balance rare classes
+Gated max classification
+We allow the model to pick between its classification or max classification. Great for the cases where mice are mixed.
+We start our training on all labs together, then finetuned for each lab
+As postprocessing, we multiply some rare/harder action's logits by 1.5 to improve F1 before applying argmax
+Ensemble
+
+For our final solution we simply selected, for each lab, the model with greatest CV (see picture for reference).
+The only exceptions are for "LyricalHare", "InvincibleJellyfish" and "ElegantMink" where we found beneficial to perform major voting across all 3 models.
+
+Authors
+Eduardo Rocha de Andrade
+
+arc144
+
+matheus
+
+tomirol
+
+Ahmet Erdem
+
+aerdem4
+
+arrow_drop_up
+26
+Share
+more_horiz
+Project Links
+MABe Final Ensemble f9e8a0 d41dff
+
+a year ago · 9 upvotes
+
+code
+
+Kaggle Notebook
+
+Public
+
+Citation
+
+Eduardo Rocha de Andrade, matheus, Ahmet Erdem. 4th Place Solution - XGB + NN Ensemble. https://www.kaggle.com/competitions/MABe-mouse-behavior-detection/writeups/4th-place-solution-xgb-nn-ensemble. 2025. Kaggle
+
+1
+1
+1
+comment
+0 Comments
+Hotness

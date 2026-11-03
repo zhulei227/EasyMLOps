@@ -1,0 +1,206 @@
+url: https://www.kaggle.com/c/playground-series-s6e1/writeups/first-loser-aka-4th-place
+fetched: 2026-11-03
+chars: 5320
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+First Loser (aka 4th place) — Predicting Student Test Scores
+First Loser (aka 4th place)
+
+So many models and ensembling...
+
+Predicting Student Test Scores
+
+Solution Writeup · 4th place · Feb 2, 2026
+
+Thanks to Kaggle and all for a great Playground competition. I am fairly new to Kaggling and what I had fun in this competition was finally one where the CV/LB correlation was decent (when you knew what to look for), and there was enough signal to work with. I would also like to thank everyone who shared their insights and code!
+
+FE
+
+I used a combination of features across my models - there was a lot of signal here to gain from FE:
+
+Base feature transformations:
+
+Interaction features: study_hours × class_attendance, study_hours × sleep_hours
+Ratio features: study_hours / (sleep_hours + eps)
+Polynomial features: study_hours², class_attendance²
+
+Categorical encodings:
+
+Target encoding with 5-fold CV scheme (smoothing parameter: 10.0)
+Mean/std of study_hours per categorical group
+Ordinal mapping of categorical features
+
+GroupBy statistics:
+
+Mean/std/count of exam_score by category
+Study hours z-score within category
+
+Composite features:
+
+good_indicators = count of positive indicators (good sleep + high facility + internet + coaching)
+study_effort = study_hours × (class_attendance / 100)
+sleep_deficit = |sleep_hours - 8.0|
+
+Formula-based features:
+
+Reverse-engineered linear formula: 5.86 × study_hours + 0.32 × class_attendance + 1.39 × sleep_hours + categorical_bonuses
+
+I also tried other fancier techniques like getting embeddings from NN, etc. but they didn't add enough signal to make it worth it.
+
+Models
+
+I focused on building a large diverse model pool rather than perfecting individual models. Here are my main model types and their CV scores:
+
+Model type	CV	Notes
+TabM	8.589	Best single model, multi-seed averaged
+XGBoost	8.600	Classification auxiliary variant helped
+LightGBM	8.621	DART and Huber loss variants
+CatBoost	8.697	Didn't spend much time on this one
+MLP	8.625	Various architectures [512,256,128]
+ResNet	8.630	Skip connections helped slightly
+FTTransformer	8.640	High correlation with tree models
+TabPFN	8.650	Added some algorithm diversity
+KNN (Manhattan)	8.720	Low correlation (0.916) but weak
+
+Some other models I tried: xLearn FFM, RealMLP, LNN, DeepFM, quantile regression variants, etc.
+
+Key finding on diversity: Models with high correlation (> 0.99) improved CV but actually WORSENED LB.
+
+Ensembling
+
+My final ensemble has a total of 330 models ensembled with Ridge (α=1.0): CV 8.5659, LB 8.53642.
+
+I tried other meta-learners:
+
+BayesianRidge: +0.002 worse than Ridge
+NNLS (non-negative least squares): +0.041 worse
+CatBoost stacker: worse than Ridge
+Simple averaging: much worse
+
+Ridge worked best: Negative weights are essential! Ridge allows de-correlating redundant models by assigning negative weights, which NNLS cannot do.
+
+What Didn't Work
+
+I spent a lot of time on things that didn't create meaningful diversity:
+
+Target transformations (log, logit) - GBDTs learn the same patterns
+Loss function changes (quantile, Huber) - correlation still > 0.99
+Different hyperparameters - correlation > 0.995
+Different seeds - correlation > 0.998
+Post-processing (isotonic, quantile mapping) - negligible or destructive
+Adding highly correlated models - improved CV, worsened LB
+Post-processing
+
+Just clipping predictions to [19.6, 100] to match the target distribution. Anything fancier (isotonic regression, Platt scaling, quantile mapping) either didn't help or hurt.
+
+Conclusion
+
+The fundamental challenge with this competition was that CTGAN-generated synthetic data is "too clean" - all models converge to learning the same underlying linear pattern. The key insight for me was recognizing that more models ≠ better when those models are highly correlated, and that CV improvements from correlated models don't translate to LB improvements.
+
+But as I have learnt from @mahoganybuttstrings numerous writeups, ensembling many diverse models is the way to go - but "diverse" is the key word. Hoping to get on podium next time!
+
+Author
+Yew Jin Lim
+
+limyewjin
+
+arrow_drop_up
+6
+Share
+more_horiz
+Citation
+
+Yew Jin Lim. First Loser (aka 4th place). https://www.kaggle.com/competitions/playground-series-s6e1/writeups/first-loser-aka-4th-place. 2026. Kaggle
+
+1
+comment
+4 Comments
+Hotness
+Tilii
+
+Posted 9 months ago
+
+· 2nd in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Great job! I appreciate your emphasis on model diversity.
+
+I think being 3rd or 4th out of 4000+ competitors hardly makes any difference. You should get Kaggle swag anyway, as neither Mahog nor I are eligible.
+
+reply
+Reply
+Yew Jin Lim
+
+Topic Author
+
+Posted 9 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thanks for the encouragement!
+
+Woohoo swag! :-)
+
+reply
+Reply
+
+Posted 9 months ago
+
+arrow_drop_up
+0
+more_vert
+
+You can still put in on your cv as an achievement. All in all congrats man!
+
+reply
+Reply
+Yew Jin Lim
+
+Topic Author
+
+Posted 9 months ago
+
+· 4th in this Competition
+
+arrow_drop_up
+0
+more_vert
+
+Thank you!
+
+reply
+Reply

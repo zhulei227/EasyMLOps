@@ -1,0 +1,170 @@
+url: https://www.kaggle.com/c/santa-2025/writeups/4th-place-hybrid-packing-with-sparrow-manual-str
+fetched: 2026-11-03
+chars: 6857
+
+menu
+Skip to
+content
+
+Create
+
+Home
+
+Competitions
+
+Benchmarks
+
+Arenas
+
+Game Arena
+
+Data Hub
+
+More
+
+menu
+Skip to
+content
+Login
+Sign Up
+Kaggle uses cookies from Google to deliver and enhance the quality of its services and to analyze traffic.
+Learn more
+OK, Got it.
+4th Place: Hybrid Packing with Sparrow, Manual Structuring, Region Replacement — Santa 2025 - Christmas Tree Packing Challenge
+4th Place: Hybrid Packing with Sparrow, Manual Structuring, Region Replacement
+
+Santa 2025 - Christmas Tree Packing Challenge
+
+Solution Writeup · 4th place · Feb 2, 2026
+
+fullscreen
+Introduction
+
+First of all, we would like to extend our sincere gratitude to the organizers for hosting this contest. Over the long two-month contest period, the problem was deep and highly engaging. We are deeply honored that this work resulted in our first gold medal.
+
+This write-up is organized as follows.
+
+First, we describe the algorithms we employed to obtain our final solutions.
+Next, we present representative layouts of our best solutions for various values of N.
+
+One note of caution: because we repeatedly refined the current best solutions using multiple algorithms, we cannot reliably determine which specific procedure led to the final solution for each N.
+
+Main Algorithms
+
+Our solution pipeline mainly consists of two steps.
+
+STEP1: Construct well-structured solutions via Sparrow + manual work + compositional exploration
+STEP2: Iteratively improve solutions by replacing partial regions
+
+Within each step, we also used a fairly standard Simulated Annealing procedure to refine solutions.
+
+STEP1: Construct Well-Structured Solutions via Sparrow + Manual Work + Compositional Exploration
+
+Sparrow is a powerful open-source tool (implemented in Rust) for 2D irregular strip packing.
+We used Sparrow with minimal customization (aside from providing an initial solution). Since Sparrow targets general strip packing, the following restrictions were helpful in promoting better structure for this instance.
+
+Restrict angles to 8 orientations: 22.5, 67.5, 112.5, …, 337.5 (configurable via allowed_orientation in Sparrow)
+For items in the central region where we want regularity, restrict angles to only 22.5 and 202.5
+Load an existing best solution, slightly shift left/right edge items outward (about 0.2), and rerun
+
+Example output from Sparrow
+
+
+These settings reflect periodic placements (constructed from angles a° and 180+a°), as well as angles aligned with walls (about 23.5°) and around tree tips (about 40°-50°, depending on the definition). In practice, they help the search efficiently discover well-structured layouts.
+
+Sparrow performed well for small N, but its output became less sufficient once N exceeded roughly 30. In parallel with running Sparrow, we explored dense regular structures; together, these efforts led us to a three-row periodic arrangement, which we further enhanced by adding items at its corners. We then manually refined solutions using a custom visualizer. To streamline this process, the visualizer included features such as data import, copy-and-paste, range selection, rotation, and reflection.
+
+Three-row periodic placement
+
+Adding corners
+
+
+
+
+(and more patterns…)
+
+Visualizer
+
+We also observed that, for some N, combining two or more regular structures can be particularly effective. Specifically, we implemented this via the following process.
+As a premise, we maintain a database of placements indexed by (width, height) under the following policy.
+
+Store width and height in buckets of size 0.01
+When registering a new placement, within the same (width, height) bucket, keep the placement with the larger number of trees
+
+We repeatedly update this database through various operations.
+
+Randomly combine 2-3 trees, then create placements by arranging them vertically and/or horizontally
+Choose two placements and compose them vertically/horizontally to create a new placement (also creating variants such as reflection, rotation, small shifts, etc.)
+Choose one placement and run a local search (hill-climbing-like) that slightly perturbs trees to reduce the overall size
+
+As a result, solutions derived from this method often look like combinations of several regular patterns.
+
+
+STEP2: Iterative Improvement by Replacing Partial Regions
+
+In the final stage of the contest, we adopted a framework that takes the current best solution as input and seeks further improvement. This framework grew out of our earlier, more hands-on manual refinements; as a pragmatic compromise to make that process repeatable at scale, we implemented a simplified, automated variant.
+The procedure follows this flow.
+
+From a best solution at some N', specify a triangular or rectangular region near a square corner, and select the k items contained in it
+Paste those k items onto a corner of the best solution for N, and remove k-1 or k or k+1 items among existing ones in descending order of overlap area
+Resolve the overlaps and apply simulated annealing
+
+This copy-and-paste operation from another N rarely yields an effective replacement in a single try. In practice, we repeat steps (1) and (2) many times (e.g. around 2000 times), use an overlap-area-based heuristic as the primary screening signal, and proceed to step (3) only with the most promising candidate.
+
+Simulated Annealing
+
+The simulated annealing procedure used throughout is fairly standard: each move slightly perturbs the position of a single tree, with no special transitions. As such, it is not effective as a standalone solver; however, it is useful for refining local optima around candidate structures.
+Our simulated annealing implementation was largely standard, with only minor (and still fairly conventional) tweaks; for completeness:
+
+Decrease temperature exponentially
+Decrease move amplitude exponentially according to the elapsed fraction of time
+Configurations in the Final CSV
+
+For ease of presentation, we group the solutions in our final submission into several broad types based on their original construction. These categories should be viewed as a rough guide, as continuous refinement can make the distinctions less clear. Here we include only visualizations for each type.
+
+Completely chaotic (mainly small N, e.g. N=17,23)
+
+
+
+
+Three-row periodic base (many N, e.g. N=140,192 and rotated ones N=58,170)
+
+
+
+
+
+Perfect lattice placement (e.g. N=156)
+
+Combination of two or more patterns (e.g. N=59,111,153)
+
+
+
+
+
+Tagged
+Optimization
+Authors
+montplusa
+
+montplusa
+
+bowwowforeach
+
+bowwowforeach
+
+arrow_drop_up
+26
+Share
+more_horiz
+Project Files
+table_chart
+final_submission.csv
+get_app
+Download All
+Citation
+
+montplusa, bowwowforeach. 4th Place: Hybrid Packing with Sparrow, Manual Structuring, Region Replacement. https://www.kaggle.com/competitions/santa-2025/writeups/4th-place-hybrid-packing-with-sparrow-manual-str. 2026. Kaggle
+
+comment
+0 Comments
+Hotness
