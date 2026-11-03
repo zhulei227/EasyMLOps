@@ -195,6 +195,7 @@ class LoRAFineTuner(object):
             self.adapt_info_ = self.auto_adapt()
         self._current_targets = self.adapt_info_["target_modules"]
         model = self._attach_lora(model)
+        self.model_ = model   # self.model_ 指向 peft 包装模型(merge_and_export 依赖)
         model.train()
         optimizer = torch.optim.AdamW(
             [p for p in model.parameters() if p.requires_grad], lr=lr)
