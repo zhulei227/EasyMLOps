@@ -30,6 +30,7 @@ class NNBase(TablePipeObjectBase):
                  embedding_dim=8, hidden_dims=(256, 128), dropout=0.2,
                  epochs=20, batch_size=256, lr=1e-3, weight_decay=0.0,
                  random_state=42, loss="ce", focal_gamma=2.0, class_weight=None,
+                 label_smoothing=0.0,
                  **kwargs):
         super().__init__(skip_check_transform_type=True, **kwargs)
         self.y = copy.deepcopy(y)
@@ -47,6 +48,7 @@ class NNBase(TablePipeObjectBase):
         self.loss = loss if loss in ("ce", "focal") else "ce"
         self.focal_gamma = float(focal_gamma)
         self.class_weight = copy.deepcopy(class_weight)
+        self.label_smoothing = float(label_smoothing)
         self.task_ = "regression"
         # fit 时填充
         self.feature_cols_ = []
@@ -157,6 +159,14 @@ class NNBase(TablePipeObjectBase):
                 [self.class_weight.get(i, 1.0) for i in range(out_dim)]).to(device)
         if self.task_ == "classification":
             targets_ndim = np.asarray(targets).ndim
+            if targets_ndim == 1 and self.label_smoothing > 0:
+                # label smoothing: 硬标签转平滑软标签, 走软标签 CE 路径
+                n_cls = out_dim
+                onehot = np.eye(n_cls, dtype=np.float32)[
+                    np.asarray(targets, dtype=np.int64)]
+                eps = self.label_smoothing
+                targets = onehot * (1.0 - eps) + eps / n_cls
+                targets_ndim = 2
             if targets_ndim == 2:
                 # 软标签交叉熵(蒸馏): -sum(p * log_softmax(output))
                 targets_t = torch.FloatTensor(np.asarray(targets, dtype=np.float32))
@@ -202,12 +212,14 @@ class NNBase(TablePipeObjectBase):
 
     def udf_get_params(self) -> dict_type:
         return {"loss": self.loss, "focal_gamma": self.focal_gamma,
-                "class_weight": self.class_weight}
+                "class_weight": self.class_weight,
+                "label_smoothing": self.label_smoothing}
 
     def udf_set_params(self, params: dict_type):
         self.loss = params["loss"]
         self.focal_gamma = params["focal_gamma"]
         self.class_weight = params["class_weight"]
+        self.label_smoothing = params["label_smoothing"]
 
     def _predict_output(self, s: dataframe_type) -> np.ndarray:
         import torch

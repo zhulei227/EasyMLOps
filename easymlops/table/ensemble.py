@@ -469,3 +469,329 @@ class StackingClassification(TablePipeObjectBase):
         if params["meta_model_params"] is not None and params["meta_class"] is not None:
             self.meta_model_ = params["meta_class"]()
             self.meta_model_.set_params(params["meta_model_params"])
+
+from easymlops.table.classification import ClassificationBase
+from easymlops.table.strategy.hill_climbing.climber import ClimberCV
+from easymlops.table.utils import EvalFunction
+
+
+def _binary_auc_metric(y_true, probs):
+    """模块级 AUC(可 pickle, 供爬山法多进程使用)"""
+    from sklearn.metrics import roc_auc_score
+    return roc_auc_score(y_true, probs)
+
+
+class AugmentationPipe(TablePipeObjectBase):
+    """
+    训练集数据增强包装器（v0.2.10 新增，源自 Kaggle: mixup/SMOTE augmentation）：
+    按(method)对训练数据增强后训练 base_pipe，transform/transform_single 委托。
+
+    方法:
+        - "smote":       分类；少数类样本与其 k 近邻少数类样本数值列插值合成新样本
+                         （类别列/标签取自种子样本），至 sampling_ratio×少数类数量
+        - "oversample":  分类；少数类随机过采样至 sampling_ratio×少数类数量
+        - "mixup":       回归；随机样本对数值列凸组合(lam~Beta(alpha,alpha))，标签同比例混合
+        - "gaussian":    回归；数值列加 N(0, noise_std×列标准差) 噪声，标签不变
+
+    注意: GBDT 类模型对插值增强基本无感，增强主要使 NN/线性模型受益。
+
+    Args:
+        base_pipe: 已配置好的模型 pipe 模板（须在构造时绑定 y）
+        method: "smote" / "oversample" / "mixup" / "gaussian"
+        sampling_ratio: smote/oversample 的增强倍率（1.0=平衡至多数类）
+        k_neighbors: smote 近邻数
+        alpha: mixup 的 Beta 分布参数
+        n_augment: mixup 合成样本数
+        noise_std: gaussian 噪声强度（相对列标准差的倍数）
+        random_state: 随机种子
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> from easymlops.table.ensemble import AugmentationPipe
+        >>> model = AugmentationPipe(
+        ...     base_pipe=TabularMLPClassification(y=y_train, epochs=10),
+        ...     method="smote", sampling_ratio=1.0)
+        >>> model.fit(train_df)
+    """
+
+    def __init__(self, base_pipe=None, method="smote", sampling_ratio=1.0, k_neighbors=5,
+                 alpha=0.2, n_augment=None, noise_std=0.1, random_state=42, **kwargs):
+        super().__init__(**kwargs)
+        self.base_pipe = base_pipe
+        self.method = method
+        if method not in ("smote", "oversample", "mixup", "gaussian"):
+            raise Exception("method must be smote/oversample/mixup/gaussian")
+        self.sampling_ratio = float(sampling_ratio)
+        self.k_neighbors = max(1, int(k_neighbors))
+        self.alpha = float(alpha)
+        self.n_augment = n_augment
+        self.noise_std = float(noise_std)
+        self.random_state = int(random_state)
+        self.model_ = None
+
+
+    def _is_classification(self):
+        return getattr(self.base_pipe, "num_class", None) is not None
+
+    def _numeric_cols(self, s: dataframe_type):
+        return [c for c in s.columns if np.issubdtype(s[c].dtype, np.number)]
+
+    def _augment_smote(self, s: dataframe_type, y: series_type):
+        from sklearn.neighbors import NearestNeighbors
+        num_cols = self._numeric_cols(s)
+        y_values = y.reset_index(drop=True)
+        counts = y_values.value_counts()
+        minority = counts.idxmin()
+        majority_count = counts.max()
+        target_count = int(counts[minority] * self.sampling_ratio) - counts[minority]
+        if target_count <= 0:
+            return s, y
+        minority_idx = y_values[y_values == minority].index.tolist()
+        minority_rows = s.loc[minority_idx].reset_index(drop=True)
+        x_num = minority_rows[num_cols].fillna(0).to_numpy(dtype=float)
+        k = min(self.k_neighbors, len(x_num) - 1)
+        if k < 1:
+            return s, y
+        nn = NearestNeighbors(n_neighbors=k + 1).fit(x_num)
+        rng = np.random.RandomState(self.random_state)
+        synth_rows = []
+        for _ in range(target_count):
+            i = rng.randint(0, len(x_num))
+            neigh = nn.kneighbors(x_num[i:i + 1], return_distance=False)[0][1:]
+            j = neigh[rng.randint(0, len(neigh))]
+            lam = rng.rand()
+            row = minority_rows.iloc[i].copy()
+            for c in num_cols:
+                v_i, v_j = x_num[i][num_cols.index(c)], x_num[j][num_cols.index(c)]
+                row[c] = v_i + lam * (v_j - v_i)
+            synth_rows.append(row)
+        aug_s = pd.concat([s.reset_index(drop=True),
+                           pd.DataFrame(synth_rows).reindex(columns=s.columns)],
+                          axis=0, ignore_index=True)
+        aug_y = pd.concat([y_values, pd.Series([minority] * len(synth_rows))],
+                          axis=0, ignore_index=True)
+        return aug_s, aug_y
+
+    def _augment_oversample(self, s: dataframe_type, y: series_type):
+        y_values = y.reset_index(drop=True)
+        counts = y_values.value_counts()
+        minority = counts.idxmin()
+        target_count = int(counts[minority] * self.sampling_ratio) - counts[minority]
+        if target_count <= 0:
+            return s, y
+        rng = np.random.RandomState(self.random_state)
+        minority_idx = y_values[y_values == minority].index.tolist()
+        picked = rng.choice(minority_idx, size=target_count, replace=True)
+        aug_s = pd.concat([s.reset_index(drop=True), s.iloc[picked].reset_index(drop=True)],
+                          axis=0, ignore_index=True)
+        aug_y = pd.concat([y_values, y_values.iloc[picked].reset_index(drop=True)],
+                          axis=0, ignore_index=True)
+        return aug_s, aug_y
+
+    def _augment_mixup(self, s: dataframe_type, y: series_type):
+        num_cols = self._numeric_cols(s)
+        n_aug = self.n_augment if self.n_augment is not None else len(s)
+        rng = np.random.RandomState(self.random_state)
+        idx_a = rng.randint(0, len(s), n_aug)
+        idx_b = rng.randint(0, len(s), n_aug)
+        lams = rng.beta(self.alpha, self.alpha, n_aug)
+        a_num = s.iloc[idx_a][num_cols].fillna(0).to_numpy(dtype=float)
+        b_num = s.iloc[idx_b][num_cols].fillna(0).to_numpy(dtype=float)
+        mix_num = lams.reshape(-1, 1) * a_num + (1 - lams.reshape(-1, 1)) * b_num
+        mix_df = s.iloc[idx_a].reset_index(drop=True).copy()
+        for k, c in enumerate(num_cols):
+            mix_df[c] = mix_num[:, k]
+        y_values = y.reset_index(drop=True)
+        mix_y = lams * y_values.iloc[idx_a].to_numpy(dtype=float) + \
+            (1 - lams) * y_values.iloc[idx_b].to_numpy(dtype=float)
+        aug_s = pd.concat([s.reset_index(drop=True), mix_df], axis=0, ignore_index=True)
+        aug_y = pd.concat([y_values, pd.Series(mix_y)], axis=0, ignore_index=True)
+        return aug_s, aug_y
+
+    def _augment_gaussian(self, s: dataframe_type, y: series_type):
+        num_cols = self._numeric_cols(s)
+        rng = np.random.RandomState(self.random_state)
+        noise_df = s.copy()
+        for c in num_cols:
+            std = float(s[c].std() or 0.0)
+            noise_df[c] = s[c] + rng.normal(0, self.noise_std * std, len(s))
+        return noise_df, y
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        if self.base_pipe is None:
+            raise Exception("AugmentationPipe requires base_pipe (with y bound at construction)")
+        np.random.seed(self.random_state)
+        y = self.base_pipe.y.reset_index(drop=True)
+        s_work = s.reset_index(drop=True)
+        if self.method == "smote":
+            if not self._is_classification():
+                raise Exception("method='smote' requires a classification base_pipe")
+            aug_s, aug_y = self._augment_smote(s_work, y)
+        elif self.method == "oversample":
+            if not self._is_classification():
+                raise Exception("method='oversample' requires a classification base_pipe")
+            aug_s, aug_y = self._augment_oversample(s_work, y)
+        elif self.method == "mixup":
+            if self._is_classification():
+                raise Exception("method='mixup' requires a regression base_pipe "
+                                "(mixed labels are not valid class labels)")
+            aug_s, aug_y = self._augment_mixup(s_work, y)
+        else:
+            aug_s, aug_y = self._augment_gaussian(s_work, y)
+
+        self.model_ = copy.deepcopy(self.base_pipe)
+        self.model_.y = aug_y
+        self.model_.fit(aug_s, **kwargs)
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        if self.model_ is None:
+            raise Exception("AugmentationPipe is not fitted, call fit before transform")
+        return self.model_.transform(s, **kwargs)
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        if self.model_ is None:
+            raise Exception("AugmentationPipe is not fitted, call fit before transform")
+        return self.model_.transform_single(s, **kwargs)
+
+    def udf_get_params(self) -> dict_type:
+        return {"base_class": self.base_pipe.__class__ if self.base_pipe is not None else None,
+                "base_params": self.base_pipe.get_params() if self.base_pipe is not None else None,
+                "method": self.method, "sampling_ratio": self.sampling_ratio,
+                "k_neighbors": self.k_neighbors, "alpha": self.alpha,
+                "n_augment": self.n_augment, "noise_std": self.noise_std,
+                "random_state": self.random_state,
+                "model_params": self.model_.get_params() if self.model_ is not None else None}
+
+    def udf_set_params(self, params: dict_type):
+        self.method = params["method"]
+        self.sampling_ratio = params["sampling_ratio"]
+        self.k_neighbors = params["k_neighbors"]
+        self.alpha = params["alpha"]
+        self.n_augment = params["n_augment"]
+        self.noise_std = params["noise_std"]
+        self.random_state = params["random_state"]
+        if params["base_class"] is not None:
+            self.base_pipe = params["base_class"]()
+            self.base_pipe.set_params(params["base_params"])
+        else:
+            self.base_pipe = None
+        if params["model_params"] is not None and self.base_pipe is not None:
+            self.model_ = params["base_class"]()
+            self.model_.set_params(params["model_params"])
+        else:
+            self.model_ = None
+
+
+
+class HillClimbingStackingClassification(ClassificationBase):
+    """
+    分类版爬山法堆叠（v0.2.10 新增，源自 Kaggle: hill climbing ensemble）。
+
+    输入为各基模型输出的概率列（来自 Parallel(模型组)），对每个类别独立运行
+    ClimberCV 爬山（StratifiedKFold 防泄漏、AUC 最大化默认），逐列贪心加权混合；
+    输出为各类别混合后的概率（跨类归一化），与 ClassificationBase 输出契约一致。
+
+    Args:
+        y: 目标变量（构造时绑定）
+        eval_function: 逐类二值评估函数（默认 "auc"，可传 callable(y_bin, probs)）
+        eval_function_direct: "maximize"/"minimize"
+        allow_negative_weights: 是否允许负权重
+        precision: 权重搜索步长
+        n_splits: StratifiedKFold 折数
+        random_state / shuffle: 分折参数
+        **kwargs: 其他父类参数
+
+    Example:
+        >>> from easymlops.table.ensemble import Parallel, HillClimbingStackingClassification
+        >>> from easymlops.table.classification import LGBMClassification, LogisticRegressionClassification
+        >>> pipeline.pipe(Parallel(pipe_objects=[
+        ...     LGBMClassification(y=y_train, prefix="lgbm", use_faster_predictor=False),
+        ...     LogisticRegressionClassification(y=y_train, prefix="lr")]))
+        >>> pipeline.pipe(HillClimbingStackingClassification(y=y_train, eval_function="auc"))
+    """
+
+    def __init__(self, y: series_type = None, eval_function="auc", eval_function_direct="maximize",
+                 cols="all", allow_negative_weights=True, precision=0.001,
+                 score_decimal_places=6, n_splits=5, random_state=42, shuffle=True,
+                 skip_check_transform_type=True, drop_input_data=True,
+                 support_sparse_input=False, **kwargs):
+        super().__init__(y=y, cols=cols, skip_check_transform_type=skip_check_transform_type,
+                         drop_input_data=drop_input_data,
+                         support_sparse_input=support_sparse_input, **kwargs)
+        if type(eval_function) == str and \
+                eval_function.lower() not in ("auc", "roc_auc"):
+            eval_function = EvalFunction.get(eval_function)
+        self.eval_function = eval_function
+        self.eval_function_direct = eval_function_direct
+        self.allow_negative_weights = allow_negative_weights
+        self.precision = precision
+        self.score_decimal_places = score_decimal_places
+        self.n_splits = n_splits
+        self.random_state = random_state
+        self.shuffle = shuffle
+        self.climbers_ = {}
+
+    def udf_fit(self, s: dataframe_type, **kwargs):
+        from sklearn.model_selection import StratifiedKFold
+        self.climbers_ = {}
+        if isinstance(self.eval_function, str) and \
+                self.eval_function.lower() in ("auc", "roc_auc"):
+            eval_fn = _binary_auc_metric
+        else:
+            eval_fn = self.eval_function
+        y_ids = self.y
+        for class_id in range(self.num_class):
+            y_bin = (np.asarray(y_ids, dtype=np.int64) == class_id).astype(float)
+            climber = ClimberCV(
+                objective=self.eval_function_direct,
+                eval_metric=eval_fn,
+                allow_negative_weights=self.allow_negative_weights,
+                precision=self.precision,
+                score_decimal_places=self.score_decimal_places,
+                verbose=False,
+                n_jobs=1,
+                cv=StratifiedKFold(n_splits=self.n_splits, random_state=self.random_state,
+                                   shuffle=self.shuffle)
+            )
+            climber.fit(s.copy(), pd.Series(y_bin))
+            self.climbers_[class_id] = climber
+        return self
+
+    def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:
+        if not self.climbers_:
+            raise Exception("HillClimbingStackingClassification is not fitted")
+        probs = {}
+        for class_id, climber in self.climbers_.items():
+            probs[class_id] = climber.predict(s)
+        prob_df = pd.DataFrame(probs, index=s.index)
+        # 跨类归一化(负权重可能出现负值, clip 到 0)
+        prob_df = prob_df.clip(lower=0.0)
+        total = prob_df.sum(axis=1).replace(0.0, 1.0)
+        prob_df = prob_df.div(total, axis=0)
+        prob_df.columns = [self.id2label[i] for i in range(self.num_class)]
+        return prob_df
+
+    def udf_transform_single(self, s: dict_type, **kwargs) -> dict_type:
+        result_df = self.transform(pd.DataFrame([s]))
+        return {col: float(row) for col, row in result_df.iloc[0].items()}
+
+    def udf_get_params(self) -> dict_type:
+        return {"eval_function": self.eval_function,
+                "eval_function_direct": self.eval_function_direct,
+                "allow_negative_weights": self.allow_negative_weights,
+                "precision": self.precision, "n_splits": self.n_splits,
+                "random_state": self.random_state, "shuffle": self.shuffle,
+                "climbers": self.climbers_,
+                "y": self.y}
+
+    def udf_set_params(self, params: dict):
+        self.eval_function = params["eval_function"]
+        self.eval_function_direct = params["eval_function_direct"]
+        self.allow_negative_weights = params["allow_negative_weights"]
+        self.precision = params["precision"]
+        self.n_splits = params["n_splits"]
+        self.random_state = params["random_state"]
+        self.shuffle = params["shuffle"]
+        self.climbers_ = params["climbers"]
+        self.y = params["y"]

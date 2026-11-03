@@ -144,6 +144,8 @@
 | SeedAveraging | 同构模型多种子训练并平均预测（v0.2.5） | base_pipe(须绑定 y), n_seeds, seed_start, seed_param |
 | PseudoLabelPipe | 伪标签半监督（v0.2.5） | base_pipe(须绑定 y), confidence, n_rounds, unlabeled |
 | StackingClassification | 分类 OOF 堆叠（v0.2.7） | base_pipes(须绑定 y), meta_pipe(须绑定 y), cv |
+| AugmentationPipe | 训练集数据增强后训练（v0.2.10）：smote/oversample/mixup/gaussian | base_pipe(须绑定 y), method, sampling_ratio, k_neighbors, alpha, noise_std |
+| HillClimbingStackingClassification | 分类爬山法堆叠（v0.2.10）：逐类 StratifiedKFold+AUC 贪心加权 | y(绑定), eval_function("auc"), n_splits, precision |
 
 ## 验证工具 (validation，v0.2.7)
 
@@ -196,7 +198,7 @@
 | TabularMLPRegression | 同上回归版，输出 pred_name 列 | 同上 + pred_name |
 
 > 训练损失（v0.2.7）：`loss="ce"/"focal"`（focal 需 `focal_gamma`）、`class_weight={类别id: 权重}`；
-> 支持软标签训练（`_train` 接受 2D 概率目标，供蒸馏使用）。
+> 支持软标签训练（`_train` 接受 2D 概率目标，供蒸馏使用）；v0.2.10 加 `label_smoothing`。
 
 ## TabNet 风格模型 (nn，v0.2.7，需 torch)
 
@@ -393,6 +395,7 @@ TargetEncoding 新增：`smoothing_k`（标准平滑 (count*mean+k*global)/(coun
 | FourierFeature | 傅里叶周期特征（period, order） |
 | RollingCorrCov | 双列滚动相关/协方差 |
 | STLDecompose | STL 分解（trend/seasonal/resid） |
+| FFTSpectralFeature | 滚动窗 FFT 频谱特征（v0.2.10）：power/domfreq/top-k 幅值 | cols, window, top_k |
 
 ## 时序统计模型 (ts.statistical)
 

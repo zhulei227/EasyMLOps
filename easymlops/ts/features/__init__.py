@@ -686,3 +686,87 @@ class STLDecompose(GroupTSBase):
         self.cols = params["cols"]
         self.period = params["period"]
         self.robust = params["robust"]
+
+class FFTSpectralFeature(GroupM2MRollingPipeBase):
+    """
+    滚动窗口频谱特征（v0.2.10 新增，源自 Kaggle: FFT/spectral features）：
+    组内对每行的 trailing window 做 FFT（去均值），输出:
+        - f"{col}_fft{window}_power":   非直流分量总谱功率
+        - f"{col}_fft{window}_domfreq": 主频（周期/窗口长度, 0~0.5）
+        - f"{col}_fft{window}_mag_{i}": 第 i 个频率 bin 的归一化幅值(i=1..top_k)
+
+    批量与单条(rfft over deque)口径一致。适用于周期/振荡检测。
+
+    Args:
+        cols: 输入列; None 表示全部数值列
+        window: FFT 窗口长度
+        top_k: 输出的低频幅值个数
+        min_periods: 触发计算的最小窗口样本数, None 表示 window
+    """
+
+    def __init__(self, cols=None, window=32, top_k=3, **kwargs):
+        super().__init__(**kwargs)
+        self.cols = normalize_cols(cols)
+        self.window = int(window)
+        if self.window <= 0:
+            raise Exception("FFTSpectralFeature window must be positive")
+        self.top_k = max(1, int(top_k))
+
+    def _build_specs(self, s: dataframe_type):
+        mp = self.min_periods if self.min_periods is not None else self.window
+        self._specs = []
+        for col in self.input_cols:
+            base = "{}_fft{}".format(col, self.window)
+            self._specs.append({"input_col": col, "output_col": base + "_power",
+                                "window": self.window, "min_periods": mp, "stat": "power"})
+            self._specs.append({"input_col": col, "output_col": base + "_domfreq",
+                                "window": self.window, "min_periods": mp, "stat": "domfreq"})
+            for i in range(1, self.top_k + 1):
+                self._specs.append({"input_col": col, "output_col": base + "_mag_{}".format(i),
+                                    "window": self.window, "min_periods": mp,
+                                    "stat": "mag", "bin": i})
+
+
+    @staticmethod
+    def _fft_stats(values: np.ndarray, top_k: int):
+        """values: 窗口内非 NaN 数值; 返回 (power, domfreq, mags[list])。"""
+        values = values - np.mean(values)
+        r = np.abs(np.fft.rfft(values)) / len(values)
+        ac = r[1:]
+        power = float(np.sum(ac ** 2))
+        domfreq = float(np.argmax(ac) + 1) / len(values) if len(ac) else np.nan
+        mags = [float(r[i]) if i < len(r) else np.nan for i in range(1, top_k + 1)]
+        return power, domfreq, mags
+
+    def _calc_batch(self, spec, series: pd.Series) -> pd.Series:
+        def _apply(values):
+            values = np.asarray(values, dtype=float)
+            values = values[~np.isnan(values)]
+            if len(values) < 3:
+                return np.nan
+            power, domfreq, mags = self._fft_stats(values, self.top_k)
+            return power if spec["stat"] == "power" else (
+                domfreq if spec["stat"] == "domfreq" else mags[spec["bin"] - 1])
+        return series.rolling(self.window, min_periods=spec["min_periods"]).apply(_apply, raw=True)
+
+    def _feature_from_deque(self, spec, dq: deque) -> float:
+        values = np.asarray(dq, dtype=float)
+        values = values[~np.isnan(values)]
+        if len(values) < 3:
+            return np.nan
+        power, domfreq, mags = self._fft_stats(values, self.top_k)
+        if spec["stat"] == "power":
+            return power
+        if spec["stat"] == "domfreq":
+            return domfreq
+        return mags[spec["bin"] - 1]
+
+    def udf_get_params(self) -> dict_type:
+        params = super().udf_get_params()
+        params.update({"window": self.window, "top_k": self.top_k})
+        return params
+
+    def udf_set_params(self, params: dict_type):
+        super().udf_set_params(params)
+        self.window = params["window"]
+        self.top_k = params["top_k"]
