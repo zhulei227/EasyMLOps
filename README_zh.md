@@ -301,9 +301,51 @@ table.transform_single(x_test.to_dict("record")[0])
 | **PredictionPostProcess** | 预测列 clip/round/二值化/自定义映射 |
 | **TabularMLPClassification / TabularMLPRegression** | 表格 MLP（数值标准化 + 类别 Embedding，需 torch） |
 | **TargetEncoding 增强** | `smoothing_k` 标准平滑 + `fit_transform_oof` 折外编码防泄漏 |
+| **StackingClassification** | 分类 OOF 堆叠（v0.2.7） |
+| **DistillationPipe** | 知识蒸馏：教师软标签 + alpha/temperature 训练学生 TabularMLP（v0.2.7） |
+| **TextStatsFeatures / AnomalyScoreFeatures** | 文本统计特征 / IsolationForest 异常分数（v0.2.7） |
+| **group_kfold_eval** | GroupKFold 分组防泄漏 CV 评估（v0.2.7，`easymlops.table.validation`） |
+| **AugmentationPipe** | 训练集增强后训练：smote/oversample/mixup/gaussian（v0.2.10） |
+| **HillClimbingStackingClassification** | 分类爬山堆叠：逐类 StratifiedKFold+AUC 贪心加权（v0.2.10） |
+| **TabNetClassification / TabNetRegression** | TabNet 风格：sparsemax 特征选择 + 多步决策（v0.2.11，需 torch） |
 
 > 以上均源自 kaggle_solutions 离线语料的高频优胜技术挖掘，端到端示例见
 > `docs/table_pipes_demo.ipynb`，验收测试见 `tests/test_*_pipes.py`。
+
+#### 9.y 时序频谱特征 (`easymlops.ts.features`，v0.2.10/0.2.12 新增)
+
+| 类名 | 说明 |
+|------|------|
+| **FFTSpectralFeature** | 滚动窗 FFT 频谱特征（power/domfreq/top-k 幅值），周期/振荡检测，组内因果 |
+
+#### 9.z OCR 五引擎 (`easymlops.ocr`，v0.2.9/0.2.10 新增)
+
+| 类名 | 说明 |
+|------|------|
+| **RapidOCRText** | 轻量生产级文本识别（PaddleOCR 模型 ONNX 化，CPU 20-50ms，无框架依赖） |
+| **PaddleOCRText** | PP-OCR 官方 SOTA 文本识别（需 paddlepaddle） |
+| **PaddleOCRStructure** | 版面分析 + 表格 HTML 解析 + `to_markdown` 阅读顺序转换 |
+| **VLDocumentParser** | VLM 适配器：OpenAI 兼容视觉模型 API → Markdown（注意幻觉风险） |
+| **EasyOCRText** | 原型级（80+ 语言） |
+
+#### 9.w Spark 分布式与远程存储 (v0.2.9 新增)
+
+- **`transform_spark`**：`TablePipeLine` 与任意单 pipe 均支持 pyspark 分布式变换
+  （`mapInPandas` 分区计算，结果与本地 `transform`/`transform_single` 一致；仅行级
+  变换 pipe 支持，TS 窗口类显式拒绝）
+- **HDFS 模型文件**：全部 `save/load` 走统一存储层（`easymlops/core/storage.py`），
+  `pipe.load("webhdfs://user@nn:9870/models/x.pkl")` 透明读写（本地路径行为不变）
+
+#### 9.v 类 Jev 决策模型与 LoRA 微调 (`easymlops.llm`，v0.2.12 新增)
+
+| 类名 | 说明 |
+|------|------|
+| **DecisionModelPipe** | 类 Jev 决策模型 pipe：state + typed questions(choice/score/noul) → 校准概率，单次前向非自回归；后端 laya(本地)/service(Jev 兼容 HTTP) |
+| **LoRAFineTuner** | LoRA/QLoRA 微调：`auto_adapt()` 自动推断 target_modules，`train_sft`/`train_decision`/`load_adapter`/`merge_and_export` |
+| **DecisionSampleGenerator** | 带标签表格 → Jev 契约微调样本（criteria 数据派生，split 可复现） |
+
+> 生态：Jev/OneJev/Jeff/Laya（<1B 决策模型，毫秒级单次前向）；完整链路
+> `generate → split → train_decision → load_adapter`；laya 真实推理需 py3.9+。
 
 #### 10. 特征降维 (`easymlops.table.decomposition`)
 

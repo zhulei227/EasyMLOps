@@ -301,10 +301,54 @@ The Table Pipeline is the core module for tabular data processing.
 | **PredictionPostProcess** | Prediction clip/round/binarize/custom mapping |
 | **TabularMLPClassification / TabularMLPRegression** | Tabular MLP (numeric scaling + categorical embedding, requires torch) |
 | **TargetEncoding enhanced** | `smoothing_k` smoothing + `fit_transform_oof` leak-free encoding |
+| **StackingClassification** | Classification OOF stacking (v0.2.7) |
+| **DistillationPipe** | Knowledge distillation: teacher soft labels + alpha/temperature → student TabularMLP (v0.2.7) |
+| **TextStatsFeatures / AnomalyScoreFeatures** | Text statistics / IsolationForest anomaly score (v0.2.7) |
+| **group_kfold_eval** | GroupKFold leak-free CV evaluation (v0.2.7, `easymlops.table.validation`) |
+| **AugmentationPipe** | Train on augmented data: smote/oversample/mixup/gaussian (v0.2.10) |
+| **HillClimbingStackingClassification** | Classification hill climbing: per-class StratifiedKFold+AUC greedy weighting (v0.2.10) |
+| **TabNetClassification / TabNetRegression** | TabNet-style: sparsemax feature selection + multi-step decisions (v0.2.11, requires torch) |
 
 > All derived from high-frequency winning techniques mined from the bundled
 > kaggle_solutions corpus. See `docs/table_pipes_demo.ipynb` for end-to-end
 > examples and `tests/test_*_pipes.py` for acceptance tests.
+
+#### 9.y Time Series Spectral Features (`easymlops.ts.features`, new in v0.2.10/0.2.12)
+
+| Class | Description |
+|-------|-------------|
+| **FFTSpectralFeature** | Rolling-window FFT spectral features (power/domfreq/top-k magnitudes), in-group causal |
+
+#### 9.z OCR Five Engines (`easymlops.ocr`, new in v0.2.9/0.2.10)
+
+| Class | Description |
+|-------|-------------|
+| **RapidOCRText** | Lightweight production text recognition (PaddleOCR models via ONNX, CPU 20-50ms, no framework dependency) |
+| **PaddleOCRText** | Official PP-OCR SOTA text recognition (requires paddlepaddle) |
+| **PaddleOCRStructure** | Layout analysis + table HTML parsing + `to_markdown` reading-order conversion |
+| **VLDocumentParser** | VLM adapter: OpenAI-compatible vision model API → Markdown (mind hallucination risk) |
+| **EasyOCRText** | Prototype-grade (80+ languages) |
+
+#### 9.w Spark Distribution & Remote Storage (new in v0.2.9)
+
+- **`transform_spark`**: both `TablePipeLine` and any single pipe support pyspark
+  distributed transform (`mapInPandas`, results identical to local
+  `transform`/`transform_single`; row-local pipes only, TS windowed pipes rejected)
+- **HDFS model files**: all `save/load` go through the unified storage layer
+  (`easymlops/core/storage.py`), e.g.
+  `pipe.load("webhdfs://user@nn:9870/models/x.pkl")` (local paths unchanged)
+
+#### 9.v Jev-like Decision Models & LoRA Fine-tuning (`easymlops.llm`, new in v0.2.12)
+
+| Class | Description |
+|-------|-------------|
+| **DecisionModelPipe** | Jev-like decision pipe: state + typed questions(choice/score/noul) → calibrated probabilities in a single forward pass; backends laya(local)/service(Jev-compatible HTTP) |
+| **LoRAFineTuner** | LoRA/QLoRA fine-tuning: `auto_adapt()` infers target_modules, `train_sft`/`train_decision`/`load_adapter`/`merge_and_export` |
+| **DecisionSampleGenerator** | Labeled table data → Jev-contract fine-tuning samples (criteria derived from data, reproducible split) |
+
+> Ecosystem: Jev/OneJev/Jeff/Laya (<1B decision models, millisecond single forward);
+> full chain `generate → split → train_decision → load_adapter`; real laya
+> inference requires py3.9+.
 
 #### 10. Dimensionality Reduction (`easymlops.table.decomposition`)
 

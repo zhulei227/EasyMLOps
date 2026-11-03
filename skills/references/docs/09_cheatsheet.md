@@ -200,6 +200,18 @@
 > 训练损失（v0.2.7）：`loss="ce"/"focal"`（focal 需 `focal_gamma`）、`class_weight={类别id: 权重}`；
 > 支持软标签训练（`_train` 接受 2D 概率目标，供蒸馏使用）；v0.2.10 加 `label_smoothing`。
 
+## OCR (ocr，五引擎矩阵)
+
+| 类名 | 说明 |
+|------|------|
+| RapidOCRText | 轻量生产级文本识别（PaddleOCR 模型 ONNX 化，CPU 20-50ms，无框架依赖） |
+| PaddleOCRText | PP-OCR 官方 SOTA 文本识别（需 paddlepaddle；py3.8 用 paddleocr==2.10.x） |
+| PaddleOCRStructure | 版面分析 + 表格 HTML 解析 + to_markdown 阅读顺序转换 |
+| VLDocumentParser | VLM 适配器：OpenAI 兼容视觉模型 API → Markdown（注意幻觉风险） |
+| EasyOCRText | 原型级（80+ 语言，慢且精度上限低） |
+
+> 详见 references/docs/12_ocr.md。
+
 ## LLM/决策模型 (llm，v0.2.12，类 Jev 生态)
 
 | 类名 | 说明 | 关键参数 |

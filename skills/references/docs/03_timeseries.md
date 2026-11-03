@@ -22,6 +22,7 @@
 | `LagFeature` / `RollingFeature` / `EWMAFeature` / `ExpandingFeature` | 滞后/滚动/指数加权/累积特征（组内因果） |
 | `SeasonalMean` / `MovingAverageTrend` / `FourierFeature` / `STLDecompose` | 季节项/趋势/傅里叶/STL 分解 |
 | `RollingCorrCov` | 双列滚动相关/协方差 |
+| `FFTSpectralFeature` | 滚动窗 FFT 频谱特征（v0.2.12）：power/domfreq/top-k 幅值，周期/振荡检测 |
 
 ### 工具 (`easymlops.ts.utils`)
 
