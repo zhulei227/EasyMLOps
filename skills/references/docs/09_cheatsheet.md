@@ -200,7 +200,7 @@
 > 训练损失（v0.2.7）：`loss="ce"/"focal"`（focal 需 `focal_gamma`）、`class_weight={类别id: 权重}`；
 > 支持软标签训练（`_train` 接受 2D 概率目标，供蒸馏使用）；v0.2.10 加 `label_smoothing`。
 
-## TabNet 风格模型 (nn，v0.2.7，需 torch)
+## TabNet 风格模型 (nn，v0.2.8，需 torch)
 
 | 类名 | 说明 | 关键参数 |
 |------|------|---------|

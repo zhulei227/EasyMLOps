@@ -293,7 +293,7 @@ python scripts/_tech_scan.py                                     # 技术×词�
 | ClusterFeatures(method="gmm") | `easymlops.table.features`（v0.2.7） | 聚类特征新增 GMM 后端（负加权对数概率作为距离代理） |
 | TabularMLP loss 选项 | `easymlops.table.nn`（v0.2.7） | `loss="focal"`(+`focal_gamma`) / `class_weight={类别id: 权重}`；`_train` 支持软标签(2D 概率目标) |
 | group_kfold_eval | `easymlops.table.validation`（v0.2.7） | GroupKFold 分组防泄漏 CV 评估：`build_model(fold_y)` 回调注入折标签，返回 scores/mean/std |
-| TabNetClassification / TabNetRegression | `easymlops.table.nn`（v0.2.7，需 torch） | TabNet 风格：sparsemax 特征选择掩码 + 多步决策 + 输出聚合（`n_d/n_a/n_steps/gamma`），复用 TabularMLP 管线 |
+| TabNetClassification / TabNetRegression | `easymlops.table.nn`（v0.2.8，需 torch） | TabNet 风格：sparsemax 特征选择掩码 + 多步决策 + 输出聚合（`n_d/n_a/n_steps/gamma`），复用 TabularMLP 管线 |
 | AugmentationPipe | `easymlops.table.ensemble`（v0.2.10） | 训练集增强后训练：`method="smote"/"oversample"/"mixup"/"gaussian"`；GBDT 对插值增强不敏感，主要使 NN/线性受益 |
 | HillClimbingStackingClassification | `easymlops.table.ensemble`（v0.2.10） | 分类爬山堆叠：输入 Parallel(模型组) 概率列，逐类 StratifiedKFold+AUC 贪心加权，输出归一化概率 |
 | FFTSpectralFeature | `easymlops.ts.features`（v0.2.10） | 滚动窗 FFT 频谱特征（power/domfreq/top-k 幅值），周期/振荡检测 |
