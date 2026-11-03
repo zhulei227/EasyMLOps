@@ -200,6 +200,18 @@
 > 训练损失（v0.2.7）：`loss="ce"/"focal"`（focal 需 `focal_gamma`）、`class_weight={类别id: 权重}`；
 > 支持软标签训练（`_train` 接受 2D 概率目标，供蒸馏使用）；v0.2.10 加 `label_smoothing`。
 
+## LLM/决策模型 (llm，v0.2.12，类 Jev 生态)
+
+| 类名 | 说明 | 关键参数 |
+|------|------|---------|
+| DecisionModelPipe | 类 Jev 决策模型 pipe：state + typed questions(choice/score/noul) → 校准概率，单次前向非自回归 | questions, backend("laya"/"service"), state_col, api_base, min_confidence |
+| LoRAFineTuner | LoRA/QLoRA 微调接口：auto_adapt() 自动推断 target_modules（扫描全部投影层，兼容 GPT 系 Conv1D/ModernBERT/Qwen 系），train_sft/train_decision, load_adapter, merge_and_export | model_id, lora_rank, lora_alpha, use_qlora, local_path |
+
+> 后端 "laya"：本地 `pip install laya`（421M/322M 非 AR 决策模型，CPU 可跑，Apache-2.0）；
+> 后端 "service"：Jev 兼容 HTTP `POST {api_base}/v1/systemone`（Jeff-serve/laya serve/OneJev）。
+> 环境约束：laya 真实推理需 py3.9+（transformers>=4.48 支持 ModernBERT）；py3.8 可用 service 后端或 mock。
+> 微调依赖 peft（+bitsandbytes 可选 QLoRA）；<1B 模型 LoRA 单卡 8GB 可跑。
+
 ## TabNet 风格模型 (nn，v0.2.8，需 torch)
 
 | 类名 | 说明 | 关键参数 |

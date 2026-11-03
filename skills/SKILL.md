@@ -298,6 +298,8 @@ python scripts/_tech_scan.py                                     # 技术×词�
 | HillClimbingStackingClassification | `easymlops.table.ensemble`（v0.2.10） | 分类爬山堆叠：输入 Parallel(模型组) 概率列，逐类 StratifiedKFold+AUC 贪心加权，输出归一化概率 |
 | FFTSpectralFeature | `easymlops.ts.features`（v0.2.10） | 滚动窗 FFT 频谱特征（power/domfreq/top-k 幅值），周期/振荡检测 |
 | TabularMLP label_smoothing | `easymlops.table.nn`（v0.2.10） | `label_smoothing=0.1` 平滑标签（走软标签 CE） |
+| DecisionModelPipe | `easymlops.llm`（v0.2.12，类 Jev 决策模型） | state + typed questions(choice/score/noul) → 校准概率列，单次前向；后端 laya(本地)/service(Jev 兼容 HTTP)；laya 真实推理需 py3.9+ |
+| LoRAFineTuner | `easymlops.llm`（v0.2.12，需 transformers+peft） | LoRA/QLoRA 微调：`auto_adapt()` 自动推断 target_modules（兼容 GPT 系 Conv1D/Qwen/ModernBERT），`train_sft`/`train_decision`/`load_adapter`/`merge_and_export`；<1B 模型单卡 8GB 可跑 |
 | 单 pipe save/load | 任意 table pipe | `pipe.save(path)` / `pipe.load(path)`（参数快照，模型类 pipe 含底层模型对象；0.2.5 起基类支持） |
 
 ## 版本实测陷阱（对照 easymlops 0.2.6 验证，docs 部分描述有漂移）

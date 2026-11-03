@@ -20,6 +20,10 @@ arch>=5.0.0
 # paddleocr
 # paddlepaddle
 # easyocr
+# 可选: LLM 决策模型(类 Jev 生态, laya 真实推理需 py3.9+) 与 LoRA 微调
+# laya
+# peft
+# bitsandbytes
 # 可选: 在线部署(easymlops.table.deploy)
 # fastapi
 # uvicorn
