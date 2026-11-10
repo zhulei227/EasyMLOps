@@ -31,7 +31,9 @@ if ($LASTEXITCODE -ne 0) { throw "build failed" }
 # ---- 1.5 同步 wheel 到 skills/assets(保持离线安装包与 PyPI 一致) ----
 $skillAssets = Join-Path $projectDir "skills/assets"
 if (Test-Path $skillAssets) {
-    Get-ChildItem $skillAssets -Filter "easymlops-*.whl" | Remove-Item -Force
+    Get-ChildItem $skillAssets -Filter "easymlops-*.whl" | ForEach-Object {
+        Remove-Item -LiteralPath $_.FullName -Force
+    }
     Copy-Item (Join-Path $projectDir "dist/easymlops-$Version-py3-none-any.whl") $skillAssets -Force
     Write-Host "skills/assets wheel synced to v$Version"
 }

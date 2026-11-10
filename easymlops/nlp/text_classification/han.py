@@ -52,9 +52,12 @@ class HANClassification(ClassificationBase):
         lr = self.native_fit_params.get("lr", 0.001)
         word_optimizer = torch.optim.Adam(self.word_attn_model.parameters(), lr=lr)
         sent_optimizer = torch.optim.Adam(self.sent_attn_model.parameters(), lr=lr)
-        for _ in range(epoch):
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
+        for epoch_idx in range(epoch):
             dataloader = DataLoader(TensorDataset(x, y), batch_size=batch_size, shuffle=True, num_workers=0,
                                     drop_last=True)
+            epoch_loss, n_batches = 0.0, 0
             for batch_x, batch_y in dataloader:
                 batch_x, batch_y = batch_x.to(self.cuda), batch_y.to(self.cuda)
                 word_optimizer.zero_grad()
@@ -77,6 +80,10 @@ class HANClassification(ClassificationBase):
                 loss.backward()
                 word_optimizer.step()
                 sent_optimizer.step()
+                epoch_loss += float(loss.detach())
+                n_batches += 1
+            if tracker is not None:
+                tracker.log({"loss": epoch_loss / max(n_batches, 1)}, step=epoch_idx + 1)
         return self
 
     def udf_transform(self, s, **kwargs):

@@ -119,6 +119,8 @@ class VAERegression(TorchForecastMixin, PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         for epoch in range(self.epochs):
             optimizer.zero_grad()
             recon, mu, logvar = self.model(X_tensor)
@@ -127,6 +129,8 @@ class VAERegression(TorchForecastMixin, PipeBase):
             loss = recon_loss + kl_loss
             loss.backward()
             optimizer.step()
+            if tracker is not None:
+                tracker.log({"loss": float(loss.detach())}, step=epoch + 1)
 
         self._after_fit_(target_norm)
         return self
@@ -267,12 +271,16 @@ class NormalizingFlowRegression(TorchForecastMixin, PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         for epoch in range(self.epochs):
             optimizer.zero_grad()
             pred, _ = self.model(X_tensor)
             loss = criterion(pred, y_tensor)
             loss.backward()
             optimizer.step()
+            if tracker is not None:
+                tracker.log({"loss": float(loss.detach())}, step=epoch + 1)
 
         self._after_fit_(target_norm)
         return self
@@ -417,6 +425,8 @@ class DiffusionRegression(TorchForecastMixin, PipeBase):
         alphas_cumprod = torch.cumprod(alphas, dim=0)
 
         self.model.train()
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         for epoch in range(self.epochs):
             optimizer.zero_grad()
             idx = torch.randint(0, self.num_steps, (X_tensor.size(0),)).to(self.device)
@@ -428,6 +438,8 @@ class DiffusionRegression(TorchForecastMixin, PipeBase):
             loss = nn.MSELoss()(pred, noise)
             loss.backward()
             optimizer.step()
+            if tracker is not None:
+                tracker.log({"loss": float(loss.detach())}, step=epoch + 1)
 
         self._after_fit_(target_norm)
         return self

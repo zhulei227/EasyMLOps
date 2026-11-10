@@ -88,6 +88,8 @@ class TextCNNRegression(RegressionBase):
         batch_size = self.native_fit_params.get("batch_size", 128)
         lr = self.native_fit_params.get("lr", 0.001)
         optimizer = torch.optim.Adam(self.text_cnn.parameters(), lr=lr)
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         step = 0
         for _ in range(epoch):
             dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0,
@@ -101,6 +103,8 @@ class TextCNNRegression(RegressionBase):
                 loss.backward()
                 optimizer.step()
                 step += 1
+                if tracker is not None:
+                    tracker.log({"loss": float(loss.detach())}, step=step)
                 if self.early_stopping_run_step(step, val_x, val_y):
                     break
         return self

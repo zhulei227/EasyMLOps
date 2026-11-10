@@ -175,6 +175,8 @@ class FFMClassification(FMBase):
         return 1 / (1 + np.exp(-np.clip(pred, -500, 500)))
     
     def udf_fit(self, s: dataframe_type, **kwargs):
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         X = s[self.cols].values
         X_encoded = self._transform_input(X)
         y = self.y.values if hasattr(self.y, 'values') else np.array(self.y)
@@ -187,6 +189,7 @@ class FFMClassification(FMBase):
         for epoch in range(self.epochs):
             np.random.shuffle(indices)
             epoch_loss = 0.0
+            n_batches = 0
             
             for start in range(0, n_samples, self.batch_size):
                 end = min(start + self.batch_size, n_samples)
@@ -212,6 +215,10 @@ class FFMClassification(FMBase):
                         )
                 
                 epoch_loss += np.mean(errors ** 2)
+                n_batches += 1
+            
+            if tracker is not None:
+                tracker.log({"loss": epoch_loss / max(n_batches, 1)}, step=epoch + 1)
             
             if self.verbose and (epoch + 1) % 2 == 0:
                 preds_all = np.array([self._predict_one(x) for x in X_encoded])
@@ -354,6 +361,8 @@ class FFMRegression(FMBase):
         return linear + interactions
     
     def udf_fit(self, s: dataframe_type, **kwargs):
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         X = s[self.cols].values
         X_encoded = self._transform_input(X)
         y = self.y.values if hasattr(self.y, 'values') else np.array(self.y)
@@ -366,6 +375,7 @@ class FFMRegression(FMBase):
         for epoch in range(self.epochs):
             np.random.shuffle(indices)
             epoch_loss = 0.0
+            n_batches = 0
             
             for start in range(0, n_samples, self.batch_size):
                 end = min(start + self.batch_size, n_samples)
@@ -391,6 +401,10 @@ class FFMRegression(FMBase):
                         )
                 
                 epoch_loss += np.mean(errors ** 2)
+                n_batches += 1
+            
+            if tracker is not None:
+                tracker.log({"loss": epoch_loss / max(n_batches, 1)}, step=epoch + 1)
             
             if self.verbose and (epoch + 1) % 2 == 0:
                 preds_all = np.array([self._predict_one(x) for x in X_encoded])

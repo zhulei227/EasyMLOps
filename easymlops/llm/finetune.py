@@ -172,7 +172,7 @@ class LoRAFineTuner(object):
         return get_peft_model(model, lora_config)
 
     def train_sft(self, samples, output_dir="lora_adapter_out", epochs=3, lr=1e-4,
-                  batch_size=2, max_length=512):
+                  batch_size=2, max_length=512, **kwargs):
         """
         通用因果 LM LoRA SFT。
 
@@ -180,6 +180,7 @@ class LoRAFineTuner(object):
             samples: [{"prompt": "...", "completion": "..."}]
             output_dir: adapter 保存目录
             epochs/lr/batch_size/max_length: 训练参数
+            **kwargs: tracker=Tracker(...) 可监控训练过程(easymlops.core.tracker.Tracker)
 
         Returns:
             dict: {"steps", "final_loss", "output_dir"}
@@ -190,6 +191,8 @@ class LoRAFineTuner(object):
         except ImportError:
             raise ImportError("LoRA fine-tuning requires peft: pip install peft")
         model = self._lazy_load_model("AutoModelForCausalLM")
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         # target_modules: 已 auto_adapt 则用之, 否则现扫
         if self.adapt_info_ is None:
             self.adapt_info_ = self.auto_adapt()
@@ -228,6 +231,8 @@ class LoRAFineTuner(object):
                 optimizer.zero_grad()
                 steps += 1
                 final_loss = float(loss.detach())
+                if tracker is not None:
+                    tracker.log({"loss": final_loss}, step=steps)
         model.save_pretrained(output_dir)
         self.tokenizer_.save_pretrained(output_dir)
         self.adapter_dir_ = output_dir

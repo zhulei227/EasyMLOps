@@ -63,7 +63,7 @@ class PipeBase(PipeObjectBase):
         :param kwargs:
         :return:
         """
-        self.udf_fit(self.before_fit(s, **kwargs))
+        self.udf_fit(self.before_fit(s, **kwargs), **kwargs)
         return self.after_fit(s, **kwargs)
 
     def before_fit(self, s: dataframe_type, **kwargs) -> dataframe_type:

@@ -65,6 +65,8 @@ class DistillationPipe(TablePipeObjectBase):
         return exp / exp.sum(axis=1, keepdims=True)
 
     def udf_fit(self, s: dataframe_type, **kwargs):
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         if self.teacher_pipe is None:
             raise Exception("DistillationPipe requires teacher_pipe (with y bound)")
         from easymlops.table.nn import TabularMLPClassification, TabularMLPRegression
@@ -84,7 +86,8 @@ class DistillationPipe(TablePipeObjectBase):
                 .to_numpy(dtype=np.float32)
             soft = self._soften(ordered)
             targets = self.alpha * soft + (1.0 - self.alpha) * onehot
-            student._train(num_x, cat_x, targets, student.num_class)
+            student._train(num_x, cat_x, targets, student.num_class,
+                           tracker=tracker)
             # 绕过框架 fit 路径, 手动补记列信息(before_transform 依赖)
             student.input_col_names = s.columns.tolist()
             self.model_ = student
@@ -94,7 +97,7 @@ class DistillationPipe(TablePipeObjectBase):
             teacher_preds = teacher.transform(s)
             pred_col = teacher_preds.columns[0]
             student.y = pd.Series(teacher_preds[pred_col].to_numpy(dtype=np.float64))
-            student.udf_fit(s)
+            student.udf_fit(s, tracker=tracker)
             student.input_col_names = s.columns.tolist()
             self.model_ = student
         return self

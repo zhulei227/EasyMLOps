@@ -145,7 +145,8 @@ class NNBase(TablePipeObjectBase):
         return TabularMLP(cat_vocabs, self.embedding_dim, len(self.num_cols_),
                           self.hidden_dims, self.dropout, out_dim)
 
-    def _train(self, x_num: np.ndarray, x_cat: np.ndarray, targets: np.ndarray, out_dim: int):
+    def _train(self, x_num: np.ndarray, x_cat: np.ndarray, targets: np.ndarray, out_dim: int,
+               tracker=None):
         import torch
         import torch.nn as nn
         torch.manual_seed(self.random_state)
@@ -199,8 +200,9 @@ class NNBase(TablePipeObjectBase):
         target_t = targets_t.to(device)
         n = len(x_num)
         self.torch_model.train()
-        for _ in range(self.epochs):
+        for epoch in range(self.epochs):
             perm = torch.randperm(n, device=device)
+            epoch_loss, n_batches = 0.0, 0
             for start in range(0, n, self.batch_size):
                 idx = perm[start:start + self.batch_size]
                 optimizer.zero_grad()
@@ -208,6 +210,10 @@ class NNBase(TablePipeObjectBase):
                 loss = criterion(output, target_t[idx])
                 loss.backward()
                 optimizer.step()
+                epoch_loss += float(loss.detach())
+                n_batches += 1
+            if tracker is not None:
+                tracker.log({"loss": epoch_loss / max(n_batches, 1)}, step=epoch + 1)
         self.torch_model.eval()
 
     def udf_get_params(self) -> dict_type:
@@ -249,6 +255,8 @@ class NNBase(TablePipeObjectBase):
 
     # ---- 训练入口 ----
     def udf_fit(self, s: dataframe_type, **kwargs):
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         try:
             import torch  # noqa: F401
         except ImportError:
@@ -260,7 +268,8 @@ class NNBase(TablePipeObjectBase):
         else:
             targets = np.asarray(self.y, dtype=np.float32)
             out_dim = 1
-        self._train(self._num_array(s), self._cat_array(s), targets, out_dim)
+        self._train(self._num_array(s), self._cat_array(s), targets, out_dim,
+                    tracker=tracker)
         return self
 
 

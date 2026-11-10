@@ -101,12 +101,16 @@ class DeepStateRegression(TorchForecastMixin, PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
+            if tracker is not None:
+                tracker.log({"loss": float(loss.detach())}, step=epoch + 1)
 
         self._after_fit_(target_norm)
         return self
@@ -248,12 +252,16 @@ class MambaRegression(TorchForecastMixin, PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
+            if tracker is not None:
+                tracker.log({"loss": float(loss.detach())}, step=epoch + 1)
 
         self._after_fit_(target_norm)
         return self
@@ -384,12 +392,16 @@ class LiquidS4Regression(TorchForecastMixin, PipeBase):
         y_tensor = torch.FloatTensor(y).to(self.device)
 
         self.model.train()
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         for epoch in range(self.epochs):
             optimizer.zero_grad()
             output = self.model(X_tensor)
             loss = criterion(output, y_tensor)
             loss.backward()
             optimizer.step()
+            if tracker is not None:
+                tracker.log({"loss": float(loss.detach())}, step=epoch + 1)
 
         self._after_fit_(target_norm)
         return self

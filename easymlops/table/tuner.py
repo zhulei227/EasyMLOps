@@ -111,6 +111,8 @@ class OptunaTuner(TablePipeObjectBase):
         return float(np.mean(scores))
 
     def udf_fit(self, s: dataframe_type, **kwargs):
+        from easymlops.core.tracker import pop_tracker
+        tracker = pop_tracker(kwargs)
         try:
             import optuna
         except ImportError:
@@ -123,7 +125,11 @@ class OptunaTuner(TablePipeObjectBase):
 
         def objective(trial):
             native_params = {name: fn(trial) for name, fn in self.search_space.items()}
-            return self._cv_score(s, native_params)
+            score = self._cv_score(s, native_params)
+            if tracker is not None:
+                metric = "-auc" if self.task == "classification" else "rmse"
+                tracker.log({metric: score}, step=trial.number + 1)
+            return score
 
         study = optuna.create_study(direction="minimize",
                                     sampler=optuna.samplers.TPESampler(seed=self.seed))
@@ -132,7 +138,7 @@ class OptunaTuner(TablePipeObjectBase):
         self.best_score_ = study.best_value
         y = np.asarray(self.fixed_params["y"])
         self.model_ = self._build_model(y, self.best_params_)
-        self.model_.fit(s, **kwargs)
+        self.model_.fit(s, tracker=tracker)
         return self
 
     def udf_transform(self, s: dataframe_type, **kwargs) -> dataframe_type:

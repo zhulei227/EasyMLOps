@@ -24,6 +24,8 @@ arch>=5.0.0
 # laya
 # peft
 # bitsandbytes
+# 可选: 训练监控(easymlops.core.tracker 适配 swanlab, 离线看板 swanlab watch)
+# swanlab>=0.4
 # 可选: 在线部署(easymlops.table.deploy)
 # fastapi
 # uvicorn
